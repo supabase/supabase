@@ -44,6 +44,8 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       supabaseAccessToken: supabaseToken,
       supabaseProjectRef: projectRef,
       stripeKey: stripeSecretKey,
+      baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
+      baseManagementApiUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
     }).catch((error) => {
       console.error('Stripe Sync Engine uninstallation failed.', error)
       throw error

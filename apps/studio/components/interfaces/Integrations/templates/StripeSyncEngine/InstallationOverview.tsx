@@ -34,7 +34,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import { sendEvent } from 'data/telemetry/send-event-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 const installFormSchema = z.object({
@@ -44,6 +44,7 @@ const installFormSchema = z.object({
 export const StripeSyncInstallationPage = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
   const [isInstallInitiated, setIsInstallInitiated] = useState(false)

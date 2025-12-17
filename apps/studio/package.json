@@ -136,7 +136,7 @@
     "sql-formatter": "^15.0.0",
     "sqlstring": "^2.3.2",
     "streamdown": "^1.3.0",
-    "stripe-experiment-sync": "^1.0.11",
+    "stripe-experiment-sync": "^1.0.12",
     "supabase-management-js": "^1.0.0",
     "tus-js-client": "^4.1.0",
     "ui": "workspace:*",

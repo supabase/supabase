@@ -1035,8 +1035,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       stripe-experiment-sync:
-        specifier: ^1.0.11
-        version: 1.0.11(@types/node@22.13.14)(supports-color@8.1.1)
+        specifier: ^1.0.12
+        version: 1.0.12(@types/node@22.13.14)(supports-color@8.1.1)
       supabase-management-js:
         specifier: ^1.0.0
         version: 1.0.0
@@ -18131,8 +18131,8 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
-  stripe-experiment-sync@1.0.11:
-    resolution: {integrity: sha512-oAfQMA//VIXpaK/O5ncSyiGnCXXQN8+q5H4Q7eg5zi/hfjbhgUIzc7uGhQo+rx7zon1H2mTrD386g89zovN6Aw==}
+  stripe-experiment-sync@1.0.12:
+    resolution: {integrity: sha512-Q3NO1SiQvsAd4x0nzUMaUXmsE5Xnou6fZ3aJRoGv0VTumBpSI3ffGDVbyouIjAlz9f3Gnm+jLNqN10FRuZKW+A==}
     hasBin: true
 
   stripe@17.7.0:
@@ -39810,7 +39810,7 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  stripe-experiment-sync@1.0.11(@types/node@22.13.14)(supports-color@8.1.1):
+  stripe-experiment-sync@1.0.12(@types/node@22.13.14)(supports-color@8.1.1):
     dependencies:
       '@ngrok/ngrok': 1.6.0
       chalk: 5.4.1

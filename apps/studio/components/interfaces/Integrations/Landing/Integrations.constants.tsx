@@ -395,13 +395,12 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
         route: 'overview',
         label: 'Overview',
       },
+      {
+        route: 'settings',
+        label: 'Settings',
+      },
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
-      if (childId) {
-        return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
-          loading: Loading,
-        })
-      }
       switch (pageId) {
         case 'overview':
           return dynamic(
@@ -409,6 +408,14 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
               import(
                 'components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview'
               ).then((mod) => mod.StripeSyncInstallationPage),
+            { loading: Loading }
+          )
+        case 'settings':
+          return dynamic(
+            () =>
+              import(
+                'components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage'
+              ).then((mod) => mod.StripeSyncSettingsPage),
             { loading: Loading }
           )
       }
