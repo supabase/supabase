@@ -1,7 +1,7 @@
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStripeSyncUninstallMutation } from 'data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { ExternalLink, Loader2, Table2 } from 'lucide-react'
+import { Loader2, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -10,11 +10,32 @@ import {
   INSTALLATION_INSTALLED_SUFFIX,
   STRIPE_SCHEMA_COMMENT_PREFIX,
 } from 'stripe-experiment-sync/supabase'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Card,
+  CardContent,
+  WarningIcon,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanelContainer, FormPanelContent } from 'components/ui/Forms/FormPanel'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 export const StripeSyncSettingsPage = () => {
   const router = useRouter()
@@ -72,57 +93,84 @@ export const StripeSyncSettingsPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-10">
-      {/* Stripe Schema Section */}
-      <FormPanelContainer>
-        <div className="px-8 py-6 flex justify-between items-center">
-          <FormHeader
-            title="Stripe Schema"
-            description="Access and manage the synced Stripe data in your database."
-          />
-        </div>
-        <FormPanelContent>
-          <div className="px-8 py-4">
-            <p className="text-sm text-foreground-light mb-4">
-              The Stripe Sync Engine stores all synced data in the <code>stripe</code> schema. You
-              can view and query this data directly in the Table Editor.
-            </p>
-            <Button asChild type="default" icon={<Table2 size={14} />}>
-              <Link href={tableEditorUrl}>Open Stripe Schema in Table Editor</Link>
-            </Button>
-          </div>
-        </FormPanelContent>
-      </FormPanelContainer>
+    <>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Stripe Sync Engine Settings</PageHeaderTitle>
+            <PageHeaderDescription>
+              Review your synced schema and manage the lifecycle of the integration.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
-      {/* Uninstall Section */}
-      <FormPanelContainer>
-        <div className="px-8 py-6 flex justify-between items-center">
-          <FormHeader
-            title="Uninstall Stripe Sync Engine"
-            description="Remove the Stripe Sync Engine integration from your project."
-          />
-        </div>
-        <FormPanelContent>
-          <div className="px-8 py-4">
-            <Admonition type="warning" className="mb-4">
-              <p>
-                Uninstalling will remove the <code>stripe</code> schema and all synced data. This
-                action cannot be undone.
-              </p>
-            </Admonition>
-            <Button
-              type="danger"
-              onClick={() => setShowUninstallModal(true)}
-              loading={isUninstalling || isUninstallInitiated}
-              disabled={isUninstalling || isUninstallInitiated}
-            >
-              {isUninstallInitiated ? 'Uninstalling...' : 'Uninstall Stripe Sync Engine'}
-            </Button>
-          </div>
-        </FormPanelContent>
-      </FormPanelContainer>
+      <PageContainer size="small">
+        <PageSection id="stripe-schema">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Stripe Schema</PageSectionTitle>
+              <PageSectionDescription>
+                Access and manage the synced Stripe data in your database.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <Card>
+              <CardContent>
+                <div className="flex flex-col gap-4">
+                  <div className="flex space-x-4">
+                    <Table2 className="mt-1" />
+                    <div className="space-y-1 xl:max-w-lg">
+                      <p className="text-sm">Open Stripe schema in Table Editor</p>
+                      <p className="text-sm text-foreground-light">
+                        The Stripe Sync Engine stores all synced data in the <code>stripe</code>{' '}
+                        schema. You can view and query this data directly in the Table Editor.
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <Button asChild type="default">
+                      <Link href={tableEditorUrl}>Open Table Editor</Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </PageSectionContent>
+        </PageSection>
 
-      {/* Uninstall Confirmation Modal */}
+        <PageSection id="uninstall-stripe-sync">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Uninstall Stripe Sync Engine</PageSectionTitle>
+              <PageSectionDescription>
+                Remove the integration and all synced data from your project.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <Alert_Shadcn_ variant="warning">
+              <WarningIcon />
+              <AlertTitle_Shadcn_>
+                Uninstalling will remove the <code>stripe</code> schema and all synced data.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>This action cannot be undone.</AlertDescription_Shadcn_>
+              <div className="mt-2">
+                <Button
+                  type="default"
+                  onClick={() => setShowUninstallModal(true)}
+                  loading={isUninstalling || isUninstallInitiated}
+                  disabled={isUninstalling || isUninstallInitiated}
+                >
+                  {isUninstallInitiated ? 'Uninstalling...' : 'Uninstall Stripe Sync Engine'}
+                </Button>
+              </div>
+            </Alert_Shadcn_>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+
       <ConfirmationModal
         visible={showUninstallModal}
         title="Uninstall Stripe Sync Engine"
@@ -148,6 +196,6 @@ export const StripeSyncSettingsPage = () => {
           This action cannot be undone.
         </p>
       </ConfirmationModal>
-    </div>
+    </>
   )
 }
