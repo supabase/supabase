@@ -12,9 +12,10 @@ import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
+import { DocsCards } from '~/components/DocsCards'
 import { Extensions } from '~/components/Extensions'
+import { GuideCardGrid } from '~/components/GuideCardGrid'
 import { JwtGenerator } from '~/components/JwtGenerator'
-import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -45,6 +46,7 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
+  DocsCards,
   ErrorCodes,
   Extensions,
   GlassPanel,
@@ -52,11 +54,11 @@ const components = {
   IconCheck: Check,
   IconPanel,
   IconX: X,
+  GuideCardGrid,
   Image: (props: any) => <Image fill alt="" className="object-contain" {...props} />,
   JwtGenerator,
   Link,
   McpConfigPanel,
-  MetricsStackCards,
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,

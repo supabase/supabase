@@ -57,11 +57,15 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
                 .filter((item) => item.enabled !== false)
                 .map((item) =>
                   !item.href ? (
-                    <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                    <div
+                      key={`${section[0].label}-${item.label}`}
+                      className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none"
+                    >
                       {item.label}
                     </div>
                   ) : (
                     <MenuItem
+                      key={item.href}
                       href={item.href}
                       title={item.label}
                       community={item.community}
@@ -94,7 +98,7 @@ const Menu = () => (
     chevronAlign="right"
   >
     {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section) => (
-      <AccordionMenuItem section={section} />
+      <AccordionMenuItem key={section[0].label} section={section} />
     ))}
   </Accordion>
 )

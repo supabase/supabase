@@ -23,9 +23,7 @@ The Metrics API is currently in beta. Metric names and labels might evolve as we
 
 ## Choose your monitoring stack
 
-Pick the workflow that best matches your tooling. Each card opens a Supabase-authored guide, and some also include a “Community” pill when there’s an accompanying vendor integration reference.
-
-<MetricsStackCards />
+<DocsCards items={metricsCards} columnsClassName="md:grid-cols-2" />
 
 <img
   src="/docs/img/guides/platform/supabase-grafana-prometheus.png"
@@ -40,3 +38,44 @@ Pick the workflow that best matches your tooling. Each card opens a Supabase-aut
 - [Datadog’s Supabase integration doc](https://docs.datadoghq.com/integrations/supabase/) (community-maintained, built on this Metrics API).
 - [Log Drains ](/docs/guides/telemetry/log-drains) for exporting event-based telemetry alongside metrics.
 - [Query Performance report](/dashboard/project/_/observability/query-performance) for built-in visualizations based on the same underlying metrics.
+
+export const metricsCards = [
+  {
+    title: 'Grafana Cloud (SaaS)',
+    description:
+      'Use Grafana Cloud’s managed Prometheus (works on Free + Pro tiers) and import the Supabase dashboard without running any infrastructure.',
+    href: '/guides/telemetry/metrics/grafana-cloud',
+    icon: 'grafana',
+    badges: [
+      { label: 'Supabase guide', variant: 'default' },
+      { label: 'Community', variant: 'community' },
+    ],
+  },
+  {
+    title: 'Grafana + self-hosted Prometheus',
+    description:
+      'Run Prometheus yourself following the official installation guidance and pair it with Grafana plus our dashboard JSON and alert pack.',
+    href: '/guides/telemetry/metrics/grafana-self-hosted',
+    icon: 'grafana',
+    badges: [{ label: 'Supabase guide', variant: 'default' }],
+  },
+  {
+    title: 'Datadog',
+    description:
+      'Scrape the Metrics API with the Datadog Agent or Prometheus remote write and monitor Supabase alongside your app telemetry.',
+    href: '/guides/telemetry/metrics/datadog',
+    icon: 'datadog',
+    badges: [
+      { label: 'Supabase guide', variant: 'default' },
+      { label: 'Community', variant: 'community' },
+    ],
+  },
+  {
+    title: 'Vendor-agnostic / BYO Prometheus',
+    description:
+      'Connect AWS AMP, Grafana Mimir, VictoriaMetrics, or any Prometheus-compatible SaaS with the same scrape job pattern.',
+    href: '/guides/telemetry/metrics/vendor-agnostic',
+    icon: 'flame',
+    badges: [{ label: 'Supabase guide', variant: 'default' }],
+  },
+]

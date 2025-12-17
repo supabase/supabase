@@ -5,39 +5,9 @@ description: 'Understand the raw logs, metrics, and traces that feed Supabase ob
 
 [← Back to the Observability overview](/docs/guides/observability)
 
-Telemetry is the raw data layer behind Supabase Observability. Every tool—Studio Reports, Query Performance, Advisors, and external dashboards—consumes one of three signals: logs, metrics, or traces.
+Telemetry is the raw data layer behind Supabase Observability. Telemetry is generally comprised of three primitives: logs, metrics, and traces.
 
-Supabase normalizes each signal so you can stay inside Studio or export them to your preferred vendor using the same credentials and APIs.
-
-<div className="grid gap-4 not-prose md:grid-cols-12">
-  {telemetrySignalCards.map((card) => (
-    <div className="col-span-12 md:col-span-4" key={card.title}>
-      {card.href ? (
-        <Link href={card.href} passHref>
-          <GlassPanel title={card.title}>
-            <div className="space-y-3">
-              <p className="text-foreground-light">{card.description}</p>
-              <span className="text-sm text-foreground-lighter">View the guide</span>
-            </div>
-          </GlassPanel>
-        </Link>
-      ) : (
-        <GlassPanel title={card.title}>
-          <div className="space-y-3">
-            <p className="text-foreground-light">{card.description}</p>
-            <span className="text-sm text-foreground-lighter">Coming soon</span>
-          </div>
-        </GlassPanel>
-      )}
-    </div>
-  ))}
-</div>
-
-<Admonition type="note">
-
-Supabase Cloud retains logs and report history according to your plan. Exported telemetry (log drains, Metrics API scrapes) follows the retention rules of whichever platform stores the data. Review the latest values on the [pricing page](/pricing).
-
-</Admonition>
+<DocsCards items={telemetrySignalCards} columnsClassName="md:grid-cols-3" />
 
 ## Related docs
 
@@ -51,16 +21,18 @@ export const telemetrySignalCards = [
   {
     title: 'Logs',
     description: 'Capture discrete events, errors, and auth signals with flexible export options.',
-    href: '/docs/guides/telemetry/logs',
+    href: '/guides/telemetry/logs',
+    icon: 'scrollText',
   },
   {
     title: 'Metrics',
     description: 'Stream ~200 Postgres series into dashboards or alerts via the Metrics API.',
-    href: '/docs/guides/telemetry/metrics',
+    href: '/guides/telemetry/metrics',
+    icon: 'activity',
   },
   {
-    title: 'Traces (coming soon)',
-    description:
-      'Supabase is working towards full support for the OpenTelemetry standard, which will make it easier to follow requests end-to-end across your stack.',
+    title: 'Traces',
+    description: 'Traces are a work in progress.',
+    icon: 'gitBranch',
   },
 ]
