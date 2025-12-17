@@ -54,6 +54,7 @@ export interface EntityListItemProps {
   style?: CSSProperties
   onExportCLI: () => void
   apiAccessMap?: TableApiAccessMap
+  policyCountMap?: Record<string, number>
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -70,6 +71,7 @@ export const EntityListItem = ({
   style,
   onExportCLI,
   apiAccessMap,
+  policyCountMap,
 }: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -218,6 +220,7 @@ export const EntityListItem = ({
             materializedViewHasLints={materializedViewHasLints}
             foreignTableHasLints={foreignTableHasLints}
             apiAccessData={apiAccessData}
+            policyCount={policyCountMap?.[entity.name] ?? 0}
           />
         </div>
 
@@ -386,6 +389,7 @@ const EntityTooltipTrigger = ({
   materializedViewHasLints,
   foreignTableHasLints,
   apiAccessData,
+  policyCount,
 }: {
   entity: Entity
   tableHasLints: boolean
@@ -393,10 +397,12 @@ const EntityTooltipTrigger = ({
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
   apiAccessData?: TableApiAccessData
+  policyCount: number
 }) => {
   const { ref } = useParams()
 
   let tooltipContent = null
+  let showUnrestrictedBadge = false
   const accessWarning = 'Data is publicly accessible via API'
   const learnMoreCTA = (
     <InlineLink
@@ -406,16 +412,8 @@ const EntityTooltipTrigger = ({
     </InlineLink>
   )
 
+  // Handle non-table entities (views, materialized views, foreign tables)
   switch (entity.type) {
-    case ENTITY_TYPE.TABLE:
-      if (tableHasLints) {
-        tooltipContent = (
-          <>
-            {accessWarning} as RLS is disabled. {learnMoreCTA}.
-          </>
-        )
-      }
-      break
     case ENTITY_TYPE.VIEW:
       if (viewHasLints) {
         tooltipContent = (
@@ -423,6 +421,7 @@ const EntityTooltipTrigger = ({
             {accessWarning} as this is a Security definer view. {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     case ENTITY_TYPE.MATERIALIZED_VIEW:
@@ -432,6 +431,7 @@ const EntityTooltipTrigger = ({
             {accessWarning} as this is a Security definer view {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
@@ -441,13 +441,38 @@ const EntityTooltipTrigger = ({
             {accessWarning} as RLS is not enforced on foreign tables. {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     default:
       break
   }
 
-  if (tooltipContent) {
+  // Handle tables with API access
+  if (entity.type === ENTITY_TYPE.TABLE && apiAccessData?.hasApiAccess) {
+    if (!entity.rls_enabled) {
+      // Case 3: API access + RLS disabled → Show "Unrestricted" badge
+      tooltipContent = <>This table can be accessed by anyone via the Data API as RLS is disabled</>
+      showUnrestrictedBadge = true
+    } else if (policyCount === 0) {
+      // Case 2: API access + RLS enabled + no policies → Show Globe with warning message
+      tooltipContent = (
+        <>This table can be accessed via the Data API but no RLS policies exist so no data will be returned</>
+      )
+      showUnrestrictedBadge = false
+    }
+    // Case 1: API access + RLS enabled + has policies → Show regular Globe icon (handled below)
+  } else if (entity.type === ENTITY_TYPE.TABLE && tableHasLints) {
+    // Legacy lint-based detection for tables without API access info
+    tooltipContent = (
+      <>
+        {accessWarning} as RLS is disabled. {learnMoreCTA}.
+      </>
+    )
+    showUnrestrictedBadge = true
+  }
+
+  if (tooltipContent && showUnrestrictedBadge) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4">
@@ -466,7 +491,9 @@ const EntityTooltipTrigger = ({
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
           <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
-        <TooltipContent side="right">This table is exposed via the Data API</TooltipContent>
+        <TooltipContent side="right">
+          {tooltipContent || 'This table is exposed via the Data API'}
+        </TooltipContent>
       </Tooltip>
     )
   }

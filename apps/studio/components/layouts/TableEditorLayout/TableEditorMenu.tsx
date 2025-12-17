@@ -14,6 +14,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
@@ -98,6 +99,26 @@ export const TableEditorMenu = () => {
     { enabled: Boolean(selectedSchema && entityNames.length > 0) }
   )
 
+  const { data: policies } = useDatabasePoliciesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: selectedSchema,
+    },
+    { enabled: Boolean(selectedSchema) }
+  )
+
+  const policyCountByTableName = useMemo(() => {
+    if (!policies) return {}
+    const counts: Record<string, number> = {}
+    policies.forEach((policy) => {
+      if (policy.table) {
+        counts[policy.table] = (counts[policy.table] || 0) + 1
+      }
+    })
+    return counts
+  }, [policies])
+
   const { can: canCreateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
@@ -145,8 +166,9 @@ export const TableEditorMenu = () => {
       isLocked: isSchemaLocked,
       onExportCLI: () => onSelectExportCLI(Number(id)),
       apiAccessMap: apiAccessByTableName,
+      policyCountMap: policyCountByTableName,
     }),
-    [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName]
+    [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName, policyCountByTableName]
   )
 
   useEffect(() => {
