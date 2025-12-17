@@ -43,6 +43,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 export const EditorPanel = () => {
@@ -129,6 +130,9 @@ export const EditorPanel = () => {
       contextualInvalidation: true,
     })
   }
+
+  // Check if this is an EXPLAIN query result
+  const isValidExplainQuery = isExplainQuery(results ?? [])
 
   const handleChange = (value: string) => {
     setValue(value)
@@ -337,9 +341,15 @@ export const EditorPanel = () => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={cn(`max-h-72 shrink-0 flex flex-col`, showResults && 'h-full')}>
+          <div
+            className={cn(
+              `shrink-0 flex flex-col`,
+              isValidExplainQuery ? 'max-h-[600px]' : 'max-h-72',
+              showResults && 'h-full'
+            )}
+          >
             {showResults && (
-              <div className="border-t flex-1 overflow-auto">
+              <div className="border-t flex-1 overflow-hidden">
                 <Results rows={results} />
               </div>
             )}

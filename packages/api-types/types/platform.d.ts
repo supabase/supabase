@@ -1226,26 +1226,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/entitlements/entitlements': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get entitlements for an organization
-     * @description Returns the entitlements available to the organization based on their plan and any overrides.
-     */
-    get: operations['OrganizationEntitlementsController_getEntitlements']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/organizations/{slug}/members': {
     parameters: {
       query?: never
@@ -4345,40 +4325,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/telemetry/page': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send server page event */
-    post: operations['TelemetryPageController_sendServerPageV2']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/telemetry/page-leave': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_trackPageLeave']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/telemetry/reset': {
     parameters: {
       query?: never
@@ -5423,15 +5369,17 @@ export interface components {
       name: string
       organization_slugs?: string[]
       permissions: (
-        | 'organizations_read'
-        | 'organizations_write'
-        | 'projects_read'
         | 'available_regions_read'
+        | 'organizations_read'
+        | 'organizations_create'
+        | 'projects_read'
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
         | 'members_read'
         | 'members_write'
+        | 'organization_projects_read'
+        | 'organization_projects_create'
         | 'project_admin_read'
         | 'project_admin_write'
         | 'advisors_read'
@@ -6966,6 +6914,7 @@ export interface components {
             | 'branching_limit'
             | 'branching_persistent'
             | 'auth.mfa_phone'
+            | 'auth.mfa_web_authn'
             | 'auth.hooks'
             | 'auth.platform.sso'
             | 'backup.retention_days'
@@ -7871,14 +7820,14 @@ export interface components {
         | 'billing:payment_methods'
         | 'realtime:all'
       )[]
-      first_name: string
-      free_project_limit: number
+      first_name: string | null
+      free_project_limit: number | null
       gotrue_id: string
       id: number
       is_alpha_user: boolean
       is_sso_user: boolean
-      last_name: string
-      mobile: string
+      last_name: string | null
+      mobile: string | null
       primary_email: string
       username: string
     }
@@ -9218,39 +9167,10 @@ export interface components {
       reset_project?: boolean
     }
     TelemetryIdentifyBodyV2: {
-      /** PostHog JS SDK's distinct_id - used for aliasing anonymous → authenticated users */
       anonymous_id?: string
       organization_slug?: string
       project_ref?: string
       user_id: string
-    }
-    TelemetryPageBodyV2: {
-      feature_flags?: {
-        [key: string]: unknown
-      }
-      groups?: {
-        organization?: string
-        project?: string
-      }
-      page_title: string
-      page_url: string
-      pathname: string
-      ph: {
-        language: string
-        referrer: string
-        search: string
-        user_agent: string
-        viewport_height: number
-        viewport_width: number
-      }
-    }
-    TelemetryPageLeaveBody: {
-      feature_flags?: {
-        [key: string]: unknown
-      }
-      page_title: string
-      page_url: string
-      pathname: string
     }
     TemporaryApiKeyResponse: {
       api_key: string
@@ -9658,6 +9578,10 @@ export interface components {
       EXTERNAL_WORKOS_ENABLED?: boolean | null
       EXTERNAL_WORKOS_SECRET?: string | null
       EXTERNAL_WORKOS_URL?: string | null
+      EXTERNAL_X_CLIENT_ID?: string | null
+      EXTERNAL_X_EMAIL_OPTIONAL?: boolean | null
+      EXTERNAL_X_ENABLED?: boolean | null
+      EXTERNAL_X_SECRET?: string | null
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
       EXTERNAL_ZOOM_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
@@ -14000,49 +13924,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationEntitlementsController_getEntitlements: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
@@ -25805,63 +25686,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to send analytics identify event */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TelemetryPageController_sendServerPageV2: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send server page event */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TelemetryPageLeaveController_trackPageLeave: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBody']
-      }
-    }
-    responses: {
-      /** @description Page leave event sent */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send analytics page leave event */
       500: {
         headers: {
           [name: string]: unknown

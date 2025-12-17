@@ -55,6 +55,16 @@ export const Index: Record<string, any> = [
   jsx: "import { Auth } from \"icons\"\n  <Auth/>\n  "
 },
 {
+  name: "big-query",
+  componentName: "BigQuery",
+  deprecated: false,
+  raw: "import createSupabaseIcon from '../createSupabaseIcon';\n\n/**\n * @component @name BigQuery\n * @description Supabase SVG icon component, renders SVG Element with children.\n *\n * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy40ODk4MSAxNy44OThMNy40ODk4MSA5LjY1MzA4TTEwLjgzNjggMTguNzU1MkwxMC44MzY4IDcuNTMwNjNNMTQuMTgzNyAxOC4wMjA1VjEyLjAyMDRNMjEgMjEuMDgxN0wxNi40Mjg2IDE2LjUxMDNNMTguNzU1MiAxMC44Nzc2QzE4Ljc1NTIgMTUuMjI4MiAxNS4yMjgyIDE4Ljc1NTIgMTAuODc3NiAxOC43NTUyQzYuNTI2OTEgMTguNzU1MiAzIDE1LjIyODIgMyAxMC44Nzc2QzMgNi41MjY5MSA2LjUyNjkxIDMgMTAuODc3NiAzQzE1LjIyODIgMyAxOC43NTUyIDYuNTI2OTEgMTguNzU1MiAxMC44Nzc2WiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIwLjk3NTI5OSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=)\n *\n * @param {Object} props - Supabase icons props and any valid SVG attribute\n * @returns {JSX.Element} JSX Element\n *\n */\nconst BigQuery = createSupabaseIcon('BigQuery', [\n  [\n    'path',\n    {\n      d: 'M7.48981 17.898L7.48981 9.65308M10.8368 18.7552L10.8368 7.53063M14.1837 18.0205V12.0204M21 21.0817L16.4286 16.5103M18.7552 10.8776C18.7552 15.2282 15.2282 18.7552 10.8776 18.7552C6.52691 18.7552 3 15.2282 3 10.8776C3 6.52691 6.52691 3 10.8776 3C15.2282 3 18.7552 6.52691 18.7552 10.8776Z',\n      stroke: 'black',\n      'stroke-width': '0.975299',\n      'stroke-linecap': 'round',\n      key: 't3k65m',\n    },\n  ],\n]);\n\nexport default BigQuery;\n",
+  component: React.lazy(() => import('icons/src/icons/big-query')),
+  import: "import { BigQuery } from 'icons'",
+  svg: "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7.48981 17.898L7.48981 9.65308M10.8368 18.7552L10.8368 7.53063M14.1837 18.0205V12.0204M21 21.0817L16.4286 16.5103M18.7552 10.8776C18.7552 15.2282 15.2282 18.7552 10.8776 18.7552C6.52691 18.7552 3 15.2282 3 10.8776C3 6.52691 6.52691 3 10.8776 3C15.2282 3 18.7552 6.52691 18.7552 10.8776Z\" stroke=\"black\" stroke-width=\"0.975299\" stroke-linecap=\"round\"/>\n</svg>\n",
+  jsx: "import { BigQuery } from \"icons\"\n  <BigQuery/>\n  "
+},
+{
   name: "box-plus",
   componentName: "BoxPlus",
   deprecated: false,

@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
 import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { WorkflowLogs } from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
