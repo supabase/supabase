@@ -27,6 +27,7 @@ jobs:
     # Run on workflow_dispatch OR issue_comment with @docritic (not PRs)
     # Write access check is handled by claude-code-action itself
     if: |
+      github.event_name == 'push' ||
       github.event_name == 'workflow_dispatch' ||
       (contains(github.event.comment.body, '@docritic') && !github.event.issue.pull_request)
     runs-on: ubuntu-latest
@@ -64,13 +65,13 @@ jobs:
           claude_args: |
             --allowedTools "Read(*),Bash(*),Write(${{ env.WORKDIR }}/*),Edit(${{ env.WORKDIR }}/*),WebFetch(domain:${{ env.ALLOWED_DOMAIN }})"
 
-      - name: Run docritic (manual dispatch)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Run docritic (manual dispatch or push)
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_WORKING_DIR: ${{ env.WORKDIR }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: '@docritic ${{ inputs.guide_url }}'
+          prompt: '@docritic ${{ inputs.guide_url || ''https://supabase.com/docs/guides/database/testing'' }}'
           claude_args: |
             --allowedTools "Read(*),Bash(*),Write(${{ env.WORKDIR }}/*),Edit(${{ env.WORKDIR }}/*),WebFetch(domain:${{ env.ALLOWED_DOMAIN }})"
