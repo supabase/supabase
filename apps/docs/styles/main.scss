@@ -310,39 +310,6 @@ th code {
   image-rendering: high-quality;
 }
 
-/* Loaders */
-
-.shimmering-loader {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--background-surface-200)) 25%,
-    hsl(var(--border-default)) 36%
-  );
-  background-size: 1000px 100%;
-}
-
-.dark .shimmering-loader {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--border-control)) 25%,
-    hsl(var(--border-default)) 36%
-  );
-  background-size: 1000px 100%;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
 .skip-link {
   @apply sr-only;
 }
