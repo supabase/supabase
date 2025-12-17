@@ -35,7 +35,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
               </span>
             </div>
           </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="!pb-0 space-y-6 pt-3">
+          <AccordionContent_Shadcn_ className="!pb-0 pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             {/* Batch wait time - applies to all destinations */}
             <FormField_Shadcn_
               control={form.control}
@@ -43,7 +43,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
               render={({ field }) => (
                 <FormItemLayout
                   label="Batch wait time (milliseconds)"
-                  layout="vertical"
+                  layout="horizontal"
                   description="How long to wait for more changes before sending. Shorter times mean more real-time updates but higher overhead."
                 >
                   <FormControl_Shadcn_>
@@ -61,34 +61,32 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
 
             {/* BigQuery-specific: Max staleness */}
             {type === 'BigQuery' && (
-              <div className="pt-2">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="maxStalenessMins"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <div className="flex items-center gap-2">
-                          <span>Maximum staleness (minutes)</span>
-                          <Badge>BigQuery only</Badge>
-                        </div>
-                      }
-                      layout="vertical"
-                      description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs."
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          {...field}
-                          type="number"
-                          value={field.value ?? ''}
-                          onChange={handleNumberChange(field)}
-                          placeholder="e.g. 60 (1 hour)"
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </div>
+              <FormField_Shadcn_
+                control={form.control}
+                name="maxStalenessMins"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label={
+                      <div className="flex flex-col gap-y-2">
+                        <span>Maximum staleness (minutes)</span>
+                        <Badge className="w-min">BigQuery only</Badge>
+                      </div>
+                    }
+                    layout="horizontal"
+                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="e.g. 60 (1 hour)"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
             )}
           </AccordionContent_Shadcn_>
         </AccordionItem_Shadcn_>
