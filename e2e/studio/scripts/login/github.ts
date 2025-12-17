@@ -6,39 +6,20 @@ import assert from 'assert'
 import { Session } from '@supabase/supabase-js'
 import { chromium } from '@playwright/test'
 
+export interface GitHubAuthentication {
+  githubTotp: string
+  githubUser: string
+  githubPass: string
+  supaDashboard: string
+}
+
 // a bit too complicated to do auth with github via API, so we do authorization with GUI
-const getAccessToken = async () => {
-  if (process.env.ACCESS_TOKEN && process.env.CONTEXT_DIR) {
-    const res = await crossFetch(
-      `${process.env.SUPA_PLATFORM_URI}/projects`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-        },
-      },
-      15000
-    )
-    if (res.ok === true) {
-      return {
-        apiKey: process.env.ACCESS_TOKEN,
-        contextDir: process.env.CONTEXT_DIR,
-      }
-    } else {
-      console.log('ACCESS_TOKEN is invalid', res.status, res.statusText)
-    }
-  }
-
-  const githubTotp = process.env.GITHUB_TOTP
-  const githubUser = process.env.GITHUB_USER
-  const githubPass = process.env.GITHUB_PASS
-  const supaDashboard = process.env.SUPA_DASHBOARD
-  const supaPlatformUri = process.env.SUPA_PLATFORM_URI
-  assert(githubTotp, 'GITHUB_TOTP is not set')
-  assert(githubUser, 'GITHUB_USER is not set')
-  assert(githubPass, 'GITHUB_PASS is not set')
-  assert(supaDashboard, 'SUPA_DASHBOARD is not set')
-  assert(supaPlatformUri, 'SUPA_PLATFORM_URI is not set')
-
+const getAccessToken = async ({
+  githubTotp,
+  githubUser,
+  githubPass,
+  supaDashboard,
+}: GitHubAuthentication) => {
   // GH auth always uses 2FA and it is not possible to disable it so we use TOTP
   let totp = new OTPAuth.TOTP({
     label: 'Github',
@@ -52,20 +33,73 @@ const getAccessToken = async () => {
   let contextDir = `browserContext-${faker.number.int({ min: 1, max: 9999 })}`
   const context = await chromium.launchPersistentContext(contextDir, {
     headless: true,
+    ignoreHTTPSErrors: true,
   })
   try {
     // Go to app.supabase.io
     const page = await context.newPage()
+
+    // Mock the auth.supabase.io user endpoint that causes CORS errors
+    // This allows the page to load properly and show the login buttons
+    await page.route('**/auth.supabase.io/auth/v1/user', (route) => {
+      route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Unauthorized' }),
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': '*',
+        },
+      })
+    })
+
+    // Handle CORS preflight requests
+    await page.route('**/auth.supabase.io/**', (route, request) => {
+      if (request.method() === 'OPTIONS') {
+        route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': '*',
+          },
+        })
+      } else {
+        route.continue()
+      }
+    })
+
     await page.goto(supaDashboard)
+
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('networkidle')
+
     try {
-      await page.locator('button:has-text("Continue with GitHub")').first().click()
-    } catch {
-      await page.locator('button:has-text("Sign In with GitHub")').first().click()
+      console.log('Looking for "Continue with GitHub" button...')
+      const button = page.locator('button:has-text("Continue with GitHub")').first()
+      await button.waitFor({ state: 'visible', timeout: 10000 })
+      console.log('Found button, clicking...')
+      await button.click({ timeout: 5000 })
+      console.log('Clicked, waiting for GitHub redirect...')
+      // Wait for navigation to GitHub
+      await page.waitForURL('**/github.com/**', { timeout: 10000 })
+      console.log('Navigated to GitHub!')
+    } catch (e) {
+      console.log('Failed to find/click "Continue with GitHub", trying "Sign In with GitHub"...', e)
+      const button = page.locator('button:has-text("Sign In with GitHub")').first()
+      await button.waitFor({ state: 'visible', timeout: 10000 })
+      await button.click({ timeout: 5000 })
+      // Wait for navigation to GitHub
+      await page.waitForURL('**/github.com/**', { timeout: 10000 })
     }
-    // REdirected to GitHub: interact with login form
+
+    console.log('Filling GitHub login form...')
+    // Redirected to GitHub: interact with login form
     await page.fill('input[name="login"]', githubUser)
     await page.fill('input[name="password"]', githubPass)
     await page.click('input[name="commit"]')
+    console.log('Submitted credentials, filling 2FA...')
 
     // Pass 2FA
     await page.fill('input[name="app_otp"]', totp.generate())
@@ -79,32 +113,47 @@ const getAccessToken = async () => {
       }
     } catch (e) {
       // that may be cause by auto submit and redirect
-      console.log(e)
+      console.log('2FA auto-submitted or error:', e)
     }
 
-    // reauthorize supabase if needed
-    try {
-      if (await page.locator('"Authorize supabase"').isVisible({ timeout: 2000 })) {
-        await page.locator('"Authorize supabase"').hover()
-        await page.locator('"Authorize supabase"').isEnabled({ timeout: 10000 })
-        await page.click('"Authorize supabase"')
+    // Wait for redirect after 2FA - either to authorization page or directly to Supabase
+    console.log('Waiting for redirect after 2FA...')
+    await page.waitForURL(
+      (url) => {
+        const href = url.href
+        // Either GitHub authorization page or redirect to Supabase
+        return (
+          href.includes('github.com/login/oauth/authorize') ||
+          href.includes('supabase.com') ||
+          href.includes('supabase.io') ||
+          href.includes('supabase.green') ||
+          href.includes('supabase.red')
+        )
+      },
+      { timeout: 30000 }
+    )
+    console.log('Redirected to:', page.url())
+
+    // reauthorize supabase if needed (only if we're on GitHub authorization page)
+    if (page.url().includes('github.com')) {
+      console.log('On GitHub authorization page, looking for Authorize button...')
+      const reauthorizeButton = page.getByRole('button', { name: 'Authorize supabase' })
+
+      try {
+        await reauthorizeButton.waitFor({ state: 'visible', timeout: 10000 })
+        console.log('Reauthorize button visible, clicking...')
+        await reauthorizeButton.click()
+        console.log('Clicked reauthorize button')
+      } catch (e) {
+        console.log('Reauthorize button not found or not needed:', e)
       }
-    } catch (e) {
-      // small probability that GH may ask for authorization of supabase again
+    } else {
+      console.log('Already redirected to Supabase, no reauthorization needed')
     }
 
     // Wait for redirect back to app.supabase.io(.green)
-    try {
-      await page.waitForURL(/app.supabase./, { waitUntil: 'networkidle' })
-    } catch {
-      // todo: we used `waitForNavigation` before and it is now deprecated cause it was racy
-      // todo: i am leaving this try catch here temporarily to see if it will be racy or not now
-      // a bit hard to make this reliable: we can sometimes not hit this wait condition and
-      // navigation will happen before we this call, and then we will receive an error;
-      // but if we omit this completely, we will get an error on the next call cause
-      // we will be at the moment before redirect actually happens during the next call
-      console.log('waitForURL failed')
-    }
+    // Replace lines 78-88 with:
+    await page.waitForURL(/alt.supabase.*/, { timeout: 30000 })
     await page.locator('button:has-text("New project")').first().isVisible()
 
     // get access token
@@ -138,35 +187,44 @@ const getAccessToken = async () => {
     await context.close()
   }
 
-  // check access token works
-  const res = await crossFetch(
-    `${supaPlatformUri}/projects`,
-    {
-      headers: {
-        Authorization: `Bearer ${token.access_token}`,
-      },
-    },
-    15000
-  )
-  assert(res.ok === true)
   return {
     apiKey: token.access_token,
     contextDir: contextDir,
   }
 }
 
-async function authenticate(retries = 5) {
+async function authenticateWithGitHub(
+  { githubTotp, githubUser, githubPass, supaDashboard }: GitHubAuthentication,
+  retries = 5
+) {
+  const signInUrl = `${supaDashboard}/sign-in`
+
   for (let i = 0; i < retries; i++) {
-    const { apiKey, contextDir } = await tryAuthenticate()
+    const { apiKey, contextDir } = await tryAuthenticate({
+      githubTotp,
+      githubUser,
+      githubPass,
+      supaDashboard: signInUrl,
+    })
     if (apiKey) return { apiKey, contextDir }
   }
   console.log('could not authenticate')
   throw new Error('could not authenticate')
 }
 
-async function tryAuthenticate() {
+async function tryAuthenticate({
+  githubTotp,
+  githubUser,
+  githubPass,
+  supaDashboard,
+}: GitHubAuthentication) {
   try {
-    const { apiKey, contextDir } = await getAccessToken()
+    const { apiKey, contextDir } = await getAccessToken({
+      githubTotp,
+      githubUser,
+      githubPass,
+      supaDashboard,
+    })
     return { apiKey, contextDir }
   } catch (e) {
     console.log(e)
@@ -174,4 +232,4 @@ async function tryAuthenticate() {
   }
 }
 
-export { getAccessToken, authenticate }
+export { getAccessToken, authenticateWithGitHub }

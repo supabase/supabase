@@ -34,7 +34,9 @@ export const env = {
 
   BRANCH_NAME: process.env.BRANCH_NAME || `e2e-test-local`,
 
-  AUTHENTICATION: Boolean(process.env.EMAIL && process.env.PASSWORD),
+  AUTHENTICATION:
+    Boolean(process.env.EMAIL && process.env.PASSWORD) ||
+    Boolean(process.env.GITHUB_USER && process.env.GITHUB_PASS && process.env.GITHUB_TOTP),
 
   IS_APP_RUNNING_ON_LOCALHOST:
     process.env.STUDIO_URL?.includes('localhost') || process.env.STUDIO_URL?.includes('127.0.0.1'),

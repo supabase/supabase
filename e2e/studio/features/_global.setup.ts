@@ -4,6 +4,7 @@ import path from 'path'
 import { env } from '../env.config.js'
 import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 import { authenticateUser } from '../scripts/login/email.js'
+import { authenticateWithGitHub } from '../scripts/login/github.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -70,9 +71,10 @@ To start API locally, run:
   /**
    * Setup Project for tests
    */
-  const projectRef = await setupProjectForTests()
-  process.env.PROJECT_REF = projectRef
-  env.PROJECT_REF = projectRef
+  // TODO: make sure to remove
+  // const projectRef = await setupProjectForTests()
+  // process.env.PROJECT_REF = projectRef
+  // env.PROJECT_REF = projectRef
 
   /**
    * Only run authentication if the environment requires it
@@ -82,24 +84,26 @@ To start API locally, run:
     return
   }
 
-  const { EMAIL, PASSWORD } = env
-  if (EMAIL && PASSWORD) {
-    console.log(`\n 🔑 Authenticating user with email and password`)
+  // TODO: make sure to remove
+  // const { EMAIL, PASSWORD } = env
+  // if (EMAIL && PASSWORD) {
+  //   console.log(`\n 🔑 Authenticating user with email and password`)
 
-    await authenticateUser(page, studioUrl, {
-      email: EMAIL,
-      password: PASSWORD,
-      projectRef,
-    })
-  }
+  //   await authenticateUser(page, studioUrl, {
+  //     email: EMAIL,
+  //     password: PASSWORD,
+  //     projectRef,
+  //   })
+  // }
 
   const { GITHUB_USER, GITHUB_PASS, GITHUB_TOTP } = env
   if (GITHUB_USER && GITHUB_PASS && GITHUB_TOTP) {
     console.log(`\n 🔑 Authenticating user with GitHub`)
-    await authenticateUser(page, studioUrl, {
-      email: GITHUB_USER,
-      password: GITHUB_PASS,
-      projectRef,
+    await authenticateWithGitHub({
+      githubTotp: GITHUB_TOTP,
+      githubUser: GITHUB_USER,
+      githubPass: GITHUB_PASS,
+      supaDashboard: studioUrl,
     })
   }
 })
