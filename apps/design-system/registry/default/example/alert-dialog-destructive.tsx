@@ -11,24 +11,25 @@ import {
   Button,
 } from 'ui'
 
-export default function AlertDialogDemo() {
+export default function AlertDialogDestructive() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="outline">Show Alert Dialog</Button>
+        <Button type="danger">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Create new API keys</AlertDialogTitle>
+          <AlertDialogTitle>
+            Delete <code className="text-code-inline">hello-world</code>
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This will create a default publishable key and a default secret key both named{' '}
-            <code className="text-code-inline">default</code>. These keys are required to connect
-            your application to your Supabase project.
+            This action cannot be undone. Ensure that you have a backup in case you want to restore
+            this edge function.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Create keys</AlertDialogAction>
+          <AlertDialogAction variant="danger">Delete</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
