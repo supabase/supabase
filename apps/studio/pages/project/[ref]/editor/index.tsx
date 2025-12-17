@@ -28,7 +28,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (isHistoryLoaded) {
+    if (isHistoryLoaded && projectRef && router) {
       const lastOpenedTableId = Number(history.editor)
       const lastTabId = Number(
         tabStore.openTabs.find((id) => editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type))
@@ -36,18 +36,19 @@ const TableEditorPage: NextPageWithLayout = () => {
 
       // Handle redirect to last opened table tab, or last table tab
       if (Number.isInteger(lastOpenedTableId)) {
-        let lastOpenedTableData = tabStore.tabsMap[lastOpenedTableId]
+        const lastOpenedTableData = tabStore.tabsMap[lastOpenedTableId]
         router.push(
           buildTableEditorUrl(projectRef!, lastOpenedTableId, lastOpenedTableData?.metadata?.schema)
         )
       } else if (Number.isInteger(lastTabId)) {
-        let lastOpenedTableData = tabStore.tabsMap[lastTabId]
+        const lastOpenedTableData = tabStore.tabsMap[lastTabId]
         router.push(
           buildTableEditorUrl(projectRef!, lastTabId, lastOpenedTableData?.metadata?.schema)
         )
       }
     }
-  }, [isHistoryLoaded])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHistoryLoaded, projectRef, router])
 
   return (
     <>

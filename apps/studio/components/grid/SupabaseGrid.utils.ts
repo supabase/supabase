@@ -157,11 +157,11 @@ export function buildTableEditorUrl(projectRef: string, tableId: number, schema?
   }
 
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
-  if (savedState?.sorts) {
-    url.searchParams.set('sort', savedState.sorts.join(','))
+  if (savedState?.sorts && savedState.sorts.length > 0) {
+    savedState.sorts?.forEach((sort) => url.searchParams.append('sort', sort))
   }
-  if (savedState?.filters) {
-    url.searchParams.set('filter', savedState.filters.join(':'))
+  if (savedState?.filters && savedState.filters.length > 0) {
+    savedState.filters?.forEach((filter) => url.searchParams.append('filter', filter))
   }
   return url.toString()
 }
@@ -175,7 +175,6 @@ export function saveTableEditorStateToLocalStorage({
 }: {
   projectRef: string
   tableId: number
-  schema?: string | null
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
@@ -185,8 +184,8 @@ export function saveTableEditorStateToLocalStorage({
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
-    ...(sorts !== undefined && { sorts }),
-    ...(filters !== undefined && { filters }),
+    ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
+    ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
   }
 
   let savedJson

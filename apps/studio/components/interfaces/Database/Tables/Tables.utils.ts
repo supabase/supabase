@@ -2,7 +2,7 @@ import { PostgresMaterializedView, PostgresTable, PostgresView } from '@supabase
 import { PostgresForeignTable } from '@supabase/postgres-meta/dist/lib/types'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
-// [Joshen] We just need name, description, rows, size, and the number of columns
+// [Joshen] We just need name, schema, description, rows, size, and the number of columns
 // Just missing partitioned tables as missing pg-meta support
 export const formatAllEntities = ({
   tables = [],

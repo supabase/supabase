@@ -67,7 +67,7 @@ export const TableNode = ({
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {data.id && !placeholder && (
+            {!placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
                 <Link href={buildTableEditorUrl(data.ref, data.id, data.schema)}>
                   <ExternalLink size={10} className="text-foreground-light" />
