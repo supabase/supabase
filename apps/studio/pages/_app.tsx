@@ -91,10 +91,8 @@ const ToastErrorTracker = () => {
 
     const originalError = toast.error
     toast.error = ((message: string | React.ReactNode, opts?: any) => {
-      const messageStr = typeof message === 'string' ? message : String(message)
       track('dashboard_error_displayed', {
         source: 'toast',
-        message: messageStr,
       })
       return originalError(message, opts)
     }) as typeof toast.error

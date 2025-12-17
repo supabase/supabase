@@ -2602,10 +2602,6 @@ export interface DashboardErrorDisplayedEvent {
      * Source of the error
      */
     source?: 'admonition' | 'toast'
-    /**
-     * Optional title of the error Admonition
-     */
-    message?: string
   }
   groups: TelemetryGroups
 }

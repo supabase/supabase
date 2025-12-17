@@ -65,7 +65,6 @@ export const AlertError = ({
       hasTrackedRef.current = true
       track('dashboard_error_displayed', {
         source: 'admonition',
-        message: subject,
       })
     }
   }, [track, subject])
