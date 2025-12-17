@@ -200,12 +200,12 @@ test.describe.serial('RLS Policies', () => {
 
         // A confirmation modal appears when toggling RLS from the policies page
         await expect(
-          page.getByRole('heading', { name: 'Confirm to disable Row Level Security' }),
+          page.getByRole('heading', { name: 'Disable Row Level Security' }),
           'RLS disable confirmation modal should appear'
         ).toBeVisible({ timeout: 50000 })
 
         // Confirm disabling RLS
-        await page.getByRole('button', { name: 'Confirm' }).click()
+        await page.getByRole('button', { name: 'Disable RLS' }).click()
 
         // After confirming, the toggle button text should change to "Enable RLS"
         await expect(
@@ -266,8 +266,8 @@ test.describe.serial('RLS Policies', () => {
       await expect(page.getByRole('radio', { name: 'SELECT' })).toBeChecked()
 
       // Fill in USING clause - allow all access
-      const editor = page.getByRole('textbox', { name: 'Editor content;Press Alt+F1' })
-      await editor.fill('true')
+      await page.locator('.view-lines').click()
+      await page.keyboard.type('true')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -314,8 +314,8 @@ test.describe.serial('RLS Policies', () => {
       await page.keyboard.press('Escape')
 
       // Fill in WITH CHECK clause - allow all inserts
-      const editor = page.getByRole('textbox', { name: 'Editor content;Press Alt+F1' })
-      await editor.fill('true')
+      await page.locator('.view-lines').click()
+      await page.keyboard.type('true')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -357,8 +357,8 @@ test.describe.serial('RLS Policies', () => {
       await page.keyboard.press('Escape')
 
       // Fill in USING clause (UPDATE has both USING and WITH CHECK editors, so use first)
-      const editor = page.getByRole('textbox', { name: 'Editor content;Press Alt+F1' }).first()
-      await editor.fill('true')
+      await page.locator('.view-lines').first().click()
+      await page.keyboard.type('true')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -399,8 +399,8 @@ test.describe.serial('RLS Policies', () => {
       await page.keyboard.press('Escape')
 
       // Fill in USING clause
-      const editor = page.getByRole('textbox', { name: 'Editor content;Press Alt+F1' })
-      await editor.fill('true')
+      await page.locator('.view-lines').click()
+      await page.keyboard.type('true')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()

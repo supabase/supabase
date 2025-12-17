@@ -53,9 +53,13 @@ export const ProjectCard = ({
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         className="h-44 !px-0 group pt-5 pb-0"
         title={
-          <div className="w-full justify-between space-y-1.5 px-5">
-            <p className="flex-shrink truncate text-sm pr-4">{name}</p>
-            <span className="text-sm text-foreground-light">{desc}</span>
+          <div className="w-full flex flex-col gap-y-4 justify-between px-5">
+            {/* Text */}
+            <div className="flex flex-col gap-y-0.5">
+              <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
+              <p className="text-sm text-foreground-lighter">{desc}</p>
+            </div>
+            {/* Compute and integrations */}
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
                 <ComputeBadgeWrapper
@@ -66,7 +70,7 @@ export const ProjectCard = ({
                 />
               )}
               {isVercelIntegrated && (
-                <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
+                <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
                   <InlineSVG
                     src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                     title="Vercel Icon"
@@ -75,12 +79,12 @@ export const ProjectCard = ({
                 </div>
               )}
               {isGithubIntegrated && (
-                <>
-                  <div className="w-fit p-1 border rounded-md flex items-center">
+                <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
+                  <div className="w-5 h-5 p-1 flex items-center justify-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs !ml-2 text-foreground-light truncate">{githubRepository}</p>
-                </>
+                  <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
+                </div>
               )}
             </div>
           </div>

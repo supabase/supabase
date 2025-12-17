@@ -59,7 +59,7 @@ export const SecuritySettings = () => {
   const {
     data: mfaConfig,
     error: mfaError,
-    isLoading: isLoadingMfa,
+    isPending: isLoadingMfa,
     isError: isErrorMfa,
     isSuccess: isSuccessMfa,
   } = useOrganizationMfaQuery({ slug }, { enabled: isPaidPlan && canReadMfaConfig })
@@ -147,18 +147,16 @@ export const SecuritySettings = () => {
                             <FormControl_Shadcn_>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                      disabled={
-                                        !isPaidPlan ||
-                                        !canUpdateMfaConfig ||
-                                        !hasMFAEnabled ||
-                                        isUpdatingMfa
-                                      }
-                                    />
-                                  </div>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={
+                                      !isPaidPlan ||
+                                      !canUpdateMfaConfig ||
+                                      !hasMFAEnabled ||
+                                      isUpdatingMfa
+                                    }
+                                  />
                                 </TooltipTrigger>
                                 {(!canUpdateMfaConfig || !hasMFAEnabled) && (
                                   <TooltipContent side="bottom">

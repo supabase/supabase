@@ -169,6 +169,9 @@ function createTabsState(projectRef: string) {
     tabsMap,
     previewTabId,
 
+    hasTab: (id: string) => {
+      return !!store.tabsMap[id]
+    },
     addTab: (tab: Tab) => {
       // If tab exists and is active, don't do anything
       if (store.tabsMap[tab.id] && store.activeTab === tab.id) {

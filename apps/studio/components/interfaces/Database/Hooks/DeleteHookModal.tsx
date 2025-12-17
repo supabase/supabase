@@ -1,9 +1,9 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { toast } from 'sonner'
 
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteHookModalProps {
   visible: boolean

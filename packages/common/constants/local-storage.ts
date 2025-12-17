@@ -80,6 +80,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
 
+  LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
+
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
