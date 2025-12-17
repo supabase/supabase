@@ -23,6 +23,7 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: 'Create a new table "foods" with columns for "name" and "color"',
     expected: {
+      requiredTools: ['execute_sql'],
       sqlQuery: stripIndent`CREATE TABLE IF NOT EXISTS public.foods ( id bigserial PRIMARY KEY, name text NOT NULL, color text );`,
     },
     metadata: { category: ['sql_generation', 'schema_design'] },
@@ -31,6 +32,7 @@ export const dataset: AssistantEvalCase[] = [
     input:
       'Write a SQL query to select all products from the products table where the price is greater than 100',
     expected: {
+      requiredTools: ['execute_sql'],
       sqlQuery: stripIndent`SELECT * FROM public.products WHERE price > 100;`,
     },
     metadata: { category: ['sql_generation'] },
@@ -38,6 +40,7 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: 'Create an index on the products table for the name column',
     expected: {
+      requiredTools: ['execute_sql'],
       sqlQuery: stripIndent`CREATE INDEX IF NOT EXISTS idx_products_name ON public.products (name);`,
     },
     metadata: { category: ['sql_generation', 'database_optimization'] },
