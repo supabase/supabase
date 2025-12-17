@@ -23,8 +23,11 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
+  // Escape single quotes for SQL string literals (e.g., "don't" -> "don''t")
+  const escapeSqlString = (value: string): string => value.replaceAll("'", "''")
+
   const createSql = `create type "${schema}"."${name}" as enum (${values
-    .map((x) => `'${x}'`)
+    .map((x) => `'${escapeSqlString(x)}'`)
     .join(', ')});`
   const commentSql =
     description !== undefined ? `comment on type "${schema}"."${name}" is '${description}';` : ''
