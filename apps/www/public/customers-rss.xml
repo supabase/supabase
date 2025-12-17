@@ -211,25 +211,18 @@
   <pubDate>Fri, 05 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/epsilon3</guid>
-  <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
-  <link>https://supabase.com/customers/epsilon3</link>
-  <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
-  <pubDate>Tue, 14 Feb 2023 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/customers/exprealty</guid>
-  <title></title>
-  <link>https://supabase.com/customers/exprealty</link>
-  <description></description>
-  <pubDate>Wed, 17 Dec 2025 00:00:00 -0700</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/customers/happyteams</guid>
   <title>HappyTeams unlocks better performance and reduces cost with Supabase.</title>
   <link>https://supabase.com/customers/happyteams</link>
   <description>How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.</description>
   <pubDate>Thu, 16 Feb 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/epsilon3</guid>
+  <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
+  <link>https://supabase.com/customers/epsilon3</link>
+  <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
+  <pubDate>Tue, 14 Feb 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/mobbin</guid>
