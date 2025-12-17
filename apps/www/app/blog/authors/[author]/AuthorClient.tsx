@@ -40,7 +40,8 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
     const term = searchTerm.toLowerCase()
     return blogs.filter(
       (blog) =>
-        blog.title?.toLowerCase().includes(term) || blog.description?.toLowerCase().includes(term)
+        (blog.title ?? '').toLowerCase().includes(term) ||
+        (blog.description ?? '').toLowerCase().includes(term)
     )
   }, [blogs, searchTerm])
 

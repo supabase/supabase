@@ -8,6 +8,20 @@ import AuthorClient from './AuthorClient'
 
 type Params = { author: string }
 
+// Build a lookup map from any identifier (author_id or username) to canonical author_id
+const authorIdLookup = new Map<string, string>()
+for (const author of blogAuthors) {
+  authorIdLookup.set(author.author_id, author.author_id)
+  if ('username' in author && author.username) {
+    authorIdLookup.set(author.username, author.author_id)
+  }
+}
+
+// Normalize any author identifier to the canonical author_id
+function toCanonicalAuthorId(identifier: string): string {
+  return authorIdLookup.get(identifier) ?? identifier
+}
+
 export async function generateStaticParams() {
   return blogAuthors.map((author) => ({ author: author.author_id }))
 }
@@ -35,16 +49,18 @@ export default async function AuthorPage({ params: paramsPromise }: { params: Pr
 
   const author = blogAuthors.find((a) => a.author_id === authorId) ?? null
 
-  // Get static posts where author field contains this author_id
+  // Get static posts where author field contains this author_id (normalize identifiers)
   const staticPosts = getSortedPosts({ directory: '_blog', limit: 0 }).filter((post: any) => {
     const postAuthors = post.author?.split(',').map((a: string) => a.trim()) || []
-    return postAuthors.includes(authorId)
+    return postAuthors.some((a: string) => toCanonicalAuthorId(a) === authorId)
   })
 
-  // Get CMS posts by this author
+  // Get CMS posts by this author (normalize identifiers)
   const allCmsPosts = await getAllCMSPosts({})
   const cmsPosts = allCmsPosts.filter((post: any) => {
-    return post.authors?.some((a: any) => a.author_id === authorId || a.username === authorId)
+    return post.authors?.some(
+      (a: any) => toCanonicalAuthorId(a.author_id ?? a.username ?? '') === authorId
+    )
   })
 
   const blogs = [...(staticPosts as any[]), ...(cmsPosts as any[])].sort(
