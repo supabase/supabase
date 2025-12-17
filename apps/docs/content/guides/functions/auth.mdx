@@ -59,17 +59,21 @@ Deno.serve((r) =>
 You can also use the Supabase Auth to verify users
 
 ```ts
-import { createClient } from 'supabase/supabase-js'
-import { JWKS, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from 'your-environment'
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!
+)
 
-Deno.serve((req) => {
+Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization')!
   const token = authHeader.replace('Bearer ', '')
 
   const { data, error } = await supabase.auth.getClaims(token)
-  if (!data || error) {
+  const userEmail = data?.claims?.email
+  if (!userEmail || error) {
     return Response.json(
       { msg: 'Invalid JWT' },
       {
@@ -78,7 +82,7 @@ Deno.serve((req) => {
     )
   }
 
-  return Response.json({ message: `hello ${data}` })
+  return Response.json({ message: `hello ${userEmail}` })
 })
 ```
 
