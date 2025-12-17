@@ -1300,8 +1300,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/auth-helpers/:path*',
-    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+    source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
+    destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
     permanent: false,
