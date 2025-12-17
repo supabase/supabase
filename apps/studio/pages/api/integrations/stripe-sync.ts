@@ -39,23 +39,16 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       .json({ data: null, error: { message: 'Bad Request: Missing projectRef in request body' } })
   }
 
-  // Read stripe key from Vault
-
-  try {
-    waitUntil(
-      uninstall({
-        supabaseAccessToken: supabaseToken,
-        supabaseProjectRef: projectRef,
-        stripeKey: stripeSecretKey,
-      })
-    )
-  } catch (error: any) {
-    console.error('Error during Stripe Sync uninstallation:', error)
-    return res.status(500).json({
-      data: null,
-      error: { message: `Internal Server Error: ${error.message || 'Uninstallation failed'}` },
+  waitUntil(
+    uninstall({
+      supabaseAccessToken: supabaseToken,
+      supabaseProjectRef: projectRef,
+      stripeKey: stripeSecretKey,
+    }).catch((error) => {
+      console.error('Stripe Sync Engine uninstallation failed.', error)
+      throw error
     })
-  }
+  )
 
   return res
     .status(200)
@@ -117,24 +110,19 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
     })
   }
 
-  try {
-    waitUntil(
-      install({
-        supabaseAccessToken: supabaseToken,
-        supabaseProjectRef: projectRef,
-        stripeKey: stripeSecretKey,
-        baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
-        baseManagementApiUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
-        packageVersion: VERSION,
-      })
-    )
-  } catch (error: any) {
-    console.error('Error during Stripe Sync installation:', error)
-    return res.status(500).json({
-      data: null,
-      error: { message: `Internal Server Error: ${error.message || 'Installation failed'}` },
+  waitUntil(
+    install({
+      supabaseAccessToken: supabaseToken,
+      supabaseProjectRef: projectRef,
+      stripeKey: stripeSecretKey,
+      baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
+      baseManagementApiUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
+      packageVersion: VERSION,
+    }).catch((error) => {
+      console.error('Stripe Sync Engine installation failed.', error)
+      throw error
     })
-  }
+  )
 
   return res
     .status(200)
