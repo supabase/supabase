@@ -33,6 +33,7 @@ const PUBLISHED_SECTIONS = [
   // 'graphql', -- technically published, but completely federated
   'integrations',
   'local-development',
+  'observability',
   'platform',
   'queues',
   'realtime',

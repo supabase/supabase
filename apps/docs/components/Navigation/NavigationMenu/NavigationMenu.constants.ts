@@ -184,9 +184,9 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'security',
           },
           {
-            label: 'Telemetry',
+            label: 'Observability',
             icon: 'telemetry',
-            href: '/guides/telemetry' as `/${string}`,
+            href: '/guides/observability' as `/${string}`,
             level: 'telemetry',
           },
           {
@@ -2748,13 +2748,13 @@ export const platform: NavMenuConstant = {
 
 export const telemetry: NavMenuConstant = {
   icon: 'telemetry',
-  title: 'Telemetry',
-  url: '/guides/telemetry',
+  title: 'Observability',
+  url: '/guides/observability',
   items: [
-    { name: 'Overview', url: '/guides/telemetry' },
+    { name: 'Overview', url: '/guides/observability' },
     {
-      name: 'Logging & observability',
-      url: undefined,
+      name: 'Telemetry signals',
+      url: '/guides/telemetry',
       items: [
         {
           name: 'Logging',

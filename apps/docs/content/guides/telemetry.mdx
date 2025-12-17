@@ -1,13 +1,66 @@
 ---
 title: Telemetry
+description: 'Understand the raw logs, metrics, and traces that feed Supabase observability.'
 ---
 
-Telemetry helps you understand what’s happening inside your app by collecting logs, metrics, and traces.
+[← Back to the Observability overview](/docs/guides/observability)
 
-- **Logs** capture individual events, such as errors or warnings, providing details about what happened at a specific moment.
-- **Metrics** track numerical data over time, like request latency or database query performance, helping you spot trends.
-- **Traces** show the flow of a request through different services, helping you debug slow or failing operations.
+Telemetry is the raw data layer behind Supabase Observability. Every tool—Studio Reports, Query Performance, Advisors, and external dashboards—consumes one of three signals: logs, metrics, or traces.
 
-Supabase is working towards full support for the [OpenTelemetry](https://opentelemetry.io/) standard, making it easier to integrate with observability tools.
+Supabase normalizes each signal so you can stay inside Studio or export them to your preferred vendor using the same credentials and APIs.
 
-This section provides guidance on telemetry in Supabase, including how to work with Supabase Logs.
+<div className="grid gap-4 not-prose md:grid-cols-12">
+  {telemetrySignalCards.map((card) => (
+    <div className="col-span-12 md:col-span-4" key={card.title}>
+      {card.href ? (
+        <Link href={card.href} passHref>
+          <GlassPanel title={card.title}>
+            <div className="space-y-3">
+              <p className="text-foreground-light">{card.description}</p>
+              <span className="text-sm text-foreground-lighter">View the guide</span>
+            </div>
+          </GlassPanel>
+        </Link>
+      ) : (
+        <GlassPanel title={card.title}>
+          <div className="space-y-3">
+            <p className="text-foreground-light">{card.description}</p>
+            <span className="text-sm text-foreground-lighter">Coming soon</span>
+          </div>
+        </GlassPanel>
+      )}
+    </div>
+  ))}
+</div>
+
+<Admonition type="note">
+
+Supabase Cloud retains logs and report history according to your plan. Exported telemetry (log drains, Metrics API scrapes) follows the retention rules of whichever platform stores the data. Review the latest values on the [pricing page](/pricing).
+
+</Admonition>
+
+## Related docs
+
+- [Observability overview](/docs/guides/observability)
+- [Supabase Reports](/docs/guides/telemetry/reports)
+- [Metrics API](/docs/guides/telemetry/metrics)
+- [Log drains](/docs/guides/telemetry/log-drains)
+- [Sentry monitoring](/docs/guides/telemetry/sentry-monitoring)
+
+export const telemetrySignalCards = [
+  {
+    title: 'Logs',
+    description: 'Capture discrete events, errors, and auth signals with flexible export options.',
+    href: '/docs/guides/telemetry/logs',
+  },
+  {
+    title: 'Metrics',
+    description: 'Stream ~200 Postgres series into dashboards or alerts via the Metrics API.',
+    href: '/docs/guides/telemetry/metrics',
+  },
+  {
+    title: 'Traces (coming soon)',
+    description:
+      'Supabase is working towards full support for the OpenTelemetry standard, which will make it easier to follow requests end-to-end across your stack.',
+  },
+]

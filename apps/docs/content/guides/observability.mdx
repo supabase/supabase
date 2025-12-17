@@ -1,0 +1,118 @@
+---
+id: 'observability'
+title: 'Observability'
+description: 'Connect Supabase telemetry, Studio tooling, and external vendors to keep projects healthy.'
+hideToc: false
+---
+
+Supabase bundles the telemetry primitives, Studio dashboards, and export hooks you need to monitor projects, optimize performance, and resolve security issues. Use built-in reports and advisors when you want guidance in Studio, or forward metrics/logs into your preferred observability stack with a few clicks.
+
+## Observability Products and features
+
+Pick the workflow that matches where you spend time today. The cards below link to the detailed guides for each surface.
+
+{/* <!-- vale off --> */}
+
+<div className="grid gap-4 not-prose md:grid-cols-12">
+  {observabilityCards.map((card) => (
+    <div className="col-span-12 md:col-span-6 xl:col-span-4" key={card.title}>
+      <Link href={card.href} passHref>
+        <GlassPanel title={card.title}>
+          <div className="space-y-3">
+            {card.pill ? (
+              <span className="inline-flex items-center rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-foreground">
+                {card.pill}
+              </span>
+            ) : null}
+            <p className="text-foreground-light">{card.description}</p>
+            <span className="text-sm text-foreground-lighter">
+              {card.external ? 'Opens external resource' : 'View the guide'}
+            </span>
+          </div>
+        </GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+{/* <!-- vale on --> */}
+
+## FAQ
+
+<div className="not-prose">
+  <Accordion
+    type="default"
+    size="medium"
+    chevronAlign="right"
+    openBehaviour="multiple"
+    className="rounded-xl border border-foreground/10 bg-surface-100"
+  >
+    <AccordionItem
+      header="How is Observability different from Telemetry?"
+      id="observability-vs-telemetry"
+      className="border-0 px-6 py-4"
+    >
+      Telemetry is the raw signal layer (logs, metrics, traces). Observability is the complete
+      workflow: collecting that telemetry, visualizing it with Reports and Advisors, and exporting
+      it to external platforms. Start with the [Telemetry guide](/docs/guides/telemetry) if you only
+      need the signals.
+    </AccordionItem>
+    <AccordionItem
+      header="Do I need to run my own Prometheus?"
+      id="observability-prometheus"
+      className="border-0 px-6 py-4"
+    >
+      No. Grafana Cloud, Datadog, or any managed Prometheus-compatible service can scrape the
+      Supabase Metrics API endpoint. If you prefer self-hosting, follow the [Grafana + Prometheus
+      guide](/docs/guides/telemetry/metrics/grafana-self-hosted) and install Prometheus using the
+      official [instructions](https://prometheus.io/docs/prometheus/latest/installation/).
+    </AccordionItem>
+    <AccordionItem
+      header="How long are logs and metrics retained?"
+      id="observability-retention"
+      className="border-0 px-6 py-4"
+    >
+      Supabase retains logs and report history based on your organization plan (Free, Pro, Team,
+      Enterprise). Metrics scraped through the Metrics API live wherever you store them. Check the
+      [pricing page](/pricing) for the latest retention matrix.
+    </AccordionItem>
+  </Accordion>
+</div>
+
+## Related docs
+
+- [Telemetry signals](/docs/guides/telemetry)
+- [Reports in Supabase Studio](/docs/guides/telemetry/reports)
+- [Log drains for SIEMs](/docs/guides/telemetry/log-drains)
+- [Index advisor extension](/docs/guides/database/extensions/index_advisor)
+- [pg_stat_statements guide](/docs/guides/database/extensions/pg_stat_statements)
+- [Pricing for retention + add-ons](/pricing)
+
+export const observabilityCards = [
+  {
+    title: 'Telemetry',
+    description: 'Understand how logs, metrics, and traces flow through Supabase plus retention.',
+    href: '/guides/telemetry',
+  },
+  {
+    title: 'Built-in reports',
+    description: 'Use Studio dashboards for CPU, IO, auth, storage, and API health with no setup.',
+    href: '/docs/guides/telemetry/reports',
+  },
+  {
+    title: 'Advisors & automation',
+    description: 'Query Performance and index_advisor surface slow queries and right-sizing hints.',
+    href: '/docs/guides/database/database-advisors',
+  },
+  {
+    title: 'Performance tools & extensions',
+    description: 'Use pg_stat_statements, EXPLAIN, and other Postgres extensions alongside Studio.',
+    href: '/docs/guides/observability/performance-tooling',
+  },
+  {
+    title: 'Pricing',
+    description: 'Compare plan-based retention, log drain quotas, and observability add-ons.',
+    href: 'https://supabase.com/pricing',
+    external: true,
+  },
+]
