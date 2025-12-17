@@ -1,7 +1,7 @@
 import type { UseFormReturn } from 'react-hook-form'
 
 import { useFlag } from 'common'
-import { AnalyticsBucket, Datadog } from 'icons'
+import { AnalyticsBucket, BigQuery } from 'icons'
 import {
   cn,
   FormControl_Shadcn_,
@@ -55,7 +55,7 @@ export const DestinationTypeSelection = ({ form, editMode }: DestinationTypeSele
                   value="BigQuery"
                 >
                   <div className="flex flex-col gap-y-2">
-                    <Datadog size={20} fill="currentColor" strokeWidth={0} />
+                    <BigQuery size={20} />
                     <div className="flex flex-col gap-y-0.5 text-sm text-left">
                       <p>BigQuery</p>
                       <p className="text-foreground-lighter">
