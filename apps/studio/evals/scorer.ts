@@ -170,3 +170,38 @@ export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ i
     score: result.score ?? 0,
   }
 }
+
+const completenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
+  name: 'Completeness',
+  promptTemplate: stripIndent`
+    Evaluate whether this response is complete and finished, or if it appears cut off or incomplete.
+
+    Input: {{input}}
+    Output: {{output}}
+
+    Does the response appear complete and finished?
+    a) Fully complete - addresses the question fully, no cut-offs or missing parts
+    b) Mostly complete - minor gaps but acceptable, response feels finished
+    c) Partially complete - some aspects addressed but response feels incomplete
+    d) Incomplete - response appears cut off mid-sentence or missing key information
+    e) Severely incomplete - empty response, frozen, or completely cut off
+  `,
+  choiceScores: { a: 1, b: 0.75, c: 0.5, d: 0.25, e: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
+  input,
+  output,
+}) => {
+  const result = await completenessEvaluator({
+    input,
+    output: output.text,
+  })
+
+  return {
+    name: 'Completeness',
+    score: result.score ?? 0,
+  }
+}
