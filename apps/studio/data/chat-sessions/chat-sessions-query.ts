@@ -20,8 +20,14 @@ export async function getChatSessions({ projectRef }: ChatSessionsVariables, sig
   })
 
   if (error) handleError(error)
-  console.log('data', data)
-  return data
+
+  if (Array.isArray(data)) return data as ChatSessionResponse[]
+
+  if (data && typeof data === 'object' && 'data' in data && Array.isArray((data as any).data)) {
+    return (data as any).data as ChatSessionResponse[]
+  }
+
+  throw new Error('Unexpected chat sessions response')
 }
 
 export type ChatSessionsData = Awaited<ReturnType<typeof getChatSessions>>

@@ -10,13 +10,19 @@ export type ChatSessionUpdateVariables = {
   name?: string
 }
 
-export async function updateChatSession({ id, projectRef, name }: ChatSessionUpdateVariables) {
+export async function updateChatSession(
+  { id, projectRef, name }: ChatSessionUpdateVariables,
+  headersInit?: HeadersInit
+) {
   if (!id) throw new Error('id is required')
   if (!projectRef) throw new Error('projectRef is required')
+
+  const headers = headersInit ? new Headers(headersInit) : undefined
 
   const { data, error } = await patch(`/v1/projects/{ref}/chat-sessions/{id}`, {
     params: { path: { ref: projectRef, id } },
     body: { name },
+    ...(headers && { headers }),
   })
 
   if (error) handleError(error)

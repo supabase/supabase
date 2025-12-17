@@ -13,6 +13,8 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { useChatSessionCreateMutation } from 'data/chat-sessions/chat-session-create-mutation'
+import { useChatSessionMessageDeleteMutation } from 'data/chat-sessions/chat-session-message-delete-mutation'
+import { useChatSessionMessagesCreateMutation } from 'data/chat-sessions/chat-session-messages-create-mutation'
 import { useChatSessionMessagesQuery } from 'data/chat-sessions/chat-session-messages-query'
 import { useChatSessionsQuery } from 'data/chat-sessions/chat-sessions-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -67,13 +69,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
   // Avoid hammering the API when project ref is unavailable or if previous calls failed
-  const shouldFetchSessions = IS_PLATFORM && !!project?.ref && !disablePrompts
   const [sessionFetchError, setSessionFetchError] = useState<string | null>(null)
+  const shouldFetchSessions =
+    IS_PLATFORM && !!project?.ref && !disablePrompts && sessionFetchError === null
 
   // Load sessions from server
   const {
     data: sessions = [],
-    isLoading: isLoadingSessions,
+    isPending: isPendingSessions,
+    isSuccess: isSuccessSessions,
     error: chatSessionsError,
   } = useChatSessionsQuery(
     { projectRef: project?.ref },
@@ -87,12 +91,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   // Load messages for active chat
-  const { data: initialMessages = [] } = useChatSessionMessagesQuery(
+  const {
+    data: initialMessages = [],
+    isSuccess: isSuccessInitialMessages,
+  } = useChatSessionMessagesQuery<MessageType[]>(
     { id: snap.activeChatId, projectRef: project?.ref },
-    { enabled: shouldFetchSessions && !!snap.activeChatId && !chatSessionsError }
+    {
+      enabled:
+        shouldFetchSessions &&
+        isSuccessSessions &&
+        !!snap.activeChatId &&
+        !chatSessionsError &&
+        typeof project?.ref !== 'undefined',
+    }
   )
 
   const createSession = useChatSessionCreateMutation()
+  const saveMessages = useChatSessionMessagesCreateMutation()
+  const deleteMessageMutation = useChatSessionMessageDeleteMutation()
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -113,6 +129,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [isPaidPlan, snap.model])
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const hasHydratedChatMessagesRef = useRef<string | null>(null)
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showMetadataWarning =
@@ -120,39 +137,42 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     !!selectedOrganization &&
     (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
 
-  // // Initialize active chat if none selected
-  // useEffect(() => {
-  //   if (!shouldFetchSessions || isLoadingSessions || chatSessionsError) return
-  //   if (!snap.activeChatId && sessions.length > 0) {
-  //     // Select the most recently updated chat
-  //     const mostRecentSession = sessions.sort(
-  //       (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-  //     )[0]
-  //     state.setActiveChatId(mostRecentSession.id)
-  //   } else if (!snap.activeChatId && sessions.length === 0 && project?.ref) {
-  //     // Create a new chat if none exist
-  //     createSession.mutate(
-  //       { projectRef: project.ref },
-  //       {
-  //         onSuccess: (newSession) => {
-  //           state.setActiveChatId(newSession.id)
-  //         },
-  //         onError: (err) => {
-  //           setSessionFetchError(err.message ?? 'Failed to create chat session')
-  //         },
-  //       }
-  //     )
-  //   }
-  // }, [
-  //   shouldFetchSessions,
-  //   isLoadingSessions,
-  //   chatSessionsError,
-  //   sessions,
-  //   snap.activeChatId,
-  //   project?.ref,
-  //   state,
-  //   createSession,
-  // ])
+  // Initialize active chat if none selected (global state lives in ai-assistant-state.tsx)
+  useEffect(() => {
+    if (!shouldFetchSessions || isPendingSessions || chatSessionsError) return
+    if (snap.activeChatId) return
+
+    if (sessions.length > 0) {
+      const mostRecentSession = [...sessions].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      )[0]
+      state.setActiveChatId(mostRecentSession.id)
+      return
+    }
+
+    if (sessions.length === 0 && project?.ref) {
+      createSession.mutate(
+        { projectRef: project.ref },
+        {
+          onSuccess: (newSession) => {
+            state.setActiveChatId(newSession.id)
+          },
+          onError: (err) => {
+            setSessionFetchError(err.message ?? 'Failed to create chat session')
+          },
+        }
+      )
+    }
+  }, [
+    shouldFetchSessions,
+    isPendingSessions,
+    chatSessionsError,
+    sessions,
+    snap.activeChatId,
+    project?.ref,
+    state,
+    createSession,
+  ])
 
   // Keep latest selected organization to avoid stale values in useChat transport
   const selectedOrganizationRef = useRef(selectedOrganization)
@@ -218,6 +238,33 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
 
+  // Hydrate the current chat with server messages once per chat id.
+  useEffect(() => {
+    if (!snap.activeChatId) return
+    if (!shouldFetchSessions) return
+    if (!isSuccessInitialMessages) return
+    if (hasHydratedChatMessagesRef.current === snap.activeChatId) return
+    if (isChatLoading) return
+
+    if (initialMessages.length > 0) {
+      const mergedMessages = [...initialMessages, ...chatMessages]
+      const uniqueMessages = mergedMessages.filter(
+        (msg, idx, all) => idx === all.findIndex((m) => m.id === msg.id)
+      )
+      setMessages(uniqueMessages)
+    }
+
+    hasHydratedChatMessagesRef.current = snap.activeChatId
+  }, [
+    snap.activeChatId,
+    shouldFetchSessions,
+    isSuccessInitialMessages,
+    isChatLoading,
+    chatMessages,
+    initialMessages,
+    setMessages,
+  ])
+
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
       // Find the message index in current chatMessages
@@ -226,12 +273,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       if (isChatLoading) stop()
 
-      snap.deleteMessagesAfter(messageId, { includeSelf: true })
-
+      // Get messages to delete (from messageId onwards)
+      const messagesToDelete = chatMessages.slice(messageIndex)
       const updatedMessages = chatMessages.slice(0, messageIndex)
+
       setMessages(updatedMessages)
+
+      // Delete messages from server
+      if (project?.ref && snap.activeChatId) {
+        for (const msg of messagesToDelete) {
+          deleteMessageMutation.mutate({
+            projectRef: project.ref,
+            chatId: snap.activeChatId,
+            messageId: msg.id,
+          })
+        }
+      }
     },
-    [snap, setMessages, chatMessages, isChatLoading, stop]
+    [chatMessages, isChatLoading, project?.ref, deleteMessageMutation, setMessages, snap.activeChatId, stop]
   )
 
   const editMessage = useCallback(
@@ -359,10 +418,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const hasMessages = chatMessages.length > 0
 
-  const sendMessageToAssistant = (finalContent: string) => {
+  const sendMessageToAssistant = async (finalContent: string) => {
     if (editingMessageId) {
-      // Handling when the user is in edit mode
-      // delete the message(s) from the chat just like the delete button
       setIsResubmitting(true)
       deleteMessageFromHere(editingMessageId)
       setEditingMessageId(null)
@@ -656,15 +713,20 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(finalMessage) => {
-              sendMessageToAssistant(finalMessage)
-            }}
+            onSubmit={(finalMessage) => void sendMessageToAssistant(finalMessage)}
             onStop={() => {
               stop()
-              // to save partial responses from the AI
+              // Save partial assistant response to the database
               const lastMessage = chatMessages[chatMessages.length - 1]
               if (lastMessage && lastMessage.role === 'assistant') {
-                state.updateMessage(lastMessage)
+                if (project?.ref && snap.activeChatId) {
+                  // Save just the partial assistant message (user message already saved by server)
+                  saveMessages.mutate({
+                    projectRef: project.ref,
+                    id: snap.activeChatId,
+                    messages: [lastMessage] as any,
+                  })
+                }
               }
             }}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}

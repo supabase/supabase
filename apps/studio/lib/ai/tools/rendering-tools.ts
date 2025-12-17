@@ -1,7 +1,14 @@
 import { tool } from 'ai'
+import { updateChatSession } from 'data/chat-sessions/chat-session-update-mutation'
 import { z } from 'zod'
 
-export const getRenderingTools = () => ({
+type RenderingToolsContext = {
+  projectRef: string
+  chatId?: string
+  authorization?: string
+}
+
+export const getRenderingTools = (context?: RenderingToolsContext) => ({
   execute_sql: tool({
     description: 'Asks the user to execute a SQL statement and return the results',
     inputSchema: z.object({
@@ -34,8 +41,29 @@ export const getRenderingTools = () => ({
     inputSchema: z.object({
       newName: z.string().describe('The new name for the chat session. Five words or less.'),
     }),
-    execute: async () => {
-      return { status: 'Chat request sent to client' }
+    execute: async ({ newName }) => {
+      if (!context?.projectRef || !context?.chatId) {
+        return { status: 'error', message: 'Missing project or chat context' }
+      }
+
+      try {
+        const headers = context.authorization ? { Authorization: context.authorization } : undefined
+        await updateChatSession(
+          {
+            id: context.chatId,
+            projectRef: context.projectRef,
+            name: newName,
+          },
+          headers
+        )
+        return { status: 'success', newName }
+      } catch (error) {
+        console.error('Failed to rename chat:', error)
+        return {
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Failed to rename chat',
+        }
+      }
     },
   }),
 })

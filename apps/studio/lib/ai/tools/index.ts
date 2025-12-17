@@ -13,15 +13,17 @@ export const getTools = async ({
   authorization,
   aiOptInLevel,
   accessToken,
+  chatId,
 }: {
   projectRef: string
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
   accessToken?: string
+  chatId?: string
 }) => {
-  // Always include rendering tools
-  let tools: ToolSet = getRenderingTools()
+  // Always include rendering tools with context for server-side execution
+  let tools: ToolSet = getRenderingTools({ projectRef, chatId, authorization })
 
   // If self-hosted, only add fallback tools
   if (!IS_PLATFORM) {
