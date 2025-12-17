@@ -8,17 +8,15 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import CopyButton from 'components/ui/CopyButton'
-import InformationBox from 'components/ui/InformationBox'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useStateTransition } from 'hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
-import { HighlightProjectRefProvider, useHighlightProjectRefContext } from './HighlightContext'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -28,6 +26,7 @@ import {
   supportFormReducer,
   type SupportFormState,
 } from './SupportForm.state'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
 
@@ -59,11 +58,7 @@ function useSupportFormTelemetry() {
 }
 
 export function SupportFormPage() {
-  return (
-    <HighlightProjectRefProvider>
-      <SupportFormPageContent />
-    </HighlightProjectRefProvider>
-  )
+  return <SupportFormPageContent />
 }
 
 function SupportFormPageContent() {
@@ -106,7 +101,7 @@ function SupportFormPageContent() {
         initialError={initialError}
         selectedProjectRef={projectRef}
       />
-      <SupportFormDirectEmailInfo />
+      <SupportFormDirectEmailInfo projectRef={projectRef} />
     </SupportFormWrapper>
   )
 }
@@ -177,38 +172,55 @@ function SupportFormHeader() {
   )
 }
 
-function SupportFormDirectEmailInfo() {
-  const { scrollToRef, setShouldHighlightRef: setHighlight } = useHighlightProjectRefContext()
+interface SupportFormDirectEmailInfoProps {
+  projectRef: string | null
+}
+
+function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoProps) {
+  const hasProjectRef = projectRef && projectRef !== NO_PROJECT_MARKER
 
   return (
-    <InformationBox
+    <Admonition
+      type="default"
       title="Having trouble submitting the form?"
       description={
-        <div className="flex flex-col gap-y-4">
-          <p className="flex items-center gap-x-1 ">
+        <div className="flex flex-col gap-y-1">
+          <p className="flex items-center gap-x-1 flex-wrap">
             Email us directly at{' '}
-            <InlineLink href="mailto:support@supabase.com" className="font-mono">
-              support@supabase.com
-            </InlineLink>
-            <CopyButton
-              type="text"
-              text="support@supabase.com"
-              iconOnly
-              onClick={() => toast.success('Copied to clipboard')}
-            />
+            <span className="inline-flex items-center gap-x-1">
+              <a
+                href={`mailto:support@supabase.com?subject=Support Request for Project: ${projectRef}&body=My project ID is ${projectRef}.%0D%0A%0D%0AHere is a detailed description of the problem I am experiencing and any other information that might be helpful...`}
+                className="hover:text-foreground transition-colors duration-100"
+              >
+                <code
+                  className={cn(
+                    'text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100'
+                  )}
+                >
+                  support@supabase.com
+                </code>
+              </a>
+              <CopyButton
+                type="text"
+                text="support@supabase.com"
+                iconOnly
+                onClick={() => toast.success('Copied email address to clipboard')}
+              />
+            </span>
           </p>
           <p>
-            Please, make sure to{' '}
-            <button
-              type="button"
-              className={cn(InlineLinkClassName, 'cursor-pointer')}
-              onClick={() => {
-                scrollToRef()
-                setHighlight(true)
-              }}
-            >
-              include your project ID
-            </button>{' '}
+            Please make sure to include your project ID{' '}
+            {hasProjectRef && (
+              <span className="inline-flex items-center gap-x-1">
+                <code className={cn('text-code-inline !text-foreground-light')}>{projectRef}</code>
+                <CopyButton
+                  iconOnly
+                  type="text"
+                  text={projectRef}
+                  onClick={() => toast.success('Copied project ID to clipboard')}
+                />
+              </span>
+            )}{' '}
             and as much information as possible.
           </p>
         </div>

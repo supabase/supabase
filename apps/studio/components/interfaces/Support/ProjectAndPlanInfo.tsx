@@ -21,7 +21,6 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useHighlightProjectRefContext } from './HighlightContext'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
@@ -43,11 +42,10 @@ export function ProjectAndPlanInfo({
   subscriptionPlanId,
   showPlanExpectationInfo = true,
 }: ProjectAndPlanProps) {
-  const { ref } = useHighlightProjectRefContext()
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
 
   return (
-    <div ref={ref} className={'flex flex-col gap-y-2'}>
+    <div className={'flex flex-col gap-y-2'}>
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
       <ProjectRefHighlighted projectRef={projectRef} />
 
@@ -146,9 +144,6 @@ interface ProjectRefHighlightedProps {
 function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
   const isVisible = !!projectRef && projectRef !== NO_PROJECT_MARKER
 
-  const { shouldHighlightRef, setShouldHighlightRef: setHighlight } =
-    useHighlightProjectRefContext()
-
   return (
     <AnimatePresence>
       {isVisible && (
@@ -159,32 +154,15 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           transition={{ duration: 0.3 }}
           className="flex items-center gap-x-1"
         >
-          <p
-            className={cn(
-              'text-sm prose transition',
-              shouldHighlightRef ? 'text-foreground' : 'text-foreground-lighter'
-            )}
-          >
+          <p className={cn('text-sm transition text-foreground-lighter')}>
             Project ID:{' '}
-            <code
-              className={cn(
-                'transition',
-                shouldHighlightRef
-                  ? 'text-brand font-medium border-brand-500 animate-pulse'
-                  : 'text-foreground-light'
-              )}
-            >
-              {projectRef}
-            </code>
+            <code className={cn('text-code-inline !text-foreground-light')}>{projectRef}</code>
           </p>
           <CopyButton
             iconOnly
             type="text"
             text={projectRef}
-            onClick={() => {
-              toast.success('Copied to clipboard')
-              setHighlight(false)
-            }}
+            onClick={() => toast.success('Copied project ID to clipboard')}
           />
         </motion.div>
       )}

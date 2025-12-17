@@ -5,16 +5,13 @@ import { useState } from 'react'
 
 import { Button, cn, DialogSectionSeparator } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { HighlightProjectRefProvider } from './HighlightContext'
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
 
 export function LinkSupportTicketPage() {
   return (
     <div className="h-full relative overflow-y-auto overflow-x-hidden">
       <div className="h-full flex flex-col gap-y-8 items-center justify-center mx-auto max-w-2xl w-full px-4 lg:px-6">
-        <HighlightProjectRefProvider>
-          <LinkSupportTicketPageContent />
-        </HighlightProjectRefProvider>
+        <LinkSupportTicketPageContent />
       </div>
     </div>
   )
