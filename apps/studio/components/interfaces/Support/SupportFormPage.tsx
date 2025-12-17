@@ -185,11 +185,14 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
       title="Having trouble submitting the form?"
       description={
         <>
+          <p className="!mb-2.5">
+            Please email us directly. Include your project ID and as much information as possible.
+          </p>
           <p className="flex items-center gap-x-1.5 flex-wrap">
-            Email us directly at{' '}
+            Email:{' '}
             <span className="inline-flex items-center gap-x-1">
               <a
-                href={`mailto:support@supabase.com?subject=Support Request for Project: ${projectRef}&body=My project ID is ${projectRef}.%0D%0A%0D%0AHere is a detailed description of the problem I am experiencing and any other information that might be helpful...`}
+                href={`mailto:support@supabase.com?subject=Support Request for Project ID: ${projectRef}&body=Here is a detailed description of the problem I am experiencing and any other information that might be helpful...`}
                 className="hover:text-foreground transition-colors duration-100"
               >
                 <code
@@ -208,9 +211,9 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
               />
             </span>
           </p>
-          <p className="flex items-center gap-x-1.5 flex-wrap">
-            Please make sure to include your project ID{' '}
-            {hasProjectRef && (
+          {hasProjectRef && (
+            <p className="flex items-center gap-x-1.5 flex-wrap">
+              Project ID:{' '}
               <span className="inline-flex items-center gap-x-1">
                 <code className={cn('text-code-inline !text-foreground-light')}>{projectRef}</code>
                 <CopyButton
@@ -220,9 +223,8 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                   onClick={() => toast.success('Copied project ID to clipboard')}
                 />
               </span>
-            )}{' '}
-            and as much information as possible.
-          </p>
+            </p>
+          )}
         </>
       }
       defaultVisibility={true}
