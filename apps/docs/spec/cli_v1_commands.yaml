@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.65.5
+  version: 2.67.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1063,52 +1063,9 @@ commands:
         description: Organization ID to create the project in.
         default_value: ''
       - id: region
-        name: --region <string>
+        name: --region <[  ]>
         description: Select a region close to you for the best performance.
         default_value: ''
-        accepted_values:
-          - id: ap-northeast-1
-            name: ap-northeast-1
-            type: string
-          - id: ap-northeast-2
-            name: ap-northeast-2
-            type: string
-          - id: ap-south-1
-            name: ap-south-1
-            type: string
-          - id: ap-southeast-1
-            name: ap-southeast-1
-            type: string
-          - id: ap-southeast-2
-            name: ap-southeast-2
-            type: string
-          - id: ca-central-1
-            name: ca-central-1
-            type: string
-          - id: eu-central-1
-            name: eu-central-1
-            type: string
-          - id: eu-west-1
-            name: eu-west-1
-            type: string
-          - id: eu-west-2
-            name: eu-west-2
-            type: string
-          - id: eu-west-3
-            name: eu-west-3
-            type: string
-          - id: sa-east-1
-            name: sa-east-1
-            type: string
-          - id: us-east-1
-            name: us-east-1
-            type: string
-          - id: us-west-1
-            name: us-west-1
-            type: string
-          - id: us-west-2
-            name: us-west-2
-            type: string
       - id: size
         name: --size <string>
         description: Select a desired instance size for your project.
@@ -2316,17 +2273,13 @@ commands:
         name: --force
         description: Overwrite existing supabase/config.toml.
         default_value: 'false'
+      - id: interactive
+        name: -i, --interactive
+        description: Enables interactive mode to configure IDE settings.
+        default_value: 'false'
       - id: use-orioledb
         name: --use-orioledb
         description: Use OrioleDB storage engine for Postgres.
-        default_value: 'false'
-      - id: with-intellij-settings
-        name: --with-intellij-settings
-        description: Generate IntelliJ IDEA settings for Deno.
-        default_value: 'false'
-      - id: with-vscode-settings
-        name: --with-vscode-settings
-        description: Generate VS Code settings for Deno.
         default_value: 'false'
   - id: supabase-gen
     title: supabase gen
@@ -2361,19 +2314,22 @@ commands:
         description: Generate types from a database url.
         default_value: ''
       - id: lang
-        name: --lang <[ typescript | go | swift ]>
+        name: --lang <[ typescript | go | swift | python ]>
         description: Output language of the generated types.
         default_value: typescript
         accepted_values:
           - id: typescript
             name: typescript
-            type: '[ typescript | go | swift ]'
+            type: '[ typescript | go | swift | python ]'
           - id: go
             name: go
-            type: '[ typescript | go | swift ]'
+            type: '[ typescript | go | swift | python ]'
           - id: swift
             name: swift
-            type: '[ typescript | go | swift ]'
+            type: '[ typescript | go | swift | python ]'
+          - id: python
+            name: python
+            type: '[ typescript | go | swift | python ]'
       - id: linked
         name: --linked
         description: Generate types from the linked project.
@@ -3593,52 +3549,9 @@ commands:
         description: Whether to create a persistent branch.
         default_value: 'false'
       - id: region
-        name: --region <string>
+        name: --region <[  ]>
         description: Select a region to deploy the branch database.
         default_value: ''
-        accepted_values:
-          - id: ap-northeast-1
-            name: ap-northeast-1
-            type: string
-          - id: ap-northeast-2
-            name: ap-northeast-2
-            type: string
-          - id: ap-south-1
-            name: ap-south-1
-            type: string
-          - id: ap-southeast-1
-            name: ap-southeast-1
-            type: string
-          - id: ap-southeast-2
-            name: ap-southeast-2
-            type: string
-          - id: ca-central-1
-            name: ca-central-1
-            type: string
-          - id: eu-central-1
-            name: eu-central-1
-            type: string
-          - id: eu-west-1
-            name: eu-west-1
-            type: string
-          - id: eu-west-2
-            name: eu-west-2
-            type: string
-          - id: eu-west-3
-            name: eu-west-3
-            type: string
-          - id: sa-east-1
-            name: sa-east-1
-            type: string
-          - id: us-east-1
-            name: us-east-1
-            type: string
-          - id: us-west-1
-            name: us-west-1
-            type: string
-          - id: us-west-2
-            name: us-west-2
-            type: string
       - id: size
         name: --size <string>
         description: Select a desired instance size for the branch database.
