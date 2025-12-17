@@ -31,8 +31,8 @@ export const StripeSyncSettingsPage = () => {
 
   const isInstalled =
     stripeSchema &&
-    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-    stripeSchema.description.includes(INSTALLATION_INSTALLED_SUFFIX)
+    stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.comment.includes(INSTALLATION_INSTALLED_SUFFIX)
 
   // Redirect to overview if not installed
   useEffect(() => {

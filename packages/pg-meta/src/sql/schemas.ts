@@ -5,7 +5,7 @@ select
   n.oid as id,
   n.nspname as name,
   u.rolname as owner,
-   obj_description(n.oid, 'pg_namespace') AS description
+   obj_description(n.oid, 'pg_namespace') AS comment
 from
   pg_namespace n,
   pg_roles u

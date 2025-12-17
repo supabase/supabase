@@ -110,20 +110,20 @@ export const StripeSyncInstallationPage = () => {
   // Determine installation status from schema description
   const isInstalled =
     stripeSchema &&
-    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-    stripeSchema.description.includes(INSTALLATION_INSTALLED_SUFFIX)
+    stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.comment.includes(INSTALLATION_INSTALLED_SUFFIX)
 
   const schemaShowsInProgress =
     stripeSchema &&
-    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-    stripeSchema.description?.includes(INSTALLATION_STARTED_SUFFIX)
+    stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.comment?.includes(INSTALLATION_STARTED_SUFFIX)
 
   const setupInProgress = schemaShowsInProgress || isInstalling || isInstallInitiated
 
   const setupError =
     stripeSchema &&
-    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-    stripeSchema.description?.includes(INSTALLATION_ERROR_SUFFIX)
+    stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.comment?.includes(INSTALLATION_ERROR_SUFFIX)
 
   useEffect(() => {
     // Clear the install initiated flag once we detect completion or error from the schema
@@ -134,7 +134,7 @@ export const StripeSyncInstallationPage = () => {
 
   // Check if there's an existing stripe schema that wasn't created by this integration
   const hasConflictingSchema =
-    stripeSchema && !stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
+    stripeSchema && !stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
 
   const canInstall = !hasConflictingSchema && !isInstalled && !setupInProgress
 
