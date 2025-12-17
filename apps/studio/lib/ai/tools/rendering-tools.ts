@@ -1,5 +1,5 @@
 import { tool } from 'ai'
-import { updateChatSession } from 'data/chat-sessions/chat-session-update-mutation'
+import { updateAgent } from 'data/agents/agent-update-mutation'
 import { z } from 'zod'
 
 type RenderingToolsContext = {
@@ -48,7 +48,7 @@ export const getRenderingTools = (context?: RenderingToolsContext) => ({
 
       try {
         const headers = context.authorization ? { Authorization: context.authorization } : undefined
-        await updateChatSession(
+        await updateAgent(
           {
             id: context.chatId,
             projectRef: context.projectRef,

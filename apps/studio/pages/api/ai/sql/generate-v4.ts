@@ -14,8 +14,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
-import { createChatSessionMessages } from 'data/chat-sessions/chat-session-messages-create'
-import { getChatSessionMessages } from 'data/chat-sessions/chat-session-messages-query'
+import { createAgentMessages } from 'data/agents/agent-messages-create-mutation'
+import { getAgentMessages } from 'data/agents/agent-messages-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { cleanMessage } from 'lib/ai/clean-message'
@@ -106,7 +106,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   let previousMessages: UIMessage[] = []
   if (chatId && projectRef) {
     try {
-      const data = await getChatSessionMessages({ projectRef, id: chatId }, undefined, {
+      const data = await getAgentMessages({ projectRef, id: chatId }, undefined, {
         ...(authorization && { Authorization: authorization }),
       })
       console.log('Loaded messages from DB:', JSON.stringify(data, null, 2))
@@ -281,10 +281,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         if (chatId && projectRef && userMessage.role === 'user') {
           try {
             console.log('Saving user message:', JSON.stringify(userMessage, null, 2))
-            await createChatSessionMessages(
-              { projectRef, id: chatId, messages: [userMessage] },
-              apiHeaders
-            )
+            await createAgentMessages({ projectRef, id: chatId, messages: [userMessage] }, apiHeaders)
           } catch (error) {
             console.error('Failed to save user message:', error)
             // Continue even if save fails - don't block the streaming
@@ -321,10 +318,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           try {
             const cleanedMessage = cleanMessage(responseMessage)
             console.log('Saving assistant message:', JSON.stringify(cleanedMessage, null, 2))
-            await createChatSessionMessages(
-              { projectRef, id: chatId, messages: [cleanedMessage] },
-              apiHeaders
-            )
+            await createAgentMessages({ projectRef, id: chatId, messages: [cleanedMessage] }, apiHeaders)
           } catch (error) {
             console.error('Failed to save assistant message:', error)
           }

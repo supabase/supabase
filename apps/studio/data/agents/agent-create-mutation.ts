@@ -1,19 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { chatSessionKeys } from './keys'
+import { agentKeys } from './keys'
 
-export type ChatSessionCreateVariables = {
+export type AgentCreateVariables = {
   projectRef: string
   name?: string
 }
 
-export async function createChatSession({ projectRef, name }: ChatSessionCreateVariables) {
+export async function createAgent({ projectRef, name }: AgentCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post(`/v1/projects/{ref}/chat-sessions`, {
+  const { data, error } = await post(`/v1/projects/{ref}/agents`, {
     params: { path: { ref: projectRef } },
     body: { name },
   })
@@ -22,29 +21,29 @@ export async function createChatSession({ projectRef, name }: ChatSessionCreateV
   return data
 }
 
-type ChatSessionCreateData = Awaited<ReturnType<typeof createChatSession>>
+type AgentCreateData = Awaited<ReturnType<typeof createAgent>>
 
-export const useChatSessionCreateMutation = ({
+export const useAgentCreateMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ChatSessionCreateData, ResponseError, ChatSessionCreateVariables>,
+  UseCustomMutationOptions<AgentCreateData, ResponseError, AgentCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ChatSessionCreateData, ResponseError, ChatSessionCreateVariables>({
-    mutationFn: (vars) => createChatSession(vars),
+  return useMutation<AgentCreateData, ResponseError, AgentCreateVariables>({
+    mutationFn: (vars) => createAgent(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
-        queryKey: chatSessionKeys.list(variables.projectRef),
+        queryKey: agentKeys.list(variables.projectRef),
       })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to create chat session: ${data.message}`)
+        toast.error(`Failed to create agent: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

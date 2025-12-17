@@ -57,8 +57,8 @@ test('generateV4 calls the tool sanitizer', async () => {
     executeSql: vi.fn().mockResolvedValue({ result: [] }),
   }))
 
-  vi.mock('data/chat-sessions/chat-session-messages-query', () => ({
-    getChatSessionMessages: vi.fn().mockResolvedValue([
+  vi.mock('data/agents/agent-messages-query', () => ({
+    getAgentMessages: vi.fn().mockResolvedValue([
       {
         id: 'assistant-tool-msg-1',
         role: 'assistant',
@@ -75,8 +75,8 @@ test('generateV4 calls the tool sanitizer', async () => {
     ]),
   }))
 
-  vi.mock('data/chat-sessions/chat-session-messages-create', () => ({
-    createChatSessionMessages: vi.fn().mockResolvedValue({}),
+  vi.mock('data/agents/agent-messages-create-mutation', () => ({
+    createAgentMessages: vi.fn().mockResolvedValue({}),
   }))
 
   vi.mock('lib/ai/tools', () => ({

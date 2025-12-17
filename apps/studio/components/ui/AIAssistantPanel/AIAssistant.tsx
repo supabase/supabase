@@ -12,11 +12,11 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
-import { useChatSessionCreateMutation } from 'data/chat-sessions/chat-session-create-mutation'
-import { useChatSessionMessageDeleteMutation } from 'data/chat-sessions/chat-session-message-delete-mutation'
-import { useChatSessionMessagesCreateMutation } from 'data/chat-sessions/chat-session-messages-create-mutation'
-import { useChatSessionMessagesQuery } from 'data/chat-sessions/chat-session-messages-query'
-import { useChatSessionsQuery } from 'data/chat-sessions/chat-sessions-query'
+import { useAgentCreateMutation } from 'data/agents/agent-create-mutation'
+import { useAgentMessageDeleteMutation } from 'data/agents/agent-message-delete-mutation'
+import { useAgentMessagesCreateMutation } from 'data/agents/agent-messages-create-mutation'
+import { useAgentMessagesQuery } from 'data/agents/agent-messages-query'
+import { useAgentsQuery } from 'data/agents/agents-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -79,7 +79,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     isPending: isPendingSessions,
     isSuccess: isSuccessSessions,
     error: chatSessionsError,
-  } = useChatSessionsQuery(
+  } = useAgentsQuery(
     { projectRef: project?.ref },
     {
       enabled: shouldFetchSessions,
@@ -94,7 +94,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const {
     data: initialMessages = [],
     isSuccess: isSuccessInitialMessages,
-  } = useChatSessionMessagesQuery<MessageType[]>(
+  } = useAgentMessagesQuery<MessageType[]>(
     { id: snap.activeChatId, projectRef: project?.ref },
     {
       enabled:
@@ -106,9 +106,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
   )
 
-  const createSession = useChatSessionCreateMutation()
-  const saveMessages = useChatSessionMessagesCreateMutation()
-  const deleteMessageMutation = useChatSessionMessageDeleteMutation()
+  const createSession = useAgentCreateMutation()
+  const saveMessages = useAgentMessagesCreateMutation()
+  const deleteMessageMutation = useAgentMessageDeleteMutation()
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -284,7 +284,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         for (const msg of messagesToDelete) {
           deleteMessageMutation.mutate({
             projectRef: project.ref,
-            chatId: snap.activeChatId,
+            agentId: snap.activeChatId,
             messageId: msg.id,
           })
         }

@@ -1,10 +1,10 @@
 import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { useChatSessionCreateMutation } from 'data/chat-sessions/chat-session-create-mutation'
-import { useChatSessionDeleteMutation } from 'data/chat-sessions/chat-session-delete-mutation'
-import { useChatSessionUpdateMutation } from 'data/chat-sessions/chat-session-update-mutation'
-import { useChatSessionsQuery } from 'data/chat-sessions/chat-sessions-query'
+import { useAgentCreateMutation } from 'data/agents/agent-create-mutation'
+import { useAgentDeleteMutation } from 'data/agents/agent-delete-mutation'
+import { useAgentUpdateMutation } from 'data/agents/agent-update-mutation'
+import { useAgentsQuery } from 'data/agents/agents-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -37,15 +37,15 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
   const shouldFetchSessions = IS_PLATFORM && !!project?.ref
 
   // Fetch chats from server
-  const { data: sessions = [] } = useChatSessionsQuery(
+  const { data: sessions = [] } = useAgentsQuery(
     { projectRef: project?.ref },
     { enabled: shouldFetchSessions && !disabled, retry: false }
   )
 
   // Mutations
-  const createSession = useChatSessionCreateMutation()
-  const updateSession = useChatSessionUpdateMutation()
-  const deleteSession = useChatSessionDeleteMutation()
+  const createSession = useAgentCreateMutation()
+  const updateSession = useAgentUpdateMutation()
+  const deleteSession = useAgentDeleteMutation()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)

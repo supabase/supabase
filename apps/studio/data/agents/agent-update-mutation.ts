@@ -2,16 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, patch } from 'data/fetchers'
 import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { chatSessionKeys } from './keys'
+import { agentKeys } from './keys'
 
-export type ChatSessionUpdateVariables = {
+export type AgentUpdateVariables = {
   id: string
   projectRef: string
   name?: string
 }
 
-export async function updateChatSession(
-  { id, projectRef, name }: ChatSessionUpdateVariables,
+export async function updateAgent(
+  { id, projectRef, name }: AgentUpdateVariables,
   headersInit?: HeadersInit
 ) {
   if (!id) throw new Error('id is required')
@@ -19,7 +19,7 @@ export async function updateChatSession(
 
   const headers = headersInit ? new Headers(headersInit) : undefined
 
-  const { data, error } = await patch(`/v1/projects/{ref}/chat-sessions/{id}`, {
+  const { data, error } = await patch(`/v1/projects/{ref}/agents/{id}`, {
     params: { path: { ref: projectRef, id } },
     body: { name },
     ...(headers && { headers }),
@@ -29,31 +29,31 @@ export async function updateChatSession(
   return data
 }
 
-type ChatSessionUpdateData = Awaited<ReturnType<typeof updateChatSession>>
+type AgentUpdateData = Awaited<ReturnType<typeof updateAgent>>
 
-export const useChatSessionUpdateMutation = ({
+export const useAgentUpdateMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ChatSessionUpdateData, ResponseError, ChatSessionUpdateVariables>,
+  UseCustomMutationOptions<AgentUpdateData, ResponseError, AgentUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ChatSessionUpdateData, ResponseError, ChatSessionUpdateVariables>({
-    mutationFn: (vars) => updateChatSession(vars),
+  return useMutation<AgentUpdateData, ResponseError, AgentUpdateVariables>({
+    mutationFn: (vars) => updateAgent(vars),
     async onSuccess(data, variables, context) {
       const { id, projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: chatSessionKeys.list(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: chatSessionKeys.detail(id) }),
+        queryClient.invalidateQueries({ queryKey: agentKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: agentKeys.detail(id) }),
       ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update chat session: ${data.message}`)
+        toast.error(`Failed to update agent: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
