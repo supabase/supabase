@@ -356,6 +356,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/hono',
         },
         {
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
         },
@@ -372,6 +376,15 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
         {
+          name: 'Flask (Python)',
+          url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+        },
+        {
           name: 'Laravel PHP',
           url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
           enabled: !jsOnly,
@@ -381,7 +394,6 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
           enabled: !jsOnly,
         },
-
         {
           name: 'SolidJS',
           url: '/guides/getting-started/quickstarts/solidjs',

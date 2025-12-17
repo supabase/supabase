@@ -15,6 +15,7 @@ import { CellDetailPanel } from './CellDetailPanel'
 import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
 import { useFeatureFlags, useFlag } from 'common'
+import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 
 function formatClipboardValue(value: any) {
   if (value === null) return ''
@@ -32,8 +33,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   // Check if this is an EXPLAIN query result
-  const isExplainQuery =
-    rows.length > 0 && rows[0].hasOwnProperty('QUERY PLAN') && Object.keys(rows[0]).length === 1
+  const isValidExplainQuery = isExplainQuery(rows)
 
   const formatter = (column: any, row: any) => {
     const cellValue = row[column]
@@ -117,7 +117,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   })
 
   // Show pretty explain query results as diagram
-  if (showPrettyExplain && isExplainQuery) {
+  if (showPrettyExplain && isValidExplainQuery) {
     if (showRaw) {
       return (
         <div className="bg-studio border-t h-full flex flex-col">
