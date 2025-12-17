@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
+import { useBreakpoint } from 'common'
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 const stats = [
@@ -47,13 +48,19 @@ function getDistance(
 }
 
 function generateNonOverlappingPosition(
-  existingBubbles: FloatingStatBubble[]
+  existingBubbles: FloatingStatBubble[],
+  isMobile: boolean
 ): { top: number; left: number } | null {
   const maxAttempts = 20
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const top = Math.random() * 70 + 10
-    const left = Math.random() * 70 + 10
+    const top = isMobile
+      ? Math.random() * 50 + 10 // 10-60% on mobile
+      : Math.random() * 70 + 10 // 10-80% on desktop
+    // On mobile, use a narrower, more centered range to prevent overflow
+    const left = isMobile
+      ? Math.random() * 20 + 20 // 20-40% on mobile
+      : Math.random() * 70 + 10 // 10-80% on desktop
 
     const hasOverlap = existingBubbles.some(
       (bubble) =>
@@ -72,9 +79,10 @@ function generateNonOverlappingPosition(
 function generateRandomBubble(
   id: number,
   existingBubbles: FloatingStatBubble[],
-  usedStatIndices: Set<number>
+  usedStatIndices: Set<number>,
+  isMobile: boolean
 ): FloatingStatBubble | null {
-  const position = generateNonOverlappingPosition(existingBubbles)
+  const position = generateNonOverlappingPosition(existingBubbles, isMobile)
 
   if (!position) {
     return null
@@ -103,6 +111,7 @@ function FloatingStatBubbles() {
   const bubbleIdRef = useRef(0)
   const usedStatIndicesRef = useRef<Set<number>>(new Set())
   const lifetimeTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set())
+  const isMobile = useBreakpoint(768)
 
   useEffect(() => {
     const spawnBubble = () => {
@@ -113,7 +122,7 @@ function FloatingStatBubbles() {
         }
 
         const id = bubbleIdRef.current++
-        const newBubble = generateRandomBubble(id, prev, usedStatIndicesRef.current)
+        const newBubble = generateRandomBubble(id, prev, usedStatIndicesRef.current, isMobile)
 
         if (!newBubble) {
           return prev
@@ -158,7 +167,7 @@ function FloatingStatBubbles() {
       lifetimeTimersRef.current.forEach(clearTimeout)
       lifetimeTimersRef.current.clear()
     }
-  }, [])
+  }, [isMobile])
 
   return (
     <AnimatePresence>
@@ -197,7 +206,7 @@ function FloatingStatBubbles() {
 export function Home() {
   return (
     <div className="h-[calc(100dvh-64px)] flex flex-col max-w-[60rem] mx-auto w-[95%] md:w-full">
-      <section className="relative border-x border-b h-full overflow-hidden">
+      <section className="relative border-x border-b h-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}

@@ -115,11 +115,19 @@ export const sqlEditorState = proxy({
     }
   },
 
-  setSql: (id: string, sql: string) => {
+  setSql: ({
+    id,
+    sql,
+    shouldInvalidate = false,
+  }: {
+    id: string
+    sql: string
+    shouldInvalidate?: boolean
+  }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.sql = sql
-      sqlEditorState.needsSaving.set(id, false)
+      sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
 
@@ -262,7 +270,9 @@ export const useSnippetFolders = (projectRef: string) => {
     () =>
       Object.values(snapshot.folders)
         .filter((x) => x.projectRef === projectRef)
-        .map((x) => x.folder),
+        .map((x) => x.folder)
+        // folders don't have created_at or inserted_at, so we always sort by name
+        .sort((a, b) => a.name.localeCompare(b.name)),
     [projectRef, snapshot.folders]
   )
 }

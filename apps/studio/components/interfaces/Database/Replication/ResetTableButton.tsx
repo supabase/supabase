@@ -61,34 +61,22 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
       </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset and restart table "{tableName}"?</AlertDialogTitle>
-          <AlertDialogDescription className="flex flex-col gap-y-3 py-4 !mt-0">
-            <p>
-              This will reset and restart replication for this table only. The table will start
-              copying from scratch, and any existing data for this table downstream will be deleted.
-            </p>
-            <p className="text-foreground-light">
-              Other tables in the pipeline will not be affected. Only this table will be restarted
-              and go through the full replication process again, starting with the initial copy
-              phase.
-            </p>
-            <p className="text-foreground-light">
-              The pipeline will be restarted to apply the table reset.
-            </p>
+          <AlertDialogTitle>Reset table and restart</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will reset replication for <code className="text-code-inline">{tableName}</code>{' '}
+            only. The table will be copied again from scratch, and any existing downstream data for
+            it will be deleted. Other tables in the pipeline are not affected, but the pipeline will
+            restart to apply this reset.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={isResetting}
-            onClick={handleReset}
-            className="bg-destructive hover:bg-destructive/90"
-          >
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
             {isRollingBack
               ? 'Resetting table...'
               : isRestartingPipeline
                 ? 'Restarting pipeline...'
-                : 'Confirm reset and restart'}
+                : 'Reset and restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
