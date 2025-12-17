@@ -199,8 +199,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
                 className="hover:text-foreground transition-colors duration-100"
               >
-                <code
-                  className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                <code className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
                   support@supabase.com
                 </code>
               </a>
