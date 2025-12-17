@@ -2,7 +2,6 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProfile } from 'lib/profile'
 import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 import { Button, IconDiscord, Separator } from 'ui'
 import { CATEGORY_OPTIONS } from './Support.constants'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
@@ -28,7 +27,6 @@ export const Success = ({
   const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
   const selectedCategory = CATEGORY_OPTIONS.find((option) => option.value === sentCategory)
-  const [searchValue, setSearchValue] = useState<string>(selectedCategory?.query ?? '')
 
   return (
     <div className="mt-10 max-w-[620px] flex flex-col items-center space-y-4">
@@ -51,7 +49,7 @@ export const Success = ({
           </p>
         )}
       </div>
-      {true && (
+      {categoriesToShowAdditionalResources.includes(sentCategory) && (
         <>
           <div className="!my-10 w-full">
             <Separator />
