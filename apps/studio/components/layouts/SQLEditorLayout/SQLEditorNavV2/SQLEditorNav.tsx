@@ -145,7 +145,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         }) ?? [],
     [filteredSnippets.snippets, sort]
   )
-  const folders = useSnippetFolders(projectRef as string)
+  const folders = useSnippetFolders(projectRef!)
 
   const { data: snippetCountData } = useContentCountQuery({
     projectRef,
@@ -399,12 +399,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   }, [id])
 
   useEffect(() => {
-    if (projectRef && privateSnippetsPages) {
+    if (projectRef && privateSnippetsPages?.pages) {
       privateSnippetsPages.pages.forEach((page) => {
         page.contents?.forEach((snippet: Snippet) => {
           snapV2.addSnippet({ projectRef, snippet })
         })
-        page.folders?.forEach((folder: SnippetFolder) => snapV2.addFolder({ projectRef, folder }))
+        page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
       })
     }
   }, [projectRef, privateSnippetsPages?.pages])

@@ -10,6 +10,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
+  cn,
   Button,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
@@ -43,7 +44,7 @@ export function ProjectAndPlanInfo({
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
 
   return (
-    <div className={'flex flex-col gap-y-2'}>
+    <div className="flex flex-col gap-y-2">
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
       <ProjectRefHighlighted projectRef={projectRef} />
 
@@ -119,7 +120,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                     }}
                   >
                     {field.value === NO_PROJECT_MARKER && <Check size={16} />}
-                    <p className={field.value !== NO_PROJECT_MARKER ? 'ml-6' : ''}>
+                    <p className={cn(field.value !== NO_PROJECT_MARKER && 'ml-6')}>
                       No specific project
                     </p>
                   </CommandItem_Shadcn_>

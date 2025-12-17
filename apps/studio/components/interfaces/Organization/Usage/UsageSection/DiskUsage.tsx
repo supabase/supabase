@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
@@ -18,6 +17,7 @@ import {
   CriticalIcon,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 

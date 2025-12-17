@@ -40,6 +40,7 @@
         "summary": "Get database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:read"
       },
       "patch": {
@@ -84,6 +85,7 @@
         "summary": "Update database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -131,6 +133,7 @@
         "summary": "Delete a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -179,6 +182,7 @@
         "summary": "Pushes a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -227,6 +231,7 @@
         "summary": "Merges a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -275,6 +280,7 @@
         "summary": "Resets a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -317,6 +323,7 @@
         "summary": "Restore a scheduled branch deletion",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -361,6 +368,7 @@
         "summary": "[Beta] Diffs a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -382,10 +390,11 @@
             }
           }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["projects_read"] }],
         "summary": "List all projects",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -405,10 +414,11 @@
             }
           }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Create a project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -475,9 +485,10 @@
             }
           }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["available_regions_read"] }],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/organizations": {
@@ -499,10 +510,11 @@
           },
           "500": { "description": "Unexpected error listing organizations" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_read"] }],
         "summary": "List all organizations",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "organizations:read"
       },
       "post": {
@@ -527,9 +539,10 @@
           },
           "500": { "description": "Unexpected error creating an organization" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_write"] }],
         "summary": "Create an organization",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/oauth/authorize": {
@@ -592,7 +605,8 @@
         "responses": { "204": { "description": "" } },
         "security": [{ "oauth2": ["read"] }],
         "summary": "[Beta] Authorize user through oauth",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/oauth/token": {
@@ -619,7 +633,8 @@
         },
         "security": [{ "oauth2": ["write"] }],
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/oauth/revoke": {
@@ -637,7 +652,8 @@
         "responses": { "204": { "description": "" } },
         "security": [{ "oauth2": ["write"] }],
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -693,7 +709,8 @@
         "responses": { "204": { "description": "" } },
         "security": [{ "bearer": [] }],
         "summary": "Authorize user through oauth and claim a project",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/snippets": {
@@ -736,10 +753,11 @@
           },
           "500": { "description": "Failed to list user's SQL snippets" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
         "summary": "Lists SQL snippets for the logged in user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -763,10 +781,11 @@
           },
           "500": { "description": "Failed to retrieve SQL snippet" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
         "summary": "Gets a specific SQL snippet",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -813,6 +832,7 @@
         "summary": "List all action runs",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:read"
       },
       "head": {
@@ -885,6 +905,7 @@
         "summary": "Get the status of an action run",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -932,6 +953,7 @@
         "summary": "Update the status of an action run",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -969,6 +991,7 @@
         "summary": "Get the logs of an action run",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -1011,6 +1034,7 @@
         "summary": "Get project api keys",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -1052,6 +1076,7 @@
         "summary": "Creates a new API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1084,6 +1109,7 @@
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -1121,6 +1147,7 @@
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1170,6 +1197,7 @@
         "summary": "Updates an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -1211,6 +1239,7 @@
         "summary": "Get API key",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -1260,6 +1289,7 @@
         "summary": "Deletes an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1297,6 +1327,7 @@
         "summary": "List all database branches",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:read"
       },
       "post": {
@@ -1333,6 +1364,7 @@
         "summary": "Create a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -1358,6 +1390,7 @@
         "summary": "Disables preview branching",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -1391,6 +1424,7 @@
         "summary": "Get a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -1424,6 +1458,7 @@
         "summary": "[Beta] Gets project's custom hostname config",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -1448,6 +1483,7 @@
         "summary": "[Beta] Deletes a project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1489,6 +1525,7 @@
         "summary": "[Beta] Updates project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1522,6 +1559,7 @@
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1555,6 +1593,7 @@
         "summary": "[Beta] Activates a custom hostname for a project.",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1588,6 +1627,7 @@
         "summary": "[Beta] Gets project's network bans",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -1621,6 +1661,7 @@
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -1655,6 +1696,7 @@
         "summary": "[Beta] Remove network bans.",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1688,6 +1730,7 @@
         "summary": "[Beta] Gets project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       },
       "patch": {
@@ -1727,6 +1770,7 @@
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1768,6 +1812,7 @@
         "summary": "[Beta] Updates project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1801,6 +1846,7 @@
         "summary": "[Beta] Gets project's pgsodium config",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -1840,6 +1886,7 @@
         "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1873,6 +1920,7 @@
         "summary": "Gets project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -1912,6 +1960,7 @@
         "summary": "Updates project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "rest:write"
       }
     },
@@ -1945,6 +1994,7 @@
         "summary": "Gets a specific project that belongs to the authenticated user",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       },
       "delete": {
@@ -1975,6 +2025,7 @@
         "summary": "Deletes the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       },
       "patch": {
@@ -2012,6 +2063,7 @@
         "summary": "Updates the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -2049,6 +2101,7 @@
         "summary": "List all secrets",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -2080,6 +2133,7 @@
         "summary": "Bulk create secrets",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       },
       "delete": {
@@ -2111,6 +2165,7 @@
         "summary": "Bulk delete secrets",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -2144,6 +2199,7 @@
         "summary": "[Beta] Get project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -2183,6 +2239,7 @@
         "summary": "[Beta] Update project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -2223,6 +2280,7 @@
         "summary": "Generate TypeScript types",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2256,6 +2314,7 @@
         "summary": "[Beta] Gets current vanity subdomain config",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -2280,6 +2339,7 @@
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -2319,6 +2379,7 @@
         "summary": "[Beta] Checks vanity subdomain availability",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -2358,6 +2419,7 @@
         "summary": "[Beta] Activates a vanity subdomain for a project.",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -2397,6 +2459,7 @@
         "summary": "[Beta] Upgrades the project's Postgres version",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -2430,6 +2493,7 @@
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -2469,6 +2533,7 @@
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -2502,6 +2567,7 @@
         "summary": "Returns project's readonly mode status",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2528,6 +2594,7 @@
         "summary": "Disables project's readonly mode for the next 15 minutes",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -2560,7 +2627,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Set up a read replica",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/read-replicas/remove": {
@@ -2592,7 +2660,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Remove a read replica",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/health": {
@@ -2655,6 +2724,7 @@
         "summary": "Gets project's service health status",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -2687,6 +2757,7 @@
         "summary": "Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found.",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -2717,6 +2788,7 @@
         "summary": "Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -2757,6 +2829,7 @@
         "summary": "Create a new signing key for the project in standby status",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -2787,6 +2860,7 @@
         "summary": "List all signing keys for the project",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -2823,7 +2897,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Get information about a signing key",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-endpoint-owners": ["unowned"]
       },
       "delete": {
         "operationId": "v1-remove-project-signing-key",
@@ -2859,6 +2934,7 @@
         "summary": "Remove a signing key from a project. Only possible if the key has been in revoked status for a while.",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       },
       "patch": {
@@ -2903,6 +2979,7 @@
         "summary": "Update a signing key, mainly its status",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -2934,7 +3011,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's storage config",
-        "tags": ["Storage"]
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["unowned"]
       },
       "patch": {
         "operationId": "v1-update-storage-config",
@@ -2964,7 +3042,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates project's storage config",
-        "tags": ["Storage"]
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/config/database/postgres": {
@@ -2997,6 +3076,7 @@
         "summary": "Gets project's Postgres config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -3036,6 +3116,7 @@
         "summary": "Updates project's Postgres config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -3068,6 +3149,7 @@
         "summary": "Get project's pgbouncer config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -3104,6 +3186,7 @@
         "summary": "Gets project's supavisor config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "patch": {
@@ -3143,6 +3226,7 @@
         "summary": "Updates project's supavisor config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -3176,6 +3260,7 @@
         "summary": "Gets project's auth config",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:read"
       },
       "patch": {
@@ -3215,6 +3300,7 @@
         "summary": "Updates a project's auth config",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:write"
       }
     },
@@ -3245,7 +3331,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets realtime configuration",
-        "tags": ["Realtime"]
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["unowned"]
       },
       "patch": {
         "operationId": "v1-update-realtime-config",
@@ -3274,7 +3361,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates realtime configuration",
-        "tags": ["Realtime"]
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -3312,6 +3400,7 @@
         "summary": "Creates a new third-party auth integration",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -3345,6 +3434,7 @@
         "summary": "Lists all third-party auth integrations",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -3381,6 +3471,7 @@
         "summary": "Removes a third-party auth integration",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -3415,6 +3506,7 @@
         "summary": "Get a third-party integration",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -3440,6 +3532,7 @@
         "summary": "Pauses the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -3474,6 +3567,7 @@
         "summary": "Lists available restore versions for the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -3497,6 +3591,7 @@
         "summary": "Restores the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -3522,6 +3617,7 @@
         "summary": "Cancels the given project restoration",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -3554,7 +3650,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "List billing addons and compute instance selections",
-        "tags": ["Billing"]
+        "tags": ["Billing"],
+        "x-endpoint-owners": ["unowned"]
       },
       "patch": {
         "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
@@ -3585,7 +3682,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Apply or update billing addons, including compute instance size",
-        "tags": ["Billing"]
+        "tags": ["Billing"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
@@ -3645,7 +3743,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Remove billing addons or revert compute instance sizing",
-        "tags": ["Billing"]
+        "tags": ["Billing"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/claim-token": {
@@ -3676,6 +3775,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true
       },
       "post": {
@@ -3705,6 +3805,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true
       },
       "delete": {
@@ -3727,6 +3828,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true
       }
     },
@@ -3761,6 +3863,7 @@
         "summary": "Gets project performance advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -3801,6 +3904,7 @@
         "summary": "Gets project security advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -3851,6 +3955,7 @@
         "summary": "Gets project's logs",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "analytics:read"
       }
     },
@@ -3891,7 +3996,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api counts",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/usage.api-requests-count": {
@@ -3922,7 +4028,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api requests count",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/functions.combined-stats": {
@@ -3958,7 +4065,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets a project's function combined statistics",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/cli/login-role": {
@@ -3997,6 +4105,7 @@
         "summary": "[Beta] Create a login role for CLI with temporary password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -4028,6 +4137,7 @@
         "summary": "[Beta] Delete existing login roles used by CLI",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4062,6 +4172,7 @@
         "summary": "[Beta] List applied migration versions",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -4102,6 +4213,7 @@
         "summary": "[Beta] Apply a database migration",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       },
       "put": {
@@ -4142,6 +4254,7 @@
         "summary": "[Beta] Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -4174,6 +4287,7 @@
         "summary": "[Beta] Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4214,6 +4328,7 @@
         "summary": "[Beta] Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "patch": {
@@ -4253,6 +4368,7 @@
         "summary": "[Beta] Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4285,6 +4401,7 @@
         "summary": "[Beta] Run sql query",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4318,6 +4435,7 @@
         "summary": "[Beta] Run a sql query as supabase_read_only_user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -4344,6 +4462,7 @@
         "summary": "[Beta] Enables Database Webhooks on the project",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4378,6 +4497,7 @@
         "summary": "Gets database metadata for the given project.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -4419,6 +4539,7 @@
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4451,6 +4572,7 @@
         "summary": "Get user-id to role mappings for JIT access",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -4491,6 +4613,7 @@
         "summary": "Authorize user-id to role mappings for JIT access",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -4525,7 +4648,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates a user mapping for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/database/jit/list": {
@@ -4557,7 +4681,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "List all user-id to role mappings for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/database/jit/{user_id}": {
@@ -4588,7 +4713,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Delete JIT access by user-id",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/functions": {
@@ -4625,6 +4751,7 @@
         "summary": "List all functions",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:read"
       },
       "post": {
@@ -4707,6 +4834,7 @@
         "summary": "Create a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:write"
       },
       "put": {
@@ -4748,6 +4876,7 @@
         "summary": "Bulk update functions",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -4767,7 +4896,7 @@
             "name": "slug",
             "required": false,
             "in": "query",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z][A-Za-z0-9_-]*$", "type": "string" }
           },
           {
             "name": "bundleOnly",
@@ -4804,6 +4933,7 @@
         "summary": "Deploy a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -4845,6 +4975,7 @@
         "summary": "Retrieve a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:read"
       },
       "patch": {
@@ -4932,6 +5063,7 @@
         "summary": "Update a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:write"
       },
       "delete": {
@@ -4964,6 +5096,7 @@
         "summary": "Delete a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -5003,6 +5136,7 @@
         "summary": "Retrieve a function body",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "edge_functions:read"
       }
     },
@@ -5039,6 +5173,7 @@
         "summary": "Lists all buckets",
         "tags": ["Storage"],
         "x-badges": [{ "name": "OAuth scope: storage:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "storage:read"
       }
     },
@@ -5078,6 +5213,7 @@
         "summary": "Creates a new SSO provider",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -5109,6 +5245,7 @@
         "summary": "Lists all SSO providers",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -5150,6 +5287,7 @@
         "summary": "Gets a SSO provider by its UUID",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:read"
       },
       "put": {
@@ -5195,6 +5333,7 @@
         "summary": "Updates a SSO provider by its UUID",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:write"
       },
       "delete": {
@@ -5234,6 +5373,7 @@
         "summary": "Removes a SSO provider by its UUID",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "auth:write"
       }
     },
@@ -5265,6 +5405,7 @@
         "summary": "Lists all backups",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -5296,6 +5437,7 @@
         "summary": "Restores a PITR backup for a database",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -5336,6 +5478,7 @@
         "summary": "Initiates a creation of a restore point for a database",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       },
@@ -5374,6 +5517,7 @@
         "summary": "Get restore points for project",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true,
         "x-oauth-scope": "database:read"
       }
@@ -5406,6 +5550,7 @@
         "summary": "Initiates an undo to a given restore point",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       }
@@ -5442,6 +5587,7 @@
         "summary": "List members of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -5474,6 +5620,7 @@
         "summary": "Gets information about the organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["unowned"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -5506,6 +5653,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true
       },
       "post": {
@@ -5529,6 +5677,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
+        "x-endpoint-owners": ["unowned"],
         "x-internal": true
       }
     },
@@ -5597,7 +5746,8 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets all projects for the given organization",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["unowned"]
       }
     }
   },
@@ -7749,6 +7899,10 @@
           "external_twitter_email_optional": { "type": "boolean", "nullable": true },
           "external_twitter_enabled": { "type": "boolean", "nullable": true },
           "external_twitter_secret": { "type": "string", "nullable": true },
+          "external_x_client_id": { "type": "string", "nullable": true },
+          "external_x_email_optional": { "type": "boolean", "nullable": true },
+          "external_x_enabled": { "type": "boolean", "nullable": true },
+          "external_x_secret": { "type": "string", "nullable": true },
           "external_workos_client_id": { "type": "string", "nullable": true },
           "external_workos_enabled": { "type": "boolean", "nullable": true },
           "external_workos_secret": { "type": "string", "nullable": true },
@@ -8027,6 +8181,10 @@
           "external_twitter_email_optional",
           "external_twitter_enabled",
           "external_twitter_secret",
+          "external_x_client_id",
+          "external_x_email_optional",
+          "external_x_enabled",
+          "external_x_secret",
           "external_workos_client_id",
           "external_workos_enabled",
           "external_workos_secret",
@@ -8493,6 +8651,10 @@
           "external_twitter_client_id": { "type": "string", "nullable": true },
           "external_twitter_email_optional": { "type": "boolean", "nullable": true },
           "external_twitter_secret": { "type": "string", "nullable": true },
+          "external_x_enabled": { "type": "boolean", "nullable": true },
+          "external_x_client_id": { "type": "string", "nullable": true },
+          "external_x_email_optional": { "type": "boolean", "nullable": true },
+          "external_x_secret": { "type": "string", "nullable": true },
           "external_workos_enabled": { "type": "boolean", "nullable": true },
           "external_workos_client_id": { "type": "string", "nullable": true },
           "external_workos_secret": { "type": "string", "nullable": true },
@@ -9465,7 +9627,7 @@
       "V1CreateFunctionBody": {
         "type": "object",
         "properties": {
-          "slug": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+          "slug": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
           "name": { "type": "string" },
           "body": { "type": "string" },
           "verify_jwt": { "type": "boolean" }
@@ -9478,7 +9640,7 @@
           "type": "object",
           "properties": {
             "id": { "type": "string" },
-            "slug": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+            "slug": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
             "name": { "type": "string" },
             "status": { "type": "string", "enum": ["ACTIVE", "REMOVED", "THROTTLED"] },
             "version": { "type": "integer" },

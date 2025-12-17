@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -24,7 +24,6 @@ import {
 } from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
-import { ActionBar } from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
@@ -35,6 +34,7 @@ const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
 export interface ForeignRowSelectorProps {
   visible: boolean
   foreignKey?: ForeignKey
+  isSaving?: boolean
   onSelect: (value?: { [key: string]: any }) => void
   closePanel: () => void
 }
@@ -42,6 +42,7 @@ export interface ForeignRowSelectorProps {
 export const ForeignRowSelector = ({
   visible,
   foreignKey,
+  isSaving,
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
@@ -167,18 +168,29 @@ export const ForeignRowSelector = ({
 
   return (
     <SidePanel
+      hideFooter
       visible={visible}
       size="large"
       header={
-        <div>
-          Select a record to reference from{' '}
-          <code className="text-code-inline !text-sm">
-            {schemaName}.{tableName}
-          </code>
+        <div className="flex items-center justify-between">
+          <p>
+            Select a record to reference from{' '}
+            <code className="text-code-inline !text-sm">
+              {schemaName}.{tableName}
+            </code>
+          </p>
+          <div className="flex items-center gap-x-4">
+            {isSaving && (
+              <div className="flex items-center gap-x-2">
+                <Loader2 className="animate-spin" size={12} />
+                <p className="text-xs text-foreground-light">Saving</p>
+              </div>
+            )}
+            <Button type="text" icon={<X />} className="w-7" onClick={closePanel} />
+          </div>
         </div>
       }
       onCancel={closePanel}
-      customFooter={<ActionBar hideApply backButtonLabel="Cancel" closePanel={closePanel} />}
     >
       <SidePanel.Content className="h-full !px-0">
         <div className="h-full">
@@ -252,15 +264,19 @@ export const ForeignRowSelector = ({
                   <SelectorGrid
                     rows={data.rows}
                     onRowSelect={(row) => {
-                      const value = columns?.reduce((a, b) => {
-                        const targetColumn = selectedTable?.columns.find((x) => x.name === b.target)
-                        const value =
-                          targetColumn?.format === 'bytea'
-                            ? convertByteaToHex(row[b.target])
-                            : row[b.target]
-                        return { ...a, [b.source]: value }
-                      }, {})
-                      onSelect(value)
+                      if (!isSaving) {
+                        const value = columns?.reduce((a, b) => {
+                          const targetColumn = selectedTable?.columns.find(
+                            (x) => x.name === b.target
+                          )
+                          const value =
+                            targetColumn?.format === 'bytea'
+                              ? convertByteaToHex(row[b.target])
+                              : row[b.target]
+                          return { ...a, [b.source]: value }
+                        }, {})
+                        onSelect(value)
+                      }
                     }}
                   />
                 ) : (
