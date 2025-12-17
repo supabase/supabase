@@ -193,8 +193,8 @@ const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps
           {planId === 'pro' && (
             <p>
               The Pro plan includes email support. In most cases, you can expect a response within 1
-              business day for all severities. For prioritised ticketing on all issues and
-              prioritised escalation to product engineering, we recommend upgrading to the Team
+              business day for all severities. For prioritized ticketing on all issues and
+              prioritized escalation to product engineering, we recommend upgrading to the Team
               plan. Enhanced support SLAs are available on the Enterprise plan.
             </p>
           )}
