@@ -3,70 +3,17 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import Link from 'next/link'
 
 import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
+import {
+  allIncidentsHaveSameStatus,
+  getMostRecentIncident,
+  getOverallStatus,
+} from 'data/platform/incident-status-utils'
+import { formatNumberForCopy } from 'lib/helpers'
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 dayjs.extend(relativeTime)
-
-/**
- * Status priority order: higher priority = more urgent
- * Used to determine which incident's status should be displayed
- */
-const STATUS_PRIORITY: Record<string, number> = {
-  investigating: 4,
-  identified: 3,
-  monitoring: 2,
-  resolved: 1,
-}
-
-/**
- * Determines the most representative status when multiple incidents exist.
- * Returns the highest priority status (most urgent) among all incidents.
- */
-const getOverallStatus = (incidents: Array<{ status: string }>): string => {
-  if (incidents.length === 0) return 'investigating'
-  if (incidents.length === 1) return incidents[0].status
-
-  // Find the highest priority status among all incidents
-  const statuses = incidents.map((inc) => inc.status)
-  const sortedByPriority = statuses.sort(
-    (a, b) => (STATUS_PRIORITY[b] || 0) - (STATUS_PRIORITY[a] || 0)
-  )
-
-  return sortedByPriority[0] || 'investigating'
-}
-
-/**
- * Gets the most recent incident (by active_since) for display purposes.
- * This is used for the title/name, not for status determination.
- */
-const getMostRecentIncident = (
-  incidents: Array<{ name: string; active_since: string }>
-): { name: string; active_since: string } => {
-  if (incidents.length === 0) {
-    throw new Error('Cannot get most recent incident from empty array')
-  }
-  if (incidents.length === 1) return incidents[0]
-
-  // Sort by active_since descending (most recent first)
-  const sorted = [...incidents].sort((a, b) => {
-    const dateA = dayjs(a.active_since)
-    const dateB = dayjs(b.active_since)
-    return dateB.isBefore(dateA) ? -1 : dateB.isAfter(dateA) ? 1 : 0
-  })
-
-  return sorted[0]
-}
-
-/**
- * Checks if all incidents have the same status
- */
-const allIncidentsHaveSameStatus = (incidents: Array<{ status: string }>): boolean => {
-  if (incidents.length <= 1) return true
-  const firstStatus = incidents[0].status
-  return incidents.every((inc) => inc.status === firstStatus)
-}
 
 export function IncidentAdmonition() {
   const { data: incidents, isPending, isError, error } = useIncidentStatusQuery()
@@ -121,11 +68,11 @@ export function IncidentAdmonition() {
   const statusTitle =
     mostRecentIncident.name +
     (hasMultipleIncidents
-      ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
+      ? ` and ${formatNumberForCopy(incidents.length - 1)} other issue${incidents.length > 2 ? 's' : ''}`
       : '')
 
   // Create descriptions based on overall status and whether all incidents share the same status
-  const statusDescriptionSignOff = 'Please check back soon or follow the status page for updates.'
+  const statusDescriptionSignOff = 'Please follow the status page for updates.'
 
   const getStatusDescription = (status: string): string => {
     const isPlural = hasMultipleIncidents
