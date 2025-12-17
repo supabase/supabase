@@ -212,7 +212,7 @@ export const ForeignKeySelector = ({
   useEffect(() => {
     if (visible) validateType()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fk])
+  }, [fk, visible])
 
   return (
     <SidePanel
