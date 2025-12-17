@@ -885,8 +885,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets a specific organization that belongs to the authenticated user */
-    get: operations['OrganizationSlugController_getOrganization']
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
     put?: never
     post?: never
     /** Deletes organization */
@@ -1207,26 +1210,6 @@ export interface paths {
     trace?: never
   }
   '/platform/organizations/{slug}/entitlements': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get entitlements for an organization
-     * @description Returns the entitlements available to the organization based on their plan and any overrides.
-     */
-    get: operations['OrganizationEntitlementsController_getEntitlements']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/entitlements/entitlements': {
     parameters: {
       query?: never
       header?: never
@@ -7871,14 +7854,14 @@ export interface components {
         | 'billing:payment_methods'
         | 'realtime:all'
       )[]
-      first_name: string
-      free_project_limit: number
+      first_name: string | null
+      free_project_limit: number | null
       gotrue_id: string
       id: number
       is_alpha_user: boolean
       is_sso_user: boolean
-      last_name: string
-      mobile: string
+      last_name: string | null
+      mobile: string | null
       primary_email: string
       username: string
     }
@@ -9218,8 +9201,6 @@ export interface components {
       reset_project?: boolean
     }
     TelemetryIdentifyBodyV2: {
-      /** PostHog JS SDK's distinct_id - used for aliasing anonymous → authenticated users */
-      anonymous_id?: string
       organization_slug?: string
       project_ref?: string
       user_id: string
@@ -12806,7 +12787,7 @@ export interface operations {
       }
     }
   }
-  OrganizationSlugController_getOrganization: {
+  OrganizationEntitlementsController_getEntitlements: {
     parameters: {
       query?: never
       header?: never
@@ -12823,7 +12804,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationSlugResponse']
+          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
@@ -14000,49 +13981,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationEntitlementsController_getEntitlements: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
