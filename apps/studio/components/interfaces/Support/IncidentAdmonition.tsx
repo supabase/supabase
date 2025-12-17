@@ -8,7 +8,6 @@ import {
   getMostRecentIncident,
   getOverallStatus,
 } from 'data/platform/incident-status-utils'
-import { formatNumberForCopy } from 'lib/helpers'
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -68,7 +67,7 @@ export function IncidentAdmonition() {
   const statusTitle =
     mostRecentIncident.name +
     (hasMultipleIncidents
-      ? ` and ${formatNumberForCopy(incidents.length - 1)} other issue${incidents.length > 2 ? 's' : ''}`
+      ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
       : '')
 
   // Create descriptions based on overall status and whether all incidents share the same status

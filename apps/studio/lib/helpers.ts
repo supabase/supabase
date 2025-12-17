@@ -247,37 +247,6 @@ export function pluralize(count: number, singular: string, plural?: string) {
   return count === 1 ? singular : plural || singular + 's'
 }
 
-/**
- * Formats a number for copywriting: writes 0-9 as words, 10+ as digits
- * This follows copywriting best practices for readability
- *
- * @example
- * formatNumberForCopy(0) // "zero"
- * formatNumberForCopy(5) // "five"
- * formatNumberForCopy(10) // "10"
- * formatNumberForCopy(42) // "42"
- */
-export function formatNumberForCopy(num: number): string {
-  const numberWords: Record<number, string> = {
-    0: 'zero',
-    1: 'one',
-    2: 'two',
-    3: 'three',
-    4: 'four',
-    5: 'five',
-    6: 'six',
-    7: 'seven',
-    8: 'eight',
-    9: 'nine',
-  }
-
-  if (num >= 0 && num <= 9) {
-    return numberWords[num]
-  }
-
-  return num.toString()
-}
-
 export const isValidHttpUrl = (value: string) => {
   let url: URL
   try {
