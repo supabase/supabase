@@ -15,6 +15,13 @@
   <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/customers/koodos</guid>
+  <title>Koodos scales its social discovery app Shelf on Supabase</title>
+  <link>https://supabase.com/customers/koodos</link>
+  <description>Koodos built its app Shelf from day one on Supabase, growing to support millions of users and billions of data points without dedicated database staff.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/phoenix-energy</guid>
   <title>Phoenix Energy completes critical infrastructure migration in six months with Supabase</title>
   <link>https://supabase.com/customers/phoenix-energy</link>
@@ -215,7 +222,7 @@
   <title></title>
   <link>https://supabase.com/customers/exprealty</link>
   <description></description>
-  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+  <pubDate>Wed, 17 Dec 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/happyteams</guid>
@@ -223,13 +230,6 @@
   <link>https://supabase.com/customers/happyteams</link>
   <description>How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.</description>
   <pubDate>Thu, 16 Feb 2023 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/customers/koodos</guid>
-  <title></title>
-  <link>https://supabase.com/customers/koodos</link>
-  <description></description>
-  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/mobbin</guid>
