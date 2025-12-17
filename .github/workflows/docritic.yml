@@ -1,0 +1,73 @@
+name: Docritic
+
+on:
+  workflow_dispatch:
+    inputs:
+      guide_url:
+        description: 'Guide URL to test (e.g., https://supabase.com/docs/guides/database/testing)'
+        required: true
+        type: string
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: docritic-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+jobs:
+  test-guide:
+    # Run on workflow_dispatch OR issue_comment with @docritic (not PRs)
+    # Write access check is handled by claude-code-action itself
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (contains(github.event.comment.body, '@docritic') && !github.event.issue.pull_request)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      WORKDIR: /tmp/workdir
+      ALLOWED_DOMAIN: supabase.com
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Setup work directory
+        run: |
+          mkdir -p $WORKDIR
+          cp .github/docritic/CLAUDE.md $WORKDIR/CLAUDE.md
+          supabase init --workdir $WORKDIR
+          cd $WORKDIR && supabase start
+        timeout-minutes: 10
+
+      - name: Run docritic (issue comment)
+        if: github.event_name == 'issue_comment'
+        uses: anthropics/claude-code-action@v1
+        env:
+          CLAUDE_WORKING_DIR: ${{ env.WORKDIR }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: '@docritic'
+          claude_args: |
+            --allowedTools "Read(*),Bash(*),Write(${{ env.WORKDIR }}/*),Edit(${{ env.WORKDIR }}/*),WebFetch(domain:${{ env.ALLOWED_DOMAIN }})"
+
+      - name: Run docritic (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        uses: anthropics/claude-code-action@v1
+        env:
+          CLAUDE_WORKING_DIR: ${{ env.WORKDIR }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: '@docritic ${{ inputs.guide_url }}'
+          claude_args: |
+            --allowedTools "Read(*),Bash(*),Write(${{ env.WORKDIR }}/*),Edit(${{ env.WORKDIR }}/*),WebFetch(domain:${{ env.ALLOWED_DOMAIN }})"
