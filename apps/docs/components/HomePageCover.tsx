@@ -10,11 +10,11 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
-const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled, sdkSwift: sdkSwiftEnabled } = isFeatureEnabled([
-  'sdk:dart',
-  'sdk:kotlin',
-  'sdk:swift',
-])
+const {
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:dart', 'sdk:kotlin', 'sdk:swift'])
 
 function AiPrompt({ className }: { className?: string }) {
   return (
