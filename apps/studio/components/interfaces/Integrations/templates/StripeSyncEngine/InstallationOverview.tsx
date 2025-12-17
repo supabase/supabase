@@ -134,7 +134,7 @@ export const StripeSyncInstallationPage = () => {
     }
   )
 
-  const isSyncing = !!syncState && !syncState.closed_at
+  const isSyncing = !!syncState && !syncState.closed_at && syncState.status === 'running'
 
   const handleUninstall = () => {
     if (!project?.ref) return
@@ -314,7 +314,9 @@ export const StripeSyncInstallationPage = () => {
                       <FormControl_Shadcn_ className="col-span-8">
                         <Input
                           id="stripe_api_key"
+                          name="stripe_api_key"
                           placeholder="Enter your Stripe API key"
+                          autoComplete="stripe-api-key"
                           reveal={false}
                           disabled={isInstalling}
                           type="password"

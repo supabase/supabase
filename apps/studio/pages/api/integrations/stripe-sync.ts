@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { install, uninstall } from 'stripe-experiment-sync/supabase'
+import { VERSION } from 'stripe-experiment-sync'
 import { waitUntil } from '@vercel/functions'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -97,6 +98,7 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
         stripeKey: stripeSecretKey,
         baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
         baseManagementApiUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
+        packageVersion: VERSION,
       })
     )
   } catch (error: any) {
@@ -107,5 +109,7 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
     })
   }
 
-  return res.status(200).json({ data: { message: 'Stripe Sync setup initiated' }, error: null })
+  return res
+    .status(200)
+    .json({ data: { message: 'Stripe Sync setup initiated', version: VERSION }, error: null })
 }

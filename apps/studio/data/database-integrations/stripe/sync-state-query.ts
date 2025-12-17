@@ -13,6 +13,7 @@ const StripeSyncStateSchema = z
   .object({
     started_at: z.string().nullable(),
     closed_at: z.string().nullable(),
+    status: z.enum(['running', 'pending', 'complete', 'error']).nullable(),
   })
   .nullable()
 
@@ -30,7 +31,7 @@ export async function getStripeSyncState(
       projectRef,
       connectionString,
       sql: `
-       SELECT started_at, closed_at FROM stripe._sync_run ORDER BY started_at DESC LIMIT 1;
+       SELECT started_at, closed_at, status FROM stripe.sync_runs WHERE status != 'pending' ORDER BY started_at DESC LIMIT 1;
       `,
       queryKey: stripeSyncKeys.syncState(projectRef),
     },
