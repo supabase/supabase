@@ -141,5 +141,5 @@ Deno.serve(async (req: Request) => {
 
   const { name } = await req.json()
   return Response.json({ message: `hello ${name}` })
-}
+})
 ```
