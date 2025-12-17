@@ -77,9 +77,7 @@ export const ClientSideExceptionHandler = ({
             </span>{' '}
             to clean potentially outdated data
           </li>
-          <li>
-            Disable browser extensions that might modify page content (e.g. Google Translate)
-          </li>
+          <li>Disable browser extensions that might modify page content (e.g. Google Translate)</li>
           <li>If the problem persists, please contact support for assistance</li>
         </ul>
       </Admonition>
