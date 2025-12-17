@@ -85,14 +85,18 @@ function SupportFormPageContent() {
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
+  const isSuccess = state.type === 'success'
+
   return (
     <SupportFormWrapper>
       <SupportFormHeader />
 
-      <div className="flex flex-col gap-y-4">
-        <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
-        <DiscordCTACard organizationSlug={orgSlug} />
-      </div>
+      {!isSuccess && (
+        <div className="flex flex-col gap-y-4">
+          <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+          <DiscordCTACard organizationSlug={orgSlug} />
+        </div>
+      )}
 
       <SupportFormBody
         form={form}
@@ -101,7 +105,7 @@ function SupportFormPageContent() {
         initialError={initialError}
         selectedProjectRef={projectRef}
       />
-      <SupportFormDirectEmailInfo projectRef={projectRef} />
+      {!isSuccess && <SupportFormDirectEmailInfo projectRef={projectRef} />}
     </SupportFormWrapper>
   )
 }
@@ -248,17 +252,17 @@ function SupportFormBody({
   initialError,
   selectedProjectRef,
 }: SupportFromBodyProps) {
-  const showSuccessMessage = state.type === 'success'
+  const isSuccess = state.type === 'success'
 
   return (
     <div
       className={cn(
         'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
-        `${showSuccessMessage ? 'pt-8' : 'py-8'}`,
+        `${isSuccess ? 'pt-8' : 'py-8'}`,
         'border-default'
       )}
     >
-      {showSuccessMessage ? (
+      {isSuccess ? (
         <Success
           selectedProject={selectedProjectRef ?? undefined}
           sentCategory={state.sentCategory}
