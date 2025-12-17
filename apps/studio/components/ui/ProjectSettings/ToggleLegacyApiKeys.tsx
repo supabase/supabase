@@ -119,7 +119,7 @@ export const ToggleLegacyApiKeysPanel = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction type="danger" onClick={() => setIsConfirmOpen(true)}>
+            <AlertDialogAction variant="danger" onClick={() => setIsConfirmOpen(true)}>
               Disable API keys
             </AlertDialogAction>
           </AlertDialogFooter>

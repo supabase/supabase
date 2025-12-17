@@ -133,20 +133,18 @@ const AlertDialogDescription = React.forwardRef<
 ))
 AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName
 
-type AlertDialogActionProps = Omit<
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>,
-  'type'
-> & {
-  type?: NonNullable<ButtonVariantProps['type']>
+type AlertDialogActionProps = React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> & {
+  variant?: NonNullable<ButtonVariantProps['type']>
 }
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
   AlertDialogActionProps
->(({ className, type = 'primary', ...props }, ref) => (
+>(({ className, variant = 'primary', type = 'button', ...props }, ref) => (
   <AlertDialogPrimitive.Action
     ref={ref}
-    className={cn(buttonVariants({ type, size: 'tiny' }), className)}
+    type={type}
+    className={cn(buttonVariants({ type: variant, size: 'tiny' }), className)}
     {...props}
   />
 ))

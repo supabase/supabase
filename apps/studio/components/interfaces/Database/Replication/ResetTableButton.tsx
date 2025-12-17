@@ -71,7 +71,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isResetting} onClick={handleReset} type="danger">
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
             {isRollingBack
               ? 'Resetting table...'
               : isRestartingPipeline
