@@ -8,7 +8,7 @@ subtitle: 'Best practices on securing Edge Functions'
 <Admonition type="note">
 
 In the past Supabase Auth used a **symmetric** secret to sign legacy JWTs.
-But it was replaced by the new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), in this guide we'll walkthrough the new patterns for securing your Edge Functions.
+But it was replaced by the new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), in this guide we'll walk through the new patterns for securing your Edge Functions.
 
 If you still need to validate using the old method, check the [Legacy JWT Secret](/docs/guides/functions/auth-legacy-jwt) guide
 
@@ -18,15 +18,15 @@ Before continuing check the comprehensive guide on [JWT Signing Keys](docs/guide
 
 ## Overview
 
-When a HTTP request is sent to Edge Functions we can leverage to Supabase Auth to secure our endpoints, in the past this verification was controlled from [`verify_jwt` flag](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks).
+When an HTTP request is sent to Edge Functions we can leverage Supabase Auth to secure our endpoints. In the past, this verification was controlled by the [`verify_jwt` flag](/docs/guides/functions/function-configuration#skipping-authorization-checks).
 
-But unfortunately this method is not compatible with the new [JWT Signing Keys](docs/guides/auth/signing-keys) and also caused a lot of trouble when trying to [third party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
+But unfortunately this method is incompatible with the new [JWT Signing Keys](/docs/guides/auth/signing-keys) and also caused trouble when attempting [third-party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
 
-That's why we decided to not implicit force JWT verification anymore, but instead suggest patterns and templates to handle this task. It allow users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
+That's why we decided to no longer implicitly force JWT verification, but instead suggest patterns and templates to handle this task. This allows users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
 
 <Admonition type="warning">
 
-Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will be still supported and enabled by default. In order to move to new [JWT Signing Keys](docs/guides/auth/signing-keys) you need to manually [skip the authorization checks](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps bellow.
+Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will still be supported and enabled by default. To move to the new [JWT Signing Keys](/docs/guides/auth/signing-keys), you need to manually [skip the authorization checks](/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps below.
 
 </Admonition>
 
@@ -36,7 +36,7 @@ Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29
 
 We've prepared some [JWT verification](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) templates, that can be found [here](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt).
 
-In order to simple verify incoming requests you can download the specified template and start to using it:
+To simply verify incoming requests you can download the specified template and start using it:
 
 ```bash
 curl -O https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/default.ts
@@ -111,7 +111,7 @@ function getAuthToken(req: Request) {
 }
 
 function verifySupabaseJWT(jwt: string) {
-  return jwtVerify(token, SUPABASE_JWT_KEYS, { issuer: SUPABASE_JWT_ISSUER })
+  return jwtVerify(jwt, SUPABASE_JWT_KEYS, { issuer: SUPABASE_JWT_ISSUER })
 }
 
 Deno.serve(async (req: Request) => {
@@ -132,5 +132,8 @@ Deno.serve(async (req: Request) => {
       })
     }
   }
+
+  const { name } = await req.json()
+  return Response.json({ message: `hello ${name}` })
 }
 ```

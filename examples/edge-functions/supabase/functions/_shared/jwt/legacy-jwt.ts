@@ -1,5 +1,5 @@
-// Default supabase JWT verification
-// Use this template to validate tokens issued by Supabase default auth
+// Legacy supabase JWT verification
+// Use this template to validate tokens using the legacy symmetric JWT secret
 
 import * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";
 
