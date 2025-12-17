@@ -3,7 +3,6 @@ import { useProfile } from 'lib/profile'
 import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { Button, IconDiscord, Separator } from 'ui'
-import { CATEGORY_OPTIONS } from './Support.constants'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface SuccessProps {
@@ -26,8 +25,6 @@ export const Success = ({
 
   const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
-  const selectedCategory = CATEGORY_OPTIONS.find((option) => option.value === sentCategory)
-
   return (
     <div className="mt-10 max-w-[620px] flex flex-col items-center space-y-4">
       <div className="relative">
@@ -38,16 +35,18 @@ export const Success = ({
       </div>
       <div className="flex items-center flex-col space-y-2 text-center p-4">
         <h3 className="text-xl">Support request sent</h3>
-        <p className="text-sm text-foreground-light">
-          We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
+
+        <p className="text-sm text-foreground-light text-balance">
+          {selectedProject !== NO_PROJECT_MARKER && (
+            <>
+              Your ticket has been logged for the project{' '}
+              <span className="text-foreground font-medium">{projectName}</span> with project ID:{' '}
+              <span className="text-foreground font-medium">{selectedProject}</span>.
+            </>
+          )}{' '}
+          We will reach out to you at{' '}
+          <span className="text-foreground font-medium">{respondToEmail}</span>.
         </p>
-        {selectedProject !== NO_PROJECT_MARKER && (
-          <p className="text-sm text-foreground-light">
-            Your ticket has been logged for the project{' '}
-            <span className="text-foreground">{projectName}</span> with Project ID:{' '}
-            <span className="text-foreground">{selectedProject}</span>.
-          </p>
-        )}
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
         <>

@@ -173,6 +173,7 @@ interface PlanExpectationInfoBoxProps {
 
 const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps) => {
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
+  const shouldShowUpgradeActions = billingAll && planId !== 'enterprise'
 
   return (
     <Admonition
@@ -208,8 +209,7 @@ const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps
         </>
       }
       actions={
-        billingAll &&
-        planId !== 'enterprise' && (
+        shouldShowUpgradeActions && (
           <>
             <Button asChild>
               <Link
