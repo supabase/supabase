@@ -68,7 +68,7 @@ const HomePageCover = (props) => {
     },
     {
       tooltip: 'iOS Swift',
-      icon: '/docs/img/icons/swift-icon',
+      icon: '/docs/img/icons/swift-icon-orange',
       href: '/guides/getting-started/quickstarts/ios-swiftui',
       enabled: sdkSwiftEnabled,
     },
