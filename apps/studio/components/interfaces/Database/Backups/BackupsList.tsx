@@ -49,7 +49,6 @@ export const BackupsList = () => {
     },
   })
 
-  const planKey = backups?.tierKey ?? ''
   const sortedBackups = (backups?.backups ?? []).sort(
     (a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
   )
@@ -74,7 +73,7 @@ export const BackupsList = () => {
   return (
     <>
       <div className="space-y-6">
-        {sortedBackups.length === 0 && planKey !== 'FREE' ? (
+        {sortedBackups.length === 0 ? (
           <BackupsEmpty />
         ) : (
           <>

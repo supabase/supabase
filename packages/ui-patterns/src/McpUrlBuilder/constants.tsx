@@ -281,6 +281,11 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
+    primaryInstructions: (config, onCopy) => (
+      <p className="text-xs text-warning">
+        Ensure you are running Windsurf version <code>0.1.37</code> or higher.
+      </p>
+    ),
     alternateInstructions: (config, onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use

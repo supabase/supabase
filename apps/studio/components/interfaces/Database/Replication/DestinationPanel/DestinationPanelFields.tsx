@@ -32,20 +32,15 @@ import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (
-    <>
-      <div className="px-5 pt-5">
-        <p className="text-sm font-medium text-foreground mb-1">BigQuery settings</p>
-        <p className="text-sm text-foreground-light mb-4">
-          Configure how data is sent to your BigQuery destination
-        </p>
-      </div>
-      <div className="space-y-4 pb-5">
+    <div className="flex flex-col gap-y-6">
+      <p className="text-sm font-medium text-foreground px-5 pt-5">BigQuery settings</p>
+      <div className="flex flex-col gap-y-4 pb-5">
         <FormField_Shadcn_
           control={form.control}
           name="projectId"
           render={({ field }) => (
             <FormItemLayout
-              layout="vertical"
+              layout="horizontal"
               className="px-5"
               label="Project ID"
               description="The Google Cloud project ID where data will be sent"
@@ -63,7 +58,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
           render={({ field }) => (
             <FormItemLayout
               label="Dataset ID"
-              layout="vertical"
+              layout="horizontal"
               className="px-5"
               description="The BigQuery dataset where replicated tables will be created"
             >
@@ -79,7 +74,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
           name="serviceAccountKey"
           render={({ field }) => (
             <FormItemLayout
-              layout="vertical"
+              layout="horizontal"
               className="px-5"
               label="Service Account Key"
               description="Service account credentials JSON for authenticating with BigQuery"
@@ -97,7 +92,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
           )}
         />
       </div>
-    </>
+    </div>
   )
 }
 
@@ -113,9 +108,11 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
 export const AnalyticsBucketFields = ({
   form,
   setIsFormInteracting,
+  onSelectNewBucket,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   setIsFormInteracting: (value: boolean) => void
+  onSelectNewBucket: () => void
 }) => {
   const { warehouseName, type, s3AccessKeyId, namespace } = form.watch()
   const [showCatalogToken, setShowCatalogToken] = useState(false)
@@ -166,21 +163,17 @@ export const AnalyticsBucketFields = ({
   )
 
   return (
-    <>
-      <div className="px-5 pt-5">
-        <p className="text-sm font-medium text-foreground mb-1">Analytics Bucket settings</p>
-        <p className="text-sm text-foreground-light mb-4">
-          Configure how data is sent to your Analytics Bucket destination
-        </p>
-      </div>
-      <div className="space-y-4 pb-5">
+    <div className="flex flex-col gap-y-6">
+      <p className="text-sm font-medium text-foreground px-5 pt-5">Analytics Bucket settings</p>
+
+      <div className="flex flex-col gap-y-4 pb-5">
         <FormField_Shadcn_
           control={form.control}
           name="warehouseName"
           render={({ field }) => (
             <FormItemLayout
               label="Bucket"
-              layout="vertical"
+              layout="horizontal"
               className="px-5"
               description="The Analytics Bucket where data will be stored"
             >
@@ -209,10 +202,14 @@ export const AnalyticsBucketFields = ({
                   <Select_Shadcn_
                     value={field.value}
                     onValueChange={(value) => {
-                      setIsFormInteracting(true)
-                      field.onChange(value)
-                      // [Joshen] Ideally should select the first namespace of the selected bucket
-                      form.setValue('namespace', '')
+                      if (value === 'new-bucket') {
+                        onSelectNewBucket()
+                      } else {
+                        setIsFormInteracting(true)
+                        field.onChange(value)
+                        // [Joshen] Ideally should select the first namespace of the selected bucket
+                        form.setValue('namespace', '')
+                      }
                     }}
                   >
                     <SelectTrigger_Shadcn_>
@@ -231,6 +228,10 @@ export const AnalyticsBucketFields = ({
                             </SelectItem_Shadcn_>
                           ))
                         )}
+                        <SelectSeparator_Shadcn_ />
+                        <SelectItem_Shadcn_ value="new-bucket">
+                          Create a new bucket
+                        </SelectItem_Shadcn_>
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
@@ -246,7 +247,7 @@ export const AnalyticsBucketFields = ({
           render={({ field }) => (
             <FormItemLayout
               label="Namespace"
-              layout="vertical"
+              layout="horizontal"
               className="px-5"
               description="The namespace within the bucket where tables will be organized"
             >
@@ -300,7 +301,7 @@ export const AnalyticsBucketFields = ({
                             </SelectItem_Shadcn_>
                           ))
                         )}
-                        {namespaces.length > 0 && <SelectSeparator_Shadcn_ />}
+                        <SelectSeparator_Shadcn_ />
                         <SelectItem_Shadcn_ key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
                           Create a new namespace
                         </SelectItem_Shadcn_>
@@ -320,7 +321,7 @@ export const AnalyticsBucketFields = ({
             render={({ field }) => (
               <FormItemLayout
                 label="New Namespace Name"
-                layout="vertical"
+                layout="horizontal"
                 className="px-5"
                 description="A unique name for the new namespace"
               >
@@ -337,7 +338,7 @@ export const AnalyticsBucketFields = ({
           name="catalogToken"
           render={({ field }) => (
             <FormItemLayout
-              layout="vertical"
+              layout="horizontal"
               label="Catalog Token"
               className="px-5"
               description={
@@ -375,7 +376,38 @@ export const AnalyticsBucketFields = ({
           control={form.control}
           name="s3AccessKeyId"
           render={({ field }) => (
-            <FormItemLayout layout="vertical" label="S3 Access Key ID" className="px-5">
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 Access Key ID"
+              description={
+                <div className="flex flex-col gap-y-2">
+                  <p>
+                    Access keys are managed in your Storage{' '}
+                    <InlineLink href={`/project/${projectRef}/storage/s3`}>S3 settings</InlineLink>
+                  </p>
+
+                  {isSuccessKeys && keyNoLongerExists && (
+                    <Admonition type="warning" title="Unable to find access key ID in project">
+                      <p className="!leading-normal">
+                        Please select another key or create a new set, as this destination will not
+                        work otherwise. S3 access keys can be managed in your{' '}
+                        <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
+                          storage settings
+                        </InlineLink>
+                      </p>
+                    </Admonition>
+                  )}
+
+                  {s3AccessKeyId === CREATE_NEW_KEY && (
+                    <Admonition
+                      type="default"
+                      title="A new set of S3 access keys will be created"
+                    />
+                  )}
+                </div>
+              }
+              className="px-5"
+            >
               {isLoadingKeys ? (
                 <Button
                   disabled
@@ -427,39 +459,13 @@ export const AnalyticsBucketFields = ({
           )}
         />
 
-        {isSuccessKeys && keyNoLongerExists && (
-          <div className="px-5">
-            <Admonition type="warning" title="Unable to find access key ID in project">
-              <p className="!leading-normal">
-                Please select another key or create a new set, as this destination will not work
-                otherwise. S3 access keys can be managed in your{' '}
-                <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
-                  storage settings
-                </InlineLink>
-              </p>
-            </Admonition>
-          </div>
-        )}
-
-        {s3AccessKeyId === CREATE_NEW_KEY ? (
-          <div className="px-5">
-            <Admonition type="default" title="A new set of S3 access keys will be created">
-              <p className="!leading-normal">
-                S3 access keys can be managed in your{' '}
-                <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
-                  storage settings
-                </InlineLink>
-                .
-              </p>
-            </Admonition>
-          </div>
-        ) : (
+        {s3AccessKeyId !== CREATE_NEW_KEY && (
           <FormField_Shadcn_
             control={form.control}
             name="s3SecretAccessKey"
             render={({ field }) => (
               <FormItemLayout
-                layout="vertical"
+                layout="horizontal"
                 label="S3 Secret Access Key"
                 className="relative px-5"
                 description="The secret key corresponding to your selected access key ID"
@@ -469,12 +475,13 @@ export const AnalyticsBucketFields = ({
                     {...field}
                     type={showSecretAccessKey ? 'text' : 'password'}
                     value={field.value ?? ''}
+                    placeholder="Provide the secret access key"
                   />
                 </FormControl_Shadcn_>
                 <Button
                   type="default"
                   icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                  className="w-7 absolute right-6 top-[33px]"
+                  className="w-7 absolute right-6 top-[4px]"
                   onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
                 />
               </FormItemLayout>
@@ -482,6 +489,6 @@ export const AnalyticsBucketFields = ({
           />
         )}
       </div>
-    </>
+    </div>
   )
 }

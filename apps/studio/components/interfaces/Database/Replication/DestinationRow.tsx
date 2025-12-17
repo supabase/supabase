@@ -18,7 +18,7 @@ import {
 } from 'state/replication-pipeline-request-status'
 import type { ResponseError } from 'types'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationPanelSchemaType } from './DestinationPanel/DestinationPanel.schema'

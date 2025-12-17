@@ -1,7 +1,6 @@
 import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import {
   UpcomingInvoiceResponse,
@@ -12,6 +11,7 @@ import { formatCurrency } from 'lib/helpers'
 import React from 'react'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {
