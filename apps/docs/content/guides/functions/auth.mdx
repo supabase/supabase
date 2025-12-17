@@ -8,9 +8,9 @@ subtitle: 'Best practices on securing Edge Functions'
 <Admonition type="note">
 
 In the past Supabase Auth used a **symmetric** secret to sign legacy JWTs.
-But it was replaced by the new [JWT Signing Keys](https://supabase.com/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), in this guide we'll walkthought the new patterns for securing your Edge Functions.
+But it was replaced by the new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), in this guide we'll walkthrough the new patterns for securing your Edge Functions.
 
-If you still need to validate using the old method, please check the [Legacy JWT Secret](/docs/guides/functions/auth-legacy-jwt) guide
+If you still need to validate using the old method, check the [Legacy JWT Secret](/docs/guides/functions/auth-legacy-jwt) guide
 
 </Admonition>
 
@@ -18,15 +18,15 @@ Before continuing check the comprehensive guide on [JWT Signing Keys](docs/guide
 
 ## Overview
 
-When a HTTP request is sent to Edge Functions we can levarage to Supabase Auth to secure our endpoints, in the past this verification was controlled from [`verify_jwt` flag](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks).
+When a HTTP request is sent to Edge Functions we can leverage to Supabase Auth to secure our endpoints, in the past this verification was controlled from [`verify_jwt` flag](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks).
 
-But unfortunely this method is not compatible with the new [JWT Signing Keys](docs/guides/auth/signing-keys) and also caused a lot of trouble when trying to [third party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
+But unfortunately this method is not compatible with the new [JWT Signing Keys](docs/guides/auth/signing-keys) and also caused a lot of trouble when trying to [third party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
 
-That's why we decided to not implicit force JWT verification anymore, but instead suggest patterns and templates to handle this task. It allow users to own and control the auth code, instead of hidding it internally under Edge Runtime infrastructure.
+That's why we decided to not implicit force JWT verification anymore, but instead suggest patterns and templates to handle this task. It allow users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
 
 <Admonition type="warning">
 
-Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will be still suported and enabled by default. In order to move to new [JWT Signing Keys](docs/guides/auth/signing-keys) you need to manually [skip the authorization checks](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps bellow.
+Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will be still supported and enabled by default. In order to move to new [JWT Signing Keys](docs/guides/auth/signing-keys) you need to manually [skip the authorization checks](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps bellow.
 
 </Admonition>
 
