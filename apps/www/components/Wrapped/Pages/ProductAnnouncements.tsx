@@ -242,8 +242,8 @@ const months: Month[] = [
         url: 'https://github.com/orgs/supabase/discussions/38119',
       },
       {
-        title: 'Expiring personnel access tokens',
-        url: 'https://supabase.com/dashboard/account/tokens',
+        title: 'Expiring personal access tokens',
+        url: 'https://supabase.com/dashboard/account/tokens', // Direct dashboard link (intentional)
       },
       {
         title: 'Self-service SSO for Teams + Enterprise',
@@ -252,10 +252,6 @@ const months: Month[] = [
       {
         title: 'Deno 2.1 in All Regions',
         url: 'https://github.com/orgs/supabase/discussions/37941',
-      },
-      {
-        title: 'SSO is Now Self-Service for Teams and Enterprise Plans',
-        url: 'https://supabase.com/docs/guides/platform/sso',
       },
     ],
   },
@@ -281,7 +277,7 @@ const months: Month[] = [
     announcements: [
       {
         title: 'Realtime Replay, available in alpha',
-        url: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay',
+        url: 'https://supabase.com/blog/realtime-broadcast-replay',
       },
       {
         title: 'Log Drains in Self-Hosted Supabase',
