@@ -5,6 +5,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { escapeSqlString } from './utils'
 
 export type EnumeratedTypeCreateVariables = {
   projectRef: string
@@ -23,14 +24,13 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  // Escape single quotes for SQL string literals (e.g., "don't" -> "don''t")
-  const escapeSqlString = (value: string): string => value.replaceAll("'", "''")
-
   const createSql = `create type "${schema}"."${name}" as enum (${values
     .map((x) => `'${escapeSqlString(x)}'`)
     .join(', ')});`
   const commentSql =
-    description !== undefined ? `comment on type "${schema}"."${name}" is '${description}';` : ''
+    description !== undefined
+      ? `comment on type "${schema}"."${name}" is '${escapeSqlString(description)}';`
+      : ''
   const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

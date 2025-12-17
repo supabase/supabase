@@ -5,6 +5,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { escapeSqlString } from './utils'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
@@ -23,9 +24,6 @@ export async function updateEnumeratedType({
   description,
   values = [],
 }: EnumeratedTypeUpdateVariables) {
-  // Escape single quotes for SQL string literals (e.g., "don't" -> "don''t")
-  const escapeSqlString = (value: string): string => value.replaceAll("'", "''")
-
   const statements: string[] = []
   if (name.original !== name.updated) {
     statements.push(`alter type "${schema}"."${name.original}" rename to "${name.updated}";`)
@@ -52,7 +50,7 @@ export async function updateEnumeratedType({
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
+    statements.push(`comment on type "${schema}"."${name.updated}" is '${escapeSqlString(description)}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))

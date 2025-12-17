@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest'
-
-/**
- * Helper function to escape single quotes for SQL string literals.
- * In PostgreSQL, single quotes inside string literals must be doubled.
- * e.g., "don't" -> "don''t"
- */
-const escapeSqlString = (value: string): string => value.replaceAll("'", "''")
+import { escapeSqlString } from 'data/enumerated-types/utils'
 
 describe('escapeSqlString', () => {
   it('should return unchanged string when no quotes present', () => {
@@ -33,10 +27,10 @@ describe('escapeSqlString', () => {
 
 describe('enum SQL generation', () => {
   it('should generate properly escaped CREATE TYPE SQL', () => {
-    const values = ["normal", "don't", "it's a 'test'"]
+    const values = ['normal', "don't", "it's a 'test'"]
     const escapedValues = values.map((x) => `'${escapeSqlString(x)}'`).join(', ')
     const sql = `create type "public"."my_enum" as enum (${escapedValues});`
-    
+
     expect(sql).toBe(
       `create type "public"."my_enum" as enum ('normal', 'don''t', 'it''s a ''test''');`
     )
@@ -45,7 +39,7 @@ describe('enum SQL generation', () => {
   it('should generate properly escaped ALTER TYPE ADD VALUE SQL', () => {
     const value = "new't value"
     const sql = `alter type "public"."my_enum" add value '${escapeSqlString(value)}';`
-    
+
     expect(sql).toBe(`alter type "public"."my_enum" add value 'new''t value';`)
   })
 
@@ -53,7 +47,14 @@ describe('enum SQL generation', () => {
     const original = "old'val"
     const updated = "new'val"
     const sql = `alter type "public"."my_enum" rename value '${escapeSqlString(original)}' to '${escapeSqlString(updated)}';`
-    
+
     expect(sql).toBe(`alter type "public"."my_enum" rename value 'old''val' to 'new''val';`)
+  })
+
+  it('should generate properly escaped COMMENT ON TYPE SQL', () => {
+    const description = "This is a 'test' description"
+    const sql = `comment on type "public"."my_enum" is '${escapeSqlString(description)}';`
+
+    expect(sql).toBe(`comment on type "public"."my_enum" is 'This is a ''test'' description';`)
   })
 })
