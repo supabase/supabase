@@ -22,6 +22,10 @@ export const env = {
   PASSWORD: process.env.PASSWORD,
   PROJECT_REF: process.env.PROJECT_REF || undefined,
 
+  GITHUB_USER: process.env.GITHUB_USER,
+  GITHUB_PASS: process.env.GITHUB_PASS,
+  GITHUB_TOTP: process.env.GITHUB_TOTP,
+
   VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO:
     process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',
   ORG_SLUG: process.env.ORG_SLUG || 'default',

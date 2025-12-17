@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
-import crossFetch from './retriedFetch.js'
-import { chromium } from 'playwright'
+import crossFetch from '../common/retriedFetch.js'
 import * as OTPAuth from 'otpauth'
 
 import assert from 'assert'
 import { Session } from '@supabase/supabase-js'
+import { chromium } from '@playwright/test'
 
 // a bit too complicated to do auth with github via API, so we do authorization with GUI
 const getAccessToken = async () => {
