@@ -1,9 +1,7 @@
 import pgMeta from '@supabase/pg-meta'
 import {
   convertToModelMessages,
-  createUIMessageStream,
-  createUIMessageStreamResponse,
-  generateId,
+  createIdGenerator,
   type ModelMessage,
   stepCountIs,
   streamText,
@@ -32,6 +30,7 @@ import {
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
 import { getTools } from 'lib/ai/tools'
+import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
 import { executeQuery } from 'lib/api/self-hosted/query'
 
@@ -67,7 +66,7 @@ export default wrapper
 
 const requestBodySchema = z.object({
   message: z.any(), // Single message from the user
-  chatId: z.string().uuid().optional(), // Chat session ID
+  chatId: z.string().uuid().optional(), // Chat session ID for persistence
   projectRef: z.string(),
   connectionString: z.string(),
   schema: z.string().optional(),
@@ -102,29 +101,24 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     model: requestedModel,
   } = data
 
+  // Headers for API calls
+  const apiHeaders = {
+    'Content-Type': 'application/json',
+    ...(authorization && { Authorization: authorization }),
+  }
+
   // Load previous messages from the database if chatId is provided
   let previousMessages: UIMessage[] = []
   if (chatId && projectRef) {
     try {
-      const data = await getAgentMessages({ projectRef, id: chatId }, undefined, {
-        ...(authorization && { Authorization: authorization }),
-      })
-      console.log('Loaded messages from DB:', JSON.stringify(data, null, 2))
-      // Clean loaded messages to match UIMessage format expected by AI SDK
-      previousMessages = (data || []).map((msg: any) => ({
-        id: msg.id,
-        role: msg.role,
-        parts: msg.parts || [],
-        ...(msg.metadata != null && typeof msg.metadata === 'object'
-          ? { metadata: msg.metadata }
-          : {}),
-      })) as UIMessage[]
+      previousMessages = await getAgentMessages({ projectRef, id: chatId }, undefined, apiHeaders)
     } catch (error) {
       console.error('Failed to load previous messages:', error)
       // Continue without previous messages
     }
   }
 
+  // Combine previous messages with new message
   const rawMessages = [...previousMessages, message]
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
@@ -152,9 +146,31 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  // Use raw messages directly - take last 7 for context window management
-  const messagesForModel = rawMessages.slice(-7)
-  const originalMessages = rawMessages
+  // Only returns last 7 messages
+  // Filters out tools with invalid states
+  // Filters out tool outputs based on opt-in level using sanitizeMessagePart
+  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    if (msg && msg.role === 'assistant' && msg.parts) {
+      const cleanedParts = msg.parts
+        .filter((part: any) => {
+          if (part.type.startsWith('tool-')) {
+            const invalidStates = ['input-streaming', 'input-available', 'output-error']
+            return !invalidStates.includes(part.state)
+          }
+          return true
+        })
+        .map((part: any) => {
+          return sanitizeMessagePart(part, aiOptInLevel)
+        })
+      return { ...msg, parts: cleanedParts }
+    }
+    return msg
+  })
 
   const {
     model,
@@ -213,7 +229,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-    const coreMessagesBase: ModelMessage[] = [
+    const coreMessages: ModelMessage[] = [
       {
         role: 'system',
         content: system,
@@ -226,6 +242,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         // Add any dynamic context here
         content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
       },
+      ...convertToModelMessages(messages),
     ]
 
     const abortController = new AbortController()
@@ -242,83 +259,48 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       chatId,
     })
 
-    // Skip validation for now - just use raw messages
-    // The validateUIMessages is too strict about tool part schemas
-    const validatedMessagesForModel = messagesForModel
-    const validatedOriginalMessages = originalMessages
-
-    console.log('Messages for model:', JSON.stringify(validatedMessagesForModel, null, 2))
-
-    let coreMessages: ModelMessage[]
-    try {
-      coreMessages = [...coreMessagesBase, ...convertToModelMessages(validatedMessagesForModel)]
-    } catch (error) {
-      console.error('convertToModelMessages failed:', error)
-      // Fall back to text-only messages if conversion fails
-      const textOnlyMessages = validatedMessagesForModel.map((msg) => ({
-        id: msg.id,
-        role: msg.role,
-        parts: msg.parts.filter((part: { type: string }) => part.type === 'text'),
-      }))
-      console.log('Falling back to text-only messages:', JSON.stringify(textOnlyMessages, null, 2))
-      coreMessages = [
-        ...coreMessagesBase,
-        ...convertToModelMessages(textOnlyMessages as UIMessage[]),
-      ]
+    // Save user message before streaming starts (if persistence is enabled)
+    const userMessage = message as UIMessage
+    if (chatId && projectRef && userMessage.role === 'user') {
+      try {
+        await createAgentMessages({ projectRef, id: chatId, messages: [userMessage] }, apiHeaders)
+      } catch (error) {
+        console.error('Failed to save user message:', error)
+        // Continue even if save fails - don't block the streaming
+      }
     }
 
-    // Headers for API calls
-    const apiHeaders = {
-      'Content-Type': 'application/json',
-      ...(authorization && { Authorization: authorization }),
-    }
+    const result = streamText({
+      model,
+      stopWhen: stepCountIs(5),
+      messages: coreMessages,
+      ...(providerOptions && { providerOptions }),
+      tools,
+      abortSignal: abortController.signal,
+    })
 
-    // Create UI message stream with immediate persistence
-    const stream = createUIMessageStream({
-      execute: async ({ writer }) => {
-        // 1. Save user message BEFORE streaming starts
-        const userMessage = message as UIMessage
-        if (chatId && projectRef && userMessage.role === 'user') {
+    // Consume the stream to ensure it runs to completion & triggers onFinish
+    // even when the client response is aborted
+    result.consumeStream()
+
+    result.pipeUIMessageStreamToResponse(res, {
+      sendReasoning: true,
+      // Generate server-side IDs for persistence
+      generateMessageId: createIdGenerator({ prefix: 'msg', size: 16 }),
+      originalMessages: rawMessages,
+      onFinish: async ({ messages: updatedMessages }) => {
+        // Save assistant message after streaming completes
+        if (chatId && projectRef) {
           try {
-            console.log('Saving user message:', JSON.stringify(userMessage, null, 2))
-            await createAgentMessages({ projectRef, id: chatId, messages: [userMessage] }, apiHeaders)
-          } catch (error) {
-            console.error('Failed to save user message:', error)
-            // Continue even if save fails - don't block the streaming
-          }
-        }
-
-        // 2. Write start events for assistant response (only for user messages)
-        if (userMessage.role === 'user') {
-          writer.write({ type: 'start', messageId: generateId() })
-          writer.write({ type: 'start-step' })
-        }
-
-        // 3. Execute streamText and merge output
-        const result = streamText({
-          model,
-          stopWhen: stepCountIs(5),
-          messages: coreMessages,
-          ...(providerOptions && { providerOptions }),
-          tools,
-          abortSignal: abortController.signal,
-        })
-
-        // Consume the stream to ensure it runs
-        result.consumeStream()
-
-        // Merge the stream output (sendStart: false since we already wrote start events)
-        writer.merge(result.toUIMessageStream({ sendStart: false, sendReasoning: true }))
-      },
-      originalMessages: validatedOriginalMessages,
-      onFinish: async ({ responseMessage }) => {
-        // 4. Save assistant message after streaming completes
-        console.log('responseMessage:', JSON.stringify(responseMessage))
-        if (chatId && projectRef && responseMessage) {
-          try {
-            const cleanedMessage = cleanMessage(responseMessage)
-            console.log('Saving assistant message:', JSON.stringify(cleanedMessage, null, 2))
-            await createAgentMessages({ projectRef, id: chatId, messages: [cleanedMessage] }, apiHeaders)
+            // Get the last message (the new assistant response)
+            const assistantMessage = updatedMessages[updatedMessages.length - 1]
+            if (assistantMessage && assistantMessage.role === 'assistant') {
+              const cleanedMessage = cleanMessage(assistantMessage)
+              await createAgentMessages(
+                { projectRef, id: chatId, messages: [cleanedMessage] },
+                apiHeaders
+              )
+            }
           } catch (error) {
             console.error('Failed to save assistant message:', error)
           }
@@ -340,30 +322,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         return JSON.stringify(error)
       },
     })
-
-    // Create response from stream
-    const uiMessageStreamResponse = createUIMessageStreamResponse({ stream })
-
-    // Stream the response
-    res.writeHead(uiMessageStreamResponse.status, {
-      'Content-Type': 'text/plain; charset=utf-8',
-      ...Object.fromEntries(uiMessageStreamResponse.headers.entries()),
-    })
-
-    if (uiMessageStreamResponse.body) {
-      const reader = uiMessageStreamResponse.body.getReader()
-      try {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          res.write(value)
-        }
-      } finally {
-        reader.releaseLock()
-      }
-    }
-
-    res.end()
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
