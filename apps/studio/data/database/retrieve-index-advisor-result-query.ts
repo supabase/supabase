@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
+import { filterProtectedSchemaIndexAdvisorResult } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
 
 export type GetIndexAdvisorResultVariables = {
   projectRef?: string
@@ -29,12 +30,15 @@ export async function getIndexAdvisorResult({
   // swap single quotes for double to prevent syntax errors
   const escapedQuery = query.replace(/'/g, "''")
 
-  const { result } = await executeSql({
+  const { result: results } = await executeSql({
     projectRef,
     connectionString,
     sql: `select * from index_advisor('${escapedQuery}');`,
   })
-  return result[0] as GetIndexAdvisorResultResponse
+  const result = results[0] as GetIndexAdvisorResultResponse
+
+  // Filter out protected schema recommendations
+  return filterProtectedSchemaIndexAdvisorResult(result) ?? result
 }
 
 export type GetIndexAdvisorResultData = Awaited<ReturnType<typeof getIndexAdvisorResult>>
