@@ -9,7 +9,7 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import { createNavigationHandler } from 'lib/navigiation'
+import { createNavigationHandler } from 'lib/navigation'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse

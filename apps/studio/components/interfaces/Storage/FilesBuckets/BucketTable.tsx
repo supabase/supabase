@@ -8,10 +8,9 @@ import {
 import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
-import { createNavigationHandler } from 'lib/navigiation'
+import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import type React from 'react'
 import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
