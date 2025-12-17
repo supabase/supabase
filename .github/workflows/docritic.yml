@@ -1,6 +1,9 @@
 name: Docritic
 
 on:
+  push:
+    branches:
+      - feat/docritic-bot  # TEMPORARY: Remove before merging
   workflow_dispatch:
     inputs:
       guide_url:
