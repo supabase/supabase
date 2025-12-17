@@ -31,6 +31,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (contains(github.event.comment.body, '@docritic') && !github.event.issue.pull_request)
     runs-on: ubuntu-latest
+    environment: Docritic
     timeout-minutes: 45
 
     env:
