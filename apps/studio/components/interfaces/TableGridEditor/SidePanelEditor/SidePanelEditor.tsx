@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -16,6 +15,7 @@ import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints
 import { databaseKeys } from 'data/database/keys'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { privilegeKeys } from 'data/privileges/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
@@ -168,7 +168,7 @@ export const SidePanelEditor = ({
       toast.success('Successfully created row')
     },
   })
-  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+  const { mutateAsync: updateTableRow, isPending: isUpdatingRow } = useTableRowUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated row')
     },
@@ -176,9 +176,6 @@ export const SidePanelEditor = ({
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
     onError: () => {},
-  })
-  const { mutateAsync: createPolicy } = useDatabasePolicyCreateMutation({
-    onError: () => {}, // Errors handled inline
   })
 
   const isDuplicating = snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'
@@ -529,6 +526,9 @@ export const SidePanelEditor = ({
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
           queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({
+            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+          }),
         ])
 
         // Show success toast after everything is complete
@@ -579,6 +579,9 @@ export const SidePanelEditor = ({
             queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({
+            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+          }),
         ])
 
         toast.success(
@@ -785,6 +788,7 @@ export const SidePanelEditor = ({
             ? snap.sidePanel.foreignKey.foreignKey
             : undefined
         }
+        isSaving={isUpdatingRow}
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
       />

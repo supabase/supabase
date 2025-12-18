@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { ExportDialog } from 'components/grid/components/header/ExportDialog'
@@ -15,6 +16,7 @@ import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/Infin
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
 import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -38,9 +40,8 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
-import EntityListItem from './EntityListItem'
+import { EntityListItem } from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
-import { keepPreviousData } from '@tanstack/react-query'
 
 export const TableEditorMenu = () => {
   const { id: _id, ref: projectRef } = useParams()
@@ -84,6 +85,17 @@ export const TableEditorMenu = () => {
   const entityTypes = useMemo(
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
+  )
+  const entityNames = useMemo(() => entityTypes?.map((entity) => entity.name) ?? [], [entityTypes])
+
+  const { data: apiAccessByTableName } = useTableApiAccessQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString ?? undefined,
+      schemaName: selectedSchema,
+      tableNames: entityNames,
+    },
+    { enabled: Boolean(selectedSchema && entityNames.length > 0) }
   )
 
   const { can: canCreateTables } = useAsyncCheckPermissions(
@@ -132,8 +144,9 @@ export const TableEditorMenu = () => {
       id: Number(id),
       isLocked: isSchemaLocked,
       onExportCLI: () => onSelectExportCLI(Number(id)),
+      apiAccessMap: apiAccessByTableName,
     }),
-    [project?.ref, id, isSchemaLocked, onSelectExportCLI]
+    [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName]
   )
 
   useEffect(() => {

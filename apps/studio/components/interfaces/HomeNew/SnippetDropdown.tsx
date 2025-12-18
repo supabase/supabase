@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
   ScrollArea,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 type SnippetDropdownProps = {
   projectRef?: string

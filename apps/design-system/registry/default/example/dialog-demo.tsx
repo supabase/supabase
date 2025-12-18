@@ -1,46 +1,42 @@
-import { Button, DialogSection, DialogSectionSeparator } from 'ui'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  Input_Shadcn_,
+  Label_Shadcn_,
 } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
 
 export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Edit Profile</Button>
+        <Button type="default">Show Dialog</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader padding={'small'}>
+        <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DialogDescription>
+          <DialogDescription>Make changes to your profile here.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="space-y-4" padding={'small'}>
+        <DialogSection className="space-y-4">
           <div>
-            <Label_Shadcn_ htmlFor="name" className="text-right">
-              Name
-            </Label_Shadcn_>
-            <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" className="col-span-3" />
+            <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
+            <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" />
           </div>
           <div>
-            <Label_Shadcn_ htmlFor="username" className="text-right">
-              Username
-            </Label_Shadcn_>
-            <Input_Shadcn_ id="username" defaultValue="@peduarte" className="col-span-3" />
+            <Label_Shadcn_ htmlFor="username">Username</Label_Shadcn_>
+            <Input_Shadcn_ id="username" defaultValue="@peduarte" />
           </div>
         </DialogSection>
-        <DialogFooter padding={'small'}>
-          <Button htmlType="submit">Save changes</Button>
+        <DialogFooter>
+          <Button>Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
