@@ -38,13 +38,14 @@ export function getOverallStatus(incidents: Array<{ status: string }>): string {
  * This is used for the title/name, not for status determination.
  *
  * @param incidents Array of incidents to analyze
- * @returns The most recent incident
+ * @returns The most recent incident, or null if array is empty
  */
-export function getMostRecentIncident(
-  incidents: Array<{ name: string; active_since: string }>
-): { name: string; active_since: string } {
+export function getMostRecentIncident(incidents: Array<{ name: string; active_since: string }>): {
+  name: string
+  active_since: string
+} | null {
   if (incidents.length === 0) {
-    throw new Error('Cannot get most recent incident from empty array')
+    return null
   }
   if (incidents.length === 1) return incidents[0]
 
@@ -95,4 +96,3 @@ export function processIncidentData(incidents: IncidentInfo[]) {
     allSameStatus,
   }
 }
-
