@@ -93,7 +93,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const metaImageUrl = `/images/blog/${blogPost.image ? blogPost.image : blogPost.thumb}`
+    const metaImageUrl = `/images/blog/${blogPost.imgSocial ? blogPost.imgSocial : blogPost.imgSite}`
 
     return {
       title: blogPost.title,
@@ -147,9 +147,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  // Fallback to thumb or image if no meta image
+  // Fallback to imgSite or imgSocial if no meta image
   if (!metaImageUrl) {
-    metaImageUrl = cmsPost.thumb || cmsPost.image
+    metaImageUrl = cmsPost.imgSite || cmsPost.imgSocial
   }
 
   // Ensure image URLs are absolute
@@ -276,12 +276,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
           isCMS: true,
           content: mdxSource,
           toc: tocResult,
-          image: publishedPost.image ?? undefined,
-          thumb: publishedPost.thumb ?? undefined,
+          imgSocial: publishedPost.imgSocial ?? undefined,
+          imgSite: publishedPost.imgSite ?? undefined,
           // Extract meta fields from CMS
           meta_title: publishedPost.meta?.title ?? undefined,
           meta_description: publishedPost.meta?.description ?? undefined,
-          meta_image: publishedPost.meta?.image ?? publishedPost.thumb ?? undefined,
+          meta_image: publishedPost.meta?.image ?? publishedPost.imgSite ?? undefined,
         } as any,
         isDraftMode: isDraft,
       }
@@ -322,12 +322,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       content: processedContent.content,
       toc: processedContent.toc,
       toc_depth: cmsPost.toc_depth || 3,
-      image: cmsPost.image ?? undefined,
-      thumb: cmsPost.thumb ?? undefined,
+      imgSocial: cmsPost.imgSocial ?? undefined,
+      imgSite: cmsPost.imgSite ?? undefined,
       // Extract meta fields from CMS
       meta_title: cmsPost.meta?.title ?? undefined,
       meta_description: cmsPost.meta?.description ?? undefined,
-      meta_image: cmsPost.meta?.image ?? cmsPost.thumb ?? undefined,
+      meta_image: cmsPost.meta?.image ?? cmsPost.imgSite ?? undefined,
     } as any,
     isDraftMode: isDraft,
   }
