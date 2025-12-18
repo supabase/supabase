@@ -38,7 +38,13 @@ export const createNavigationHandler = (url: string, router: Router) => {
     if ('key' in event) {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-        router.push(url)
+
+        const isModifierKey = event.metaKey || event.ctrlKey
+        if (isModifierKey) {
+          window.open(`${BASE_PATH}${url}`, '_blank')
+        } else {
+          router.push(url)
+        }
       }
       return
     }
