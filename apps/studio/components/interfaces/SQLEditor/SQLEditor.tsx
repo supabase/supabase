@@ -248,7 +248,7 @@ export const SQLEditor = () => {
             range: editorModel.getFullModelRange(),
           },
         ])
-        snapV2.setSql(id, formattedSql)
+        snapV2.setSql({ id, sql: formattedSql })
       }
     }
   }, [id, isDiffOpen, project, snapV2])

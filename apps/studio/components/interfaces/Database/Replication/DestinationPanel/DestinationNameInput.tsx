@@ -14,11 +14,7 @@ export const DestinationNameInput = ({ form }: DestinationNameInputProps) => {
       control={form.control}
       name="name"
       render={({ field }) => (
-        <FormItemLayout
-          label="Name"
-          layout="vertical"
-          description="A descriptive name to identify this destination"
-        >
+        <FormItemLayout label="Name" layout="horizontal">
           <FormControl_Shadcn_>
             <Input_Shadcn_ {...field} placeholder="My destination" />
           </FormControl_Shadcn_>
