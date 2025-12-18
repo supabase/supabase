@@ -25,6 +25,7 @@ import {
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
 import { formatDuration } from './QueryPerformance.utils'
+import { useTrack } from 'lib/telemetry/track'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -47,11 +48,9 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
   const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
 
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const track = useTrack()
 
   useEffect(() => {
     if (selectedRow !== undefined) {
@@ -78,13 +77,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
       initialMessage: prompt,
     })
 
-    sendEvent({
-      action: 'query_performance_ai_explanation_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('query_performance_ai_explanation_clicked')
 
     // Close the query detail panel since we need to see the AI assistant panel
     onClose?.()
