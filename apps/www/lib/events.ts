@@ -108,7 +108,7 @@ interface EventRecord {
   date: string
   end_date?: string
   description: string
-  thumb: string
+  imgSite: string
   cover_url: string
   path: string
   url: string
@@ -173,7 +173,7 @@ export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
           title: event?.name || '',
           date: event?.start_at || '',
           description: '',
-          thumb: '',
+          imgSite: '',
           cover_url: '',
           path: '',
           url: event?.url || '',
@@ -219,7 +219,7 @@ export const getStaticEvents = async (): Promise<{
       title: `Launch Week ${meetup.launch_week.slice(2)} Meetup: ${meetup.city}, ${meetup.country}`,
       date: meetup.start_at,
       description: '',
-      thumb: '',
+      imgSite: '',
       cover_url: '',
       path: '',
       url: meetup.link || '',
@@ -249,7 +249,7 @@ export const getStaticEvents = async (): Promise<{
         title: post.title || '',
         date: post.date || '',
         description: post.description || '',
-        thumb: post.thumb || '',
+        imgSite: post.imgSite || '',
         cover_url: (post as any).cover_url || '',
         path: post.path || '',
         // For webinars, use internal path; for other events, use external link if available

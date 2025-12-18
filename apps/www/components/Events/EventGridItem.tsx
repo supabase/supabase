@@ -33,14 +33,14 @@ const EventGridItem = ({ event }: Props) => {
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
           <div className="border-default relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border shadow-sm">
-            {!event.thumb ? (
+            {!event.imgSite ? (
               <div className="bg-background-alternative w-full h-full" />
             ) : (
               <Image
                 fill
                 sizes="100%"
                 quality={100}
-                src={event.type === 'casestudy' ? event.thumb : `/images/blog/${event.thumb}`}
+                src={event.type === 'casestudy' ? event.imgSite : `/images/blog/${event.imgSite}`}
                 className="scale-100 object-cover overflow-hidden"
                 alt={`${event.title} thumbnail`}
               />

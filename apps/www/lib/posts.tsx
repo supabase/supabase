@@ -14,8 +14,8 @@ export type Post = {
   title?: string
   description?: string
   author?: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgSite?: string
   categories?: string[]
   tags?: string[]
   date?: string

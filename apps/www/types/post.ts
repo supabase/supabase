@@ -15,8 +15,8 @@ export interface PostTypes {
     url: string
   }
   content?: string
-  thumb: string
-  image?: string
+  imgSite: string
+  imgSocial?: string
   readingTime?: string
   description: string
   url: string
@@ -110,8 +110,8 @@ export type Blog = {
   blog_url?: string
   url?: string
   source: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgSite?: string
   youtubeHero?: string
   launchweek?: number | string
   meta_title?: string
@@ -145,8 +145,8 @@ export type BlogData = {
   blog_url?: string
   url?: string
   source: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgSite?: string
   youtubeHero?: string
   launchweek?: number | string
   meta_title?: string
@@ -196,7 +196,7 @@ export interface EventData {
   speakers: string
   speakers_label?: string
   og_image?: string
-  thumb?: string
+  imgSite?: string
   thumb_light?: string
   youtubeHero?: string
   author_url?: string
