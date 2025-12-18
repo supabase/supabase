@@ -18,6 +18,7 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
+import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -95,7 +96,10 @@ function SupportFormPageContent() {
     <SupportFormWrapper>
       <SupportFormHeader />
 
-      {!isSuccess && (
+      {hasActiveIncidents && <IncidentAdmonition />}
+
+      {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
+      {!isSuccess && !hasActiveIncidents && (
         <div className="flex flex-col gap-y-4">
           <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
           <DiscordCTACard organizationSlug={orgSlug} />
