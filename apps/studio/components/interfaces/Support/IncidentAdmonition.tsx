@@ -15,6 +15,48 @@ interface IncidentAdmonitionProps {
   isActive: boolean
 }
 
+const STATUS_DESCRIPTION_SIGN_OFF = 'Please follow the status page for updates.'
+
+const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
+
+const getStatusDescription = (
+  status: string,
+  hasMultipleIncidents: boolean,
+  allSameStatus: boolean
+): string => {
+  const isPlural = hasMultipleIncidents
+  const issueTerm = isPlural ? 'these issues' : 'this issue'
+
+  switch (status) {
+    case 'investigating':
+      if (hasMultipleIncidents && !allSameStatus) {
+        return `We are aware of multiple ongoing issues and are investigating. ${STATUS_DESCRIPTION_SIGN_OFF}`
+      }
+      return `We are investigating ${issueTerm}. ${STATUS_DESCRIPTION_SIGN_OFF}`
+
+    case 'identified':
+      if (hasMultipleIncidents && !allSameStatus) {
+        return `We have identified the cause of some of ${issueTerm} and are working on fixes. ${STATUS_DESCRIPTION_SIGN_OFF}`
+      }
+      return `We have identified the cause of ${issueTerm} and are working on a fix. ${STATUS_DESCRIPTION_SIGN_OFF}`
+
+    case 'monitoring':
+      if (hasMultipleIncidents && !allSameStatus) {
+        return `Fixes have been deployed for some of ${issueTerm} and we are monitoring the results. ${STATUS_DESCRIPTION_SIGN_OFF}`
+      }
+      return `A fix has been deployed and we are monitoring the results. ${STATUS_DESCRIPTION_SIGN_OFF}`
+
+    case 'resolved':
+      if (hasMultipleIncidents && !allSameStatus) {
+        return `Some of ${issueTerm} have been resolved, but others may still be ongoing. ${STATUS_DESCRIPTION_SIGN_OFF}`
+      }
+      return `${capitalizeFirstLetter(issueTerm)} ${isPlural ? 'have' : 'has'} been resolved but may take some time to fully recover. ${STATUS_DESCRIPTION_SIGN_OFF}`
+
+    default:
+      return `We are investigating ${issueTerm}. ${STATUS_DESCRIPTION_SIGN_OFF}`
+  }
+}
+
 export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
   const { data: incidents, isLoading, isError } = useIncidentStatusQuery()
 
@@ -28,51 +70,12 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
   const overallStatus = getOverallStatus(incidents)
   const allSameStatus = allIncidentsHaveSameStatus(incidents)
 
-  // Create title - show most recent incident name + count if multiple
+  // Show most recent incident name + count if multiple incidents
   const statusTitle =
     (mostRecentIncident?.name ?? '') +
     (hasMultipleIncidents && incidents
       ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
       : '')
-
-  // Create descriptions based on overall status and whether all incidents share the same status
-  const statusDescriptionSignOff = 'Please follow the status page for updates.'
-
-  const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
-
-  const getStatusDescription = (status: string): string => {
-    const isPlural = hasMultipleIncidents
-    const issueTerm = isPlural ? 'these issues' : 'this issue'
-
-    switch (status) {
-      case 'investigating':
-        if (hasMultipleIncidents && !allSameStatus) {
-          return `We are aware of multiple ongoing issues and are investigating. ${statusDescriptionSignOff}`
-        }
-        return `We are investigating ${issueTerm}. ${statusDescriptionSignOff}`
-
-      case 'identified':
-        if (hasMultipleIncidents && !allSameStatus) {
-          return `We have identified the cause of some of ${issueTerm} and are working on fixes. ${statusDescriptionSignOff}`
-        }
-        return `We have identified the cause of ${issueTerm} and are working on a fix. ${statusDescriptionSignOff}`
-
-      case 'monitoring':
-        if (hasMultipleIncidents && !allSameStatus) {
-          return `Fixes have been deployed for some of ${issueTerm} and we are monitoring the results. ${statusDescriptionSignOff}`
-        }
-        return `A fix has been deployed and we are monitoring the results. ${statusDescriptionSignOff}`
-
-      case 'resolved':
-        if (hasMultipleIncidents && !allSameStatus) {
-          return `Some of ${issueTerm} have been resolved, but others may still be ongoing. ${statusDescriptionSignOff}`
-        }
-        return `${capitalizeFirstLetter(issueTerm)} ${isPlural ? 'have' : 'has'} been resolved but may take some time to fully recover. ${statusDescriptionSignOff}`
-
-      default:
-        return `We are investigating ${issueTerm}. ${statusDescriptionSignOff}`
-    }
-  }
 
   return (
     <AnimatePresence>
@@ -88,7 +91,7 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
             type="warning"
             layout="horizontal"
             title={statusTitle}
-            description={getStatusDescription(overallStatus)}
+            description={getStatusDescription(overallStatus, hasMultipleIncidents, allSameStatus)}
             actions={
               <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
