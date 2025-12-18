@@ -1,5 +1,3 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -12,8 +10,6 @@ import {
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-
-dayjs.extend(relativeTime)
 
 interface IncidentAdmonitionProps {
   isActive: boolean
