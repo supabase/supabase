@@ -2,9 +2,7 @@ import { Lightbulb, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'common'
 import { formatSql } from 'lib/formatSql'
 import {
   AlertDescription_Shadcn_,
@@ -52,6 +50,8 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
 
+  const showExplainWithAiInQueryPerformance = useFlag('ShowExplainWithAiInQueryPerformance')
+
   useEffect(() => {
     if (selectedRow !== undefined) {
       const formattedQuery = formatSql(selectedRow['query'])
@@ -88,14 +88,16 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
       <QueryPanelSection className="pt-2 border-b relative">
         <div className="flex items-center justify-between mb-4">
           <h4>Query pattern</h4>
-          <Button
-            type="default"
-            size="tiny"
-            icon={<AiIconAnimation size={14} />}
-            onClick={handleExplainQuery}
-          >
-            Explain with AI
-          </Button>
+          {showExplainWithAiInQueryPerformance && (
+            <Button
+              type="default"
+              size="tiny"
+              icon={<AiIconAnimation size={14} />}
+              onClick={handleExplainQuery}
+            >
+              Explain with AI
+            </Button>
+          )}
         </div>
         <div
           className={cn(
