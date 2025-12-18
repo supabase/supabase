@@ -15,8 +15,8 @@ export interface PostTypes {
     url: string
   }
   content?: string
-  imgSite?: string // Used by blogs and case studies
-  imgSocial?: string // Used by blogs
+  imgSite?: string // Used by blog posts and case studies
+  imgSocial?: string // Used by blog posts
   thumb?: string // Used by events
   readingTime?: string
   description: string
