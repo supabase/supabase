@@ -76,7 +76,7 @@ export function useSnippetCommands() {
     [
       {
         id: 'run-snippet',
-        name: 'Run snippet',
+        name: 'Run snippet...',
         icon: () => <Code />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   BarChart3,
   Binary,
@@ -51,6 +51,7 @@ import {
   useIsAnalyticsBucketsEnabled,
 } from 'data/config/project-storage-config-query'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
@@ -62,6 +63,22 @@ export function useCreateCommands(options?: CommandOptions) {
   const { openSidebar } = useSidebarManagerSnapshot()
   const snap = useAiAssistantStateSnapshot()
   const authenticationOauth21 = useFlag('EnableOAuth21')
+
+  const {
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationPerformance,
+  } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+    'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:performance',
+  ])
 
   const databaseCommands = useMemo(
     () =>
@@ -170,60 +187,77 @@ export function useCreateCommands(options?: CommandOptions) {
           route: `/project/${ref}/auth/policies?new=true`,
           icon: () => <ShieldPlus />,
         },
-        {
-          id: 'create-auth-hook-sms',
-          name: 'Create Auth Hook (SMS)',
-          route: `/project/${ref}/auth/hooks?hook=${sendSmsHook?.id}`,
-          icon: () => <MessageCircle />,
-        },
-        {
-          id: 'create-auth-hook-email',
-          name: 'Create Auth Hook (Email)',
-          route: `/project/${ref}/auth/hooks?hook=${sendEmailHook?.id}`,
-          icon: () => <Mail />,
-        },
-        {
-          id: 'create-auth-hook-custom-access-token',
-          name: 'Create Auth Hook (Custom Access Token)',
-          route: `/project/${ref}/auth/hooks?hook=${customAccessTokenHook?.id}`,
-          icon: () => <KeyRound />,
-        },
-        {
-          id: 'create-auth-hook-mfa-verification',
-          name: 'Create Auth Hook (MFA Verification Attempt)',
-          route: `/project/${ref}/auth/hooks?hook=${mfaVerificationHook?.id}`,
-          icon: () => <ShieldPlus />,
-          badge: () => (mfaVerificationHookEnabled ? <Badge>Team</Badge> : null),
-          className: mfaVerificationHookEnabled
-            ? 'opacity-50 cursor-not-allowed pointer-events-none'
-            : '',
-        },
-        {
-          id: 'create-auth-hook-password-verification',
-          name: 'Create Auth Hook (Password Verification Attempt)',
-          route: `/project/${ref}/auth/hooks?hook=${passwordVerificationHook?.id}`,
-          icon: () => <Lock />,
-          badge: () => (passwordVerificationHookEnabled ? <Badge>Team</Badge> : null),
-          className: passwordVerificationHookEnabled
-            ? 'opacity-50 cursor-not-allowed pointer-events-none'
-            : '',
-        },
-        {
-          id: 'create-auth-hook-before-user-created',
-          name: 'Create Auth Hook (Before User Created)',
-          route: `/project/${ref}/auth/hooks?hook=${beforeUserCreatedHook?.id}`,
-          icon: () => <KeyRound />,
-        },
-        authenticationOauth21
-          ? {
-              id: 'create-oauth-app',
-              name: 'Create OAuth App',
-              route: `/project/${ref}/auth/oauth-apps?new=true`,
-              icon: () => <KeyRound />,
-            }
-          : null,
+        ...(IS_PLATFORM
+          ? [
+              {
+                id: 'create-auth-hook-sms',
+                name: 'Create Auth Hook (SMS)',
+                route: `/project/${ref}/auth/hooks?hook=${sendSmsHook?.id}`,
+                icon: () => <MessageCircle />,
+              },
+              {
+                id: 'create-auth-hook-email',
+                name: 'Create Auth Hook (Email)',
+                route: `/project/${ref}/auth/hooks?hook=${sendEmailHook?.id}`,
+                icon: () => <Mail />,
+              },
+              {
+                id: 'create-auth-hook-custom-access-token',
+                name: 'Create Auth Hook (Custom Access Token)',
+                route: `/project/${ref}/auth/hooks?hook=${customAccessTokenHook?.id}`,
+                icon: () => <KeyRound />,
+              },
+              {
+                id: 'create-auth-hook-mfa-verification',
+                name: 'Create Auth Hook (MFA Verification Attempt)',
+                route: `/project/${ref}/auth/hooks?hook=${mfaVerificationHook?.id}`,
+                icon: () => <ShieldPlus />,
+                badge: () => (mfaVerificationHookEnabled ? <Badge>Team</Badge> : null),
+                className: mfaVerificationHookEnabled
+                  ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                  : '',
+              },
+              {
+                id: 'create-auth-hook-password-verification',
+                name: 'Create Auth Hook (Password Verification Attempt)',
+                route: `/project/${ref}/auth/hooks?hook=${passwordVerificationHook?.id}`,
+                icon: () => <Lock />,
+                badge: () => (passwordVerificationHookEnabled ? <Badge>Team</Badge> : null),
+                className: passwordVerificationHookEnabled
+                  ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                  : '',
+              },
+              {
+                id: 'create-auth-hook-before-user-created',
+                name: 'Create Auth Hook (Before User Created)',
+                route: `/project/${ref}/auth/hooks?hook=${beforeUserCreatedHook?.id}`,
+                icon: () => <KeyRound />,
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM && authenticationOauth21
+          ? [
+              {
+                id: 'create-oauth-app',
+                name: 'Create OAuth App',
+                route: `/project/${ref}/auth/oauth-apps?new=true`,
+                icon: () => <KeyRound />,
+              },
+            ]
+          : []),
       ].filter(Boolean) as ICommand[],
-    [ref]
+    [
+      ref,
+      sendSmsHook?.id,
+      sendEmailHook?.id,
+      customAccessTokenHook?.id,
+      mfaVerificationHook?.id,
+      mfaVerificationHookEnabled,
+      passwordVerificationHook?.id,
+      passwordVerificationHookEnabled,
+      beforeUserCreatedHook?.id,
+      authenticationOauth21,
+    ]
   )
 
   const edgeFunctionsCommands = useMemo(
