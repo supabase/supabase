@@ -21,7 +21,7 @@
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
-    "typecheck": "NODE_OPTIONS=\"--max-old-space-size=4096\" turbo --continue typecheck",
+    "typecheck": "turbo --continue typecheck",
     "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "format": "prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
