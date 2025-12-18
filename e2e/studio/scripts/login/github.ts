@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker'
 import * as OTPAuth from 'otpauth'
 
 import { chromium, Page } from '@playwright/test'
+import { STORAGE_STATE_PATH } from '../../env.config.js'
 
 export interface GitHubAuthentication {
   page: Page
@@ -123,36 +124,51 @@ const getAccessToken = async ({
       { timeout: 30000 }
     )
 
-    console.log('Waiting for organization projects to load...')
-    const orgResponse = page.waitForResponse(
-      (response) =>
-        response.url().includes('/platform/organizations/') && response.url().includes('/projects'),
-      { timeout: 30000 }
-    )
+    // Check if we landed on GitHub authorization page by looking for the Authorize button
+    console.log('Current URL after 2FA:', page.url())
+    const reauthorizeButton = page.getByRole('button', { name: 'Authorize supabase' })
 
-    // reauthorize supabase if needed (only if we're on GitHub authorization page)
-    if (page.url().includes('github.com')) {
-      console.log('On GitHub authorization page, looking for Authorize button...')
-      const reauthorizeButton = page.getByRole('button', { name: 'Authorize supabase' })
+    // Give a short window to check if the authorize button exists
+    // Use waitFor with a short timeout and catch the error if it doesn't appear
+    const needsAuthorization = await reauthorizeButton
+      .waitFor({ state: 'visible', timeout: 3000 })
+      .then(() => true)
+      .catch(() => false)
 
-      try {
-        await reauthorizeButton.waitFor({ state: 'visible', timeout: 10000 })
-        console.log('Reauthorize button visible, clicking...')
-        await reauthorizeButton.click()
-        console.log('Clicked reauthorize button')
-      } catch (e) {
-        console.log('Reauthorize button not found or not needed:', e)
-      }
+    if (needsAuthorization) {
+      console.log('Authorization required, clicking Authorize button...')
+      await reauthorizeButton.click()
+      console.log('Clicked Authorize button, waiting for redirect to Supabase...')
+
+      // Wait for redirect to Supabase after clicking authorize
+      await page.waitForURL(
+        (url) =>
+          url.href.includes('supabase.com') ||
+          url.href.includes('supabase.io') ||
+          url.href.includes('supabase.green') ||
+          url.href.includes('supabase.red'),
+        { timeout: 30000 }
+      )
     } else {
-      console.log('Already redirected to Supabase, no reauthorization needed')
+      console.log('No authorization needed, already on Supabase')
     }
 
     console.log('Redirected to:', page.url())
-    console.log('Waiting for organization projects to load...')
-    await orgResponse
+
+    // Wait for dashboard to fully load
+    await Promise.race([
+      page.waitForSelector('text=Organizations', { timeout: 30000 }),
+      page.waitForSelector('[data-testid="project-card"]', { timeout: 30000 }),
+    ]).catch(() => {
+      console.log('Dashboard load indicator not found, but continuing...')
+    })
+
     console.log('Organization page loaded successfully')
+
+    await page.context().storageState({ path: STORAGE_STATE_PATH })
   } catch (e) {
-    console.log(e)
+    console.error('Authentication failed:', e)
+    throw e
   }
 }
 
@@ -163,35 +179,23 @@ async function authenticateWithGitHub(
   const signInUrl = `${supaDashboard}/sign-in`
 
   for (let i = 0; i < retries; i++) {
-    await tryAuthenticate({
-      page,
-      githubTotp,
-      githubUser,
-      githubPass,
-      supaDashboard: signInUrl,
-    })
-  }
-  console.log('could not authenticate')
-  throw new Error('could not authenticate')
-}
-
-async function tryAuthenticate({
-  page,
-  githubTotp,
-  githubUser,
-  githubPass,
-  supaDashboard,
-}: GitHubAuthentication) {
-  try {
-    await getAccessToken({
-      page,
-      githubTotp,
-      githubUser,
-      githubPass,
-      supaDashboard,
-    })
-  } catch (e) {
-    console.log(e)
+    try {
+      console.log(`Authentication attempt ${i + 1} of ${retries}...`)
+      await getAccessToken({
+        page,
+        githubTotp,
+        githubUser,
+        githubPass,
+        supaDashboard: signInUrl,
+      })
+      console.log('Authentication successful!')
+      return
+    } catch (e) {
+      console.log(`Attempt ${i + 1} failed:`, e)
+      if (i === retries - 1) throw e
+      // Optional: add a small delay before retry
+      await page.waitForTimeout(2000)
+    }
   }
 }
 
