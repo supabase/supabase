@@ -38,8 +38,8 @@ export async function getGraphDataFromTables(
     })
 
     const data: TableNodeData = {
+      ref,
       id: table.id,
-      ref: ref!,
       name: table.name,
       schema: table.schema,
       isForeign: false,
@@ -47,9 +47,9 @@ export async function getGraphDataFromTables(
     }
 
     return {
+      data,
       id: `${table.id}`,
       type: 'table',
-      data: data,
       position: { x: 0, y: 0 },
     }
   })
@@ -79,9 +79,9 @@ export async function getGraphDataFromTables(
       }
 
       nodes.push({
+        data,
         id: rel.constraint_name,
         type: 'table',
-        data: data,
         position: { x: 0, y: 0 },
       })
 

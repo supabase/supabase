@@ -5,6 +5,7 @@ import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import { BASE_PATH } from 'lib/constants'
 import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { copyToClipboard } from 'ui'
@@ -148,8 +149,16 @@ export function loadTableEditorStateFromLocalStorage(
  * Builds a table editor URL with the given project reference, table ID. It will load the saved state from local storage
  * and add the sort and filter parameters to the URL.
  */
-export function buildTableEditorUrl(projectRef: string, tableId: number, schema?: string) {
-  const url = new URL(`/project/${projectRef}/editor/${tableId}`, location.origin)
+export function buildTableEditorUrl({
+  projectRef = 'default',
+  tableId,
+  schema,
+}: {
+  projectRef?: string
+  tableId: number
+  schema?: string
+}) {
+  const url = new URL(`${BASE_PATH}/project/${projectRef}/editor/${tableId}`, location.origin)
 
   // If the schema is provided, add it to the URL so that the left sidebar is opened to the correct schema
   if (schema) {

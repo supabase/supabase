@@ -13,7 +13,7 @@ export type TableNodeData = {
   id: number
   schema: string
   name: string
-  ref: string
+  ref?: string
   isForeign: boolean
   columns: {
     id: string
@@ -69,7 +69,13 @@ export const TableNode = ({
             </div>
             {!placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={buildTableEditorUrl(data.ref, data.id, data.schema)}>
+                <Link
+                  href={buildTableEditorUrl({
+                    projectRef: data.ref,
+                    tableId: data.id,
+                    schema: data.schema,
+                  })}
+                >
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
