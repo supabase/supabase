@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
+import type { ConnectionVars } from 'data/common.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import {
   getLargestSizeLimitBucketsKey,
@@ -12,11 +13,6 @@ import {
 } from 'data/sql/queries/get-live-tuple-stats'
 
 export const THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS = 10_000
-
-type ConnectionVars = {
-  projectRef?: string
-  connectionString?: string
-}
 
 const getBucketNumberEstimateKey = (projectRef: string | undefined) =>
   getLiveTupleEstimateKey(projectRef, 'buckets', 'storage')
