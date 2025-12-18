@@ -27,8 +27,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationPanel.constants'
-import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
+import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (
@@ -114,7 +114,7 @@ export const AnalyticsBucketFields = ({
   setIsFormInteracting: (value: boolean) => void
   onSelectNewBucket: () => void
 }) => {
-  const { warehouseName, type, s3AccessKeyId, namespace } = form.watch()
+  const { warehouseName, s3AccessKeyId, namespace } = form.watch()
   const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
@@ -153,13 +153,8 @@ export const AnalyticsBucketFields = ({
     isPending: isLoadingNamespaces,
     isError: isErrorNamespaces,
   } = useIcebergNamespacesQuery(
-    {
-      projectRef,
-      warehouse: warehouseName,
-    },
-    {
-      enabled: type === 'Analytics Bucket' && !!serviceApiKey,
-    }
+    { projectRef, warehouse: warehouseName },
+    { enabled: !!serviceApiKey }
   )
 
   return (
