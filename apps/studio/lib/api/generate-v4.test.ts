@@ -31,6 +31,7 @@ test('generateV4 calls the tool sanitizer', async () => {
       connectionString: 'test-connection',
       orgSlug: 'test-org',
     },
+    on: vi.fn(),
   }
 
   const mockRes = {
@@ -63,13 +64,15 @@ test('generateV4 calls the tool sanitizer', async () => {
     getTools: vi.fn().mockResolvedValue({}),
   }))
 
-  vi.mock('ai', () => ({
-    streamText: vi.fn().mockReturnValue({
-      pipeUIMessageStreamToResponse: vi.fn(),
-    }),
-    convertToModelMessages: vi.fn((msgs) => msgs),
-    stepCountIs: vi.fn(),
-  }))
+  vi.mock('ai', async () => {
+    const actual = await vi.importActual('ai')
+    return {
+      ...actual,
+      streamText: vi.fn().mockReturnValue({
+        pipeUIMessageStreamToResponse: vi.fn(),
+      }),
+    }
+  })
 
   await generateV4(mockReq as any, mockRes as any)
 
