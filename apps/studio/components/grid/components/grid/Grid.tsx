@@ -180,7 +180,7 @@ export const Grid = memo(
                           isValidFileDraggedOver ? (
                             'Drop your CSV file here'
                           ) : (
-                            <span className="text-destructive">Only CSV files are accepted</span>
+                            <span className="text-destructive">Only CSV and TSV files are accepted</span>
                           )
                         ) : (
                           'This table is empty'
