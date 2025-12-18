@@ -60,9 +60,7 @@ import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { toast } from 'sonner'
-import { useTrack } from 'lib/telemetry/track'
-import { useEffect, useRef } from 'react'
+import { ToastErrorTracker } from 'lib/toast-errors'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -82,27 +80,6 @@ loader.config({
       : `${BASE_PATH}/monaco-editor`,
   },
 })
-
-const ToastErrorTracker = () => {
-  const track = useTrack()
-  const hasPatchedRef = useRef(false)
-
-  useEffect(() => {
-    if (hasPatchedRef.current) return
-
-    const originalError = toast.error
-    toast.error = ((message: string | React.ReactNode, opts?: any) => {
-      track('dashboard_error_displayed', {
-        source: 'toast',
-      })
-      return originalError(message, opts)
-    }) as typeof toast.error
-
-    hasPatchedRef.current = true
-  }, [track])
-
-  return null
-}
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
