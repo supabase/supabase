@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -168,7 +167,7 @@ export const SidePanelEditor = ({
       toast.success('Successfully created row')
     },
   })
-  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+  const { mutateAsync: updateTableRow, isPending: isUpdatingRow } = useTableRowUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated row')
     },
@@ -176,9 +175,6 @@ export const SidePanelEditor = ({
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
     onError: () => {},
-  })
-  const { mutateAsync: createPolicy } = useDatabasePolicyCreateMutation({
-    onError: () => {}, // Errors handled inline
   })
 
   const isDuplicating = snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'
@@ -785,6 +781,7 @@ export const SidePanelEditor = ({
             ? snap.sidePanel.foreignKey.foreignKey
             : undefined
         }
+        isSaving={isUpdatingRow}
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
       />

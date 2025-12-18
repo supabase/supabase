@@ -800,5 +800,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/mandarini",
     "author_image_url": "https://github.com/mandarini.png"
+  },
+  {
+    "author_id": "pedro_rodrigues",
+    "author": "Pedro Rodrigues",
+    "username": "Rodriguespn",
+    "position": "AI Tooling Engineer",
+    "author_url": "https://github.com/Rodriguespn",
+    "author_image_url": "https://github.com/Rodriguespn.png"
   }
 ]
