@@ -1,9 +1,6 @@
 import { faker } from '@faker-js/faker'
-import crossFetch from '../common/retriedFetch.js'
 import * as OTPAuth from 'otpauth'
 
-import assert from 'assert'
-import { Session } from '@supabase/supabase-js'
 import { chromium } from '@playwright/test'
 
 export interface GitHubAuthentication {
@@ -29,7 +26,6 @@ const getAccessToken = async ({
     secret: githubTotp,
   })
 
-  let token: Session
   let contextDir = `browserContext-${faker.number.int({ min: 1, max: 9999 })}`
   const context = await chromium.launchPersistentContext(contextDir, {
     headless: true,
@@ -132,7 +128,13 @@ const getAccessToken = async ({
       },
       { timeout: 30000 }
     )
-    console.log('Redirected to:', page.url())
+
+    console.log('Waiting for organization projects to load...')
+    const orgResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes('/platform/organizations/') && response.url().includes('/projects'),
+      { timeout: 30000 }
+    )
 
     // reauthorize supabase if needed (only if we're on GitHub authorization page)
     if (page.url().includes('github.com')) {
@@ -151,62 +153,37 @@ const getAccessToken = async ({
       console.log('Already redirected to Supabase, no reauthorization needed')
     }
 
-    // Wait for redirect back to app.supabase.io(.green)
-    // Replace lines 78-88 with:
-    await page.waitForURL(/alt.supabase.*/, { timeout: 30000 })
-    await page.locator('button:has-text("New project")').first().isVisible()
-
-    // get access token
-    token = await page.evaluate<Session>(async () => {
-      for (var i = 0; i < 100; i++) {
-        if (
-          localStorage.getItem('supabase.auth.token') !== null &&
-          localStorage.getItem('supabase.dashboard.auth.token') !== null
-        ) {
-          console.log(
-            'token found',
-            localStorage.getItem('supabase.auth.token'),
-            localStorage.getItem('supabase.dashboard.auth.token')
-          )
-          break
-        }
-        console.log('token not found')
-        await new Promise((resolve) => setTimeout(resolve, 100))
-      }
-      let token = localStorage.getItem('supabase.auth.token')
-      if (!token) {
-        token = localStorage.getItem('supabase.dashboard.auth.token')
-      }
-      return token ? JSON.parse(token) : null
-    })
+    console.log('Redirected to:', page.url())
+    console.log('Waiting for organization projects to load...')
+    await orgResponse
+    console.log('Organization page loaded successfully')
   } catch (e) {
     console.log(e)
-    token = {} as any
   } finally {
     // dispose browser context
     await context.close()
   }
 
   return {
-    apiKey: token.access_token,
     contextDir: contextDir,
   }
 }
 
 async function authenticateWithGitHub(
   { githubTotp, githubUser, githubPass, supaDashboard }: GitHubAuthentication,
-  retries = 5
+  retries = 3
 ) {
   const signInUrl = `${supaDashboard}/sign-in`
 
   for (let i = 0; i < retries; i++) {
-    const { apiKey, contextDir } = await tryAuthenticate({
+    const { contextDir } = await tryAuthenticate({
       githubTotp,
       githubUser,
       githubPass,
       supaDashboard: signInUrl,
     })
-    if (apiKey) return { apiKey, contextDir }
+
+    if (contextDir) return { contextDir }
   }
   console.log('could not authenticate')
   throw new Error('could not authenticate')
@@ -219,16 +196,16 @@ async function tryAuthenticate({
   supaDashboard,
 }: GitHubAuthentication) {
   try {
-    const { apiKey, contextDir } = await getAccessToken({
+    const { contextDir } = await getAccessToken({
       githubTotp,
       githubUser,
       githubPass,
       supaDashboard,
     })
-    return { apiKey, contextDir }
+    return { contextDir }
   } catch (e) {
     console.log(e)
-    return { apiKey: '', contextDir: '' }
+    return { contextDir: '' }
   }
 }
 
