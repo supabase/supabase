@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.12.09-sha-434634f
+    image: supabase/studio:2025.12.17-sha-43f4f7f
     restart: unless-stopped
     healthcheck:
       test:
@@ -90,7 +90,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.183.0
+    image: supabase/gotrue:v2.184.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -301,7 +301,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.93.1
+    image: supabase/postgres-meta:v0.95.1
     restart: unless-stopped
     depends_on:
       db:
@@ -344,7 +344,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.26.25
+    image: supabase/logflare:1.27.0
     restart: unless-stopped
     ports:
       - 4000:4000
