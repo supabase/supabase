@@ -5,7 +5,7 @@ import { Database, Users } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { cn } from 'ui'
 import { ShimmeringLoader } from 'components/ui/ShimmeringLoader'
-import type { SearchContextValue } from './SearchContextSelector'
+import type { SearchContextValue } from './ContextSearchCommands'
 
 interface SearchResult {
   id: string
