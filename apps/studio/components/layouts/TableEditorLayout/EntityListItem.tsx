@@ -54,6 +54,7 @@ export interface EntityListItemProps {
   style?: CSSProperties
   onExportCLI: () => void
   apiAccessMap?: TableApiAccessMap
+  policyCountMap?: Record<string, number>
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -70,6 +71,7 @@ export const EntityListItem = ({
   style,
   onExportCLI,
   apiAccessMap,
+  policyCountMap,
 }: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -218,6 +220,7 @@ export const EntityListItem = ({
             materializedViewHasLints={materializedViewHasLints}
             foreignTableHasLints={foreignTableHasLints}
             apiAccessData={apiAccessData}
+            policyCount={policyCountMap?.[entity.name] ?? 0}
           />
         </div>
 
@@ -386,6 +389,7 @@ const EntityTooltipTrigger = ({
   materializedViewHasLints,
   foreignTableHasLints,
   apiAccessData,
+  policyCount,
 }: {
   entity: Entity
   tableHasLints: boolean
@@ -393,11 +397,13 @@ const EntityTooltipTrigger = ({
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
   apiAccessData?: TableApiAccessData
+  policyCount: number
 }) => {
   const { ref } = useParams()
 
   let tooltipContent = null
-  const accessWarning = 'Data is publicly accessible via API'
+  let showUnrestrictedBadge = false
+  const accessWarning = 'This table can be accessed by anyone via the Data API'
   const learnMoreCTA = (
     <InlineLink
       href={`/project/${ref}/editor/${entity.id}?schema=${entity.schema}&showWarning=true`}
@@ -414,6 +420,7 @@ const EntityTooltipTrigger = ({
             {accessWarning} as RLS is disabled. {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     case ENTITY_TYPE.VIEW:
@@ -423,6 +430,7 @@ const EntityTooltipTrigger = ({
             {accessWarning} as this is a Security definer view. {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     case ENTITY_TYPE.MATERIALIZED_VIEW:
@@ -432,6 +440,7 @@ const EntityTooltipTrigger = ({
             {accessWarning} as this is a Security definer view {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
@@ -441,13 +450,22 @@ const EntityTooltipTrigger = ({
             {accessWarning} as RLS is not enforced on foreign tables. {learnMoreCTA}.
           </>
         )
+        showUnrestrictedBadge = true
       }
       break
     default:
       break
   }
 
-  if (tooltipContent) {
+  // Handle tables with API access and RLS enabled but no policies
+  if (entity.type === ENTITY_TYPE.TABLE && apiAccessData?.hasApiAccess && entity.rls_enabled && policyCount === 0) {
+    tooltipContent = (
+      <>This table can be accessed via the Data API but no RLS policies exist so no data will be returned</>
+    )
+    showUnrestrictedBadge = false
+  }
+
+  if (tooltipContent && showUnrestrictedBadge) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4">
@@ -466,7 +484,9 @@ const EntityTooltipTrigger = ({
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
           <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
-        <TooltipContent side="right">This table is exposed via the Data API</TooltipContent>
+        <TooltipContent side="right">
+          {tooltipContent || 'This table is exposed via the Data API'}
+        </TooltipContent>
       </Tooltip>
     )
   }
