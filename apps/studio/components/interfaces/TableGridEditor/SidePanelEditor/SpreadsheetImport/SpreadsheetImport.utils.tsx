@@ -172,9 +172,23 @@ export const acceptedFileExtension = (file: any) => {
   return UPLOAD_FILE_EXTENSIONS.includes(ext)
 }
 
+/**
+ * Checks file mime type. Returns `true` if the mime type is among the accepted file types
+ * or is an empty string.
+ * 
+ * The reason for that is that browsers derive the uploaded mime type from the local machine's
+ * registry, and sets it to `''` if the machine doesn't have a spot for the type in the machine.
+ * 
+ * @param {File} file the file to check the mime type of
+ * @returns {boolean} indicates the validity of the mime type, or `true` if it's an empty string
+ */
+export const acceptedFileType = (file: File): boolean => {
+  return file.type.length === 0 || UPLOAD_FILE_TYPES.includes(file.type)
+}
+
 export function flagInvalidFileImport(file: File): boolean {
-  if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
-    toast.error("Couldn't import file: only CSV files are accepted")
+  if (!file || !acceptedFileType(file) || !acceptedFileExtension(file)) {
+    toast.error("Couldn't import file: only CSV and TSV files are accepted")
     return true
   } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
     toast.error(
