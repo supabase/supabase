@@ -21,7 +21,7 @@
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
-    "typecheck": "turbo --continue typecheck",
+    "typecheck": "NODE_OPTIONS=\"--max-old-space-size=4096\" turbo --continue typecheck",
     "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "format": "prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
@@ -63,13 +63,6 @@
     "pnpm": "10.24",
     "node": ">=22"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@10.24.0"
 }
