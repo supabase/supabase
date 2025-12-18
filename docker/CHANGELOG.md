@@ -22,7 +22,7 @@ Check updates for each service to learn more.
 
 ### Utils
 - Added `generate-keys.sh` - PR [#41363](https://github.com/supabase/supabase/pull/41363)
-- Added `db-passwd.sh` - PR [#41408](https://github.com/supabase/supabase/pull/41408), PR [#41432](https://github.com/supabase/supabase/pull/41432)
+- Added `db-passwd.sh` - PR [#41432](https://github.com/supabase/supabase/pull/41432)
 - Changed `reset.sh` to POSIX and added more checks - PR [#41361](https://github.com/supabase/supabase/pull/41361)
 
 ### Studio
@@ -41,7 +41,7 @@ Check updates for each service to learn more.
 
 ### Analytics (Logflare)
 - Updated to `v1.27.0` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.27.0)
-- Fixed multiple issues, including a race condition - PR [logflare#3028](https://github.com/Logflare/logflare/pull/3028)
+- Fixed multiple issues, including a race condition
 
 ---
 
