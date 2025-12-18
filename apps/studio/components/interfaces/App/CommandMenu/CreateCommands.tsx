@@ -45,11 +45,12 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
 import { type Hook, HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
-import { Badge } from 'ui'
+import { AiIconAnimation, Badge } from 'ui'
 import {
   useIsVectorBucketsEnabled,
   useIsAnalyticsBucketsEnabled,
-} from '../../../../data/config/project-storage-config-query'
+} from 'data/config/project-storage-config-query'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
@@ -270,11 +271,13 @@ export function useCreateCommands(options?: CommandOptions) {
             })
             setIsOpen(false)
           },
-          icon: () => <Sparkles />,
+          icon: () => (
+            <AiIconAnimation allowHoverEffect={false} size={20} className="text-foreground-light" />
+          ),
         },
         {
-          id: 'create-function-secret',
-          name: 'Create Function Secret',
+          id: 'create-edge-function-secret',
+          name: 'Create Edge Function Secret',
           route: `/project/${ref}/functions/secrets`,
           icon: () => <LockKeyhole />,
         },
@@ -312,35 +315,50 @@ export function useCreateCommands(options?: CommandOptions) {
     [ref]
   )
 
+  const { installedIntegrations } = useInstalledIntegrations()
+
+  const installedIntegrationIds = useMemo(
+    () => new Set(installedIntegrations.map((integration) => integration.id)),
+    [installedIntegrations]
+  )
+
   const integrationsCommands = useMemo(
     () =>
       [
-        {
-          id: 'create-vault-secret',
-          name: 'Create Vault Secret',
-          route: `/project/${ref}/integrations/vault/secrets?new=true`,
-          icon: () => <Vault />,
-        },
-        {
-          id: 'create-cron-job',
-          name: 'Create Cron Job',
-          route: `/project/${ref}/integrations/cron/jobs?new=true`,
-          icon: () => <Timer />,
-        },
-        {
-          id: 'create-webhook',
-          name: 'Create Webhook',
-          route: `/project/${ref}/integrations/webhooks/webhooks?new=true`,
-          icon: () => <Webhook />,
-        },
-        {
-          id: 'create-queue',
-          name: 'Create Queue',
-          route: `/project/${ref}/integrations/queues/queues?new=true`,
-          icon: () => <ListTree />,
-        },
+        installedIntegrationIds.has('vault')
+          ? {
+              id: 'create-vault-secret',
+              name: 'Create Vault Secret',
+              route: `/project/${ref}/integrations/vault/secrets?new=true`,
+              icon: () => <Vault />,
+            }
+          : null,
+        installedIntegrationIds.has('cron')
+          ? {
+              id: 'create-cron-job',
+              name: 'Create Cron Job',
+              route: `/project/${ref}/integrations/cron/jobs?new=true`,
+              icon: () => <Timer />,
+            }
+          : null,
+        installedIntegrationIds.has('webhooks')
+          ? {
+              id: 'create-webhook',
+              name: 'Create Webhook',
+              route: `/project/${ref}/integrations/webhooks/webhooks?new=true`,
+              icon: () => <Webhook />,
+            }
+          : null,
+        installedIntegrationIds.has('queues')
+          ? {
+              id: 'create-queue',
+              name: 'Create Queue',
+              route: `/project/${ref}/integrations/queues/queues?new=true`,
+              icon: () => <ListTree />,
+            }
+          : null,
       ].filter(Boolean) as ICommand[],
-    [ref]
+    [ref, installedIntegrationIds]
   )
 
   useRegisterPage(
