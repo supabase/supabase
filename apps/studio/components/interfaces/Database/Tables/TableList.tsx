@@ -470,7 +470,11 @@ export const TableList = ({
                                     className="flex items-center space-x-2"
                                     onClick={() =>
                                       router.push(
-                                        buildTableEditorUrl(project?.ref!, x.id, x.schema)
+                                        buildTableEditorUrl({
+                                          projectRef: project?.ref,
+                                          tableId: x.id,
+                                          schema: x.schema,
+                                        })
                                       )
                                     }
                                     onMouseEnter={() =>

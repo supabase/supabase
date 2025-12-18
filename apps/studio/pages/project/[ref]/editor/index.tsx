@@ -38,12 +38,20 @@ const TableEditorPage: NextPageWithLayout = () => {
       if (Number.isInteger(lastOpenedTableId)) {
         const lastOpenedTableData = tabStore.tabsMap[lastOpenedTableId]
         router.push(
-          buildTableEditorUrl(projectRef!, lastOpenedTableId, lastOpenedTableData?.metadata?.schema)
+          buildTableEditorUrl({
+            projectRef,
+            tableId: lastOpenedTableId,
+            schema: lastOpenedTableData?.metadata?.schema,
+          })
         )
       } else if (Number.isInteger(lastTabId)) {
         const lastOpenedTableData = tabStore.tabsMap[lastTabId]
         router.push(
-          buildTableEditorUrl(projectRef!, lastTabId, lastOpenedTableData?.metadata?.schema)
+          buildTableEditorUrl({
+            projectRef,
+            tableId: lastTabId,
+            schema: lastOpenedTableData?.metadata?.schema,
+          })
         )
       }
     }

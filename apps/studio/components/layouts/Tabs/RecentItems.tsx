@@ -61,7 +61,11 @@ export function RecentItems() {
                             item.type === 'm' ||
                             item.type === 'f' ||
                             item.type === 'p'
-                          ? buildTableEditorUrl(ref, item.metadata?.tableId!, item.metadata?.schema)
+                          ? buildTableEditorUrl({
+                              projectRef: ref,
+                              tableId: item.metadata?.tableId!,
+                              schema: item.metadata?.schema,
+                            })
                           : `/project/${ref}/explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
                     }
                     className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
