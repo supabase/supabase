@@ -58,7 +58,10 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>{trigger}</PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0" align="end">
+      <PopoverContent_Shadcn_
+        className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0"
+        align="end"
+      >
         <div className="p-4">
           {/* Header */}
           <div className="flex flex-row items-center justify-between pb-4">
