@@ -359,8 +359,11 @@ th code {
 }
 
 /* Word wrap styles for code blocks */
-.shiki[data-wrapped='true'] .code-content {
+.shiki[data-wrapped='true'] {
   overflow-x: hidden !important;
+}
+
+.shiki[data-wrapped='true'] .code-content {
   white-space: pre-wrap !important;
   word-break: break-word !important;
 }
