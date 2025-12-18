@@ -128,13 +128,19 @@ export function useCreateCommands(options?: CommandOptions) {
     () =>
       [
         {
-          id: 'create-edge-function',
+          id: 'create-edge-function-editor',
           name: 'Create Edge Function via Editor',
           route: `/project/${ref}/functions/new`,
           icon: () => <EdgeFunctions />,
         },
         {
-          id: 'create-edge-function',
+          id: 'create-edge-function-cli',
+          name: 'Create Edge Function via CLI',
+          route: `/project/${ref}/functions?create=cli`,
+          icon: () => <EdgeFunctions />,
+        },
+        {
+          id: 'create-edge-function-ai',
           name: 'Create Edge Function via AI',
           action: () => {
             openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
