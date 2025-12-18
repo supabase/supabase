@@ -1,9 +1,10 @@
 import { faker } from '@faker-js/faker'
 import * as OTPAuth from 'otpauth'
 
-import { chromium } from '@playwright/test'
+import { chromium, Page } from '@playwright/test'
 
 export interface GitHubAuthentication {
+  page: Page
   githubTotp: string
   githubUser: string
   githubPass: string
@@ -12,6 +13,7 @@ export interface GitHubAuthentication {
 
 // a bit too complicated to do auth with github via API, so we do authorization with GUI
 const getAccessToken = async ({
+  page,
   githubTotp,
   githubUser,
   githubPass,
@@ -26,15 +28,7 @@ const getAccessToken = async ({
     secret: githubTotp,
   })
 
-  let contextDir = `browserContext-${faker.number.int({ min: 1, max: 9999 })}`
-  const context = await chromium.launchPersistentContext(contextDir, {
-    headless: true,
-    ignoreHTTPSErrors: true,
-  })
   try {
-    // Go to app.supabase.io
-    const page = await context.newPage()
-
     // Mock the auth.supabase.io user endpoint that causes CORS errors
     // This allows the page to load properly and show the login buttons
     await page.route('**/auth.supabase.io/auth/v1/user', (route) => {
@@ -159,53 +153,45 @@ const getAccessToken = async ({
     console.log('Organization page loaded successfully')
   } catch (e) {
     console.log(e)
-  } finally {
-    // dispose browser context
-    await context.close()
-  }
-
-  return {
-    contextDir: contextDir,
   }
 }
 
 async function authenticateWithGitHub(
-  { githubTotp, githubUser, githubPass, supaDashboard }: GitHubAuthentication,
+  { page, githubTotp, githubUser, githubPass, supaDashboard }: GitHubAuthentication,
   retries = 3
 ) {
   const signInUrl = `${supaDashboard}/sign-in`
 
   for (let i = 0; i < retries; i++) {
-    const { contextDir } = await tryAuthenticate({
+    await tryAuthenticate({
+      page,
       githubTotp,
       githubUser,
       githubPass,
       supaDashboard: signInUrl,
     })
-
-    if (contextDir) return { contextDir }
   }
   console.log('could not authenticate')
   throw new Error('could not authenticate')
 }
 
 async function tryAuthenticate({
+  page,
   githubTotp,
   githubUser,
   githubPass,
   supaDashboard,
 }: GitHubAuthentication) {
   try {
-    const { contextDir } = await getAccessToken({
+    await getAccessToken({
+      page,
       githubTotp,
       githubUser,
       githubPass,
       supaDashboard,
     })
-    return { contextDir }
   } catch (e) {
     console.log(e)
-    return { contextDir: '' }
   }
 }
 

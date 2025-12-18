@@ -71,10 +71,9 @@ To start API locally, run:
   /**
    * Setup Project for tests
    */
-  // TODO: make sure to remove
-  // const projectRef = await setupProjectForTests()
-  // process.env.PROJECT_REF = projectRef
-  // env.PROJECT_REF = projectRef
+  const projectRef = await setupProjectForTests()
+  process.env.PROJECT_REF = projectRef
+  env.PROJECT_REF = projectRef
 
   /**
    * Only run authentication if the environment requires it
@@ -84,26 +83,27 @@ To start API locally, run:
     return
   }
 
-  // TODO: make sure to remove
-  // const { EMAIL, PASSWORD } = env
-  // if (EMAIL && PASSWORD) {
-  //   console.log(`\n 🔑 Authenticating user with email and password`)
+  const { EMAIL, PASSWORD } = env
+  if (EMAIL && PASSWORD) {
+    console.log(`\n 🔑 Authenticating user with email and password`)
 
-  //   await authenticateUser(page, studioUrl, {
-  //     email: EMAIL,
-  //     password: PASSWORD,
-  //     projectRef,
-  //   })
-  // }
+    await authenticateUser(page, studioUrl, {
+      email: EMAIL,
+      password: PASSWORD,
+      projectRef,
+    })
+  }
 
   const { GITHUB_USER, GITHUB_PASS, GITHUB_TOTP } = env
   if (GITHUB_USER && GITHUB_PASS && GITHUB_TOTP) {
     console.log(`\n 🔑 Authenticating user with GitHub`)
     await authenticateWithGitHub({
+      page,
       githubTotp: GITHUB_TOTP,
       githubUser: GITHUB_USER,
       githubPass: GITHUB_PASS,
       supaDashboard: studioUrl,
     })
+    return
   }
 })
