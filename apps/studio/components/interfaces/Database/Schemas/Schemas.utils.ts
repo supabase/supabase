@@ -4,9 +4,9 @@ import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -37,16 +37,19 @@ export async function getGraphDataFromTables(
       }
     })
 
+    const data: TableNodeData = {
+      ref,
+      id: table.id,
+      name: table.name,
+      schema: table.schema,
+      isForeign: false,
+      columns,
+    }
+
     return {
+      data,
       id: `${table.id}`,
       type: 'table',
-      data: {
-        ref,
-        id: table.id,
-        name: table.name,
-        isForeign: false,
-        columns,
-      } as TableNodeData,
       position: { x: 0, y: 0 },
     }
   })
@@ -66,15 +69,19 @@ export async function getGraphDataFromTables(
 
     // Create additional [this->foreign] node that we can point to on the graph.
     if (rel.target_table_schema !== currentSchema) {
+      const data: TableNodeData = {
+        id: rel.id,
+        ref: ref!,
+        schema: rel.target_table_schema,
+        name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
+        isForeign: true,
+        columns: [],
+      }
+
       nodes.push({
+        data,
         id: rel.constraint_name,
         type: 'table',
-        data: {
-          ref,
-          name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
-          isForeign: true,
-          columns: [],
-        } as TableNodeData,
         position: { x: 0, y: 0 },
       })
 
