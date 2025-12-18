@@ -17,9 +17,11 @@ permissions:
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: blacksmith-2vcpu-ubuntu-2404-arm
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
     env:
       NODE_OPTIONS: --max_old_space_size=4096
+      TURBO_THREADS: 4
+      TURBO_CONCURRENCY: 4
 
     steps:
       - name: Checkout
