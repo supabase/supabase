@@ -41,9 +41,20 @@ function getPostHogSessionId(): string | null {
 
 export function getSharedTelemetryData(pathname?: string) {
   const sessionId = getPostHogSessionId()
+  const pageUrl = (() => {
+    if (!isBrowser) return ''
+
+    try {
+      const url = new URL(window.location.href)
+      url.hash = ''
+      return url.href
+    } catch {
+      return window.location.href.split('#')[0]
+    }
+  })()
 
   return {
-    page_url: isBrowser ? window.location.href : '',
+    page_url: pageUrl,
     page_title: isBrowser ? document?.title : '',
     pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
     session_id: sessionId,

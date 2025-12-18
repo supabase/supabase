@@ -54,6 +54,7 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
 
   try {
     const url = new URL(urlString)
+    url.hash = ''
     const params = url.searchParams
 
     const getParam = (key: string) => {
