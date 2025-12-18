@@ -55,6 +55,7 @@ export async function getModel({
 
   let preferredProvider: ProviderName | undefined = provider
 
+  const openAIBaseURL = process.env.OPENAI_BASE_URL?.trim() || 'https://api.openai.com/v1'
   const hasAwsCredentials = await checkAwsCredentials()
   const hasAwsBedrockRoleArn = !!process.env.AWS_BEDROCK_ROLE_ARN
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
@@ -101,7 +102,7 @@ export async function getModel({
     }
     const openai = createOpenAI({
       apiKey: process.env.OPENAI_API_KEY!,
-      baseURL: process.env.OPENAI_BASE_URL || undefined,
+      baseURL: openAIBaseURL,
     })
     return {
       model: openai(chosenModelId as OpenAIModel),

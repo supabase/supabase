@@ -74,7 +74,7 @@ describe('getModel', () => {
     // Default openai model in registry is gpt-5-mini
     expect(mockCreateOpenAI).toHaveBeenCalledWith({
       apiKey: 'test-key',
-      baseURL: undefined,
+      baseURL: 'https://api.openai.com/v1',
     })
     expect(mockOpenAIModel).toHaveBeenCalledWith('gpt-5-mini')
     expect(promptProviderOptions).toBeUndefined()
@@ -120,7 +120,7 @@ describe('getModel', () => {
     expect(model).toEqual('openai-model')
     expect(mockCreateOpenAI).toHaveBeenCalledWith({
       apiKey: 'test-key',
-      baseURL: undefined,
+      baseURL: 'https://api.openai.com/v1',
     })
     expect(mockOpenAIModel).toHaveBeenCalledWith('gpt-5')
   })

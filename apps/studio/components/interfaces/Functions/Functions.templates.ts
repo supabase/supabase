@@ -145,7 +145,7 @@ import { OpenAI } from "npm:openai@4.8.0"
 
 const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY'),
-  baseURL: Deno.env.get('OPENAI_BASE_URL') || undefined,
+  baseURL: Deno.env.get('OPENAI_BASE_URL')?.trim() || 'https://api.openai.com/v1',
 })
 
 Deno.serve(async (req)=>{

@@ -33,7 +33,7 @@ export const config = {
 }
 
 const openAiKey = process.env.OPENAI_API_KEY
-const openAiBaseUrl = process.env.OPENAI_BASE_URL || undefined
+const openAiBaseUrl = process.env.OPENAI_BASE_URL?.trim() || 'https://api.openai.com/v1'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
