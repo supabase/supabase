@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run TypeScript type check
-        run: pnpm exec turbo run typecheck
+        run: pnpm run typecheck
 
       - name: Run Lint
-        run: pnpm exec turbo run lint
+        run: pnpm run lint
