@@ -103,7 +103,7 @@ cover_url: https://external-cdn.com/event-banner.jpg
 
 #### Case studies
 
-Case studies are defined in `data/CustomerStories.ts` (not MDX files) and use a different field name:
+Case studies are defined in `data/CustomerStories.ts` and use a different field name:
 
 - **`imgUrl`**: Path to the case study image in the source data
 - This gets mapped to `imgSite` when rendered via `BlogGridItem` component
