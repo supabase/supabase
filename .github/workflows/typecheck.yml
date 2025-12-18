@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   typecheck:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404-arm
     env:
       NODE_OPTIONS: --max-old-space-size=4096
 
