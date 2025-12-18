@@ -1,4 +1,20 @@
 import { isBrowser } from './helpers'
+import { IS_PROD } from './constants'
+import { LOCAL_STORAGE_KEYS } from './constants'
+
+export function getTelemetryCookieOptions() {
+  if (typeof window === 'undefined') return 'path=/; SameSite=Lax'
+  if (!IS_PROD) return 'path=/; SameSite=Lax'
+
+  const hostname = window.location.hostname
+  const isSupabaseCom = hostname === 'supabase.com' || hostname.endsWith('.supabase.com')
+  return isSupabaseCom ? 'path=/; domain=supabase.com; SameSite=Lax' : 'path=/; SameSite=Lax'
+}
+
+export function clearTelemetryDataCookie() {
+  if (!isBrowser) return
+  document.cookie = `${LOCAL_STORAGE_KEYS.TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; ${getTelemetryCookieOptions()}`
+}
 
 // Parse session_id from PostHog cookie since SDK doesn't expose session ID
 // (needed to correlate client and server events)
