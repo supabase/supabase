@@ -8,21 +8,21 @@ subtitle: 'Best practices on securing Edge Functions'
 <Admonition type="note">
 
 In the past Supabase Auth used a **symmetric** secret to sign legacy JWTs.
-But it was replaced by the new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), in this guide we'll walk through the new patterns for securing your Edge Functions.
+But it was replaced by the new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), this guide covers the new patterns for securing your Edge Functions.
 
-If you still need to validate using the old method, check the [Legacy JWT Secret](/docs/guides/functions/auth-legacy-jwt) guide
+If you need to validate using the old method, read the [Legacy JWT Secret](/docs/guides/functions/auth-legacy-jwt) guide
 
 </Admonition>
 
-Before continuing check the comprehensive guide on [JWT Signing Keys](/docs/guides/auth/signing-keys) for all the details about the main differences compared to Legacy JWTs.
+Before continuing, read the [JWT Signing Keys guide](/docs/guides/auth/signing-keys) for details about the main differences compared to Legacy JWTs.
 
 ## Overview
 
-When an HTTP request is sent to Edge Functions we can leverage Supabase Auth to secure our endpoints. In the past, this verification was controlled by the [`verify_jwt` flag](/docs/guides/functions/function-configuration#skipping-authorization-checks).
+When an HTTP request is sent to Edge Functions, you can use Supabase Auth to secure endpoints. In the past, this verification was controlled by the [`verify_jwt` flag](/docs/guides/functions/function-configuration#skipping-authorization-checks).
 
-But unfortunately this method is incompatible with the new [JWT Signing Keys](/docs/guides/auth/signing-keys) and also caused trouble when attempting [third-party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
+But, this method is incompatible with the new [JWT Signing Keys](/docs/guides/auth/signing-keys) and also caused trouble when attempting [third-party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
 
-That's why we decided to no longer implicitly force JWT verification, but instead suggest patterns and templates to handle this task. This allows users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
+For this reason we decided to no longer implicitly force JWT verification, but instead suggest patterns and templates to handle this task. This allows users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
 
 <Admonition type="warning">
 
@@ -36,7 +36,7 @@ Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29
 
 We've prepared some [JWT verification](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) templates, that can be found [here](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt).
 
-To simply verify incoming requests you can download the specified template and start using it:
+To verify incoming requests, you can download the specified template and start using it:
 
 ```bash
 curl -O https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/default.ts
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
 
 ### Using JWT library
 
-The popular `jose` library can be used to verify received JWTs, like the following example:
+Use the popular [`jose`](https://www.npmjs.com/package/jose/v/4.10.0) library can be used to verify received JWTs, like the following example:
 
 ```ts
 import { createRemoteJWKSet, jwtVerify } from 'https://deno.land/x/jose@v4.14.4/index.ts'
