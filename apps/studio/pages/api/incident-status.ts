@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { IS_PLATFORM } from 'common'
 import { InternalServerError } from 'lib/api/apiHelpers'
 
 type IncidentInfo = {
@@ -34,6 +35,14 @@ const StatusPageIncidentsSchema = z.array(
 )
 
 const getActiveIncidents = async (): Promise<IncidentInfo[]> => {
+  if (!STATUSPAGE_PAGE_ID) {
+    throw new InternalServerError('StatusPage page ID is not configured')
+  }
+
+  if (!STATUSPAGE_API_KEY) {
+    throw new InternalServerError('StatusPage API key is not configured')
+  }
+
   const response = await fetch(INCIDENTS_ENDPOINT, {
     headers: {
       Authorization: `OAuth ${STATUSPAGE_API_KEY}`,
@@ -103,6 +112,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IncidentInfo[] | { error: string }>
 ) {
+  if (!IS_PLATFORM) {
+    return res.status(404).end()
+  }
+
   const { method } = req
 
   if (method === 'HEAD') {
