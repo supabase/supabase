@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { platformKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+import { platformKeys } from './keys'
 
 export type IncidentInfo = {
   id: string
@@ -13,10 +13,8 @@ export type IncidentInfo = {
 export async function getIncidentStatus(signal?: AbortSignal): Promise<IncidentInfo[]> {
   // Add cache-busting in development to avoid stale empty responses
   const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-  const url = isDevelopment 
-    ? `/api/incident-status?_t=${Date.now()}` 
-    : '/api/incident-status'
-  
+  const url = isDevelopment ? `/api/incident-status?_t=${Date.now()}` : '/api/incident-status'
+
   const response = await fetch(url, {
     signal,
     method: 'GET',
@@ -33,9 +31,14 @@ export async function getIncidentStatus(signal?: AbortSignal): Promise<IncidentI
   }
 
   const data = await response.json()
-  console.log('[getIncidentStatus] Received data:', Array.isArray(data) ? `${data.length} incidents` : data)
+  console.log(
+    '[getIncidentStatus] Received data:',
+    Array.isArray(data) ? `${data.length} incidents` : data
+  )
   if (Array.isArray(data) && data.length === 0) {
-    console.warn('[getIncidentStatus] Received empty array - this should not happen in development!')
+    console.warn(
+      '[getIncidentStatus] Received empty array - this should not happen in development!'
+    )
   }
   return data as IncidentInfo[]
 }
@@ -52,4 +55,3 @@ export const useIncidentStatusQuery = <TData = IncidentStatusData>(
     staleTime: 1000 * 60 * 5, // 5 minutes to match API cache
     ...options,
   })
-

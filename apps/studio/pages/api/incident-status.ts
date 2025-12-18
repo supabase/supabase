@@ -14,10 +14,6 @@ const STATUSPAGE_API_URL = 'https://api.statuspage.io/v1'
 const STATUSPAGE_PAGE_ID = process.env.STATUSPAGE_PAGE_ID
 const STATUSPAGE_API_KEY = process.env.STATUSPAGE_API_KEY
 
-console.log('!! Logging statuspage variables...')
-console.log('STATUSPAGE_PAGE_ID', STATUSPAGE_PAGE_ID)
-console.log('STATUSPAGE_API_KEY', STATUSPAGE_API_KEY)
-
 const INCIDENTS_ENDPOINT = `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/incidents/unresolved`
 
 /**
@@ -32,12 +28,12 @@ const StatusPageIncidentsSchema = z.array(
     id: z.string(),
     name: z.string(),
     status: z.string(),
-    created_at: z.string(),
-    scheduled_for: z.string().nullable(),
+    // created_at: z.string(),
+    // scheduled_for: z.string().nullable(),
   })
 )
 
-const getMockIncidents = (count: number = 2): IncidentInfo[] => {
+const getMockIncidents = (count: number = 3): IncidentInfo[] => {
   const now = new Date()
   const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000)
   const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
@@ -45,25 +41,22 @@ const getMockIncidents = (count: number = 2): IncidentInfo[] => {
 
   const allMockIncidents: IncidentInfo[] = [
     {
-      id: 'abc123',
+      id: '123',
       name: 'Elevated error rates for Postgres connections',
-      status: 'investigating | identified | monitoring | resolved',
-      active_since: '2025-12-16T10:54:46Z',
+      status: 'investigating',
+      // active_since: '2025-12-16T10:54:46Z',
     },
     {
       id: '456',
       name: 'Partial outage affecting Auth and Realtime',
       status: 'identified',
-      impact: 'major',
-      created_at: '2025-12-16T10:54:46Z',
-      incident_updates: [
-        {
-          status: 'identified',
-          body: 'The root cause has been identified and a fix is being deployed.',
-          created_at: '2025-12-16T11:20:00Z',
-        },
-      ],
-      shortlink: 'https://stspg.io/xyz',
+      // impact: 'major',
+      // created_at: '2025-12-16T10:54:46Z',
+    },
+    {
+      id: '789',
+      name: 'Increased latency and occasional timeouts on requests to Data APIs for projects in US-East-1',
+      status: 'monitoring',
     },
   ]
 

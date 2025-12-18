@@ -63,6 +63,8 @@ export function IncidentAdmonition() {
     }
   }
 
+  console.log({ incidents })
+
   // Create title - show most recent incident name + count if multiple
   const statusTitle =
     mostRecentIncident.name +
