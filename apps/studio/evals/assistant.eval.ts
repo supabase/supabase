@@ -27,13 +27,21 @@ Eval('Assistant', {
       tools: await getMockTools(),
     })
 
-    const textLastStep = await result.text
-
     // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
     const steps = await result.steps
-    const toolNamesAllStepsFlattened = steps.flatMap((step) =>
-      step.toolCalls.map((call) => call.toolName)
-    )
+
+    const stepsSerialized = steps
+      .map((step) => {
+        const toolCalls = step.toolCalls
+          ?.map((call) => JSON.stringify({ tool: call.toolName, input: call.input }))
+          .join('\n')
+
+        const text = step.text
+        return toolCalls ? `${text}\n${toolCalls}` : text
+      })
+      .join('\n')
+
+    const toolNames = steps.flatMap((step) => step.toolCalls.map((call) => call.toolName))
 
     const sqlQueries: string[] = []
 
@@ -46,8 +54,8 @@ Eval('Assistant', {
     }
 
     return {
-      text: textLastStep,
-      tools: toolNamesAllStepsFlattened,
+      stepsSerialized,
+      toolNames,
       sqlQueries,
     }
   },

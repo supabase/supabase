@@ -8,8 +8,8 @@ const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 type Input = string
 
 type Output = {
-  text: string
-  tools: string[]
+  stepsSerialized: string
+  toolNames: string[]
   sqlQueries?: string[]
 }
 
@@ -43,7 +43,9 @@ export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
 }) => {
   if (!expected.requiredTools) return null
 
-  const presentCount = expected.requiredTools.filter((tool) => output.tools.includes(tool)).length
+  const presentCount = expected.requiredTools.filter((tool) =>
+    output.toolNames.includes(tool)
+  ).length
   const totalCount = expected.requiredTools.length
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
@@ -87,7 +89,7 @@ export const criteriaMetScorer: EvalScorer<Input, Output, Expected> = async ({
 
   const qaResult = await ClosedQA({
     input: 'According to the provided criterion is the submission correct?',
-    output: output.text,
+    output: output.stepsSerialized,
     criteria: expected.criteria,
     model: LLM_AS_A_JUDGE_MODEL,
   })
@@ -104,7 +106,7 @@ export const textIncludesScorer: EvalScorer<Input, Output, Expected> = async ({
 }) => {
   if (!expected.textIncludes) return null
 
-  const includes = output.text.includes(expected.textIncludes)
+  const includes = output.stepsSerialized.includes(expected.textIncludes)
   return {
     name: 'Text Includes',
     score: includes ? 1 : 0,
@@ -162,7 +164,7 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
   const result = await concisenessEvaluator({
     input,
-    output: output.text,
+    output: output.stepsSerialized,
   })
 
   return {
@@ -197,7 +199,7 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
 }) => {
   const result = await completenessEvaluator({
     input,
-    output: output.text,
+    output: output.stepsSerialized,
   })
 
   return {
