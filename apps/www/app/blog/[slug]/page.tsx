@@ -94,9 +94,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
     const imageField = blogPost.imgSocial ? blogPost.imgSocial : blogPost.imgSite
-    const metaImageUrl = imageField
-      ? `/images/blog/${imageField}`
-      : undefined
+    const metaImageUrl = imageField ? `/images/blog/${imageField}` : undefined
 
     return {
       title: blogPost.title,
