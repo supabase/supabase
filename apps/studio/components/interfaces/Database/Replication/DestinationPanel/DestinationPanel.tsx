@@ -33,7 +33,9 @@ export const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const unifiedReplication = useFlag('unifiedReplication')
 
-  const [selectedType, setSelectedType] = useState<DestinationType>('Read Replica')
+  const [selectedType, setSelectedType] = useState<DestinationType>(
+    unifiedReplication ? 'Read Replica' : 'BigQuery'
+  )
 
   const editMode = !!existingDestination
 
