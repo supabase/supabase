@@ -9,6 +9,7 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
   ProjectServiceStatus as APIProjectServiceStatus,
+  ServiceHealthResponse,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -74,6 +75,16 @@ export const StatusIcon = ({
   return <AlertIcon />
 }
 
+/*
+ * Extract the db_schema from the response.info object
+ */
+export const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
+  if (response?.info && 'db_schema' in response.info) {
+    return response.info.db_schema
+  }
+  return undefined
+}
+
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -129,7 +140,7 @@ export const ServiceStatus = () => {
         const data = query.state.data
         const isServiceUnhealthy = data?.some((service) => {
           // if the postgrest service has an empty schema, the user chose to turn off postgrest during project creation
-          if (service.name === 'rest' && (service.info as any)?.db_schema === '') {
+          if (service.name === 'rest' && extractDbSchema(service) === '') {
             return false
           }
           if (service.status === 'ACTIVE_HEALTHY') {
@@ -184,10 +195,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
-      status:
-        (restStatus?.info as any)?.db_schema === ''
-          ? 'DISABLED'
-          : restStatus?.status ?? 'UNHEALTHY',
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled

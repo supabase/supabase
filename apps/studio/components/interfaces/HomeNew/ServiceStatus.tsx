@@ -12,7 +12,12 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { InfoIcon, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-import { ProjectServiceStatus, StatusIcon, StatusMessage } from '../Home/ServiceStatus'
+import {
+  ProjectServiceStatus,
+  StatusIcon,
+  StatusMessage,
+  extractDbSchema,
+} from '../Home/ServiceStatus'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -71,8 +76,8 @@ export const ServiceStatus = () => {
       refetchInterval: (query) => {
         const data = query.state.data
         const isServiceUnhealthy = data?.some((service) => {
-          // if the postgrest service has an empty schema, the user chose to turn off postgrest during project creation
-          if (service.name === 'rest' && (service.info as any)?.db_schema === '') {
+          // if the postgrest service has an empty schema, postgrest has been disabled
+          if (service.name === 'rest' && extractDbSchema(service) === '') {
             return false
           }
           if (service.status === 'ACTIVE_HEALTHY') {
@@ -126,10 +131,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
-      status:
-        (restStatus?.info as any)?.db_schema === ''
-          ? 'DISABLED'
-          : restStatus?.status ?? 'UNHEALTHY',
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -176,10 +178,10 @@ export const ServiceStatus = () => {
             docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
             status: edgeFunctionsStatus?.healthy
-              ? 'ACTIVE_HEALTHY'
+              ? ('ACTIVE_HEALTHY' as const)
               : isLoading
-                ? 'COMING_UP'
-                : ('UNHEALTHY' as ProjectServiceStatus),
+                ? ('COMING_UP' as const)
+                : ('UNHEALTHY' as const),
             logsUrl: '/logs/edge-functions-logs',
           },
         ]
@@ -193,14 +195,14 @@ export const ServiceStatus = () => {
             isLoading: isBranchesLoading,
             status: isBranch
               ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
-                ? 'ACTIVE_HEALTHY'
+                ? ('ACTIVE_HEALTHY' as const)
                 : currentBranch?.status === 'FUNCTIONS_FAILED' ||
                     currentBranch?.status === 'MIGRATIONS_FAILED'
-                  ? 'UNHEALTHY'
-                  : 'COMING_UP'
+                  ? ('UNHEALTHY' as const)
+                  : ('COMING_UP' as const)
               : isMigrationLoading
                 ? 'COMING_UP'
-                : ('ACTIVE_HEALTHY' as ProjectServiceStatus),
+                : 'ACTIVE_HEALTHY',
             logsUrl: isBranch ? '/branches' : '/logs/database-logs',
           },
         ]
