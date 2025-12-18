@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
@@ -99,6 +99,10 @@ export async function getModel({
     if (!hasOpenAIKey) {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
+    const openai = createOpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+      baseURL: process.env.OPENAI_BASE_URL || undefined,
+    })
     return {
       model: openai(chosenModelId as OpenAIModel),
       promptProviderOptions: models[chosenModelId as OpenAIModel]?.promptProviderOptions,

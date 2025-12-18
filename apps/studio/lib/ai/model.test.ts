@@ -1,10 +1,12 @@
-import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as bedrockModule from './bedrock'
 import { getModel, ModelErrorMessage } from './model'
 
+const mockOpenAIModel = vi.fn()
+const mockCreateOpenAI = vi.fn(() => mockOpenAIModel)
+
 vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn(() => 'openai-model'),
+  createOpenAI: mockCreateOpenAI,
 }))
 
 vi.mock('./bedrock', async () => ({
@@ -18,6 +20,8 @@ describe('getModel', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    mockOpenAIModel.mockReturnValue('openai-model')
+    mockCreateOpenAI.mockReturnValue(mockOpenAIModel)
     vi.stubEnv('AWS_BEDROCK_ROLE_ARN', 'test')
   })
 
@@ -68,8 +72,28 @@ describe('getModel', () => {
 
     expect(model).toEqual('openai-model')
     // Default openai model in registry is gpt-5-mini
-    expect(openai).toHaveBeenCalledWith('gpt-5-mini')
+    expect(mockCreateOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: undefined,
+    })
+    expect(mockOpenAIModel).toHaveBeenCalledWith('gpt-5-mini')
     expect(promptProviderOptions).toBeUndefined()
+  })
+
+  it('should pass OPENAI_BASE_URL through to the OpenAI client when provided', async () => {
+    vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
+    process.env.OPENAI_API_KEY = 'test-key'
+    process.env.OPENAI_BASE_URL = 'https://example-proxy/v1'
+
+    await getModel({
+      routingKey: 'test',
+      isLimited: false,
+    })
+
+    expect(mockCreateOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: 'https://example-proxy/v1',
+    })
   })
 
   it('should return error when neither AWS credentials nor OPENAI_API_KEY is available', async () => {
@@ -94,6 +118,10 @@ describe('getModel', () => {
 
     expect(error).toBeUndefined()
     expect(model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5')
+    expect(mockCreateOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: undefined,
+    })
+    expect(mockOpenAIModel).toHaveBeenCalledWith('gpt-5')
   })
 })

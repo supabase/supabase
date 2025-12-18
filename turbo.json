@@ -104,6 +104,7 @@
         "DEFAULT_PROJECT_NAME",
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
         "AUTH_JWT_SECRET",
         "LOGFLARE_API_KEY",
         "LOGFLARE_PUBLIC_ACCESS_TOKEN",
@@ -186,6 +187,7 @@
         "HUBSPOT_ENTERPRISE_FORM_GUID",
         "HUBSPOT_PARTNERSHIP_FORM_GUID",
         "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
         "EMAIL_REPORT_SLACK_WEBHOOK",
         "npm_lifecycle_event",
         "AWS_ACCESS_KEY_ID",
@@ -226,7 +228,8 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "SUPABASE_MANAGEMENT_API_TOKEN",
-        "OPENAI_API_KEY"
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
