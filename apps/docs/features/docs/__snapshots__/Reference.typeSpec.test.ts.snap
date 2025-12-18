@@ -8258,43 +8258,55 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           {
                             "name": "currentAuthenticationMethods",
                             "type": {
-                              "type": "array",
-                              "elemType": {
-                                "type": "object",
-                                "name": "AMREntry",
-                                "properties": [
-                                  {
-                                    "name": "method",
-                                    "type": {
-                                      "type": "union",
-                                      "name": "AMRMethod",
-                                      "subTypes": [
-                                        {
-                                          "type": "nameOnly",
-                                          "name": "['number']"
+                              "type": "union",
+                              "subTypes": [
+                                {
+                                  "type": "array",
+                                  "elemType": {
+                                    "type": "object",
+                                    "name": "AMREntry",
+                                    "properties": [
+                                      {
+                                        "name": "method",
+                                        "type": {
+                                          "type": "union",
+                                          "name": "AMRMethod",
+                                          "subTypes": [
+                                            {
+                                              "type": "nameOnly",
+                                              "name": "['number']"
+                                            },
+                                            null
+                                          ]
                                         },
-                                        null
-                                      ]
-                                    },
-                                    "comment": {
-                                      "shortText": "Authentication method name."
-                                    }
-                                  },
-                                  {
-                                    "name": "timestamp",
-                                    "type": {
-                                      "type": "intrinsic",
-                                      "name": "number"
-                                    },
-                                    "comment": {
-                                      "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
-                                    }
+                                        "comment": {
+                                          "shortText": "Authentication method name."
+                                        }
+                                      },
+                                      {
+                                        "name": "timestamp",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "number"
+                                        },
+                                        "comment": {
+                                          "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
+                                        }
+                                      }
+                                    ]
                                   }
-                                ]
-                              }
+                                },
+                                {
+                                  "type": "array",
+                                  "elemType": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                }
+                              ]
                             },
                             "comment": {
-                              "shortText": "A list of all authentication methods attached to this session. Use\\nthe information here to detect the last time a user verified a\\nfactor, for example if implementing a step-up scenario."
+                              "shortText": "A list of all authentication methods attached to this session. Use\\nthe information here to detect the last time a user verified a\\nfactor, for example if implementing a step-up scenario.\\n\\nSupports both RFC-8176 compliant format (string[]) and detailed format (AMREntry[]).\\n- String format: ['password', 'otp'] - RFC-8176 compliant\\n- Object format: [{ method: 'password', timestamp: 1234567890 }] - includes timestamps"
                             }
                           },
                           {
@@ -15931,42 +15943,57 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "name": "amr",
                                   "type": {
-                                    "type": "array",
-                                    "elemType": {
-                                      "type": "object",
-                                      "name": "AMREntry",
-                                      "properties": [
-                                        {
-                                          "name": "method",
-                                          "type": {
-                                            "type": "union",
-                                            "name": "AMRMethod",
-                                            "subTypes": [
-                                              {
-                                                "type": "nameOnly",
-                                                "name": "['number']"
-                                              },
-                                              null
-                                            ]
-                                          },
-                                          "comment": {
-                                            "shortText": "Authentication method name."
-                                          }
-                                        },
-                                        {
-                                          "name": "timestamp",
-                                          "type": {
-                                            "type": "intrinsic",
-                                            "name": "number"
-                                          },
-                                          "comment": {
-                                            "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
-                                          }
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "array",
+                                        "elemType": {
+                                          "type": "intrinsic",
+                                          "name": "string"
                                         }
-                                      ]
-                                    }
+                                      },
+                                      {
+                                        "type": "array",
+                                        "elemType": {
+                                          "type": "object",
+                                          "name": "AMREntry",
+                                          "properties": [
+                                            {
+                                              "name": "method",
+                                              "type": {
+                                                "type": "union",
+                                                "name": "AMRMethod",
+                                                "subTypes": [
+                                                  {
+                                                    "type": "nameOnly",
+                                                    "name": "['number']"
+                                                  },
+                                                  null
+                                                ]
+                                              },
+                                              "comment": {
+                                                "shortText": "Authentication method name."
+                                              }
+                                            },
+                                            {
+                                              "name": "timestamp",
+                                              "type": {
+                                                "type": "intrinsic",
+                                                "name": "number"
+                                              },
+                                              "comment": {
+                                                "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
                                   },
-                                  "isOptional": true
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "Authentication Method References.\\nSupports both RFC-8176 compliant format (string[]) and detailed format (AMREntry[]).\\n- String format: ['password', 'otp'] - RFC-8176 compliant\\n- Object format: [{ method: 'password', timestamp: 1234567890 }] - includes timestamps"
+                                  }
                                 },
                                 {
                                   "name": "app_metadata",
@@ -17803,6 +17830,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       },
                       {
                         "type": "literal",
+                        "value": "x"
+                      },
+                      {
+                        "type": "literal",
                         "value": "workos"
                       },
                       {
@@ -17920,6 +17951,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -18044,6 +18079,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -28456,6 +28495,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       },
                       {
                         "type": "literal",
+                        "value": "x"
+                      },
+                      {
+                        "type": "literal",
                         "value": "workos"
                       },
                       {
@@ -28573,6 +28616,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -28697,6 +28744,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -47817,43 +47868,55 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           {
                             "name": "currentAuthenticationMethods",
                             "type": {
-                              "type": "array",
-                              "elemType": {
-                                "type": "object",
-                                "name": "AMREntry",
-                                "properties": [
-                                  {
-                                    "name": "method",
-                                    "type": {
-                                      "type": "union",
-                                      "name": "AMRMethod",
-                                      "subTypes": [
-                                        {
-                                          "type": "nameOnly",
-                                          "name": "['number']"
+                              "type": "union",
+                              "subTypes": [
+                                {
+                                  "type": "array",
+                                  "elemType": {
+                                    "type": "object",
+                                    "name": "AMREntry",
+                                    "properties": [
+                                      {
+                                        "name": "method",
+                                        "type": {
+                                          "type": "union",
+                                          "name": "AMRMethod",
+                                          "subTypes": [
+                                            {
+                                              "type": "nameOnly",
+                                              "name": "['number']"
+                                            },
+                                            null
+                                          ]
                                         },
-                                        null
-                                      ]
-                                    },
-                                    "comment": {
-                                      "shortText": "Authentication method name."
-                                    }
-                                  },
-                                  {
-                                    "name": "timestamp",
-                                    "type": {
-                                      "type": "intrinsic",
-                                      "name": "number"
-                                    },
-                                    "comment": {
-                                      "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
-                                    }
+                                        "comment": {
+                                          "shortText": "Authentication method name."
+                                        }
+                                      },
+                                      {
+                                        "name": "timestamp",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "number"
+                                        },
+                                        "comment": {
+                                          "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
+                                        }
+                                      }
+                                    ]
                                   }
-                                ]
-                              }
+                                },
+                                {
+                                  "type": "array",
+                                  "elemType": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                }
+                              ]
                             },
                             "comment": {
-                              "shortText": "A list of all authentication methods attached to this session. Use\\nthe information here to detect the last time a user verified a\\nfactor, for example if implementing a step-up scenario."
+                              "shortText": "A list of all authentication methods attached to this session. Use\\nthe information here to detect the last time a user verified a\\nfactor, for example if implementing a step-up scenario.\\n\\nSupports both RFC-8176 compliant format (string[]) and detailed format (AMREntry[]).\\n- String format: ['password', 'otp'] - RFC-8176 compliant\\n- Object format: [{ method: 'password', timestamp: 1234567890 }] - includes timestamps"
                             }
                           },
                           {
@@ -52453,42 +52516,57 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "name": "amr",
                                   "type": {
-                                    "type": "array",
-                                    "elemType": {
-                                      "type": "object",
-                                      "name": "AMREntry",
-                                      "properties": [
-                                        {
-                                          "name": "method",
-                                          "type": {
-                                            "type": "union",
-                                            "name": "AMRMethod",
-                                            "subTypes": [
-                                              {
-                                                "type": "nameOnly",
-                                                "name": "['number']"
-                                              },
-                                              null
-                                            ]
-                                          },
-                                          "comment": {
-                                            "shortText": "Authentication method name."
-                                          }
-                                        },
-                                        {
-                                          "name": "timestamp",
-                                          "type": {
-                                            "type": "intrinsic",
-                                            "name": "number"
-                                          },
-                                          "comment": {
-                                            "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
-                                          }
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "array",
+                                        "elemType": {
+                                          "type": "intrinsic",
+                                          "name": "string"
                                         }
-                                      ]
-                                    }
+                                      },
+                                      {
+                                        "type": "array",
+                                        "elemType": {
+                                          "type": "object",
+                                          "name": "AMREntry",
+                                          "properties": [
+                                            {
+                                              "name": "method",
+                                              "type": {
+                                                "type": "union",
+                                                "name": "AMRMethod",
+                                                "subTypes": [
+                                                  {
+                                                    "type": "nameOnly",
+                                                    "name": "['number']"
+                                                  },
+                                                  null
+                                                ]
+                                              },
+                                              "comment": {
+                                                "shortText": "Authentication method name."
+                                              }
+                                            },
+                                            {
+                                              "name": "timestamp",
+                                              "type": {
+                                                "type": "intrinsic",
+                                                "name": "number"
+                                              },
+                                              "comment": {
+                                                "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
                                   },
-                                  "isOptional": true
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "Authentication Method References.\\nSupports both RFC-8176 compliant format (string[]) and detailed format (AMREntry[]).\\n- String format: ['password', 'otp'] - RFC-8176 compliant\\n- Object format: [{ method: 'password', timestamp: 1234567890 }] - includes timestamps"
+                                  }
                                 },
                                 {
                                   "name": "app_metadata",
@@ -54325,6 +54403,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       },
                       {
                         "type": "literal",
+                        "value": "x"
+                      },
+                      {
+                        "type": "literal",
                         "value": "workos"
                       },
                       {
@@ -54442,6 +54524,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -54566,6 +54652,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -64977,6 +65067,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       },
                       {
                         "type": "literal",
+                        "value": "x"
+                      },
+                      {
+                        "type": "literal",
                         "value": "workos"
                       },
                       {
@@ -65094,6 +65188,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",
@@ -65218,6 +65316,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "twitter"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "x"
                                 },
                                 {
                                   "type": "literal",

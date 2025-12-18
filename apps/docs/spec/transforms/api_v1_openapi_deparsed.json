@@ -1244,7 +1244,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["project_admin_write"]
+            "fga_permissions": ["organization_projects_create"]
           }
         ],
         "summary": "Create a project",
@@ -1437,9 +1437,6 @@
         "security": [
           {
             "bearer": []
-          },
-          {
-            "fga_permissions": ["available_regions_read"]
           }
         ],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
@@ -1561,7 +1558,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["organizations_write"]
+            "fga_permissions": ["organizations_create"]
           }
         ],
         "summary": "Create an organization",
@@ -1891,6 +1888,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Authorize user through oauth and claim a project",
@@ -2912,6 +2912,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Get project api keys",
@@ -3052,6 +3055,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Creates a new API key for the project",
@@ -3113,6 +3119,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -3181,6 +3190,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -3327,6 +3339,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Updates an API key for the project",
@@ -3444,6 +3459,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Get API key",
@@ -3578,6 +3596,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Deletes an API key for the project",
@@ -5030,6 +5051,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_read"]
           }
         ],
         "summary": "[Beta] Gets project's network bans",
@@ -5109,6 +5133,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_read"]
           }
         ],
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
@@ -5188,6 +5215,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_write"]
           }
         ],
         "summary": "[Beta] Remove network bans.",
@@ -6073,6 +6103,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets a specific project that belongs to the authenticated user",
@@ -6138,6 +6171,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Deletes the given project",
@@ -6224,6 +6260,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Updates the given project",
@@ -7040,6 +7079,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write", "database_write"]
           }
         ],
         "summary": "[Beta] Upgrades the project's Postgres version",
@@ -7172,6 +7214,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read", "database_read"]
           }
         ],
         "summary": "[Beta] Returns the project's eligibility for upgrades",
@@ -7290,6 +7335,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read", "database_read"]
           }
         ],
         "summary": "[Beta] Gets the latest status of the project's upgrade",
@@ -7360,6 +7408,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_readonly_config_read"]
           }
         ],
         "summary": "Returns project's readonly mode status",
@@ -7411,6 +7462,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_readonly_config_write"]
           }
         ],
         "summary": "Disables project's readonly mode for the next 15 minutes",
@@ -7500,6 +7554,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_read_replicas_write"]
           }
         ],
         "summary": "[Beta] Set up a read replica",
@@ -7560,6 +7617,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_read_replicas_write"]
           }
         ],
         "summary": "[Beta] Remove a read replica",
@@ -13601,6 +13661,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Pauses the given project",
@@ -13679,6 +13742,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Lists available restore versions for the given project",
@@ -13725,6 +13791,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Restores the given project",
@@ -13773,6 +13842,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Cancels the given project restoration",
@@ -14309,6 +14381,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets project claim token",
@@ -14375,6 +14450,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Creates project claim token",
@@ -14415,6 +14493,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Revokes project claim token",
@@ -19515,6 +19596,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["members_write"]
           }
         ],
         "summary": "List members of an organization",
@@ -19599,6 +19683,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_read"]
           }
         ],
         "summary": "Gets information about the organization",
@@ -19771,6 +19858,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write"]
           }
         ],
         "summary": "Gets project details for the specified organization and claim token",
@@ -19817,6 +19907,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write"]
           }
         ],
         "summary": "Claims project for the specified organization",
@@ -20072,6 +20165,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_projects_read"]
           }
         ],
         "summary": "Gets all projects for the given organization",
