@@ -18,7 +18,7 @@ jobs:
   typecheck:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     env:
-      NODE_OPTIONS: --max_old_space_size=4096
+      NODE_OPTIONS: --max-old-space-size=4096
 
     steps:
       - name: Checkout
