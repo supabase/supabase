@@ -28,76 +28,12 @@ const StatusPageIncidentsSchema = z.array(
     id: z.string(),
     name: z.string(),
     status: z.string(),
-    // created_at: z.string(),
-    // scheduled_for: z.string().nullable(),
+    created_at: z.string(),
+    scheduled_for: z.string().nullable(),
   })
 )
 
-const getMockIncidents = (count: number = 3): IncidentInfo[] => {
-  const now = new Date()
-  const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000)
-  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
-  const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000)
-
-  const allMockIncidents: IncidentInfo[] = [
-    {
-      id: '123',
-      name: 'Elevated error rates for Postgres connections',
-      status: 'investigating',
-      // active_since: '2025-12-16T10:54:46Z',
-    },
-    {
-      id: '456',
-      name: 'Partial outage affecting Auth and Realtime',
-      status: 'identified',
-      // impact: 'major',
-      // created_at: '2025-12-16T10:54:46Z',
-    },
-    {
-      id: '789',
-      name: 'Increased latency and occasional timeouts on requests to Data APIs for projects in US-East-1',
-      status: 'monitoring',
-    },
-  ]
-
-  return allMockIncidents.slice(0, Math.max(1, Math.min(count, allMockIncidents.length)))
-}
-
-const getActiveIncidents = async (
-  useMock: boolean = false,
-  useRealApi: boolean = false,
-  mockCount?: number
-): Promise<IncidentInfo[]> => {
-  // Return mock data if explicitly requested or if environment variables are not configured
-  // This allows for local development and design testing
-  const hasEnvVars =
-    STATUSPAGE_PAGE_ID &&
-    STATUSPAGE_PAGE_ID.trim() !== '' &&
-    STATUSPAGE_API_KEY &&
-    STATUSPAGE_API_KEY.trim() !== ''
-  const isDevelopment = process.env.NODE_ENV === 'development'
-
-  // Use mock data if:
-  // 1. Explicitly requested via useMock
-  // 2. Env vars are not configured
-  // 3. In development mode UNLESS explicitly requesting real API
-  const shouldUseMock = useMock || !hasEnvVars || (isDevelopment && !useRealApi)
-
-  if (shouldUseMock) {
-    console.log('[incident-status] Using mock data', {
-      useMock,
-      useRealApi,
-      mockCount,
-      hasEnvVars,
-      isDevelopment,
-      STATUSPAGE_PAGE_ID: !!STATUSPAGE_PAGE_ID,
-      STATUSPAGE_API_KEY: !!STATUSPAGE_API_KEY,
-    })
-    const mockData = getMockIncidents(mockCount)
-    console.log('[incident-status] Mock data generated:', mockData.length, 'incidents')
-    return mockData
-  }
-
+const getActiveIncidents = async (): Promise<IncidentInfo[]> => {
   const response = await fetch(INCIDENTS_ENDPOINT, {
     headers: {
       Authorization: `OAuth ${STATUSPAGE_API_KEY}`,
@@ -169,16 +105,6 @@ export default async function handler(
 ) {
   const { method } = req
 
-  // Support query parameters for mock mode and incident count
-  const useMock = req.query.mock === 'true'
-  const useRealApi = req.query.useRealApi === 'true'
-  const mockCount = req.query.count ? parseInt(req.query.count as string, 10) : undefined
-
-  // Allow endpoint to work in local development
-  // getActiveIncidents will automatically use mock data if env vars aren't set
-  // Only block if we're on platform and trying to use real API without proper config
-  // (But allow mock mode or when env vars aren't set for local dev)
-
   if (method === 'HEAD') {
     res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
     return res.status(200).end()
@@ -190,24 +116,7 @@ export default async function handler(
   }
 
   try {
-    console.log('[incident-status] Request received - logging statuspage variables:')
-    console.log('[incident-status] STATUSPAGE_PAGE_ID:', STATUSPAGE_PAGE_ID || 'NOT SET')
-    console.log(
-      '[incident-status] STATUSPAGE_API_KEY:',
-      STATUSPAGE_API_KEY ? '***SET***' : 'NOT SET'
-    )
-    console.log(
-      '[incident-status] useMock:',
-      useMock,
-      'useRealApi:',
-      useRealApi,
-      'mockCount:',
-      mockCount
-    )
-
-    const incidents = await getActiveIncidents(useMock, useRealApi, mockCount)
-
-    console.log('[incident-status] Returning incidents:', incidents.length, incidents)
+    const incidents = await getActiveIncidents()
 
     res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
 

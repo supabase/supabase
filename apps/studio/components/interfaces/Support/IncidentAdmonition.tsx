@@ -15,29 +15,10 @@ import { Admonition } from 'ui-patterns/admonition'
 dayjs.extend(relativeTime)
 
 export function IncidentAdmonition() {
-  const { data: incidents, isPending, isError, error } = useIncidentStatusQuery()
-
-  // Debug logging
-  if (typeof window !== 'undefined') {
-    console.log('[IncidentAdmonition] State:', {
-      isPending,
-      isError,
-      incidents,
-      incidentsLength: incidents?.length,
-      error,
-    })
-  }
+  const { data: incidents, isPending, isError } = useIncidentStatusQuery()
 
   // Don't show anything while loading or on error
   if (isPending || isError || !incidents || incidents.length === 0) {
-    if (typeof window !== 'undefined' && !isPending) {
-      console.warn('[IncidentAdmonition] Not rendering:', {
-        isPending,
-        isError,
-        hasIncidents: !!incidents,
-        incidentsLength: incidents?.length,
-      })
-    }
     return null
   }
 
@@ -45,25 +26,6 @@ export function IncidentAdmonition() {
   const mostRecentIncident = getMostRecentIncident(incidents)
   const overallStatus = getOverallStatus(incidents)
   const allSameStatus = allIncidentsHaveSameStatus(incidents)
-
-  const formatActiveSince = (activeSince: string) => {
-    try {
-      const date = dayjs(activeSince)
-      const daysDiff = dayjs().diff(date, 'day')
-
-      // If less than 1 day, show relative time (e.g., "2 hours ago")
-      if (daysDiff < 1) {
-        return date.fromNow()
-      }
-
-      // Otherwise show formatted date (e.g., "Jan 15, 2024 at 2:30 PM")
-      return date.format('MMM D, YYYY [at] h:mm A')
-    } catch {
-      return activeSince
-    }
-  }
-
-  console.log({ incidents })
 
   // Create title - show most recent incident name + count if multiple
   const statusTitle =
