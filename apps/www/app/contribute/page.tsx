@@ -1,4 +1,3 @@
-import { GetStarted } from '~/components/Contribute/GetStarted'
 import { Hero } from '~/components/Contribute/Hero'
 import { UnansweredThreads } from '~/components/Contribute/UnansweredThreads'
 import DefaultLayout from '~/components/Layouts/Default'
