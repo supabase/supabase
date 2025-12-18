@@ -1,7 +1,7 @@
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
@@ -237,13 +237,18 @@ export const sqlEditorState = proxy({
 
   addResult: (id: string, results: any[], autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: results, autoLimit })
+      // Use ref() to prevent Valtio from creating proxies for each row object.
+      // This is critical for large result sets - without ref(), Valtio wraps every
+      // row and nested property in a Proxy, causing massive memory overhead.
+      // Alright to use ref() in this case as the data is meant to be read-only and we
+      // don't need to track changes to the underlying data
+      sqlEditorState.results[id] = [{ rows: ref(results), autoLimit }]
     }
   },
 
   addResultError: (id: string, error: any, autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
+      sqlEditorState.results[id] = [{ rows: ref([]), error, autoLimit }]
     }
   },
 
