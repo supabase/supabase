@@ -9,8 +9,8 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { PublicationsComboBox } from '../PublicationsComboBox'
-import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { PublicationsComboBox } from './PublicationsComboBox'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
