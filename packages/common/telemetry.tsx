@@ -43,15 +43,14 @@ export const TelemetryTagManager = () => {
 //---
 // PAGE TELEMETRY
 //---
-export function handlePageTelemetry(
+function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
   featureFlags?: {
     [key: string]: unknown
   },
   slug?: string,
-  ref?: string,
-  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
+  ref?: string
 ) {
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
@@ -197,15 +196,7 @@ export const PageTelemetry = ({
       if (telemetryCookie) {
         try {
           const encodedData = telemetryCookie.split('=')[1]
-          const telemetryData = JSON.parse(decodeURIComponent(encodedData))
-          handlePageTelemetry(
-            API_URL,
-            pathnameRef.current,
-            featureFlagsRef.current,
-            slug,
-            ref,
-            telemetryData
-          )
+          handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
           // remove the telemetry cookie
           document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
         } catch (error) {

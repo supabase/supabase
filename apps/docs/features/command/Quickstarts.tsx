@@ -36,6 +36,10 @@ const quickstarts = [
     url: '/guides/getting-started/quickstarts/solidjs',
   },
   {
+    label: 'TanStack Start',
+    url: '/guides/getting-started/quickstarts/tanstack',
+  },
+  {
     label: 'Vue',
     url: '/guides/getting-started/quickstarts/vue',
   },

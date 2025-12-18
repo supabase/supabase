@@ -12,7 +12,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -32,6 +31,7 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { sanitizeRoute } from './ProjectDropdown'
 
 const BranchLink = ({

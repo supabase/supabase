@@ -6,7 +6,8 @@ description: 'Secure private network connectivity to your Supabase database usin
 
 <Admonition type="note">
 
-PrivateLink is currently in alpha and available exclusively to Enterprise customers. Contact your account manager or [reach out to our team](/contact/enterprise) to enable this feature.
+PrivateLink is currently in beta and available only to Team and Enterprise customers.
+Contact support if you would like to create a PrivateLink connection for a read-only replica.
 
 </Admonition>
 
@@ -31,19 +32,25 @@ Supabase PrivateLink is currently just for direct database and PgBouncer connect
 
 To use PrivateLink with your Supabase project:
 
-- Enterprise Supabase subscription
+- Team or Enterprise Supabase subscription
 - AWS VPC in the same region as your Supabase project
 - Appropriate permissions to accept Resource Shares, and create and manage endpoints
 
 ## Getting started
 
-#### Step 1: Contact Supabase support
+#### Step 1: Add AWS account
 
-Reach out to your Enterprise account manager or [contact our team](/contact/enterprise) to initiate PrivateLink setup. During this initial contact, be prepared to provide:
+Navigate to your project's Integrations section to set up PrivateLink:
 
-- Your Supabase organization slug
-- The specific projects you want to enable PrivateLink for (optional)
-- Your AWS Account ID(s)
+1. Go to your Supabase project dashboard
+2. Navigate to [**Settings** > **Integrations**](/dashboard/project/_/settings/integrations)
+3. Find the **AWS PrivateLink** section
+4. Click **Add Account**
+5. Enter your AWS Account ID
+6. Provide a description for the account (recommended)
+7. Click **Add Account** to submit
+
+After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the account will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
 
 #### Step 2: Accept resource share
 
@@ -54,7 +61,7 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
    {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 3. Go to [Shared with me > Resource shares](https://console.aws.amazon.com/ram/home#SharedResourceShares)
 4. Locate the resource share from Supabase.
-   - The resource share will have the format `cust-prod-[region]-pl-[organisation]-rc-share`
+   - The resource share has the format `sspl-[project_ref]-[random alphanumeric string]`
 5. Click on the resource share name to view details. Review the list of resource shares - it should only include resources of type vpc-lattice:ResourceConfiguration.
 6. Click **Accept resource share**
 7. Confirm the acceptance in the dialog box
@@ -115,7 +122,7 @@ In your AWS account, you have two options to establish connectivity:
 
 Verify the private connection is working correctly from your VPC:
 
-1. Launch an EC2 instance or use an existing instance in your VPC
+1. Launch an EC2 instance or use an existing instance within your VPC
 2. Install a Postgres client (e.g., `psql`)
 3. Test the connection using the private endpoint:
 
@@ -144,7 +151,7 @@ postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:5432/postgres
 ```
 
-#### Step 8: Disable public connectivity (optional)
+#### Step 7: Disable public connectivity (optional)
 
 For maximum security, you can disable public internet access for your database:
 
@@ -152,11 +159,11 @@ For maximum security, you can disable public internet access for your database:
 2. Ensure all applications are successfully using the private connection
 3. Update any monitoring or backup tools to use the private endpoint
 
-## Alpha limitations
+## Beta limitations
 
-During the alpha phase:
+During the beta phase:
 
-- **Setup Coordination**: Configuration requires direct coordination with Supabase support team
+- **Read Replicas**: PrivateLink does not currently support read replicas
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
 
 ## Compatibility

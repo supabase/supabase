@@ -92,6 +92,18 @@ export const pricingTooltips: PricingTooltips = {
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
   },
+  'security.privateLink': {
+    main: (
+      <span className="prose text-xs">
+        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
+        traffic within the AWS network. Read more in our{' '}
+        <Link href="/docs/guides/platform/privatelink" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
 
   'security.accessRoles': {
     main: (
