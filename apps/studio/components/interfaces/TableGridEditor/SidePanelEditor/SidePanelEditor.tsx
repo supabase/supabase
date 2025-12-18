@@ -15,6 +15,7 @@ import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints
 import { databaseKeys } from 'data/database/keys'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { privilegeKeys } from 'data/privileges/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
@@ -525,6 +526,9 @@ export const SidePanelEditor = ({
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
           queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({
+            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+          }),
         ])
 
         // Show success toast after everything is complete
@@ -575,6 +579,9 @@ export const SidePanelEditor = ({
             queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({
+            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+          }),
         ])
 
         toast.success(
