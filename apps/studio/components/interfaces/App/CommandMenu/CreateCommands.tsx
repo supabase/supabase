@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   BarChart3,
   Binary,
@@ -9,7 +9,6 @@ import {
   FolderPlus,
   KeyRound,
   Layers,
-  Link2,
   ListChecks,
   ListTree,
   LockKeyhole,
@@ -24,6 +23,9 @@ import {
   Zap,
   Table2,
   Sparkles,
+  MessageCircle,
+  Mail,
+  Lock,
 } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
@@ -39,6 +41,15 @@ import { EdgeFunctions } from 'icons'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
+import { type Hook, HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
+import { Badge } from 'ui'
+import {
+  useIsVectorBucketsEnabled,
+  useIsAnalyticsBucketsEnabled,
+} from '../../../../data/config/project-storage-config-query'
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
@@ -49,6 +60,7 @@ export function useCreateCommands(options?: CommandOptions) {
   const setIsOpen = useSetCommandMenuOpen()
   const { openSidebar } = useSidebarManagerSnapshot()
   const snap = useAiAssistantStateSnapshot()
+  const authenticationOauth21 = useFlag('EnableOAuth21')
 
   const databaseCommands = useMemo(
     () =>
@@ -93,6 +105,55 @@ export function useCreateCommands(options?: CommandOptions) {
     [ref]
   )
 
+  const {
+    data: authConfig,
+    isError: isAuthConfigError,
+    isPending: isAuthConfigLoading,
+  } = useAuthConfigQuery({ projectRef: ref })
+
+  const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
+  const entitledHookSet = getEntitledHookSet()
+
+  const { nonAvailableHooks } = useMemo(() => {
+    const allHooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => ({
+      ...definition,
+      enabled: authConfig?.[definition.enabledKey] || false,
+      method: extractMethod(
+        authConfig?.[definition.uriKey] || '',
+        authConfig?.[definition.secretsKey] || ''
+      ),
+    }))
+
+    const nonAvailableHooks: string[] = allHooks
+      .filter((h) => !isValidHook(h) && !entitledHookSet.includes(h.entitlementKey))
+      .map((h) => h.entitlementKey)
+
+    return { nonAvailableHooks }
+  }, [entitledHookSet, authConfig])
+
+  const showAuthConfig = !isAuthConfigError && !isAuthConfigLoading
+
+  const sendSmsHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'send-sms')
+  const sendEmailHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'send-email')
+  const customAccessTokenHook = HOOKS_DEFINITIONS.find(
+    (hook) => hook.id === 'custom-access-token-claims'
+  )
+  const mfaVerificationHook = HOOKS_DEFINITIONS.find(
+    (hook) => hook.id === 'mfa-verification-attempt'
+  )
+  const mfaVerificationHookEnabled =
+    showAuthConfig &&
+    mfaVerificationHook &&
+    nonAvailableHooks.includes(mfaVerificationHook.entitlementKey)
+  const passwordVerificationHook = HOOKS_DEFINITIONS.find(
+    (hook) => hook.id === 'password-verification-attempt'
+  )
+  const passwordVerificationHookEnabled =
+    showAuthConfig &&
+    passwordVerificationHook &&
+    nonAvailableHooks.includes(passwordVerificationHook.entitlementKey)
+  const beforeUserCreatedHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'before-user-created')
+
   const authCommands = useMemo(
     () =>
       [
@@ -109,17 +170,57 @@ export function useCreateCommands(options?: CommandOptions) {
           icon: () => <ShieldPlus />,
         },
         {
-          id: 'create-auth-hook',
-          name: 'Create Auth Hook',
-          route: `/project/${ref}/auth/hooks?new=true`,
-          icon: () => <Link2 />,
+          id: 'create-auth-hook-sms',
+          name: 'Create Auth Hook (SMS)',
+          route: `/project/${ref}/auth/hooks?hook=${sendSmsHook?.id}`,
+          icon: () => <MessageCircle />,
         },
         {
-          id: 'create-oauth-app',
-          name: 'Create OAuth App',
-          route: `/project/${ref}/auth/oauth-apps?new=true`,
+          id: 'create-auth-hook-email',
+          name: 'Create Auth Hook (Email)',
+          route: `/project/${ref}/auth/hooks?hook=${sendEmailHook?.id}`,
+          icon: () => <Mail />,
+        },
+        {
+          id: 'create-auth-hook-custom-access-token',
+          name: 'Create Auth Hook (Custom Access Token)',
+          route: `/project/${ref}/auth/hooks?hook=${customAccessTokenHook?.id}`,
           icon: () => <KeyRound />,
         },
+        {
+          id: 'create-auth-hook-mfa-verification',
+          name: 'Create Auth Hook (MFA Verification Attempt)',
+          route: `/project/${ref}/auth/hooks?hook=${mfaVerificationHook?.id}`,
+          icon: () => <ShieldPlus />,
+          badge: () => (mfaVerificationHookEnabled ? <Badge>Team</Badge> : null),
+          className: mfaVerificationHookEnabled
+            ? 'opacity-50 cursor-not-allowed pointer-events-none'
+            : '',
+        },
+        {
+          id: 'create-auth-hook-password-verification',
+          name: 'Create Auth Hook (Password Verification Attempt)',
+          route: `/project/${ref}/auth/hooks?hook=${passwordVerificationHook?.id}`,
+          icon: () => <Lock />,
+          badge: () => (passwordVerificationHookEnabled ? <Badge>Team</Badge> : null),
+          className: passwordVerificationHookEnabled
+            ? 'opacity-50 cursor-not-allowed pointer-events-none'
+            : '',
+        },
+        {
+          id: 'create-auth-hook-before-user-created',
+          name: 'Create Auth Hook (Before User Created)',
+          route: `/project/${ref}/auth/hooks?hook=${beforeUserCreatedHook?.id}`,
+          icon: () => <KeyRound />,
+        },
+        authenticationOauth21
+          ? {
+              id: 'create-oauth-app',
+              name: 'Create OAuth App',
+              route: `/project/${ref}/auth/oauth-apps?new=true`,
+              icon: () => <KeyRound />,
+            }
+          : null,
       ].filter(Boolean) as ICommand[],
     [ref]
   )
@@ -174,12 +275,15 @@ export function useCreateCommands(options?: CommandOptions) {
         {
           id: 'create-function-secret',
           name: 'Create Function Secret',
-          route: `/project/${ref}/functions/secrets?new=true`,
+          route: `/project/${ref}/functions/secrets`,
           icon: () => <LockKeyhole />,
         },
       ].filter(Boolean) as ICommand[],
     [ref, openSidebar, snap, setIsOpen]
   )
+
+  const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
+  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
 
   const storageCommands = useMemo(
     () =>
@@ -195,12 +299,14 @@ export function useCreateCommands(options?: CommandOptions) {
           name: 'Create Storage Bucket (Analytics)',
           route: `/project/${ref}/storage/analytics?new=true`,
           icon: () => <BarChart3 />,
+          badge: () => (isAnalyticsBucketsEnabled ? <Badge>Pro</Badge> : null),
         },
         {
           id: 'create-storage-bucket-vectors',
           name: 'Create Storage Bucket (Vectors)',
           route: `/project/${ref}/storage/vectors?new=true`,
           icon: () => <Binary />,
+          badge: () => (isVectorBucketsEnabled ? <Badge>Pro</Badge> : null),
         },
       ].filter(Boolean) as ICommand[],
     [ref]
@@ -212,32 +318,26 @@ export function useCreateCommands(options?: CommandOptions) {
         {
           id: 'create-vault-secret',
           name: 'Create Vault Secret',
-          route: `/project/${ref}/integrations/vault?new=true`,
+          route: `/project/${ref}/integrations/vault/secrets?new=true`,
           icon: () => <Vault />,
         },
         {
           id: 'create-cron-job',
           name: 'Create Cron Job',
-          route: `/project/${ref}/integrations/cron?new=true`,
+          route: `/project/${ref}/integrations/cron/jobs?new=true`,
           icon: () => <Timer />,
         },
         {
           id: 'create-webhook',
           name: 'Create Webhook',
-          route: `/project/${ref}/integrations/webhooks?new=true`,
+          route: `/project/${ref}/integrations/webhooks/webhooks?new=true`,
           icon: () => <Webhook />,
         },
         {
           id: 'create-queue',
           name: 'Create Queue',
-          route: `/project/${ref}/integrations/queues?new=true`,
+          route: `/project/${ref}/integrations/queues/queues?new=true`,
           icon: () => <ListTree />,
-        },
-        {
-          id: 'create-wrapper',
-          name: 'Create Wrapper',
-          route: `/project/${ref}/integrations/wrappers?new=true`,
-          icon: () => <Layers />,
         },
       ].filter(Boolean) as ICommand[],
     [ref]

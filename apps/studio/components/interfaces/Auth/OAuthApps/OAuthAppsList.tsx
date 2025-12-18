@@ -2,7 +2,7 @@ import type { OAuthClient } from '@supabase/supabase-js'
 import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -95,6 +95,13 @@ export const OAuthAppsList = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  // Prevent opening the create sheet if OAuth Server is disabled
+  useEffect(() => {
+    if (!isOAuthServerEnabled && showCreateSheet) {
+      setShowCreateSheet(false)
+    }
+  }, [isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
 
   const { setValue: setSelectedAppToEdit, value: appToEdit } = useQueryStateWithSelect({
     urlKey: 'edit',
@@ -404,7 +411,7 @@ export const OAuthAppsList = () => {
       </div>
 
       <CreateOrUpdateOAuthAppSheet
-        visible={showCreateSheet || !!appToEdit}
+        visible={showCreateSheet ? isOAuthServerEnabled : !!appToEdit}
         appToEdit={appToEdit}
         onSuccess={(app) => {
           const isCreating = !appToEdit

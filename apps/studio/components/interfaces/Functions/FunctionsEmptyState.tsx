@@ -25,6 +25,13 @@ import {
   CardTitle,
   cn,
   CodeBlock,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DialogTrigger,
   Separator,
 } from 'ui'
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
