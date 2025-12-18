@@ -94,17 +94,6 @@ export const StripeSyncSettingsPage = () => {
 
   return (
     <>
-      <PageHeader size="small">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Stripe Sync Engine Settings</PageHeaderTitle>
-            <PageHeaderDescription>
-              Review your synced schema and manage the lifecycle of the integration.
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
-
       <PageContainer size="small">
         <PageSection id="stripe-schema">
           <PageSectionMeta>
@@ -118,18 +107,16 @@ export const StripeSyncSettingsPage = () => {
           <PageSectionContent>
             <Card>
               <CardContent>
-                <div className="flex flex-col gap-4">
-                  <div className="flex space-x-4">
-                    <Table2 className="mt-1" />
-                    <div className="space-y-1 xl:max-w-lg">
-                      <p className="text-sm">Open Stripe schema in Table Editor</p>
+                <div className="flex space-x-4 @container">
+                  <Table2 className="w-5 h-5 shrink-0" />
+                  <div className="flex flex-col items-start @lg:flex-row @lg:items-center  gap-4">
+                    <div className="flex flex-col gap-1">
+                      <h5 className="text-sm mb-1">Open Stripe schema in Table Editor</h5>
                       <p className="text-sm text-foreground-light">
                         The Stripe Sync Engine stores all synced data in the <code>stripe</code>{' '}
                         schema. You can view and query this data directly in the Table Editor.
                       </p>
                     </div>
-                  </div>
-                  <div>
                     <Button asChild type="default">
                       <Link href={tableEditorUrl}>Open Table Editor</Link>
                     </Button>
@@ -150,21 +137,27 @@ export const StripeSyncSettingsPage = () => {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>
-            <Alert_Shadcn_ variant="warning">
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                Uninstalling will remove the <code>stripe</code> schema and all synced data.
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>This action cannot be undone.</AlertDescription_Shadcn_>
-              <div className="mt-2">
-                <Button
-                  type="default"
-                  onClick={() => setShowUninstallModal(true)}
-                  loading={isUninstalling || isUninstallInitiated}
-                  disabled={isUninstalling || isUninstallInitiated}
-                >
-                  {isUninstallInitiated ? 'Uninstalling...' : 'Uninstall Stripe Sync Engine'}
-                </Button>
+            <Alert_Shadcn_ variant="warning" className="flex space-x-4 @container">
+              <div>
+                <WarningIcon className="w-5 h-5 shrink-0" />
+              </div>
+              <div className="flex flex-col items-start @lg:flex-row @lg:items-center gap-4 p-0 m-0">
+                <div>
+                  <AlertTitle_Shadcn_>
+                    Uninstalling will remove the <code>stripe</code> schema and all synced data.
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>This action cannot be undone.</AlertDescription_Shadcn_>
+                </div>
+                <div className="mt-2">
+                  <Button
+                    type="default"
+                    onClick={() => setShowUninstallModal(true)}
+                    loading={isUninstalling || isUninstallInitiated}
+                    disabled={isUninstalling || isUninstallInitiated}
+                  >
+                    {isUninstallInitiated ? 'Uninstalling...' : 'Uninstall Stripe Sync Engine'}
+                  </Button>
+                </div>
               </div>
             </Alert_Shadcn_>
           </PageSectionContent>
