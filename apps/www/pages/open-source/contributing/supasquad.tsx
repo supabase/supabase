@@ -34,7 +34,7 @@ const BeginnersPage: NextPage = () => {
         <Separator />
         <WhySupaSquad {...content.why} />
         <Separator />
-        <Benefits className="md:mt-24" {...content.benefits} />
+        <Benefits {...content.benefits} />
         <ApplicationFormSection
           id={content.ctaSection.id}
           title={content.ctaSection.title}

@@ -32,7 +32,7 @@ export const data = {
     ctas: [
       {
         label: 'Learn how to join',
-        href: '#why-supasquad',
+        href: '#cta',
         type: 'primary' as any,
       },
     ],
