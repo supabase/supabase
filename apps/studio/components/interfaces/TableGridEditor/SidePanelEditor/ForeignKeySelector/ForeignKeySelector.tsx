@@ -66,10 +66,12 @@ export const ForeignKeySelector = ({
   const hasTypeErrors = (errors.types ?? []).length > 0
   const hasTypeNotices = (errors.typeNotice ?? []).length > 0
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: schemas = [] } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const sortedSchemas = [...schemas].sort((a, b) => a.name.localeCompare(b.name))
+
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -145,7 +147,7 @@ export const ForeignKeySelector = ({
     setFk({ ...fk, [action]: value })
   }
 
-  const validateSelection = (resolve: any) => {
+  const validateSelection = (resolve: () => void) => {
     const errors: SelectorErrors = {}
     const incompleteColumns = fk.columns.filter(
       (column) => column.source === '' || column.target === ''
@@ -204,11 +206,13 @@ export const ForeignKeySelector = ({
       if (foreignKey !== undefined) setFk(foreignKey)
       else setFk({ ...EMPTY_STATE, id: uuidv4() })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   useEffect(() => {
     if (visible) validateType()
-  }, [fk])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fk, visible])
 
   return (
     <SidePanel
@@ -222,7 +226,7 @@ export const ForeignKeySelector = ({
           disableApply={disableApply}
           applyButtonLabel="Save"
           closePanel={onClose}
-          applyFunction={(resolve: any) => validateSelection(resolve)}
+          applyFunction={(resolve) => validateSelection(resolve)}
         />
       }
     >
@@ -244,7 +248,7 @@ export const ForeignKeySelector = ({
             value={fk.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas?.map((schema) => {
+            {sortedSchemas.map((schema) => {
               return (
                 <Listbox.Option
                   key={schema.id}

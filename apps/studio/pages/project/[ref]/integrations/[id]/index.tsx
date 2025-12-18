@@ -4,10 +4,10 @@ import { useEffect } from 'react'
 import { useParams } from 'common'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()

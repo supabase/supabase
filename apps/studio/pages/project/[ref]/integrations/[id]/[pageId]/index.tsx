@@ -7,7 +7,6 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
@@ -34,6 +33,7 @@ import {
   PageSection,
   PageSectionContent,
 } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 type NavigationItem = { label: string; href: string; active?: boolean }
 
