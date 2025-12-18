@@ -72,6 +72,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
     onSuccess: () => {
       setIsFeedbackSent(true)
       setFeedback('')
+      setStoredFeedback(null)
       setScreenshot(null)
       setSending(false)
     },
