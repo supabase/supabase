@@ -2,11 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
 import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
-import {
-  allIncidentsHaveSameStatus,
-  getMostRecentIncident,
-  getOverallStatus,
-} from 'data/platform/incident-status-utils'
+import { processIncidentData } from 'data/platform/incident-status-utils'
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -65,14 +61,12 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
     return null
   }
 
-  const hasMultipleIncidents = incidents.length > 1
-  const mostRecentIncident = getMostRecentIncident(incidents)
-  const overallStatus = getOverallStatus(incidents)
-  const allSameStatus = allIncidentsHaveSameStatus(incidents)
+  const { hasMultipleIncidents, mostCriticalIncident, overallStatus, allSameStatus } =
+    processIncidentData(incidents)
 
   // Show most recent incident name + count if multiple incidents
   const statusTitle =
-    (mostRecentIncident?.name ?? '') +
+    (mostCriticalIncident?.name ?? '') +
     (hasMultipleIncidents && incidents
       ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
       : '')
@@ -81,8 +75,6 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
     <AnimatePresence>
       {isActive && (
         <motion.aside
-          role="alert"
-          aria-live="polite"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}

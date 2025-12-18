@@ -1,62 +1,72 @@
-import dayjs from 'dayjs'
+import type { IncidentInfo } from 'lib/api/incident-status'
 
-import type { IncidentInfo } from './incident-status-query'
+export type IncidentImpact = 'critical' | 'major' | 'maintenance' | 'minor' | 'none'
+
+/**
+ * Impact priority order: higher priority = more severe
+ */
+const IMPACT_PRIORITY: Record<IncidentImpact, number> = {
+  critical: 4,
+  major: 3,
+  maintenance: 2,
+  minor: 1,
+  none: 0,
+}
+
+const isIncidentImpact = (impact: string): impact is IncidentImpact => {
+  return Object.keys(IMPACT_PRIORITY).includes(impact)
+}
+
+export type IncidentStatus = 'investigating' | 'identified' | 'monitoring' | 'resolved'
 
 /**
  * Status priority order: higher priority = more urgent
- * Used to determine which incident's status should be displayed
  */
-const STATUS_PRIORITY: Record<string, number> = {
+const STATUS_PRIORITY: Record<IncidentStatus, number> = {
   investigating: 4,
   identified: 3,
   monitoring: 2,
   resolved: 1,
 }
 
-/**
- * Determines the most representative status when multiple incidents exist.
- * Returns the highest priority status (most urgent) among all incidents.
- *
- * @param incidents Array of incidents to analyze
- * @returns The highest priority status string
- */
-export function getOverallStatus(incidents: Array<{ status: string }>): string {
-  if (incidents.length === 0) return 'investigating'
-  if (incidents.length === 1) return incidents[0].status
-
-  // Find the highest priority status among all incidents
-  const statuses = incidents.map((inc) => inc.status)
-  const sortedByPriority = statuses.sort(
-    (a, b) => (STATUS_PRIORITY[b] || 0) - (STATUS_PRIORITY[a] || 0)
-  )
-
-  return sortedByPriority[0] || 'investigating'
+const isIncidentStatus = (status: string): status is IncidentStatus => {
+  return Object.keys(STATUS_PRIORITY).includes(status)
 }
 
 /**
- * Gets the most recent incident (by active_since) for display purposes.
- * This is used for the title/name, not for status determination.
+ * Sorts incidents by priority: first by impact, then by date, then by status.
  *
- * @param incidents Array of incidents to analyze
- * @returns The most recent incident, or null if array is empty
+ * @param incidents Array of incidents to sort
+ * @returns New array of incidents sorted by priority
  */
-export function getMostRecentIncident(incidents: Array<{ name: string; active_since: string }>): {
-  name: string
-  active_since: string
-} | null {
-  if (incidents.length === 0) {
-    return null
-  }
-  if (incidents.length === 1) return incidents[0]
+function sortIncidentsByPriority(incidents: Array<IncidentInfo>): Array<IncidentInfo> {
+  const incidentsCopy = [...incidents]
 
-  // Sort by active_since descending (most recent first)
-  const sorted = [...incidents].sort((a, b) => {
-    const dateA = dayjs(a.active_since)
-    const dateB = dayjs(b.active_since)
-    return dateB.isBefore(dateA) ? -1 : dateB.isAfter(dateA) ? 1 : 0
+  incidentsCopy.sort((a, b) => {
+    const impactA = isIncidentImpact(a.impact) ? a.impact : 'none'
+    const impactB = isIncidentImpact(b.impact) ? b.impact : 'none'
+    const impactPriorityA = IMPACT_PRIORITY[impactA]
+    const impactPriorityB = IMPACT_PRIORITY[impactB]
+
+    const dateA = new Date(a.active_since).getTime()
+    const dateB = new Date(b.active_since).getTime()
+    const differentDates = Number.isFinite(dateA) && Number.isFinite(dateB) && dateB !== dateA
+
+    const statusA = isIncidentStatus(a.status) ? a.status : 'investigating'
+    const statusB = isIncidentStatus(b.status) ? b.status : 'investigating'
+    const statusPriorityA = STATUS_PRIORITY[statusA]
+    const statusPriorityB = STATUS_PRIORITY[statusB]
+
+    if (impactPriorityB !== impactPriorityA) {
+      return impactPriorityB - impactPriorityA
+    } else if (differentDates) {
+      return dateB - dateA
+    } else {
+      return statusPriorityB - statusPriorityA
+    }
   })
 
-  return sorted[0]
+  return incidentsCopy
 }
 
 /**
@@ -65,7 +75,7 @@ export function getMostRecentIncident(incidents: Array<{ name: string; active_si
  * @param incidents Array of incidents to check
  * @returns true if all incidents share the same status
  */
-export function allIncidentsHaveSameStatus(incidents: Array<{ status: string }>): boolean {
+function allIncidentsHaveSameStatus(incidents: Array<{ status: string }>): boolean {
   if (incidents.length <= 1) return true
   const firstStatus = incidents[0].status
   return incidents.every((inc) => inc.status === firstStatus)
@@ -78,20 +88,22 @@ export function processIncidentData(incidents: IncidentInfo[]) {
   if (incidents.length === 0) {
     return {
       hasMultipleIncidents: false,
-      mostRecentIncident: null,
+      mostCriticalIncident: null,
       overallStatus: 'investigating' as const,
       allSameStatus: true,
     }
   }
 
   const hasMultipleIncidents = incidents.length > 1
-  const mostRecentIncident = getMostRecentIncident(incidents)
-  const overallStatus = getOverallStatus(incidents)
+  const mostCriticalIncident = sortIncidentsByPriority(incidents)[0]
+  const overallStatus = isIncidentStatus(mostCriticalIncident.status)
+    ? mostCriticalIncident.status
+    : 'investigating'
   const allSameStatus = allIncidentsHaveSameStatus(incidents)
 
   return {
     hasMultipleIncidents,
-    mostRecentIncident,
+    mostCriticalIncident,
     overallStatus,
     allSameStatus,
   }
