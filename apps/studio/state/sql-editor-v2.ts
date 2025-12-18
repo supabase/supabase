@@ -240,6 +240,8 @@ export const sqlEditorState = proxy({
       // Use ref() to prevent Valtio from creating proxies for each row object.
       // This is critical for large result sets - without ref(), Valtio wraps every
       // row and nested property in a Proxy, causing massive memory overhead.
+      // Alright to use ref() in this case as the data is meant to be read-only and we
+      // don't need to track changes to the underlying data
       sqlEditorState.results[id] = [{ rows: ref(results), autoLimit }]
     }
   },
