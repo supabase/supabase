@@ -11,6 +11,7 @@ import { useReportsGotoCommands } from './ReportsLayout/Reports.Commands'
 import { useSqlEditorGotoCommands } from './SQLEditorLayout/SqlEditor.Commands'
 import { useStorageGotoCommands } from '../interfaces/Storage/Storage.Commands'
 import { useTableEditorGotoCommands } from './TableEditorLayout/TableEditor.Commands'
+import { useCreateCommands } from '../interfaces/App/CommandMenu/CreateCommands'
 
 export function useLayoutNavCommands() {
   const isLoggedIn = useIsLoggedIn()
