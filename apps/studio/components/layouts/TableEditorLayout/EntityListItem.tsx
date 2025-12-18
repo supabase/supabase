@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
@@ -395,6 +395,7 @@ const EntityTooltipTrigger = ({
   apiAccessData?: TableApiAccessData
 }) => {
   const { ref } = useParams()
+  const isDataApiExposedBadgeEnabled = useFlag('dataApiExposedBadge')
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
@@ -460,7 +461,7 @@ const EntityTooltipTrigger = ({
     )
   }
 
-  if (apiAccessData?.hasApiAccess) {
+  if (isDataApiExposedBadgeEnabled && apiAccessData?.hasApiAccess) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
