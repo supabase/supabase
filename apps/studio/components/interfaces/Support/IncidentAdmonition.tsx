@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
 import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
@@ -14,23 +15,22 @@ import { Admonition } from 'ui-patterns/admonition'
 
 dayjs.extend(relativeTime)
 
-export function IncidentAdmonition() {
-  const { data: incidents, isPending, isError } = useIncidentStatusQuery()
+interface IncidentAdmonitionProps {
+  isActive: boolean
+}
 
-  // Don't show anything while loading or on error
-  if (isPending || isError || !incidents || incidents.length === 0) {
-    return null
-  }
+export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
+  const { data: incidents } = useIncidentStatusQuery()
 
-  const hasMultipleIncidents = incidents.length > 1
-  const mostRecentIncident = getMostRecentIncident(incidents)
-  const overallStatus = getOverallStatus(incidents)
-  const allSameStatus = allIncidentsHaveSameStatus(incidents)
+  const hasMultipleIncidents = incidents && incidents.length > 1
+  const mostRecentIncident = incidents ? getMostRecentIncident(incidents) : null
+  const overallStatus = incidents ? getOverallStatus(incidents) : ''
+  const allSameStatus = incidents ? allIncidentsHaveSameStatus(incidents) : false
 
   // Create title - show most recent incident name + count if multiple
   const statusTitle =
-    mostRecentIncident.name +
-    (hasMultipleIncidents
+    (mostRecentIncident?.name ?? '') +
+    (hasMultipleIncidents && incidents
       ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
       : '')
 
@@ -73,18 +73,28 @@ export function IncidentAdmonition() {
   }
 
   return (
-    <Admonition
-      type="warning"
-      layout="horizontal"
-      title={statusTitle}
-      description={getStatusDescription(overallStatus)}
-      actions={
-        <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-          <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-            Status page
-          </Link>
-        </Button>
-      }
-    />
+    <AnimatePresence>
+      {isActive && (
+        <motion.aside
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+        >
+          <Admonition
+            type="warning"
+            layout="horizontal"
+            title={statusTitle}
+            description={getStatusDescription(overallStatus)}
+            actions={
+              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                  Status page
+                </Link>
+              </Button>
+            }
+          />
+        </motion.aside>
+      )}
+    </AnimatePresence>
   )
 }

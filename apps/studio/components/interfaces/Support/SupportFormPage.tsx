@@ -71,8 +71,13 @@ function SupportFormPageContent() {
   const selectedOrg = organizations?.find((org) => org.slug === orgSlug)
   const isFreePlan = selectedOrg?.plan.id === 'free'
 
-  const { data: incidents } = useIncidentStatusQuery()
-  const hasActiveIncidents = incidents && incidents.length > 0
+  const {
+    data: incidents,
+    isPending: isIncidentsPending,
+    isError: isIncidentsError,
+  } = useIncidentStatusQuery()
+  const hasActiveIncidents =
+    !isIncidentsPending && !isIncidentsError && incidents && incidents.length > 0
 
   const sendTelemetry = useSupportFormTelemetry()
   useStateTransition(state, 'submitting', 'success', (_, curr) => {
@@ -96,7 +101,7 @@ function SupportFormPageContent() {
     <SupportFormWrapper>
       <SupportFormHeader />
 
-      {hasActiveIncidents && <IncidentAdmonition />}
+      <IncidentAdmonition isActive={hasActiveIncidents} />
 
       {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
       {!isSuccess && !hasActiveIncidents && (
