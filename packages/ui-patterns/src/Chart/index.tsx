@@ -138,7 +138,7 @@ const ChartTitle = React.forwardRef<HTMLDivElement, ChartTitleProps>(
                 className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
               />
             </TooltipTrigger>
-            <TooltipContent>{tooltip}</TooltipContent>
+            <TooltipContent className="max-w-72">{tooltip}</TooltipContent>
           </Tooltip>
         )}
       </h3>
@@ -280,7 +280,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
                     className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
                   />
                 </TooltipTrigger>
-                <TooltipContent>{tooltip}</TooltipContent>
+                <TooltipContent className="max-w-72">{tooltip}</TooltipContent>
               </Tooltip>
             )}
           </h3>

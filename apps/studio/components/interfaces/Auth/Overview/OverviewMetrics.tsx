@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
+import { ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import {
   Card,
@@ -27,6 +26,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { Chart, ChartCard, ChartHeader, ChartActions, ChartMetric } from 'ui-patterns/Chart'
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
@@ -39,7 +39,6 @@ import {
   calculatePercentageChange,
   getApiSuccessRates,
   getAuthSuccessRates,
-  getChangeColor,
   getMetricValues,
 } from './OverviewUsage.constants'
 
@@ -63,14 +62,6 @@ const StatCard = ({
   tooltip?: string
 }) => {
   const router = useRouter()
-  const isZeroChange = previous === 0
-  const changeColor = isZeroChange
-    ? 'text-foreground-lighter'
-    : invert
-      ? previous >= 0
-        ? 'text-destructive'
-        : 'text-brand'
-      : getChangeColor(previous)
   const formattedCurrent =
     suffix === 'ms'
       ? current.toFixed(2)
@@ -79,57 +70,29 @@ const StatCard = ({
         : Math.round(current).toLocaleString()
   const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
+  const actions = [
+    {
+      label: 'Go to Auth Report',
+      icon: <ExternalLink size={12} />,
+      onClick: () => router.push(href || ''),
+    },
+  ]
+
   return (
-    <Card className={cn(href, 'mb-0 flex flex-col')}>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative">
-        <CardTitle className="text-foreground-light flex items-center gap-2">
-          {title}
-          {tooltip && (
-            <Tooltip>
-              <TooltipTrigger>
-                <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
-              </TooltipTrigger>
-              <TooltipContent className="w-[300px]">
-                <p>{tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </CardTitle>
-        <ButtonTooltip
-          type="text"
-          size="tiny"
-          icon={<ExternalLink />}
-          className="w-6 h-6 absolute right-4 top-3"
-          onClick={() => router.push(href || '')}
-          tooltip={{
-            content: {
-              side: 'top',
-              text: 'Go to Auth Report',
-            },
-          }}
-        />
-      </CardHeader>
-      <CardContent
-        className={cn(
-          'pb-4 px-6 pt-0 flex-1 h-full overflow-hidden',
-          loading && 'pt-2 opacity-50 items-center justify-center'
-        )}
-      >
-        {loading ? (
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-6 w-20" />
-            <Skeleton className="h-3 w-8" />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-0.5">
-            <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
-            <span className={cn('flex items-center gap-1 text-sm', changeColor)}>
-              <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <Chart isLoading={loading}>
+      <ChartCard>
+        <ChartHeader align="start">
+          <ChartMetric
+            className="pb-4"
+            label={title}
+            tooltip={tooltip}
+            diffValue={`${signChar}${Math.abs(previous).toFixed(1)}%`}
+            value={`${formattedCurrent}${suffix}`}
+          />
+          <ChartActions actions={actions} />
+        </ChartHeader>
+      </ChartCard>
+    </Chart>
   )
 }
 
