@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -167,7 +167,7 @@ const EntityListItem = ({
       title={entity.name}
       style={style}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+      href={buildTableEditorUrl({ projectRef, tableId: entity.id, schema: entity.schema })}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(

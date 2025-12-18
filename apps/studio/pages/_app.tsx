@@ -15,6 +15,7 @@ import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/typography.scss'
 import 'styles/ui.scss'
+import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 

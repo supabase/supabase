@@ -4,13 +4,21 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 08 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 17 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/building-chatgpt-apps-with-supabase</guid>
+  <title>Building ChatGPT Apps with Supabase Edge Functions and mcp-use</title>
+  <link>https://supabase.com/blog/building-chatgpt-apps-with-supabase</link>
+  <description>Learn how to build a ChatGPT app that connects to your Supabase database using mcp-use and Edge Functions. Create interactive widgets for schema exploration, data viewing, and SQL queries.</description>
+  <pubDate>Wed, 17 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/metrics-api-observability</guid>
   <title>Own Your Observability: Supabase Metrics API</title>
   <link>https://supabase.com/blog/metrics-api-observability</link>
   <description>Stream your Supabase database telemetry into any Prometheus-compatible observability stack with the Metrics API. Full control over monitoring, visualization, and alerting.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/introducing-iceberg-js</guid>
