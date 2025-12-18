@@ -167,9 +167,9 @@ export const inferColumnType = (column: string, rows: object[]) => {
   return 'text'
 }
 
-export const acceptedFileExtension = (file: any) => {
-  const ext = file?.name.split('.').pop().toLowerCase()
-  return UPLOAD_FILE_EXTENSIONS.includes(ext)
+export const acceptedFileExtension = (file: File) => {
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  return ext !== undefined && UPLOAD_FILE_EXTENSIONS.includes(ext)
 }
 
 /**
