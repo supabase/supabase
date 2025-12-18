@@ -16,9 +16,9 @@ export function Hero() {
         Jump in to these unresolved threads and share your knowledge with fellow builders. Every
         question answered helps someone build something amazing.
       </p>
-      <div className="grid gap-2 justify-center mt-4">
+      <div className="grid gap-2 justify-center mt-6 text-foreground-lighter">
         Want to get involved?
-        <Button asChild type="primary" iconRight={<ArrowRight className="h-4 w-4" />}>
+        <Button asChild type="secondary" iconRight={<ArrowRight className="h-4 w-4" />}>
           <Link href="/contribute/about">Learn more</Link>
         </Button>
       </div>
