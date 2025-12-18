@@ -208,7 +208,10 @@ export const ServiceStatus = () => {
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.status === 'ACTIVE_HEALTHY')
+  // We consider a service operational if it's healthy or intentionally disabled
+  const allServicesOperational = services.every(
+    (service) => service.status === 'ACTIVE_HEALTHY' || service.status === 'DISABLED'
+  )
 
   // Check if project or branch is in a startup state
   const isProjectNew =
@@ -219,9 +222,7 @@ export const ServiceStatus = () => {
         currentBranch?.status === 'RUNNING_MIGRATIONS' ||
         isMigrationLoading))
 
-  const anyUnhealthy = services.some(
-    (service) => service.status !== 'ACTIVE_HEALTHY' && service.status !== 'COMING_UP'
-  )
+  const anyUnhealthy = services.some((service) => service.status === 'UNHEALTHY')
   const anyComingUp = services.some((service) => service.status === 'COMING_UP')
   // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
   const showSpinnerIcon = project?.status === 'COMING_UP'

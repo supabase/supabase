@@ -40,6 +40,7 @@ export const StatusMessage = ({
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  // isProjectNew has to be after all other statuses
   if (isProjectNew) return 'Coming up...'
   if (status) return status
   return 'Unable to connect'
@@ -62,12 +63,14 @@ export const StatusIcon = ({
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isLoading) return <LoaderIcon />
-  if (isProjectNew) return <LoaderIcon />
-  if (projectStatus === 'DISABLED') return <AlertIcon />
-  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
-  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  //
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (projectStatus === 'DISABLED') return <AlertIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (isLoading) return <LoaderIcon />
+  // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
+  if (isProjectNew) return <LoaderIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   return <AlertIcon />
 }
 
@@ -263,7 +266,10 @@ export const ServiceStatus = () => {
     currentBranch?.status === 'CREATING_PROJECT' ||
     currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.status === 'ACTIVE_HEALTHY')
+  // We consider a service operational if it's healthy or intentionally disabled
+  const allServicesOperational = services.every(
+    (service) => service.status === 'ACTIVE_HEALTHY' || service.status === 'DISABLED'
+  )
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
