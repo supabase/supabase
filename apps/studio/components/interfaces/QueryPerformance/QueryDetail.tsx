@@ -9,6 +9,7 @@ import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { QueryPlan } from './QueryPlan'
 import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryDetailProps {
@@ -91,6 +92,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
           </Button>
         </div>
       </QueryPanelSection>
+      <QueryPlan query={query} />
       <QueryPanelSection className="pb-3 pt-6">
         <h4 className="mb-2">Metadata</h4>
         <ul className="flex flex-col gap-y-3 divide-y divide-dashed">
