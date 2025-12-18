@@ -15,8 +15,9 @@ export interface PostTypes {
     url: string
   }
   content?: string
-  imgSite: string
-  imgSocial?: string
+  imgSite?: string // Used by blogs and case studies
+  imgSocial?: string // Used by blogs
+  thumb?: string // Used by events
   readingTime?: string
   description: string
   url: string
@@ -196,7 +197,7 @@ export interface EventData {
   speakers: string
   speakers_label?: string
   og_image?: string
-  imgSite?: string
+  thumb?: string
   thumb_light?: string
   youtubeHero?: string
   author_url?: string

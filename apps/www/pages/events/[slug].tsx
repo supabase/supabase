@@ -72,7 +72,7 @@ interface EventData {
   speakers: string
   speakers_label?: string
   og_image?: string
-  imgSite?: string
+  thumb?: string
   thumb_light?: string
   youtubeHero?: string
   author_url?: string
@@ -305,14 +305,14 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
                 </div>
               </div>
-              {!!event.imgSite && (
+              {!!event.thumb && (
                 <div className="relative w-full aspect-[5/3] lg:aspect-[3/2] overflow-hidden border shadow-lg rounded-lg z-10">
                   <Image
                     src={{
-                      dark: `/images/events/` + event.imgSite,
+                      dark: `/images/events/` + event.thumb,
                       light:
                         `/images/events/` +
-                        (!!event.thumb_light ? event.thumb_light! : event.imgSite),
+                        (!!event.thumb_light ? event.thumb_light! : event.thumb),
                     }}
                     fill
                     sizes="100%"
