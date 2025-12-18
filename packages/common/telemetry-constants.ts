@@ -2556,8 +2556,8 @@ export interface AdvisorAssistantButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/observability/query-performance
  */
-export interface QueryPerformanceAIExplanationClickedEvent {
-  action: 'query_performance_ai_explanation_clicked'
+export interface QueryPerformanceAIExplanationButtonClickedEvent {
+  action: 'query_performance_explain_with_ai_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2743,6 +2743,6 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
-  | QueryPerformanceAIExplanationClickedEvent
+  | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent

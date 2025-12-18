@@ -77,7 +77,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
       initialMessage: prompt,
     })
 
-    track('query_performance_ai_explanation_clicked')
+    track('query_performance_explain_with_ai_button_clicked')
 
     // Close the query detail panel since we need to see the AI assistant panel
     onClose?.()
