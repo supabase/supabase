@@ -53,6 +53,7 @@ export const AddIntegrationDropdown = ({
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
   const isWorkOSEnabled = useFlag('isWorkOSTPAEnabled')
+  const isScaleKitEnabled = useFlag('isScaleKitTPAEnabled')
 
   return (
     <DropdownMenu>
@@ -67,6 +68,9 @@ export const AddIntegrationDropdown = ({
 
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
+        {isScaleKitEnabled && (
+          <ProviderDropdownItem type="scalekit" onSelectIntegrationType={onSelectIntegrationType} />
+        )}
         {isWorkOSEnabled && (
           <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         )}
