@@ -26,8 +26,7 @@ import { formatDuration } from './QueryPerformance.utils'
 import { useTrack } from 'lib/telemetry/track'
 
 interface QueryDetailProps {
-  reportType: QUERY_PERFORMANCE_REPORT_TYPES
-  selectedRow: QueryPerformanceRow
+  selectedRow?: QueryPerformanceRow
   onClickViewSuggestion: () => void
   onClose?: () => void
 }
