@@ -90,6 +90,9 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell className="lg:table-cell">
         <p className="text-foreground-light">{item.version}</p>
+        <button tabIndex={-1} className="sr-only">
+          Go to function details
+        </button>
       </TableCell>
     </TableRow>
   )
