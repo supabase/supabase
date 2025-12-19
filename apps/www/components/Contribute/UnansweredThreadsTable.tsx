@@ -50,9 +50,6 @@ function ThreadsTable({
                 Thread
               </th>
               <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[20%]">Stack</th>
-              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[15%]">
-                Posted
-              </th>
               <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[10%]">
                 Replies
               </th>
@@ -371,8 +368,10 @@ function ThreadRow({
 
   return (
     <tr className="border-b border-border hover:bg-muted/50 transition-colors">
+      {/* Thread title and product areas */}
       <td className="px-3 py-4 md:px-6 w-[45%]">
         <div className="flex items-center gap-3 overflow-hidden">
+          {/* Channel icon */}
           <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md ">
             {thread.channel === 'discord' && (
               <DiscordIcon
@@ -400,13 +399,18 @@ function ThreadRow({
             )}
           </div>
           <div className="min-w-0 flex-1">
+            {/* Thread title */}
             <Link
               href={`/contribute/t/${thread.id}`}
               className="block text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2"
             >
               {highlightText(thread.title, search)}
             </Link>
-            <div className="flex flex-wrap gap-2 overflow-hidden">
+            {/* Posted time and product areas */}
+            <div className="flex flex-row items-baseline gap-2 overflow-hidden">
+              {/* Posted time */}
+              <p className="text-xs text-foreground-lighter whitespace-nowrap">{thread.posted}</p>
+              {/* Product areas */}
               {thread.product_areas.length > 0 &&
                 thread.product_areas
                   .filter((area: string) => area !== 'Other')
@@ -434,9 +438,7 @@ function ThreadRow({
           </div>
         </div>
       </td>
-      {/* <td className="py-4 px-3 md:px-6 w-[20%]">
-       
-      </td> */}
+      {/* Stack */}
       <td className="py-4 px-3 md:px-6 w-[20%]">
         <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.stack.length > 0 ? (
@@ -495,9 +497,7 @@ function ThreadRow({
           )}
         </div>
       </td>
-      <td className="py-4 px-3 md:px-6 w-[15%]">
-        <p className="text-sm text-foreground-lighter whitespace-nowrap">{thread.posted}</p>
-      </td>
+
       {/* Replies */}
       <td className="py-4 px-3 md:px-6 w-[10%]">
         <Link href={`/contribute/t/${thread.id}`} className="flex flex-row items-center gap-2">
