@@ -74,6 +74,7 @@ export function useCreateCommands(options?: CommandOptions) {
     isAnalyticsBucketsEnabled,
     installedIntegrationIds,
     allIntegrations,
+    reportsEnabled,
   } = useCreateCommandsConfig()
 
   const databaseCommands = useMemo(
@@ -367,15 +368,17 @@ export function useCreateCommands(options?: CommandOptions) {
 
   const observabilityCommands = useMemo(
     () =>
-      [
-        {
-          id: 'create-observability-report',
-          name: 'Create Custom Report',
-          route: `/project/${ref}/observability/api-overview?newReport=true`,
-          icon: () => <Telescope />,
-        },
-      ] as ICommand[],
-    [ref]
+      IS_PLATFORM && reportsEnabled
+        ? [
+            {
+              id: 'create-observability-report',
+              name: 'Create Custom Report',
+              route: `/project/${ref}/observability/api-overview?newReport=true`,
+              icon: () => <Telescope />,
+            },
+          ]
+        : [],
+    [ref, reportsEnabled]
   )
 
   const sections = useMemo(

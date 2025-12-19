@@ -159,14 +159,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         disableTransitionOnChange
                       >
                         <AppBannerContextProvider>
-                          <FeaturePreviewContextProvider>
-                            <MainScrollContainerProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                            </MainScrollContainerProvider>
-                            <FeaturePreviewModal />
-                          </FeaturePreviewContextProvider>
-                          <SonnerToaster position="top-right" />
-                          <MonacoThemeProvider />
+                          <CommandProvider>
+                            <FeaturePreviewContextProvider>
+                              <MainScrollContainerProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                              </MainScrollContainerProvider>
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
+                            <SonnerToaster position="top-right" />
+                            <MonacoThemeProvider />
+                          </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

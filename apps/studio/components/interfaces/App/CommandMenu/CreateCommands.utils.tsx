@@ -45,13 +45,14 @@ export function getIntegrationRoute(
       return `/project/${ref}/integrations/webhooks/webhooks?new=true`
     case 'queues':
       return `/project/${ref}/integrations/queues/queues?new=true`
-    default:
+    default: {
       // For other integrations, try to find a navigation route that's not 'overview'
       const createRoute = integration.navigation?.find((nav) => nav.route !== 'overview')
       if (createRoute) {
         return `/project/${ref}/integrations/${integration.id}/${createRoute.route}?new=true`
       }
       return null
+    }
   }
 }
 
@@ -91,7 +92,13 @@ export function useCreateCommandsConfig() {
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
-  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+    reportsAll: reportsEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'reports:all',
+  ])
 
   const {
     data: authConfig,
@@ -185,5 +192,6 @@ export function useCreateCommandsConfig() {
     installedIntegrationIds,
     integrationsWrappers,
     allIntegrations,
+    reportsEnabled,
   }
 }
