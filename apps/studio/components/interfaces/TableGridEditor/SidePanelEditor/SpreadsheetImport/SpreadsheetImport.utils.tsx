@@ -186,9 +186,16 @@ export const acceptedFileType = (file: File): boolean => {
   return file.type.length === 0 || UPLOAD_FILE_TYPES.includes(file.type)
 }
 
+export const isFileEmpty = (file: File): boolean => {
+  return file.size === 0
+}
+
 export function flagInvalidFileImport(file: File): boolean {
   if (!file || !acceptedFileType(file) || !acceptedFileExtension(file)) {
     toast.error("Couldn't import file: only CSV and TSV files are accepted")
+    return true
+  } else if (isFileEmpty(file)) {
+    toast.error("Couldn't import file because it is empty")
     return true
   } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
     toast.error(
