@@ -25,6 +25,7 @@ import {
   MessageCircle,
   Mail,
   Lock,
+  Telescope,
 } from 'lucide-react'
 import {
   PageType,
@@ -343,6 +344,19 @@ export function useCreateCommands(options?: CommandOptions) {
     [ref, installedIntegrationIds]
   )
 
+  const observabilityCommands = useMemo(
+    () =>
+      [
+        {
+          id: 'create-observability-report',
+          name: 'Create Custom Report',
+          route: `/project/${ref}/observability/api-overview?newReport=true`,
+          icon: () => <Telescope />,
+        },
+      ] as ICommand[],
+    [ref]
+  )
+
   const sections = useMemo(
     () => [
       {
@@ -386,8 +400,24 @@ export function useCreateCommands(options?: CommandOptions) {
             },
           ]
         : []),
+      ...(observabilityCommands.length > 0
+        ? [
+            {
+              id: 'create-observability',
+              name: 'Observability',
+              commands: observabilityCommands,
+            },
+          ]
+        : []),
     ],
-    [databaseCommands, authCommands, edgeFunctionsCommands, storageCommands, integrationsCommands]
+    [
+      databaseCommands,
+      authCommands,
+      edgeFunctionsCommands,
+      storageCommands,
+      integrationsCommands,
+      observabilityCommands,
+    ]
   )
 
   useRegisterPage(
