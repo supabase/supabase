@@ -50,7 +50,7 @@ function sortIncidentsByPriority(incidents: Array<IncidentInfo>): Array<Incident
 
     const dateA = new Date(a.active_since).getTime()
     const dateB = new Date(b.active_since).getTime()
-    const differentDates = Number.isFinite(dateA) && Number.isFinite(dateB) && dateB !== dateA
+    const hasDifferentDates = Number.isFinite(dateA) && Number.isFinite(dateB) && dateB !== dateA
 
     const statusA = isIncidentStatus(a.status) ? a.status : 'investigating'
     const statusB = isIncidentStatus(b.status) ? b.status : 'investigating'
@@ -59,7 +59,7 @@ function sortIncidentsByPriority(incidents: Array<IncidentInfo>): Array<Incident
 
     if (impactPriorityB !== impactPriorityA) {
       return impactPriorityB - impactPriorityA
-    } else if (differentDates) {
+    } else if (hasDifferentDates) {
       return dateB - dateA
     } else {
       return statusPriorityB - statusPriorityA
