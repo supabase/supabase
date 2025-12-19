@@ -120,6 +120,14 @@ export const Grid = memo(
         },
       })
 
+      const emptyStateMessage = isDraggedOver
+        ? isValidFileDraggedOver
+          ? 'Drop your CSV file here'
+          : 'Only CSV files are accepted'
+        : 'This table is empty'
+
+      const messageClassName = isDraggedOver && !isValidFileDraggedOver ? 'text-destructive' : ''
+
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
@@ -199,7 +207,7 @@ export const Grid = memo(
                       {!canImportData ? (
                         <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center pointer-events-auto">
                           <div className="max-w-xl">
-                          <h3 className="text-xl text-center mb-4">This entity is empty</h3>
+                            <h3 className="text-xl text-center mb-4">This entity is empty</h3>
                             {!isSelectedTable ? (
                               <Admonition
                                 type="default"
@@ -216,17 +224,7 @@ export const Grid = memo(
                       ) : (
                         <div className="flex flex-col items-center justify-center col-span-full h-full">
                           <p className="text-sm text-light pointer-events-auto">
-                            {isDraggedOver ? (
-                              isValidFileDraggedOver ? (
-                                'Drop your CSV file here'
-                              ) : (
-                                <span className="text-destructive">
-                                  Only CSV files are accepted
-                                </span>
-                              )
-                            ) : (
-                              'This table is empty'
-                            )}
+                            <span className={messageClassName}>{emptyStateMessage}</span>
                           </p>
                           {isSelectedForeignTable ? (
                             <div className="flex items-center space-x-2 mt-4">
