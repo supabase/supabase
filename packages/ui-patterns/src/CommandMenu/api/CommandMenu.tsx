@@ -37,7 +37,7 @@ function Breadcrumb({ className }: { className?: string }) {
     <button
       type="button"
       className={cn(
-        'p-2 bg-overlay flex items-center gap-2 text-xs text-foreground-lighter',
+        'p-2 bg-overlay flex items-center gap-2 text-xs text-foreground-muted',
         className
       )}
       onClick={popPage}
@@ -199,7 +199,7 @@ function CommandMenuTriggerInput({
             strokeWidth={1.5}
             className="group-hover:text-foreground-light transition-colors"
           />
-          <p className="flex text-sm pr-2 text-foreground-lighter">{placeholder}</p>
+          <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
         </div>
         {showShortcut && (
           <div className="command-shortcut hidden md:flex items-center space-x-1">
