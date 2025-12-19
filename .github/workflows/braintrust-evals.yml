@@ -18,8 +18,7 @@ jobs:
     timeout-minutes: 20
 
     env:
-      BRAINTRUST_PROJECT_ID: "ec4bfca4-0f06-4659-8007-9b638e3fdddc" # Hardcoded for testing, not sensitive
-      # BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }} # Eventually configure at repo level
+      BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }} # Eventually configure at repo level
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
