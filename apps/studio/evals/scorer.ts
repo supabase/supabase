@@ -91,12 +91,10 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 
     Is the response concise and free of unnecessary words?
     a) Very concise - no wasted words
-    b) Mostly concise - minor verbosity
-    c) Some verbosity but acceptable
-    d) Contains superfluous wording
-    e) Overly verbose
+    b) Acceptable verbosity - some verbosity but acceptable
+    c) Too verbose - contains superfluous wording or overly verbose
   `,
-  choiceScores: { a: 1, b: 0.75, c: 0.5, d: 0.25, e: 0 },
+  choiceScores: { a: 1, b: 0.5, c: 0 },
   useCoT: true,
   model: LLM_AS_A_JUDGE_MODEL,
 })
@@ -117,13 +115,10 @@ const completenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
     Output: {{output}}
 
     Does the response appear complete and finished?
-    a) Fully complete - addresses the question fully, no cut-offs or missing parts
-    b) Mostly complete - minor gaps but acceptable, response feels finished
-    c) Partially complete - some aspects addressed but response feels incomplete
-    d) Incomplete - response appears cut off mid-sentence or missing key information
-    e) Severely incomplete - empty response, frozen, or completely cut off
+    a) Complete - response is complete and finished
+    b) Incomplete - response appears cut off, missing parts, or severely incomplete
   `,
-  choiceScores: { a: 1, b: 0.75, c: 0.5, d: 0.25, e: 0 },
+  choiceScores: { a: 1, b: 0 },
   useCoT: true,
   model: LLM_AS_A_JUDGE_MODEL,
 })
@@ -138,8 +133,8 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
   })
 }
 
-const helpfulnessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
-  name: 'Helpfulness',
+const goalCompletionEvaluator = LLMClassifierFromTemplate<{ input: string }>({
+  name: 'Goal Completion',
   promptTemplate: stripIndent`
     Evaluate whether this response addresses what the user asked.
     
@@ -148,18 +143,19 @@ const helpfulnessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
     
     Does the response address what the user asked?
     a) Fully addresses - completely answers the question or fulfills the request
-    b) Mostly addresses - addresses the main request with minor gaps
-    c) Partially addresses - addresses some aspects but misses key parts
-    d) Barely addresses - tangentially related but doesn't fulfill the request
-    e) Doesn't address - off-topic or fails to address the request
+    b) Partially addresses - addresses some aspects but misses key parts
+    c) Doesn't address - off-topic or fails to address the request
   `,
-  choiceScores: { a: 1, b: 0.75, c: 0.5, d: 0.25, e: 0 },
+  choiceScores: { a: 1, b: 0.5, c: 0 },
   useCoT: true,
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const helpfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
-  return await helpfulnessEvaluator({
+export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async ({
+  input,
+  output,
+}) => {
+  return await goalCompletionEvaluator({
     input,
     output: output.stepsSerialized,
   })
