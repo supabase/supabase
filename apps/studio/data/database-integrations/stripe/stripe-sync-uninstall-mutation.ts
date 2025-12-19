@@ -9,7 +9,6 @@ import { stripeSyncKeys } from './keys'
 
 export type StripeSyncUninstallVariables = {
   projectRef: string
-  stripeSecretKey?: string
 }
 
 export type StripeSyncUninstallResponse = {
@@ -19,7 +18,6 @@ export type StripeSyncUninstallResponse = {
 
 export async function uninstallStripeSync({
   projectRef,
-  stripeSecretKey,
 }: StripeSyncUninstallVariables): Promise<StripeSyncUninstallResponse> {
   const accessToken = await getAccessToken()
 
@@ -31,7 +29,6 @@ export async function uninstallStripeSync({
     },
     body: JSON.stringify({
       projectRef,
-      stripeSecretKey,
     }),
   })
 

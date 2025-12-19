@@ -489,7 +489,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nuqs:
         specifier: ^1.19.1
-        version: 1.19.1(next@15.5.9(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
+        version: 1.19.1(next@15.5.9(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
@@ -1035,8 +1035,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       stripe-experiment-sync:
-        specifier: ^1.0.12
-        version: 1.0.12(@types/node@22.13.14)(supports-color@8.1.1)
+        specifier: ^1.0.17
+        version: 1.0.17(@types/node@22.13.14)(supports-color@8.1.1)
       tus-js-client:
         specifier: ^4.1.0
         version: 4.1.0
@@ -18127,8 +18127,8 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
-  stripe-experiment-sync@1.0.12:
-    resolution: {integrity: sha512-Q3NO1SiQvsAd4x0nzUMaUXmsE5Xnou6fZ3aJRoGv0VTumBpSI3ffGDVbyouIjAlz9f3Gnm+jLNqN10FRuZKW+A==}
+  stripe-experiment-sync@1.0.17:
+    resolution: {integrity: sha512-AzJoUAsOHUs69eQh3uEOdgno0iSnmo/wYTye5L/SLhXdaOqGEEU1uSOLnGHs06eqnVD5WobIpaG+/FyZnUxiew==}
     hasBin: true
 
   stripe@17.7.0:
@@ -36520,7 +36520,7 @@ snapshots:
 
   number-flow@0.3.7: {}
 
-  nuqs@1.19.1(next@15.5.9(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)):
+  nuqs@1.19.1(next@15.5.9(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)):
     dependencies:
       mitt: 3.0.1
       next: 15.5.9(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
@@ -39802,7 +39802,7 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  stripe-experiment-sync@1.0.12(@types/node@22.13.14)(supports-color@8.1.1):
+  stripe-experiment-sync@1.0.17(@types/node@22.13.14)(supports-color@8.1.1):
     dependencies:
       '@ngrok/ngrok': 1.6.0
       chalk: 5.4.1
@@ -39810,6 +39810,7 @@ snapshots:
       dotenv: 16.5.0
       express: 4.22.1(supports-color@8.1.1)
       inquirer: 12.11.1(@types/node@22.13.14)
+      papaparse: 5.4.1
       pg: 8.16.3
       pg-node-migrations: 0.0.8
       stripe: 17.7.0

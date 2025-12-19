@@ -38,14 +38,12 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       .status(400)
       .json({ data: null, error: { message: 'Bad Request: Missing projectRef in request body' } })
   }
-
   waitUntil(
     uninstall({
       supabaseAccessToken: supabaseToken,
       supabaseProjectRef: projectRef,
-      stripeKey: stripeSecretKey,
       baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
-      baseManagementApiUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
+      supabaseManagementUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
     }).catch((error) => {
       console.error('Stripe Sync Engine uninstallation failed.', error)
       throw error
@@ -111,14 +109,13 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       error: { message: `Failed to validate Stripe API key: ${error.message}` },
     })
   }
-
   waitUntil(
     install({
       supabaseAccessToken: supabaseToken,
       supabaseProjectRef: projectRef,
       stripeKey: stripeSecretKey,
       baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
-      baseManagementApiUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
+      supabaseManagementUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
       packageVersion: VERSION,
     }).catch((error) => {
       console.error('Stripe Sync Engine installation failed.', error)
