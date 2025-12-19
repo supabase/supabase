@@ -57,7 +57,7 @@ const removeWrappingQuotes = (str: string): string => {
 
 const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
-  const [showSecretValue, setShowSecretValue] = useState(false)
+  const [visibleSecrets, setVisibleSecrets] = useState<Set<number>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
   const [pendingSecrets, setPendingSecrets] = useState<z.infer<typeof FormSchema> | null>(null)
 
@@ -130,7 +130,10 @@ const AddNewSecretForm = () => {
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
       // RHF recommends using setTimeout/useEffect to reset the form
-      setTimeout(() => form.reset(), 0)
+      setTimeout(() => {
+        form.reset()
+        setVisibleSecrets(new Set())
+      }, 0)
     },
   })
 
@@ -198,7 +201,7 @@ const AddNewSecretForm = () => {
                         <FormControl_Shadcn_>
                           <Input
                             {...field}
-                            type={showSecretValue ? 'text' : 'password'}
+                            type={visibleSecrets.has(index) ? 'text' : 'password'}
                             data-1p-ignore
                             data-lpignore="true"
                             data-form-type="other"
@@ -208,8 +211,18 @@ const AddNewSecretForm = () => {
                                 <Button
                                   type="text"
                                   className="px-1"
-                                  icon={showSecretValue ? <EyeOff /> : <Eye />}
-                                  onClick={() => setShowSecretValue(!showSecretValue)}
+                                  icon={visibleSecrets.has(index) ? <EyeOff /> : <Eye />}
+                                  onClick={() => {
+                                    setVisibleSecrets((prev) => {
+                                      const next = new Set(prev)
+                                      if (next.has(index)) {
+                                        next.delete(index)
+                                      } else {
+                                        next.add(index)
+                                      }
+                                      return next
+                                    })
+                                  }}
                                 />
                               </div>
                             }
@@ -225,7 +238,22 @@ const AddNewSecretForm = () => {
                     className="h-[34px] mt-6"
                     icon={<MinusCircle />}
                     disabled={fields.length <= 1}
-                    onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
+                    onClick={() => {
+                      if (fields.length > 1) {
+                        remove(index)
+                        setVisibleSecrets((prev) => {
+                          const next = new Set<number>()
+                          prev.forEach((i) => {
+                            if (i < index) next.add(i)
+                            else if (i > index) next.add(i - 1)
+                          })
+                          return next
+                        })
+                      } else {
+                        form.reset(defaultValues)
+                        setVisibleSecrets(new Set())
+                      }
+                    }}
                   />
                 </div>
               ))}
