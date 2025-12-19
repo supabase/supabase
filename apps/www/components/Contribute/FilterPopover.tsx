@@ -64,10 +64,10 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
         className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0"
         align="end"
       >
-        <div className="p-4">
+        <div className="">
           {/* Header */}
-          <div className="flex flex-row items-center justify-between pb-4">
-            <h3 className="text-sm text-foreground">Filter Threads</h3>
+          <div className="flex flex-row items-center justify-between px-4 py-2 bg-muted border-b">
+            <h3 className="text-base text-foreground">Filter Threads</h3>
             <div className="flex items-center gap-2">
               {((productAreas && productAreas.length > 0) || (stacks && stacks.length > 0)) && (
                 <Button
@@ -81,12 +81,11 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
               )}
             </div>
           </div>
-          <PopoverSeparator />
 
           <ScrollArea className="h-[300px] sm:h-[400px] md:h-[430px]">
-            <div className="grid gap-8 pb-4 mt-4 pr-4">
+            <div className="grid gap-8 p-4">
               {/* Product Area Section */}
-              <div className="grid gap-3">
+              <div className="grid gap-3 pb-0">
                 <h3 className="text-sm  text-muted-foreground">Product Area</h3>
                 <div className="flex flex-wrap gap-2">
                   {allProductAreas
