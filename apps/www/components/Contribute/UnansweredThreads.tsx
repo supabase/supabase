@@ -12,9 +12,9 @@ export async function UnansweredThreads({
   stack,
   search,
 }: {
-  product_area?: string
+  product_area?: string | string[]
   channel?: string
-  stack?: string
+  stack?: string | string[]
   search?: string
 }) {
   try {

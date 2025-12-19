@@ -55,8 +55,8 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
 }
 
 export async function getChannelCounts(
-  product_area?: string,
-  stack?: string,
+  product_area?: string | string[],
+  stack?: string | string[],
   search?: string
 ): Promise<{ all: number; discord: number; reddit: number; github: number }> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
@@ -73,11 +73,13 @@ export async function getChannelCounts(
   }
 
   if (product_area) {
-    query = query.contains('product_areas', [product_area])
+    const areas = Array.isArray(product_area) ? product_area : [product_area]
+    query = query.overlaps('product_areas', areas)
   }
 
   if (stack) {
-    query = query.contains('stack', [stack])
+    const stacks = Array.isArray(stack) ? stack : [stack]
+    query = query.overlaps('stack', stacks)
   }
 
   if (search && search.trim()) {
@@ -107,9 +109,9 @@ export async function getChannelCounts(
 }
 
 export async function getUnansweredThreads(
-  product_area?: string,
+  product_area?: string | string[],
   channel?: string,
-  stack?: string,
+  stack?: string | string[],
   search?: string,
   offset: number = 0,
   limit: number = 100
@@ -133,11 +135,13 @@ export async function getUnansweredThreads(
   // When searching, skip status filter to find threads regardless of status
 
   if (product_area) {
-    query = query.contains('product_areas', [product_area])
+    const areas = Array.isArray(product_area) ? product_area : [product_area]
+    query = query.overlaps('product_areas', areas)
   }
 
   if (stack) {
-    query = query.contains('stack', [stack])
+    const stacks = Array.isArray(stack) ? stack : [stack]
+    query = query.overlaps('stack', stacks)
   }
 
   if (channel && channel !== 'all') {

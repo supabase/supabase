@@ -7,9 +7,9 @@ export default async function ContributePage({
   searchParams,
 }: {
   searchParams: Promise<{
-    product_area?: string
+    product_area?: string | string[]
     channel?: string
-    stack?: string
+    stack?: string | string[]
     search?: string
   }>
 }) {

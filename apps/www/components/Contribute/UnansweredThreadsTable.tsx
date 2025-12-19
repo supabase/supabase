@@ -380,7 +380,7 @@ function ThreadRow({
   }
 
   return (
-    <TableRow>
+    <TableRow className="relative group [&.hovering-badge>td]:hover:!bg-transparent">
       {/* Thread title and product areas */}
       <TableCell className="min-w-[400px]">
         <div className="flex items-center gap-3 overflow-hidden">
@@ -413,14 +413,9 @@ function ThreadRow({
           </div>
           <div className="min-w-0 flex-1 flex flex-col gap-y-0.5">
             {/* Thread title */}
-            <Link
-              href={`/contribute/t/${thread.id}`}
-              className="block text-md text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2"
-            >
-              <h3 className="text-base text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2">
-                {highlightText(thread.title, search)}
-              </h3>
-            </Link>
+            <h3 className="text-base text-foreground truncate group-hover:underline transition-[text-decoration] duration-100 underline-offset-2">
+              {highlightText(thread.title, search)}
+            </h3>
             {/* Posted time and product areas */}
             <div className="flex flex-row items-baseline gap-2 overflow-hidden">
               {/* Posted time */}
@@ -432,19 +427,35 @@ function ThreadRow({
                     (area: string) => area !== 'Other'
                   )
                   return filteredAreas.length > 0 ? (
-                    <div className="flex flex-wrap gap-x-1.5 gap-y-1 overflow-hidden">
+                    <div
+                      onMouseEnter={(e) => {
+                        const row = e.currentTarget.closest('tr')
+                        row?.classList.remove('group')
+                        row?.classList.add('hovering-badge')
+                      }}
+                      onMouseLeave={(e) => {
+                        const row = e.currentTarget.closest('tr')
+                        row?.classList.add('group')
+                        row?.classList.remove('hovering-badge')
+                      }}
+                      className="flex flex-wrap gap-x-1.5 gap-y-1 overflow-hidden"
+                    >
                       {filteredAreas.map((area: string) => {
                         const isActive = productArea === area
                         return (
                           <button
                             key={area}
-                            onClick={() => handleProductAreaClick(area)}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleProductAreaClick(area)
+                            }}
                             type="button"
+                            className="relative z-10"
                           >
                             <Badge
                               variant={isActive ? 'success' : 'default'}
-                              // Hover states to indicate interactivity
-                              className="transition-all duration-150 hover:opacity-70"
+                              className="transition-all duration-150 hover:bg-brand-300/30"
                             >
                               {area}
                             </Badge>
@@ -460,7 +471,19 @@ function ThreadRow({
       </TableCell>
       {/* Stack */}
       <TableCell>
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 overflow-hidden">
+        <div
+          onMouseEnter={(e) => {
+            const row = e.currentTarget.closest('tr')
+            row?.classList.remove('group')
+            row?.classList.add('hovering-badge')
+          }}
+          onMouseLeave={(e) => {
+            const row = e.currentTarget.closest('tr')
+            row?.classList.add('group')
+            row?.classList.remove('hovering-badge')
+          }}
+          className="flex flex-wrap gap-x-1.5 gap-y-0.5 overflow-hidden"
+        >
           {thread.stack.length > 0 ? (
             (() => {
               const filteredStack = thread.stack.filter((tech: string) => tech !== 'Other')
@@ -474,11 +497,19 @@ function ThreadRow({
                   {filteredStack.slice(0, 5).map((tech: string) => {
                     const isActive = currentStack === tech
                     return (
-                      <button key={tech} onClick={() => handleStackClick(tech)} type="button">
+                      <button
+                        key={tech}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleStackClick(tech)
+                        }}
+                        type="button"
+                        className="relative z-10"
+                      >
                         <Badge
                           variant={isActive ? 'success' : 'default'}
-                          // Hover states to indicate interactivity
-                          className="transition-all duration-150 hover:opacity-70"
+                          className="transition-all duration-150 hover:bg-brand-300/30"
                         >
                           {tech}
                         </Badge>
@@ -488,11 +519,27 @@ function ThreadRow({
                   {filteredStack.length > 5 && (
                     <Popover_Shadcn_>
                       <PopoverTrigger_Shadcn_ asChild>
-                        <button type="button">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                          }}
+                          onMouseEnter={(e) => {
+                            const row = e.currentTarget.closest('tr')
+                            row?.classList.remove('group')
+                            row?.classList.add('hovering-badge')
+                          }}
+                          onMouseLeave={(e) => {
+                            const row = e.currentTarget.closest('tr')
+                            row?.classList.add('group')
+                            row?.classList.remove('hovering-badge')
+                          }}
+                          className="relative z-10"
+                        >
                           <Badge
                             variant={hasActiveInOverflow ? 'success' : 'default'}
-                            // Hover states to indicate interactivity
-                            className="transition-all duration-150 hover:opacity-70"
+                            className="transition-all duration-150 hover:bg-brand-200/50 hover:border-brand-300/50"
                           >
                             + {filteredStack.length - 5}
                           </Badge>
@@ -505,10 +552,19 @@ function ThreadRow({
                             return (
                               <button
                                 key={tech}
-                                onClick={() => handleStackClick(tech)}
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  handleStackClick(tech)
+                                }}
                                 type="button"
                               >
-                                <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
+                                <Badge
+                                  variant={isActive ? 'success' : 'default'}
+                                  className="transition-all duration-150 hover:bg-brand-200/50 hover:border-brand-300/50"
+                                >
+                                  {tech}
+                                </Badge>
                               </button>
                             )
                           })}
@@ -527,7 +583,7 @@ function ThreadRow({
 
       {/* Replies */}
       <TableCell className="text-right">
-        <Link href={`/contribute/t/${thread.id}`} className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
             <MessageSquareReply
               size={18}
@@ -540,8 +596,16 @@ function ThreadRow({
               ? Math.max(0, thread.message_count - 1)
               : '—'}
           </p>
-        </Link>
+        </div>
       </TableCell>
+
+      {/* Floatin link */}
+      <Link
+        href={`/contribute/t/${thread.id}`}
+        className="absolute inset-0 z-0"
+        aria-label={`View thread: ${thread.title}`}
+        tabIndex={1}
+      />
     </TableRow>
   )
 }
