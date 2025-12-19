@@ -48,18 +48,18 @@ type PostResponseData =
 type PostRequestData =
   paths['/platform/projects/{ref}/content/folders']['post']['requestBody']['content']['application/json']
 const handlePost = async (req: NextApiRequest, res: NextApiResponse<PostResponseData>) => {
-  const { name, parent_id } = req.body as PostRequestData
+  const { name } = req.body as PostRequestData
 
   const folder = await createFolder(name)
 
-  return res.status(200).json(folder)
+  return res.status(201).json(folder)
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ids } = req.query
 
   if (!ids || typeof ids !== 'string') {
-    return res.status(400).json({ error: 'Snippet IDs are required' })
+    return res.status(400).json({ error: 'Folder IDs are required' })
   }
   const folderIds = ids.split(',').map((id) => id.trim())
 

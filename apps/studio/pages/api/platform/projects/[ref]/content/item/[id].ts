@@ -25,7 +25,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const snippet = await getSnippet(req.query.id as string)
 
-    return res.status(200).json(snippet!)
+    return res.status(200).json(snippet)
   } catch (error) {
     if (error instanceof Error && error.message.includes('not found')) {
       return res.status(404).json({ message: 'Content not found.' })

@@ -10,6 +10,7 @@ import {
   SnippetSchema,
   updateSnippet,
 } from 'lib/api/snippets.utils'
+import { compact } from 'node_modules/@headlessui/react/dist/utils/render'
 
 const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -68,11 +69,11 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error: any) {
     if (error instanceof Error && error.message.includes('not found')) {
       const body = req.body
-      const { data, error } = SnippetSchema.safeParse(body)
+      const { data, error: parseError } = SnippetSchema.safeParse(body)
 
-      if (error) {
-        console.error('Validation error:', error)
-        return res.status(400).json({ error: error.message })
+      if (parseError) {
+        console.error('Validation error:', parseError)
+        return res.status(400).json({ error: parseError.message })
       }
 
       try {
@@ -83,7 +84,7 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(500).json({ error: 'Failed to create snippet' })
       }
     }
-    return res.status(500).json({ message: error?.message ?? 'Failed to update snippet' })
+    return res.status(500).json({ error: error?.message ?? 'Failed to update snippet' })
   }
 }
 
@@ -93,7 +94,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!ids || typeof ids !== 'string') {
     return res.status(400).json({ error: 'Snippet IDs are required' })
   }
-  const snippetIds = ids.split(',').map((id) => id.trim())
+  const snippetIds = compact(ids.split(',').map((id) => id.trim()))
   if (snippetIds.length === 0) {
     return res.status(400).json({ error: 'No snippet IDs provided' })
   }

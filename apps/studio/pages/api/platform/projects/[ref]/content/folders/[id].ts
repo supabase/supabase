@@ -27,7 +27,7 @@ type GetResponseData =
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
   const params = req.query as GetRequestData
-  const folderId = (params as any)?.id ?? null
+  const folderId = (req.query.id as string) ?? null
 
   const folders = await getFolders(folderId)
   const { cursor, snippets } = await getSnippets({
