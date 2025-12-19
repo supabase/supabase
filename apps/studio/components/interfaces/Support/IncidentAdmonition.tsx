@@ -67,7 +67,7 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
   // Show most recent incident name + count if multiple incidents
   const statusTitle =
     (mostCriticalIncident?.name ?? '') +
-    (hasMultipleIncidents && incidents
+    (hasMultipleIncidents
       ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
       : '')
 
