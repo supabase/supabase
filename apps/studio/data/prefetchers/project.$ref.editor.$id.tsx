@@ -45,7 +45,7 @@ export function prefetchEditorTablePage({
       const supaTable = parseSupaTable(entity)
 
       const { sorts: localSorts = [], filters: localFilters = [] } =
-        loadTableEditorStateFromLocalStorage(projectRef, entity.name, entity.schema) ?? {}
+        loadTableEditorStateFromLocalStorage(projectRef, entity.id) ?? {}
 
       prefetchTableRows(queryClient, {
         projectRef,

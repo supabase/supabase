@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -37,8 +37,8 @@ import {
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -52,7 +52,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'

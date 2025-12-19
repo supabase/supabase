@@ -9,6 +9,7 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { createNavigationHandler } from 'lib/navigation'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -29,16 +30,19 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
       : `${protocol}://${endpoint}/functions/v1/${item.slug}`
 
+  const handleNavigation = createNavigationHandler(`/project/${ref}/functions/${item.slug}`, router)
+
   return (
     <TableRow
       key={item.id}
-      onClick={() => {
-        router.push(`/project/${ref}/functions/${item.slug}`)
-      }}
-      className="cursor-pointer"
+      onClick={handleNavigation}
+      onAuxClick={handleNavigation}
+      onKeyDown={handleNavigation}
+      tabIndex={0}
+      className="cursor-pointer inset-focus"
     >
       <TableCell>
-        <p className="text-sm text-foreground whitespace-nowrap">{item.name}</p>
+        <p className="text-sm text-foreground whitespace-nowrap py-2">{item.name}</p>
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
@@ -72,20 +76,23 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           </button>
         </div>
       </TableCell>
-      <TableCell className="hidden 2xl:table-cell">
+      <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
         <p className="text-foreground-light">
           {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
         </p>
       </TableCell>
       <TableCell className="lg:table-cell">
         <TimestampInfo
-          className="text-sm text-foreground-light"
+          className="text-sm text-foreground-light whitespace-nowrap"
           utcTimestamp={item.updated_at}
           label={dayjs(item.updated_at).fromNow()}
         />
       </TableCell>
       <TableCell className="lg:table-cell">
         <p className="text-foreground-light">{item.version}</p>
+        <button tabIndex={-1} className="sr-only">
+          Go to function details
+        </button>
       </TableCell>
     </TableRow>
   )

@@ -33,9 +33,6 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
-  experimental: {
-    webpackBuildWorker: true,
-  },
   async rewrites() {
     return [
       {
@@ -127,6 +124,11 @@ const nextConfig = {
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/auth/advanced',
+        destination: '/project/:ref/auth/performance',
         permanent: true,
       },
       {
@@ -521,7 +523,6 @@ const nextConfig = {
     ]
   },
   images: {
-    // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
     dangerouslyAllowSVG: false,
     remotePatterns: [
       {
@@ -567,26 +568,6 @@ const nextConfig = {
       },
     },
   },
-  // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
-  webpack(config) {
-    config.module?.rules
-      .find((rule) => rule.oneOf)
-      .oneOf.forEach((rule) => {
-        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
-          const and = rule.issuer.and
-          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
-          delete rule.issuer.and
-        }
-      })
-
-    // .md files to be loaded as raw text
-    config.module.rules.push({
-      test: /\.md$/,
-      type: 'asset/source',
-    })
-
-    return config
-  },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
@@ -596,13 +577,8 @@ const nextConfig = {
     // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
-  },
 }
 
-// module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =

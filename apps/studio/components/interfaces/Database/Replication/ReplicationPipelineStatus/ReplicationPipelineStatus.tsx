@@ -65,7 +65,7 @@ export const ReplicationPipelineStatus = () => {
   const {
     data: pipeline,
     error: pipelineError,
-    isLoading: isPipelineLoading,
+    isPending: isPipelineLoading,
     isError: isPipelineError,
   } = useReplicationPipelineByIdQuery({
     projectRef,
@@ -88,7 +88,7 @@ export const ReplicationPipelineStatus = () => {
 
   const {
     data: replicationStatusData,
-    isLoading: isStatusLoading,
+    isPending: isStatusLoading,
     isError: isStatusError,
   } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId },
@@ -215,8 +215,8 @@ export const ReplicationPipelineStatus = () => {
               </Button>
             )}
             <Input
-              icon={<Search size={12} />}
-              className="pl-7 h-[26px] text-xs"
+              icon={<Search />}
+              className="text-xs"
               placeholder="Search for tables"
               value={searchString}
               disabled={isPipelineError}
@@ -228,7 +228,7 @@ export const ReplicationPipelineStatus = () => {
                         key="close"
                         className="mx-2 cursor-pointer text-foreground"
                         size={14}
-                        strokeWidth={2}
+                        strokeWidth={1.5}
                         onClick={() => setSearchString('')}
                       />,
                     ]

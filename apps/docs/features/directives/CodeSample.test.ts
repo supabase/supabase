@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, it, expect, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { stripIndent } from 'common-tags'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -593,35 +593,35 @@ Some more text.
         const users = [
           { id: 1, name: 'John', email: 'john@example.com' },
           { id: 2, name: 'Jane' },
-        ];
+        ]
 
         function getUserById(id) {
-          return users.find((user) => user.id === id);
+          return users.find((user) => user.id === id)
         }
 
         function createUser(name, email) {
-          const newId = Math.max(...users.map((u) => u.id)) + 1;
-          const newUser = { id: newId, name };
+          const newId = Math.max(...users.map((u) => u.id)) + 1
+          const newUser = { id: newId, name }
           if (email) {
-            newUser.email = email;
+            newUser.email = email
           }
-          users.push(newUser);
-          return newUser;
+          users.push(newUser)
+          return newUser
         }
 
         class UserManager {
-          users = [];
+          users = []
 
           constructor(initialUsers = []) {
-            this.users = initialUsers;
+            this.users = initialUsers
           }
 
           addUser(user) {
-            this.users.push(user);
+            this.users.push(user)
           }
 
           getUsers() {
-            return [...this.users];
+            return [...this.users]
           }
         }
 	\`\`\`
@@ -698,33 +698,33 @@ Some more text.
         const users = [
           { id: 1, name: 'John', email: 'john@example.com' },
           { id: 2, name: 'Jane' },
-        ];
+        ]
 
         // ...
 
         function createUser(name, email) {
-          const newId = Math.max(...users.map((u) => u.id)) + 1;
-          const newUser = { id: newId, name };
+          const newId = Math.max(...users.map((u) => u.id)) + 1
+          const newUser = { id: newId, name }
           if (email) {
-            newUser.email = email;
+            newUser.email = email
           }
-          users.push(newUser);
-          return newUser;
+          users.push(newUser)
+          return newUser
         }
 
         class UserManager {
-          users = [];
+          users = []
 
           constructor(initialUsers = []) {
-            this.users = initialUsers;
+            this.users = initialUsers
           }
 
           addUser(user) {
-            this.users.push(user);
+            this.users.push(user)
           }
 
           getUsers() {
-            return [...this.users];
+            return [...this.users]
           }
         }
         \`\`\`

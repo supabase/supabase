@@ -1,13 +1,17 @@
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
+import {
+  Badge,
+  cn,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 
 import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
-import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -16,20 +20,22 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { type IApiEndPoint } from './Reference.api.utils'
+import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
   ApiSchemaParamDetails,
   CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
-  RequiredBadge,
   ReturnTypeDetails,
   StickyHeader,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
@@ -211,7 +217,11 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     <span className="font-mono text-sm font-medium text-foreground">
                       {flag.name}
                     </span>
-                    <RequiredBadge isOptional={!flag.required} />
+                    {flag.required ? (
+                      <Badge variant="warning">Required</Badge>
+                    ) : (
+                      <Badge variant="default">Optional</Badge>
+                    )}
                   </div>
                   {flag.description && (
                     <ReactMarkdown className="prose break-words text-sm">
@@ -304,15 +314,9 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           <>
             {endpointDetails.summary}
             {endpointDetails.deprecated && (
-              <span
-                className="
-                  uppercase
-                  whitespace-nowrap align-middle inline-block -translate-y-0.5
-                  border border-amber-700 bg-amber-300 text-amber-900
-                  rounded-full font-mono font-medium text-xs px-2 py-0.5 ml-2"
-              >
+              <Badge variant="warning" className="ml-2">
                 deprecated
-              </span>
+              </Badge>
             )}
           </>
         }

@@ -276,7 +276,7 @@ const MapView = ({
                                 `(ID: ${formatDatabaseID(database.identifier)})`
                               }`}
                           {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                            <Badge variant="brand">Healthy</Badge>
+                            <Badge variant="success">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
                           ) : database.status === REPLICA_STATUS.RESTARTING ? (
