@@ -12,7 +12,6 @@ import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-statu
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -21,15 +20,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 export const APIKeys = () => {
   const { ref: projectRef } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-
-  // [Joshen] These will no longer be needed and should be cleaned up in enabled-features
-  const {
-    projectConnectionJavascriptExample: javascriptExampleEnabled,
-    projectConnectionDartExample: dartExampleEnabled,
-  } = useIsFeatureEnabled([
-    'project_connection:javascript_example',
-    'project_connection:dart_example',
-  ])
 
   const {
     data: settings,
@@ -193,7 +183,6 @@ export const APIKeys = () => {
           </CardContent>
 
           <CardContent className="relative overflow-hidden">
-            {/* Background pattern */}
             <div
               className="absolute inset-0 rounded-md -mt-[1px]"
               style={{
@@ -206,7 +195,6 @@ export const APIKeys = () => {
                 backgroundPosition: '0 0, 0 0, 0 0',
               }}
             />
-            {/* Content */}
             <div className="relative mt-6 mb-3">
               <div className="flex gap-x-3.5 relative ml-0.5 mb-4 opacity-80">
                 <ConnectionIcon icon="nextjs" size={26} />
