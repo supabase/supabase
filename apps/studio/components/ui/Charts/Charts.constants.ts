@@ -25,14 +25,14 @@ const LIGHT_STACKED_CHART_COLORS = [
 ]
 
 const LIGHT_STACKED_CHART_FILLS = [
-  '#7CDEB2',
   '#85e0ba',
-  '#85e0ba',
-  '#85e0ba',
-  '#85e0ba',
-  '#85e0ba',
-  '#85e0ba',
-  '#85e0ba',
+  '#f5d4a8',
+  '#7cdeb2',
+  '#f5e8a8',
+  '#a8c9e8',
+  '#8db8f5',
+  '#d9c3e8',
+  '#e8a8d4',
 ]
 
 const DARK_STACKED_CHART_COLORS = [
@@ -47,14 +47,14 @@ const DARK_STACKED_CHART_COLORS = [
 ]
 
 const DARK_STACKED_CHART_FILLS = [
-  '#7FE8B5',
-  '#C7FFD9',
-  '#F5A84D',
-  '#F5E487',
-  '#8DD2E8',
-  '#4A94F5',
-  '#E8B2FF',
-  '#D84DC8',
+  '#222b27',
+  '#1f2b23',
+  '#2b2117',
+  '#2b281e',
+  '#1d252b',
+  '#18222b',
+  '#27202b',
+  '#2b1f28',
 ]
 
 // Default to light mode colors, will be updated based on theme
