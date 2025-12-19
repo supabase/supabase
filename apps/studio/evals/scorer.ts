@@ -101,15 +101,10 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 })
 
 export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
-  const result = await concisenessEvaluator({
+  return await concisenessEvaluator({
     input,
     output: output.stepsSerialized,
   })
-
-  return {
-    name: 'Conciseness',
-    score: result.score ?? 0,
-  }
 }
 
 const completenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
@@ -136,15 +131,10 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
   input,
   output,
 }) => {
-  const result = await completenessEvaluator({
+  return await completenessEvaluator({
     input,
     output: output.stepsSerialized,
   })
-
-  return {
-    name: 'Completeness',
-    score: result.score ?? 0,
-  }
 }
 
 const helpfulnessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
@@ -168,13 +158,8 @@ const helpfulnessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 })
 
 export const helpfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
-  const result = await helpfulnessEvaluator({
+  return await helpfulnessEvaluator({
     input,
     output: output.stepsSerialized,
   })
-
-  return {
-    name: 'Helpfulness',
-    score: result.score ?? 0,
-  }
 }
