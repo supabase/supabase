@@ -298,7 +298,7 @@ export function UnansweredThreadsTable({
                 size="tiny"
                 icon={<X className="h-4 w-4" />}
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                className="absolute right-2 px-1 top-1/2 transform -translate-y-1/2"
                 aria-label="Clear search"
               />
             )}
