@@ -89,8 +89,7 @@ const InfrastructureInfo = () => {
     <>
       <ScaffoldDivider />
       {project?.cloud_provider !== 'FLY' &&
-        // [Joshen TODO] switch this back to unifiedReplication
-        (false ? (
+        (unifiedReplication ? (
           <ScaffoldContainer>
             <ScaffoldSection isFullWidth>
               <NoticeBar
