@@ -52,10 +52,6 @@ export const ReadReplicaEligibilityWarnings = () => {
         )
         setRefetchInterval(5000)
       },
-      onError: () => {
-        toast('test')
-        setRefetchInterval(5000)
-      },
     }
   )
 
@@ -113,7 +109,7 @@ export const ReadReplicaEligibilityWarnings = () => {
         title="Read replicas can only be deployed with projects on Postgres version 15 and above"
       >
         <p>If you'd like to use read replicas, please contact us via support</p>
-        <Button type="default" className="mt-2">
+        <Button asChild type="default" className="mt-2">
           <SupportLink
             queryParams={{
               projectRef,

@@ -89,7 +89,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
             disabled={!canDeployReplica}
           >
             <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ placeholder="Select primary email" />
+              <SelectValue_Shadcn_ placeholder="Select a region" />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
               {availableRegions.map((region) => (
