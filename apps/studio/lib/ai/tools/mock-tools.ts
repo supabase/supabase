@@ -2,13 +2,16 @@ import { tool, type ToolSet } from 'ai'
 import { getRenderingTools } from '../tools/rendering-tools'
 import { z } from 'zod'
 import { getMcpTools } from 'lib/ai/tools/mcp-tools'
+import assert from 'node:assert'
 
 /**
  * Deterministic mock implementations of MCP/platform tools for evals.
  * These mirror tool names used in prompts so the model can call them,
  * but return stable, static data for repeatable tests.
+ *
+ * Note: search_docs uses the real implementation
  */
-export function getMockTools() {
+export async function getMockTools() {
   const renderingTools = getRenderingTools()
 
   const mockedRenderingTools = Object.fromEntries(
@@ -34,35 +37,19 @@ export function getMockTools() {
     })
   ) as typeof renderingTools
 
+  // Real tools from MCP server
+  const { search_docs } = await getMcpTools({
+    accessToken: 'mock-access-token',
+    projectRef: 'mock-project-ref',
+    aiOptInLevel: 'schema_and_log_and_data',
+  })
+
+  assert(search_docs, 'search_docs tool not available from MCP server')
+
   return {
     ...mockedRenderingTools,
 
-    search_docs: tool({
-      description: 'Searches Supabase documentation for the given query (mocked).',
-      inputSchema: z.object({
-        query: z.string(),
-        limit: z.number().optional(),
-      }),
-      execute: async ({ query }: { query: string; limit?: number }) => {
-        return {
-          query,
-          results: [
-            {
-              title: 'Manage project API keys',
-              url: 'https://supabase.com/docs/guides/platform/api-keys',
-              snippet:
-                'Open the Dashboard, navigate to Project Settings > API to view and manage service role and anon keys.',
-            },
-            {
-              title: 'Rotate Supabase API keys',
-              url: 'https://supabase.com/docs/guides/platform/rotate-api-keys',
-              snippet:
-                'Use the Rotate key button from Project Settings > API to issue new credentials.',
-            },
-          ],
-        }
-      },
-    }),
+    search_docs,
 
     list_tables: tool({
       description: 'Lists tables and columns for the provided schemas.',

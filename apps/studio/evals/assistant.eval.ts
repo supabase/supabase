@@ -42,11 +42,21 @@ Eval('Assistant', {
     const toolNames = steps.flatMap((step) => step.toolCalls.map((call) => call.toolName))
 
     const sqlQueries: string[] = []
+    const docs: string[] = []
 
     for (const step of steps) {
       for (const call of step.toolCalls) {
         if (call.toolName === 'execute_sql') {
           sqlQueries.push(call.input.sql)
+        }
+        if (call.toolName === 'search_docs') {
+          const result = step.toolResults.at(0)
+          const searchDocsText = result?.output?.content?.at(0)?.text
+          if (typeof searchDocsText !== 'string') {
+            continue // invalid or missing search_docs text
+          }
+
+          docs.push(searchDocsText)
         }
       }
     }
@@ -55,6 +65,7 @@ Eval('Assistant', {
       stepsSerialized,
       toolNames,
       sqlQueries,
+      docs,
     }
   },
   scores: [

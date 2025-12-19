@@ -2,7 +2,7 @@ import { AssistantEvalCase } from './scorer'
 
 export const dataset: AssistantEvalCase[] = [
   {
-    input: 'How do I implement IP address rate limiting?',
+    input: 'How do I run WASM in edge functions? Use `search_docs`.',
     expected: { requiredTools: ['search_docs'] },
     metadata: { category: ['general_help'] },
   },

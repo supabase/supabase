@@ -10,7 +10,8 @@ type Input = string
 type Output = {
   stepsSerialized: string
   toolNames: string[]
-  sqlQueries?: string[]
+  sqlQueries: string[]
+  docs: string[]
 }
 
 export type Expected = {
