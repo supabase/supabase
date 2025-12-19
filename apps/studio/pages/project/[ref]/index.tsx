@@ -8,7 +8,7 @@ import type { NextPageWithLayout } from 'types'
 const HomePage: NextPageWithLayout = () => {
   const isHomeNewPH = usePHFlag('homeNew')
 
-  if (isHomeNewPH) {
+  if (false) {
     return <HomeV2 />
   }
   return <Home />

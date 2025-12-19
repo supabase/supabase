@@ -2,6 +2,8 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -212,14 +214,12 @@ export const NewProjectPanel = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h2>Connecting to your new project</h2>
-            <p className="text-base text-foreground-light lg:max-w-sm">
+            <p className="text-base text-foreground-light text-balance">
               Interact with your database through the{' '}
-              <Link href={`${DOCS_URL}/reference`} className="text-brand">
-                Supabase client libraries
-              </Link>{' '}
-              with your API keys.
+              <InlineLink href={`${DOCS_URL}/reference`}>Supabase client libraries</InlineLink> with
+              your API keys.
             </p>
-            <p className="text-base text-foreground-light lg:max-w-sm">
+            <p className="text-base text-foreground-light text-balance">
               More information about your project's keys can be found in your project's API
               settings.
             </p>
@@ -228,11 +228,7 @@ export const NewProjectPanel = () => {
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
             </Button>
-            <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
-              <Link href={`${DOCS_URL}/guides/database/api`} target="_blank" rel="noreferrer">
-                About APIs
-              </Link>
-            </Button>
+            <DocsButton href={`${DOCS_URL}/guides/database/api`} />
           </div>
         </div>
       </div>

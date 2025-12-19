@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 
@@ -56,7 +55,7 @@ export const Home = () => {
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const isNewProject = dayjs(project?.inserted_at).isAfter(dayjs().subtract(2, 'day'))
+  const isNewProject = true // dayjs(project?.inserted_at).isAfter(dayjs().subtract(2, 'day'))
 
   useEffect(() => {
     if (enableBranching && !hasShownEnableBranchingModalRef.current) {
