@@ -1,0 +1,120 @@
+import { useMemo } from 'react'
+import { useFlag, useParams } from 'common'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
+import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
+import {
+  useIsVectorBucketsEnabled,
+  useIsAnalyticsBucketsEnabled,
+} from 'data/config/project-storage-config-query'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSetPage } from 'ui-patterns/CommandMenu'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
+
+export function useCreateCommandsConfig() {
+  let { ref } = useParams()
+  ref ||= '_'
+  const setPage = useSetPage()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const snap = useAiAssistantStateSnapshot()
+
+  // Auth
+  const authenticationOauth21 = useFlag('EnableOAuth21')
+
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+
+  const {
+    data: authConfig,
+    isError: isAuthConfigError,
+    isPending: isAuthConfigLoading,
+  } = useAuthConfigQuery({ projectRef: ref })
+
+  const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
+  const entitledHookSet = getEntitledHookSet()
+
+  const { nonAvailableHooks } = useMemo(() => {
+    const allHooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => ({
+      ...definition,
+      enabled: authConfig?.[definition.enabledKey] || false,
+      method: extractMethod(
+        authConfig?.[definition.uriKey] || '',
+        authConfig?.[definition.secretsKey] || ''
+      ),
+    }))
+
+    const nonAvailableHooks: string[] = allHooks
+      .filter((h) => !isValidHook(h) && !entitledHookSet.includes(h.entitlementKey))
+      .map((h) => h.entitlementKey)
+
+    return { nonAvailableHooks }
+  }, [entitledHookSet, authConfig])
+
+  const showAuthConfig = !isAuthConfigError && !isAuthConfigLoading
+
+  const sendSmsHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'send-sms')
+  const sendEmailHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'send-email')
+  const customAccessTokenHook = HOOKS_DEFINITIONS.find(
+    (hook) => hook.id === 'custom-access-token-claims'
+  )
+  const mfaVerificationHook = HOOKS_DEFINITIONS.find(
+    (hook) => hook.id === 'mfa-verification-attempt'
+  )
+  const mfaVerificationHookEnabled =
+    showAuthConfig &&
+    mfaVerificationHook &&
+    nonAvailableHooks.includes(mfaVerificationHook.entitlementKey)
+  const passwordVerificationHook = HOOKS_DEFINITIONS.find(
+    (hook) => hook.id === 'password-verification-attempt'
+  )
+  const passwordVerificationHookEnabled =
+    showAuthConfig &&
+    passwordVerificationHook &&
+    nonAvailableHooks.includes(passwordVerificationHook.entitlementKey)
+  const beforeUserCreatedHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'before-user-created')
+
+  // Storage
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isFreePlan = organization?.plan.id === 'free'
+  const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
+  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
+
+  // Integrations
+  const { installedIntegrations } = useInstalledIntegrations()
+
+  const installedIntegrationIds = useMemo(
+    () => new Set(installedIntegrations.map((integration) => integration.id)),
+    [installedIntegrations]
+  )
+
+  return {
+    ref,
+    setPage,
+    openSidebar,
+    snap,
+    authenticationOauth21,
+    authEnabled,
+    edgeFunctionsEnabled,
+    storageEnabled,
+    sendSmsHook,
+    sendEmailHook,
+    customAccessTokenHook,
+    mfaVerificationHook,
+    mfaVerificationHookEnabled,
+    passwordVerificationHook,
+    passwordVerificationHookEnabled,
+    beforeUserCreatedHook,
+    isFreePlan,
+    isVectorBucketsEnabled,
+    isAnalyticsBucketsEnabled,
+    installedIntegrationIds,
+  }
+}

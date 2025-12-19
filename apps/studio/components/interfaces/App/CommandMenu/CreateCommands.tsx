@@ -1,14 +1,14 @@
 'use client'
 
 import { useMemo } from 'react'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import dynamic from 'next/dynamic'
+import { IS_PLATFORM } from 'common'
 import {
   BarChart3,
   Binary,
   Code2,
   FolderPlus,
   KeyRound,
-  Layers,
   ListChecks,
   ListTree,
   LockKeyhole,
@@ -22,75 +22,52 @@ import {
   Webhook,
   Zap,
   Table2,
-  Sparkles,
   MessageCircle,
   Mail,
   Lock,
 } from 'lucide-react'
-import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
-  type CommandOptions,
   useRegisterCommands,
   useRegisterPage,
-  useSetPage,
   useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
-import { EdgeFunctions } from 'icons'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
-import { type Hook, HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
-import { AiIconAnimation, Badge } from 'ui'
-import {
-  useIsVectorBucketsEnabled,
-  useIsAnalyticsBucketsEnabled,
-} from 'data/config/project-storage-config-query'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useCreateCommandsConfig } from './CreateCommands.utils'
+import type { CommandOptions } from 'ui-patterns/CommandMenu'
+import type { ICommand } from 'ui-patterns/CommandMenu'
+
+const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
+const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
+const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFunctions))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
 export function useCreateCommands(options?: CommandOptions) {
-  let { ref } = useParams()
-  ref ||= '_'
-  const setPage = useSetPage()
   const setIsOpen = useSetCommandMenuOpen()
-  const { openSidebar } = useSidebarManagerSnapshot()
-  const snap = useAiAssistantStateSnapshot()
-  const authenticationOauth21 = useFlag('EnableOAuth21')
-
   const {
-    authenticationSignInProviders,
-    authenticationRateLimits,
-    authenticationEmails,
-    authenticationMultiFactor,
-    authenticationAttackProtection,
-    authenticationPerformance,
-  } = useIsFeatureEnabled([
-    'authentication:sign_in_providers',
-    'authentication:rate_limits',
-    'authentication:emails',
-    'authentication:multi_factor',
-    'authentication:attack_protection',
-    'authentication:performance',
-  ])
-
-  const {
-    projectAuthAll: authEnabled,
-    projectEdgeFunctionAll: edgeFunctionsEnabled,
-    projectStorageAll: storageEnabled,
-    realtimeAll: realtimeEnabled,
-  } = useIsFeatureEnabled([
-    'project_auth:all',
-    'project_edge_function:all',
-    'project_storage:all',
-    'realtime:all',
-  ])
+    ref,
+    setPage,
+    openSidebar,
+    snap,
+    authenticationOauth21,
+    authEnabled,
+    edgeFunctionsEnabled,
+    storageEnabled,
+    sendSmsHook,
+    sendEmailHook,
+    customAccessTokenHook,
+    mfaVerificationHook,
+    mfaVerificationHookEnabled,
+    passwordVerificationHook,
+    passwordVerificationHookEnabled,
+    beforeUserCreatedHook,
+    isFreePlan,
+    isVectorBucketsEnabled,
+    isAnalyticsBucketsEnabled,
+    installedIntegrationIds,
+  } = useCreateCommandsConfig()
 
   const databaseCommands = useMemo(
     () =>
@@ -134,55 +111,6 @@ export function useCreateCommands(options?: CommandOptions) {
       ].filter(Boolean) as ICommand[],
     [ref]
   )
-
-  const {
-    data: authConfig,
-    isError: isAuthConfigError,
-    isPending: isAuthConfigLoading,
-  } = useAuthConfigQuery({ projectRef: ref })
-
-  const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
-  const entitledHookSet = getEntitledHookSet()
-
-  const { nonAvailableHooks } = useMemo(() => {
-    const allHooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => ({
-      ...definition,
-      enabled: authConfig?.[definition.enabledKey] || false,
-      method: extractMethod(
-        authConfig?.[definition.uriKey] || '',
-        authConfig?.[definition.secretsKey] || ''
-      ),
-    }))
-
-    const nonAvailableHooks: string[] = allHooks
-      .filter((h) => !isValidHook(h) && !entitledHookSet.includes(h.entitlementKey))
-      .map((h) => h.entitlementKey)
-
-    return { nonAvailableHooks }
-  }, [entitledHookSet, authConfig])
-
-  const showAuthConfig = !isAuthConfigError && !isAuthConfigLoading
-
-  const sendSmsHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'send-sms')
-  const sendEmailHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'send-email')
-  const customAccessTokenHook = HOOKS_DEFINITIONS.find(
-    (hook) => hook.id === 'custom-access-token-claims'
-  )
-  const mfaVerificationHook = HOOKS_DEFINITIONS.find(
-    (hook) => hook.id === 'mfa-verification-attempt'
-  )
-  const mfaVerificationHookEnabled =
-    showAuthConfig &&
-    mfaVerificationHook &&
-    nonAvailableHooks.includes(mfaVerificationHook.entitlementKey)
-  const passwordVerificationHook = HOOKS_DEFINITIONS.find(
-    (hook) => hook.id === 'password-verification-attempt'
-  )
-  const passwordVerificationHookEnabled =
-    showAuthConfig &&
-    passwordVerificationHook &&
-    nonAvailableHooks.includes(passwordVerificationHook.entitlementKey)
-  const beforeUserCreatedHook = HOOKS_DEFINITIONS.find((hook) => hook.id === 'before-user-created')
 
   const authCommands = useMemo(
     () =>
@@ -263,14 +191,14 @@ export function useCreateCommands(options?: CommandOptions) {
     [
       ref,
       authEnabled,
-      sendSmsHook?.id,
-      sendEmailHook?.id,
-      customAccessTokenHook?.id,
-      mfaVerificationHook?.id,
+      sendSmsHook,
+      sendEmailHook,
+      customAccessTokenHook,
+      mfaVerificationHook,
       mfaVerificationHookEnabled,
-      passwordVerificationHook?.id,
+      passwordVerificationHook,
       passwordVerificationHookEnabled,
-      beforeUserCreatedHook?.id,
+      beforeUserCreatedHook,
       authenticationOauth21,
     ]
   )
@@ -341,9 +269,6 @@ export function useCreateCommands(options?: CommandOptions) {
     [ref, edgeFunctionsEnabled, openSidebar, snap, setIsOpen]
   )
 
-  const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
-  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
-
   const storageCommands = useMemo(
     () =>
       storageEnabled
@@ -359,25 +284,24 @@ export function useCreateCommands(options?: CommandOptions) {
               name: 'Create Storage Bucket (Analytics)',
               route: `/project/${ref}/storage/analytics?new=true`,
               icon: () => <BarChart3 />,
-              badge: () => (isAnalyticsBucketsEnabled ? <Badge>Pro</Badge> : null),
+              badge: () => (isFreePlan ? <Badge>Pro</Badge> : null),
+              className: !isAnalyticsBucketsEnabled
+                ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                : '',
             },
             {
               id: 'create-storage-bucket-vectors',
               name: 'Create Storage Bucket (Vectors)',
               route: `/project/${ref}/storage/vectors?new=true`,
               icon: () => <Binary />,
-              badge: () => (isVectorBucketsEnabled ? <Badge>Pro</Badge> : null),
+              badge: () => (isFreePlan ? <Badge>Pro</Badge> : null),
+              className: !isVectorBucketsEnabled
+                ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                : '',
             },
           ].filter(Boolean) as ICommand[])
         : [],
-    [ref, storageEnabled, isAnalyticsBucketsEnabled, isVectorBucketsEnabled]
-  )
-
-  const { installedIntegrations } = useInstalledIntegrations()
-
-  const installedIntegrationIds = useMemo(
-    () => new Set(installedIntegrations.map((integration) => integration.id)),
-    [installedIntegrations]
+    [ref, storageEnabled, isFreePlan, isAnalyticsBucketsEnabled, isVectorBucketsEnabled]
   )
 
   const integrationsCommands = useMemo(
