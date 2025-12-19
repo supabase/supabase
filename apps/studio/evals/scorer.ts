@@ -1,5 +1,5 @@
 import { EvalCase, EvalScorer } from 'braintrust'
-import { ClosedQA, Sql, LLMClassifierFromTemplate } from 'autoevals'
+import { LLMClassifierFromTemplate } from 'autoevals'
 import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 
@@ -15,9 +15,6 @@ type Output = {
 
 export type Expected = {
   requiredTools?: string[]
-  sqlQuery?: string
-  criteria?: string
-  textIncludes?: string
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -52,64 +49,6 @@ export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
   return {
     name: 'Tool Usage',
     score: ratio,
-  }
-}
-
-export const sqlSimilarityScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-  expected,
-}) => {
-  if (!expected.sqlQuery) return null
-
-  const sqlQuery = output.sqlQueries?.[0]
-  let score = 0
-
-  if (sqlQuery) {
-    const sqlResult = await Sql({
-      input,
-      output: sqlQuery,
-      expected: expected.sqlQuery,
-      model: LLM_AS_A_JUDGE_MODEL,
-    })
-    score = sqlResult.score ?? 0
-  }
-
-  return {
-    name: 'SQL Similarity',
-    score,
-  }
-}
-
-export const criteriaMetScorer: EvalScorer<Input, Output, Expected> = async ({
-  output,
-  expected,
-}) => {
-  if (!expected.criteria) return null
-
-  const qaResult = await ClosedQA({
-    input: 'According to the provided criterion is the submission correct?',
-    output: output.stepsSerialized,
-    criteria: expected.criteria,
-    model: LLM_AS_A_JUDGE_MODEL,
-  })
-
-  return {
-    name: 'Criteria Met',
-    score: qaResult.score ?? 0,
-  }
-}
-
-export const textIncludesScorer: EvalScorer<Input, Output, Expected> = async ({
-  output,
-  expected,
-}) => {
-  if (!expected.textIncludes) return null
-
-  const includes = output.stepsSerialized.includes(expected.textIncludes)
-  return {
-    name: 'Text Includes',
-    score: includes ? 1 : 0,
   }
 }
 
@@ -204,6 +143,38 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
 
   return {
     name: 'Completeness',
+    score: result.score ?? 0,
+  }
+}
+
+const helpfulnessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
+  name: 'Helpfulness',
+  promptTemplate: stripIndent`
+    Evaluate whether this response addresses what the user asked.
+    
+    Input: {{input}}
+    Output: {{output}}
+    
+    Does the response address what the user asked?
+    a) Fully addresses - completely answers the question or fulfills the request
+    b) Mostly addresses - addresses the main request with minor gaps
+    c) Partially addresses - addresses some aspects but misses key parts
+    d) Barely addresses - tangentially related but doesn't fulfill the request
+    e) Doesn't address - off-topic or fails to address the request
+  `,
+  choiceScores: { a: 1, b: 0.75, c: 0.5, d: 0.25, e: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const helpfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
+  const result = await helpfulnessEvaluator({
+    input,
+    output: output.stepsSerialized,
+  })
+
+  return {
+    name: 'Helpfulness',
     score: result.score ?? 0,
   }
 }

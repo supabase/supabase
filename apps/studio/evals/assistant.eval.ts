@@ -7,10 +7,8 @@ import { dataset } from './dataset'
 import {
   completenessScorer,
   concisenessScorer,
-  criteriaMetScorer,
-  sqlSimilarityScorer,
+  helpfulnessScorer,
   sqlSyntaxScorer,
-  textIncludesScorer,
   toolUsageScorer,
 } from './scorer'
 
@@ -61,10 +59,8 @@ Eval('Assistant', {
   },
   scores: [
     toolUsageScorer,
-    sqlSimilarityScorer,
     sqlSyntaxScorer,
-    criteriaMetScorer,
-    textIncludesScorer,
+    helpfulnessScorer,
     concisenessScorer,
     completenessScorer,
   ],
