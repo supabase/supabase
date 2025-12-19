@@ -82,7 +82,6 @@ export const Grid = memo(
       const table = snap.table
       const isSelectedTable = isTableLike(snap.originalTable)
       const isSelectedForeignTable = isForeignTable(snap.originalTable)
-      const isValidEntity = isSelectedTable || isSelectedForeignTable
       const isTableEmpty = (rows ?? []).length === 0
 
       const { can: canEditTables } = useAsyncCheckPermissions(
@@ -98,8 +97,7 @@ export const Grid = memo(
       const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema ?? '' })
 
       const hasPermissionToImportData = canEditTables && canEditColumns
-      const canImportData =
-        !isSchemaLocked && (isValidEntity) && hasPermissionToImportData
+      const canImportData = !isSchemaLocked && isSelectedTable && hasPermissionToImportData
 
       const { mutate: sendEvent } = useSendEventMutation()
 
@@ -127,8 +125,10 @@ export const Grid = memo(
           ? 'Drop your CSV file here'
           : 'Only CSV files are accepted'
         : 'This table is empty'
-
-      const messageClassName = isDraggedOver && !isValidFileDraggedOver ? 'text-destructive' : ''
+                        
+      const messageClassName = isDraggedOver && !isValidFileDraggedOver
+        ? 'text-destructive'
+        : ''
 
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
@@ -209,8 +209,13 @@ export const Grid = memo(
                       {!canImportData ? (
                         <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center pointer-events-auto">
                           <div className="max-w-xl">
-                            <h3 className="text-xl text-center mb-4">This entity is empty</h3>
-                            {!isValidEntity ? (
+                          <h3 className="text-xl text-center mb-4">This entity is empty</h3>
+                            {isSelectedForeignTable ? (
+                              <p className="text-sm text-light text-center">
+                                This table is a foreign table. Add data to the connected source to
+                                get started.
+                              </p>
+                            ) : !isSelectedTable ? (
                               <Admonition
                                 type="default"
                                 className="max-w-sm"
@@ -226,40 +231,33 @@ export const Grid = memo(
                       ) : (
                         <div className="flex flex-col items-center justify-center col-span-full h-full">
                           <p className="text-sm text-light pointer-events-auto">
-                            <span className={messageClassName}>{emptyStateMessage}</span>
+                            <span className={messageClassName}>
+                              {emptyStateMessage}
+                            </span>
                           </p>
-                          {isSelectedForeignTable ? (
-                            <div className="flex items-center space-x-2 mt-4">
-                              <p className="text-sm text-light pointer-events-auto">
-                                This table is a foreign table. Add data to the connected source to
-                                get started.
+                          {!isDraggedOver && (
+                            <div className="flex flex-col items-center gap-4 mt-4">
+                              <Button
+                                type="default"
+                                className="pointer-events-auto"
+                                onClick={() => {
+                                  tableEditorSnap.onImportData()
+                                  sendEvent({
+                                    action: 'import_data_button_clicked',
+                                    properties: { tableType: 'Existing Table' },
+                                    groups: {
+                                      project: project?.ref ?? 'Unknown',
+                                      organization: org?.slug ?? 'Unknown',
+                                    },
+                                  })
+                                }}
+                              >
+                                Import data from CSV
+                              </Button>
+                              <p className="text-xs text-foreground-light pointer-events-auto">
+                                or drag and drop a CSV file here
                               </p>
                             </div>
-                          ) : (
-                            !isDraggedOver && (
-                              <div className="flex flex-col items-center gap-4 mt-4">
-                                <Button
-                                  type="default"
-                                  className="pointer-events-auto"
-                                  onClick={() => {
-                                    tableEditorSnap.onImportData()
-                                    sendEvent({
-                                      action: 'import_data_button_clicked',
-                                      properties: { tableType: 'Existing Table' },
-                                      groups: {
-                                        project: project?.ref ?? 'Unknown',
-                                        organization: org?.slug ?? 'Unknown',
-                                      },
-                                    })
-                                  }}
-                                >
-                                  Import data from CSV
-                                </Button>
-                                <p className="text-xs text-foreground-light pointer-events-auto">
-                                  or drag and drop a CSV file here
-                                </p>
-                              </div>
-                            )
                           )}
                         </div>
                       )}
