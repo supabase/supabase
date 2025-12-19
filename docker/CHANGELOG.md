@@ -14,6 +14,7 @@ Check updates for each service to learn more.
 ## Unreleased
 
 - Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901)
+- Studio: Added optional `OPENAI_BASE_URL` support to configure OpenAI-compatible proxies (requires `docker-compose.yml` update)
 
 ---
 

@@ -33,6 +33,7 @@ export const config = {
 }
 
 const openAiKey = process.env.OPENAI_API_KEY
+const openAiBaseUrl = process.env.OPENAI_BASE_URL?.trim() || 'https://api.openai.com/v1'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -92,7 +93,7 @@ export default async function handler(req: NextRequest) {
 }
 
 async function handlePost(request: NextRequest) {
-  const openai = new OpenAI({ apiKey: openAiKey })
+  const openai = new OpenAI({ apiKey: openAiKey, baseURL: openAiBaseUrl })
 
   const body = await (request.json() as Promise<{
     messages: { content: string; role: 'user' | 'assistant' }[]
