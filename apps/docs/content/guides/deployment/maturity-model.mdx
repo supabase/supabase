@@ -4,17 +4,23 @@ title: 'Maturity Model'
 description: 'Growing with your application.'
 ---
 
-Supabase is great for building something very fast _and_ for scaling up. However, it's important to note that as your application matures and your team expands, the practices you use for managing an application in production should not be the same as the practices you used for prototyping.
+Supabase is great for building applications quickly _and_ for scaling them over time. However, as your application matures and your team grows, the practices you use to manage production systems should evolve beyond the approaches used during early prototyping.
+
+This guide outlines recommended practices as your project progresses through different stages of maturity.
 
 ## Prototyping
 
-The Dashboard is a quick and easy tool for building applications while you are prototyping. That said, we strongly recommend using [Migrations](/docs/guides/deployment/database-migrations) to manage your database changes. You can use our CLI to [capture any changes](/docs/reference/cli/supabase-db-diff) you have made on the Dashboard so that you can commit them a version control system, like git.
+The Dashboard is a fast and convenient way to build applications during the prototyping phase. That said, we strongly recommend using [Database Migrations](/docs/guides/deployment/database-migrations) to manage schema changes—even early on.
+
+You can use the Supabase CLI to [capture changes](/docs/reference/cli/supabase-db-diff) made through the Dashboard and commit them to a version control system such as Git. This ensures your database changes are reproducible and traceable from the beginning.
 
 ## Collaborating
 
-As soon as you start collaborating with team members, all project changes should be in version control. At this point we strongly recommend moving away from using the Dashboard for schema changes. Use migrations to manage your database, and check them into your version control system to track every change.
+Once you begin collaborating with other team members, **all project changes should be tracked in version control**.
 
-Resources:
+At this stage, we strongly recommend moving away from using the Dashboard for schema changes. Instead, use migrations to manage your database and commit them to your repository so every change is reviewed, tracked, and auditable.
+
+**Resources:**
 
 - [Database migrations](/docs/guides/deployment/database-migrations)
 - [Managing access on the Dashboard](/docs/guides/platform/access-control)
@@ -22,16 +28,19 @@ Resources:
 
 ## In production
 
-Once your application is live, you should never change your database using the Dashboard - everything should be done with [Migrations](/docs/guides/cli/managing-environments#create-a-new-migration). Some other important things to consider at this point include:
+When your application is live, you should **never** make database changes directly through the Dashboard. All changes should be applied using [migrations](/docs/guides/cli/managing-environments#create-a-new-migration).
 
-- The Dashboard has various [access levels](/docs/guides/platform/access-control) that can prevent changes being made via the UI.
-- Design a [safe workflow](/docs/guides/platform/shared-responsibility-model#you-decide-your-own-workflow) for managing your database. We strongly recommend running [multiple environments](/docs/guides/cli/managing-environments) as part of your development workflow (`local` -> `staging` -> `prod`).
-- Do not share any production passwords with your team, _especially_ your `postgres` password. All changes should be made via version-controlled migrations which run via a bastion host or a CI platform (like [GitHub Actions](/docs/guides/cli/managing-environments#configure-github-actions). If you use GitHub Actions, use [approval workflows](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments) to prevent any migrations being run accidentally.
-- Restrict production access to your database using [Network Restrictions](/docs/guides/platform/network-restrictions).
-- As your database to grows, we strongly recommend moving to [Point-in-Time Recovery](/docs/guides/platform/backups#point-in-time-recovery). This is safer and has less impact on your database performance during maintenance windows.
-- Read the [Production Checklist](/docs/guides/platform/going-into-prod) and familiarize your team with the [Shared Responsibilities](/docs/guides/platform/shared-responsibility-model) between your organization and Supabase.
+Additional best practices to follow in production include:
 
-Resources:
+- Use the Dashboard’s [access levels](/docs/guides/platform/access-control) to prevent unauthorized or accidental changes.
+- Design a [safe workflow](/docs/guides/platform/shared-responsibility-model#you-decide-your-own-workflow) for managing database changes. We strongly recommend using [multiple environments](/docs/guides/cli/managing-environments) as part of your development process (`local` → `staging` → `production`).
+- Never share production credentials, especially your `postgres` password. All changes should be applied via version-controlled migrations executed through a bastion host or a CI/CD platform such as [GitHub Actions](/docs/guides/cli/managing-environments#configure-github-actions).  
+  When using GitHub Actions, enable [approval workflows](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments) to prevent accidental deployments.
+- Restrict access to your production database using [Network Restrictions](/docs/guides/platform/network-restrictions).
+- As your database grows, we strongly recommend enabling [Point-in-Time Recovery](/docs/guides/platform/backups#point-in-time-recovery). This provides safer recovery options with minimal performance impact during maintenance.
+- Review the [Production Checklist](/docs/guides/platform/going-into-prod) and ensure your team understands the [Shared Responsibility Model](/docs/guides/platform/shared-responsibility-model) between your organization and Supabase.
+
+**Resources:**
 
 - [Database migrations](/docs/guides/deployment/database-migrations)
 - [Managing access on the Dashboard](/docs/guides/platform/access-control)
@@ -40,6 +49,6 @@ Resources:
 
 ## Enterprise
 
-For a more secure setup, consider running your workload across several organizations. It's a common pattern to have a Production organization which is restricted to only those team members who are qualified to have direct access to production databases.
+For organizations with stricter security requirements, consider running workloads across multiple Supabase organizations. A common pattern is to maintain a dedicated Production organization that is accessible only to team members who are qualified to manage live systems.
 
-Reach out to [growth](https://forms.supabase.com/enterprise) if you need help designing a secure development workflow for your organization.
+If you need help designing a secure and scalable development workflow, reach out to the Supabase team via the [Enterprise contact form](https://forms.supabase.com/enterprise).
