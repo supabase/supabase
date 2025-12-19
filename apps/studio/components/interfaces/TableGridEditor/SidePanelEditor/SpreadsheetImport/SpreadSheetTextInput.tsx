@@ -12,10 +12,10 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Tab" && !event.shiftKey) {
-      if (!input.endsWith("\t")) {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      if (!input.endsWith('\t')) {
         event.preventDefault()
-        onInputChange(input + "\t")
+        onInputChange(input + '\t')
       }
     }
   }

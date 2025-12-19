@@ -205,7 +205,7 @@ export function flagInvalidFileImport(file: File): boolean {
   } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
     toast.error(
       <div className="space-y-1">
-        <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
+        <p>The dashboard currently only supports importing of files below 100MB.</p>
         <p>For bulk data loading, we recommend doing so directly through the database.</p>
         <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
           <Link
