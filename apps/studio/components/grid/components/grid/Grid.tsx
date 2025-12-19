@@ -125,10 +125,8 @@ export const Grid = memo(
           ? 'Drop your CSV file here'
           : 'Only CSV files are accepted'
         : 'This table is empty'
-                        
-      const messageClassName = isDraggedOver && !isValidFileDraggedOver
-        ? 'text-destructive'
-        : ''
+
+      const messageClassName = isDraggedOver && !isValidFileDraggedOver ? 'text-destructive' : ''
 
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
@@ -230,9 +228,7 @@ export const Grid = memo(
                       ) : (
                         <div className="flex flex-col items-center justify-center col-span-full h-full">
                           <p className="text-sm text-light pointer-events-auto">
-                            <span className={messageClassName}>
-                              {emptyStateMessage}
-                            </span>
+                            <span className={messageClassName}>{emptyStateMessage}</span>
                           </p>
                           {!isDraggedOver && (
                             <div className="flex flex-col items-center gap-4 mt-4">
