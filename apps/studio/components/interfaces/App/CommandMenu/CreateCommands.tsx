@@ -367,17 +367,19 @@ export function useCreateCommands(options?: CommandOptions) {
   }, [ref, allIntegrations, installedIntegrationIds])
 
   const observabilityCommands = useMemo(
-    () =>
-      IS_PLATFORM && reportsEnabled
+    () => [
+      ...(IS_PLATFORM && reportsEnabled
         ? [
             {
               id: 'create-observability-report',
               name: 'Create Custom Report',
-              route: `/project/${ref}/observability/api-overview?newReport=true`,
+              route:
+                `/project/${ref}/observability/api-overview?newReport=true` as unknown as `/${string}`,
               icon: () => <Telescope />,
             },
           ]
-        : [],
+        : []),
+    ],
     [ref, reportsEnabled]
   )
 
