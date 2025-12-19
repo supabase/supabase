@@ -42,18 +42,18 @@ function ThreadsTable({
 }) {
   return (
     <Card>
-      <Table className="table-fixed min-w-[900px] mt-0">
-        <TableHeader>
+      <Table className="min-w-[900px] mt-0">
+        <TableHeader className="sr-only">
           <TableRow>
-            <TableHead className="w-[45%]">Thread</TableHead>
-            <TableHead className="w-[20%]">Stack</TableHead>
-            <TableHead className="w-[10%]">Replies</TableHead>
+            <TableHead>Thread</TableHead>
+            <TableHead>Stack</TableHead>
+            <TableHead>Replies</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {threads.length === 0 ? (
             <TableRow className="[&>td]:hover:bg-inherit">
-              <TableCell colSpan={3} className="text-center text-foreground-lighter">
+              <TableCell colSpan={3} className="text-center text-foreground-lighter py-6">
                 No threads found
               </TableCell>
             </TableRow>
@@ -373,7 +373,7 @@ function ThreadRow({
   return (
     <TableRow>
       {/* Thread title and product areas */}
-      <TableCell className="w-[45%]">
+      <TableCell className="min-w-[400px]">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Channel icon */}
           <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md ">
@@ -450,8 +450,8 @@ function ThreadRow({
         </div>
       </TableCell>
       {/* Stack */}
-      <TableCell className="w-[20%]">
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0 overflow-hidden">
+      <TableCell>
+        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 overflow-hidden">
           {thread.stack.length > 0 ? (
             (() => {
               const filteredStack = thread.stack.filter((tech: string) => tech !== 'Other')
@@ -517,7 +517,7 @@ function ThreadRow({
       </TableCell>
 
       {/* Replies */}
-      <TableCell className="w-[10%]">
+      <TableCell className="text-right">
         <Link href={`/contribute/t/${thread.id}`} className="flex flex-row items-center gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
             <MessageSquareReply
