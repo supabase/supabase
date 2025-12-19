@@ -28,7 +28,11 @@ import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagement.types'
-import { calculateComputeSizePrice, getAvailableComputeOptions } from '../DiskManagement.utils'
+import {
+  calculateComputeSizePrice,
+  getAvailableComputeOptions,
+  ComputeAddonVariant,
+} from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
@@ -36,14 +40,6 @@ import { NoticeBar } from '../ui/NoticeBar'
 /**
  * to do: this could be a type from api-types
  */
-type ComputeOption = {
-  identifier: ComputeInstanceAddonVariantId
-  name: string
-  price: number
-  price_interval: 'monthly' | 'hourly'
-  meta?: InstanceSpecs
-}
-
 type ComputeSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
   disabled?: boolean
@@ -170,7 +166,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 </FormMessage>
               ) : (
                 <>
-                  {availableOptions.map((compute: ComputeOption) => {
+                  {availableOptions.map((compute) => {
                     const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
 
                     const lockedMicroDueToPITR =
@@ -187,9 +183,20 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       project?.infra_compute_size === 'nano' &&
                       compute.identifier === 'ci_nano'
                         ? availableOptions.find(
-                            (option: ComputeOption) => option.identifier === 'ci_micro'
+                            (option: ComputeAddonVariant) => option.identifier === 'ci_micro'
                           )?.price
                         : compute.price
+
+                    const cpuLabel = (() => {
+                      const cpuCores = compute.meta?.cpu_cores
+                      if (typeof cpuCores === 'number') {
+                        return `${cpuCores}-core ${cpuArchitecture} CPU`
+                      }
+                      if (cpuCores) {
+                        return `${cpuCores} CPU`
+                      }
+                      return 'CPU'
+                    })()
 
                     return (
                       <RadioGroupCardItem
@@ -263,12 +270,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                           size={14}
                                           className="text-foreground-lighter"
                                         />
-                                        <span>
-                                          {compute.meta?.cpu_cores ?? 0}
-                                          {compute.meta?.cpu_cores !== 'Shared' &&
-                                            `-core ${cpuArchitecture}`}{' '}
-                                          CPU
-                                        </span>
+                                        <span>{cpuLabel}</span>
                                       </div>
                                     </div>
                                   </div>
