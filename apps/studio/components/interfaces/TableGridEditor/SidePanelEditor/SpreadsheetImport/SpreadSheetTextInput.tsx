@@ -12,9 +12,11 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Tab") {
-      event.preventDefault()
-      onInputChange(input + "\t")
+    if (event.key === "Tab" && !event.shiftKey) {
+      if (!input.endsWith("\t")) {
+        event.preventDefault()
+        onInputChange(input + "\t")
+      }
     }
   }
   return (
@@ -27,7 +29,10 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
           <code>_</code>).
         </p>
         <p className="text-sm text-foreground-lighter">
-          Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
+          Tip 1: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
+        </p>
+        <p className="text-sm text-foreground-lighter">
+          Tip 2: Press <kbd>Tab</kbd> 2 times to move focus to the next element
         </p>
       </div>
       <Input.TextArea
