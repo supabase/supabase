@@ -2621,6 +2621,60 @@ export interface IntegrationInstalledEvent {
 }
 
 /**
+ * User started installing an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallStartedEvent {
+  action: 'integration_install_started'
+  properties: {
+    /**
+     * The name of the integration being installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started uninstalling an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallStartedEvent {
+  action: 'integration_uninstall_started'
+  properties: {
+    /**
+     * The name of the integration being uninstalled
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Installation failed for an integration.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallFailedEvent {
+  action: 'integration_install_failed'
+  properties: {
+    /**
+     * The name of the integration whose installation failed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User uninstalled an integration via the integrations marketplace in the dashboard.
  * Note: This excludes Wrappers and Postgres Extensions.
  *
@@ -2785,4 +2839,7 @@ export type TelemetryEvent =
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | IntegrationInstalledEvent
+  | IntegrationInstallStartedEvent
+  | IntegrationUninstallStartedEvent
+  | IntegrationInstallFailedEvent
   | IntegrationUninstalledEvent

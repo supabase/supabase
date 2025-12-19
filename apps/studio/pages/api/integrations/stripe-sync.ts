@@ -1,9 +1,39 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 import { install, uninstall } from 'stripe-experiment-sync/supabase'
 import { VERSION } from 'stripe-experiment-sync'
 import { waitUntil } from '@vercel/functions'
 
+const ENABLE_FLAG_KEY = 'enableStripeSyncEngineIntegration'
+
+const InstallBodySchema = z.object({
+  projectRef: z.string().min(1),
+  stripeSecretKey: z.string().min(1),
+})
+
+const UninstallBodySchema = z.object({
+  projectRef: z.string().min(1),
+})
+
+async function isStripeSyncEnabled() {
+  // The ConfigClient doesn't seem to work properly so we'll just gate access from the frontend
+  // for now
+  return true
+}
+
+function getBearerToken(req: NextApiRequest) {
+  const authHeader = req.headers.authorization
+  if (!authHeader || Array.isArray(authHeader)) return null
+  const match = authHeader.match(/^Bearer\s+(.+)$/i)
+  return match?.[1]?.trim() ?? null
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Hide endpoint if the integration is disabled.
+  if (!(await isStripeSyncEnabled())) {
+    return res.status(404).json({ data: null, error: { message: 'Not Found' } })
+  }
+
   const { method } = req
   switch (method) {
     case 'POST':
@@ -18,26 +48,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const authHeader = req.headers['authorization']
-  if (!authHeader || Array.isArray(authHeader)) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Missing Supabase token' } })
-  }
-  const supabaseToken = authHeader.replace('Bearer ', '')
-  const { projectRef, stripeSecretKey } = req.body
-
+  const supabaseToken = getBearerToken(req)
   if (!supabaseToken) {
     return res
       .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Missing Supabase token' } })
+      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
   }
 
-  if (!projectRef) {
+  const parsed = UninstallBodySchema.safeParse(req.body)
+  if (!parsed.success) {
     return res
       .status(400)
-      .json({ data: null, error: { message: 'Bad Request: Missing projectRef in request body' } })
+      .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
+  const { projectRef } = parsed.data
+
   waitUntil(
     uninstall({
       supabaseAccessToken: supabaseToken,
@@ -56,33 +81,20 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
 }
 
 async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const authHeader = req.headers['authorization']
-  if (!authHeader || Array.isArray(authHeader)) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Missing Supabase token' } })
-  }
-  const supabaseToken = authHeader.replace('Bearer ', '')
-  const { projectRef, stripeSecretKey } = req.body
-
+  const supabaseToken = getBearerToken(req)
   if (!supabaseToken) {
     return res
       .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Missing Supabase token' } })
+      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
   }
 
-  if (!projectRef) {
+  const parsed = InstallBodySchema.safeParse(req.body)
+  if (!parsed.success) {
     return res
       .status(400)
-      .json({ data: null, error: { message: 'Bad Request: Missing projectRef in request body' } })
+      .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
-
-  if (!stripeSecretKey) {
-    return res.status(400).json({
-      data: null,
-      error: { message: 'Bad Request: Missing stripeSecretKey in request body' },
-    })
-  }
+  const { projectRef, stripeSecretKey } = parsed.data
 
   // Validate the Stripe API key before proceeding with installation
   try {

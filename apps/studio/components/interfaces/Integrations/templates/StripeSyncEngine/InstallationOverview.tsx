@@ -5,9 +5,10 @@ import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-st
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { formatRelative } from 'date-fns'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTrack } from 'lib/telemetry/track'
 import { AlertCircle, BadgeCheck, Check, ExternalLink, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -34,8 +35,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
@@ -43,8 +42,8 @@ const installFormSchema = z.object({
 
 export const StripeSyncInstallationPage = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
+  const hasTrackedInstallFailed = useRef(false)
 
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
   const [isInstallInitiated, setIsInstallInitiated] = useState(false)
@@ -71,16 +70,6 @@ export const StripeSyncInstallationPage = () => {
   } = useStripeSyncInstallMutation({
     onSuccess: () => {
       toast.success('Stripe Sync installation started')
-      sendEvent({
-        action: 'integration_installed',
-        properties: {
-          integrationName: 'stripe_sync_engine',
-        },
-        groups: {
-          project: project?.ref ?? 'Unknown',
-          organization: org?.slug ?? 'Unknown',
-        },
-      })
       setShouldShowInstallSheet(false)
       form.reset()
       setIsInstallInitiated(true)
@@ -91,16 +80,6 @@ export const StripeSyncInstallationPage = () => {
     {
       onSuccess: () => {
         toast.success('Stripe Sync uninstallation started')
-        sendEvent({
-          action: 'integration_uninstalled',
-          properties: {
-            integrationName: 'stripe_sync_engine',
-          },
-          groups: {
-            project: project?.ref ?? 'Unknown',
-            organization: org?.slug ?? 'Unknown',
-          },
-        })
       },
     }
   )
@@ -124,6 +103,20 @@ export const StripeSyncInstallationPage = () => {
     stripeSchema &&
     stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
     stripeSchema.comment?.includes(INSTALLATION_ERROR_SUFFIX)
+
+  useEffect(() => {
+    if (!setupError) {
+      hasTrackedInstallFailed.current = false
+      return
+    }
+
+    if (!hasTrackedInstallFailed.current) {
+      hasTrackedInstallFailed.current = true
+      track('integration_install_failed', {
+        integrationName: 'stripe_sync_engine',
+      })
+    }
+  }, [setupError, track])
 
   useEffect(() => {
     // Clear the install initiated flag once we detect completion or error from the schema

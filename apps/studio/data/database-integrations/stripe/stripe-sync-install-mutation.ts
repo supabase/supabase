@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { getAccessToken } from 'common'
 import { databaseKeys } from 'data/database/keys'
 import { BASE_PATH } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import type { ResponseError } from 'types'
 import { stripeSyncKeys } from './keys'
 
@@ -55,11 +56,16 @@ export const useStripeSyncInstallMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const track = useTrack()
 
   return useMutation<StripeSyncInstallData, ResponseError, StripeSyncInstallVariables>({
     mutationFn: (vars) => installStripeSync(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
+
+      track('integration_install_started', {
+        integrationName: 'stripe_sync_engine',
+      })
 
       // Invalidate schemas query to refresh installation status
       await queryClient.invalidateQueries({
