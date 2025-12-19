@@ -4,7 +4,7 @@ import { Button } from 'ui'
 export function Hero() {
   return (
     <header className="container relative mx-auto px-6 pt-12 pb-8 lg:pt-24 lg:px-16 xl:px-20 text-center space-y-4">
-      <h1 className="text-sm text-brand md:text-base">
+      <h1 className="text-sm text-brand-link md:text-base">
         <span className="sr-only">Supabase </span>Contribute
       </h1>
       <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-6xl lg:mx-auto tracking-[-1px]">
