@@ -285,7 +285,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Chart isLoading={isLoadingResp}>
               <ChartCard>
-                <ChartHeader className="pb-4">
+                <ChartHeader>
                   <ChartTitle>Auth API Errors</ChartTitle>
                 </ChartHeader>
                 <ChartContent
@@ -358,7 +358,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
 
             <Chart isLoading={isLoadingCodes}>
               <ChartCard>
-                <ChartHeader className="pb-4">
+                <ChartHeader>
                   <ChartTitle>Auth Server Errors</ChartTitle>
                   <ChartActions actions={errorCodesActions} />
                 </ChartHeader>

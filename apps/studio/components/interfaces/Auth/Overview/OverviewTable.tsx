@@ -21,7 +21,7 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
   const hasData = !isLoading && data.length > 0
 
   return (
-    <Table className="border-t">
+    <Table className="border-t mt-4">
       {hasData && (
         <TableHeader>
           <TableRow>
