@@ -25,7 +25,14 @@ import {
 
 import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
-import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { AllIcon, DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+
+interface TabConfig {
+  id: string
+  label: string
+  icon?: React.ComponentType<{ className?: string }>
+  iconColor?: string
+}
 
 function CountSkeleton() {
   return <span className="inline-block min-w-[24px] h-5 bg-surface-300 animate-pulse rounded" />
@@ -77,14 +84,20 @@ function ThreadsTable({
 }
 
 export function UnansweredThreadsTable({
-  threads,
+  threads: initialThreads,
+  channelCounts,
   allProductAreas,
   allStacks,
 }: {
   threads: ThreadRow[]
+  channelCounts: { all: number; discord: number; reddit: number; github: number }
   allProductAreas: string[]
   allStacks: string[]
 }) {
+  const [threads, setThreads] = useState(initialThreads)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(initialThreads.length === 100)
+
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useQueryState(
     'search',
@@ -96,31 +109,79 @@ export function UnansweredThreadsTable({
   const [isPending, startTransition] = useTransition()
   const [channel, setChannel] = useQueryState(
     'channel',
-    parseAsString.withDefault('discord').withOptions({
+    parseAsString.withDefault('all').withOptions({
       shallow: false, // notify server, re-render RSC tree
     })
   )
   const [productArea] = useQueryState('product_area', parseAsString)
   const [stack] = useQueryState('stack', parseAsString)
 
-  const validTabs = ['discord', 'reddit', 'github'] as const
+  const tabs: TabConfig[] = [
+    {
+      id: 'all',
+      label: 'All',
+      icon: AllIcon,
+    },
+    {
+      id: 'discord',
+      label: 'Discord',
+      icon: DiscordIcon,
+      iconColor: 'text-[#5865F2]',
+    },
+    {
+      id: 'reddit',
+      label: 'Reddit',
+      icon: RedditIcon,
+      iconColor: 'text-[#FF4500]',
+    },
+    {
+      id: 'github',
+      label: 'GitHub',
+      icon: GitHubIcon,
+      iconColor: 'text-foreground',
+    },
+  ]
+
+  const validTabs = ['all', 'discord', 'reddit', 'github'] as const
   const currentTab = (
-    validTabs.includes(channel as (typeof validTabs)[number]) ? channel : 'discord'
+    validTabs.includes(channel as (typeof validTabs)[number]) ? channel : 'all'
   ) as (typeof validTabs)[number]
 
-  // Calculate counts for each channel
-  const channelCounts = useMemo(() => {
-    return {
-      discord: threads.filter((t) => t.channel === 'discord').length,
-      reddit: threads.filter((t) => t.channel === 'reddit').length,
-      github: threads.filter((t) => t.channel === 'github').length,
-    }
-  }, [threads])
+  // Reset threads when filters change
+  useEffect(() => {
+    setThreads(initialThreads)
+    setHasMore(initialThreads.length === 100)
+  }, [initialThreads])
 
   async function handleTabChange(value: string) {
     startTransition(async () => {
       await setChannel(value)
     })
+  }
+
+  async function handleLoadMore() {
+    setIsLoadingMore(true)
+    try {
+      const params = new URLSearchParams()
+      params.set('offset', threads.length.toString())
+      if (channel && channel !== 'all') params.set('channel', channel)
+      if (productArea) params.set('product_area', productArea)
+      if (stack) params.set('stack', stack)
+      if (search) params.set('search', search)
+
+      const response = await fetch(`/api-v2/contribute/threads?${params.toString()}`)
+      const newThreads = await response.json()
+
+      if (newThreads.length < 100) {
+        setHasMore(false)
+      }
+
+      setThreads((prev) => [...prev, ...newThreads])
+    } catch (error) {
+      console.error('Error loading more threads:', error)
+    } finally {
+      setIsLoadingMore(false)
+    }
   }
 
   function handleSearchSubmit(e: React.FormEvent) {
@@ -186,102 +247,37 @@ export function UnansweredThreadsTable({
       {/* Channel Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3 overflow-x-auto">
-          <Button
-            type={currentTab === 'reddit' ? 'default' : 'dashed'}
-            size="tiny"
-            onClick={() => handleTabChange('discord')}
-            icon={
-              <DiscordIcon
-                className={cn(
-                  'h-4 w-4',
-                  currentTab === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
-                )}
-              />
-            }
-            className={cn('w-[118px] justify-start', currentTab === 'discord' && 'bg-surface-300')}
-          >
-            <span className="flex items-center gap-1.5">
-              Discord
-              {isPending ? (
-                <CountSkeleton />
-              ) : (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded min-w-[24px] text-center',
-                    currentTab === 'discord'
-                      ? 'bg-surface-100 text-foreground'
-                      : 'bg-surface-300 text-foreground-lighter'
-                  )}
-                >
-                  {channelCounts.discord}
+          {tabs.map((tab) => {
+            const isActive = currentTab === tab.id
+            const Icon = tab.icon
+
+            return (
+              <Button
+                key={tab.id}
+                type={isActive ? 'default' : 'dashed'}
+                size="tiny"
+                onClick={() => handleTabChange(tab.id)}
+                icon={
+                  Icon ? (
+                    <Icon
+                      className={cn(
+                        'h-4 w-4',
+                        isActive ? tab.iconColor : 'text-foreground-lighter'
+                      )}
+                    />
+                  ) : undefined
+                }
+                className={cn('w-fit justify-start', isActive && 'bg-surface-300')}
+              >
+                <span className="flex items-center gap-1.5">
+                  {tab.label}
+                  <span className={cn('text-xs pl-1.5 min-w-[24px] text-center tabular-nums')}>
+                    {channelCounts[tab.id as keyof typeof channelCounts]}
+                  </span>
                 </span>
-              )}
-            </span>
-          </Button>
-          <Button
-            type={currentTab === 'reddit' ? 'default' : 'dashed'}
-            size="tiny"
-            onClick={() => handleTabChange('reddit')}
-            icon={
-              <RedditIcon
-                className={cn(
-                  'h-4 w-4',
-                  currentTab === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
-                )}
-              />
-            }
-            className="w-[115px] justify-start"
-          >
-            <span className="flex items-center gap-1.5">
-              Reddit
-              {isPending ? (
-                <CountSkeleton />
-              ) : (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded min-w-[24px] text-center',
-                    currentTab === 'reddit'
-                      ? 'bg-surface-100 text-foreground'
-                      : 'bg-surface-300 text-foreground-lighter'
-                  )}
-                >
-                  {channelCounts.reddit}
-                </span>
-              )}
-            </span>
-          </Button>
-          <Button
-            type={currentTab === 'github' ? 'default' : 'dashed'}
-            size="tiny"
-            onClick={() => handleTabChange('github')}
-            icon={
-              <GitHubIcon
-                className={cn(
-                  'h-4 w-4',
-                  currentTab === 'github' ? 'text-foreground' : 'text-foreground-lighter'
-                )}
-              />
-            }
-            className={cn('w-[115px] justify-start', currentTab === 'github' && 'bg-surface-300')}
-          >
-            <span className="flex items-center gap-1.5">
-              GitHub
-              {isPending ? (
-                <CountSkeleton />
-              ) : (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded min-w-[24px] text-center',
-                    currentTab === 'github'
-                      ? 'bg-surface-100 text-foreground'
-                      : 'bg-surface-300 text-foreground-lighter'
-                  )}
-                >
-                  {channelCounts.github}
-                </span>
-              )}
-            </span>
-          </Button>
+              </Button>
+            )
+          })}
         </div>
 
         <div className="flex items-center gap-2 flex-1 justify-end w-full md:w-auto">
@@ -328,6 +324,19 @@ export function UnansweredThreadsTable({
         </div>
       </div>
       <ThreadsTable threads={filteredThreads} productArea={productArea} search={search} />
+      {hasMore && (
+        <div className="flex justify-center mt-4">
+          <Button
+            type="default"
+            size="small"
+            onClick={handleLoadMore}
+            loading={isLoadingMore}
+            disabled={isLoadingMore}
+          >
+            Load more
+          </Button>
+        </div>
+      )}
     </section>
   )
 }

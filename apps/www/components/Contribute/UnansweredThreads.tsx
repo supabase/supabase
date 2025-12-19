@@ -1,4 +1,9 @@
-import { getAllProductAreas, getAllStacks, getUnansweredThreads } from '~/data/contribute'
+import {
+  getAllProductAreas,
+  getAllStacks,
+  getChannelCounts,
+  getUnansweredThreads,
+} from '~/data/contribute'
 import { UnansweredThreadsTable } from './UnansweredThreadsTable'
 
 export async function UnansweredThreads({
@@ -13,8 +18,9 @@ export async function UnansweredThreads({
   search?: string
 }) {
   try {
-    const [threads, allProductAreas, allStacks] = await Promise.all([
+    const [threads, channelCounts, allProductAreas, allStacks] = await Promise.all([
       getUnansweredThreads(product_area, channel, stack, search),
+      getChannelCounts(product_area, stack, search),
       getAllProductAreas(),
       getAllStacks(),
     ])
@@ -22,6 +28,7 @@ export async function UnansweredThreads({
     return (
       <UnansweredThreadsTable
         threads={threads}
+        channelCounts={channelCounts}
         allProductAreas={allProductAreas}
         allStacks={allStacks}
       />
