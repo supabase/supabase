@@ -65,8 +65,8 @@ export const DefaultLayout = ({
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <LayoutSidebarProvider>
-        <CommandProvider>
+      <CommandProvider>
+        <LayoutSidebarProvider>
           <ProjectContextProvider projectRef={ref}>
             <AppBannerContextProvider>
               <div className="flex flex-col h-screen w-screen">
@@ -114,8 +114,8 @@ export const DefaultLayout = ({
               <StudioCommandMenu />
             </AppBannerContextProvider>
           </ProjectContextProvider>
-        </CommandProvider>
-      </LayoutSidebarProvider>
+        </LayoutSidebarProvider>
+      </CommandProvider>
     </SidebarProvider>
   )
 }
