@@ -209,7 +209,6 @@ export const Grid = memo(
                       {!canImportData ? (
                         <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center pointer-events-auto">
                           <div className="max-w-xl">
-                          <h3 className="text-xl text-center mb-4">This entity is empty</h3>
                             {isSelectedForeignTable ? (
                               <p className="text-sm text-light text-center">
                                 This table is a foreign table. Add data to the connected source to
