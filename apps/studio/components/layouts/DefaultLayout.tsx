@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
@@ -14,6 +15,11 @@ import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { CommandProvider } from 'ui-patterns'
+
+const StudioCommandMenu = dynamic(() =>
+  import('components/interfaces/App/CommandMenu').then((mod) => mod.StudioCommandMenu)
+)
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -60,52 +66,55 @@ export const DefaultLayout = ({
   return (
     <SidebarProvider defaultOpen={false}>
       <LayoutSidebarProvider>
-        <ProjectContextProvider projectRef={ref}>
-          <AppBannerContextProvider>
-            <div className="flex flex-col h-screen w-screen">
-              {/* Top Banner */}
-              <AppBannerWrapper />
-              <div className="flex-shrink-0">
-                <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
-                <LayoutHeader
-                  showProductMenu={showProductMenu}
-                  headerTitle={headerTitle}
-                  backToDashboardURL={
-                    router.pathname.startsWith('/account') ? backToDashboardURL : undefined
-                  }
-                />
-              </div>
-              {/* Main Content Area */}
-              <div className="flex flex-1 w-full overflow-y-hidden">
-                {/* Sidebar - Only show for project pages, not account pages */}
-                {!router.pathname.startsWith('/account') && <Sidebar />}
-                {/* Main Content with Layout Sidebar */}
-                <ResizablePanelGroup
-                  direction="horizontal"
-                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                  autoSaveId="default-layout-content"
-                >
-                  <ResizablePanel
-                    id="panel-content"
-                    order={1}
-                    className="w-full"
-                    minSize={contentMinSizePercentage}
-                    maxSize={contentMaxSizePercentage}
-                    defaultSize={contentMaxSizePercentage}
-                  >
-                    <div className="h-full overflow-y-auto">{children}</div>
-                  </ResizablePanel>
-                  <LayoutSidebar
-                    order={2}
-                    minSize={100 - contentMaxSizePercentage}
-                    maxSize={100 - contentMinSizePercentage}
-                    defaultSize={100 - contentMaxSizePercentage}
+        <CommandProvider>
+          <ProjectContextProvider projectRef={ref}>
+            <AppBannerContextProvider>
+              <div className="flex flex-col h-screen w-screen">
+                {/* Top Banner */}
+                <AppBannerWrapper />
+                <div className="flex-shrink-0">
+                  <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
+                  <LayoutHeader
+                    showProductMenu={showProductMenu}
+                    headerTitle={headerTitle}
+                    backToDashboardURL={
+                      router.pathname.startsWith('/account') ? backToDashboardURL : undefined
+                    }
                   />
-                </ResizablePanelGroup>
+                </div>
+                {/* Main Content Area */}
+                <div className="flex flex-1 w-full overflow-y-hidden">
+                  {/* Sidebar - Only show for project pages, not account pages */}
+                  {!router.pathname.startsWith('/account') && <Sidebar />}
+                  {/* Main Content with Layout Sidebar */}
+                  <ResizablePanelGroup
+                    direction="horizontal"
+                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                    autoSaveId="default-layout-content"
+                  >
+                    <ResizablePanel
+                      id="panel-content"
+                      order={1}
+                      className="w-full"
+                      minSize={contentMinSizePercentage}
+                      maxSize={contentMaxSizePercentage}
+                      defaultSize={contentMaxSizePercentage}
+                    >
+                      <div className="h-full overflow-y-auto">{children}</div>
+                    </ResizablePanel>
+                    <LayoutSidebar
+                      order={2}
+                      minSize={100 - contentMaxSizePercentage}
+                      maxSize={100 - contentMinSizePercentage}
+                      defaultSize={100 - contentMaxSizePercentage}
+                    />
+                  </ResizablePanelGroup>
+                </div>
               </div>
-            </div>
-          </AppBannerContextProvider>
-        </ProjectContextProvider>
+              <StudioCommandMenu />
+            </AppBannerContextProvider>
+          </ProjectContextProvider>
+        </CommandProvider>
       </LayoutSidebarProvider>
     </SidebarProvider>
   )

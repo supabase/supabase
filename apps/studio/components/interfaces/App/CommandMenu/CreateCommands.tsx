@@ -23,7 +23,6 @@ import {
   Telescope,
   Clock5,
   Layers,
-  GitGraph,
 } from 'lucide-react'
 import {
   PageType,

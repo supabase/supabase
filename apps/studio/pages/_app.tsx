@@ -43,7 +43,6 @@ import {
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
@@ -160,17 +159,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         disableTransitionOnChange
                       >
                         <AppBannerContextProvider>
-                          <CommandProvider>
-                            <FeaturePreviewContextProvider>
-                              <MainScrollContainerProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                              </MainScrollContainerProvider>
-                              <StudioCommandMenu />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                            <SonnerToaster position="top-right" />
-                            <MonacoThemeProvider />
-                          </CommandProvider>
+                          <FeaturePreviewContextProvider>
+                            <MainScrollContainerProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                            </MainScrollContainerProvider>
+                            <FeaturePreviewModal />
+                          </FeaturePreviewContextProvider>
+                          <SonnerToaster position="top-right" />
+                          <MonacoThemeProvider />
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
