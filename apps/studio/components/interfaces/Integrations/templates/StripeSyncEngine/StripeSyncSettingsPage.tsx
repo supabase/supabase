@@ -22,13 +22,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  PageHeader,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
-import {
   PageSection,
   PageSectionContent,
   PageSectionDescription,

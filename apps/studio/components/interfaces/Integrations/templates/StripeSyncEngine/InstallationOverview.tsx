@@ -186,6 +186,8 @@ export const StripeSyncInstallationPage = () => {
     }
   }
 
+  const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
+
   const alert = useMemo(() => {
     if (setupError) {
       return (
@@ -228,6 +230,9 @@ export const StripeSyncInstallationPage = () => {
                 <div className="flex items-center gap-2">
                   <BadgeCheck size={14} className="text-brand" />
                   <div>All up to date</div>
+                  <Button asChild type="link">
+                    <Link href={tableEditorUrl}>View data</Link>
+                  </Button>
                 </div>
                 <div className="text-foreground-light text-sm">
                   Last synced {formatRelative(new Date(syncState.closed_at!), new Date())}
