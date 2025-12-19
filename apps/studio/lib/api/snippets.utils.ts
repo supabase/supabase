@@ -111,6 +111,15 @@ const buildFolder = (name: string) => {
   return folder
 }
 
+const sanitizeName = (name: string): string => {
+  // Remove path traversal sequences and normalize
+  const sanitized = path.basename(name)
+  if (sanitized !== name || name.includes('\0')) {
+    throw new Error('Invalid name: path traversal or null bytes detected')
+  }
+  return sanitized
+}
+
 /**
  * Gets a complete snapshot of the filesystem structure including files and folders
  * @returns An array of files and folders with their metadata
@@ -305,7 +314,7 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
     }
   }
 
-  const snippetName = snippet.name
+  const snippetName = sanitizeName(snippet.name)
   const content = snippet.content.sql || ''
   const folderId = snippet.folder_id || null
   const folder = entries.find((f) => f.id === folderId && f.type === 'folder')
@@ -408,7 +417,9 @@ export const getFolders = async (folderId: string | null = null): Promise<Folder
 /**
  * Creates a new folder as an actual directory
  */
-export async function createFolder(folderName: string): Promise<Folder> {
+export async function createFolder(_folderName: string): Promise<Folder> {
+  const folderName = sanitizeName(_folderName)
+
   const entries = await getFilesystemEntries()
   const existingFolder = entries.find((folder) => folder.name === folderName)
 

@@ -862,6 +862,163 @@ describe('snippets.utils', () => {
         'Folder with id non-existent-folder-id not found'
       )
     })
+
+    it('should reject path traversal attempts with ../', async () => {
+      const mockSnippet: Snippet = {
+        id: 'test-id',
+        inserted_at: '2023-01-01T00:00:00.000Z',
+        updated_at: '2023-01-01T00:00:00.000Z',
+        type: 'sql',
+        name: '../malicious-snippet',
+        description: '',
+        favorite: false,
+        content: {
+          sql: 'SELECT * FROM test;',
+          content_id: 'content-id',
+          schema_version: '1.0',
+        },
+        visibility: 'user',
+        project_id: 1,
+        folder_id: null,
+        owner_id: 1,
+        owner: { id: 1, username: 'testuser' },
+        updated_by: { id: 1, username: 'testuser' },
+      }
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(saveSnippet(mockSnippet)).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should reject path traversal attempts with nested directories', async () => {
+      const mockSnippet: Snippet = {
+        id: 'test-id',
+        inserted_at: '2023-01-01T00:00:00.000Z',
+        updated_at: '2023-01-01T00:00:00.000Z',
+        type: 'sql',
+        name: 'foo/bar/snippet',
+        description: '',
+        favorite: false,
+        content: {
+          sql: 'SELECT * FROM test;',
+          content_id: 'content-id',
+          schema_version: '1.0',
+        },
+        visibility: 'user',
+        project_id: 1,
+        folder_id: null,
+        owner_id: 1,
+        owner: { id: 1, username: 'testuser' },
+        updated_by: { id: 1, username: 'testuser' },
+      }
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(saveSnippet(mockSnippet)).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should reject names with null bytes', async () => {
+      const mockSnippet: Snippet = {
+        id: 'test-id',
+        inserted_at: '2023-01-01T00:00:00.000Z',
+        updated_at: '2023-01-01T00:00:00.000Z',
+        type: 'sql',
+        name: 'malicious\0snippet',
+        description: '',
+        favorite: false,
+        content: {
+          sql: 'SELECT * FROM test;',
+          content_id: 'content-id',
+          schema_version: '1.0',
+        },
+        visibility: 'user',
+        project_id: 1,
+        folder_id: null,
+        owner_id: 1,
+        owner: { id: 1, username: 'testuser' },
+        updated_by: { id: 1, username: 'testuser' },
+      }
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(saveSnippet(mockSnippet)).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should reject absolute path attempts', async () => {
+      const mockSnippet: Snippet = {
+        id: 'test-id',
+        inserted_at: '2023-01-01T00:00:00.000Z',
+        updated_at: '2023-01-01T00:00:00.000Z',
+        type: 'sql',
+        name: '/etc/passwd',
+        description: '',
+        favorite: false,
+        content: {
+          sql: 'SELECT * FROM test;',
+          content_id: 'content-id',
+          schema_version: '1.0',
+        },
+        visibility: 'user',
+        project_id: 1,
+        folder_id: null,
+        owner_id: 1,
+        owner: { id: 1, username: 'testuser' },
+        updated_by: { id: 1, username: 'testuser' },
+      }
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(saveSnippet(mockSnippet)).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should allow valid names with special characters', async () => {
+      const mockSnippet: Snippet = {
+        id: 'test-id',
+        inserted_at: '2023-01-01T00:00:00.000Z',
+        updated_at: '2023-01-01T00:00:00.000Z',
+        type: 'sql',
+        name: 'my-snippet_v2 (copy)',
+        description: '',
+        favorite: false,
+        content: {
+          sql: 'SELECT * FROM test;',
+          content_id: 'content-id',
+          schema_version: '1.0',
+        },
+        visibility: 'user',
+        project_id: 1,
+        folder_id: null,
+        owner_id: 1,
+        owner: { id: 1, username: 'testuser' },
+        updated_by: { id: 1, username: 'testuser' },
+      }
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+      mockedFS.writeFile.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await saveSnippet(mockSnippet)
+
+      expect(result.name).toBe('my-snippet_v2 (copy)')
+      expect(mockedFS.writeFile).toHaveBeenCalledWith(
+        path.join(MOCK_SNIPPETS_DIR, 'my-snippet_v2 (copy).sql'),
+        'SELECT * FROM test;',
+        'utf-8'
+      )
+    })
   })
 
   describe('deleteSnippet', () => {
@@ -1404,6 +1561,42 @@ describe('snippets.utils', () => {
       expect(mockedFS.mkdir).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, 'New Folder'), {
         recursive: true,
       })
+    })
+
+    it('should reject path traversal attempts with ../', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(createFolder('../malicious-folder')).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should reject path traversal attempts with nested directories', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(createFolder('foo/bar/folder')).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should reject names with null bytes', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(createFolder('malicious\0folder')).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
+    })
+
+    it('should reject absolute path attempts', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([])
+
+      await expect(createFolder('/etc/malicious')).rejects.toThrow(
+        'Invalid name: path traversal or null bytes detected'
+      )
     })
   })
 
