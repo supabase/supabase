@@ -217,7 +217,7 @@ export const APIKeys = () => {
               </div>
               <p className="mb-1">Choose your preferred framework</p>
               <p className="text-sm text-foreground-light mb-4 md:mr-20 text-balance">
-                Connect to your project with a variety of frameworks, ORMs, an MCP server, or even
+                Connect to your project from a variety of frameworks, ORMs, an MCP server, or even
                 directly via connection string.
               </p>
               <Connect />
