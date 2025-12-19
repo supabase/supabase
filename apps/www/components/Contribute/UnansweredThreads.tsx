@@ -1,4 +1,4 @@
-import { getUnansweredThreads, getAllProductAreas, getAllStacks } from '~/data/contribute'
+import { getAllProductAreas, getAllStacks, getUnansweredThreads } from '~/data/contribute'
 import { UnansweredThreadsTable } from './UnansweredThreadsTable'
 
 export async function UnansweredThreads({
@@ -29,7 +29,7 @@ export async function UnansweredThreads({
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return (
-      <section className="w-full max-w-7xl mx-auto px-4 py-16">
+      <section className="w-full max-w-7xl mx-auto px-4">
         <div className="border border-border rounded-lg p-8 text-center">
           <p className="text-destructive">Error loading threads: {errorMessage}</p>
         </div>
