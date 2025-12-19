@@ -8,11 +8,19 @@ import { useEffect, useMemo, useState, useTransition } from 'react'
 import {
   Badge,
   Button,
+  Card,
   cn,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 
 import type { ThreadRow } from '~/types/contribute'
@@ -32,47 +40,39 @@ function ThreadsTable({
   productArea: string | null
   search: string | null
 }) {
-  if (threads.length === 0) {
-    return (
-      <div className="border border-muted rounded-lg p-8 text-center text-foreground-lighter">
-        No threads found
-      </div>
-    )
-  }
-
   return (
-    <div className="grid gap-4">
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full table-fixed min-w-[900px]">
-          <thead className="border-b border-muted">
-            <tr>
-              <th className="text-sm text-foreground-lighter font-normal text-left py-3 px-3 md:px-6 w-[45%]">
-                Thread
-              </th>
-              <th className="text-sm text-foreground-lighter font-normal text-left py-3 px-3 md:px-6 w-[20%]">
-                Stack
-              </th>
-              <th className="text-sm text-foreground-lighter font-normal text-left py-3 px-3 md:px-6 w-[10%]">
-                Replies
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {threads.map((thread) => (
+    <Card>
+      <Table className="table-fixed min-w-[900px] mt-0">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[45%]">Thread</TableHead>
+            <TableHead className="w-[20%]">Stack</TableHead>
+            <TableHead className="w-[10%]">Replies</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {threads.length === 0 ? (
+            <TableRow className="[&>td]:hover:bg-inherit">
+              <TableCell colSpan={3} className="text-center text-foreground-lighter">
+                No threads found
+              </TableCell>
+            </TableRow>
+          ) : (
+            threads.map((thread) => (
               <ThreadRow
                 key={thread.id}
                 thread={thread}
                 productArea={productArea}
                 search={search}
               />
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="text-sm text-foreground-muted px-3 md:px-6">
-        Showing {threads.length} {threads.length === 1 ? 'thread' : 'threads'}
-      </div>
-    </div>
+            ))
+          )}
+        </TableBody>
+        <TableCaption>
+          Showing {threads.length} {threads.length === 1 ? 'thread' : 'threads'}
+        </TableCaption>
+      </Table>
+    </Card>
   )
 }
 
@@ -371,9 +371,9 @@ function ThreadRow({
   }
 
   return (
-    <tr className="border-b border-muted hover:bg-muted/50 transition-colors">
+    <TableRow>
       {/* Thread title and product areas */}
-      <td className="px-3 py-4 md:px-6 w-[45%]">
+      <TableCell className="w-[45%]">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Channel icon */}
           <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md ">
@@ -402,13 +402,15 @@ function ThreadRow({
               />
             )}
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 flex flex-col gap-y-0.5">
             {/* Thread title */}
             <Link
               href={`/contribute/t/${thread.id}`}
-              className="block text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2"
+              className="block text-md text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2"
             >
-              {highlightText(thread.title, search)}
+              <h3 className="text-base text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2">
+                {highlightText(thread.title, search)}
+              </h3>
             </Link>
             {/* Posted time and product areas */}
             <div className="flex flex-row items-baseline gap-2 overflow-hidden">
@@ -446,9 +448,9 @@ function ThreadRow({
             </div>
           </div>
         </div>
-      </td>
+      </TableCell>
       {/* Stack */}
-      <td className="py-4 px-3 md:px-6 w-[20%]">
+      <TableCell className="w-[20%]">
         <div className="flex flex-wrap gap-x-1.5 gap-y-0 overflow-hidden">
           {thread.stack.length > 0 ? (
             (() => {
@@ -512,10 +514,10 @@ function ThreadRow({
             <p className="text-xs text-foreground-lighter">—</p>
           )}
         </div>
-      </td>
+      </TableCell>
 
       {/* Replies */}
-      <td className="py-4 px-3 md:px-6 w-[10%]">
+      <TableCell className="w-[10%]">
         <Link href={`/contribute/t/${thread.id}`} className="flex flex-row items-center gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
             <MessageSquareReply
@@ -530,8 +532,8 @@ function ThreadRow({
               : '—'}
           </p>
         </Link>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   )
 }
 
