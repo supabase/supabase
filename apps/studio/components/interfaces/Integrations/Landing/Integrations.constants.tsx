@@ -385,7 +385,7 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
     ),
     description:
       'Continuously sync your payments, customer, and other data from Stripe to your Postgres database',
-    docsUrl: 'https://github.com/tx-stripe/stripe-sync-engine',
+    docsUrl: 'https://github.com/stripe-experiments/sync-engine/',
     author: {
       name: 'Stripe',
       websiteUrl: 'https://www.stripe.com',
