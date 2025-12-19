@@ -216,7 +216,7 @@ export const NewProjectPanel = () => {
             <h2>Connect to your project</h2>
             <p className="text-base text-foreground-light text-balance">
               Interact with your database through the{' '}
-              <InlineLink href={`${DOCS_URL}/reference`}>Supabase client libraries</InlineLink> with
+              <InlineLink href={`${DOCS_URL}/reference`}>Supabase client libraries</InlineLink> and
               your API keys.
             </p>
           </div>
