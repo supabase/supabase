@@ -2,6 +2,9 @@ name: Run Braintrust evals
 
 on:
   push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, labeled]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -14,11 +17,12 @@ permissions:
 jobs:
   eval:
     name: Run evals
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-evals'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     env:
-      BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }} # Eventually configure at repo level
+      BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
