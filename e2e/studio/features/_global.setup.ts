@@ -90,8 +90,8 @@ To start API locally, run:
     await loginWithEmail(page, studioUrl, {
       email: EMAIL,
       password: PASSWORD,
-      projectRef,
     })
+    return
   }
 
   const { GITHUB_USER, GITHUB_PASS, GITHUB_TOTP } = env

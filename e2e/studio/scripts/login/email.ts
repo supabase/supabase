@@ -7,7 +7,7 @@ import { STORAGE_STATE_PATH } from '../../env.config.js'
 export async function loginWithEmail(
   page: Page,
   studioUrl: string,
-  credentials: { email: string; password: string; projectRef: string }
+  credentials: { email: string; password: string }
 ) {
   const signInUrl = `${studioUrl}/sign-in`
   console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
@@ -117,7 +117,6 @@ export async function loginWithEmail(
 
   expect(credentials.email).toBeDefined()
   expect(credentials.password).toBeDefined()
-  expect(credentials.projectRef).toBeDefined()
 
   // Wait for form elements with increased timeout
   const emailInput = page.getByLabel('Email')
