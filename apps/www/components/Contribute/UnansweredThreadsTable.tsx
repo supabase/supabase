@@ -628,7 +628,7 @@ function highlightText(text: string, searchTerm: string | null): ReactNode {
     }
     // Add the highlighted match
     parts.push(
-      <mark key={index} className="bg-brand-200 dark:bg-brand-300 px-0.5 rounded">
+      <mark key={index} className="bg-brand-200 dark:bg-brand-500 dark:!text-foreground px-0.5">
         {text.slice(index, index + searchTerm.length)}
       </mark>
     )
