@@ -82,6 +82,7 @@ export const Grid = memo(
       const table = snap.table
       const isSelectedTable = isTableLike(snap.originalTable)
       const isSelectedForeignTable = isForeignTable(snap.originalTable)
+      const isValidEntity = isSelectedTable || isSelectedForeignTable
       const isTableEmpty = (rows ?? []).length === 0
 
       const { can: canEditTables } = useAsyncCheckPermissions(
@@ -98,7 +99,7 @@ export const Grid = memo(
 
       const hasPermissionToImportData = canEditTables && canEditColumns
       const canImportData =
-        !isSchemaLocked && (isSelectedTable || isSelectedForeignTable) && hasPermissionToImportData
+        !isSchemaLocked && (isValidEntity) && hasPermissionToImportData
 
       const { mutate: sendEvent } = useSendEventMutation()
 
@@ -209,7 +210,7 @@ export const Grid = memo(
                         <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center pointer-events-auto">
                           <div className="max-w-xl">
                             <h3 className="text-xl text-center mb-4">This entity is empty</h3>
-                            {!isSelectedTable ? (
+                            {!isValidEntity ? (
                               <Admonition
                                 type="default"
                                 className="max-w-sm"
