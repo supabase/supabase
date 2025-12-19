@@ -101,7 +101,7 @@ export const useInstalledIntegrations = () => {
   // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
   const availableIntegrations = useMemo(
     () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    []
+    [allIntegrations]
   )
 
   const error = fdwError || extensionsError || schemasError

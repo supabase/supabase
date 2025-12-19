@@ -57,8 +57,6 @@ const IntegrationsPage: NextPageWithLayout = () => {
     }
   }, [isStripeSyncEngineEnabled])
 
-  console.log('isStripeSyncEngineEnabled', isStripeSyncEngineEnabled, featuredIntegrationIds)
-
   const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
     useInstalledIntegrations()
 
@@ -121,10 +119,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
     const featured = filteredAndSortedIntegrations.filter((i) =>
       featuredIntegrationIds.includes(i.id)
     )
-    console.log(
-      'all integrations',
-      filteredAndSortedIntegrations.map((i) => i.id)
-    )
+
     const allIntegrations = filteredAndSortedIntegrations // Include all integrations, including featured
 
     return {
