@@ -14,7 +14,68 @@ import { useSetPage } from 'ui-patterns/CommandMenu'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  IntegrationDefinition,
+  INTEGRATIONS,
+} from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
+
+export function getIntegrationRoute(
+  integration: IntegrationDefinition,
+  ref: string,
+  installedIntegrationIds: Set<string>
+): string | null {
+  // For wrappers, route to overview with new=true (always available if wrappers feature is enabled)
+  if (integration.type === 'wrapper') {
+    return `/project/${ref}/integrations/${integration.id}/overview?new=true`
+  }
+
+  // For non-wrapper integrations, check if installed and determine route
+  if (!installedIntegrationIds.has(integration.id)) {
+    return null
+  }
+
+  // Map integration IDs to their create routes
+  switch (integration.id) {
+    case 'vault':
+      return `/project/${ref}/integrations/vault/secrets?new=true`
+    case 'cron':
+      return `/project/${ref}/integrations/cron/jobs?new=true`
+    case 'webhooks':
+      return `/project/${ref}/integrations/webhooks/webhooks?new=true`
+    case 'queues':
+      return `/project/${ref}/integrations/queues/queues?new=true`
+    default:
+      // For other integrations, try to find a navigation route that's not 'overview'
+      const createRoute = integration.navigation?.find((nav) => nav.route !== 'overview')
+      if (createRoute) {
+        return `/project/${ref}/integrations/${integration.id}/${createRoute.route}?new=true`
+      }
+      return null
+  }
+}
+
+export function getIntegrationCommandName(integration: IntegrationDefinition): string {
+  if (integration.type === 'wrapper') {
+    // Extract the wrapper name (e.g., "Stripe Wrapper" -> "Stripe")
+    const wrapperName = integration.name.replace(' Wrapper', '')
+    return `Add ${wrapperName} wrapper`
+  }
+
+  // Map integration IDs to their command names
+  switch (integration.id) {
+    case 'vault':
+      return 'Create Vault Secret'
+    case 'cron':
+      return 'Create Cron Job'
+    case 'webhooks':
+      return 'Create Webhook'
+    case 'queues':
+      return 'Create Queue'
+    default:
+      return `Create ${integration.name}`
+  }
+}
 
 export function useCreateCommandsConfig() {
   let { ref } = useParams()
@@ -95,6 +156,12 @@ export function useCreateCommandsConfig() {
     [installedIntegrations]
   )
 
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
+  const allIntegrations = integrationsWrappers
+    ? INTEGRATIONS
+    : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper'))
+
   return {
     ref,
     setPage,
@@ -116,5 +183,7 @@ export function useCreateCommandsConfig() {
     isVectorBucketsEnabled,
     isAnalyticsBucketsEnabled,
     installedIntegrationIds,
+    integrationsWrappers,
+    allIntegrations,
   }
 }

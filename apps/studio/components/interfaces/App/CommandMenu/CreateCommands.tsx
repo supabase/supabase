@@ -7,13 +7,11 @@ import {
   Code2,
   KeyRound,
   ListChecks,
-  ListTree,
   LockKeyhole,
   Plus,
   Rows,
   Vault,
   ShieldPlus,
-  Timer,
   UserCog,
   UserPlus,
   Webhook,
@@ -23,6 +21,9 @@ import {
   Mail,
   Lock,
   Telescope,
+  Clock5,
+  Layers,
+  GitGraph,
 } from 'lucide-react'
 import {
   PageType,
@@ -32,7 +33,11 @@ import {
 } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useCreateCommandsConfig } from './CreateCommands.utils'
+import {
+  useCreateCommandsConfig,
+  getIntegrationRoute,
+  getIntegrationCommandName,
+} from './CreateCommands.utils'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 
@@ -42,6 +47,7 @@ const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFuncti
 const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
 const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
 const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
+const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
@@ -68,6 +74,7 @@ export function useCreateCommands(options?: CommandOptions) {
     isVectorBucketsEnabled,
     isAnalyticsBucketsEnabled,
     installedIntegrationIds,
+    allIntegrations,
   } = useCreateCommandsConfig()
 
   const databaseCommands = useMemo(
@@ -305,44 +312,59 @@ export function useCreateCommands(options?: CommandOptions) {
     [ref, storageEnabled, isFreePlan, isAnalyticsBucketsEnabled, isVectorBucketsEnabled]
   )
 
-  const integrationsCommands = useMemo(
-    () =>
-      [
-        installedIntegrationIds.has('vault')
-          ? {
-              id: 'create-vault-secret',
-              name: 'Create Vault Secret',
-              route: `/project/${ref}/integrations/vault/secrets?new=true`,
-              icon: () => <Vault />,
-            }
-          : null,
-        installedIntegrationIds.has('cron')
-          ? {
-              id: 'create-cron-job',
-              name: 'Create Cron Job',
-              route: `/project/${ref}/integrations/cron/jobs?new=true`,
-              icon: () => <Timer />,
-            }
-          : null,
-        installedIntegrationIds.has('webhooks')
-          ? {
-              id: 'create-webhook',
-              name: 'Create Webhook',
-              route: `/project/${ref}/integrations/webhooks/webhooks?new=true`,
-              icon: () => <Webhook />,
-            }
-          : null,
-        installedIntegrationIds.has('queues')
-          ? {
-              id: 'create-queue',
-              name: 'Create Queue',
-              route: `/project/${ref}/integrations/queues/queues?new=true`,
-              icon: () => <ListTree />,
-            }
-          : null,
-      ].filter(Boolean) as ICommand[],
-    [ref, installedIntegrationIds]
-  )
+  const integrationsCommands = useMemo(() => {
+    // Sort integrations: Postgres modules (non-wrappers) first, then wrappers
+    const sortedIntegrations = [...allIntegrations].sort((a, b) => {
+      const aIsWrapper = a.type === 'wrapper' ? 1 : 0
+      const bIsWrapper = b.type === 'wrapper' ? 1 : 0
+      return aIsWrapper - bIsWrapper
+    })
+
+    return sortedIntegrations
+      .map((integration) => {
+        const route = getIntegrationRoute(integration, ref, installedIntegrationIds)
+        if (!route) return null
+
+        const isWrapper = integration.type === 'wrapper'
+
+        // For wrappers, use the integration icon with wrapper styling
+        // For Postgres modules, use plain icons
+        const getIcon = () => {
+          if (isWrapper) {
+            return (
+              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+                {integration.icon()}
+              </div>
+            )
+          }
+
+          // Use plain icons for Postgres modules
+          switch (integration.id) {
+            case 'vault':
+              return <Vault />
+            case 'cron':
+              return <Clock5 />
+            case 'webhooks':
+              return <Webhook />
+            case 'queues':
+              return <Layers />
+            case 'graphiql':
+              return <Graphql />
+            default:
+              // Fallback to integration icon for other Postgres modules
+              return integration.icon()
+          }
+        }
+
+        return {
+          id: `create-integration-${integration.id}`,
+          name: getIntegrationCommandName(integration),
+          route,
+          icon: getIcon,
+        }
+      })
+      .filter(Boolean) as ICommand[]
+  }, [ref, allIntegrations, installedIntegrationIds])
 
   const observabilityCommands = useMemo(
     () =>
@@ -391,21 +413,21 @@ export function useCreateCommands(options?: CommandOptions) {
             },
           ]
         : []),
-      ...(integrationsCommands.length > 0
-        ? [
-            {
-              id: 'create-integrations',
-              name: 'Integrations',
-              commands: integrationsCommands,
-            },
-          ]
-        : []),
       ...(observabilityCommands.length > 0
         ? [
             {
               id: 'create-observability',
               name: 'Observability',
               commands: observabilityCommands,
+            },
+          ]
+        : []),
+      ...(integrationsCommands.length > 0
+        ? [
+            {
+              id: 'create-integrations',
+              name: 'Integrations',
+              commands: integrationsCommands,
             },
           ]
         : []),
