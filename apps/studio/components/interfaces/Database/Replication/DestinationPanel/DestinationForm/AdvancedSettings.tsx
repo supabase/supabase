@@ -12,11 +12,16 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import { DestinationType } from '../DestinationPanel.types'
+import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 
-export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
-  const { type } = form.watch()
-
+export const AdvancedSettings = ({
+  type,
+  form,
+}: {
+  type: DestinationType
+  form: UseFormReturn<DestinationPanelSchemaType>
+}) => {
   const handleNumberChange =
     (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value

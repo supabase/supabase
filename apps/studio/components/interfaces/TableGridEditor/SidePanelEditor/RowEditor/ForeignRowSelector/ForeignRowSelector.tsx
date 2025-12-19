@@ -131,12 +131,7 @@ export const ForeignRowSelector = ({
     if (!project?.ref || !table?.name || !table?.schema) return
 
     try {
-      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
-      const savedState = loadTableEditorStateFromLocalStorage(
-        project.ref,
-        persistenceTableName,
-        table.schema
-      )
+      const savedState = loadTableEditorStateFromLocalStorage(project.ref, table.id)
       const urlSorts = savedState?.sorts ?? []
       const parsedSorts = formatSortURLParams(table.name, urlSorts)
       if (parsedSorts.length > 0) {
@@ -147,24 +142,22 @@ export const ForeignRowSelector = ({
     } finally {
       setShouldSaveSorts(true)
     }
-  }, [project?.ref, table?.schema, table?.name])
+  }, [project?.ref, table?.schema, table?.name, table?.id])
 
   // Persist sorts to local storage
   useEffect(() => {
-    if (!project?.ref || !table?.name || !table?.schema || !shouldSaveSorts) return
+    if (!project?.ref || !table?.id || !shouldSaveSorts) return
     try {
       const urlSorts = sortsToUrlParams(sorts)
-      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
       saveTableEditorStateToLocalStorage({
         projectRef: project.ref,
-        tableName: persistenceTableName,
-        schema: table.schema,
+        tableId: table.id,
         sorts: urlSorts,
       })
     } catch (e) {
       console.error(e)
     }
-  }, [shouldSaveSorts, sorts, project?.ref, table?.schema, table?.name])
+  }, [shouldSaveSorts, sorts, project?.ref, table?.id])
 
   return (
     <SidePanel

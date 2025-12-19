@@ -21,7 +21,7 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import { DestinationPanelSchemaType } from './DestinationPanel/DestinationPanel.schema'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
@@ -32,7 +32,7 @@ interface DestinationRowProps {
   sourceId?: number
   destinationId: number
   destinationName: string
-  type: DestinationPanelSchemaType['type'] | 'Other'
+  type: DestinationType | 'Other'
   pipeline?: Pipeline
   error: ResponseError | null
   isLoading: boolean
@@ -223,7 +223,6 @@ export const DestinationRow = ({
       <DestinationPanel
         visible={showEditDestinationPanel}
         onClose={() => setShowEditDestinationPanel(false)}
-        sourceId={sourceId}
         existingDestination={{
           sourceId,
           destinationId: destinationId,
