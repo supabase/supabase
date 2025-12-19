@@ -68,7 +68,7 @@ export const parseSpreadsheet = (
       dynamicTyping: false,
       skipEmptyLines: true,
       worker: true,
-      quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
+      quoteChar: isTsvFile(file) ? '' : '"',
       chunkSize: CHUNK_SIZE,
       chunk: (results) => {
         headers = results.meta.fields as string[]
@@ -167,6 +167,11 @@ export const inferColumnType = (column: string, rows: object[]) => {
   return 'text'
 }
 
+export const isTsvFile = (file: File) => {
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  return (file.type.length === 0 || file.type === 'text/tab-separated-values') && ext === 'tsv'
+}
+
 export const acceptedFileExtension = (file: File) => {
   const ext = file.name.split('.').pop()?.toLowerCase()
   return ext !== undefined && UPLOAD_FILE_EXTENSIONS.includes(ext)
@@ -175,10 +180,10 @@ export const acceptedFileExtension = (file: File) => {
 /**
  * Checks file mime type. Returns `true` if the mime type is among the accepted file types
  * or is an empty string.
- * 
+ *
  * The reason for that is that browsers derive the uploaded mime type from the local machine's
  * registry, and sets it to `''` if the machine doesn't have a spot for the type in the machine.
- * 
+ *
  * @param {File} file the file to check the mime type of
  * @returns {boolean} indicates the validity of the mime type, or `true` if it's an empty string
  */
