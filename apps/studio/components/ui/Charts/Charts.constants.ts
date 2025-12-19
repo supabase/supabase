@@ -15,13 +15,24 @@ export const CHART_COLORS = {
 
 const LIGHT_STACKED_CHART_COLORS = [
   '#3ECF8E',
-  '#097c4f',
   '#DA760B',
+  '#097c4f',
   '#EDC35E',
   '#65BCD9',
   '#0063E8',
   '#DB8DF9',
   '#B616A6',
+]
+
+const LIGHT_STACKED_CHART_FILLS = [
+  '#7CDEB2',
+  '#85e0ba',
+  '#85e0ba',
+  '#85e0ba',
+  '#85e0ba',
+  '#85e0ba',
+  '#85e0ba',
+  '#85e0ba',
 ]
 
 const DARK_STACKED_CHART_COLORS = [
@@ -35,12 +46,24 @@ const DARK_STACKED_CHART_COLORS = [
   '#B616A6',
 ]
 
+const DARK_STACKED_CHART_FILLS = [
+  '#7FE8B5',
+  '#C7FFD9',
+  '#F5A84D',
+  '#F5E487',
+  '#8DD2E8',
+  '#4A94F5',
+  '#E8B2FF',
+  '#D84DC8',
+]
+
 // Default to light mode colors, will be updated based on theme
 export let STACKED_CHART_COLORS = LIGHT_STACKED_CHART_COLORS
-
+export let STACKED_CHART_FILLS = LIGHT_STACKED_CHART_FILLS
 // Function to update colors based on theme
 export const updateStackedChartColors = (isDarkMode: boolean) => {
   STACKED_CHART_COLORS = isDarkMode ? DARK_STACKED_CHART_COLORS : LIGHT_STACKED_CHART_COLORS
+  STACKED_CHART_FILLS = isDarkMode ? DARK_STACKED_CHART_FILLS : LIGHT_STACKED_CHART_FILLS
 }
 
 // refer to packages/ui/radix-colors.js for full list of colors
