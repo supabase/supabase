@@ -4,10 +4,7 @@ import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { IS_PLATFORM } from 'common'
 import {
-  BarChart3,
-  Binary,
   Code2,
-  FolderPlus,
   KeyRound,
   ListChecks,
   ListTree,
@@ -42,6 +39,9 @@ import type { ICommand } from 'ui-patterns/CommandMenu'
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
 const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFunctions))
+const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
+const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
+const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
@@ -278,13 +278,13 @@ export function useCreateCommands(options?: CommandOptions) {
               id: 'create-storage-bucket-files',
               name: 'Create Storage Bucket (Files)',
               route: `/project/${ref}/storage/files?new=true`,
-              icon: () => <FolderPlus />,
+              icon: () => <FilesBucket />,
             },
             {
               id: 'create-storage-bucket-analytics',
               name: 'Create Storage Bucket (Analytics)',
               route: `/project/${ref}/storage/analytics?new=true`,
-              icon: () => <BarChart3 />,
+              icon: () => <AnalyticsBucket />,
               badge: () => (isFreePlan ? <Badge>Pro</Badge> : null),
               className: !isAnalyticsBucketsEnabled
                 ? 'opacity-50 cursor-not-allowed pointer-events-none'
@@ -294,7 +294,7 @@ export function useCreateCommands(options?: CommandOptions) {
               id: 'create-storage-bucket-vectors',
               name: 'Create Storage Bucket (Vectors)',
               route: `/project/${ref}/storage/vectors?new=true`,
-              icon: () => <Binary />,
+              icon: () => <VectorBucket />,
               badge: () => (isFreePlan ? <Badge>Pro</Badge> : null),
               className: !isVectorBucketsEnabled
                 ? 'opacity-50 cursor-not-allowed pointer-events-none'
