@@ -34,7 +34,7 @@ function ThreadsTable({
 }) {
   if (threads.length === 0) {
     return (
-      <div className="border border-border rounded-lg p-8 text-center text-foreground-lighter">
+      <div className="border border-muted rounded-lg p-8 text-center text-foreground-lighter">
         No threads found
       </div>
     )
@@ -44,13 +44,15 @@ function ThreadsTable({
     <div className="grid gap-4">
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
         <table className="w-full table-fixed min-w-[900px]">
-          <thead className="border-b border-border">
+          <thead className="border-b border-muted">
             <tr>
-              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[45%]">
+              <th className="text-sm text-foreground-lighter font-normal text-left py-3 px-3 md:px-6 w-[45%]">
                 Thread
               </th>
-              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[20%]">Stack</th>
-              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[10%]">
+              <th className="text-sm text-foreground-lighter font-normal text-left py-3 px-3 md:px-6 w-[20%]">
+                Stack
+              </th>
+              <th className="text-sm text-foreground-lighter font-normal text-left py-3 px-3 md:px-6 w-[10%]">
                 Replies
               </th>
             </tr>
@@ -68,7 +70,7 @@ function ThreadsTable({
         </table>
       </div>
       <div className="text-sm text-foreground-muted px-3 md:px-6">
-        Showing {threads.length} {threads.length === 1 ? 'result' : 'results'}
+        Showing {threads.length} {threads.length === 1 ? 'thread' : 'threads'}
       </div>
     </div>
   )
@@ -172,17 +174,17 @@ export function UnansweredThreadsTable({
   return (
     <section className="w-full max-w-7xl mx-auto px-4 py-16 relative">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
-        <div className="flex flex-col gap-2">
+      <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
+        <div className="flex flex-col gap-1">
           <h2 className="text-xl text-foreground">Unresolved threads</h2>
           <p className="text-foreground-lighter">
-            From the last 30 days, with data refreshed every 10 minutes.
+            Over the last 30 days, with data refreshed every 10 minutes.
           </p>
         </div>
-      </div>
+      </header>
 
       {/* Channel Filters */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3 overflow-x-auto">
           <Button
             type={currentTab === 'reddit' ? 'default' : 'dashed'}
@@ -315,7 +317,9 @@ export function UnansweredThreadsTable({
                 <span className="flex items-center gap-2">
                   Filters
                   {activeFilterCount > 0 && (
-                    <Badge className="bg-black text-white">{activeFilterCount}</Badge>
+                    <div className="flex items-center justify-center text-[10px] font-medium w-4 h-4 rounded-full text-center bg-black dark:bg-white text-contrast">
+                      {activeFilterCount}
+                    </div>
                   )}
                 </span>
               </Button>
@@ -367,7 +371,7 @@ function ThreadRow({
   }
 
   return (
-    <tr className="border-b border-border hover:bg-muted/50 transition-colors">
+    <tr className="border-b border-muted hover:bg-muted/50 transition-colors">
       {/* Thread title and product areas */}
       <td className="px-3 py-4 md:px-6 w-[45%]">
         <div className="flex items-center gap-3 overflow-hidden">
@@ -412,35 +416,40 @@ function ThreadRow({
               <p className="text-xs text-foreground-lighter whitespace-nowrap">{thread.posted}</p>
               {/* Product areas */}
               {thread.product_areas.length > 0 &&
-                thread.product_areas
-                  .filter((area: string) => area !== 'Other')
-                  .map((area: string) => {
-                    const isActive = productArea === area
-                    return (
-                      <button key={area} onClick={() => handleProductAreaClick(area)} type="button">
-                        <Badge
-                          variant={isActive ? 'success' : 'default'}
-                          className={cn(
-                            // Hover states to indicate interactivity
-                            'transition-all duration-150 hover:opacity-70'
-                            // 'hover:bg-brand/5 hover:text-brand-600/60 hover:border-brand-500/50,'
-                            // isActive
-                            //   ? 'hover:bg-brand/5 hover:text-brand-600/60 hover:border-brand-500/50'
-                            //   : 'hover:bg-brand hover:text-brand-600 hover:border-brand-500'
-                          )}
-                        >
-                          {area}
-                        </Badge>
-                      </button>
-                    )
-                  })}
+                (() => {
+                  const filteredAreas = thread.product_areas.filter(
+                    (area: string) => area !== 'Other'
+                  )
+                  return filteredAreas.length > 0 ? (
+                    <div className="flex flex-wrap gap-x-1.5 gap-y-1 overflow-hidden">
+                      {filteredAreas.map((area: string) => {
+                        const isActive = productArea === area
+                        return (
+                          <button
+                            key={area}
+                            onClick={() => handleProductAreaClick(area)}
+                            type="button"
+                          >
+                            <Badge
+                              variant={isActive ? 'success' : 'default'}
+                              // Hover states to indicate interactivity
+                              className="transition-all duration-150 hover:opacity-70"
+                            >
+                              {area}
+                            </Badge>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  ) : null
+                })()}
             </div>
           </div>
         </div>
       </td>
       {/* Stack */}
       <td className="py-4 px-3 md:px-6 w-[20%]">
-        <div className="flex flex-wrap gap-2 overflow-hidden">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-0 overflow-hidden">
           {thread.stack.length > 0 ? (
             (() => {
               const filteredStack = thread.stack.filter((tech: string) => tech !== 'Other')
@@ -455,7 +464,13 @@ function ThreadRow({
                     const isActive = currentStack === tech
                     return (
                       <button key={tech} onClick={() => handleStackClick(tech)} type="button">
-                        <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
+                        <Badge
+                          variant={isActive ? 'success' : 'default'}
+                          // Hover states to indicate interactivity
+                          className="transition-all duration-150 hover:opacity-70"
+                        >
+                          {tech}
+                        </Badge>
                       </button>
                     )
                   })}
@@ -465,9 +480,10 @@ function ThreadRow({
                         <button type="button">
                           <Badge
                             variant={hasActiveInOverflow ? 'success' : 'default'}
-                            className="cursor-pointer hover:bg-surface-300"
+                            // Hover states to indicate interactivity
+                            className="transition-all duration-150 hover:opacity-70"
                           >
-                            +{filteredStack.length - 5}
+                            + {filteredStack.length - 5}
                           </Badge>
                         </button>
                       </PopoverTrigger_Shadcn_>
@@ -502,7 +518,11 @@ function ThreadRow({
       <td className="py-4 px-3 md:px-6 w-[10%]">
         <Link href={`/contribute/t/${thread.id}`} className="flex flex-row items-center gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
-            <MessageSquareReply size={18} strokeWidth={1.75} className="text-foreground-muted" />
+            <MessageSquareReply
+              size={18}
+              strokeWidth={1.75}
+              className="text-foreground-muted mt-0.5"
+            />
           )}
           <p className="text-sm text-foreground-lighter whitespace-nowrap">
             {thread.message_count !== null && thread.message_count !== undefined
