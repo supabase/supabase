@@ -6,63 +6,12 @@ settings:
 
 catalogs:
   default:
-    '@sentry/nextjs':
-      specifier: ^10.26.0
-      version: 10.27.0
-    '@supabase/auth-js':
-      specifier: 2.87.0
-      version: 2.87.0
-    '@supabase/postgrest-js':
-      specifier: 2.87.0
-      version: 2.87.0
-    '@supabase/realtime-js':
-      specifier: 2.87.0
-      version: 2.87.0
     '@supabase/supabase-js':
       specifier: 2.87.0
       version: 2.87.0
-    '@types/node':
-      specifier: ^22.0.0
-      version: 22.13.14
-    '@types/react':
-      specifier: ^18.3.0
-      version: 18.3.3
-    '@types/react-dom':
-      specifier: ^18.3.0
-      version: 18.3.0
-    next:
-      specifier: ^15.5.9
-      version: 15.5.9
-    react:
-      specifier: ^18.3.0
-      version: 18.3.1
-    react-dom:
-      specifier: ^18.3.0
-      version: 18.3.1
-    recharts:
-      specifier: ^2.15.4
-      version: 2.15.4
-    tailwindcss:
-      specifier: 3.4.1
-      version: 3.4.1
     tsx:
       specifier: 4.20.3
       version: 4.20.3
-    typescript:
-      specifier: ~5.9.0
-      version: 5.9.2
-    valtio:
-      specifier: ^1.12.0
-      version: 1.12.0
-    vite:
-      specifier: ^7.1.11
-      version: 7.1.11
-    vitest:
-      specifier: ^3.2.0
-      version: 3.2.4
-    zod:
-      specifier: ^3.25.76
-      version: 3.25.76
 
 overrides:
   '@eslint/eslintrc>js-yaml': ^4.1.1
@@ -1890,6 +1839,9 @@ importers:
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
+      otpauth:
+        specifier: ^9.4.1
+        version: 9.4.1
     devDependencies:
       '@faker-js/faker':
         specifier: ^9.9.0
@@ -15590,6 +15542,9 @@ packages:
   ora@8.2.0:
     resolution: {integrity: sha512-weP+BZ8MVNnlCm8c0Qdc1WSWq4Qn7I+9CJGm7Qali6g44e/PUzbjNqJX5NJ9ljlNMosfJvg1fKEGILklK9cwnw==}
     engines: {node: '>=18'}
+
+  otpauth@9.4.1:
+    resolution: {integrity: sha512-+iVvys36CFsyXEqfNftQm1II7SW23W1wx9RwNk0Cd97lbvorqAhBDksb/0bYry087QMxjiuBS0wokdoZ0iUeAw==}
 
   outdent@0.8.0:
     resolution: {integrity: sha512-KiOAIsdpUTcAXuykya5fnVVT+/5uS0Q1mrkRHcF89tpieSmY33O/tmc54CqwA+bfhbtEfZUNLHaPUiB9X3jt1A==}
@@ -36394,6 +36349,10 @@ snapshots:
       stdin-discarder: 0.2.2
       string-width: 7.2.0
       strip-ansi: 7.1.0
+
+  otpauth@9.4.1:
+    dependencies:
+      '@noble/hashes': 1.8.0
 
   outdent@0.8.0: {}
 
