@@ -192,16 +192,16 @@ export const APIKeys = () => {
             </FormItemLayout>
           </CardContent>
 
-          <CardContent>
-            <div className="flex gap-x-2 relative mb-4">
+          <CardContent className="mt-5 mb-3">
+            <div className="flex gap-x-3.5 relative ml-0.5 mb-4 opacity-80">
               <ConnectionIcon icon="nextjs" size={26} />
-              <ConnectionIcon icon="react" size={26} className="opacity-80" />
-              <ConnectionIcon icon="svelte" size={22} className="opacity-40" />
-              <ConnectionIcon icon="flutter" size={24} className="opacity-60" />
-              <ConnectionIcon icon="prisma" size={20} className="opacity-20" />
+              <ConnectionIcon icon="react" size={26} />
+              <ConnectionIcon icon="svelte" size={22} />
+              <ConnectionIcon icon="flutter" size={23} />
+              <ConnectionIcon icon="prisma" size={22} />
             </div>
             <p className="mb-1">Choose with your preferred framework</p>
-            <p className="text-sm text-foreground-light mb-4">
+            <p className="text-sm text-foreground-light mb-4 text-balance">
               Connect to your project with a variety of frameworks, ORMs, an MCP server, or even
               directly via connection string.
             </p>
