@@ -246,7 +246,7 @@ export function UnansweredThreadsTable({
 
       {/* Channel Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-3 overflow-x-auto">
+        <div className="flex items-center flex-wrap gap-3 overflow-x-auto">
           {tabs.map((tab) => {
             const isActive = currentTab === tab.id
             const Icon = tab.icon
@@ -280,7 +280,7 @@ export function UnansweredThreadsTable({
           })}
         </div>
 
-        <div className="flex items-center gap-2 flex-1 justify-end w-full md:w-auto">
+        <div className="flex items-center gap-2 flex-1 md:justify-end w-full md:w-auto">
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-lighter" />

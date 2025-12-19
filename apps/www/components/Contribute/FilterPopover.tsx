@@ -67,7 +67,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
       >
         <div className="">
           {/* Header */}
-          <div className="flex flex-row items-center justify-between px-4 py-2 bg-muted border-b">
+          <div className="flex flex-row items-center justify-between px-4 py-2 bg-muted dark:bg-foreground-muted/10 border-b rounded-t-md">
             <h3 className="text-base text-foreground">Filter Threads</h3>
             <div className="flex items-center gap-2">
               {((productAreas && productAreas.length > 0) || (stacks && stacks.length > 0)) && (
