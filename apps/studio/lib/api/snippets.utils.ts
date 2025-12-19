@@ -15,8 +15,8 @@ type DeepPartial<T> = T extends object
 
 export const SnippetSchema = z.object({
   id: z.string(),
-  inserted_at: z.string().default(new Date().toISOString()),
-  updated_at: z.string().default(new Date().toISOString()),
+  inserted_at: z.string().default(() => new Date().toISOString()),
+  updated_at: z.string().default(() => new Date().toISOString()),
   type: z.literal('sql'),
   name: z.string(),
   description: z.string().optional(),
@@ -438,7 +438,7 @@ export async function deleteFolder(id: string): Promise<void> {
 
   const folderPath = path.join(SNIPPETS_DIR, folder.name)
   try {
-    await fs.rmdir(folderPath, { recursive: true })
+    await fs.rm(folderPath, { recursive: true, force: true })
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       throw error

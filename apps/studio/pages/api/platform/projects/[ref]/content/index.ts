@@ -21,12 +21,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handleGetAll(req, res)
     case 'PUT':
       return handlePut(req, res)
-    case 'POST':
-      return handlePost(req, res)
+
     case 'DELETE':
       return handleDelete(req, res)
     default:
-      res.setHeader('Allow', ['GET', 'PUT', 'POST', 'DELETE'])
+      res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
@@ -85,28 +84,6 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
     return res.status(500).json({ message: error?.message ?? 'Failed to update snippet' })
-  }
-}
-
-type PostRequestData =
-  paths['/platform/projects/{ref}/content']['post']['requestBody']['content']['application/json']
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const body = req.body as PostRequestData
-
-  const { data, error } = SnippetSchema.safeParse(body)
-
-  if (error) {
-    console.error('Validation error:', error)
-    return res.status(400).json({ error: error.message })
-  }
-
-  try {
-    const savedSnippet = await saveSnippet(data)
-    return res.status(200).json(savedSnippet)
-  } catch (error) {
-    console.error('Error creating snippet:', error)
-    return res.status(500).json({ error: 'Failed to create snippet' })
   }
 }
 
