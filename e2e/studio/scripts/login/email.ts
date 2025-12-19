@@ -4,7 +4,7 @@ import { STORAGE_STATE_PATH } from '../../env.config.js'
 /**
  * Authenticate user and save storage state
  */
-export async function authenticateUser(
+export async function loginWithEmail(
   page: Page,
   studioUrl: string,
   credentials: { email: string; password: string; projectRef: string }

@@ -12,8 +12,7 @@ export interface GitHubAuthentication {
   supaDashboard: string
 }
 
-// a bit too complicated to do auth with github via API, so we do authorization with GUI
-const getAccessToken = async ({
+const loginWithGithub = async ({
   page,
   githubTotp,
   githubUser,
@@ -172,7 +171,7 @@ const getAccessToken = async ({
   }
 }
 
-async function authenticateWithGitHub(
+export async function loginWithGithubWithRetry(
   { page, githubTotp, githubUser, githubPass, supaDashboard }: GitHubAuthentication,
   retries = 3
 ) {
@@ -181,7 +180,7 @@ async function authenticateWithGitHub(
   for (let i = 0; i < retries; i++) {
     try {
       console.log(`Authentication attempt ${i + 1} of ${retries}...`)
-      await getAccessToken({
+      await loginWithGithub({
         page,
         githubTotp,
         githubUser,
@@ -198,5 +197,3 @@ async function authenticateWithGitHub(
     }
   }
 }
-
-export { getAccessToken, authenticateWithGitHub }

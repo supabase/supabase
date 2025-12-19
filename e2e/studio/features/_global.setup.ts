@@ -3,8 +3,8 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { env } from '../env.config.js'
 import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
-import { authenticateUser } from '../scripts/login/email.js'
-import { authenticateWithGitHub } from '../scripts/login/github.js'
+import { loginWithEmail } from '../scripts/login/email.js'
+import { loginWithGithubWithRetry } from '../scripts/login/github.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -87,7 +87,7 @@ To start API locally, run:
   if (EMAIL && PASSWORD) {
     console.log(`\n 🔑 Authenticating user with email and password`)
 
-    await authenticateUser(page, studioUrl, {
+    await loginWithEmail(page, studioUrl, {
       email: EMAIL,
       password: PASSWORD,
       projectRef,
@@ -97,7 +97,7 @@ To start API locally, run:
   const { GITHUB_USER, GITHUB_PASS, GITHUB_TOTP } = env
   if (GITHUB_USER && GITHUB_PASS && GITHUB_TOTP) {
     console.log(`\n 🔑 Authenticating user with GitHub`)
-    await authenticateWithGitHub({
+    await loginWithGithubWithRetry({
       page,
       githubTotp: GITHUB_TOTP,
       githubUser: GITHUB_USER,
