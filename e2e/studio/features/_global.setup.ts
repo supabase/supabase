@@ -87,23 +87,35 @@ To start API locally, run:
   if (EMAIL && PASSWORD) {
     console.log(`\n 🔑 Authenticating user with email and password`)
 
-    await loginWithEmail(page, studioUrl, {
-      email: EMAIL,
-      password: PASSWORD,
-    })
-    return
+    try {
+      await loginWithEmail(page, studioUrl, {
+        email: EMAIL,
+        password: PASSWORD,
+      })
+      console.log(`\n ✅ Successfully authenticated with email`)
+      return
+    } catch (err) {
+      console.error(`\n 🚨 Authentication failed with email/password`)
+      throw err
+    }
   }
 
   const { GITHUB_USER, GITHUB_PASS, GITHUB_TOTP } = env
   if (GITHUB_USER && GITHUB_PASS && GITHUB_TOTP) {
     console.log(`\n 🔑 Authenticating user with GitHub`)
-    await loginWithGithubWithRetry({
-      page,
-      githubTotp: GITHUB_TOTP,
-      githubUser: GITHUB_USER,
-      githubPass: GITHUB_PASS,
-      supaDashboard: studioUrl,
-    })
-    return
+    try {
+      await loginWithGithubWithRetry({
+        page,
+        githubTotp: GITHUB_TOTP,
+        githubUser: GITHUB_USER,
+        githubPass: GITHUB_PASS,
+        supaDashboard: studioUrl,
+      })
+      console.log(`\n ✅ Successfully authenticated with GitHub`)
+      return
+    } catch (err) {
+      console.error(`\n 🚨 Authentication failed with GitHub`)
+      throw err
+    }
   }
 })
