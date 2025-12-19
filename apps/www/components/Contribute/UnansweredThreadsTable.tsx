@@ -413,7 +413,7 @@ function ThreadRow({
           </div>
           <div className="min-w-0 flex-1 flex flex-col gap-y-0.5">
             {/* Thread title */}
-            <h3 className="text-base text-foreground truncate group-hover:underline transition-[text-decoration] duration-100 underline-offset-2">
+            <h3 className="text-base text-foreground truncate transition-[text-decoration] duration-100 underline-offset-2">
               {highlightText(thread.title, search)}
             </h3>
             {/* Posted time and product areas */}
@@ -455,7 +455,7 @@ function ThreadRow({
                           >
                             <Badge
                               variant={isActive ? 'success' : 'default'}
-                              className="transition-all duration-150 hover:bg-brand-300/30"
+                              className="transition-all duration-150 hover:bg-brand-300/30 dark:hover:bg-brand-300/80"
                             >
                               {area}
                             </Badge>
@@ -509,7 +509,7 @@ function ThreadRow({
                       >
                         <Badge
                           variant={isActive ? 'success' : 'default'}
-                          className="transition-all duration-150 hover:bg-brand-300/30"
+                          className="transition-all duration-150 hover:bg-brand-300/30 dark:hover:bg-brand-300/80"
                         >
                           {tech}
                         </Badge>
@@ -539,7 +539,7 @@ function ThreadRow({
                         >
                           <Badge
                             variant={hasActiveInOverflow ? 'success' : 'default'}
-                            className="transition-all duration-150 hover:bg-brand-200/50 hover:border-brand-300/50"
+                            className="transition-all duration-150 hover:bg-brand-200/50 dark:hover:bg-brand-300/80"
                           >
                             + {filteredStack.length - 5}
                           </Badge>

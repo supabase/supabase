@@ -63,6 +63,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
       <PopoverContent_Shadcn_
         className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0"
         align="end"
+        sideOffset={8}
       >
         <div className="">
           {/* Header */}
