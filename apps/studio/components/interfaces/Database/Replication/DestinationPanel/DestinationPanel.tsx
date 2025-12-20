@@ -13,6 +13,7 @@ import {
 import { DestinationForm } from './DestinationForm'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
+import { ReadReplicaForm } from './ReadReplicaForm'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -66,9 +67,7 @@ export const DestinationPanel = ({
             <DialogSectionSeparator />
 
             {selectedType === 'Read Replica' ? (
-              <div className="w-full h-full flex items-center justify-center">
-                <p className="text-foreground-lighter text-sm">Coming soon</p>
-              </div>
+              <ReadReplicaForm onClose={onClose} />
             ) : (
               <DestinationForm
                 visible={visible}
