@@ -29,10 +29,10 @@ export const ReadReplicaPricingDialog = () => {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <p className={cn(InlineLinkClassName, 'text-sm text-foreground-light cursor-pointer')}>
+      <DialogTrigger asChild>
+        <button className={cn(InlineLinkClassName, 'text-sm text-foreground-light')}>
           Learn more
-        </p>
+        </button>
       </DialogTrigger>
       <DialogContent
         size={showNewDiskManagementUI ? 'medium' : 'small'}
