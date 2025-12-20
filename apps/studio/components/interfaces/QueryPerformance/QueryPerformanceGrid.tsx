@@ -25,7 +25,10 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Admonition } from 'ui-patterns'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
+import {
+  hasIndexRecommendations,
+  queryInvolvesProtectedSchemas,
+} from './IndexAdvisor/index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
@@ -484,6 +487,10 @@ export const QueryPerformanceGrid = ({
     )
   }
 
+  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
+  const isProtectedSchemaQuery = queryInvolvesProtectedSchemas(selectedQuery)
+  const canShowIndexesTab = isSelectQuery(selectedQuery) && !isProtectedSchemaQuery
+
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
@@ -597,7 +604,7 @@ export const QueryPerformanceGrid = ({
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                {selectedRow !== undefined && isSelectQuery(reportData[selectedRow]?.query) && (
+                {selectedRow !== undefined && canShowIndexesTab && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
                     className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
@@ -611,13 +618,13 @@ export const QueryPerformanceGrid = ({
             <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
-                  reportType={reportType}
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
+                  onClose={() => setSelectedRow(undefined)}
                 />
               )}
             </TabsContent_Shadcn_>
-            {selectedRow !== undefined && isSelectQuery(reportData[selectedRow]?.query) && (
+            {selectedRow !== undefined && canShowIndexesTab && (
               <TabsContent_Shadcn_
                 value="suggestion"
                 className="mt-0 flex-grow min-h-0 overflow-y-auto"

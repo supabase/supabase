@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import CopyButton from 'components/ui/CopyButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useStateTransition } from 'hooks/misc/useStateTransition'
@@ -17,6 +18,7 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
+import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -69,6 +71,14 @@ function SupportFormPageContent() {
   const selectedOrg = organizations?.find((org) => org.slug === orgSlug)
   const isFreePlan = selectedOrg?.plan.id === 'free'
 
+  const {
+    data: incidents,
+    isPending: isIncidentsPending,
+    isError: isIncidentsError,
+  } = useIncidentStatusQuery()
+  const hasActiveIncidents =
+    !isIncidentsPending && !isIncidentsError && incidents && incidents.length > 0
+
   const sendTelemetry = useSupportFormTelemetry()
   useStateTransition(state, 'submitting', 'success', (_, curr) => {
     toast.success('Support request sent. Thank you!')
@@ -91,7 +101,10 @@ function SupportFormPageContent() {
     <SupportFormWrapper>
       <SupportFormHeader />
 
-      {!isSuccess && (
+      <IncidentAdmonition isActive={hasActiveIncidents} />
+
+      {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
+      {!isSuccess && !hasActiveIncidents && (
         <div className="flex flex-col gap-y-4">
           <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
           <DiscordCTACard organizationSlug={orgSlug} />
@@ -168,7 +181,7 @@ function SupportFormHeader() {
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center">
-            Check Supabase status page
+            Check the Supabase status page
           </TooltipContent>
         </Tooltip>
       </div>

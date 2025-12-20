@@ -230,7 +230,6 @@ export const Destinations = () => {
 
       <DestinationPanel
         visible={showNewDestinationPanel}
-        sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}
       />
     </>
