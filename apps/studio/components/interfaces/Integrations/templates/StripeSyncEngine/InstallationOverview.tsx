@@ -112,6 +112,8 @@ export const StripeSyncInstallationPage = () => {
 
     if (!hasTrackedInstallFailed.current) {
       hasTrackedInstallFailed.current = true
+      // This isn't ideal because it will fire on every page load while in error state
+      // in the future we should connect this in the backend to track accurately
       track('integration_install_failed', {
         integrationName: 'stripe_sync_engine',
       })
