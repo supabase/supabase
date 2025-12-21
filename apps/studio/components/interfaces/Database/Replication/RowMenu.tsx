@@ -21,9 +21,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
-  PIPELINE_ACTIONABLE_STATES,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,

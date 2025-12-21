@@ -30,7 +30,7 @@ import {
   Separator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()

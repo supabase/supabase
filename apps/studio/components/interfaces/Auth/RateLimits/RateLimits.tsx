@@ -9,7 +9,6 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -22,12 +21,14 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
 export const RateLimits = () => {
@@ -175,9 +176,9 @@ export const RateLimits = () => {
     <PageSection>
       <PageSectionContent>
         <Form_Shadcn_ {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
                   name="RATE_LIMIT_EMAIL_SENT"
@@ -190,13 +191,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig || !canUpdateEmailLimit}
-                            />
+                            <PrePostTab postTab="emails/h">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig || !canUpdateEmailLimit}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateEmailLimit ? (
@@ -257,13 +259,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
-                            />
+                            <PrePostTab postTab="sms/h">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateSMSRateLimit ? (
@@ -302,13 +305,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
+                            <PrePostTab postTab="requests/5 min">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig && (
@@ -345,13 +349,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
+                            <PrePostTab postTab="requests/5 min">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig && (
@@ -388,13 +393,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
-                            />
+                            <PrePostTab postTab="requests/h">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateAnonymousUsersRateLimit ? (
@@ -431,13 +437,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
+                            <PrePostTab postTab="requests/5 min">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig && (
@@ -474,13 +481,14 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              type="number"
-                              className="w-24"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig || !canUpdateWeb3RateLimit}
-                            />
+                            <PrePostTab postTab="requests/5 min">
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig || !canUpdateWeb3RateLimit}
+                              />
+                            </PrePostTab>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateWeb3RateLimit ? (
