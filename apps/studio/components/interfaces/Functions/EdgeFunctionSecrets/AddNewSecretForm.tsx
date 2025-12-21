@@ -191,15 +191,7 @@ const AddNewSecretForm = () => {
   }
 
   const handleAddAnotherSecret = () => {
-    const formValues = form.getValues('secrets')
-    const isEmptyForm = formValues.every((field) => !field.name && !field.value)
-    if (isEmptyForm) {
-      fields.forEach((_, index) => remove(index))
-      append({ name: '', value: '' })
-      setVisibleSecrets(new Set())
-    } else {
-      append({ name: '', value: '' })
-    }
+    append({ name: '', value: '' })
   }
 
   const isSecretVisible = (fieldId: string) => visibleSecrets.has(fieldId)
