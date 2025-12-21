@@ -10,13 +10,13 @@ import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { useAgentCreateMutation } from 'data/agents/agent-create-mutation'
 import { useAgentMessageDeleteMutation } from 'data/agents/agent-message-delete-mutation'
 import { useAgentMessagesCreateMutation } from 'data/agents/agent-messages-create-mutation'
 import { useAgentMessagesQuery } from 'data/agents/agent-messages-query'
 import { useAgentsQuery } from 'data/agents/agents-query'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
+import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -91,10 +91,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   // Load messages for active chat
-  const {
-    data: initialMessages = [],
-    isSuccess: isSuccessInitialMessages,
-  } = useAgentMessagesQuery<MessageType[]>(
+  const { data: initialMessages = [], isSuccess: isSuccessInitialMessages } = useAgentMessagesQuery<
+    MessageType[]
+  >(
     { id: snap.activeChatId, projectRef: project?.ref },
     {
       enabled:
@@ -106,7 +105,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
   )
 
-  const createSession = useAgentCreateMutation()
+  const { mutate: createSession, isPending: isCreatingSession } = useAgentCreateMutation()
   const saveMessages = useAgentMessagesCreateMutation()
   const deleteMessageMutation = useAgentMessageDeleteMutation()
 
@@ -139,7 +138,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   // Initialize active chat if none selected (global state lives in ai-assistant-state.tsx)
   useEffect(() => {
-    if (!shouldFetchSessions || isPendingSessions || chatSessionsError) return
+    if (!shouldFetchSessions || isPendingSessions || chatSessionsError || isCreatingSession) return
     if (snap.activeChatId) return
 
     if (sessions.length > 0) {
@@ -151,7 +150,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
 
     if (sessions.length === 0 && project?.ref) {
-      createSession.mutate(
+      createSession(
         { projectRef: project.ref },
         {
           onSuccess: (newSession) => {
@@ -167,6 +166,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     shouldFetchSessions,
     isPendingSessions,
     chatSessionsError,
+    isCreatingSession,
     sessions,
     snap.activeChatId,
     project?.ref,
@@ -290,7 +290,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         }
       }
     },
-    [chatMessages, isChatLoading, project?.ref, deleteMessageMutation, setMessages, snap.activeChatId, stop]
+    [
+      chatMessages,
+      isChatLoading,
+      project?.ref,
+      deleteMessageMutation,
+      setMessages,
+      snap.activeChatId,
+      stop,
+    ]
   )
 
   const editMessage = useCallback(
@@ -463,7 +471,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const handleNewChat = () => {
     if (!project?.ref) return
 
-    createSession.mutate(
+    createSession(
       { projectRef: project.ref },
       {
         onSuccess: (newSession) => {
@@ -477,7 +485,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (isChatLoading) stop()
     // Create a new chat to replace the current one
     if (project?.ref) {
-      createSession.mutate(
+      createSession(
         { projectRef: project.ref },
         {
           onSuccess: (newSession) => {
