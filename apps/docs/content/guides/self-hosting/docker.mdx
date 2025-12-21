@@ -133,13 +133,25 @@ While we provided example placeholder passwords and keys in the `.env.example` f
 
 <Admonition type="danger">
 
-  Follow all of the steps in this section to ensure you have a secure setup, and only then start all services.
+  Review the configuration options below and ensure you set all secrets before starting the services.
 
 </Admonition>
 
+### Quick setup (experimental)
+
+To generate and apply all secrets at once you can run:
+
+```sh
+sh ./utils/generate-keys.sh
+```
+
+The script is experimental, so review the output before proceeding and also check `.env` after it's updated by the script.
+
+Alternatively, configure all secrets manually as follows.
+
 ### Configure database password
 
-Change the placeholder password in the `.env` file **before** starting your Supabase for the first time.
+Change the placeholder password in the `.env` file **before** starting Supabase for the first time.
 
 - `POSTGRES_PASSWORD`: the password for the `postgres` and `supabase_admin` database roles
 
@@ -264,7 +276,9 @@ psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:6
 
 When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`, and not just `postgres`.
 
-If for some reason you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database) below.
+If you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database).
+
+To change the database password, read [Changing database password](#changing-database-password).
 
 ### Accessing Edge Functions
 
@@ -478,6 +492,16 @@ After restarting, you can connect to the database directly using a standard Post
 ```sh
 postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
 ```
+
+### Changing database password
+
+To change the database password after initial setup, run:
+
+```sh
+sh ./utils/db-passwd.sh
+```
+
+The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with `docker compose up -d --force-recreate`.
 
 #### File storage backend on macOS
 

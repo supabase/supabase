@@ -19,7 +19,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
@@ -470,7 +470,11 @@ export const TableList = ({
                                     className="flex items-center space-x-2"
                                     onClick={() =>
                                       router.push(
-                                        `/project/${project?.ref}/editor/${x.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+                                        buildTableEditorUrl({
+                                          projectRef: project?.ref,
+                                          tableId: x.id,
+                                          schema: x.schema,
+                                        })
                                       )
                                     }
                                     onMouseEnter={() =>
