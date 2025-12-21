@@ -32,7 +32,8 @@ const IntegrationSettings = () => {
   const showAWSPrivateLinkConfigCat = useFlag('awsPrivateLinkIntegration')
   // PrivateLink is not available in eu-central-2 (Zurich) until Feb 2026
   const isPrivateLinkUnsupportedRegion = project?.region === 'eu-central-2'
-  const showAWSPrivateLink = showAWSPrivateLinkFeature && showAWSPrivateLinkConfigCat && !isPrivateLinkUnsupportedRegion
+  const showAWSPrivateLink =
+    showAWSPrivateLinkFeature && showAWSPrivateLinkConfigCat && !isPrivateLinkUnsupportedRegion
 
   return (
     <>
