@@ -34,7 +34,7 @@ Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29
 
 ### Using Supabase template
 
-We've prepared some [JWT verification](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) templates, that can be found [here](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt).
+You can see [a custom JWT verification example on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) and a variety of [auth function templates](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt) also on GitHub.
 
 To verify incoming requests, you can download the specified template and start using it:
 
@@ -58,14 +58,21 @@ Deno.serve((r) =>
 
 You can also use the Supabase Auth to verify users
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
+
+<Admonition type="warning">
+  Currently the new API keys are not available by default on Edge Functions environment.
+  But you can manually exposed them as [secret](/docs/guides/functions/secrets#local-secrets) using the `SB_` prefix.
+
+We're working on exposing these secrets and make them as default in the future.
+
+</Admonition>
+
 ```ts
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!
-)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SB_PUBLISHABLE_KEY')!)
 
 Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization')!
@@ -95,29 +102,29 @@ import { createRemoteJWKSet, jwtVerify } from 'https://deno.land/x/jose@v4.14.4/
 
 // While developing you may populate the 'SB_JWT_ISSUER' to match the same issuer from your local environment
 // The issuer can also be customised from [auth.jwt_issuer] property
-const SUPABASE_JWT_ISSUER = Deno.env.get("SB_JWT_ISSUER") ??
-  Deno.env.get("SUPABASE_URL") + "/auth/v1";
+const SUPABASE_JWT_ISSUER =
+  Deno.env.get('SB_JWT_ISSUER') ?? Deno.env.get('SUPABASE_URL') + '/auth/v1'
 
 const SUPABASE_JWT_KEYS = createRemoteJWKSet(
-  new URL(Deno.env.get("SUPABASE_URL")! + "/auth/v1/.well-known/jwks.json"),
-);
+  new URL(Deno.env.get('SUPABASE_URL')! + '/auth/v1/.well-known/jwks.json')
+)
 
 function getAuthToken(req: Request) {
-  const authHeader = req.headers.get("authorization");
+  const authHeader = req.headers.get('authorization')
   if (!authHeader) {
-    throw new Error("Missing authorization header");
+    throw new Error('Missing authorization header')
   }
-  const [bearer, token] = authHeader.split(" ");
-  if (bearer !== "Bearer") {
-    throw new Error(`Auth header is not 'Bearer {token}'`);
+  const [bearer, token] = authHeader.split(' ')
+  if (bearer !== 'Bearer') {
+    throw new Error(`Auth header is not 'Bearer {token}'`)
   }
-  return token;
+  return token
 }
 
 function verifySupabaseJWT(jwt: string) {
   return jwtVerify(jwt, SUPABASE_JWT_KEYS, {
     issuer: SUPABASE_JWT_ISSUER,
-  });
+  })
 }
 
 Deno.serve(async (req: Request) => {
@@ -127,15 +134,21 @@ Deno.serve(async (req: Request) => {
       const isValidJWT = await verifySupabaseJWT(token)
 
       if (!isValidJWT) {
-        return Response.json({ msg: 'Invalid JWT' }, {
-          status: 401,
-        })
+        return Response.json(
+          { msg: 'Invalid JWT' },
+          {
+            status: 401,
+          }
+        )
       }
     } catch (e) {
       console.error(e)
-      return Response.json({ msg: e.toString() }, {
-        status: 401,
-      })
+      return Response.json(
+        { msg: e.toString() },
+        {
+          status: 401,
+        }
+      )
     }
   }
 
