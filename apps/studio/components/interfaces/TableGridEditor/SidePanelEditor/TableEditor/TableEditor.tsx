@@ -96,7 +96,8 @@ export const TableEditor = ({
 
   const [generatedPolicies, setGeneratedPolicies] = useState<GeneratedPolicy[]>([])
 
-  const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({
+  const generatePoliciesEnabled = false
+  const { enabled: generatePoliciesEnableds } = useTableCreateGeneratePolicies({
     isNewRecord,
     projectInsertedAt: project?.inserted_at,
   })
