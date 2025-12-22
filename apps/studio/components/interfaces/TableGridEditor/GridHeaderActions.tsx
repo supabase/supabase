@@ -304,7 +304,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             ) : (
               <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger_Shadcn_ asChild>
-                  <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
+                  <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>

@@ -6,16 +6,21 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()
@@ -61,36 +66,30 @@ export const ComplianceConfig = () => {
   }, [isLoading])
 
   return (
-    <div id="compliance-configuration">
-      <div className="flex items-center justify-between mb-6">
-        <FormHeader
-          className="mb-0"
-          title="High Compliance Configuration"
-          description="For projects storing and processing sensitive data (HIPAA)"
-        />
-        <DocsButton href={`${DOCS_URL}/guides/platform/hipaa-projects`} />
-      </div>
-      <FormPanel>
-        <FormSection
-          header={
-            <FormSectionLabel
-              className="lg:col-span-9"
-              description={
-                <p className="text-sm text-foreground-light">
-                  Enable security warnings in the{' '}
-                  <InlineLink href={`/project/${ref}/advisors/security`}>
-                    Security Advisor
-                  </InlineLink>{' '}
-                  to enforce requirements for managing sensitive data
-                </p>
-              }
-            >
-              Apply additional compliance controls to project
-            </FormSectionLabel>
-          }
-        >
-          <FormSectionContent loading={false} className="lg:!col-span-3">
-            <div className="flex items-center justify-end mt-2.5 space-x-2">
+    <PageSection id="compliance-configuration">
+      <PageSectionMeta>
+        <div className="flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
+          <PageSectionSummary>
+            <PageSectionTitle>High Compliance Configuration</PageSectionTitle>
+            <PageSectionDescription>
+              For projects storing and processing sensitive data (HIPAA).
+            </PageSectionDescription>
+          </PageSectionSummary>
+          <DocsButton href={`${DOCS_URL}/guides/platform/hipaa-projects`} />
+        </div>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent className="flex flex-col gap-4 @lg:flex-row @lg:items-center @lg:justify-between">
+            <div className="space-y-2 max-w-2xl">
+              <p className="text-sm">Apply additional compliance controls to project</p>
+              <p className="text-sm text-foreground-light">
+                Enable security warnings in the{' '}
+                <InlineLink href={`/project/${ref}/advisors/security`}>Security Advisor</InlineLink>{' '}
+                to enforce requirements for managing sensitive data.
+              </p>
+            </div>
+            <div className="flex items-center justify-end space-x-2">
               {(isLoading || isSubmitting) && (
                 <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
               )}
@@ -119,9 +118,9 @@ export const ComplianceConfig = () => {
                 </Tooltip>
               )}
             </div>
-          </FormSectionContent>
-        </FormSection>
-      </FormPanel>
-    </div>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }

@@ -19,7 +19,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'

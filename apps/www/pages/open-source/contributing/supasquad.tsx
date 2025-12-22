@@ -9,8 +9,6 @@ import { data as content } from 'data/open-source/contributing/supasquad'
 import { Separator } from 'ui'
 
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const FeaturedSection = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const PerfectTiming = dynamic(() => import('components/Supasquad/PerfectTiming'))
 const Benefits = dynamic(() => import('components/Supasquad/FeaturesSection'))
 const ApplicationFormSection = dynamic(() => import('components/Supasquad/ApplicationFormSection'))
 
@@ -36,15 +34,7 @@ const BeginnersPage: NextPage = () => {
         <Separator />
         <WhySupaSquad {...content.why} />
         <Separator />
-        <FeaturedSection {...content.featured} />
-        <Separator />
-        <PerfectTiming
-          id={content.timing.id}
-          heading={content.timing.heading}
-          subheading={content.timing.subheading}
-          highlights={content.timing.highlights}
-        />
-        <Benefits className="md:mt-24" {...content.benefits} />
+        <Benefits {...content.benefits} />
         <ApplicationFormSection
           id={content.ctaSection.id}
           title={content.ctaSection.title}

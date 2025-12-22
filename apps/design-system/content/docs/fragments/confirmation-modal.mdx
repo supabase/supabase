@@ -1,0 +1,71 @@
+---
+title: Confirmation Modal
+description: A modal dialog for confirmations that require additional context or simple interaction.
+component: true
+---
+
+Confirmation Modal is a convenience wrapper for confirmation flows that are more complex than a single paragraph but do not warrant a full custom dialog. It is built on top of [Dialog](../components/dialog) and provides a prop-based API for consistent confirmation patterns.
+
+Use Confirmation Modal when the user needs extra context to make a decision, such as explanatory copy, callouts, or small form elements, and the action is not so destructive that it requires typed confirmation.
+
+If the confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If the action is highly destructive and requires explicit typed intent, use [Text Confirm Dialog](../fragments/text-confirm-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing the appropriate pattern.
+
+<ComponentPreview name="confirmation-modal-demo" peekCode wide />
+
+## Usage
+
+```tsx
+'use client'
+
+import { useState } from 'react'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+```
+
+```tsx
+export default function ConfirmationModalDemo() {
+  const [visible, setVisible] = useState(false)
+
+  return (
+    <>
+      <Button onClick={() => setVisible(true)}>Show Confirmation Modal</Button>
+
+      <ConfirmationModal
+        visible={visible}
+        size="small"
+        title="Resume this project"
+        confirmLabel="Resume"
+        confirmLabelLoading="Resuming"
+        cancelLabel="Cancel"
+        onConfirm={() => {
+          setVisible(false)
+        }}
+        onCancel={() => {
+          setVisible(false)
+        }}
+      >
+        This will resume the project and restart any paused processes.
+      </ConfirmationModal>
+    </>
+  )
+}
+```
+
+## Guidelines
+
+- **Use for moderate complexity:** Suitable when the confirmation requires more than a single sentence but does not need typed intent.
+- **Avoid critical destruction:** Do not use for irreversible or high-risk actions that could benefit from stronger safeguards.
+- **Keep content focused:** Include only the context needed to make the decision. If the dialog becomes a full flow, use a custom [Dialog](../components/dialog) instead.
+- **Provide clear actions:** Ensure confirm and cancel labels clearly describe the outcome of each choice.
+
+## Props
+
+- `visible`: Controls open state
+- `title`: Dialog title
+- `description`: Optional description
+- `variant`: 'default' | 'destructive' | 'warning'
+- `loading`: Loading state
+- `onConfirm`: Confirm handler
+- `onCancel`: Cancel handler
+- `alert`: Optional callout (see [Admonition](../fragments/admonition))
+- `children`: Additional content
