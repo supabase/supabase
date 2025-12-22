@@ -34,7 +34,7 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
     buyerId: buyerId as string,
   })
 
-  const renderMarketplaceContent = () => {
+  const renderContent = () => {
     if (!isOrganizationsFetched || !isContractLinkingEligibilityFetched) {
       return <AwsMarketplaceOnboardingPlaceholder />
     }
@@ -64,7 +64,7 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
         <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
       </ScaffoldHeader>
       <ScaffoldDivider />
-      {renderMarketplaceContent()}
+      {renderContent()}
     </ScaffoldContainer>
   )
 }
