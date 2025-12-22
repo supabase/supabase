@@ -1,4 +1,4 @@
-import { ident, literal } from '@supabase/pg-meta/src/pg-format'
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -26,7 +26,7 @@ export async function createDatabaseIndex({
 
   const sql = `
   CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${ident(type)} (${columns
-    .map((column) => `${literal(column)}`)
+    .map((column) => `${ident(column)}`)
     .join(', ')});
   `.trim()
 

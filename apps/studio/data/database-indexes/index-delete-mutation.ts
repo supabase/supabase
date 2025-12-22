@@ -19,7 +19,7 @@ export async function deleteDatabaseIndex({
   name,
   schema,
 }: DatabaseIndexDeleteVariables) {
-  const sql = `drop index if exists "${ident(schema)}"."${ident(name)}"`
+  const sql = `drop index if exists ${ident(schema)}.${ident(name)}`
 
   const { result } = await executeSql({
     projectRef,
