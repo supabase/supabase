@@ -14,26 +14,12 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Button,
-  Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
-import {
-  ReadReplicasWarning,
-  UnsupportedExtensionsWarning,
-  UserDefinedObjectsInInternalSchemasWarning,
-  ValidationErrorsWarning,
-} from './UpgradeWarnings'
+import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -82,8 +68,6 @@ const InfrastructureInfo = () => {
   const hasReadReplicas = (databases ?? []).length > 1
 
   const hasValidationErrors = (data?.validation_errors ?? []).length > 0
-  const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
-  const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
   return (
     <>
@@ -124,14 +108,12 @@ const InfrastructureInfo = () => {
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             {isInactive ? (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_>
-                  Service versions cannot be retrieved while project is paused
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Restoring the project will update Postgres to the newest version
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              <Admonition
+                type="note"
+                showIcon={false}
+                title="Service versions cannot be retrieved while project is paused"
+                description="Restoring the project will update Postgres to the newest version"
+              />
             ) : (
               <>
                 {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
@@ -221,18 +203,8 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && !data.eligible ? (
-                      hasValidationErrors ? (
-                        <ValidationErrorsWarning validationErrors={data.validation_errors} />
-                      ) : hasUnsupportedExtensions ? (
-                        <UnsupportedExtensionsWarning
-                          unsupportedExtensions={data.unsupported_extensions}
-                        />
-                      ) : hasObjectsInternalSchema ? (
-                        <UserDefinedObjectsInInternalSchemasWarning
-                          objects={data.user_defined_objects_in_internal_schemas}
-                        />
-                      ) : null
+                    {showDatabaseUpgrades && !data.eligible && hasValidationErrors ? (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors} />
                     ) : null}
                   </>
                 )}

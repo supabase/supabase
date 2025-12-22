@@ -3,43 +3,168 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
+import { Badge, Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   return (
-    <Alert_Shadcn_>
-      <AlertTitle_Shadcn_>
-        A new version of Postgres is available for your project
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        You will need to remove all read replicas prior to upgrading your Postgres version to the
-        latest available ({latestPgVersion}).
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+    <Admonition
+      type="note"
+      showIcon={false}
+      title="A newer version of Postgres is available"
+      description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
+    />
   )
 }
 
-type ValidationError = {
-  type?: string
-  schema_name: string
-  function_name: string
-  lang_name?: string
+type ValidationError =
+  | { type: 'objects_depending_on_pg_cron'; dependents: string[] }
+  | {
+      type: 'indexes_referencing_ll_to_earth'
+      schema_name: string
+      table_name: string
+      index_name: string
+    }
+  | {
+      type: 'function_using_obsolete_lang'
+      schema_name: string
+      function_name: string
+      lang_name: string
+    }
+  | { type: 'unsupported_extension'; extension_name: string }
+  | { type: 'unsupported_fdw_handler'; fdw_name: string; fdw_handler_name: string }
+  | {
+      type: 'unlogged_table_with_persistent_sequence'
+      schema_name: string
+      table_name: string
+      sequence_name: string
+    }
+  | {
+      type: 'user_defined_objects_in_internal_schemas'
+      obj_type: 'table' | 'function'
+      schema_name: string
+      obj_name: string
+    }
+  | { type: 'active_replication_slot'; slot_name: string }
+
+const getValidationErrorKey = (error: ValidationError): string => {
+  switch (error.type) {
+    case 'objects_depending_on_pg_cron':
+      return `pg_cron-${error.dependents.join(',')}`
+    case 'indexes_referencing_ll_to_earth':
+      return `index-${error.schema_name}.${error.index_name}`
+    case 'function_using_obsolete_lang':
+      return `function-${error.schema_name}.${error.function_name}`
+    case 'unsupported_extension':
+      return `extension-${error.extension_name}`
+    case 'unsupported_fdw_handler':
+      return `fdw-${error.fdw_name}`
+    case 'unlogged_table_with_persistent_sequence':
+      return `sequence-${error.schema_name}.${error.table_name}.${error.sequence_name}`
+    case 'user_defined_objects_in_internal_schemas':
+      return `internal-${error.schema_name}.${error.obj_name}`
+    case 'active_replication_slot':
+      return `slot-${error.slot_name}`
+  }
+}
+
+const getValidationErrorTitle = (error: ValidationError): string => {
+  switch (error.type) {
+    case 'objects_depending_on_pg_cron':
+      return error.dependents.join(', ')
+    case 'indexes_referencing_ll_to_earth':
+      return `${error.schema_name}.${error.index_name}`
+    case 'function_using_obsolete_lang':
+      return `${error.schema_name}.${error.function_name}`
+    case 'unsupported_extension':
+      return error.extension_name
+    case 'unsupported_fdw_handler':
+      return error.fdw_name
+    case 'unlogged_table_with_persistent_sequence':
+      return `${error.schema_name}.${error.table_name}`
+    case 'user_defined_objects_in_internal_schemas':
+      return `${error.schema_name}.${error.obj_name}`
+    case 'active_replication_slot':
+      return error.slot_name
+  }
 }
 
 const getValidationErrorDescription = (error: ValidationError): string => {
-  if (!error.type) {
-    return ''
+  switch (error.type) {
+    case 'objects_depending_on_pg_cron':
+      return 'Objects depending on pg_cron must be removed'
+    case 'indexes_referencing_ll_to_earth':
+      return `Index on table ${error.schema_name}.${error.table_name} references ll_to_earth()`
+    case 'function_using_obsolete_lang':
+      return `Function uses obsolete language: ${error.lang_name}`
+    case 'unsupported_extension':
+      return 'Extension not supported in newer Postgres versions'
+    case 'unsupported_fdw_handler':
+      return `FDW using obsolete handler: ${error.fdw_handler_name}`
+    case 'unlogged_table_with_persistent_sequence':
+      return `Unlogged table has persistent sequence: ${error.sequence_name}`
+    case 'user_defined_objects_in_internal_schemas':
+      return `User-defined ${error.obj_type} in Supabase-managed schema`
+    case 'active_replication_slot':
+      return 'Active replication slot must be dropped'
+  }
+}
+
+const ValidationErrorItem = ({
+  error,
+  projectRef,
+}: {
+  error: ValidationError
+  projectRef: string
+}) => {
+  const title = getValidationErrorTitle(error)
+  const description = getValidationErrorDescription(error)
+
+  const getManageLink = (): string | null => {
+    switch (error.type) {
+      case 'function_using_obsolete_lang':
+        return `/project/${projectRef}/database/functions?schema=${error.schema_name}&search=${error.function_name}`
+      case 'unsupported_extension':
+        return `/project/${projectRef}/database/extensions?filter=${error.extension_name}`
+      case 'indexes_referencing_ll_to_earth':
+      case 'unlogged_table_with_persistent_sequence':
+        return `/project/${projectRef}/editor?schema=${error.schema_name}`
+      case 'user_defined_objects_in_internal_schemas':
+        return error.obj_type === 'function'
+          ? `/project/${projectRef}/database/functions?schema=${error.schema_name}&search=${error.obj_name}`
+          : `/project/${projectRef}/editor?schema=${error.schema_name}`
+      case 'objects_depending_on_pg_cron':
+      case 'unsupported_fdw_handler':
+      case 'active_replication_slot':
+        return null
+    }
   }
 
-  switch (error.type) {
-    case 'function_using_obsolete_lang':
-      return error.lang_name
-        ? `Using obsolete language: ${error.lang_name}`
-        : 'Using obsolete language'
-    default:
-      // Fallback to error type as-is
-      return error.type
-  }
+  const manageLink = getManageLink()
+  const showDeprecatedBadge = error.type === 'unsupported_extension'
+
+  return (
+    <li className="py-3 last:pb-0 flex flex-row justify-between items-center">
+      <div className="flex flex-col gap-0 flex-1 min-w-0">
+        <div className="flex flex-row gap-2 items-center">
+          <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
+            {title}
+          </h6>
+          {showDeprecatedBadge && (
+            <Badge variant="warning" className="flex-shrink-0">
+              Deprecated
+            </Badge>
+          )}
+        </div>
+        <p className="text-foreground-muted text-sm">{description}</p>
+      </div>
+      {manageLink && (
+        <Button size="tiny" type="default" asChild>
+          <Link href={manageLink}>Manage</Link>
+        </Button>
+      )}
+    </li>
+  )
 }
 
 export const ValidationErrorsWarning = ({
@@ -49,134 +174,22 @@ export const ValidationErrorsWarning = ({
 }) => {
   const { ref } = useParams()
   return (
-    <Alert_Shadcn_ title="A newer version of Postgres is available for your project">
-      <AlertTitle_Shadcn_>A newer version of Postgres is available</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-        <>
-          <p className="mb-1">
-            The following objects are not supported and must be removed before upgrading.{' '}
-            <InlineLink
-              className="text-foreground-lighter hover:text-foreground transition-colors"
-              href={`${DOCS_URL}/guides/platform/upgrading`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn more
-            </InlineLink>
-          </p>
-
-          <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
-            {validationErrors.map((obj) => {
-              const description = getValidationErrorDescription(obj)
-              return (
-                <li
-                  className="py-3 last:pb-0 flex flex-row justify-between gap-2 items-center"
-                  key={obj.function_name}
-                >
-                  <div className="flex flex-col gap-0 flex-1 min-w-0">
-                    <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
-                      {obj.function_name}
-                    </h6>
-                    {description && <p className="text-foreground-muted text-xs">{description}</p>}
-                  </div>
-                  <Button size="tiny" type="default" asChild>
-                    <Link
-                      href={`/project/${ref}/database/functions?schema=${obj.schema_name}&search=${obj.function_name}`}
-                    >
-                      Manage
-                    </Link>
-                  </Button>
-                </li>
-              )
-            })}
-          </ul>
-        </>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
-  )
-}
-
-export const UnsupportedExtensionsWarning = ({
-  unsupportedExtensions,
-}: {
-  unsupportedExtensions: string[]
-}) => {
-  const { ref } = useParams()
-
-  return (
-    <Alert_Shadcn_ title="A newer version of Postgres is available">
-      <AlertTitle_Shadcn_>A newer version of Postgres is available</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-        <>
-          <p className="mb-1">
-            The following extensions are not supported in newer versions of Postgres and must be
-            removed before upgrading.{' '}
-            <InlineLink
-              className="text-foreground-lighter hover:text-foreground transition-colors"
-              href={`${DOCS_URL}/guides/platform/upgrading#upgrading-to-postgres-17`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn more
-            </InlineLink>
-          </p>
-
-          <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
-            {unsupportedExtensions.map((obj: string) => (
-              <li className="py-3 last:pb-0 flex flex-row justify-between gap-2" key={obj}>
-                <div className="flex flex-row gap-2 items-center flex-1 min-w-0">
-                  <p className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{obj}</p>
-                  <Badge variant="warning" className="flex-shrink-0">
-                    Deprecated
-                  </Badge>
-                </div>
-                <Button size="tiny" type="default" asChild>
-                  <Link href={`/project/${ref}/database/extensions?filter=${obj}`}>Manage</Link>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
-  )
-}
-
-export const UserDefinedObjectsInInternalSchemasWarning = ({ objects }: { objects: string[] }) => {
-  return (
-    <Alert_Shadcn_ title="A newer version of Postgres is available for your project">
-      <AlertTitle_Shadcn_>A newer version of Postgres is available</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-        <div>
-          <p className="mb-1">
-            The following objects must be removed from the auth/realtime/storage schemas before
-            upgrading:
-          </p>
-
-          <ul className="pl-4">
-            {objects.map((obj: string) => (
-              <li className="list-disc" key={obj}>
-                {obj}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
+      <div className="flex flex-col gap-3">
         <p>
-          These schemas are Supabase-managed and creating custom objects in them is no longer
-          supported. Check the changelog to see how to move them to your own schemas.
+          The following issues must be resolved before upgrading.{' '}
+          <InlineLink href={`${DOCS_URL}/guides/platform/upgrading`}>Learn more</InlineLink>
         </p>
-        <div>
-          <Button size="tiny" type="default" asChild>
-            <a
-              href="https://github.com/orgs/supabase/discussions/34270"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View changelog
-            </a>
-          </Button>
-        </div>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+        <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
+          {validationErrors.map((error) => (
+            <ValidationErrorItem
+              key={getValidationErrorKey(error)}
+              error={error}
+              projectRef={ref as string}
+            />
+          ))}
+        </ul>
+      </div>
+    </Admonition>
   )
 }
