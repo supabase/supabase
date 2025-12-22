@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 17 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 19 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/stripe-sync-engine-integration</guid>
+  <title>One-click Stripe data in your Supabase database</title>
+  <link>https://supabase.com/blog/stripe-sync-engine-integration</link>
+  <description>Announcing official support for the Stripe Sync Engine in the Supabase Dashboard. Get a one-click integration that syncs your Stripe data directly into your Supabase database.</description>
+  <pubDate>Fri, 19 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/building-chatgpt-apps-with-supabase</guid>
   <title>Building ChatGPT Apps with Supabase Edge Functions and mcp-use</title>
   <link>https://supabase.com/blog/building-chatgpt-apps-with-supabase</link>
