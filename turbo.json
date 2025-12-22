@@ -194,14 +194,15 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "LUMA_API_KEY",
+        "NEXT_RUNTIME",
         // These env vars are used by some community and marketing integrations
         "SENTRY_DSN_COMMUNITY",
         "NOTION_SUPASQUAD_API_KEY",
         "NOTION_SUPASQUAD_APPLICATIONS_DB_ID",
+        "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY",
-        "NEXT_RUNTIME"
+        "CUSTOMERIO_APP_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
