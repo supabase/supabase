@@ -19,7 +19,34 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
   )
 }
 
-export const ValidationErrorsWarning = ({ validationErrors }: { validationErrors: string[] }) => {
+type ValidationError = {
+  type?: string
+  schema_name: string
+  function_name: string
+  lang_name?: string
+}
+
+const getValidationErrorDescription = (error: ValidationError): string => {
+  if (!error.type) {
+    return ''
+  }
+
+  switch (error.type) {
+    case 'function_using_obsolete_lang':
+      return error.lang_name
+        ? `Using obsolete language: ${error.lang_name}`
+        : 'Using obsolete language'
+    default:
+      // Fallback to error type as-is
+      return error.type
+  }
+}
+
+export const ValidationErrorsWarning = ({
+  validationErrors,
+}: {
+  validationErrors: ValidationError[]
+}) => {
   const { ref } = useParams()
   return (
     <Alert_Shadcn_ title="A newer version of Postgres is available for your project">
@@ -30,7 +57,7 @@ export const ValidationErrorsWarning = ({ validationErrors }: { validationErrors
             The following objects are not supported and must be removed before upgrading.{' '}
             <InlineLink
               className="text-foreground-lighter hover:text-foreground transition-colors"
-              href={`${DOCS_URL}/guides/platform/upgrading#extensions`}
+              href={`${DOCS_URL}/guides/platform/upgrading`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -39,26 +66,29 @@ export const ValidationErrorsWarning = ({ validationErrors }: { validationErrors
           </p>
 
           <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
-            {validationErrors.map((obj: { function_name: string; type: string }) => (
-              <li
-                className="py-3 last:pb-0 flex flex-row justify-between gap-2 items-center"
-                key={obj.function_name}
-              >
-                <div className="flex flex-col gap-0 flex-1 min-w-0">
-                  <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
-                    {obj.function_name}
-                  </h6>
-                  <p className="text-foreground-muted text-xs">{obj.type}</p>
-                </div>
-                <Button size="tiny" type="default" asChild>
-                  <Link
-                    href={`/project/${ref}/database/functions?schema=${obj.schema_name}&search=${obj.function_name}`}
-                  >
-                    Manage
-                  </Link>
-                </Button>
-              </li>
-            ))}
+            {validationErrors.map((obj) => {
+              const description = getValidationErrorDescription(obj)
+              return (
+                <li
+                  className="py-3 last:pb-0 flex flex-row justify-between gap-2 items-center"
+                  key={obj.function_name}
+                >
+                  <div className="flex flex-col gap-0 flex-1 min-w-0">
+                    <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
+                      {obj.function_name}
+                    </h6>
+                    {description && <p className="text-foreground-muted text-xs">{description}</p>}
+                  </div>
+                  <Button size="tiny" type="default" asChild>
+                    <Link
+                      href={`/project/${ref}/database/functions?schema=${obj.schema_name}&search=${obj.function_name}`}
+                    >
+                      Manage
+                    </Link>
+                  </Button>
+                </li>
+              )
+            })}
           </ul>
         </>
       </AlertDescription_Shadcn_>

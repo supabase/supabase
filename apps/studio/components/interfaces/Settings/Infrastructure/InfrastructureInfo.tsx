@@ -82,7 +82,6 @@ const InfrastructureInfo = () => {
   const hasReadReplicas = (databases ?? []).length > 1
 
   const hasValidationErrors = (data?.validation_errors ?? []).length > 0
-  console.log('data?.validation_errors', data?.validation_errors)
   const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
   const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
