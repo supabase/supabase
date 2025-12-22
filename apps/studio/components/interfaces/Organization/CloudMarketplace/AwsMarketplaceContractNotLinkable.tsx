@@ -47,7 +47,7 @@ function determineCardContent(
             .
           </p>
 
-          <Button type="primary" size="medium" className="mt-8">
+          <Button asChild type="primary" size="medium" className="mt-8">
             <Link href="/organizations">Go to Dashboard</Link>
           </Button>
         </>
@@ -63,7 +63,7 @@ function determineCardContent(
             continue to run as usual.
           </p>
 
-          <Button type="primary" size="medium" className="mt-8">
+          <Button asChild type="primary" size="medium" className="mt-8">
             <Link href="/organizations">Go to Dashboard</Link>
           </Button>
         </>

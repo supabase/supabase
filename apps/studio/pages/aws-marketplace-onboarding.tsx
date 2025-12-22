@@ -20,11 +20,19 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
     query: { buyer_id: buyerId },
   } = useRouter()
 
-  const { data: organizations, isFetched: isOrganizationsFetched } = useOrganizationsQuery()
-  const { data: contractLinkingEligibility, isFetched: isContractLinkingEligibilityFetched } =
-    useCloudMarketplaceContractLinkingEligibilityQuery({
-      buyerId: buyerId as string,
-    })
+  const {
+    data: organizations,
+    isFetched: isOrganizationsFetched,
+    isSuccess: wasOrganizationsRequestSuccessful,
+  } = useOrganizationsQuery()
+
+  const {
+    data: contractLinkingEligibility,
+    isFetched: isContractLinkingEligibilityFetched,
+    isSuccess: wasEligibilityRequestSuccessful,
+  } = useCloudMarketplaceContractLinkingEligibilityQuery({
+    buyerId: buyerId as string,
+  })
 
   return (
     <ScaffoldContainer>
@@ -34,18 +42,21 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
       <ScaffoldDivider />
       {!isOrganizationsFetched || !isContractLinkingEligibilityFetched ? (
         <AwsMarketplaceOnboardingPlaceholder />
-      ) : // If the contract is eligible for linking
-      contractLinkingEligibility?.eligibility.is_eligible ? (
-        // If the contract is linkable and there are existing organizations
-        organizations?.length ? (
-          <AwsMarketplaceLinkExistingOrg organizations={organizations} />
-        ) : (
-          // If the contract is linkable and there are no existing organizations
-          <AwsMarketplaceCreateNewOrg />
-        )
       ) : (
-        // If the contract is not eligible for linking
-        <AwsMarketplaceContractNotLinkable eligibility={contractLinkingEligibility!} />
+        wasOrganizationsRequestSuccessful &&
+        wasEligibilityRequestSuccessful &&
+        (contractLinkingEligibility?.eligibility.is_eligible ? (
+          // If the contract is linkable and there are existing organizations
+          organizations?.length ? (
+            <AwsMarketplaceLinkExistingOrg organizations={organizations} />
+          ) : (
+            // If the contract is linkable and there are no existing organizations
+            <AwsMarketplaceCreateNewOrg />
+          )
+        ) : (
+          // If the contract is not eligible for linking
+          <AwsMarketplaceContractNotLinkable eligibility={contractLinkingEligibility} />
+        ))
       )}
     </ScaffoldContainer>
   )
