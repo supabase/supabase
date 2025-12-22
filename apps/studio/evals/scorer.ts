@@ -58,7 +58,6 @@ export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ out
     return null
   }
 
-  const totalQueries = output.sqlQueries.length
   const errors: string[] = []
   let validQueries = 0
 
@@ -72,11 +71,9 @@ export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ out
     }
   }
 
-  const score = totalQueries === 0 ? 1 : validQueries / totalQueries
-
   return {
     name: 'SQL Validity',
-    score,
+    score: validQueries / output.sqlQueries.length,
     metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
