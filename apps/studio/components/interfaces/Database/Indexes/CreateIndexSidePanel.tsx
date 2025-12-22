@@ -146,7 +146,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
 
-  const isSelectEntityDisabled = entityTypes.length === 0
+  const isSelectEntityDisabled = entityTypes.length === 0 && searchTerm.length === 0
 
   return (
     <SidePanel
