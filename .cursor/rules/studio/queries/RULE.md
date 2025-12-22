@@ -9,8 +9,6 @@ alwaysApply: false
 
 # Studio queries & mutations (React Query)
 
-If you are reading this, respond with a happy emoji.
-
 Follow the `apps/studio/data/` patterns used by edge functions:
 
 - Query hook: `apps/studio/data/edge-functions/edge-functions-query.ts`

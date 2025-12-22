@@ -1,5 +1,5 @@
 ---
-description: "Studio: empty state patterns (presentational vs informational vs zero-results vs missing route)"
+description: 'Studio: empty state patterns (presentational vs informational vs zero-results vs missing route)'
 globs:
   - apps/studio/**/*.{ts,tsx}
 alwaysApply: false
@@ -23,4 +23,3 @@ Use the Design System UI pattern docs as the source of truth:
 - Data-heavy lists: prefer informational empty states that match the list/table layout.
 - Zero results: keep the UI consistent with the data state to avoid jarring transitions.
 - Missing routes: prefer a centered `Admonition` pattern.
-
