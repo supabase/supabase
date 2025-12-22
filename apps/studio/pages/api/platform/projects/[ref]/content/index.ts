@@ -1,6 +1,7 @@
 import { paths } from 'api-types'
 import { compact } from 'lodash'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 import apiWrapper from 'lib/api/apiWrapper'
 import {
@@ -88,16 +89,20 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
+const snippetIdsSchema = z
+  .string()
+  .transform((val) => compact(val.split(',').map((id) => id.trim())))
+  .pipe(z.array(z.string().uuid()).nonempty())
+
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ids } = req.query
 
-  if (!ids || typeof ids !== 'string') {
+  const result = snippetIdsSchema.safeParse(ids)
+  if (!result.success) {
     return res.status(400).json({ error: 'Snippet IDs are required' })
   }
-  const snippetIds = compact(ids.split(',').map((id) => id.trim()))
-  if (snippetIds.length === 0) {
-    return res.status(400).json({ error: 'No snippet IDs provided' })
-  }
+
+  const snippetIds = result.data
 
   try {
     for (const id of snippetIds) {
