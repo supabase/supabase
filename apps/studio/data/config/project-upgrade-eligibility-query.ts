@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { IS_PLATFORM } from 'common'
-import type { ValidationError } from 'components/interfaces/Settings/Infrastructure/UpgradeWarnings'
 import { get, handleError } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
+import type { ValidationError } from './types'
 
 export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }

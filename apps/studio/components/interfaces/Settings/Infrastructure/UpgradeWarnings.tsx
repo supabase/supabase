@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
+import type { ValidationError } from 'data/config/types'
 import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -16,36 +17,6 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
     />
   )
 }
-
-export type ValidationError =
-  | { type: 'objects_depending_on_pg_cron'; dependents: string[] }
-  | {
-      type: 'indexes_referencing_ll_to_earth'
-      schema_name: string
-      table_name: string
-      index_name: string
-    }
-  | {
-      type: 'function_using_obsolete_lang'
-      schema_name: string
-      function_name: string
-      lang_name: string
-    }
-  | { type: 'unsupported_extension'; extension_name: string }
-  | { type: 'unsupported_fdw_handler'; fdw_name: string; fdw_handler_name: string }
-  | {
-      type: 'unlogged_table_with_persistent_sequence'
-      schema_name: string
-      table_name: string
-      sequence_name: string
-    }
-  | {
-      type: 'user_defined_objects_in_internal_schemas'
-      obj_type: 'table' | 'function'
-      schema_name: string
-      obj_name: string
-    }
-  | { type: 'active_replication_slot'; slot_name: string }
 
 const getValidationErrorKey = (error: ValidationError): string => {
   switch (error.type) {
@@ -156,7 +127,7 @@ const ValidationErrorItem = ({
             </Badge>
           )}
         </div>
-        <p className="text-foreground-muted text-sm">{description}</p>
+        <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
         <Button size="tiny" type="default" asChild>
@@ -173,6 +144,8 @@ export const ValidationErrorsWarning = ({
   validationErrors: ValidationError[]
 }) => {
   const { ref } = useParams()
+  if (!ref) return null
+  const projectRef: string = ref
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
       <div className="flex flex-col gap-3">
@@ -185,7 +158,7 @@ export const ValidationErrorsWarning = ({
             <ValidationErrorItem
               key={getValidationErrorKey(error)}
               error={error}
-              projectRef={ref as string}
+              projectRef={projectRef}
             />
           ))}
         </ul>
