@@ -1,7 +1,8 @@
+import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 import { fetchHandler } from 'data/fetchers'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { Button } from 'ui'
 
 // Show the banner if the clock skew is greater than 2 minutes
 const CLOCK_SKEW_THRESHOLD = 2 * 60 * 1000
@@ -42,15 +43,17 @@ export const ClockSkewBanner = () => {
   if (!clockSkew) return null
 
   return (
-    <div className="flex items-center justify-center gap-x-4 bg-destructive-400 py-0.5 transition text-foreground box-border border-b border-default">
-      <p className="text-sm">
-        Your computer's clock appears to be inaccurate. This can cause issues with certain features.
-      </p>
-      <Button asChild type="text">
-        <a href={`${DOCS_URL}`} target="_blank">
-          More information
-        </a>
-      </Button>
-    </div>
+    <HeaderBanner
+      variant="warning"
+      title="Your computer’s clock appears to be inaccurate"
+      description={
+        <>
+          This can cause issues with certain features.{' '}
+          <Link href={`${DOCS_URL}`} target="_blank" rel="noopener noreferrer">
+            Learn more
+          </Link>
+        </>
+      }
+    />
   )
 }
