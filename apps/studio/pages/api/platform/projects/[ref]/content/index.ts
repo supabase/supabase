@@ -6,7 +6,6 @@ import { z } from 'zod'
 import apiWrapper from 'lib/api/apiWrapper'
 import {
   deleteSnippet,
-  getSnippet,
   getSnippets,
   saveSnippet,
   SnippetSchema,
@@ -82,8 +81,6 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
 const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const updates = req.body
-    // try to get the snippet first, if the snippet doesn't exist, it will throw an error
-    await getSnippet(updates.id)
     const updatedSnippet = await updateSnippet(updates.id, updates)
     return res.status(200).json(updatedSnippet)
   } catch (error: any) {

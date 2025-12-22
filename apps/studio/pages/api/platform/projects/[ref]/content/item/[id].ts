@@ -1,4 +1,3 @@
-import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
@@ -17,9 +16,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
-
-type ResponseData =
-  paths['/platform/projects/{ref}/content/item/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

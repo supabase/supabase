@@ -14,7 +14,7 @@ type DeepPartial<T> = T extends object
   : T
 
 export const SnippetSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   inserted_at: z.string().default(() => new Date().toISOString()),
   updated_at: z.string().default(() => new Date().toISOString()),
   type: z.literal('sql'),
