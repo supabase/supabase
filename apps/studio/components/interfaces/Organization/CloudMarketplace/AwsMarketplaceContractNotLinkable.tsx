@@ -58,9 +58,9 @@ function determineCardContent(
         <>
           <p>
             You’ve accepted a private offer that updated or extended an existing Supabase
-            subscription on the AWS Marketplace. Your Supabase organization will remain linked to
-            the AWS Marketplace, and your projects will continue to run as usual. No further action
-            is required on your end.
+            subscription on the AWS Marketplace. No further action is required on your end. Your
+            Supabase organization will remain linked to the AWS Marketplace, and your projects will
+            continue to run as usual.
           </p>
 
           <Button type="primary" size="medium" className="mt-8">
