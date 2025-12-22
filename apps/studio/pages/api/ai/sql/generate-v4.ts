@@ -164,11 +164,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         : "You don't have access to any schemas."
     }
 
-    const validatedMessages = await safeValidateUIMessages({ messages: rawMessages })
-    if (!validatedMessages.success) {
-      return res.status(400).json({ error: 'Invalid messages', issues: validatedMessages.error })
-    }
-
     const result = await generateAssistantResponse({
       messages,
       model,
