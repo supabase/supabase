@@ -34,15 +34,18 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
       <ScaffoldDivider />
       {!isOrganizationsFetched || !isContractLinkingEligibilityFetched ? (
         <AwsMarketplaceOnboardingPlaceholder />
-      ) : // If the contract is not eligible for linking
-      !contractLinkingEligibility.eligibility.is_eligible ? (
-        <AwsMarketplaceContractNotLinkable eligibility={contractLinkingEligibility} />
-      ) : // If the contract is linkable and there are existing organizations
-      organizations?.length ? (
-        <AwsMarketplaceLinkExistingOrg organizations={organizations} />
+      ) : // If the contract is eligible for linking
+      contractLinkingEligibility?.eligibility.is_eligible ? (
+        // If the contract is linkable and there are existing organizations
+        organizations?.length ? (
+          <AwsMarketplaceLinkExistingOrg organizations={organizations} />
+        ) : (
+          // If the contract is linkable and there are no existing organizations
+          <AwsMarketplaceCreateNewOrg />
+        )
       ) : (
-        // If the contract is linkable and there are no existing organizations
-        <AwsMarketplaceCreateNewOrg />
+        // If the contract is not eligible for linking
+        <AwsMarketplaceContractNotLinkable eligibility={contractLinkingEligibility!} />
       )}
     </ScaffoldContainer>
   )
