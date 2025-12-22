@@ -1,5 +1,5 @@
 ---
-title: 'Sync Stripe data to your Supabase database in one click'
+title: 'Sync Stripe Data to Your Supabase Database in One Click'
 description: 'Announcing official support for the Stripe Sync Engine in the Supabase Dashboard. Get a one-click integration that syncs your Stripe data directly into your Supabase database.'
 categories:
   - product
@@ -119,10 +119,15 @@ Enable the Stripe Sync Engine from your Supabase dashboard:
 
 1. Navigate to **Integrations** in your project dashboard
 2. Find **Stripe Sync Engine** and click **Install**
-3. Enter your Stripe API key (we recommend a restricted key with read-only access)
+3. Enter your Stripe API key (we recommend a restricted key with write access to Webhook Endpoints and read-only access to all other categories)
 4. Syncing will start automatically after the installation completes
 
-![Stripe Sync Engine integration in the Supabase Dashboard](/images/blog/2025-12-19-stripe-sync-engine-integration/dashboard.png)
+<Img
+  alt="Stripe Sync Engine overview page in the dashboard"
+  src="/images/blog/2025-12-19-stripe-sync-engine-integration/dashboard.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
 The initial backfill will sync your historical data. Depending on your Stripe account size, this may take a few minutes to a few hours. Webhooks begin processing immediately, so new events are captured in real-time.
 
