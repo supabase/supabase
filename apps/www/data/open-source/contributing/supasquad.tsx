@@ -31,9 +31,10 @@ export const data = {
     ),
     ctas: [
       {
-        label: 'Learn how to join',
-        href: '#cta',
+        label: 'Apply to join',
+        href: process.env.NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL || '#',
         type: 'primary' as any,
+        target: '_blank',
       },
     ],
   },
