@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react'
-import Link from 'next/link'
-import { Badge, cn } from 'ui'
 import { ChevronRightIcon } from 'lucide-react'
+import Link from 'next/link'
+import React, { ReactNode } from 'react'
+import { Badge, cn } from 'ui'
 
 interface Props {
   url: string
@@ -40,7 +40,7 @@ const AnnouncementBadge = ({
           p-1 pr-0.5
           text-sm
           w-auto
-          gap-2
+          gap-1.5
           text-left
           rounded-full
           bg-opacity-20
@@ -52,7 +52,7 @@ const AnnouncementBadge = ({
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
-        !badge && 'pl-4'
+        !badge && 'pl-5'
       )}
     >
       {badge && (
