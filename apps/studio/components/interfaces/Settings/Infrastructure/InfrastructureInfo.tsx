@@ -29,10 +29,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import {
-  ObjectsToBeDroppedWarning,
   ReadReplicasWarning,
   UnsupportedExtensionsWarning,
   UserDefinedObjectsInInternalSchemasWarning,
+  ValidationErrorsWarning,
 } from './UpgradeWarnings'
 
 const InfrastructureInfo = () => {
@@ -81,7 +81,8 @@ const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
+  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
+  console.log('data?.validation_errors', data?.validation_errors)
   const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
   const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
@@ -117,7 +118,7 @@ const InfrastructureInfo = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <h4 className="text-base capitalize m-0">Service versions</h4>
             <p className="text-foreground-light text-sm pr-8 mt-1">
               Service versions and upgrade eligibility for your provisioned instance.
             </p>
@@ -222,10 +223,8 @@ const InfrastructureInfo = () => {
                     ) : null}
 
                     {showDatabaseUpgrades && !data.eligible ? (
-                      hasObjectsToBeDropped ? (
-                        <ObjectsToBeDroppedWarning
-                          objectsToBeDropped={data.objects_to_be_dropped}
-                        />
+                      hasValidationErrors ? (
+                        <ValidationErrorsWarning validationErrors={data.validation_errors} />
                       ) : hasUnsupportedExtensions ? (
                         <UnsupportedExtensionsWarning
                           unsupportedExtensions={data.unsupported_extensions}

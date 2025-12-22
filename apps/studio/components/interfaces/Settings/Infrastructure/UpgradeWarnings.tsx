@@ -19,11 +19,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
   )
 }
 
-export const ObjectsToBeDroppedWarning = ({
-  objectsToBeDropped,
-}: {
-  objectsToBeDropped: string[]
-}) => {
+export const ValidationErrorsWarning = ({ validationErrors }: { validationErrors: string[] }) => {
   const { ref } = useParams()
   return (
     <Alert_Shadcn_ title="A newer version of Postgres is available for your project">
@@ -42,18 +38,28 @@ export const ObjectsToBeDroppedWarning = ({
             </InlineLink>
           </p>
 
-          {/* Old */}
-          <ul className="pl-4 pb-3">
-            {objectsToBeDropped.map((obj) => (
-              <li className="list-disc" key={obj}>
-                {obj}
+          <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
+            {validationErrors.map((obj: { function_name: string; type: string }) => (
+              <li
+                className="py-3 last:pb-0 flex flex-row justify-between gap-2 items-center"
+                key={obj.function_name}
+              >
+                <div className="flex flex-col gap-0 flex-1 min-w-0">
+                  <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
+                    {obj.function_name}
+                  </h6>
+                  <p className="text-foreground-muted text-xs">{obj.type}</p>
+                </div>
+                <Button size="tiny" type="default" asChild>
+                  <Link
+                    href={`/project/${ref}/database/functions?schema=${obj.schema_name}&search=${obj.function_name}`}
+                  >
+                    Manage
+                  </Link>
+                </Button>
               </li>
             ))}
           </ul>
-
-          <Button className="w-fit" size="tiny" type="default" asChild>
-            <Link href={`/project/${ref}/database/functions`}>Manage functions</Link>
-          </Button>
         </>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
