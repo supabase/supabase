@@ -1,5 +1,4 @@
-import { Badge, Image } from 'ui'
-import { companyStats } from '~/data/company-stats'
+import { Image } from 'ui'
 
 export const data = {
   metadata: {
@@ -14,8 +13,8 @@ export const data = {
     subheader: [
       <>
         Join passionate contributors to shape the entire Supabase experience. From helping
-        developers solve problems to creating guides, advocating on social channels, and maintaining
-        code repositories, find your way to make a meaningful impact.
+        developers solve problems to hosting events, advocating on social channels, and creating
+        content, find your way to make a meaningful impact.
       </>,
     ],
     image: (
@@ -33,7 +32,7 @@ export const data = {
     ctas: [
       {
         label: 'Learn how to join',
-        href: '#why-supasquad',
+        href: '#cta',
         type: 'primary' as any,
       },
     ],
@@ -102,95 +101,32 @@ export const data = {
       "We recognize that every contributor brings unique strengths, which is why we've created four distinct tracks to match how you want to make an impact. You can join one or multiple tracks based on your interests and skills.",
     features: [
       {
-        id: 'advocate',
-        icon: 'heart',
-        heading: 'Advocate',
-        subheading:
-          "Spread the word on social channels and help answer Supabase-related questions across the broader developer community. Your voice helps more builders discover what's possible.",
-      },
-      {
-        id: 'helper',
+        id: 'contributor',
         icon: 'life-buoy',
-        heading: 'Helper',
+        heading: 'Contributor',
         subheading:
-          "Share your expertise by answering questions on Discord, GitHub Discussions, and other community platforms. Help improve docs and guides that make everyone's journey smoother.",
+          'Support the Supabase community by sharing expertise, improving docs, answering questions, and keeping our spaces welcoming and productive.',
       },
       {
-        id: 'maintainer',
-        icon: 'wrench',
-        heading: 'Maintainer',
+        id: 'content-creator',
+        icon: 'video',
+        heading: 'Content Creator',
         subheading:
-          'Contribute to client libraries, manage issues, fix bugs, and improve the overall developer experience. Work directly with the core team to keep Supabase running smoothly.',
+          'Make Supabase shine through videos, blogs, tutorials, and other content that educates and inspires developers.',
       },
       {
-        id: 'moderator',
-        icon: 'shield',
-        heading: 'Moderator',
+        id: 'trusted-host',
+        icon: 'users',
+        heading: 'Trusted Host',
         subheading:
-          'Maintain welcoming community guidelines across GitHub, Discord, Reddit, and other platforms. Ensure our spaces remain productive and helpful for all members.',
-      },
-    ],
-  },
-  timing: {
-    id: 'results',
-    heading: <>The Perfect Time to Join</>,
-    subheading:
-      "Supabase's explosive growth means more builders need help. There are more opportunities to contribute, and more ways to make your mark. Join SupaSquad and help us support this thriving ecosystem of builders.",
-    highlights: [
-      {
-        heading: companyStats.databasesManaged.label,
-        subheading: companyStats.databasesManaged.text,
+          'Run high-quality Supabase meetups that bring developers together and grow strong local communities.',
       },
       {
-        heading: companyStats.databasesLaunchedDaily.label,
-        subheading: companyStats.databasesLaunchedDaily.text,
-      },
-    ],
-  },
-  featured: {
-    id: 'featured',
-    label: '',
-    heading: (
-      <>
-        <p className="label">Featured</p>
-        <span className="text-foreground">We're especially looking for</span>
-      </>
-    ),
-    subheading:
-      "These are the areas where we need the most help right now. If you have expertise in any of these domains, we'd love to hear from you!",
-    features: [
-      {
-        id: 'expo',
-        icon: 'smartphone',
-        heading: (
-          <div className="flex items-center gap-2">
-            Expo <Badge variant="success">High Priority</Badge>
-          </div>
-        ),
+        id: 'event-speaker',
+        icon: 'mic',
+        heading: 'Event Speaker',
         subheading:
-          'Know Expo really well? Come help the team by writing docs, creating examples, and making sure our guides are up to date. ',
-      },
-      {
-        id: 'ai-builders',
-        icon: 'bot',
-        heading: (
-          <div className="flex items-center gap-2">
-            AI Builders <Badge variant="success">High Priority</Badge>
-          </div>
-        ),
-        subheading:
-          "Help our users who are building with AI + Supabase. If you've vibed a bunch of projects but understand what's happening under the hood, we'd love to talke with you .",
-      },
-      {
-        id: 'realtime',
-        icon: 'zap',
-        heading: (
-          <div className="flex items-center gap-2">
-            Realtime <Badge variant="success">High Priority</Badge>
-          </div>
-        ),
-        subheading:
-          'Help the team by writing docs, creating examples, and making sure our guides are up to date. Experience with React and friends is an extra bonus.',
+          'Represent Supabase at developer events by sharing insights, telling great stories, and showcasing what builders can create.',
       },
     ],
   },
@@ -198,7 +134,7 @@ export const data = {
     id: 'benefits',
     heading: <span className="text-foreground">Benefits for our members</span>,
     subheading:
-      'Contributing to SupaSquad comes with real benefits. From community recognition to paid opportunities, we value your time and impact.',
+      'Contributing to SupaSquad comes with real benefits. From community recognition to exclusive perks, we value your time and impact.',
     features: [
       {
         id: 'community-recognition',
@@ -223,11 +159,11 @@ export const data = {
         icon: 'message-square',
       },
       {
-        id: 'paid-contributions',
-        heading: 'Paid Contributions',
+        id: 'partner-deals',
+        heading: 'Partner Deals',
         subheading:
-          'We invite top contributors to get paid for their efforts. Earn while you contribute with a stipend that recognizes the value of your time and expertise.',
-        icon: 'dollar-sign',
+          'Exclusive discounts and benefits on leading developer tools, AI platforms, and lifestyle brands.',
+        icon: 'tag',
       },
       {
         id: 'exclusive-swag',

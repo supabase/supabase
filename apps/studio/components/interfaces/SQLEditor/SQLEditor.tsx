@@ -11,7 +11,6 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -19,7 +18,6 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { generateUuid } from 'lib/api/snippets.browser'
@@ -94,8 +92,7 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { includeSchemaMetadata, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
-  const [selectedSchemas] = useSchemasForAi(project?.ref!)
+  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
 
   const {
     sourceSqlDiff,
@@ -149,25 +146,12 @@ export const SQLEditor = () => {
     { enabled: isValidConnString(project?.connectionString) }
   )
 
-  const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
-    {
-      schemas: selectedSchemas,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: isValidConnString(project?.connectionString) && includeSchemaMetadata }
-  )
-  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) snapV2.addResult(id, data.result, vars.autoLimit)
-
-      // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
-      refetchEntityDefinitions()
 
       // revalidate lint query
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
@@ -410,7 +394,7 @@ export const SQLEditor = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entityDefinitions, id, snapV2.results, snapV2.snippets])
+  }, [id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {

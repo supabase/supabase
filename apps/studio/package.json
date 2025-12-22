@@ -136,6 +136,7 @@
     "sql-formatter": "^15.0.0",
     "sqlstring": "^2.3.2",
     "streamdown": "^1.3.0",
+    "stripe-experiment-sync": "^1.0.18",
     "tus-js-client": "^4.1.0",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
