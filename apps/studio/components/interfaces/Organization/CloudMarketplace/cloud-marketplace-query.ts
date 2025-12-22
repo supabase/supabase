@@ -75,6 +75,9 @@ export async function getCloudMarketplaceContractLinkingEligibility(
 export type CloudMarketplaceContractLinkingEligibility = Awaited<
   ReturnType<typeof getCloudMarketplaceContractLinkingEligibility>
 >
+export type CloudMarketplaceContractLinkingIneligibilityReason =
+  CloudMarketplaceContractLinkingEligibility['eligibility']['reasons'][0]
+
 export type CloudMarketplaceContractEligibilityError = ResponseError
 
 export const useCloudMarketplaceContractLinkingEligibilityQuery = <

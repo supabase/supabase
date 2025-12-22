@@ -1,25 +1,23 @@
-import { CloudMarketplaceContractLinkingEligibility } from './cloud-marketplace-query'
+import { CloudMarketplaceContractLinkingIneligibilityReason } from './cloud-marketplace-query'
 import { Button, Card, CardContent } from 'ui'
 import Link from 'next/link'
 import { SupportLink } from '../../Support/SupportLink'
 
 interface Props {
-  eligibility: CloudMarketplaceContractLinkingEligibility
+  reason: CloudMarketplaceContractLinkingIneligibilityReason
 }
 
-const AwsMarketplaceContractNotLinkable = ({ eligibility }: Props) => {
+const AwsMarketplaceContractNotLinkable = ({ reason }: Props) => {
   return (
     <div className="mt-5 mb-10">
       <Card className="p-4">
-        <CardContent>{determineCardContent(eligibility.eligibility.reasons[0])}</CardContent>
+        <CardContent>{determineCardContent(reason)}</CardContent>
       </Card>
     </div>
   )
 }
 
-function determineCardContent(
-  reason: CloudMarketplaceContractLinkingEligibility['eligibility']['reasons'][0]
-) {
+function determineCardContent(reason: CloudMarketplaceContractLinkingIneligibilityReason) {
   switch (reason) {
     case 'NO_ACTIVE_CONTRACT_FOUND':
       return (

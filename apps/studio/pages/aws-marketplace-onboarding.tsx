@@ -45,7 +45,7 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
       ) : (
         wasOrganizationsRequestSuccessful &&
         wasEligibilityRequestSuccessful &&
-        (contractLinkingEligibility?.eligibility.is_eligible ? (
+        (contractLinkingEligibility.eligibility.is_eligible ? (
           // If the contract is linkable and there are existing organizations
           organizations?.length ? (
             <AwsMarketplaceLinkExistingOrg organizations={organizations} />
@@ -55,7 +55,9 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
           )
         ) : (
           // If the contract is not eligible for linking
-          <AwsMarketplaceContractNotLinkable eligibility={contractLinkingEligibility} />
+          <AwsMarketplaceContractNotLinkable
+            reason={contractLinkingEligibility.eligibility.reasons[0]}
+          />
         ))
       )}
     </ScaffoldContainer>
