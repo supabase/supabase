@@ -5,6 +5,7 @@ import { DiscordIcon, GitHubIcon, RedditIcon } from '~/components/Contribute/Ico
 import { Conversation } from '~/components/Contribute/Conversation'
 import { Suspense } from 'react'
 import Loading from '../../app/contribute/t/[id]/loading'
+import Link from 'next/link'
 
 export async function ThreadContent({ id }: { id: string }) {
   const thread = await getThreadById(id)
@@ -26,12 +27,20 @@ export async function ThreadContent({ id }: { id: string }) {
             <span className="text-sm text-foreground-lighter">{thread.posted}</span>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-2">{thread.title}</h1>
-          <p className="text-sm text-foreground-lighter">by {thread.user}</p>
+          <p className="text-sm text-foreground-lighter">
+            by{' '}
+            <Link
+              href={`/contribute/u/${encodeURIComponent(thread.user)}`}
+              className="hover:text-foreground transition-colors"
+            >
+              {thread.user}
+            </Link>
+          </p>
         </div>
       </div>
 
       <Suspense fallback={<Loading />}>
-        <Conversation thread_key={thread.thread_key} />
+        <Conversation thread_key={thread.thread_key} summary={thread.summary} />
       </Suspense>
 
       <div className="grid gap-4 mb-6">

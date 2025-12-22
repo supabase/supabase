@@ -106,7 +106,7 @@ export function UnansweredThreadsTable({
     })
   )
 
-  const [isPending, startTransition] = useTransition()
+  const [_, startTransition] = useTransition()
   const [channel, setChannel] = useQueryState(
     'channel',
     parseAsString.withDefault('all').withOptions({
@@ -120,7 +120,6 @@ export function UnansweredThreadsTable({
     {
       id: 'all',
       label: 'All',
-      icon: AllIcon,
     },
     {
       id: 'discord',
@@ -597,15 +596,14 @@ function ThreadRow({
               : '—'}
           </p>
         </div>
+        {/* Floating link */}
+        <Link
+          href={`/contribute/t/${thread.id}`}
+          className="absolute inset-0 z-0"
+          aria-label={`View thread: ${thread.title}`}
+          tabIndex={1}
+        />
       </TableCell>
-
-      {/* Floatin link */}
-      <Link
-        href={`/contribute/t/${thread.id}`}
-        className="absolute inset-0 z-0"
-        aria-label={`View thread: ${thread.title}`}
-        tabIndex={1}
-      />
     </TableRow>
   )
 }

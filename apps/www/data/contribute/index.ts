@@ -283,3 +283,63 @@ export async function getLeaderboard(
   if (error) throw error
   return data ?? []
 }
+
+export async function getUserActivity(author: string) {
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
+
+  // Get user's threads
+  const { data: threads, error: threadsError } = await supabase
+    .from('contribute_threads')
+    .select(
+      'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
+    )
+    .eq('author', author)
+    .order('first_msg_time', { ascending: false })
+    .limit(50)
+
+  if (threadsError) {
+    console.error('Error fetching user threads:', threadsError)
+  }
+
+  // Get user's replies
+  const { data: replies, error: repliesError } = await supabase
+    .from('contribute_posts')
+    .select('id, author, content, ts, external_activity_url, thread_key, kind')
+    .eq('author', author)
+    .eq('kind', 'reply')
+    .order('ts', { ascending: false })
+    .limit(50)
+
+  if (repliesError) {
+    console.error('Error fetching user replies:', repliesError)
+  }
+
+  // Get thread information for replies
+  const threadKeys = replies?.map((r) => r.thread_key).filter(Boolean) ?? []
+  let replyThreads: Thread[] = []
+
+  if (threadKeys.length > 0) {
+    const { data: replyThreadsData, error: replyThreadsError } = await supabase
+      .from('contribute_threads')
+      .select(
+        'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
+      )
+      .in('thread_key', threadKeys)
+
+    if (replyThreadsError) {
+      console.error('Error fetching reply threads:', replyThreadsError)
+    } else {
+      replyThreads = (replyThreadsData ?? []) as Thread[]
+    }
+  }
+
+  return {
+    threads: threads ? threads.map((t) => mapThreadRowToThread(t as Thread)) : [],
+    replies: replies ?? [],
+    replyThreads: replyThreads.map((t) => mapThreadRowToThread(t)),
+    stats: {
+      threadCount: threads?.length ?? 0,
+      replyCount: replies?.length ?? 0,
+    },
+  }
+}
