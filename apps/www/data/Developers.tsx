@@ -1,4 +1,4 @@
-import { Calendar, HardHat } from 'lucide-react'
+import { HardHat, Calendar, Pencil } from 'lucide-react'
 import {
   IconBriefcase2,
   IconChangelog,
@@ -78,9 +78,10 @@ export const data = {
           icon: IconGitHubSolid,
         },
         {
-          text: 'GitHub Discussions',
-          url: 'https://github.com/orgs/supabase/discussions',
-          icon: IconDiscussions,
+          text: 'Contribute',
+          description: 'How to contribute to Supabase.',
+          url: '/contribute',
+          icon: () => <Pencil className="w-4 h-4  " />,
         },
         {
           text: 'Become a Partner',
