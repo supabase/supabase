@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 import { useOrganizationRestrictions } from 'hooks/misc/useOrganizationRestrictions'
 import { cn, CriticalIcon, WarningIcon } from 'ui'
@@ -10,6 +10,9 @@ const bannerMotionProps = {
   exit: { height: 0, opacity: 0 },
   transition: { duration: 0.2, delay: 0.5 },
 } as const
+
+const linkStyles =
+  '[&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-foreground-muted/80 [&_a]:hover:decoration-foreground [&_a]:transition-all'
 
 export const OrganizationResourceBanner = () => {
   const { warnings } = useOrganizationRestrictions()
@@ -26,13 +29,13 @@ export const OrganizationResourceBanner = () => {
 export const HeaderBanner = ({
   type,
   title,
-  message,
+  description,
   link,
   linkText = 'Details',
 }: {
   type: 'danger' | 'warning' | 'note'
   title: string
-  message: string
+  description: string | ReactNode
   link?: string
   linkText?: string
 }) => {
@@ -54,11 +57,12 @@ export const HeaderBanner = ({
     <motion.div
       {...bannerMotionProps}
       className={cn(
-        'relative border-b py-3 flex items-center justify-center flex-shrink-0 px-0',
+        'relative border-b px-4 py-4 md:py-3 flex items-center md:justify-center',
         bannerStyles
       )}
       layout="position"
     >
+      {/* Striped background */}
       <div
         className="absolute inset-0 opacity-[1.6%] dark:opacity-[0.8%]"
         style={{
@@ -74,22 +78,21 @@ export const HeaderBanner = ({
         }}
       />
       {/* Text content and link */}
-      <div className="relative z-[1] items-center flex flex-row gap-2">
-        <Icon className={cn('flex-shrink-0', iconStyles)} />
-        {/* Required text */}
-        <div className="flex flex-col md:flex-row gap-0 md:gap-2.5">
+      <div className="relative items-start md:items-center flex flex-row gap-3">
+        <Icon className={cn('flex-shrink-0 w-5 h-5 md:w-4 md:h-4', iconStyles)} />
+        {/* Text content */}
+        <div className="flex flex-col md:flex-row gap-0.5 md:gap-2 text-balance">
+          {/* Title */}
           <p className="text-sm text-foreground font-medium">{title}</p>
-          <p className="text-sm text-foreground-light">{message}</p>
-        </div>
-        {/* Optional link */}
-        {link && (
-          <div className="hidden lg:flex text-sm flex-row items-center gap-2">
-            <span className="text-foreground-muted">·</span>
-            <p className="text-foreground-light underline underline-offset-2 decoration-foreground-muted/80 hover:decoration-foreground transition-all">
-              <Link href={link}>{linkText}</Link>
-            </p>
+          {/* Description */}
+          <div className="flex flex-row items-center gap-2">
+            {typeof description === 'string' ? (
+              <p className="text-sm text-foreground-light">{description}</p>
+            ) : (
+              <div className={cn('text-sm text-foreground-light', linkStyles)}>{description}</div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </motion.div>
   )
