@@ -12,7 +12,7 @@ const bannerMotionProps = {
 } as const
 
 const linkStyles =
-  '[&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-foreground-muted/80 [&_a]:hover:decoration-foreground [&_a]:transition-all'
+  '[&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-foreground-muted/80 [&_a]:hover:decoration-foreground [&_a]:hover:text-foreground [&_a]:transition-all'
 
 export const OrganizationResourceBanner = () => {
   const { warnings } = useOrganizationRestrictions()

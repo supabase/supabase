@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import type { ReactNode } from 'react'
 
 import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
@@ -9,8 +10,7 @@ import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 export type WarningBannerProps = {
   variant: 'danger' | 'warning' | 'note'
   title: string
-  description: string
-  link: string
+  description: ReactNode
 }
 
 export function useOrganizationRestrictions() {
@@ -37,8 +37,9 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
-      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.description,
-      link: `/org/${org?.slug}/billing#address`,
+      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.description(
+        `/org/${org.slug}/billing#address`
+      ),
     })
   }
 
@@ -46,17 +47,22 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.description,
-      link: `/org/${org?.slug}/billing#invoices`,
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.description(
+        `/org/${org?.slug}/billing#invoices`
+      ),
     })
   }
 
   if (overdueInvoicesFromOtherOrgs?.length) {
+    const otherOrgSlug = organizations?.find(
+      (o) => o.id === overdueInvoicesFromOtherOrgs[0].organization_id
+    )?.slug
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description,
-      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/billing#invoices`,
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description(
+        `/org/${otherOrgSlug ?? org?.slug}/billing#invoices`
+      ),
     })
   }
 
@@ -65,9 +71,9 @@ export function useOrganizationRestrictions() {
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
       description: RESTRICTION_MESSAGES.GRACE_PERIOD.description(
-        dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')
+        dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY'),
+        `/org/${org.slug}/billing`
       ),
-      link: `/org/${org?.slug}/billing`,
     })
   }
 
@@ -75,8 +81,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.title,
-      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.description,
-      link: `/org/${org?.slug}/billing`,
+      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.description(`/org/${org.slug}/billing`),
     })
   }
 
@@ -84,8 +89,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
-      description: RESTRICTION_MESSAGES.RESTRICTED.description,
-      link: `/org/${org?.slug}/billing`,
+      description: RESTRICTION_MESSAGES.RESTRICTED.description(`/org/${org.slug}/billing`),
     })
   }
 
