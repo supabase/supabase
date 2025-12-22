@@ -177,7 +177,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
               snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
 
-              // remove the tab for the old snippet if the snippet was open. Renaming can also happen when the tab is not open.
+              // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
               const tabId = createTabId('sql', { id: snippet.id })
               if (tabsSnap.hasTab(tabId)) {
                 tabsSnap.removeTab(tabId)

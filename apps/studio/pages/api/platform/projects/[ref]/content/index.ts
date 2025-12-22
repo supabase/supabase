@@ -36,21 +36,40 @@ type GetRequestData = paths['/platform/projects/{ref}/content']['get']['paramete
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
 
+const getRequestParamsSchema = z.object({
+  visibility: z.enum(['project', 'user']).optional(),
+  name: z.string().optional(),
+  limit: z
+    .string()
+    .transform((val) => Number(val))
+    .pipe(z.number().int().positive())
+    .optional(),
+  cursor: z.string().optional(),
+  sort_by: z.enum(['name', 'inserted_at']).optional(),
+  sort_order: z.enum(['asc', 'desc']).optional(),
+})
+
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  const params = req.query as GetRequestData
+  const result = getRequestParamsSchema.safeParse(req.query)
+
+  if (!result.success) {
+    return res.status(400).json({ data: [] })
+  }
+
+  const params = result.data
 
   // Platform specific endpoint
-  if (params?.visibility === 'project') {
+  if (params.visibility === 'project') {
     return res.status(200).json({ data: [] })
   }
 
   try {
     const { cursor, snippets } = await getSnippets({
-      searchTerm: params?.name,
-      limit: params?.limit ? Number(params.limit) : undefined,
-      cursor: params?.cursor,
-      sort: params?.sort_by,
-      sortOrder: params?.sort_order,
+      searchTerm: params.name,
+      limit: params.limit,
+      cursor: params.cursor,
+      sort: params.sort_by,
+      sortOrder: params.sort_order,
     })
 
     return res.status(200).json({ data: snippets, cursor })
