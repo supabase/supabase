@@ -10,6 +10,7 @@ import { Separator } from 'ui'
 
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))
 const Benefits = dynamic(() => import('components/Supasquad/FeaturesSection'))
+const CtaSection = dynamic(() => import('components/Supasquad/CtaSection'))
 
 const BeginnersPage: NextPage = () => {
   return (
@@ -34,6 +35,7 @@ const BeginnersPage: NextPage = () => {
         <WhySupaSquad {...content.why} />
         <Separator />
         <Benefits {...content.benefits} />
+        <CtaSection {...content.ctaSection} />
       </Layout>
     </>
   )

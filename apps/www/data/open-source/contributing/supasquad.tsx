@@ -31,10 +31,9 @@ export const data = {
     ),
     ctas: [
       {
-        label: 'Apply to join',
-        href: process.env.NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL || '#',
+        label: 'Learn how to join',
+        href: '#why-supasquad',
         type: 'primary' as any,
-        target: '_blank',
       },
     ],
   },
@@ -186,8 +185,8 @@ export const data = {
     id: 'cta',
     title: 'Ready to make an impact?',
     primaryCta: {
-      label: 'Apply to join',
-      url: 'https://www.notion.so/supabase/25c5004b775f804599b7eb886a15d6b2?pvs=106',
+      label: 'Apply to Join SupaSquad',
+      url: process.env.NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL || '#',
       type: 'primary' as any,
     },
   },
