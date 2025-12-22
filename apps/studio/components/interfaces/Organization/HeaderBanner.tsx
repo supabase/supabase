@@ -93,11 +93,12 @@ export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderB
             {/* Title */}
             <p className="text-sm text-foreground font-medium md:truncate">{title}</p>
             {/* Description */}
-            <div className="flex flex-row items-center gap-1.5 min-w-0 md:flex-nowrap">
+            <div className="flex flex-row items-center gap-1.5 min-w-0 md:flex-nowrap text-sm">
+              <span className="hidden md:inline text-foreground-muted">·</span>
               {typeof description === 'string' ? (
-                <p className="text-sm text-foreground-light md:truncate">{description}</p>
+                <p className="text-foreground-light md:truncate">{description}</p>
               ) : (
-                <div className={cn('text-sm text-foreground-light md:truncate', linkStyles)}>
+                <div className={cn('text-foreground-light md:truncate', linkStyles)}>
                   {description}
                 </div>
               )}
