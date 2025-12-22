@@ -1,10 +1,10 @@
 import pgMeta from '@supabase/pg-meta'
+import { safeValidateUIMessages } from 'ai'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { UIMessage } from 'ai'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
@@ -44,7 +44,7 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 const requestBodySchema = z.object({
-  messages: z.array(z.custom<UIMessage>()),
+  messages: z.array(z.any()),
   projectRef: z.string(),
   connectionString: z.string(),
   schema: z.string().optional(),
@@ -77,6 +77,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     chatName,
     model: requestedModel,
   } = data
+
+  const messagesValidation = await safeValidateUIMessages({ messages: rawMessages })
+  if (!messagesValidation.success) {
+    return res
+      .status(400)
+      .json({ error: 'Invalid request body', message: messagesValidation.error.message })
+  }
+  const messages = messagesValidation.data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
@@ -156,8 +164,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         : "You don't have access to any schemas."
     }
 
+    const validatedMessages = await safeValidateUIMessages({ messages: rawMessages })
+    if (!validatedMessages.success) {
+      return res.status(400).json({ error: 'Invalid messages', issues: validatedMessages.error })
+    }
+
     const result = await generateAssistantResponse({
-      messages: rawMessages,
+      messages,
       model,
       tools,
       aiOptInLevel,
