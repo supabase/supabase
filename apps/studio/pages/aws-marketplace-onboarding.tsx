@@ -34,32 +34,37 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
     buyerId: buyerId as string,
   })
 
+  const renderMarketplaceContent = () => {
+    if (!isOrganizationsFetched || !isContractLinkingEligibilityFetched) {
+      return <AwsMarketplaceOnboardingPlaceholder />
+    }
+
+    if (!wasOrganizationsRequestSuccessful || !wasEligibilityRequestSuccessful) {
+      return <p className="mt-4">Error loading AWS Marketplace setup page. Try again later.</p>
+    }
+
+    if (!contractLinkingEligibility.eligibility.is_eligible) {
+      return (
+        <AwsMarketplaceContractNotLinkable
+          reason={contractLinkingEligibility.eligibility.reasons[0]}
+        />
+      )
+    }
+
+    if (organizations?.length) {
+      return <AwsMarketplaceLinkExistingOrg organizations={organizations} />
+    }
+
+    return <AwsMarketplaceCreateNewOrg />
+  }
+
   return (
     <ScaffoldContainer>
       <ScaffoldHeader>
         <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
       </ScaffoldHeader>
       <ScaffoldDivider />
-      {!isOrganizationsFetched || !isContractLinkingEligibilityFetched ? (
-        <AwsMarketplaceOnboardingPlaceholder />
-      ) : (
-        wasOrganizationsRequestSuccessful &&
-        wasEligibilityRequestSuccessful &&
-        (contractLinkingEligibility.eligibility.is_eligible ? (
-          // If the contract is linkable and there are existing organizations
-          organizations?.length ? (
-            <AwsMarketplaceLinkExistingOrg organizations={organizations} />
-          ) : (
-            // If the contract is linkable and there are no existing organizations
-            <AwsMarketplaceCreateNewOrg />
-          )
-        ) : (
-          // If the contract is not eligible for linking
-          <AwsMarketplaceContractNotLinkable
-            reason={contractLinkingEligibility.eligibility.reasons[0]}
-          />
-        ))
-      )}
+      {renderMarketplaceContent()}
     </ScaffoldContainer>
   )
 }
