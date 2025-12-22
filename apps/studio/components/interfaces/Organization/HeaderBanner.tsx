@@ -81,7 +81,7 @@ export const HeaderBanner = ({
       <div className="relative items-start md:items-center flex flex-row gap-3 min-w-0">
         <Icon className={cn('flex-shrink-0 w-5 h-5 md:w-4 md:h-4', iconStyles)} />
         {/* Text content */}
-        <div className="flex flex-col md:flex-row gap-0.5 md:gap-2 text-balance md:flex-nowrap min-w-0 flex-1">
+        <div className="flex flex-col md:flex-row gap-0.5 md:gap-2.5 text-balance md:flex-nowrap min-w-0 flex-1">
           {/* Title */}
           <p className="text-sm text-foreground font-medium md:truncate">{title}</p>
           {/* Description */}
