@@ -54,11 +54,67 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
   }
 }
 
-export async function getUnansweredThreads(
-  product_area?: string,
-  channel?: string,
-  stack?: string,
+export async function getChannelCounts(
+  product_area?: string | string[],
+  stack?: string | string[],
   search?: string
+): Promise<{ all: number; discord: number; reddit: number; github: number }> {
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
+
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 30)
+  const since = sevenDaysAgo.toISOString()
+
+  let query = supabase.from('contribute_threads').select('source', { count: 'exact', head: false })
+
+  // When searching, don't apply time/status filters to allow finding any matching threads
+  if (!search || !search.trim()) {
+    query = query.gte('first_msg_time', since).in('status', ['unanswered', 'unresolved'])
+  }
+
+  if (product_area) {
+    const areas = Array.isArray(product_area) ? product_area : [product_area]
+    query = query.overlaps('product_areas', areas)
+  }
+
+  if (stack) {
+    const stacks = Array.isArray(stack) ? stack : [stack]
+    query = query.overlaps('stack', stacks)
+  }
+
+  if (search && search.trim()) {
+    const trimmedSearch = search.trim()
+    const searchTerm = `%${trimmedSearch}%`
+    query = query.ilike('subject', searchTerm)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Error fetching channel counts:', error)
+    return { all: 0, discord: 0, reddit: 0, github: 0 }
+  }
+
+  const threads = (data ?? []) as Array<{ source: string }>
+  const discord = threads.filter((t) => normalizeSource(t.source) === 'discord').length
+  const reddit = threads.filter((t) => normalizeSource(t.source) === 'reddit').length
+  const github = threads.filter((t) => normalizeSource(t.source) === 'github').length
+
+  return {
+    all: threads.length,
+    discord,
+    reddit,
+    github,
+  }
+}
+
+export async function getUnansweredThreads(
+  product_area?: string | string[],
+  channel?: string,
+  stack?: string | string[],
+  search?: string,
+  offset: number = 0,
+  limit: number = 100
 ): Promise<ThreadRow[]> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
@@ -79,14 +135,16 @@ export async function getUnansweredThreads(
   // When searching, skip status filter to find threads regardless of status
 
   if (product_area) {
-    query = query.contains('product_areas', [product_area])
+    const areas = Array.isArray(product_area) ? product_area : [product_area]
+    query = query.overlaps('product_areas', areas)
   }
 
   if (stack) {
-    query = query.contains('stack', [stack])
+    const stacks = Array.isArray(stack) ? stack : [stack]
+    query = query.overlaps('stack', stacks)
   }
 
-  if (channel) {
+  if (channel && channel !== 'all') {
     console.log('channel', channel)
     query = query.eq('source', channel.toLowerCase())
   }
@@ -106,7 +164,7 @@ export async function getUnansweredThreads(
   const { data, error } = await query
     // .gte("created_at", since)
     .order('first_msg_time', { ascending: false })
-    .limit(100)
+    .range(offset, offset + limit - 1)
 
   if (error) {
     console.error('Error fetching threads:', error)

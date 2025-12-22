@@ -42,3 +42,26 @@ export function GitHubIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   )
 }
+
+export function AllIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      {...props}
+    >
+      <path d="M16 5H3" />
+      <path d="M16 12H3" />
+      <path d="M16 19H3" />
+      <path d="M21 5h.01" />
+      <path d="M21 12h.01" />
+      <path d="M21 19h.01" />
+    </svg>
+  )
+}

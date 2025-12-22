@@ -25,7 +25,14 @@ import {
 
 import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
-import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { AllIcon, DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+
+interface TabConfig {
+  id: string
+  label: string
+  icon?: React.ComponentType<{ className?: string }>
+  iconColor?: string
+}
 
 function CountSkeleton() {
   return <span className="inline-block min-w-[24px] h-5 bg-surface-300 animate-pulse rounded" />
@@ -77,14 +84,20 @@ function ThreadsTable({
 }
 
 export function UnansweredThreadsTable({
-  threads,
+  threads: initialThreads,
+  channelCounts,
   allProductAreas,
   allStacks,
 }: {
   threads: ThreadRow[]
+  channelCounts: { all: number; discord: number; reddit: number; github: number }
   allProductAreas: string[]
   allStacks: string[]
 }) {
+  const [threads, setThreads] = useState(initialThreads)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(initialThreads.length === 100)
+
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useQueryState(
     'search',
@@ -96,31 +109,79 @@ export function UnansweredThreadsTable({
   const [isPending, startTransition] = useTransition()
   const [channel, setChannel] = useQueryState(
     'channel',
-    parseAsString.withDefault('discord').withOptions({
+    parseAsString.withDefault('all').withOptions({
       shallow: false, // notify server, re-render RSC tree
     })
   )
   const [productArea] = useQueryState('product_area', parseAsString)
   const [stack] = useQueryState('stack', parseAsString)
 
-  const validTabs = ['discord', 'reddit', 'github'] as const
+  const tabs: TabConfig[] = [
+    {
+      id: 'all',
+      label: 'All',
+      icon: AllIcon,
+    },
+    {
+      id: 'discord',
+      label: 'Discord',
+      icon: DiscordIcon,
+      iconColor: 'text-[#5865F2]',
+    },
+    {
+      id: 'reddit',
+      label: 'Reddit',
+      icon: RedditIcon,
+      iconColor: 'text-[#FF4500]',
+    },
+    {
+      id: 'github',
+      label: 'GitHub',
+      icon: GitHubIcon,
+      iconColor: 'text-foreground',
+    },
+  ]
+
+  const validTabs = ['all', 'discord', 'reddit', 'github'] as const
   const currentTab = (
-    validTabs.includes(channel as (typeof validTabs)[number]) ? channel : 'discord'
+    validTabs.includes(channel as (typeof validTabs)[number]) ? channel : 'all'
   ) as (typeof validTabs)[number]
 
-  // Calculate counts for each channel
-  const channelCounts = useMemo(() => {
-    return {
-      discord: threads.filter((t) => t.channel === 'discord').length,
-      reddit: threads.filter((t) => t.channel === 'reddit').length,
-      github: threads.filter((t) => t.channel === 'github').length,
-    }
-  }, [threads])
+  // Reset threads when filters change
+  useEffect(() => {
+    setThreads(initialThreads)
+    setHasMore(initialThreads.length === 100)
+  }, [initialThreads])
 
   async function handleTabChange(value: string) {
     startTransition(async () => {
       await setChannel(value)
     })
+  }
+
+  async function handleLoadMore() {
+    setIsLoadingMore(true)
+    try {
+      const params = new URLSearchParams()
+      params.set('offset', threads.length.toString())
+      if (channel && channel !== 'all') params.set('channel', channel)
+      if (productArea) params.set('product_area', productArea)
+      if (stack) params.set('stack', stack)
+      if (search) params.set('search', search)
+
+      const response = await fetch(`/api-v2/contribute/threads?${params.toString()}`)
+      const newThreads = await response.json()
+
+      if (newThreads.length < 100) {
+        setHasMore(false)
+      }
+
+      setThreads((prev) => [...prev, ...newThreads])
+    } catch (error) {
+      console.error('Error loading more threads:', error)
+    } finally {
+      setIsLoadingMore(false)
+    }
   }
 
   function handleSearchSubmit(e: React.FormEvent) {
@@ -185,106 +246,41 @@ export function UnansweredThreadsTable({
 
       {/* Channel Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-3 overflow-x-auto">
-          <Button
-            type={currentTab === 'reddit' ? 'default' : 'dashed'}
-            size="tiny"
-            onClick={() => handleTabChange('discord')}
-            icon={
-              <DiscordIcon
-                className={cn(
-                  'h-4 w-4',
-                  currentTab === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
-                )}
-              />
-            }
-            className={cn('w-[118px] justify-start', currentTab === 'discord' && 'bg-surface-300')}
-          >
-            <span className="flex items-center gap-1.5">
-              Discord
-              {isPending ? (
-                <CountSkeleton />
-              ) : (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded min-w-[24px] text-center',
-                    currentTab === 'discord'
-                      ? 'bg-surface-100 text-foreground'
-                      : 'bg-surface-300 text-foreground-lighter'
-                  )}
-                >
-                  {channelCounts.discord}
+        <div className="flex items-center flex-wrap gap-3 overflow-x-auto">
+          {tabs.map((tab) => {
+            const isActive = currentTab === tab.id
+            const Icon = tab.icon
+
+            return (
+              <Button
+                key={tab.id}
+                type={isActive ? 'default' : 'dashed'}
+                size="tiny"
+                onClick={() => handleTabChange(tab.id)}
+                icon={
+                  Icon ? (
+                    <Icon
+                      className={cn(
+                        'h-4 w-4',
+                        isActive ? tab.iconColor : 'text-foreground-lighter'
+                      )}
+                    />
+                  ) : undefined
+                }
+                className={cn('w-fit justify-start', isActive && 'bg-surface-300')}
+              >
+                <span className="flex items-center gap-1.5">
+                  {tab.label}
+                  <span className={cn('text-xs pl-1.5 min-w-[24px] text-center tabular-nums')}>
+                    {channelCounts[tab.id as keyof typeof channelCounts]}
+                  </span>
                 </span>
-              )}
-            </span>
-          </Button>
-          <Button
-            type={currentTab === 'reddit' ? 'default' : 'dashed'}
-            size="tiny"
-            onClick={() => handleTabChange('reddit')}
-            icon={
-              <RedditIcon
-                className={cn(
-                  'h-4 w-4',
-                  currentTab === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
-                )}
-              />
-            }
-            className="w-[115px] justify-start"
-          >
-            <span className="flex items-center gap-1.5">
-              Reddit
-              {isPending ? (
-                <CountSkeleton />
-              ) : (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded min-w-[24px] text-center',
-                    currentTab === 'reddit'
-                      ? 'bg-surface-100 text-foreground'
-                      : 'bg-surface-300 text-foreground-lighter'
-                  )}
-                >
-                  {channelCounts.reddit}
-                </span>
-              )}
-            </span>
-          </Button>
-          <Button
-            type={currentTab === 'github' ? 'default' : 'dashed'}
-            size="tiny"
-            onClick={() => handleTabChange('github')}
-            icon={
-              <GitHubIcon
-                className={cn(
-                  'h-4 w-4',
-                  currentTab === 'github' ? 'text-foreground' : 'text-foreground-lighter'
-                )}
-              />
-            }
-            className={cn('w-[115px] justify-start', currentTab === 'github' && 'bg-surface-300')}
-          >
-            <span className="flex items-center gap-1.5">
-              GitHub
-              {isPending ? (
-                <CountSkeleton />
-              ) : (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded min-w-[24px] text-center',
-                    currentTab === 'github'
-                      ? 'bg-surface-100 text-foreground'
-                      : 'bg-surface-300 text-foreground-lighter'
-                  )}
-                >
-                  {channelCounts.github}
-                </span>
-              )}
-            </span>
-          </Button>
+              </Button>
+            )
+          })}
         </div>
 
-        <div className="flex items-center gap-2 flex-1 justify-end w-full md:w-auto">
+        <div className="flex items-center gap-2 flex-1 md:justify-end w-full md:w-auto">
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-lighter" />
@@ -302,7 +298,7 @@ export function UnansweredThreadsTable({
                 size="tiny"
                 icon={<X className="h-4 w-4" />}
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                className="absolute right-2 px-1 top-1/2 transform -translate-y-1/2"
                 aria-label="Clear search"
               />
             )}
@@ -328,6 +324,19 @@ export function UnansweredThreadsTable({
         </div>
       </div>
       <ThreadsTable threads={filteredThreads} productArea={productArea} search={search} />
+      {hasMore && (
+        <div className="flex justify-center mt-4">
+          <Button
+            type="default"
+            size="small"
+            onClick={handleLoadMore}
+            loading={isLoadingMore}
+            disabled={isLoadingMore}
+          >
+            Load more
+          </Button>
+        </div>
+      )}
     </section>
   )
 }
@@ -371,7 +380,7 @@ function ThreadRow({
   }
 
   return (
-    <TableRow>
+    <TableRow className="relative group [&.hovering-badge>td]:hover:!bg-transparent">
       {/* Thread title and product areas */}
       <TableCell className="min-w-[400px]">
         <div className="flex items-center gap-3 overflow-hidden">
@@ -404,14 +413,9 @@ function ThreadRow({
           </div>
           <div className="min-w-0 flex-1 flex flex-col gap-y-0.5">
             {/* Thread title */}
-            <Link
-              href={`/contribute/t/${thread.id}`}
-              className="block text-md text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2"
-            >
-              <h3 className="text-base text-foreground truncate hover:underline transition-[text-decoration] duration-100 underline-offset-2">
-                {highlightText(thread.title, search)}
-              </h3>
-            </Link>
+            <h3 className="text-base text-foreground truncate transition-[text-decoration] duration-100 underline-offset-2">
+              {highlightText(thread.title, search)}
+            </h3>
             {/* Posted time and product areas */}
             <div className="flex flex-row items-baseline gap-2 overflow-hidden">
               {/* Posted time */}
@@ -423,19 +427,35 @@ function ThreadRow({
                     (area: string) => area !== 'Other'
                   )
                   return filteredAreas.length > 0 ? (
-                    <div className="flex flex-wrap gap-x-1.5 gap-y-1 overflow-hidden">
+                    <div
+                      onMouseEnter={(e) => {
+                        const row = e.currentTarget.closest('tr')
+                        row?.classList.remove('group')
+                        row?.classList.add('hovering-badge')
+                      }}
+                      onMouseLeave={(e) => {
+                        const row = e.currentTarget.closest('tr')
+                        row?.classList.add('group')
+                        row?.classList.remove('hovering-badge')
+                      }}
+                      className="flex flex-wrap gap-x-1.5 gap-y-1 overflow-hidden"
+                    >
                       {filteredAreas.map((area: string) => {
                         const isActive = productArea === area
                         return (
                           <button
                             key={area}
-                            onClick={() => handleProductAreaClick(area)}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleProductAreaClick(area)
+                            }}
                             type="button"
+                            className="relative z-10"
                           >
                             <Badge
                               variant={isActive ? 'success' : 'default'}
-                              // Hover states to indicate interactivity
-                              className="transition-all duration-150 hover:opacity-70"
+                              className="transition-all duration-150 hover:bg-brand-300/30 dark:hover:bg-brand-300/80"
                             >
                               {area}
                             </Badge>
@@ -451,7 +471,19 @@ function ThreadRow({
       </TableCell>
       {/* Stack */}
       <TableCell>
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 overflow-hidden">
+        <div
+          onMouseEnter={(e) => {
+            const row = e.currentTarget.closest('tr')
+            row?.classList.remove('group')
+            row?.classList.add('hovering-badge')
+          }}
+          onMouseLeave={(e) => {
+            const row = e.currentTarget.closest('tr')
+            row?.classList.add('group')
+            row?.classList.remove('hovering-badge')
+          }}
+          className="flex flex-wrap gap-x-1.5 gap-y-0.5 overflow-hidden"
+        >
           {thread.stack.length > 0 ? (
             (() => {
               const filteredStack = thread.stack.filter((tech: string) => tech !== 'Other')
@@ -465,11 +497,19 @@ function ThreadRow({
                   {filteredStack.slice(0, 5).map((tech: string) => {
                     const isActive = currentStack === tech
                     return (
-                      <button key={tech} onClick={() => handleStackClick(tech)} type="button">
+                      <button
+                        key={tech}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleStackClick(tech)
+                        }}
+                        type="button"
+                        className="relative z-10"
+                      >
                         <Badge
                           variant={isActive ? 'success' : 'default'}
-                          // Hover states to indicate interactivity
-                          className="transition-all duration-150 hover:opacity-70"
+                          className="transition-all duration-150 hover:bg-brand-300/30 dark:hover:bg-brand-300/80"
                         >
                           {tech}
                         </Badge>
@@ -479,11 +519,27 @@ function ThreadRow({
                   {filteredStack.length > 5 && (
                     <Popover_Shadcn_>
                       <PopoverTrigger_Shadcn_ asChild>
-                        <button type="button">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                          }}
+                          onMouseEnter={(e) => {
+                            const row = e.currentTarget.closest('tr')
+                            row?.classList.remove('group')
+                            row?.classList.add('hovering-badge')
+                          }}
+                          onMouseLeave={(e) => {
+                            const row = e.currentTarget.closest('tr')
+                            row?.classList.add('group')
+                            row?.classList.remove('hovering-badge')
+                          }}
+                          className="relative z-10"
+                        >
                           <Badge
                             variant={hasActiveInOverflow ? 'success' : 'default'}
-                            // Hover states to indicate interactivity
-                            className="transition-all duration-150 hover:opacity-70"
+                            className="transition-all duration-150 hover:bg-brand-200/50 dark:hover:bg-brand-300/80"
                           >
                             + {filteredStack.length - 5}
                           </Badge>
@@ -496,10 +552,19 @@ function ThreadRow({
                             return (
                               <button
                                 key={tech}
-                                onClick={() => handleStackClick(tech)}
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  handleStackClick(tech)
+                                }}
                                 type="button"
                               >
-                                <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
+                                <Badge
+                                  variant={isActive ? 'success' : 'default'}
+                                  className="transition-all duration-150 hover:bg-brand-200/50 hover:border-brand-300/50"
+                                >
+                                  {tech}
+                                </Badge>
                               </button>
                             )
                           })}
@@ -518,7 +583,7 @@ function ThreadRow({
 
       {/* Replies */}
       <TableCell className="text-right">
-        <Link href={`/contribute/t/${thread.id}`} className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
             <MessageSquareReply
               size={18}
@@ -531,8 +596,16 @@ function ThreadRow({
               ? Math.max(0, thread.message_count - 1)
               : '—'}
           </p>
-        </Link>
+        </div>
       </TableCell>
+
+      {/* Floatin link */}
+      <Link
+        href={`/contribute/t/${thread.id}`}
+        className="absolute inset-0 z-0"
+        aria-label={`View thread: ${thread.title}`}
+        tabIndex={1}
+      />
     </TableRow>
   )
 }
@@ -555,7 +628,7 @@ function highlightText(text: string, searchTerm: string | null): ReactNode {
     }
     // Add the highlighted match
     parts.push(
-      <mark key={index} className="bg-brand-200 dark:bg-brand-300 px-0.5 rounded">
+      <mark key={index} className="bg-brand-200 dark:bg-brand-500 dark:!text-foreground px-0.5">
         {text.slice(index, index + searchTerm.length)}
       </mark>
     )

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { X, Check } from 'lucide-react'
-import { useQueryState, parseAsString } from 'nuqs'
+import { useQueryState, parseAsArrayOf, parseAsString } from 'nuqs'
 import {
   Button,
   Popover_Shadcn_,
@@ -21,38 +21,40 @@ interface FilterPopoverProps {
 
 export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPopoverProps) {
   const [open, setOpen] = useState(false)
-  const [productArea, setProductArea] = useQueryState(
+  const [productAreas, setProductAreas] = useQueryState(
     'product_area',
-    parseAsString.withOptions({
+    parseAsArrayOf(parseAsString).withOptions({
       shallow: false,
     })
   )
-  const [stack, setStack] = useQueryState(
+  const [stacks, setStacks] = useQueryState(
     'stack',
-    parseAsString.withOptions({
+    parseAsArrayOf(parseAsString).withOptions({
       shallow: false,
     })
   )
 
   function handleProductAreaClick(area: string) {
-    if (productArea === area) {
-      setProductArea(null)
+    const current = productAreas || []
+    if (current.includes(area)) {
+      setProductAreas(current.filter((a) => a !== area))
     } else {
-      setProductArea(area)
+      setProductAreas([...current, area])
     }
   }
 
   function handleStackClick(tech: string) {
-    if (stack === tech) {
-      setStack(null)
+    const current = stacks || []
+    if (current.includes(tech)) {
+      setStacks(current.filter((t) => t !== tech))
     } else {
-      setStack(tech)
+      setStacks([...current, tech])
     }
   }
 
   function handleClearAll() {
-    setProductArea(null)
-    setStack(null)
+    setProductAreas(null)
+    setStacks(null)
   }
 
   return (
@@ -61,13 +63,14 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
       <PopoverContent_Shadcn_
         className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0"
         align="end"
+        sideOffset={8}
       >
-        <div className="p-4">
+        <div className="">
           {/* Header */}
-          <div className="flex flex-row items-center justify-between pb-4">
-            <h3 className="text-sm text-foreground">Filter Threads</h3>
+          <div className="flex flex-row items-center justify-between px-4 py-2 bg-muted dark:bg-foreground-muted/10 border-b rounded-t-md">
+            <h3 className="text-base text-foreground">Filter Threads</h3>
             <div className="flex items-center gap-2">
-              {(productArea || stack) && (
+              {((productAreas && productAreas.length > 0) || (stacks && stacks.length > 0)) && (
                 <Button
                   type="outline"
                   onClick={handleClearAll}
@@ -79,38 +82,28 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
               )}
             </div>
           </div>
-          <PopoverSeparator />
 
           <ScrollArea className="h-[300px] sm:h-[400px] md:h-[430px]">
-            <div className="grid gap-8 pb-4 mt-4 pr-4">
+            <div className="grid gap-8 p-4">
               {/* Product Area Section */}
-              <div className="grid gap-3">
+              <div className="grid gap-3 pb-0">
                 <h3 className="text-sm  text-muted-foreground">Product Area</h3>
-                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="flex flex-wrap gap-2">
                   {allProductAreas
                     .filter((area) => area !== 'Other')
                     .map((area) => {
-                      const isSelected = productArea === area
+                      const isSelected = productAreas?.includes(area) ?? false
                       return (
-                        <button
+                        <Button
                           key={area}
-                          type="button"
+                          type={isSelected ? 'primary' : 'dashed'}
+                          size="tiny"
                           onClick={() => handleProductAreaClick(area)}
-                          className={cn(
-                            'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
-                            isSelected
-                              ? 'bg-brand-200 text-brand-foreground border border-brand-300'
-                              : 'bg-surface-200 hover:bg-surface-300'
-                          )}
+                          icon={isSelected ? <Check className="h-3.5 w-3.5 shrink-0" /> : undefined}
+                          className="justify-start w-fit"
                         >
-                          <Check
-                            className={cn(
-                              'h-3.5 w-3.5 shrink-0',
-                              isSelected ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-                          <span className="text-left">{area}</span>
-                        </button>
+                          {area}
+                        </Button>
                       )
                     })}
                 </div>
@@ -119,31 +112,22 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
               {/* Tech Stack Section */}
               <div className="grid gap-3">
                 <h3 className="text-sm  text-muted-foreground">Tech Stack</h3>
-                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="flex flex-wrap gap-2">
                   {allStacks
                     .filter((tech) => tech !== 'Other')
                     .map((tech) => {
-                      const isSelected = stack === tech
+                      const isSelected = stacks?.includes(tech) ?? false
                       return (
-                        <button
+                        <Button
                           key={tech}
-                          type="button"
+                          type={isSelected ? 'primary' : 'dashed'}
+                          size="tiny"
                           onClick={() => handleStackClick(tech)}
-                          className={cn(
-                            'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
-                            isSelected
-                              ? 'bg-brand-200 text-brand-foreground border border-brand-300'
-                              : 'bg-surface-200 hover:bg-surface-300'
-                          )}
+                          icon={isSelected ? <Check className="h-3.5 w-3.5 shrink-0" /> : undefined}
+                          className="justify-start w-fit"
                         >
-                          <Check
-                            className={cn(
-                              'h-3.5 w-3.5 shrink-0',
-                              isSelected ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-                          <span className="text-left">{tech}</span>
-                        </button>
+                          {tech}
+                        </Button>
                       )
                     })}
                 </div>
