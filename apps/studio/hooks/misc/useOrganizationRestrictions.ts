@@ -37,7 +37,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
-      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.message,
+      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.description,
       link: `/org/${org?.slug}/billing#address`,
     })
   }
@@ -46,7 +46,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.description,
       link: `/org/${org?.slug}/billing#invoices`,
     })
   }
@@ -55,7 +55,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description,
       link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/billing#invoices`,
     })
   }
@@ -64,7 +64,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
-      description: RESTRICTION_MESSAGES.GRACE_PERIOD.message(
+      description: RESTRICTION_MESSAGES.GRACE_PERIOD.description(
         dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')
       ),
       link: `/org/${org?.slug}/billing`,
@@ -75,7 +75,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.title,
-      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.message,
+      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.description,
       link: `/org/${org?.slug}/billing`,
     })
   }
@@ -84,7 +84,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
-      description: RESTRICTION_MESSAGES.RESTRICTED.message,
+      description: RESTRICTION_MESSAGES.RESTRICTED.description,
       link: `/org/${org?.slug}/billing`,
     })
   }
