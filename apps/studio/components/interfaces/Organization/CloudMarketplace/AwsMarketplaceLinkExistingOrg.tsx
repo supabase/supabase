@@ -31,13 +31,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OrganizationCard } from '../OrganizationCard'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
 import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
-import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
+import { useCloudMarketplaceOnboardingInfoQuery } from './cloud-marketplace-query'
 import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 
 interface AwsMarketplaceLinkExistingOrgProps {
   organizations?: Organization[] | undefined
-  onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
-  isLoadingOnboardingInfo: boolean
 }
 
 const FormSchema = z.object({
@@ -48,13 +46,16 @@ type LinkExistingOrgForm = z.infer<typeof FormSchema>
 
 export const AwsMarketplaceLinkExistingOrg = ({
   organizations,
-  onboardingInfo,
-  isLoadingOnboardingInfo,
 }: AwsMarketplaceLinkExistingOrgProps) => {
   const router = useRouter()
   const {
     query: { buyer_id: buyerId },
   } = router
+
+  const { data: onboardingInfo, isPending: isLoadingOnboardingInfo } =
+    useCloudMarketplaceOnboardingInfoQuery({
+      buyerId: buyerId as string,
+    })
 
   const form = useForm<LinkExistingOrgForm>({
     resolver: zodResolver(FormSchema),

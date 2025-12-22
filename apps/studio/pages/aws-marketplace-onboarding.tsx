@@ -4,7 +4,6 @@ import type { NextPageWithLayout } from 'types'
 import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
 import { AwsMarketplaceLinkExistingOrg } from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
 import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
-import { useCloudMarketplaceOnboardingInfoQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
 import {
   ScaffoldContainer,
@@ -13,6 +12,8 @@ import {
   ScaffoldTitle,
 } from '../components/layouts/Scaffold'
 import { useOrganizationsQuery } from '../data/organizations/organizations-query'
+import { useCloudMarketplaceContractLinkingEligibilityQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
+import AwsMarketplaceContractNotLinkable from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceContractNotLinkable'
 
 const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   const {
@@ -20,8 +21,8 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   } = useRouter()
 
   const { data: organizations, isFetched: isOrganizationsFetched } = useOrganizationsQuery()
-  const { data: onboardingInfo, isPending: isLoadingOnboardingInfo } =
-    useCloudMarketplaceOnboardingInfoQuery({
+  const { data: contractLinkingEligibility, isFetched: isContractLinkingEligibilityFetched } =
+    useCloudMarketplaceContractLinkingEligibilityQuery({
       buyerId: buyerId as string,
     })
 
@@ -31,16 +32,17 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
         <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
       </ScaffoldHeader>
       <ScaffoldDivider />
-      {!isOrganizationsFetched ? (
+      {!isOrganizationsFetched || !isContractLinkingEligibilityFetched ? (
         <AwsMarketplaceOnboardingPlaceholder />
-      ) : organizations?.length ? (
-        <AwsMarketplaceLinkExistingOrg
-          organizations={organizations}
-          onboardingInfo={onboardingInfo}
-          isLoadingOnboardingInfo={isLoadingOnboardingInfo}
-        />
+      ) : // If the contract is not eligible for linking
+      !contractLinkingEligibility.eligibility.is_eligible ? (
+        <AwsMarketplaceContractNotLinkable eligibility={contractLinkingEligibility} />
+      ) : // If the contract is linkable and there are existing organizations
+      organizations?.length ? (
+        <AwsMarketplaceLinkExistingOrg organizations={organizations} />
       ) : (
-        <AwsMarketplaceCreateNewOrg onboardingInfo={onboardingInfo} />
+        // If the contract is linkable and there are no existing organizations
+        <AwsMarketplaceCreateNewOrg />
       )}
     </ScaffoldContainer>
   )

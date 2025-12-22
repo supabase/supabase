@@ -12,21 +12,21 @@ import {
   ScaffoldSectionDetail,
 } from '../../../layouts/Scaffold'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
-import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
+import { useCloudMarketplaceOnboardingInfoQuery } from './cloud-marketplace-query'
 import NewAwsMarketplaceOrgForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
   NewMarketplaceOrgForm,
 } from './NewAwsMarketplaceOrgForm'
 
-interface Props {
-  onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
-}
-
-const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
+const AwsMarketplaceCreateNewOrg = () => {
   const router = useRouter()
   const {
     query: { buyer_id: buyerId },
   } = router
+
+  const { data: onboardingInfo } = useCloudMarketplaceOnboardingInfoQuery({
+    buyerId: buyerId as string,
+  })
 
   const { mutate: createOrganization, isPending: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
