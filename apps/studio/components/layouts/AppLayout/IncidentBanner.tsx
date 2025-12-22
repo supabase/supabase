@@ -4,8 +4,8 @@ import Link from 'next/link'
 export const IncidentBanner = () => {
   return (
     <HeaderBanner
+      variant="note"
       title="We are investigating a technical issue"
-      type="note"
       description={
         <>
           Follow the{' '}
