@@ -39,7 +39,7 @@ export async function getMockTools() {
 
   // Real tools from MCP server
   const { search_docs } = await getMcpTools({
-    accessToken: 'mock-access-token',
+    accessToken: 'mock-access-token', // Not a secret
     projectRef: 'mock-project-ref',
     aiOptInLevel: 'schema_and_log_and_data',
   })
