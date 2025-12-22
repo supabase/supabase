@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { Badge } from 'ui'
+import { Badge, Button } from 'ui'
 import { getUserActivity } from '~/data/contribute'
 import { DiscordIcon, GitHubIcon, RedditIcon } from '~/components/Contribute/Icons'
 import Link from 'next/link'
@@ -72,18 +72,23 @@ function ReplyCard({ reply, thread }: { reply: Reply; thread?: ThreadRow }) {
           </Link>
         )}
         <p className="text-foreground text-sm line-clamp-3">{reply.content}</p>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {reply.ts && <span>{new Date(reply.ts).toLocaleString()}</span>}
-          {reply.ts && reply.external_activity_url && <span>•</span>}
+        <div className="flex items-center justify-between gap-2">
+          {reply.ts && (
+            <span className="text-xs text-muted-foreground">
+              {new Date(reply.ts).toLocaleString()}
+            </span>
+          )}
           {reply.external_activity_url && (
-            <a
-              href={reply.external_activity_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              View on {platformName}
-            </a>
+            <Button asChild type="default" size="tiny">
+              <a
+                href={reply.external_activity_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2"
+              >
+                View on {platformName}
+              </a>
+            </Button>
           )}
         </div>
       </div>
@@ -102,15 +107,16 @@ export async function UserProfile({ username }: { username: string }) {
     <div className="border border-border rounded-lg p-8 bg-surface-200">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-foreground mb-2">{username}</h1>
-        <div className="flex items-center gap-6 text-muted-foreground">
+        <h1 className="text-3xl  text-foreground mb-2">{username}</h1>
+        <div className="flex items-center gap-3 text-foreground-light">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-semibold text-foreground">{stats.threadCount}</span>
-            <span className="text-sm">{stats.threadCount === 1 ? 'Thread' : 'Threads'}</span>
+            <span>{stats.threadCount}</span>
+            <span>{stats.threadCount === 1 ? 'thread' : 'threads'}</span>
           </div>
+          <span>/</span>
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-semibold text-foreground">{stats.replyCount}</span>
-            <span className="text-sm">{stats.replyCount === 1 ? 'Reply' : 'Replies'}</span>
+            <span>{stats.replyCount}</span>
+            <span>{stats.replyCount === 1 ? 'reply' : 'replies'}</span>
           </div>
         </div>
       </div>
@@ -118,7 +124,7 @@ export async function UserProfile({ username }: { username: string }) {
       {/* Threads Section */}
       {threads.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-4">Threads</h2>
+          <h2 className="text-xl  text-foreground mb-4">Threads</h2>
           <div className="grid gap-3">
             {threads.map((thread) => (
               <ThreadCard key={thread.id} thread={thread} />
@@ -130,7 +136,7 @@ export async function UserProfile({ username }: { username: string }) {
       {/* Replies Section */}
       {replies.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-foreground mb-4">Recent Replies</h2>
+          <h2 className="text-xl text-foreground mb-4">Recent Replies</h2>
           <div className="grid gap-3">
             {replies.map((reply) => {
               const thread = replyThreads.find((t) => t.thread_key === reply.thread_key)

@@ -3,6 +3,14 @@ import { Suspense } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
 import { UserProfile } from '~/components/Contribute/UserProfile'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
 
 function UserProfileLoading() {
   return (
@@ -37,4 +45,3 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
     </DefaultLayout>
   )
 }
-

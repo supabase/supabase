@@ -4,6 +4,14 @@ import { ArrowLeft } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
 import { ThreadContent } from '~/components/Contribute/ThreadContent'
 import PageLoading from './page-loading'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
 
 // eslint-disable-next-line no-restricted-exports
 export default async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {

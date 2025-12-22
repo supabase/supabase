@@ -18,9 +18,10 @@ interface Reply {
 interface RepliesListProps {
   replies: Reply[]
   questionAuthor: string | null
+  totalReplyCount?: number
 }
 
-export function RepliesList({ replies, questionAuthor }: RepliesListProps) {
+export function RepliesList({ replies, questionAuthor, totalReplyCount }: RepliesListProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const hasMoreThanThree = replies.length > 3
   const displayedReplies = isExpanded ? replies : replies.slice(0, 3)
@@ -29,13 +30,15 @@ export function RepliesList({ replies, questionAuthor }: RepliesListProps) {
     return null
   }
 
+  const displayCount = totalReplyCount || replies.length
+
   return (
     <div className="grid gap-2">
       <h3 className="text-sm font-medium text-muted-foreground mb-2">
-        {replies.length} {replies.length === 1 ? 'Reply' : 'Replies'}
+        {displayCount} {displayCount === 1 ? 'Reply' : 'Replies'}
       </h3>
       <div className="relative">
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {displayedReplies.map((reply, index) => {
             const timestamp = reply.ts ? new Date(reply.ts).toLocaleString() : null
             const isOP = reply.author === questionAuthor
@@ -43,7 +46,7 @@ export function RepliesList({ replies, questionAuthor }: RepliesListProps) {
             return (
               <div
                 key={reply.id}
-                className="border border-border rounded-lg p-4 bg-surface-75 min-w-0"
+                className="min-w-0 border border-border rounded-lg bg-surface-100 p-4"
               >
                 <div className="text-foreground mb-3 min-w-0">
                   <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
@@ -80,14 +83,6 @@ export function RepliesList({ replies, questionAuthor }: RepliesListProps) {
             )
           })}
         </div>
-
-        {/* Stacked cards effect when collapsed */}
-        {hasMoreThanThree && !isExpanded && (
-          <div className="relative">
-            <div className="absolute -bottom-1 left-2 right-2 h-3 border border-border border-t-0 rounded-b-lg bg-surface-75 opacity-60 -z-10" />
-            <div className="absolute -bottom-2 left-4 right-4 h-3 border border-border border-t-0 rounded-b-lg bg-surface-75 opacity-30 -z-20" />
-          </div>
-        )}
       </div>
 
       {hasMoreThanThree && (
