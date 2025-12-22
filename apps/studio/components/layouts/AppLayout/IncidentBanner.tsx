@@ -1,6 +1,8 @@
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 import Link from 'next/link'
 
+// Used to display ongoing incidents
+
 export const IncidentBanner = () => {
   return (
     <HeaderBanner
