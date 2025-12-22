@@ -108,7 +108,7 @@ export const CreateCronJobSheet = ({
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
+  const { mutate: upsertCronJob, isPending: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
   const { can: canToggleExtensions } = useAsyncCheckPermissions(
@@ -366,8 +366,8 @@ export const CreateCronJobSheet = ({
                     // @ts-ignore
                     title={
                       <span>
-                        Enable <code className="text-xs w-min">pg_net</code> for HTTP requests or
-                        Edge Functions
+                        Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
+                        requests or Edge Functions
                       </span>
                     }
                     description={

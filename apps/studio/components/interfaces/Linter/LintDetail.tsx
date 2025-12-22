@@ -1,19 +1,15 @@
 import Link from 'next/link'
-import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { toast } from 'sonner'
 
 import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint } from 'data/lint/lint-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 
 interface LintDetailProps {
@@ -23,32 +19,24 @@ interface LintDetailProps {
 }
 
 const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
+  const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { data: project } = useSelectedProjectQuery()
-  const [isRunningAction, setIsRunningAction] = useState(false)
-  const [isConfirmVisible, setIsConfirmVisible] = useState(false)
 
-  const lintInfo = lintInfoMap.find((item) => item.name === lint.name)
-  const actionConfirm = lintInfo?.action?.confirm
+  const handleAskAssistant = () => {
+    track('advisor_assistant_button_clicked', {
+      origin: 'lint_detail',
+      advisorCategory: lint.categories[0],
+      advisorType: lint.name,
+      advisorLevel: lint.level,
+    })
 
-  const handleRunAction = async () => {
-    if (!lintInfo?.action || !projectRef) return
-    setIsRunningAction(true)
-    try {
-      await lintInfo.action.run({
-        projectRef,
-        connectionString: project?.connectionString,
-        metadata: lint.metadata,
-      })
-      toast.success(`${lintInfo.action.label} successful`)
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to run action'
-      toast.error(message)
-    } finally {
-      setIsRunningAction(false)
-      setIsConfirmVisible(false)
-    }
+    onAskAssistant?.()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    snap.newChat({
+      name: 'Summarize lint',
+      initialMessage: createLintSummaryPrompt(lint),
+    })
   }
 
   return (
@@ -70,46 +58,19 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
 
       <h3 className="text-sm mb-2">Resolve</h3>
       <div className="flex items-center gap-2">
-        {lintInfo?.action && (
-          <Button
-            type="primary"
-            loading={isRunningAction}
-            onClick={() => {
-              if (actionConfirm) {
-                setIsConfirmVisible(true)
-              } else {
-                handleRunAction()
-              }
-            }}
-          >
-            {lintInfo.action.label}
-          </Button>
-        )}
-
-        <LintCTA title={lint.name} projectRef={projectRef} metadata={lint.metadata} />
-        <ButtonTooltip
-          type="default"
-          className="px-1"
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: 'Fix issue using Supabase Assistant',
-            },
-          }}
-          onClick={() => {
-            onAskAssistant?.()
-            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-            snap.newChat({
-              name: 'Fix issue',
-              initialInput: createLintSummaryPrompt(lint),
-            })
-          }}
+        <Button
+          icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
+          onClick={handleAskAssistant}
         >
-          <AiIconAnimation size={16} />
-        </ButtonTooltip>
+          Ask Assistant
+        </Button>
+        <LintCTA title={lint.name} projectRef={projectRef} metadata={lint.metadata} />
         <Button asChild type="text">
           <Link
-            href={lintInfo?.docsLink || `${DOCS_URL}/guides/database/database-linter`}
+            href={
+              lintInfoMap.find((item) => item.name === lint.name)?.docsLink ||
+              `${DOCS_URL}/guides/database/database-linter`
+            }
             target="_blank"
             rel="noreferrer"
             className="no-underline"
@@ -120,30 +81,6 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
           </Link>
         </Button>
       </div>
-
-      {lintInfo?.action && actionConfirm && (
-        <ConfirmationModal
-          visible={isConfirmVisible}
-          loading={isRunningAction}
-          title={actionConfirm.title({
-            projectRef,
-            connectionString: project?.connectionString,
-            metadata: lint.metadata,
-          })}
-          description={
-            actionConfirm.description?.({
-              projectRef,
-              connectionString: project?.connectionString,
-              metadata: lint.metadata,
-            }) ?? undefined
-          }
-          confirmLabel={actionConfirm.confirmLabel ?? 'Confirm'}
-          cancelLabel={actionConfirm.cancelLabel}
-          variant={actionConfirm.variant ?? 'default'}
-          onCancel={() => setIsConfirmVisible(false)}
-          onConfirm={handleRunAction}
-        />
-      )}
     </div>
   )
 }

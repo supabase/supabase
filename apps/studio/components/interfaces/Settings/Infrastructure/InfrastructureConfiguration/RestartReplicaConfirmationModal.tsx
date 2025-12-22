@@ -24,7 +24,7 @@ export const RestartReplicaConfirmationModal = ({
   const queryClient = useQueryClient()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
 
-  const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
+  const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {
       toast.success(`Restarting read replica (ID: ${formattedId})`)
 

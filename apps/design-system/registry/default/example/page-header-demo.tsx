@@ -15,9 +15,9 @@ import {
   PageHeaderAside,
   PageHeaderBreadcrumb,
   PageHeaderDescription,
-  PageHeaderFooter,
   PageHeaderIcon,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -71,7 +71,7 @@ export default function PageHeaderDemo() {
             </Button>
           </PageHeaderAside>
         </PageHeaderMeta>
-        <PageHeaderFooter>
+        <PageHeaderNavigationTabs>
           <NavMenu>
             {navigationItems.map((item) => (
               <NavMenuItem key={item.label} active={false}>
@@ -79,7 +79,7 @@ export default function PageHeaderDemo() {
               </NavMenuItem>
             ))}
           </NavMenu>
-        </PageHeaderFooter>
+        </PageHeaderNavigationTabs>
       </PageHeader>
     </div>
   )

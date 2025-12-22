@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -13,6 +15,7 @@ import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints
 import { databaseKeys } from 'data/database/keys'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { privilegeKeys } from 'data/privileges/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
@@ -24,6 +27,7 @@ import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useTrack } from 'lib/telemetry/track'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
@@ -31,15 +35,15 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ColumnEditor from './ColumnEditor/ColumnEditor'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
-import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { ForeignRowSelector } from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditor } from './RowEditor/JsonEditor'
-import RowEditor from './RowEditor/RowEditor'
+import { RowEditor } from './RowEditor/RowEditor'
 import { convertByteaToHex } from './RowEditor/RowEditor.utils'
 import { TextEditor } from './RowEditor/TextEditor'
-import SchemaEditor from './SchemaEditor'
+import { SchemaEditor } from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
@@ -64,6 +68,7 @@ type SaveTableParamsBase = {
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   resolve: () => void
+  generatedPolicies?: GeneratedPolicy[]
 }
 
 type SaveTableParamsNew = SaveTableParamsBase & {
@@ -130,12 +135,19 @@ export const SidePanelEditor = ({
   const tabsSnap = useTabsStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
+  const track = useTrack()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const track = useTrack()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
+  const generatePoliciesFlag = usePHFlag<boolean>('tableCreateGeneratePolicies')
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
+
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
@@ -156,21 +168,15 @@ export const SidePanelEditor = ({
       toast.success('Successfully created row')
     },
   })
-  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+  const { mutateAsync: updateTableRow, isPending: isUpdatingRow } = useTableRowUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated row')
     },
-  })
-  const { data: publications } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
     onError: () => {},
   })
-
-  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const isDuplicating = snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'
 
@@ -472,13 +478,18 @@ export const SidePanelEditor = ({
     }
   }
 
-  const saveTable = async (params: SaveTableParams) => {
-    // action and payload are not destructured here to preserve type
-    // narrowing later on
-    const { configuration, columns, foreignKeyRelations, resolve } = params
-
+  const saveTable = async ({
+    action,
+    payload,
+    configuration,
+    columns,
+    foreignKeyRelations,
+    generatedPolicies = [],
+    resolve,
+  }: SaveTableParams) => {
     let toastId
     let saveTableError = false
+
     const {
       importContent,
       isRLSEnabled,
@@ -489,46 +500,78 @@ export const SidePanelEditor = ({
     } = configuration
 
     try {
-      if (params.action === 'create') {
-        toastId = toast.loading(`Creating new table: ${params.payload.name}...`)
+      if (action === 'create') {
+        toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
-        const table = await createTable({
+        const { table, failedPolicies } = await createTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           toastId,
-          payload: params.payload,
+          payload,
           columns,
           foreignKeyRelations,
           isRLSEnabled,
           importContent,
           organizationSlug: org?.slug,
+          generatedPolicies,
+          onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
         })
+
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
+        // Invalidate queries for table creation
         await Promise.all([
           queryClient.invalidateQueries({
             queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({
+            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+          }),
         ])
 
-        toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        // Show success toast after everything is complete
+        if (failedPolicies.length > 0) {
+          toast.success(
+            `Table ${table.name} is created successfully, but we ran into issues creating ${failedPolicies.length} policie${failedPolicies.length > 1 ? 's' : ''}`,
+            {
+              id: toastId,
+              description: (
+                <ul className="list-disc pl-6">
+                  {failedPolicies.map((x) => (
+                    <li key={x.name}>{x.name}</li>
+                  ))}
+                </ul>
+              ),
+            }
+          )
+        } else {
+          toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        }
+
+        // Track experiment conversion if user is in the experiment
+        if (generatePoliciesFlag !== undefined) {
+          track('table_create_generate_policies_experiment_converted', {
+            experiment_id: 'tableCreateGeneratePolicies',
+            variant: generatePoliciesFlag ? 'treatment' : 'control',
+            has_rls_enabled: isRLSEnabled,
+            has_rls_policies: generatedPolicies.length > 0,
+            has_generated_policies: generatedPolicies.length > 0,
+          })
+        }
+
         onTableCreated(table)
-      } else if (params.action === 'duplicate' && !!selectedTable) {
+      } else if (action === 'duplicate' && !!selectedTable) {
         const tableToDuplicate = selectedTable
         toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
 
-        const table = await duplicateTable(
-          project?.ref!,
-          project?.connectionString,
-          params.payload,
-          {
-            isRLSEnabled,
-            isDuplicateRows,
-            duplicateTable: tableToDuplicate,
-            foreignKeyRelations,
-          }
-        )
+        const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
+          isRLSEnabled,
+          isDuplicateRows,
+          duplicateTable: tableToDuplicate,
+          foreignKeyRelations,
+        })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
@@ -536,6 +579,9 @@ export const SidePanelEditor = ({
             queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({
+            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+          }),
         ])
 
         toast.success(
@@ -543,7 +589,7 @@ export const SidePanelEditor = ({
           { id: toastId }
         )
         onTableCreated(table)
-      } else if (params.action === 'update' && selectedTable) {
+      } else if (action === 'update' && selectedTable) {
         toastId = toast.loading(`Updating table: ${selectedTable.name}...`)
 
         const { table, hasError } = await updateTable({
@@ -551,7 +597,7 @@ export const SidePanelEditor = ({
           connectionString: project?.connectionString,
           toastId,
           table: selectedTable,
-          payload: params.payload,
+          payload,
           columns,
           foreignKeyRelations,
           existingForeignKeyRelations,
@@ -571,10 +617,10 @@ export const SidePanelEditor = ({
             `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
           )
         } else {
-          if (ref && params.payload.name) {
+          if (ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            tabsSnap.updateTab(tabId, { label: params.payload.name })
+            tabsSnap.updateTab(tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
@@ -742,6 +788,7 @@ export const SidePanelEditor = ({
             ? snap.sidePanel.foreignKey.foreignKey
             : undefined
         }
+        isSaving={isUpdatingRow}
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
       />

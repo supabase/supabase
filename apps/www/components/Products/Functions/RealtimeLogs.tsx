@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Badge, cn } from 'ui'
+import { FC, useEffect, useState } from 'react'
 import { useInterval } from 'react-use'
+import { Badge, cn } from 'ui'
 
 interface Props {
   isActive?: boolean
@@ -87,9 +87,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
             >
               <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
               <span className="">
-                <Badge color={log.status === 200 ? 'slate' : 'amber'} className="rounded">
-                  {log.status}
-                </Badge>
+                <Badge variant={log.status === 200 ? 'default' : 'warning'}>{log.status}</Badge>
               </span>
               <span className="w-10 truncate">{log.method}</span>
               <span className="truncate">{log.id}</span>

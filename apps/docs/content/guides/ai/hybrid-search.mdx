@@ -74,7 +74,7 @@ create index on documents using gin(fts);
 create index on documents using hnsw (embedding vector_ip_ops);
 ```
 
-For full text search we use a [generalized inverted (GIN) index](https://www.postgresql.org/docs/current/gin-intro.html) which is designed for handling composite values like those stored in a `tsvector`.
+For full text search we use a [generalized inverted (GIN) index](https://www.postgresql.org/docs/current/gin.html) which is designed for handling composite values like those stored in a `tsvector`.
 
 For semantic vector search we use an [HNSW index](/docs/guides/ai/vector-indexes/hnsw-indexes), which is a high performing approximate nearest neighbor (ANN) search algorithm. Note that we are using the `vector_ip_ops` (inner product) operator with this index because we plan on using the inner product (`<#>`) operator later in our query. If you plan to use a different operator like cosine distance (`<=>`), be sure to update the index accordingly. For more information, see [distance operators](/docs/guides/ai/vector-indexes#distance-operators).
 

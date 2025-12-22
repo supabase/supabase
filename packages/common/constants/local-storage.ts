@@ -17,7 +17,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
-  UI_PREVIEW_SECURITY_NOTIFICATIONS: 'security-notifications',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -67,7 +66,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
+  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2025-11-21',
   REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys
@@ -81,8 +80,16 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
 
+  LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
+
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
+
+  // Index Advisor notice dismissed
+  INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
+  // Observability banner dismissed
+  OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
 
   /**
    * COMMON
