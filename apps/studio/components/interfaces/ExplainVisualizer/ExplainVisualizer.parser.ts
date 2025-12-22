@@ -218,7 +218,7 @@ function addNodeToTree(
 
 // Calculate max cost for scaling the visualization bars
 function getNodeMaxCost(node: ExplainNode): number {
-  const nodeCost = node.cost?.end || 0
+  const nodeCost = node.cost?.end || node.actualTime?.end || 0
   const childrenMax = node.children.reduce((max, child) => Math.max(max, getNodeMaxCost(child)), 0)
   return Math.max(nodeCost, childrenMax)
 }
