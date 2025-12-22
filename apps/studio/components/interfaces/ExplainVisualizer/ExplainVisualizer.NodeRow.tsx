@@ -3,97 +3,14 @@ import { ChevronRight, ChevronDown } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { RowCountIndicator } from './ExplainVisualizer.RowCountIndicator'
 import type { ExplainNode } from './ExplainVisualizer.types'
+import { parseDetailLines } from './ExplainVisualizer.parser'
+import { formatNodeDuration, getScanBarColor, getScanBorderColor } from './ExplainVisualizer.utils'
 
 interface ExplainNodeRowProps {
   node: ExplainNode
   depth: number
   /** Maximum duration across all nodes, used to calculate bar width as % */
   maxDuration: number
-}
-
-function formatTime(ms: number | undefined): string {
-  if (ms === undefined) return '-'
-  if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
-  if (ms >= 1) return `${ms.toFixed(2)}ms`
-  if (ms >= 0.01) return `${ms.toFixed(2)}ms`
-  if (ms >= 0.001) return `${ms.toFixed(3)}ms`
-  // Convert to microseconds for very small values
-  const us = ms * 1000
-  if (us >= 0.1) return `${us.toFixed(1)}µs`
-  return `${us.toFixed(2)}µs`
-}
-
-/**
- * Parse node details into structured lines for display
- */
-function parseDetailLines(details: string): { label: string; value: string }[] {
-  if (!details) return []
-
-  const lines = details.split('\n').filter(Boolean)
-  const result: { label: string; value: string }[] = []
-
-  for (const line of lines) {
-    const colonIndex = line.indexOf(':')
-    if (colonIndex > 0) {
-      result.push({
-        label: line.substring(0, colonIndex + 1),
-        value: line.substring(colonIndex + 1).trim(),
-      })
-    } else if (line.trim()) {
-      // Lines without colons (like table names)
-      result.push({ label: '', value: line.trim() })
-    }
-  }
-
-  return result
-}
-
-/**
- * Determine bar color based on scan type
- */
-function getScanBarColor(operation: string): string {
-  const op = operation.toLowerCase()
-
-  // Index scans are efficient - green
-  if (
-    op.includes('index scan') ||
-    op.includes('index only scan') ||
-    op.includes('bitmap index scan')
-  ) {
-    return 'bg-brand/20'
-  }
-
-  // Sequential scans are slower - yellow
-  if (op.includes('seq scan') || op.includes('sequential scan')) {
-    return 'bg-warning/20'
-  }
-
-  // Default neutral color for other operations
-  return 'bg-foreground/[0.06]'
-}
-
-/**
- * Determine left border color based on scan type
- */
-function getScanBorderColor(operation: string): string {
-  const op = operation.toLowerCase()
-
-  // Index scans are efficient - green
-  if (
-    op.includes('index scan') ||
-    op.includes('index only scan') ||
-    op.includes('bitmap index scan')
-  ) {
-    return 'border-l-brand'
-  }
-
-  // Sequential scans are slower - yellow
-  if (op.includes('seq scan') || op.includes('sequential scan')) {
-    return 'border-l-warning'
-  }
-
-  // Default neutral color for other operations
-  return 'border-l-border-muted'
 }
 
 export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps) {
@@ -172,11 +89,11 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span className="text-foreground-light cursor-help">
-                        {formatTime(duration)}
+                        {formatNodeDuration(duration)}
                       </span>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs font-sans">
-                      <p className="font-medium">Execution time: {formatTime(duration)}</p>
+                      <p className="font-medium">Execution time: {formatNodeDuration(duration)}</p>
                       <p className="text-foreground-lighter text-xs mt-1">
                         This is how long this operation took to execute. The bar width shows this as
                         a percentage of the slowest operation ({Math.round(barWidthPercent)}%) —

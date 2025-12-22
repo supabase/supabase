@@ -131,3 +131,57 @@ export function isExplainQuery(rows: readonly any[]): boolean {
     rows.length > 0 && rows[0].hasOwnProperty('QUERY PLAN') && Object.keys(rows[0]).length === 1
   )
 }
+
+export function formatNodeDuration(ms: number | undefined): string {
+  if (ms === undefined) return '-'
+  if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
+  if (ms >= 1) return `${ms.toFixed(2)}ms`
+  if (ms >= 0.01) return `${ms.toFixed(2)}ms`
+  if (ms >= 0.001) return `${ms.toFixed(3)}ms`
+
+  const us = ms * 1000
+  if (us >= 0.1) return `${us.toFixed(1)}µs`
+  return `${us.toFixed(2)}µs`
+}
+
+export function getScanBarColor(operation: string): string {
+  const op = operation.toLowerCase()
+
+  // Index scans are green
+  if (
+    op.includes('index scan') ||
+    op.includes('index only scan') ||
+    op.includes('bitmap index scan')
+  ) {
+    return 'bg-brand/20'
+  }
+
+  // Sequential scans are yellow
+  if (op.includes('seq scan') || op.includes('sequential scan')) {
+    return 'bg-warning/20'
+  }
+
+  // Default neutral color for other operations
+  return 'bg-foreground/[0.06]'
+}
+
+export function getScanBorderColor(operation: string): string {
+  const op = operation.toLowerCase()
+
+  // Index scans are green
+  if (
+    op.includes('index scan') ||
+    op.includes('index only scan') ||
+    op.includes('bitmap index scan')
+  ) {
+    return 'border-l-brand'
+  }
+
+  // Sequential scans are yellow
+  if (op.includes('seq scan') || op.includes('sequential scan')) {
+    return 'border-l-warning'
+  }
+
+  // Default neutral color for other operations
+  return 'border-l-border-muted'
+}

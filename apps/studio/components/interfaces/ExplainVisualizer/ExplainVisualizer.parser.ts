@@ -280,3 +280,25 @@ export function createNodeTree(rows: readonly QueryPlanRow[]): ExplainNode[] {
   tree.forEach(parseNodeDetails)
   return tree
 }
+
+export function parseDetailLines(details: string): { label: string; value: string }[] {
+  if (!details) return []
+
+  const lines = details.split('\n').filter(Boolean)
+  const result: { label: string; value: string }[] = []
+
+  for (const line of lines) {
+    const colonIndex = line.indexOf(':')
+    if (colonIndex > 0) {
+      result.push({
+        label: line.substring(0, colonIndex + 1),
+        value: line.substring(colonIndex + 1).trim(),
+      })
+    } else if (line.trim()) {
+      // Lines without colons (like table names)
+      result.push({ label: '', value: line.trim() })
+    }
+  }
+
+  return result
+}
