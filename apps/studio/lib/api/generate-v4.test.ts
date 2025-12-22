@@ -2,9 +2,10 @@ import { expect, test, vi } from 'vitest'
 // End of third-party imports
 
 import generateV4 from '../../pages/api/ai/sql/generate-v4'
-import { sanitizeMessagePart } from '../ai/tools/tool-sanitizer'
+import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+import { UIMessage } from 'ai'
 
-vi.mock('../ai/tools/tool-sanitizer', () => ({
+vi.mock('lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
 }))
 
@@ -17,16 +18,19 @@ test('generateV4 calls the tool sanitizer', async () => {
     body: {
       messages: [
         {
+          id: 'test-msg-id',
           role: 'assistant',
           parts: [
             {
               type: 'tool-execute_sql',
               state: 'output-available',
-              output: 'test output',
+              toolCallId: 'test-tool-call-id',
+              input: { sql: 'SELECT * FROM users' },
+              output: [{ id: 1, name: 'test-output' }],
             },
           ],
         },
-      ],
+      ] satisfies UIMessage[],
       projectRef: 'test-project',
       connectionString: 'test-connection',
       orgSlug: 'test-org',
