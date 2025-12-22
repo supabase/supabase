@@ -48,6 +48,54 @@ function parseDetailLines(details: string): { label: string; value: string }[] {
   return result
 }
 
+/**
+ * Determine bar color based on scan type
+ */
+function getScanBarColor(operation: string): string {
+  const op = operation.toLowerCase()
+
+  // Index scans are efficient - green
+  if (
+    op.includes('index scan') ||
+    op.includes('index only scan') ||
+    op.includes('bitmap index scan')
+  ) {
+    return 'bg-brand/20'
+  }
+
+  // Sequential scans are slower - yellow
+  if (op.includes('seq scan') || op.includes('sequential scan')) {
+    return 'bg-warning/20'
+  }
+
+  // Default neutral color for other operations
+  return 'bg-foreground/[0.06]'
+}
+
+/**
+ * Determine left border color based on scan type
+ */
+function getScanBorderColor(operation: string): string {
+  const op = operation.toLowerCase()
+
+  // Index scans are efficient - green
+  if (
+    op.includes('index scan') ||
+    op.includes('index only scan') ||
+    op.includes('bitmap index scan')
+  ) {
+    return 'border-l-brand'
+  }
+
+  // Sequential scans are slower - yellow
+  if (op.includes('seq scan') || op.includes('sequential scan')) {
+    return 'border-l-warning'
+  }
+
+  // Default neutral color for other operations
+  return 'border-l-border-muted'
+}
+
 export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const hasChildren = node.children.length > 0
@@ -61,14 +109,17 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
   const duration = node.actualTime ? node.actualTime.end - node.actualTime.start : 0
   const hasTimingData = node.actualTime && duration > 0
   const barWidthPercent = maxDuration > 0 ? (duration / maxDuration) * 100 : 0
+  const barColorClass = getScanBarColor(node.operation)
+  const borderColorClass = getScanBorderColor(node.operation)
 
   return (
     <>
       {/* Main row */}
       <div
         className={cn(
-          'flex items-stretch border-b border-border-muted transition-colors',
-          isExpanded ? 'bg-surface-100' : 'bg-studio hover:bg-surface-100/50'
+          'flex items-stretch border-b border-l-4 border-border-muted transition-colors',
+          isExpanded ? 'bg-surface-100' : 'bg-studio hover:bg-surface-100/50',
+          borderColorClass
         )}
       >
         {/* Left section: expand button + operation info */}
@@ -112,7 +163,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
             <>
               {/* Duration bar - width represents % of slowest operation */}
               <div
-                className="absolute left-0 top-0 h-full bg-foreground/[0.06]"
+                className={cn('absolute left-0 top-0 h-full', barColorClass)}
                 style={{ width: `${barWidthPercent}%` }}
               />
               {/* Duration and row count info */}
@@ -147,7 +198,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
       {/* Expanded details section */}
       {isExpanded && detailLines.length > 0 && (
         <div
-          className="border-b border-border-muted bg-surface-100"
+          className={cn('border-b border-l-4 border-border-muted bg-surface-100', borderColorClass)}
           style={{ paddingLeft: `${16 + indentPx + 32}px` }}
         >
           <div className="px-4 py-3 space-y-2 font-mono text-xs">
