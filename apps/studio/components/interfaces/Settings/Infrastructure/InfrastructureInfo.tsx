@@ -195,7 +195,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {showDatabaseUpgrades && data.eligible ? (
+                    {showDatabaseUpgrades && data && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -203,8 +203,8 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && !data.eligible && hasValidationErrors ? (
-                      <ValidationErrorsWarning validationErrors={data.validation_errors} />
+                    {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
                     ) : null}
                   </>
                 )}

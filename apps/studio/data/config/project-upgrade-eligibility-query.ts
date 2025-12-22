@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { IS_PLATFORM } from 'common'
+import type { ValidationError } from 'components/interfaces/Settings/Infrastructure/UpgradeWarnings'
 import { get, handleError } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
@@ -11,12 +12,14 @@ import { configKeys } from './keys'
 export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse =
-  components['schemas']['ProjectUpgradeEligibilityResponse']
+  components['schemas']['ProjectUpgradeEligibilityResponse'] & {
+    validation_errors?: ValidationError[]
+  }
 
 export async function getProjectUpgradeEligibility(
   { projectRef }: ProjectUpgradeEligibilityVariables,
   signal?: AbortSignal
-) {
+): Promise<ProjectUpgradeEligibilityResponse | undefined> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/v1/projects/{ref}/upgrade/eligibility', {
@@ -25,7 +28,7 @@ export async function getProjectUpgradeEligibility(
   })
 
   if (error) handleError(error)
-  return data
+  return data as ProjectUpgradeEligibilityResponse | undefined
 }
 
 export type ProjectUpgradeEligibilityData = Awaited<ReturnType<typeof getProjectUpgradeEligibility>>

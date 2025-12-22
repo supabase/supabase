@@ -17,7 +17,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
   )
 }
 
-type ValidationError =
+export type ValidationError =
   | { type: 'objects_depending_on_pg_cron'; dependents: string[] }
   | {
       type: 'indexes_referencing_ll_to_earth'
