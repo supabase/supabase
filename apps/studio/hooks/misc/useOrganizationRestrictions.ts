@@ -7,9 +7,9 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 
 export type WarningBannerProps = {
-  type: 'danger' | 'warning' | 'note'
+  variant: 'danger' | 'warning' | 'note'
   title: string
-  message: string
+  description: string
   link: string
 }
 
@@ -35,36 +35,36 @@ export function useOrganizationRestrictions() {
 
   if (org && org.organization_missing_address && !org.billing_partner) {
     warnings.push({
-      type: 'danger',
+      variant: 'danger',
       title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
-      message: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.message,
+      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.message,
       link: `/org/${org?.slug}/billing#address`,
     })
   }
 
   if (thisOrgHasOverdueInvoices?.length) {
     warnings.push({
-      type: 'danger',
+      variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
-      message: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
       link: `/org/${org?.slug}/billing#invoices`,
     })
   }
 
   if (overdueInvoicesFromOtherOrgs?.length) {
     warnings.push({
-      type: 'danger',
+      variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
-      message: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
       link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/billing#invoices`,
     })
   }
 
   if (org?.restriction_status === 'grace_period') {
     warnings.push({
-      type: 'warning',
+      variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
-      message: RESTRICTION_MESSAGES.GRACE_PERIOD.message(
+      description: RESTRICTION_MESSAGES.GRACE_PERIOD.message(
         dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')
       ),
       link: `/org/${org?.slug}/billing`,
@@ -73,18 +73,18 @@ export function useOrganizationRestrictions() {
 
   if (org?.restriction_status === 'grace_period_over') {
     warnings.push({
-      type: 'warning',
+      variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.title,
-      message: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.message,
+      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.message,
       link: `/org/${org?.slug}/billing`,
     })
   }
 
   if (org?.restriction_status === 'restricted') {
     warnings.push({
-      type: 'danger',
+      variant: 'danger',
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
-      message: RESTRICTION_MESSAGES.RESTRICTED.message,
+      description: RESTRICTION_MESSAGES.RESTRICTED.message,
       link: `/org/${org?.slug}/billing`,
     })
   }

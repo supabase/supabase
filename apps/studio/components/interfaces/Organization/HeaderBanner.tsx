@@ -27,29 +27,25 @@ export const OrganizationResourceBanner = () => {
 }
 
 export const HeaderBanner = ({
-  type,
+  variant,
   title,
   description,
-  link,
-  linkText = 'Details',
 }: {
-  type: 'danger' | 'warning' | 'note'
+  variant: 'danger' | 'warning' | 'note'
   title: string
   description: string | ReactNode
-  link?: string
-  linkText?: string
 }) => {
   const bannerStyles =
-    type === 'danger'
+    variant === 'danger'
       ? 'bg-destructive-200 border-destructive-400'
-      : type === 'warning'
+      : variant === 'warning'
         ? 'bg-warning-200 border-warning-400'
         : 'bg-surface-200/25 border-default'
-  const Icon = type === 'danger' ? CriticalIcon : WarningIcon
+  const Icon = variant === 'danger' ? CriticalIcon : WarningIcon
   const iconStyles =
-    type === 'danger'
+    variant === 'danger'
       ? 'text-destructive-200 bg-destructive-600'
-      : type === 'warning'
+      : variant === 'warning'
         ? 'text-warning-200 bg-warning-600'
         : 'text-background bg-foreground'
 
