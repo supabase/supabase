@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useFlag, useParams, IS_PLATFORM } from 'common'
+import { useFlag, useParams } from 'common'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
@@ -88,28 +88,17 @@ export function useCreateCommandsConfig() {
   // Auth
   const authenticationOauth21 = useFlag('EnableOAuth21')
 
-  // Only include 'reports:all' when IS_PLATFORM is true to avoid unnecessary work in self-hosted builds
-  const baseFeatures = IS_PLATFORM
-    ? ([
-        'project_auth:all',
-        'project_edge_function:all',
-        'project_storage:all',
-        'reports:all',
-      ] as const)
-    : (['project_auth:all', 'project_edge_function:all', 'project_storage:all'] as const)
-
-  const featureFlags = useIsFeatureEnabled([...baseFeatures])
   const {
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
-  } = featureFlags
-  // Only fetch reportsEnabled when IS_PLATFORM is true to avoid unnecessary work in self-hosted builds
-  const reportsEnabled = IS_PLATFORM
-    ? 'reportsAll' in featureFlags
-      ? (featureFlags as { reportsAll: boolean }).reportsAll
-      : false
-    : false
+    reportsAll: reportsEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'reports:all',
+  ])
 
   const {
     data: authConfig,
