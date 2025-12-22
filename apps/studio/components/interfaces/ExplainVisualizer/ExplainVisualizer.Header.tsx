@@ -22,9 +22,22 @@ export function ExplainHeader({ mode, onToggleMode, summary }: ExplainHeaderProp
   return (
     <div className="bg-surface-100 border-b px-4 py-3 flex flex-col gap-3 text-xs">
       {/* Title row */}
-      <div className="flex items-center gap-2">
-        <Activity size={16} className="text-foreground-light" />
-        <h3 className="text-sm font-medium text-foreground">Query Execution Plan</h3>
+      <div className="flex items-center gap-2 text-sm">
+        <h3 className="font-medium text-foreground">Query Execution Plan</h3>
+        {/* Summary stats - only show in visual mode when we have the data */}
+        {hasSummaryStats && (
+          <div className="flex items-center gap-4 flex-wrap">
+            {summary.totalTime > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-foreground-light">/</span>
+                <span className="text-foreground-light">Total time</span>
+                <span className="font-mono font-medium text-foreground">
+                  {summary.totalTime.toFixed(2)}ms
+                </span>
+              </div>
+            )}
+          </div>
+        )}
         <button
           type="button"
           onClick={onToggleMode}
@@ -45,45 +58,16 @@ export function ExplainHeader({ mode, onToggleMode, summary }: ExplainHeaderProp
         </span>
       </div>
 
-      {/* Summary stats - only show in visual mode when we have the data */}
-      {hasSummaryStats && (
-        <div className="flex items-center gap-4 flex-wrap">
-          {summary.totalTime > 0 && (
-            <div className="flex items-center gap-1.5">
-              <Clock size={12} className="text-foreground-muted" />
-              <span className="text-foreground-light">Total:</span>
-              <span className="font-mono font-medium text-foreground">
-                {summary.totalTime.toFixed(2)}ms
-              </span>
-            </div>
-          )}
-          {summary.hasSeqScan && !summary.hasIndexScan && (
-            <Badge variant="warning" className="text-xs gap-1">
-              <Database size={10} />
-              Sequential scan detected
-            </Badge>
-          )}
-        </div>
-      )}
-
       {/* Icon legend - only relevant in visual mode */}
       {isVisual && (
         <div className="flex items-center gap-4 flex-wrap text-foreground-lighter">
           <div className="flex items-center gap-1.5">
-            <Database size={12} className="text-warning" />
-            <span>Seq Scan (full table read)</span>
+            <span className="inline-block w-2 h-2 rounded-full bg-warning" />
+            <span>Seq Scan (slow)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Zap size={12} className="text-brand" />
-            <span>Index Scan (fast lookup)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <GitMerge size={12} className="text-foreground-light" />
-            <span>Join</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Hash size={12} className="text-foreground-light" />
-            <span>Hash (lookup table)</span>
+            <span className="inline-block w-2 h-2 rounded-full bg-brand" />
+            <span>Index Scan (fast)</span>
           </div>
         </div>
       )}
