@@ -3,6 +3,7 @@ import type {
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
   FactoryMcpConfig,
+  GeminiMcpConfig,
   GooseMcpConfig,
   McpClient,
   McpFeatureGroup,
@@ -211,6 +212,60 @@ export const MCP_CLIENTS: McpClient[] = [
     ),
   },
   {
+    key: 'gemini-cli',
+    label: 'Gemini CLI',
+    icon: 'gemini-cli',
+    configFile: '.gemini/settings.json',
+    externalDocsUrl: 'https://geminicli.com/docs/tools/mcp-server/',
+    transformConfig: (config): GeminiMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            httpUrl: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    primaryInstructions: (config, onCopy) => {
+      const mcpUrl = getMcpUrl(config)
+      const command = `gemini mcp add -t http supabase ${mcpUrl}`
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-warning">
+            Ensure you are running Gemini CLI version <code>0.20.2</code> or higher.
+          </p>
+          <p className="text-xs text-foreground-light">
+            Add the Supabase MCP server to Gemini CLI:
+          </p>
+          <CodeBlock
+            value={command}
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy('command')}
+          />
+        </div>
+      )
+    },
+    alternateInstructions: (config, onCopy) => {
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">
+            After installation, start the Gemini CLI and run the following command to authenticate
+            the server:
+          </p>
+          <CodeBlock
+            value="/mcp auth supabase"
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy('command')}
+          />
+        </div>
+      )
+    },
+  },
+  {
     key: 'windsurf',
     label: 'Windsurf',
     icon: 'windsurf',
@@ -226,6 +281,11 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
+    primaryInstructions: (config, onCopy) => (
+      <p className="text-xs text-warning">
+        Ensure you are running Windsurf version <code>0.1.37</code> or higher.
+      </p>
+    ),
     alternateInstructions: (config, onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use

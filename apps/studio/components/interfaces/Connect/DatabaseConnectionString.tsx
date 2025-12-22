@@ -7,7 +7,6 @@ import { getAddons } from 'components/interfaces/Billing/Subscription/Subscripti
 import AlertError from 'components/ui/AlertError'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { InlineLink } from 'components/ui/InlineLink'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -33,6 +32,7 @@ import {
   Separator,
   cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,
