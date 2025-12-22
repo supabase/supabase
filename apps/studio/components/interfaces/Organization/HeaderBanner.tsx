@@ -20,37 +20,37 @@ export const OrganizationResourceBanner = () => {
 
   return (
     <AnimatePresence initial={false}>
-      {warnings.map((warning, i) => (
-        <HeaderBanner key={i} {...warning} />
+      {warnings.map((warning) => (
+        <HeaderBanner key={`${warning.variant}-${warning.title}`} {...warning} />
       ))}
     </AnimatePresence>
   )
 }
 
-export const HeaderBanner = ({
-  variant,
-  title,
-  description,
-  onDismiss,
-}: {
+interface HeaderBannerProps {
   variant: 'danger' | 'warning' | 'note'
   title: string
   description: string | ReactNode
   onDismiss?: () => void
-}) => {
-  const bannerStyles =
-    variant === 'danger'
-      ? 'bg-destructive-200 border-destructive-400'
-      : variant === 'warning'
-        ? 'bg-warning-200 border-warning-400'
-        : 'bg-surface-200/25 border-default'
+}
+const variantStyles = {
+  danger: {
+    banner: 'bg-destructive-200 border-destructive-400',
+    icon: 'text-destructive-200 bg-destructive-600',
+  },
+  warning: {
+    banner: 'bg-warning-200 border-warning-400',
+    icon: 'text-warning-200 bg-warning-600',
+  },
+  note: {
+    banner: 'bg-surface-200/25 border-default',
+    icon: 'text-background bg-foreground',
+  },
+} as const
+
+export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderBannerProps) => {
+  const { banner: bannerStyles, icon: iconStyles } = variantStyles[variant]
   const Icon = variant === 'danger' ? CriticalIcon : WarningIcon
-  const iconStyles =
-    variant === 'danger'
-      ? 'text-destructive-200 bg-destructive-600'
-      : variant === 'warning'
-        ? 'text-warning-200 bg-warning-600'
-        : 'text-background bg-foreground'
 
   return (
     <motion.div
