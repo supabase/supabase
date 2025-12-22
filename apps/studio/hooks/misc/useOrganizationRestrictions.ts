@@ -13,6 +13,16 @@ export type WarningBannerProps = {
   description: ReactNode
 }
 
+/**
+ * Compute billing-related restriction banners for the currently selected organization.
+ *
+ * The hook examines billing feature availability, overdue invoices, organization billing data,
+ * and restriction status to produce an ordered list of warning/danger banner props.
+ *
+ * @returns An object containing:
+ *  - `warnings`: an array of `WarningBannerProps` to display for the selected organization (may be empty).
+ *  - `org`: the selected organization data (may be `undefined`).
+ */
 export function useOrganizationRestrictions() {
   const { data: org } = useSelectedOrganizationQuery()
 
