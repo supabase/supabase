@@ -2,11 +2,7 @@ import { useMemo } from 'react'
 import { ExplainHeader } from './ExplainVisualizer.Header'
 import { ExplainNodeRow } from './ExplainVisualizer.NodeRow'
 import { TimelineHeader } from './ExplainVisualizer.TimelineHeader'
-import {
-  calculateMaxTime,
-  calculateSummary,
-  createNodeTree,
-} from './ExplainVisualizer.parser'
+import { calculateMaxTime, calculateSummary, createNodeTree } from './ExplainVisualizer.parser'
 import type { QueryPlanRow } from './ExplainVisualizer.types'
 
 export interface ExplainVisualizerProps {
@@ -39,9 +35,7 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
       {/* Timeline header and rows container */}
       <div className="flex-1 overflow-auto">
         {/* Timeline header with time markers */}
-        {maxTime > 0 && (
-          <TimelineHeader maxTime={maxTime} leftSectionWidth={LEFT_SECTION_WIDTH} />
-        )}
+        {maxTime > 0 && <TimelineHeader maxTime={maxTime} leftSectionWidth={LEFT_SECTION_WIDTH} />}
 
         {/* Flat list of plan nodes */}
         <div className="flex flex-col">

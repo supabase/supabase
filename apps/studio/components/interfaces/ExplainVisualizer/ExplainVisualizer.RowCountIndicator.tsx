@@ -177,4 +177,3 @@ export function RowCountIndicator({
 
   return <span className="text-foreground-muted">-</span>
 }
-

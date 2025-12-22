@@ -75,4 +75,3 @@ export function TimelineHeader({ maxTime, leftSectionWidth }: TimelineHeaderProp
     </div>
   )
 }
-
