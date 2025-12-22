@@ -108,6 +108,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
     for (const id of snippetIds) {
       await deleteSnippet(id)
     }
+    res.setHeader('Content-Type', 'application/json')
     return res.status(200).send(snippetIds.map((id) => ({ id })))
   } catch (error) {
     console.error('Error deleting snippets:', error)
