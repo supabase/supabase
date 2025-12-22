@@ -1,22 +1,26 @@
 import { useState } from 'react'
 import { ChevronRight, ChevronDown } from 'lucide-react'
-import { cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { RowCountIndicator } from './ExplainVisualizer.RowCountIndicator'
 import type { ExplainNode } from './ExplainVisualizer.types'
 
 interface ExplainNodeRowProps {
   node: ExplainNode
   depth: number
-  maxTime: number
-  /** Width of the left section (synced across all rows) */
-  leftSectionWidth: number
+  /** Maximum duration across all nodes, used to calculate bar width as % */
+  maxDuration: number
 }
 
 function formatTime(ms: number | undefined): string {
   if (ms === undefined) return '-'
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
   if (ms >= 1) return `${ms.toFixed(2)}ms`
-  return `${ms.toFixed(2)}ms`
+  if (ms >= 0.01) return `${ms.toFixed(2)}ms`
+  if (ms >= 0.001) return `${ms.toFixed(3)}ms`
+  // Convert to microseconds for very small values
+  const us = ms * 1000
+  if (us >= 0.1) return `${us.toFixed(1)}µs`
+  return `${us.toFixed(2)}µs`
 }
 
 /**
@@ -44,7 +48,7 @@ function parseDetailLines(details: string): { label: string; value: string }[] {
   return result
 }
 
-export function ExplainNodeRow({ node, depth, maxTime, leftSectionWidth }: ExplainNodeRowProps) {
+export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const hasChildren = node.children.length > 0
   const hasDetails = Boolean(node.details?.trim())
@@ -53,13 +57,10 @@ export function ExplainNodeRow({ node, depth, maxTime, leftSectionWidth }: Expla
   const detailLines = parseDetailLines(node.details)
   const indentPx = depth * 24
 
-  // Calculate time bar position and width
-  const actualTimeEnd = node.actualTime?.end ?? 0
-  const timeBarWidth = maxTime > 0 ? (actualTimeEnd / maxTime) * 100 : 0
-
-  // Calculate the starting position of the time bar based on start time
-  const actualTimeStart = node.actualTime?.start ?? 0
-  const timeBarLeft = maxTime > 0 ? (actualTimeStart / maxTime) * 100 : 0
+  // Calculate duration and bar width as % of max duration
+  const duration = node.actualTime ? node.actualTime.end - node.actualTime.start : 0
+  const hasTimingData = node.actualTime && duration > 0
+  const barWidthPercent = maxDuration > 0 ? (duration / maxDuration) * 100 : 0
 
   return (
     <>
@@ -72,8 +73,8 @@ export function ExplainNodeRow({ node, depth, maxTime, leftSectionWidth }: Expla
       >
         {/* Left section: expand button + operation info */}
         <div
-          className="flex items-center gap-3 px-4 py-3 shrink-0"
-          style={{ width: leftSectionWidth, paddingLeft: `${16 + indentPx}px` }}
+          className="flex items-center gap-3 px-4 py-3 shrink-0 min-w-[400px]"
+          style={{ paddingLeft: `${16 + indentPx}px` }}
         >
           {/* Expand/collapse button */}
           <button
@@ -105,19 +106,32 @@ export function ExplainNodeRow({ node, depth, maxTime, leftSectionWidth }: Expla
           </div>
         </div>
 
-        {/* Right section: time bar visualization */}
-        <div className="flex-1 relative min-h-[43px]">
-          {node.actualTime && (
-            <div
-              className="absolute top-0 h-full bg-white/[0.03] flex flex-col items-start justify-center px-4 py-2"
-              style={{
-                left: `${timeBarLeft}%`,
-                width: `${Math.max(timeBarWidth - timeBarLeft, 0)}%`,
-                minWidth: 'fit-content',
-              }}
-            >
-              <div className="flex items-center gap-2 font-mono text-xs whitespace-nowrap">
-                <span className="text-foreground-light">{formatTime(node.actualTime.end)}</span>
+        {/* Right section: duration bar visualization */}
+        <div className="flex-1 relative min-h-[43px] flex items-center">
+          {hasTimingData && (
+            <>
+              {/* Duration bar - width represents % of slowest operation */}
+              <div
+                className="absolute left-0 top-0 h-full bg-foreground/[0.06]"
+                style={{ width: `${barWidthPercent}%` }}
+              />
+              {/* Duration and row count info */}
+              <div className="relative flex items-center gap-2 font-mono text-xs whitespace-nowrap px-3">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-foreground-light cursor-help">
+                      {formatTime(duration)}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs font-sans">
+                    <p className="font-medium">Execution time: {formatTime(duration)}</p>
+                    <p className="text-foreground-lighter text-xs mt-1">
+                      This is how long this operation took to execute. The bar width shows this as a
+                      percentage of the slowest operation ({Math.round(barWidthPercent)}%) — wider
+                      bars indicate where more time is spent.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
                 <span className="text-foreground-muted">/</span>
                 <RowCountIndicator
                   actualRows={node.actualRows}
@@ -125,7 +139,7 @@ export function ExplainNodeRow({ node, depth, maxTime, leftSectionWidth }: Expla
                   rowsRemovedByFilter={node.rowsRemovedByFilter}
                 />
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -150,13 +164,7 @@ export function ExplainNodeRow({ node, depth, maxTime, leftSectionWidth }: Expla
       {/* Render children recursively */}
       {hasChildren &&
         node.children.map((child, idx) => (
-          <ExplainNodeRow
-            key={idx}
-            node={child}
-            depth={depth + 1}
-            maxTime={maxTime}
-            leftSectionWidth={leftSectionWidth}
-          />
+          <ExplainNodeRow key={idx} node={child} depth={depth + 1} maxDuration={maxDuration} />
         ))}
     </>
   )

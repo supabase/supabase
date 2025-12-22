@@ -227,15 +227,18 @@ export function calculateMaxCost(tree: ExplainNode[]): number {
   return tree.reduce((max, node) => Math.max(max, getNodeMaxCost(node)), 0)
 }
 
-// Calculate max time for the timeline visualization
-function getNodeMaxTime(node: ExplainNode): number {
-  const nodeTime = node.actualTime?.end || 0
-  const childrenMax = node.children.reduce((max, child) => Math.max(max, getNodeMaxTime(child)), 0)
-  return Math.max(nodeTime, childrenMax)
+// Calculate max duration across all nodes for scaling the visualization bars
+function getNodeMaxDuration(node: ExplainNode): number {
+  const nodeDuration = node.actualTime ? node.actualTime.end - node.actualTime.start : 0
+  const childrenMax = node.children.reduce(
+    (max, child) => Math.max(max, getNodeMaxDuration(child)),
+    0
+  )
+  return Math.max(nodeDuration, childrenMax)
 }
 
-export function calculateMaxTime(tree: ExplainNode[]): number {
-  return tree.reduce((max, node) => Math.max(max, getNodeMaxTime(node)), 0)
+export function calculateMaxDuration(tree: ExplainNode[]): number {
+  return tree.reduce((max, node) => Math.max(max, getNodeMaxDuration(node)), 0)
 }
 
 // Calculate summary stats

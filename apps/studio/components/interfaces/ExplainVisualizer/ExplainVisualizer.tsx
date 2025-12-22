@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 import { ExplainHeader } from './ExplainVisualizer.Header'
 import { ExplainNodeRow } from './ExplainVisualizer.NodeRow'
-import { TimelineHeader } from './ExplainVisualizer.TimelineHeader'
-import { calculateMaxTime, calculateSummary, createNodeTree } from './ExplainVisualizer.parser'
+import { calculateMaxDuration, calculateSummary, createNodeTree } from './ExplainVisualizer.parser'
 import type { QueryPlanRow } from './ExplainVisualizer.types'
 
 export interface ExplainVisualizerProps {
@@ -10,12 +9,9 @@ export interface ExplainVisualizerProps {
   onShowRaw?: () => void
 }
 
-// Width of the left section containing operation names and cost info
-const LEFT_SECTION_WIDTH = 450
-
 export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
   const parsedTree = useMemo(() => createNodeTree(rows), [rows])
-  const maxTime = useMemo(() => calculateMaxTime(parsedTree), [parsedTree])
+  const maxDuration = useMemo(() => calculateMaxDuration(parsedTree), [parsedTree])
   const summary = useMemo(() => calculateSummary(parsedTree), [parsedTree])
 
   if (parsedTree.length === 0) {
@@ -32,21 +28,11 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
     <div className="bg-studio border-t h-full flex flex-col">
       {onShowRaw && <ExplainHeader mode="visual" onToggleMode={onShowRaw} summary={summary} />}
 
-      {/* Timeline header and rows container */}
+      {/* Plan nodes */}
       <div className="flex-1 overflow-auto">
-        {/* Timeline header with time markers */}
-        {maxTime > 0 && <TimelineHeader maxTime={maxTime} leftSectionWidth={LEFT_SECTION_WIDTH} />}
-
-        {/* Flat list of plan nodes */}
         <div className="flex flex-col">
           {parsedTree.map((node, idx) => (
-            <ExplainNodeRow
-              key={idx}
-              node={node}
-              depth={0}
-              maxTime={maxTime}
-              leftSectionWidth={LEFT_SECTION_WIDTH}
-            />
+            <ExplainNodeRow key={idx} node={node} depth={0} maxDuration={maxDuration} />
           ))}
         </div>
       </div>
