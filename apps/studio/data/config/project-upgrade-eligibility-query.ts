@@ -16,6 +16,13 @@ export type ProjectUpgradeEligibilityResponse =
     validation_errors?: ValidationError[]
   }
 
+/**
+ * Fetches upgrade eligibility information for a project.
+ *
+ * @param projectRef - The project's reference identifier
+ * @returns The project upgrade eligibility response, or `undefined` if no data was returned
+ * @throws Error if `projectRef` is not provided
+ */
 export async function getProjectUpgradeEligibility(
   { projectRef }: ProjectUpgradeEligibilityVariables,
   signal?: AbortSignal
