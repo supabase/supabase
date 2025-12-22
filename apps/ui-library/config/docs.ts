@@ -117,6 +117,14 @@ export const componentPages: SidebarNavGroup = {
       items: [],
       commandItemLabel: 'Infinite Query Hook',
     },
+    {
+      title: 'Assistant',
+      supportedFrameworks: [],
+      href: '/docs/assistant-chat',
+      new: true,
+      items: [],
+      commandItemLabel: 'Assistant',
+    },
   ],
 }
 

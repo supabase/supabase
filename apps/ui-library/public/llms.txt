@@ -15,6 +15,8 @@ Library of components for your project. The components integrate with Supabase a
     - Install shadcn/ui and use the components in your project
 - [Infinite Query Hook](https://supabase.com/ui/docs/infinite-query-hook)
     - React hook for infinite lists, fetching data from Supabase.
+- [Assistant](https://supabase.com/ui/docs/assistant-chat)
+    - AI assistant widget that streams Supabase-backed answers through MCP and Edge Functions.
 - [Supabase Client Libraries](https://supabase.com/ui/docs/nextjs/client)
     - Supabase client for Next.js
 - [Current User Avatar](https://supabase.com/ui/docs/nextjs/current-user-avatar)
