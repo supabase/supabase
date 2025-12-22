@@ -25,12 +25,12 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
   }
 
   return (
-    <div className="bg-studio border-t h-full flex flex-col">
+    <div className="bg-studio border-t h-full flex flex-col min-h-0">
       {onShowRaw && <ExplainHeader mode="visual" onToggleMode={onShowRaw} summary={summary} />}
 
       {/* Plan nodes */}
-      <div className="flex-1 overflow-auto">
-        <div className="flex flex-col">
+      <div className="flex-1 overflow-auto min-h-0">
+        <div className="flex flex-col min-w-max pb-4">
           {parsedTree.map((node, idx) => (
             <ExplainNodeRow key={idx} node={node} depth={0} maxDuration={maxDuration} />
           ))}
