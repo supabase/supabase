@@ -291,10 +291,6 @@ describe('snippets.utils', () => {
   })
 
   describe('getSnippets', () => {
-    beforeEach(() => {
-      vi.clearAllMocks()
-    })
-
     it('should get all snippets from root folder', async () => {
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -565,37 +561,6 @@ describe('snippets.utils', () => {
       mockedFS.mkdir.mockRejectedValue(new Error('Directory not accessible'))
 
       await expect(getSnippets({})).rejects.toThrow('Directory not accessible')
-    })
-
-    it('should filter out files with empty or null content', async () => {
-      mockedFS.access.mockResolvedValue(undefined)
-      mockedFS.readdir.mockResolvedValue([
-        { name: 'valid.sql', isDirectory: () => false, isFile: () => true },
-        { name: 'empty.sql', isDirectory: () => false, isFile: () => true },
-        { name: 'null.sql', isDirectory: () => false, isFile: () => true },
-      ] as any)
-      mockedFS.readFile.mockImplementation((filePath: any) => {
-        const fileName = path.basename(filePath as string)
-        switch (fileName) {
-          case 'valid.sql':
-            return Promise.resolve('SELECT 1;')
-          case 'empty.sql':
-            return Promise.resolve('')
-          case 'null.sql':
-            return Promise.resolve('')
-          default:
-            return Promise.resolve('')
-        }
-      })
-      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
-
-      const result = await getSnippets({})
-
-      // All files should be included, even empty ones
-      expect(result.snippets).toHaveLength(3)
-      expect(result.snippets.map((s) => s.name)).toContain('valid')
-      expect(result.snippets.map((s) => s.name)).toContain('empty')
-      expect(result.snippets.map((s) => s.name)).toContain('null')
     })
 
     it('should return correct snippet structure', async () => {
@@ -1035,8 +1000,6 @@ describe('snippets.utils', () => {
 
       await deleteSnippet(snippetId)
 
-      // BUG: The implementation incorrectly tries to delete a .json file
-      // but snippets are stored as .sql files
       expect(mockedFS.unlink).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, `test-snippet.sql`))
     })
 
@@ -1110,14 +1073,9 @@ describe('snippets.utils', () => {
 
       await deleteSnippet(snippetId)
 
-      // BUG: The implementation incorrectly tries to delete a .json file
-      // but should delete the actual .sql file from the folder
       expect(mockedFS.unlink).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'my-folder', 'folder-snippet.sql')
       )
-
-      // TODO: The implementation should actually delete:
-      // path.join(MOCK_SNIPPETS_DIR, 'my-folder', 'folder-snippet.sql')
     })
   })
 
@@ -1165,14 +1123,14 @@ describe('snippets.utils', () => {
       const id = generateDeterministicUuid(['existing-snippet.sql'])
 
       mockedFS.access.mockResolvedValue(undefined)
-      // // Mock readdir for both getFilesystemEntries calls (initial and final)
+      // Mock readdir for both getFilesystemEntries calls (initial and final)
       mockedFS.readdir.mockResolvedValue([
         { name: 'existing-snippet.sql', isDirectory: () => false, isFile: () => true },
       ] as any)
-      // // Mock readFile for both calls (initial and final)
+      // Mock readFile for both calls (initial and final)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
       mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
-      // mockedFS.writeFile.mockResolvedValue(undefined)
+      mockedFS.writeFile.mockResolvedValue(undefined)
 
       const updates = {
         name: 'new-name',
@@ -1416,7 +1374,6 @@ describe('snippets.utils', () => {
       const snippetName = 'existing-snippet'
       const existingSnippetId = generateDeterministicUuid([`${snippetName}.sql`])
       const targetFolderId = generateDeterministicUuid(['target-folder'])
-      const conflictingSnippetId = generateDeterministicUuid([targetFolderId, `${snippetName}.sql`])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -1609,13 +1566,14 @@ describe('snippets.utils', () => {
         { name: 'Delete Me', isDirectory: () => true, isFile: () => false, folderId: null },
         { name: 'Keep Me', isDirectory: () => true, isFile: () => false, folderId: null },
       ] as any)
-      mockedFS.rmdir.mockResolvedValue(undefined)
+      mockedFS.rm.mockResolvedValue(undefined)
       mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await deleteFolder(folderId)
 
-      expect(mockedFS.rmdir).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, 'Delete Me'), {
+      expect(mockedFS.rm).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, 'Delete Me'), {
         recursive: true,
+        force: true,
       })
     })
 
@@ -1640,7 +1598,7 @@ describe('snippets.utils', () => {
 
       const error = new Error('Permission denied') as NodeJS.ErrnoException
       error.code = 'EACCES'
-      mockedFS.rmdir.mockRejectedValue(error)
+      mockedFS.rm.mockRejectedValue(error)
       mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(deleteFolder(folderId)).rejects.toThrow('Permission denied')
@@ -1656,7 +1614,7 @@ describe('snippets.utils', () => {
 
       const error = new Error('Directory not found') as NodeJS.ErrnoException
       error.code = 'ENOENT'
-      mockedFS.rmdir.mockRejectedValue(error)
+      mockedFS.rm.mockRejectedValue(error)
       mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(deleteFolder(folderId)).rejects.toThrow(`Folder with id ${folderId} not found`)

@@ -1,4 +1,5 @@
 import { paths } from 'api-types'
+import { compact } from 'lodash'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
@@ -10,7 +11,6 @@ import {
   SnippetSchema,
   updateSnippet,
 } from 'lib/api/snippets.utils'
-import { compact } from 'node_modules/@headlessui/react/dist/utils/render'
 
 const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
