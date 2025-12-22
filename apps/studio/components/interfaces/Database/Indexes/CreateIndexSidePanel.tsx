@@ -189,8 +189,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
