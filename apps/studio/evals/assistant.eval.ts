@@ -50,13 +50,19 @@ Eval('Assistant', {
           sqlQueries.push(call.input.sql)
         }
         if (call.toolName === 'search_docs') {
-          const result = step.toolResults.at(0)
-          const searchDocsText = result?.output?.content?.at(0)?.text
-          if (typeof searchDocsText !== 'string') {
-            continue // invalid or missing search_docs text
-          }
+          for (const result of step.toolResults) {
+            const content = result?.output?.content
+            if (!content || !Array.isArray(content)) {
+              continue
+            }
 
-          docs.push(searchDocsText)
+            for (const contentItem of content) {
+              const searchDocsText = contentItem?.text
+              if (typeof searchDocsText === 'string') {
+                docs.push(searchDocsText)
+              }
+            }
+          }
         }
       }
     }
