@@ -208,7 +208,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             }}
                           >
                             <span>{schema.name}</span>
-                            {selectedEntity === schema.name && (
+                            {selectedSchema === schema.name && (
                               <Check className="text-brand" strokeWidth={2} size={16} />
                             )}
                           </CommandItem_Shadcn_>
