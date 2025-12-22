@@ -120,9 +120,6 @@ next-env.d.ts
 .claude/
 CLAUDE.md
 
-# Cursor MCP config
-.cursor/mcp.json
-
 #include template .env file for docker-compose
 !docker/.env
 !docker/supabase/.env
