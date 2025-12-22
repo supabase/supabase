@@ -111,6 +111,7 @@ export const HeaderBanner = ({
             size="tiny"
             className="opacity-75 z-[1] flex-shrink-0 p-0.5 h-auto absolute right-5 md:right-4 top-1/2 -translate-y-1/2"
             onClick={onDismiss}
+            aria-label="Dismiss banner"
           >
             <XIcon size={16} className="text-foreground" />
           </Button>
