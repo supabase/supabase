@@ -1,6 +1,5 @@
 {
-  // NOTE(mattrossman): using relative path to satisfy Braintrust CLI
-  "extends": "../tsconfig/react-library.json",
+  "extends": "tsconfig/react-library.json",
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
