@@ -195,6 +195,10 @@ export const OAuthAppsList = () => {
     }
   }
 
+  const isCreateMode = showCreateSheet && isOAuthServerEnabled
+  const isEditMode = !!appToEdit
+  const isCreateOrUpdateSheetVisible = isCreateMode || isEditMode
+
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
   }
@@ -411,7 +415,7 @@ export const OAuthAppsList = () => {
       </div>
 
       <CreateOrUpdateOAuthAppSheet
-        visible={showCreateSheet ? isOAuthServerEnabled : !!appToEdit}
+        visible={isCreateOrUpdateSheetVisible}
         appToEdit={appToEdit}
         onSuccess={(app) => {
           const isCreating = !appToEdit
