@@ -9,18 +9,16 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CompletedState, FailedState, UpgradingState, WaitingState } from './states'
-import { deriveUpgradeState, UPGRADE_STATE_CONTENT } from './types'
+import { deriveUpgradeState, UPGRADE_STATE_CONTENT, UpgradeTargetVersion } from './types'
 
-const formatValue = ({
-  postgres_version,
-  release_channel,
-}: {
-  postgres_version: number
-  release_channel: string
-}) => {
-  return `${postgres_version}|${release_channel}`
+const formatValue = (version: UpgradeTargetVersion) => {
+  return `${version.postgres_version}|${version.release_channel}`
+}
+
+const getVersionDisplayString = (version: UpgradeTargetVersion | undefined) => {
+  return version?.app_version?.split('supabase-postgres-')[1] ?? ''
 }
 
 export const PostgresUpgradePanel = () => {
@@ -32,6 +30,7 @@ export const PostgresUpgradePanel = () => {
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   const [loading, setLoading] = useState(false)
+  const [selectedVersionValue, setSelectedVersionValue] = useState('')
 
   // Determine if upgrade is in progress based on project status
   const isUpgradeInProgress = project?.status === PROJECT_STATUS.UPGRADING
@@ -48,6 +47,18 @@ export const PostgresUpgradePanel = () => {
     { projectRef: ref },
     { enabled: !isUpgradeInProgress }
   )
+
+  const targetVersions = useMemo(
+    () => (eligibilityData?.target_upgrade_versions ?? []) as UpgradeTargetVersion[],
+    [eligibilityData?.target_upgrade_versions]
+  )
+
+  // Initialize selected version when eligibility data loads
+  useEffect(() => {
+    if (targetVersions.length > 0 && !selectedVersionValue) {
+      setSelectedVersionValue(formatValue(targetVersions[0]))
+    }
+  }, [targetVersions, selectedVersionValue])
 
   // Upgrade status for in-progress tracking
   const { data: upgradeStatusData } = useProjectUpgradingStatusQuery(
@@ -72,11 +83,15 @@ export const PostgresUpgradePanel = () => {
     initiatedAt: initiated_at,
   })
 
-  // Get the target version for display
-  const displayTargetVersion =
-    target_version ||
-    eligibilityData?.target_upgrade_versions?.[0]?.app_version?.split('supabase-postgres-')[1] ||
-    ''
+  // Get the target version for display - use upgrade status if available, otherwise use selected version
+  const displayTargetVersion = (() => {
+    // If upgrading/completed/failed, use the target version from the upgrade status
+    if (target_version) return target_version
+
+    // Otherwise, derive from the selected version in the form
+    const selectedVersion = targetVersions.find((v) => formatValue(v) === selectedVersionValue)
+    return getVersionDisplayString(selectedVersion) || getVersionDisplayString(targetVersions[0])
+  })()
 
   const content = UPGRADE_STATE_CONTENT[upgradeState.status]
 
@@ -146,6 +161,8 @@ export const PostgresUpgradePanel = () => {
           eligibilityData={eligibilityData}
           diskAttributes={diskAttributes}
           isDiskSizeUpdated={isDiskSizeUpdated}
+          selectedVersionValue={selectedVersionValue}
+          onVersionChange={setSelectedVersionValue}
           onCancel={handleCancel}
         />
       )}

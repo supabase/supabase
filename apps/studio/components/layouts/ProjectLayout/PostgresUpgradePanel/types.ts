@@ -1,5 +1,13 @@
 import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { ProjectUpgradeTargetVersion } from 'data/config/project-upgrade-eligibility-query'
+
+/**
+ * Target version for upgrade - matches API response structure
+ */
+export interface UpgradeTargetVersion {
+  app_version: string
+  postgres_version: string
+  release_channel: string
+}
 
 /**
  * Discriminated union for upgrade panel states
@@ -96,7 +104,7 @@ export interface SharedUpgradeProps {
 export interface WaitingStateProps extends SharedUpgradeProps {
   eligibilityData:
     | {
-        target_upgrade_versions?: ProjectUpgradeTargetVersion[]
+        target_upgrade_versions?: UpgradeTargetVersion[]
         duration_estimate_hours?: number
         legacy_auth_custom_roles?: string[]
         potential_breaking_changes?: string[]
@@ -111,6 +119,10 @@ export interface WaitingStateProps extends SharedUpgradeProps {
       }
     | undefined
   isDiskSizeUpdated: boolean
+  /** The currently selected version value (format: "postgres_version|release_channel") */
+  selectedVersionValue: string
+  /** Callback when the version selection changes */
+  onVersionChange: (value: string) => void
   onCancel: () => void
 }
 
