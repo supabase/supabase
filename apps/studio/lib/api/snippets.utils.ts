@@ -125,6 +125,12 @@ const sanitizeName = (name: string): string => {
  * @returns An array of files and folders with their metadata
  */
 export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
+  if (SNIPPETS_DIR === '') {
+    throw new Error(
+      'SNIPPETS_MANAGEMENT_FOLDER env var is not set. Please set it to use snippets properly.'
+    )
+  }
+
   // Ensure the snippets directory exists
   try {
     await fs.access(SNIPPETS_DIR)
