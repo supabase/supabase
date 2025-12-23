@@ -192,9 +192,17 @@ export function getScanBorderColor(operation: string): string {
 }
 
 export function splitSqlStatements(sql: string): string[] {
+  // Enhanced tokenizer that handles:
+  // - Single-quoted strings: '...' (with '' escaping)
+  // - Double-quoted strings: "..." (with "" escaping)
+  // - Dollar-quoted strings: $tag$...$tag$
+  // - Line comments: -- (until end of line)
+  // - Block comments: /* ... */ (may be multiline)
+  // - Semicolons: ;
   const tokens =
-    sql.match(/'([^']|'')*'|"([^"]|"")*"|\$[a-zA-Z0-9_]*\$[\s\S]*?\$[a-zA-Z0-9_]*\$|;|[^'"$;]+/g) ||
-    []
+    sql.match(
+      /'([^']|'')*'|"([^"]|"")*"|\$[a-zA-Z0-9_]*\$[\s\S]*?\$[a-zA-Z0-9_]*\$|--[^\r\n]*|\/\*[\s\S]*?\*\/|;|[^'"$;\-\/]+|./g
+    ) || []
 
   const statements: string[] = []
   let current = ''
