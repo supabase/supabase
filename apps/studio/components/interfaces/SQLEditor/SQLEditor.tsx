@@ -124,7 +124,7 @@ export const SQLEditor = () => {
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
   const [generatedNewSnippetName, generatedId] = useMemo(() => {
     const name = generateSnippetTitle()
-    return [name, generateUuid([name])]
+    return [name, generateUuid([`${name}.sql`])]
   }, [urlId])
 
   // the id is stable across renders - it depends either on the url or on the memoized generated id
