@@ -1,25 +1,23 @@
-'use client'
-import Link from 'next/link'
 import {
   ArrowLeft,
-  MessageCircle,
-  Code,
-  FileText,
-  Sparkles,
-  DollarSign,
   Award,
-  Zap,
-  Gift,
-  TrendingUp,
-  Smartphone,
   Bot,
+  Code,
+  DollarSign,
+  FileText,
+  Gift,
+  MessageCircle,
+  Smartphone,
+  Sparkles,
   Split,
+  TrendingUp,
+  Zap,
 } from 'lucide-react'
-import DefaultLayout from '~/components/Layouts/Default'
-import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Badge, Button, Separator, cn } from 'ui'
-import ApplyToSupaSquadForm from '~/components/Forms/ApplyToSupaSquadForm'
+import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
+import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
 
