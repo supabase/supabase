@@ -11,11 +11,14 @@ import {
   Zap,
   Gift,
   TrendingUp,
+  Smartphone,
+  Bot,
+  Split,
 } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
 import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
 import Image from 'next/image'
-import { Separator, cn } from 'ui'
+import { Badge, Button, Separator, cn } from 'ui'
 import ApplyToSupaSquadForm from '~/components/Forms/ApplyToSupaSquadForm'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
@@ -101,6 +104,44 @@ const benefits = [
   },
 ]
 
+const especially = [
+  {
+    id: 'expo',
+    icon: Smartphone,
+    heading: (
+      <div className="flex items-center gap-2">
+        Expo <Badge variant="success">High Priority</Badge>
+      </div>
+    ),
+    subheading:
+      'Know Expo really well? Come help the team by writing docs, creating examples, and making sure our guides are up to date. ',
+  },
+  {
+    id: 'ai',
+    icon: Bot,
+    heading: (
+      <div className="flex items-center gap-2">
+        AI / Vectors <Badge variant="success">High Priority</Badge>
+      </div>
+    ),
+    subheading: 'Help the team keep our AI / Vector docs and examples up to date. ',
+  },
+  {
+    id: 'realtime',
+    icon: Zap,
+    heading: <div className="flex items-center gap-2">Realtime</div>,
+    subheading:
+      'Help the team by writing docs, creating examples, and making sure our guides are up to date. Experience with React and friends is an extra bonus.',
+  },
+  {
+    id: 'branching',
+    icon: Split,
+    heading: <div className="flex items-center gap-2">Branching</div>,
+    subheading:
+      "We're looking for a branching power user to help the team by writing docs, creating examples, and making sure our guides are up to date. ",
+  },
+]
+
 // eslint-disable-next-line no-restricted-exports
 export default function AboutPage() {
   return (
@@ -116,7 +157,7 @@ export default function AboutPage() {
           </Link>
 
           <h1 className="sr-only">About the contributors program</h1>
-          <SectionContainer id="mission" className="border-b border-border">
+          <SectionContainer id="mission" className="sm:py-18 md:py-24 lg:px-16 lg:py-24 xl:px-0 ">
             <div className="grid gap-y-4">
               <div className="pb-4">
                 <h2 className="h2 text-foreground">Our Mission</h2>
@@ -142,7 +183,10 @@ export default function AboutPage() {
                   <p className="text-foreground text-lg">
                     We're looking for people who can help support these many technical combinations.
                   </p>
-                  <p className="text-foreground-light mt-4">We'd love to have your help!</p>
+                  <p className="text-foreground-light mt-4">
+                    If you're skilled in a couple of different areas, and interested in helping
+                    other developers, we'd love to have your help!
+                  </p>
                 </div>
                 <Image
                   src="/images/contribute/community-combinations.png"
@@ -163,14 +207,31 @@ export default function AboutPage() {
             columns={2}
           />
 
+          <Image
+            src="/images/contribute/ask-supabase.jpg"
+            alt="Ask Supabase"
+            width={1000}
+            height={1000}
+            className="rounded-md border"
+          />
+
           <FeaturesSection
             id="benefits"
+            columns={2}
             heading={<span className="text-foreground">Benefits for contributors</span>}
             subheading="Becoming a contributor comes with real benefits. From community recognition to paid opportunities, we value your time and impact."
             features={benefits}
           />
 
-          <SectionContainer id="who-are-we" className="border-b border-border">
+          <FeaturesSection
+            id="especially"
+            columns={2}
+            heading={<span className="text-foreground">We're especially looking for:</span>}
+            subheading="These are the areas where we need the most help right now. If you have expertise in any of these domains, we'd love to hear from you!"
+            features={especially}
+          />
+
+          <SectionContainer id="who-are-we" className="border-b border-border xl:px-0">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex gap-4 flex-wrap mt-2">
                 {githubUsers.map((username) => (
@@ -195,8 +256,15 @@ export default function AboutPage() {
               </div>
             </div>
           </SectionContainer>
-          <SectionContainer id="apply">
-            <ApplyToSupaSquadForm />
+
+          <SectionContainer id="apply" className="text-center">
+            <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight mb-8">
+              Ready to start contributing?
+            </h2>
+
+            <Button asChild type="primary" size="small">
+              <Link href="/contribute/about">Apply to join</Link>
+            </Button>
           </SectionContainer>
         </div>
       </main>
@@ -213,7 +281,7 @@ const FeaturesSection = ({
   columns = 3,
 }: FeaturesSectionType & { columns?: 2 | 3 | 4 }) => {
   return (
-    <SectionContainer id={id} className="flex flex-col gap-4 md:gap-8">
+    <SectionContainer id={id} className="flex flex-col gap-4 md:gap-8 xl:px-0">
       <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{label}</span>
         <h2 className="h2 text-foreground-lighter">{heading}</h2>
