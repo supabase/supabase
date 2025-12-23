@@ -5,7 +5,6 @@ import { Database, Users } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
-  Breadcrumb,
   CommandHeader,
   CommandInput,
   CommandWrapper,

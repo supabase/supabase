@@ -39,6 +39,18 @@ const PolicySearchResults = dynamic(
   }
 )
 
+// Lazy load edge function search results component
+const EdgeFunctionSearchResults = dynamic(
+  () =>
+    import('./EdgeFunctionSearchResults').then((mod) => ({
+      default: mod.EdgeFunctionSearchResults,
+    })),
+  {
+    loading: () => <SkeletonResults />,
+    ssr: false,
+  }
+)
+
 interface ContextSearchResultsProps {
   context: SearchContextValue
   query: string
@@ -71,6 +83,7 @@ const CONTEXT_CONFIG: Record<
   'edge-functions': {
     icon: EdgeFunctions,
     label: 'Edge Functions',
+    requiresInput: false,
   },
   storage: {
     icon: Storage,
@@ -87,11 +100,7 @@ const MOCK_RESULTS: Record<SearchContextValue, SearchResult[]> = {
   ],
   'database-tables': [],
   'auth-policies': [],
-  'edge-functions': [
-    { id: '1', name: 'send-email', description: 'Last deployed: 2 days ago' },
-    { id: '2', name: 'process-webhook', description: 'Last deployed: 1 week ago' },
-    { id: '3', name: 'generate-report', description: 'Last deployed: 3 days ago' },
-  ],
+  'edge-functions': [],
   storage: [
     { id: '1', name: 'avatars', description: 'Public bucket • 234 files' },
     { id: '2', name: 'documents', description: 'Private bucket • 567 files' },
@@ -105,7 +114,12 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
 
   // Mock data for other contexts - always compute, even if we return early
   const mockResults = useMemo(() => {
-    if (context === 'users' || context === 'database-tables' || context === 'auth-policies')
+    if (
+      context === 'users' ||
+      context === 'database-tables' ||
+      context === 'auth-policies' ||
+      context === 'edge-functions'
+    )
       return []
     const mockData = MOCK_RESULTS[context] || []
     return query.trim()
@@ -130,6 +144,11 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
   // Delegate to PolicySearchResults for auth-policies context
   if (context === 'auth-policies') {
     return <PolicySearchResults query={query} />
+  }
+
+  // Delegate to EdgeFunctionSearchResults for edge-functions context
+  if (context === 'edge-functions') {
+    return <EdgeFunctionSearchResults query={query} />
   }
 
   // Show empty state immediately if no query and context requires input
