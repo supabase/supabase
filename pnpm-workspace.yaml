@@ -51,6 +51,7 @@ minimumReleaseAgeExclude:
   - iceberg-js
   - '@vitejs/plugin-rsc'
   - stripe-experiment-sync # TODO(matlin) remove, temp just to unblock launch
+  - braintrust
 
 onlyBuiltDependencies:
   - supabase
