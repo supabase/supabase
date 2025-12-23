@@ -1,4 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import {
   ExternalLinkIcon,
@@ -9,31 +11,34 @@ import {
   WandSparklesIcon,
   X,
 } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
-import pgMeta from '@supabase/pg-meta'
 
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
+import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
-import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -69,12 +74,6 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
-import { InlineLink } from 'components/ui/InlineLink'
-import Link from 'next/link'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -142,6 +141,10 @@ export const UsersV2 = () => {
     'providers',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [selectedId, setSelectedId] = useQueryState(
+    'show',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   // [Joshen] Opting to store filter column, into local storage for now, which will initialize
   // the page when landing on auth users page only if no query params for filter column provided
@@ -190,7 +193,7 @@ export const UsersV2 = () => {
       providers: [],
       forceExactCount: false,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const totalUsers = totalUsersCountData?.count ?? 0
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
@@ -223,7 +226,7 @@ export const UsersV2 = () => {
         : { column: undefined }),
     },
     {
-      keepPreviousData: Boolean(filterKeywords),
+      placeholderData: Boolean(filterKeywords) ? keepPreviousData : undefined,
       // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
       // a barrage of requests to invalidate each page esp when the project has many many users.
       staleTime: Infinity,
@@ -233,13 +236,7 @@ export const UsersV2 = () => {
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
-
-  const { setValue: setSelectedUser, value: selectedUser } = useQueryStateWithSelect({
-    urlKey: 'show',
-    select: (id: string) => (id ? users?.find((u) => u.id === id)?.id : undefined),
-    enabled: !!users && !isLoading,
-    onError: () => toast.error(`User not found`),
-  })
+  const selectedUser = users?.find((u) => u.id === selectedId)?.id
 
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
@@ -345,7 +342,7 @@ export const UsersV2 = () => {
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
 
-      if (userIds.includes(selectedUser)) setSelectedUser(null)
+      if (userIds.includes(selectedUser)) setSelectedId(null)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
     } finally {
@@ -468,6 +465,7 @@ export const UsersV2 = () => {
         setSortByValue(localStorageSortByValue)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLocalStorageFilterLoaded, isLocalStorageSortByValueLoaded, isCountLoaded])
 
   return (
@@ -542,7 +540,7 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   setFilterKeywords={(s) => {
                     setFilterKeywords(s)
-                    setSelectedUser(null)
+                    setSelectedId(null)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
@@ -788,7 +786,7 @@ export const UsersV2 = () => {
                           if (user) {
                             const idx = users.indexOf(user)
                             if (props.row.id) {
-                              setSelectedUser(props.row.id)
+                              setSelectedId(props.row.id)
                               gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                             }
                           }
@@ -825,12 +823,7 @@ export const UsersV2 = () => {
               />
             </div>
           </ResizablePanel>
-          {selectedUser !== undefined && (
-            <UserPanel
-              selectedUser={users.find((u) => u.id === selectedUser)}
-              onClose={() => setSelectedUser(null)}
-            />
-          )}
+          {!!selectedId && <UserPanel />}
         </ResizablePanelGroup>
 
         <UsersFooter
@@ -943,7 +936,7 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
-          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(null)
+          if (selectedUserToDelete?.id === selectedUser) setSelectedId(null)
           setSelectedUserToDelete(undefined)
           cleanPointerEventsNoneOnBody(500)
         }}

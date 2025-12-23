@@ -37,7 +37,7 @@ const UsageSection = ({
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
@@ -73,7 +73,7 @@ const UsageSection = ({
             currentBillingCycleSelected={currentBillingCycleSelected}
             usage={usage}
           />
-        ) : attribute.key === PricingMetric.DATABASE_SIZE ? (
+        ) : attribute.key === PricingMetric.DATABASE_SIZE && subscription?.plan.id === 'free' ? (
           <DatabaseSizeUsage
             key={attribute.name}
             slug={orgSlug}

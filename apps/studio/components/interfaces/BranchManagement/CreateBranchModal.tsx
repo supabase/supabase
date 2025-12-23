@@ -16,7 +16,6 @@ import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchin
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -55,7 +54,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   estimateComputeSize,
   estimateDiskCost,
@@ -137,7 +136,7 @@ export const CreateBranchModal = () => {
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery(
@@ -159,7 +158,7 @@ export const CreateBranchModal = () => {
 
   const {
     data: disk,
-    isLoading: isLoadingDiskAttr,
+    isPending: isLoadingDiskAttr,
     isError: isErrorDiskAttr,
   } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal && withData })
   const projectDiskAttributes = disk?.attributes ?? {

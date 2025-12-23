@@ -7,7 +7,6 @@ import { General } from 'components/interfaces/Settings/General/General'
 import { TransferProjectPanel } from 'components/interfaces/Settings/General/TransferProjectPanel/TransferProjectPanel'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -15,6 +14,14 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -36,12 +43,17 @@ const ProjectSettings: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Project Settings</ScaffoldTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Project Settings</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure general options, domains, transfers, and project lifecycle.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="small">
         <General />
 
         {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
@@ -49,7 +61,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         {projectSettingsCustomDomains && <CustomDomainConfig />}
         {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
         {!isBranch && <DeleteProjectPanel />}
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }
