@@ -6,7 +6,8 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
@@ -93,6 +94,7 @@ export const SQLEditor = () => {
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const {
     sourceSqlDiff,
@@ -119,6 +121,7 @@ export const SQLEditor = () => {
   const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
   const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
+  const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
   // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -151,7 +154,16 @@ export const SQLEditor = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
-      if (id) snapV2.addResult(id, data.result, vars.autoLimit)
+      if (id) {
+        snapV2.addResult(id, data.result, vars.autoLimit)
+
+        // Check if results are from an EXPLAIN query
+        // If so, and the flag is on, store in explainResults and switch to explain tab
+        if (showPrettyExplain && isExplainQuery(data.result)) {
+          snapV2.addExplainResult(id, data.result)
+          setActiveUtilityTab('explain')
+        }
+      }
 
       // revalidate lint query
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
@@ -190,6 +202,21 @@ export const SQLEditor = () => {
         }
 
         snapV2.addResultError(id, error, vars.autoLimit)
+      }
+    },
+  })
+
+  const { mutate: executeExplain, isPending: isExplainExecuting } = useExecuteSqlMutation({
+    onSuccess(data) {
+      if (id) {
+        snapV2.addExplainResult(id, data.result)
+        setActiveUtilityTab('explain')
+      }
+    },
+    onError(error: any) {
+      if (id) {
+        snapV2.addExplainResultError(id, error)
+        setActiveUtilityTab('explain')
       }
     },
   })
@@ -333,6 +360,60 @@ export const SQLEditor = () => {
       limit,
     ]
   )
+
+  const executeExplainQuery = useCallback(async () => {
+    if (isDiffOpen) return
+
+    // use the latest state
+    const state = getSqlEditorV2StateSnapshot()
+    const snippet = state.snippets[id]
+
+    if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        : selectedValue || editorRef.current?.getValue()
+
+      if (lineHighlights.length > 0) {
+        editor?.deltaDecorations(lineHighlights, [])
+        setLineHighlights([])
+      }
+
+      const impersonatedRoleState = getImpersonatedRoleState()
+      const connectionString = databases?.find(
+        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+      )?.connectionString
+      if (!isValidConnString(connectionString)) {
+        return toast.error('Unable to run query: Connection string is missing')
+      }
+
+      // Wrap the query with EXPLAIN ANALYZE
+      const explainSql = `EXPLAIN ANALYZE ${sql}`
+
+      executeExplain({
+        projectRef: project.ref,
+        connectionString: connectionString,
+        sql: wrapWithRoleImpersonation(explainSql, impersonatedRoleState),
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+        handleError: (error) => {
+          throw error
+        },
+      })
+    }
+  }, [
+    isDiffOpen,
+    id,
+    isExplainExecuting,
+    project,
+    executeExplain,
+    getImpersonatedRoleState,
+    databaseSelectorState.selectedDatabaseId,
+    databases,
+    lineHighlights,
+  ])
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -807,11 +888,15 @@ export const SQLEditor = () => {
               <UtilityPanel
                 id={id}
                 isExecuting={isExecuting}
+                isExplainExecuting={isExplainExecuting}
                 isDisabled={isDiffOpen}
                 hasSelection={hasSelection}
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQuery}
+                executeExplainQuery={executeExplainQuery}
                 onDebug={onDebug}
+                activeTab={activeUtilityTab}
+                onActiveTabChange={setActiveUtilityTab}
               />
             )}
           </ResizablePanel>
