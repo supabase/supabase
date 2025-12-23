@@ -9,7 +9,6 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
 import {
   CronJob,
@@ -26,6 +25,7 @@ import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { formatCronJobColumns } from './CronJobs.utils'
 import { DeleteCronJob } from './DeleteCronJob'
 

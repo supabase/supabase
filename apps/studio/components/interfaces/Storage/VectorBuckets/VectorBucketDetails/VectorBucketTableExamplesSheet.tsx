@@ -1,9 +1,11 @@
-import { BookOpen, ChevronDown, ListPlus } from 'lucide-react'
+import { ChevronDown, ListPlus } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -27,7 +29,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { getVectorBucketFDWSchemaName } from '../VectorBuckets.utils'
+import { Admonition } from 'ui-patterns'
+import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 
 interface VectorBucketTableExamplesSheetProps {
   index: VectorBucketIndex
@@ -35,8 +38,14 @@ interface VectorBucketTableExamplesSheetProps {
 
 export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamplesSheetProps) => {
   const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
+  const [open, setOpen] = useState(false)
   const [language, setLanguage] = useState<'javascript' | 'sql'>('sql')
   const [showLanguage, setShowLanguage] = useState(false)
+
+  const [_, setOpenImportForeignSchemaDialog] = useQueryState(
+    'initForeignSchema',
+    parseAsBoolean.withDefault(false)
+  )
 
   const updateLanguage = (value: 'javascript' | 'sql') => {
     setLanguage(value)
@@ -44,7 +53,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
         <Button type="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
@@ -67,9 +76,13 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
               dimension={index.dimension}
               metadataKeys={metadataKeys}
               language={language}
-              onLanguageChange={updateLanguage}
               showLanguage={showLanguage}
+              onLanguageChange={updateLanguage}
               onShowLanguageChange={setShowLanguage}
+              onSelectQueryFromPostgres={() => {
+                setOpen(false)
+                setOpenImportForeignSchemaDialog(true)
+              }}
             />
           </div>
         </div>
@@ -105,9 +118,10 @@ interface VectorBucketIndexExamplesProps {
   dimension: number
   metadataKeys: string[]
   language: 'javascript' | 'sql'
-  onLanguageChange: (value: 'javascript' | 'sql') => void
   showLanguage: boolean
+  onLanguageChange: (value: 'javascript' | 'sql') => void
   onShowLanguageChange: (show: boolean) => void
+  onSelectQueryFromPostgres: () => void
 }
 
 function VectorBucketIndexExamples({
@@ -116,20 +130,22 @@ function VectorBucketIndexExamples({
   dimension,
   metadataKeys,
   language,
-  onLanguageChange,
   showLanguage,
+  onLanguageChange,
   onShowLanguageChange,
+  onSelectQueryFromPostgres,
 }: VectorBucketIndexExamplesProps) {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, bucketId } = useParams()
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
   const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { serviceKey, secretKey } = canReadAPIKeys
-    ? getKeys(apiKeys)
-    : { serviceKey: null, secretKey: null }
+  const { secretKey } = canReadAPIKeys ? getKeys(apiKeys) : { secretKey: null }
+
+  const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
+  const foreignTable = wrapperInstance?.tables?.find((x) => x.name === indexName)
 
   const dimensionLabel = `Data should match ${dimension} dimension${dimension > 1 ? 's' : ''}`
   const startValue = 0.1
@@ -139,7 +155,7 @@ function VectorBucketIndexExamples({
 
   const sqlCode = `-- Insert multiple vectors
 insert into
-  "${getVectorBucketFDWSchemaName(bucketName)}"."${indexName}" (key, data, metadata)
+  "${foreignTable?.schema}"."${foreignTable?.name}" (key, data, metadata)
 values
   (
     'doc-1',
@@ -228,19 +244,9 @@ const result = await index.putVectors({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
 
-          <Button
-            type="default"
-            icon={<BookOpen size={12} className="text-foreground-lighter" />}
-            asChild
-          >
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}
-            >
-              Docs
-            </Link>
-          </Button>
+          <DocsButton
+            href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}
+          />
         </div>
         {language === 'javascript' ? (
           <CodeBlock
@@ -249,6 +255,17 @@ const result = await index.putVectors({
             className="[&_code]:text-foreground"
             language="js"
             value={jsCode}
+          />
+        ) : !foreignTable ? (
+          <Admonition
+            type="default"
+            title="Insert data via SQL with a Foreign Data Wrapper"
+            description="Data from vector tables can be queried and inserted from Postgres with the S3 Vectors Wrapper as foreign tables."
+            actions={
+              <Button type="default" onClick={onSelectQueryFromPostgres}>
+                Query from Postgres
+              </Button>
+            }
           />
         ) : (
           <>
@@ -259,7 +276,7 @@ const result = await index.putVectors({
               language="sql"
               value={sqlCode}
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end">
               <Button
                 type="default"
                 asChild

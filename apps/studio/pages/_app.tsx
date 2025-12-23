@@ -15,6 +15,7 @@ import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/typography.scss'
 import 'styles/ui.scss'
+import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
@@ -48,6 +49,7 @@ import { FeaturePreviewContextProvider } from 'components/interfaces/App/Feature
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
+import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
@@ -160,7 +162,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         <AppBannerContextProvider>
                           <CommandProvider>
                             <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
+                              <MainScrollContainerProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                              </MainScrollContainerProvider>
                               <StudioCommandMenu />
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>

@@ -1,7 +1,7 @@
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
@@ -115,11 +115,19 @@ export const sqlEditorState = proxy({
     }
   },
 
-  setSql: (id: string, sql: string) => {
+  setSql: ({
+    id,
+    sql,
+    shouldInvalidate = false,
+  }: {
+    id: string
+    sql: string
+    shouldInvalidate?: boolean
+  }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.sql = sql
-      sqlEditorState.needsSaving.set(id, false)
+      sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
 
@@ -136,19 +144,17 @@ export const sqlEditorState = proxy({
     if (snippet) {
       snippet.name = name
       snippet.description = description
-
-      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
-  removeSnippet: (id: string) => {
+  removeSnippet: (id: string, skipSave: boolean = false) => {
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
 
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
 
-    sqlEditorState.needsSaving.delete(id)
+    if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
 
   addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {
@@ -229,13 +235,18 @@ export const sqlEditorState = proxy({
 
   addResult: (id: string, results: any[], autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: results, autoLimit })
+      // Use ref() to prevent Valtio from creating proxies for each row object.
+      // This is critical for large result sets - without ref(), Valtio wraps every
+      // row and nested property in a Proxy, causing massive memory overhead.
+      // Alright to use ref() in this case as the data is meant to be read-only and we
+      // don't need to track changes to the underlying data
+      sqlEditorState.results[id] = [{ rows: ref(results), autoLimit }]
     }
   },
 
   addResultError: (id: string, error: any, autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
+      sqlEditorState.results[id] = [{ rows: ref([]), error, autoLimit }]
     }
   },
 
@@ -262,7 +273,9 @@ export const useSnippetFolders = (projectRef: string) => {
     () =>
       Object.values(snapshot.folders)
         .filter((x) => x.projectRef === projectRef)
-        .map((x) => x.folder),
+        .map((x) => x.folder)
+        // folders don't have created_at or inserted_at, so we always sort by name
+        .sort((a, b) => a.name.localeCompare(b.name)),
     [projectRef, snapshot.folders]
   )
 }

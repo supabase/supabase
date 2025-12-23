@@ -7,12 +7,12 @@ import { useContextMenu } from 'react-contexify'
 import { toast } from 'sonner'
 
 import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Checkbox, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
