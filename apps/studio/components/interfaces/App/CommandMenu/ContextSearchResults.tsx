@@ -1,17 +1,25 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { useMemo } from 'react'
 import { Database, Users } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
-import { cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import type { SearchContextValue } from './ContextSearchCommands'
+import {
+  SkeletonResults,
+  EmptyState,
+  ResultItem,
+  type SearchResult,
+} from './ContextSearchResults.shared'
 
-interface SearchResult {
-  id: string
-  name: string
-  description?: string
-}
+// Lazy load user search results component
+const UserSearchResults = dynamic(
+  () => import('./UserSearchResults').then((mod) => ({ default: mod.UserSearchResults })),
+  {
+    loading: () => <SkeletonResults />,
+    ssr: false,
+  }
+)
 
 interface ContextSearchResultsProps {
   context: SearchContextValue
@@ -19,7 +27,7 @@ interface ContextSearchResultsProps {
 }
 
 const CONTEXT_CONFIG: Record<
-  Exclude<SearchContextValue, 'commands'>,
+  SearchContextValue,
   {
     icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
     label: string
@@ -52,7 +60,7 @@ const CONTEXT_CONFIG: Record<
 }
 
 // Mock data for different contexts
-const MOCK_RESULTS: Record<Exclude<SearchContextValue, 'commands'>, SearchResult[]> = {
+const MOCK_RESULTS: Record<SearchContextValue, SearchResult[]> = {
   users: [
     { id: '1', name: 'john@example.com', description: 'User ID: abc-123' },
     { id: '2', name: 'jane@example.com', description: 'User ID: def-456' },
@@ -80,134 +88,40 @@ const MOCK_RESULTS: Record<Exclude<SearchContextValue, 'commands'>, SearchResult
   ],
 }
 
-function SkeletonResults() {
-  return (
-    <div className="p-2 space-y-1">
-      {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="flex items-center gap-3 px-2 py-2">
-          <ShimmeringLoader className="!w-4 !h-4 !py-0 rounded" delayIndex={i} />
-          <div className="flex-1 space-y-1">
-            <ShimmeringLoader className="!w-32 !py-1.5" delayIndex={i} />
-            <ShimmeringLoader className="!w-48 !py-1" delayIndex={i + 1} />
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function EmptyState({
-  context,
-  query,
-}: {
-  context: Exclude<SearchContextValue, 'commands'>
-  query: string
-}) {
-  const config = CONTEXT_CONFIG[context]
-  const Icon = config.icon
-
-  return (
-    <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
-      <Icon className="h-6 w-6" strokeWidth={1.5} />
-      <p className="text-sm">
-        {query ? `No results found for "${query}"` : `Type to search in ${config.label}`}
-      </p>
-    </div>
-  )
-}
-
-function ResultItem({
-  result,
-  context,
-}: {
-  result: SearchResult
-  context: Exclude<SearchContextValue, 'commands'>
-}) {
-  const config = CONTEXT_CONFIG[context]
-  const Icon = config.icon
-
-  return (
-    <button
-      type="button"
-      className={cn(
-        'flex items-center gap-3 w-full px-2 py-2 text-left rounded-md transition-colors',
-        'hover:bg-surface-200 focus:bg-surface-200 focus:outline-none',
-        'group cursor-pointer'
-      )}
-    >
-      <Icon
-        className="h-4 w-4 text-foreground-muted group-hover:text-foreground-light transition-colors shrink-0"
-        strokeWidth={1.5}
-      />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-foreground-light group-hover:text-foreground truncate">
-          {result.name}
-        </p>
-        {result.description && (
-          <p className="text-xs text-foreground-muted truncate">{result.description}</p>
-        )}
-      </div>
-    </button>
-  )
-}
-
 export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<SearchResult[]>([])
-
-  const config = context !== 'commands' ? CONTEXT_CONFIG[context] : null
+  const config = CONTEXT_CONFIG[context]
   const requiresInput = config?.requiresInput ?? false
 
-  // Mock loading and filtering
-  useEffect(() => {
-    if (context === 'commands') return
+  // Delegate to UserSearchResults for users context
+  if (context === 'users') {
+    return <UserSearchResults query={query} />
+  }
 
-    // Don't search if query is empty and context requires input
-    if (!query.trim() && requiresInput) {
-      setResults([])
-      setIsLoading(false)
-      return
-    }
-
-    setIsLoading(true)
-    setResults([])
-
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      const mockData = MOCK_RESULTS[context] || []
-      const filtered = query.trim()
-        ? mockData.filter(
-            (item) =>
-              item.name.toLowerCase().includes(query.toLowerCase()) ||
-              item.description?.toLowerCase().includes(query.toLowerCase())
-          )
-        : mockData
-      setResults(filtered)
-      setIsLoading(false)
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [context, query, requiresInput])
-
-  if (context === 'commands') return null
+  // Mock data for other contexts
+  const mockResults = useMemo(() => {
+    const mockData = MOCK_RESULTS[context] || []
+    return query.trim()
+      ? mockData.filter(
+          (item) =>
+            item.name.toLowerCase().includes(query.toLowerCase()) ||
+            item.description?.toLowerCase().includes(query.toLowerCase())
+        )
+      : mockData
+  }, [context, query])
 
   // Show empty state immediately if no query and context requires input
   if (!query.trim() && requiresInput) {
-    return <EmptyState context={context} query="" />
+    return <EmptyState icon={config.icon} label={config.label} query="" />
   }
 
-  if (isLoading) {
-    return <SkeletonResults />
-  }
-
-  if (results.length === 0) {
-    return <EmptyState context={context} query={query} />
+  if (mockResults.length === 0) {
+    return <EmptyState icon={config.icon} label={config.label} query={query} />
   }
 
   return (
     <div className="p-2 space-y-0.5 overflow-y-auto max-h-[300px]">
-      {results.map((result) => (
-        <ResultItem key={result.id} result={result} context={context} />
+      {mockResults.map((result) => (
+        <ResultItem key={result.id} result={result} icon={config.icon} />
       ))}
     </div>
   )
