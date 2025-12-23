@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -132,23 +132,44 @@ export const ReplicationPipelineStatus = () => {
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  const tableStatuses = (replicationStatusData?.table_statuses || []).sort((a, b) =>
-    a.table_name.localeCompare(b.table_name)
+  // Sort tables by name for consistent ordering (memoized)
+  const tableStatuses = useMemo(
+    () =>
+      (replicationStatusData?.table_statuses || []).sort((a, b) =>
+        a.table_name.localeCompare(b.table_name)
+      ),
+    [replicationStatusData?.table_statuses]
   )
+
   const applyLagMetrics = replicationStatusData?.apply_lag
-  const filteredTableStatuses =
-    searchString.length === 0
-      ? tableStatuses
-      : tableStatuses.filter((table) =>
-          table.table_name.toLowerCase().includes(searchString.toLowerCase())
-        )
-  const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
-  const erroredTables = tableStatuses.filter(
-    (table) =>
-      table.state.name === 'error' &&
-      'retry_policy' in table.state &&
-      table.state.retry_policy?.policy === 'manual_retry'
+
+  // Filter tables based on search (memoized)
+  const filteredTableStatuses = useMemo(
+    () =>
+      searchString.length === 0
+        ? tableStatuses
+        : tableStatuses.filter((table) =>
+            table.table_name.toLowerCase().includes(searchString.toLowerCase())
+          ),
+    [tableStatuses, searchString]
   )
+
+  const tablesWithLag = useMemo(
+    () => tableStatuses.filter((table) => Boolean(table.table_sync_lag)),
+    [tableStatuses]
+  )
+
+  const erroredTables = useMemo(
+    () =>
+      tableStatuses.filter(
+        (table) =>
+          table.state.name === 'error' &&
+          'retry_policy' in table.state &&
+          table.state.retry_policy?.policy === 'manual_retry'
+      ),
+    [tableStatuses]
+  )
+
   const hasErroredTables = erroredTables.length > 0
   const isAnyRestartInProgress = restartingTableIds.size > 0
 
@@ -296,30 +317,6 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
 
-        {showDisabledState && (
-          <div
-            className={cn(
-              'p-4 border border-default rounded-lg flex items-center justify-between',
-              config.colors.bg
-            )}
-          >
-            <div className="flex items-center gap-x-3">
-              <div
-                className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center',
-                  config.colors.iconBg
-                )}
-              >
-                <div className={config.colors.icon}>{config.icon}</div>
-              </div>
-              <div className="flex-1">
-                <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
-                <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {(isPipelineLoading || isStatusLoading) && (
           <div className="space-y-3">
             <div className="flex items-center gap-x-3">
@@ -387,7 +384,7 @@ export const ReplicationPipelineStatus = () => {
               <div className="flex items-center gap-x-2">
                 <p className="text-sm text-foreground-light">
                   {tableStatuses.length} table{tableStatuses.length !== 1 ? 's' : ''} in pipeline
-                  {hasErroredTables && (
+                  {hasErroredTables && !isAnyRestartInProgress && (
                     <span className="text-destructive-600 font-medium">
                       {' '}
                       · {erroredTables.length} failed
@@ -489,10 +486,7 @@ export const ReplicationPipelineStatus = () => {
                           </Table.td>
                           <Table.td className="align-top">
                             {isRestarting ? (
-                              <Badge variant="default" className="gap-1.5">
-                                <Activity size={12} className="animate-pulse" />
-                                Restarting
-                              </Badge>
+                              <Badge variant="default">Restarting</Badge>
                             ) : showDisabledState ? (
                               <Badge variant="default">Not Available</Badge>
                             ) : (
@@ -525,35 +519,33 @@ export const ReplicationPipelineStatus = () => {
                             )}
                           </Table.td>
                           <Table.td className="align-top">
-                            {!showDisabledState && (
-                              <div className="flex items-center justify-end">
-                                <TableActionsMenu
-                                  tableId={table.table_id}
-                                  tableName={table.table_name}
-                                  tableState={table.state}
-                                  disabled={isRestarting}
-                                  onRestartClick={() => {
-                                    setSelectedTableForRestart({
-                                      tableId: table.table_id,
-                                      tableName: table.table_name,
-                                    })
-                                    setShowRestartDialog(true)
-                                  }}
-                                  onShowErrorClick={
-                                    isErrorState && errorReason
-                                      ? () => {
-                                          setSelectedTableError({
-                                            tableName: table.table_name,
-                                            reason: errorReason,
-                                            solution: errorSolution,
-                                          })
-                                          setShowErrorDialog(true)
-                                        }
-                                      : undefined
-                                  }
-                                />
-                              </div>
-                            )}
+                            <div className="flex items-center justify-end">
+                              <TableActionsMenu
+                                tableId={table.table_id}
+                                tableName={table.table_name}
+                                tableState={table.state}
+                                disabled={showDisabledState || isRestarting}
+                                onRestartClick={() => {
+                                  setSelectedTableForRestart({
+                                    tableId: table.table_id,
+                                    tableName: table.table_name,
+                                  })
+                                  setShowRestartDialog(true)
+                                }}
+                                onShowErrorClick={
+                                  isErrorState && errorReason
+                                    ? () => {
+                                        setSelectedTableError({
+                                          tableName: table.table_name,
+                                          reason: errorReason,
+                                          solution: errorSolution,
+                                        })
+                                        setShowErrorDialog(true)
+                                      }
+                                    : undefined
+                                }
+                              />
+                            </div>
                           </Table.td>
                         </Table.tr>
                       )

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
@@ -44,8 +45,8 @@ export const BatchRestartDialog = ({
   onRestartStart,
   onRestartComplete,
 }: BatchRestartDialogProps) => {
-  // Determine which table IDs will be restarted based on mode
-  const getAffectedTableIds = () => {
+  // Calculate which table IDs will be restarted based on mode (memoized)
+  const affectedTableIds = useMemo(() => {
     if (mode === 'all') {
       return tables.map((t) => t.table_id)
     } else {
@@ -58,7 +59,7 @@ export const BatchRestartDialog = ({
         )
         .map((t) => t.table_id)
     }
-  }
+  }, [mode, tables])
 
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
@@ -66,12 +67,12 @@ export const BatchRestartDialog = ({
       toast.success(
         `Replication restarted for ${count} table${count > 1 ? 's' : ''} and pipeline is being restarted automatically`
       )
-      onRestartComplete?.(getAffectedTableIds())
+      onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      onRestartComplete?.(getAffectedTableIds())
+      onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
     },
   })
@@ -79,7 +80,6 @@ export const BatchRestartDialog = ({
   const handleReset = () => {
     if (!projectRef) return toast.error('Project ref is required')
 
-    const affectedTableIds = getAffectedTableIds()
     onRestartStart?.(affectedTableIds)
 
     rollbackTables({

@@ -72,7 +72,15 @@ export const useRollbackTablesMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
 
-      // Invalidate queries first
+      // Restart the pipeline (stop + start)
+      try {
+        await restartPipeline({ projectRef, pipelineId })
+      } catch (error: any) {
+        toast.error(`Rollback succeeded but failed to restart pipeline: ${error.message}`)
+        throw error
+      }
+
+      // Invalidate queries after restart to get the latest state
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
@@ -81,23 +89,6 @@ export const useRollbackTablesMutation = ({
           queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
         }),
       ])
-
-      // Restart the pipeline (stop + start)
-      try {
-        await restartPipeline({ projectRef, pipelineId })
-        // Invalidate queries again after restart to get the latest state
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
-          }),
-        ])
-      } catch (error: any) {
-        toast.error(`Rollback succeeded but failed to restart pipeline: ${error.message}`)
-        throw error
-      }
 
       await onSuccess?.(data, variables, context)
     },

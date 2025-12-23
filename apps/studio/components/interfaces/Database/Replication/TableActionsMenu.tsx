@@ -57,20 +57,20 @@ export const TableActionsMenu = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="bottom" align="end" className="w-52">
-        <DropdownMenuItem className="space-x-2" onClick={handleRestartClick}>
-          <RotateCcw size={14} />
-          <p>Restart table replication</p>
-        </DropdownMenuItem>
-
         {hasErrorDetails && (
           <>
-            <DropdownMenuSeparator />
             <DropdownMenuItem className="space-x-2" onClick={handleShowErrorClick}>
               <AlertCircle size={14} />
               <p>Show error</p>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
           </>
         )}
+
+        <DropdownMenuItem className="space-x-2" onClick={handleRestartClick}>
+          <RotateCcw size={14} />
+          <p>Restart table replication</p>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

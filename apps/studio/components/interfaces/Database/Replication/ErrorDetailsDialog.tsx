@@ -31,7 +31,9 @@ export const ErrorDetailsDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="xlarge" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Replication error on "{tableName}"</DialogTitle>
+          <DialogTitle>
+            Replication error on <code className="text-code-inline">{tableName}</code>
+          </DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="!p-0">
