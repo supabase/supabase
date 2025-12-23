@@ -14,7 +14,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()

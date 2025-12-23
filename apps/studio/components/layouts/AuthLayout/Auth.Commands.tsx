@@ -19,7 +19,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
+    authenticationPerformance,
   } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:third_party_auth',
@@ -27,7 +27,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     'authentication:emails',
     'authentication:multi_factor',
     'authentication:attack_protection',
-    'authentication:advanced',
+    'authentication:performance',
   ])
 
   useRegisterCommands(
@@ -161,13 +161,13 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/hooks`,
         defaultHidden: true,
       },
-      ...(authenticationAdvanced
+      ...(authenticationPerformance
         ? [
             {
-              id: 'nav-auth-advanced-settings',
-              name: 'Auth Advanced Settings',
-              value: 'Auth: Advanced Settings',
-              route: `/project/${ref}/auth/advanced`,
+              id: 'nav-auth-performance-settings',
+              name: 'Auth Performance Settings',
+              value: 'Auth: Performance Settings',
+              route: `/project/${ref}/auth/performance`,
               defaultHidden: true,
             } as IRouteCommand,
           ]

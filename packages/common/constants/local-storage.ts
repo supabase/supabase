@@ -80,11 +80,16 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
 
+  LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
+
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
+  // Observability banner dismissed
+  OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
 
   /**
    * COMMON

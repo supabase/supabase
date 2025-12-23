@@ -10,7 +10,6 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
@@ -38,6 +37,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -61,7 +61,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery({

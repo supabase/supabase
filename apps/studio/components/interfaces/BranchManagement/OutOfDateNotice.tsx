@@ -109,7 +109,7 @@ export const OutOfDateNotice = ({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Update branch with modified functions?</AlertDialogTitle>
+                <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
                   {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
@@ -119,7 +119,7 @@ export const OutOfDateNotice = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleUpdate(true)}>
+                <AlertDialogAction variant="warning" onClick={() => handleUpdate(true)}>
                   Update anyway
                 </AlertDialogAction>
               </AlertDialogFooter>

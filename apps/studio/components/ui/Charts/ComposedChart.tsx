@@ -223,7 +223,12 @@ export function ComposedChart({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      const formatted = formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
     }
 
     return numberFormatter(value, valuePrecision)
@@ -290,7 +295,9 @@ export function ComposedChart({
     att.name.toLowerCase().includes('pg_database_size')
   )
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+  const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+  const shouldFormatBytes =
+    isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -534,34 +541,36 @@ export function ComposedChart({
         </div>
       )}
       {showLegend && (
-        <CustomLabel
-          payload={[maxAttributeData, ...chartData]}
-          attributes={attributes}
-          showMaxValue={_showMaxValue}
-          onLabelHover={setHoveredLabel}
-          onToggleAttribute={(attribute, options) => {
-            setHiddenAttributes((prev) => {
-              if (options?.exclusive) {
-                const next = new Set<string>()
-                // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
-                const allNames = chartData.map((c) => c.name)
-                const allHiddenExcept = allNames.filter((n) => n !== attribute)
-                const isAlreadyExclusive =
-                  allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
-                return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
-              }
+        <div className="relative z-0">
+          <CustomLabel
+            payload={[maxAttributeData, ...chartData]}
+            attributes={attributes}
+            showMaxValue={_showMaxValue}
+            onLabelHover={setHoveredLabel}
+            onToggleAttribute={(attribute, options) => {
+              setHiddenAttributes((prev) => {
+                if (options?.exclusive) {
+                  const next = new Set<string>()
+                  // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
+                  const allNames = chartData.map((c) => c.name)
+                  const allHiddenExcept = allNames.filter((n) => n !== attribute)
+                  const isAlreadyExclusive =
+                    allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
+                  return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
+                }
 
-              const next = new Set(prev)
-              if (next.has(attribute)) {
-                next.delete(attribute)
-              } else {
-                next.add(attribute)
-              }
-              return next
-            })
-          }}
-          hiddenAttributes={hiddenAttributes}
-        />
+                const next = new Set(prev)
+                if (next.has(attribute)) {
+                  next.delete(attribute)
+                } else {
+                  next.add(attribute)
+                }
+                return next
+              })
+            }}
+            hiddenAttributes={hiddenAttributes}
+          />
+        </div>
       )}
     </div>
   )
