@@ -78,7 +78,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
         async provideDocumentFormattingEdits(model) {
           const value = model.getValue()
           const formatted = formatSql(value)
-          if (id) snapV2.setSql(id, formatted)
+          if (id) snapV2.setSql({ id, sql: formatted })
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })

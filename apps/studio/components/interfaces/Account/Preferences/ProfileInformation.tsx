@@ -69,7 +69,12 @@ export const ProfileInformation = () => {
     onSuccess: (data) => {
       toast.success('Successfully saved profile')
       const { first_name, last_name, username, primary_email } = data
-      form.reset({ first_name, last_name, username, primary_email })
+      form.reset({
+        first_name: first_name ?? undefined,
+        last_name: last_name ?? undefined,
+        username,
+        primary_email,
+      })
     },
     onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
