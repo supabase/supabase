@@ -126,10 +126,11 @@ export function getOperationColor(operation: string): string {
   return 'text-foreground-light'
 }
 
-export function isExplainQuery(rows: readonly any[]): boolean {
-  return (
-    rows.length > 0 && rows[0].hasOwnProperty('QUERY PLAN') && Object.keys(rows[0]).length === 1
-  )
+export function isExplainQuery(rows: readonly unknown[]): boolean {
+  if (rows.length === 0) return false
+  const firstRow = rows[0]
+  if (typeof firstRow !== 'object' || firstRow === null) return false
+  return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
 }
 
 export function isExplainSql(sql: string): boolean {
