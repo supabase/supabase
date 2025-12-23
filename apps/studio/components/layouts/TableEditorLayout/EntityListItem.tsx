@@ -178,7 +178,6 @@ export const EntityListItem = ({
       className={cn(
         TreeViewItemVariant({
           isSelected: isActive && !isPreview,
-          isOpened: isOpened && !isPreview,
           isPreview,
         }),
         'pl-4 pr-1'
