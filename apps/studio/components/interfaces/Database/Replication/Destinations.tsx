@@ -171,7 +171,7 @@ export const Destinations = () => {
                   ? 'BigQuery'
                   : 'iceberg' in destination.config
                     ? 'Analytics Bucket'
-                    : 'Other'
+                    : undefined
 
               return (
                 <DestinationRow
