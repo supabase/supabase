@@ -69,7 +69,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     }
   )
 
-  const vectorBuckets = vectorBucketsData?.vectorBuckets ?? []
+  const vectorBuckets = useMemo(() => vectorBucketsData?.vectorBuckets ?? [], [vectorBucketsData])
 
   const isLoading = isLoadingFileBuckets || isLoadingAnalyticsBuckets || isLoadingVectorBuckets
   const isError = isErrorFileBuckets || isErrorAnalyticsBuckets || isErrorVectorBuckets
@@ -210,11 +210,5 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     return <EmptyState icon={Storage} label="Storage" query={query} />
   }
 
-  return (
-    <ResultsList
-      results={allResults}
-      icon={Storage}
-      getRoute={getRoute}
-    />
-  )
+  return <ResultsList results={allResults} icon={Storage} getRoute={getRoute} />
 }
