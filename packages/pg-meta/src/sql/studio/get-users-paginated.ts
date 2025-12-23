@@ -170,11 +170,10 @@ from
  * Uses cursor-based pagination for efficient and consistent paging.
  *
  * Indexes leveraged:
- * - idx_users_email (btree) - for email prefix searches and sorting by email
- * - idx_users_email_trgm - for email trigram/fuzzy searches
+ * - idx_users_email (btree) - for email prefix and exact match searches and sorting by email
  * - idx_users_created_at_desc - for sorting by created_at
  * - idx_users_last_sign_in_at_desc - for sorting by last_sign_in_at
- * - idx_users_name_trgm - for name trigram searches on raw_user_meta_data->>'name'
+ * - idx_users_name (btree) - for name prefix and exact match searches on raw_user_meta_data->>'name'
  * - users_phone_key (btree) - for phone prefix searches and sorting by phone
  */
 export const getImprovedPaginatedUsersSQL = ({
@@ -195,8 +194,13 @@ export const getImprovedPaginatedUsersSQL = ({
   // Column-specific search condition
   if (hasValidKeywords) {
     if (column === 'email') {
-      // Use trigram index for fuzzy matching
-      conditions.push(`email ILIKE '%${formattedKeywords}%'`)
+      // Use btree index with prefix matching
+      const range = stringRange(formattedKeywords)
+      if (range[1]) {
+        conditions.push(`email >= '${range[0]}' AND email < '${range[1]}'`)
+      } else {
+        conditions.push(`email >= '${range[0]}'`)
+      }
     } else if (column === 'phone') {
       // Use btree index with prefix matching
       const range = stringRange(formattedKeywords)
@@ -209,8 +213,15 @@ export const getImprovedPaginatedUsersSQL = ({
       // Exact match on UUID
       conditions.push(`id = '${formattedKeywords}'`)
     } else if (column === 'name') {
-      // Use trigram index on raw_user_meta_data->>'name'
-      conditions.push(`raw_user_meta_data->>'name' ILIKE '%${formattedKeywords}%'`)
+      // Use btree index with prefix matching on raw_user_meta_data->>'name'
+      const range = stringRange(formattedKeywords)
+      if (range[1]) {
+        conditions.push(
+          `raw_user_meta_data->>'name' >= '${range[0]}' AND raw_user_meta_data->>'name' < '${range[1]}'`
+        )
+      } else {
+        conditions.push(`raw_user_meta_data->>'name' >= '${range[0]}'`)
+      }
     }
   }
 
