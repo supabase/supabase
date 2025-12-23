@@ -62,6 +62,7 @@ services:
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
     volumes:
       - ./volumes/snippets:/app/snippets:Z
+  
   kong:
     container_name: supabase-kong
     image: kong:2.8.1
