@@ -7,7 +7,7 @@ export const DATABASE_UPGRADE_STEPS = [
   },
   {
     key: DatabaseUpgradeProgress.LaunchedUpgradedInstance,
-    title: 'Prepare new server for migration',
+    title: 'Get new server ready for migration',
   },
   {
     key: DatabaseUpgradeProgress.DetachedVolumeFromUpgradedInstance,
