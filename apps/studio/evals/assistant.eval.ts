@@ -96,14 +96,15 @@ function parseToolCall(
   toolResult: TypedToolResult<ToolSet>
 ): ParsedToolCall {
   switch (toolCall.toolName) {
-    case 'execute_sql':
+    case 'execute_sql': {
       const sqlQuery = toolCall.input.sql
       if (typeof sqlQuery !== 'string') {
         return {}
       }
 
       return { sqlQuery }
-    case 'search_docs':
+    }
+    case 'search_docs': {
       const content = toolResult.output.content
       if (!content || !Array.isArray(content)) {
         return {}
@@ -115,6 +116,7 @@ function parseToolCall(
       }
 
       return { docs }
+    }
   }
 
   return {}
