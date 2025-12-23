@@ -39,7 +39,7 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
                 key={step.key}
                 className={cn(
                   // Tighten up child cell padding
-                  '[&_td]:py-3.5',
+                  '[&_td]:px-2.5 md:[&_td]:px-3 [&_td]:py-3 md:[&_td]:py-3.5',
                   // Handle conditional row background color
                   isCurrentStep
                     ? 'bg-surface-75'
@@ -48,13 +48,13 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
                       : 'bg-inherit'
                 )}
               >
-                <TableCell className="border-r border-border w-1 ">
+                <TableCell className="border-r border-border w-1">
                   <StepIndicator isCurrentStep={isCurrentStep} isCompletedStep={isCompletedStep} />
                 </TableCell>
                 <TableCell>
                   <p
                     className={cn(
-                      'text-sm',
+                      'text-sm truncate',
                       isCurrentStep
                         ? 'text-foreground'
                         : isCompletedStep
@@ -67,7 +67,7 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
                 </TableCell>
                 <TableCell className="justify-end">
                   {step.offline && (
-                    <p className="text-sm text-foreground-muted text-right">
+                    <p className="text-sm text-foreground-muted text-right whitespace-nowrap">
                       Project will be offline
                     </p>
                   )}

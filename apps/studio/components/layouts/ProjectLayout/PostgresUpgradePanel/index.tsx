@@ -10,6 +10,14 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { CompletedState, FailedState, UpgradingState, WaitingState } from './states'
 import { deriveUpgradeState, UPGRADE_STATE_CONTENT, UpgradeTargetVersion } from './types'
 
@@ -111,80 +119,86 @@ export const PostgresUpgradePanel = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto my-16 px-6 lg:px-8 flex flex-col gap-y-10">
-      {/* Header adapts based on upgrade state */}
-      <header className="flex flex-col gap-y-4">
-        <p className="text-xs uppercase font-mono text-foreground-lighter tracking-wider">
-          {content.label}
-        </p>
-        <h1>{content.headline}</h1>
-        <HeaderDescription
-          upgradeState={upgradeState}
-          projectName={project?.name ?? ''}
-          displayTargetVersion={displayTargetVersion}
-        />
-      </header>
+    <>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <p className="text-xs uppercase font-mono text-foreground-lighter tracking-wider">
+              {content.label}
+            </p>
+            <PageHeaderTitle>{content.headline}</PageHeaderTitle>
+            <PageHeaderDescription className="text-balance">
+              <UpgradePanelHeaderDescription
+                upgradeState={upgradeState}
+                projectName={project?.name ?? ''}
+                displayTargetVersion={displayTargetVersion}
+              />
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="small">
+        {/* State-specific content */}
+        {upgradeState.status === 'completed' && (
+          <CompletedState
+            {...sharedProps}
+            targetVersion={upgradeState.targetVersion}
+            onReturnToProject={refetchProjectDetails}
+            isLoading={loading}
+          />
+        )}
 
-      {/* State-specific content */}
-      {upgradeState.status === 'completed' && (
-        <CompletedState
-          {...sharedProps}
-          targetVersion={upgradeState.targetVersion}
-          onReturnToProject={refetchProjectDetails}
-          isLoading={loading}
-        />
-      )}
+        {upgradeState.status === 'failed' && (
+          <FailedState
+            {...sharedProps}
+            error={upgradeState.error}
+            initiatedAt={upgradeState.initiatedAt}
+            targetVersion={upgradeState.targetVersion}
+            onReturnToProject={refetchProjectDetails}
+            isLoading={loading}
+          />
+        )}
 
-      {upgradeState.status === 'failed' && (
-        <FailedState
-          {...sharedProps}
-          error={upgradeState.error}
-          initiatedAt={upgradeState.initiatedAt}
-          targetVersion={upgradeState.targetVersion}
-          onReturnToProject={refetchProjectDetails}
-          isLoading={loading}
-        />
-      )}
+        {upgradeState.status === 'upgrading' && (
+          <UpgradingState
+            {...sharedProps}
+            progress={upgradeState.progress}
+            isPerformingBackup={upgradeState.isPerformingBackup}
+            initiatedAt={initiated_at}
+          />
+        )}
 
-      {upgradeState.status === 'upgrading' && (
-        <UpgradingState
-          {...sharedProps}
-          progress={upgradeState.progress}
-          isPerformingBackup={upgradeState.isPerformingBackup}
-          initiatedAt={initiated_at}
-        />
-      )}
-
-      {upgradeState.status === 'waiting' && (
-        <WaitingState
-          {...sharedProps}
-          eligibilityData={eligibilityData}
-          diskAttributes={diskAttributes}
-          isDiskSizeUpdated={isDiskSizeUpdated}
-          selectedVersionValue={selectedVersionValue}
-          onVersionChange={setSelectedVersionValue}
-          onCancel={handleCancel}
-        />
-      )}
-    </div>
+        {upgradeState.status === 'waiting' && (
+          <WaitingState
+            {...sharedProps}
+            eligibilityData={eligibilityData}
+            diskAttributes={diskAttributes}
+            isDiskSizeUpdated={isDiskSizeUpdated}
+            selectedVersionValue={selectedVersionValue}
+            onVersionChange={setSelectedVersionValue}
+            onCancel={handleCancel}
+          />
+        )}
+      </PageContainer>
+    </>
   )
 }
 
-interface HeaderDescriptionProps {
+interface UpgradePanelHeaderDescriptionProps {
   upgradeState: ReturnType<typeof deriveUpgradeState>
   projectName: string
   displayTargetVersion: string | number
 }
 
-const HeaderDescription = ({
+const UpgradePanelHeaderDescription = ({
   upgradeState,
   projectName,
   displayTargetVersion,
-}: HeaderDescriptionProps) => {
+}: UpgradePanelHeaderDescriptionProps) => {
   switch (upgradeState.status) {
     case 'waiting':
       return (
-        <p className="text-base text-foreground-light text-balance">
+        <p>
           Postgres version{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong> is now
           available for the project{' '}
@@ -194,7 +208,7 @@ const HeaderDescription = ({
       )
     case 'upgrading':
       return (
-        <p className="text-base text-foreground-light text-balance">
+        <p>
           Your project <strong className="text-foreground font-medium">{projectName}</strong> is
           being upgraded to Postgres{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong>. This may
@@ -203,7 +217,7 @@ const HeaderDescription = ({
       )
     case 'completed':
       return (
-        <p className="text-base text-foreground-light text-balance">
+        <p>
           Your project <strong className="text-foreground font-medium">{projectName}</strong> has
           been successfully upgraded to Postgres{' '}
           <strong className="text-foreground font-medium">{upgradeState.targetVersion}</strong>.
@@ -211,7 +225,7 @@ const HeaderDescription = ({
       )
     case 'failed':
       return (
-        <p className="text-base text-foreground-light text-balance">
+        <p>
           Something went wrong while upgrading{' '}
           <strong className="text-foreground font-medium">{projectName}</strong>. Your project is
           back online and your data is not affected.

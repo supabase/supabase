@@ -16,6 +16,7 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
+import { PageSection } from 'ui-patterns/PageSection'
 import { Admonition } from 'ui-patterns/admonition'
 import { UpgradeStepsTable } from '../UpgradeStepsTable'
 import { UPGRADE_STATE_CONTENT, UpgradeTargetVersion, WaitingStateProps } from '../types'
@@ -84,7 +85,7 @@ export const WaitingState = ({
   })()
 
   return (
-    <div className="flex flex-col gap-y-6">
+    <PageSection>
       <div className="space-y-3">
         <h3 className="text-lg">{content.stepsHeading}</h3>
         <UpgradeStepsTable showProgress={false} />
@@ -230,6 +231,6 @@ export const WaitingState = ({
           </Button>
         </div>
       </div>
-    </div>
+    </PageSection>
   )
 }
