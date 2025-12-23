@@ -72,6 +72,7 @@ overrides:
   '@tanstack/directive-functions-plugin>vite': ^7.1.11
   '@tanstack/react-start-plugin>vite': ^7.1.11
   esbuild: ^0.25.2
+  nodemailer: ^7.0.11
   refractor>prismjs: ^1.30.0
   tar: ^7.0.0
   tmp: ^0.2.4
@@ -15602,8 +15603,8 @@ packages:
     resolution: {integrity: sha512-2YEOR5qlI1zUFbGMLKNfsrR5JUvFg9LxIRVE+xJe962pfVLH0rnItqLzv96XVs1Y1UIR8FxsXAuvX/lYAWZ2BQ==}
     engines: {node: '>=8'}
 
-  nodemailer@7.0.9:
-    resolution: {integrity: sha512-9/Qm0qXIByEP8lEV2qOqcAW7bRpL8CR9jcTwk3NBnHJNmP9fIJ86g2fgmIXqHY+nj55ZEMwWqYAT2QTDpRUYiQ==}
+  nodemailer@7.0.11:
+    resolution: {integrity: sha512-gnXhNRE0FNhD7wPSCGhdNh46Hs6nm+uTyg+Kq0cZukNQiYdnCsoQjodNP9BQVG9XrcK/v6/MgpAPBUFyzh9pvw==}
     engines: {node: '>=6.0.0'}
 
   nopt@5.0.0:
@@ -24804,7 +24805,7 @@ snapshots:
 
   '@payloadcms/email-nodemailer@3.60.0(payload@3.52.0(graphql@16.11.0)(typescript@5.9.2))':
     dependencies:
-      nodemailer: 7.0.9
+      nodemailer: 7.0.11
       payload: 3.52.0(graphql@16.11.0)(typescript@5.9.2)
 
   '@payloadcms/graphql@3.52.0(graphql@16.11.0)(payload@3.52.0(graphql@16.11.0)(typescript@5.9.2))(typescript@5.9.2)':
@@ -24861,7 +24862,7 @@ snapshots:
       '@aws-sdk/lib-storage': 3.830.0(@aws-sdk/client-s3@3.830.0)
       '@payloadcms/email-nodemailer': 3.60.0(payload@3.52.0(graphql@16.11.0)(typescript@5.9.2))
       amazon-cognito-identity-js: 6.3.15(encoding@0.1.13)
-      nodemailer: 7.0.9
+      nodemailer: 7.0.11
       payload: 3.52.0(graphql@16.11.0)(typescript@5.9.2)
     transitivePeerDependencies:
       - aws-crt
@@ -36747,7 +36748,7 @@ snapshots:
     dependencies:
       big-integer: 1.6.51
 
-  nodemailer@7.0.9: {}
+  nodemailer@7.0.11: {}
 
   nopt@5.0.0:
     dependencies:
