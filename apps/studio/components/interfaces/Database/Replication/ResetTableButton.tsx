@@ -93,8 +93,8 @@ export const ResetTableButton = ({
                   <strong>All other tables remain untouched.</strong> Only this table is affected.
                 </li>
                 <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to apply
-                  this change.
+                  <strong>The pipeline will restart automatically.</strong> This is required to
+                  apply this change.
                 </li>
               </ul>
             </div>

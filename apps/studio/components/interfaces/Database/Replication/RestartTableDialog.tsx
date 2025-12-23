@@ -36,7 +36,7 @@ export const RestartTableDialog = ({
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
-        `Replication restarted for "${tableName}" and pipeline is being restarted automatically`
+        `Restarting replication for "${tableName}". Pipeline will restart automatically.`
       )
       onRestartComplete?.()
       onOpenChange(false)
@@ -64,7 +64,9 @@ export const RestartTableDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Restart replication for {tableName}</AlertDialogTitle>
+          <AlertDialogTitle>
+            Restart replication for <code className="text-code-inline">{tableName}</code>
+          </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-3 text-sm">
               <p>
@@ -84,8 +86,8 @@ export const RestartTableDialog = ({
                   <strong>All other tables remain untouched.</strong> Only this table is affected.
                 </li>
                 <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to apply
-                  this change.
+                  <strong>The pipeline will restart automatically.</strong> This is required to
+                  apply this change.
                 </li>
               </ul>
             </div>

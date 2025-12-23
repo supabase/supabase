@@ -78,7 +78,7 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
       ) : retryPolicy === 'timed_retry' ? (
         <div className="flex flex-col text-foreground-lighter gap-y-3">
           <p className="text-xs">
-            A retry will be triggered automatically by restarting the pipeline on this table.
+            Replication will retry automatically. The pipeline will restart to apply the retry.
           </p>
           <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
         </div>

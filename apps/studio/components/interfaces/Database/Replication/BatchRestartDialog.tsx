@@ -65,7 +65,7 @@ export const BatchRestartDialog = ({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
-        `Replication restarted for ${count} table${count > 1 ? 's' : ''} and pipeline is being restarted automatically`
+        `Restarting replication for ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
       )
       onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
