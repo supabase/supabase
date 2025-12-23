@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import {
   Code2,
   KeyRound,
@@ -51,6 +51,7 @@ const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
 export function useCreateCommands(options?: CommandOptions) {
+  const enableCreateCommands = useFlag('enablecreatecommands')
   const setIsOpen = useSetCommandMenuOpen()
   const {
     ref,
@@ -369,15 +370,14 @@ export function useCreateCommands(options?: CommandOptions) {
   const observabilityCommands = useMemo(
     () => [
       ...(IS_PLATFORM && reportsEnabled
-        ? [
+        ? ([
             {
               id: 'create-observability-report',
               name: 'Create Custom Report',
-              route:
-                `/project/${ref}/observability/api-overview?newReport=true` as unknown as `/${string}`,
+              route: `/project/${ref}/observability/api-overview?newReport=true`,
               icon: () => <Telescope />,
             },
-          ]
+          ].filter(Boolean) as ICommand[])
         : []),
     ],
     [ref, reportsEnabled]
@@ -454,6 +454,7 @@ export function useCreateCommands(options?: CommandOptions) {
     },
     {
       deps: [sections],
+      enabled: enableCreateCommands,
     }
   )
 
@@ -471,6 +472,7 @@ export function useCreateCommands(options?: CommandOptions) {
       ...options,
       orderSection: (sections) => sections,
       sectionMeta: { priority: 3 },
+      enabled: enableCreateCommands,
     }
   )
 }
