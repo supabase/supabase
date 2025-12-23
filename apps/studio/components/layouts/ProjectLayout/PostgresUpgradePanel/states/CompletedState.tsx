@@ -1,5 +1,6 @@
 import { Button } from 'ui'
 import { PageSection } from 'ui-patterns/PageSection'
+import { UpgradeStepsTable } from '../UpgradeStepsTable'
 import { CompletedStateProps, UPGRADE_STATE_CONTENT } from '../types'
 
 export const CompletedState = ({
@@ -14,7 +15,17 @@ export const CompletedState = ({
 
   return (
     <PageSection>
-      <Button loading={isLoading} disabled={isLoading} onClick={onReturnToProject}>
+      <div className="flex flex-col gap-y-3">
+        <h3 className="text-lg">{content.stepsHeading}</h3>
+        <UpgradeStepsTable variant="completed" />
+      </div>
+
+      <Button
+        className="w-min"
+        loading={isLoading}
+        disabled={isLoading}
+        onClick={onReturnToProject}
+      >
         Return to project
       </Button>
     </PageSection>

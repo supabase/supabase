@@ -2,6 +2,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { Button } from 'ui'
 import { PageSection } from 'ui-patterns/PageSection'
+import { UpgradeStepsTable } from '../UpgradeStepsTable'
 import { FailedStateProps, UPGRADE_STATE_CONTENT } from '../types'
 
 export const FailedState = ({
@@ -21,6 +22,11 @@ export const FailedState = ({
 
   return (
     <PageSection>
+      <div className="flex flex-col gap-y-3">
+        <h3 className="text-lg">{content.stepsHeading}</h3>
+        <UpgradeStepsTable variant="failed" />
+      </div>
+
       <div className="flex flex-row gap-x-2 items-center">
         <Button loading={isLoading} disabled={isLoading} onClick={onReturnToProject}>
           Return to project

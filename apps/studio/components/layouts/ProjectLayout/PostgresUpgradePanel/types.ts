@@ -83,11 +83,15 @@ export function deriveUpgradeState(params: {
 
   if (isUpgradeInProgress) {
     // After upgrade completes, we may enter a backup phase
-    const isPerformingBackup =
+    // This happens when progress is either:
+    // - 9_completed_upgrade (backup in progress)
+    // - 10_completed_post_physical_backup (backup done, waiting for final status)
+    const isInBackupPhase =
       status === DatabaseUpgradeStatus.Upgrading &&
-      progress === DatabaseUpgradeProgress.CompletedUpgrade
+      (progress === DatabaseUpgradeProgress.CompletedUpgrade ||
+        progress === DatabaseUpgradeProgress.CompletedPostPhysicalBackup)
 
-    if (isPerformingBackup) {
+    if (isInBackupPhase) {
       return { status: 'backingUp' }
     }
 

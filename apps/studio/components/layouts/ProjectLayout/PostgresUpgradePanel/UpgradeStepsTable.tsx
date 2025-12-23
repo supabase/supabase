@@ -22,6 +22,18 @@ type UpgradeStepsTableProps =
        */
       variant: 'backingUp'
     }
+  | {
+      /**
+       * Completed view: all steps including backup shown as completed
+       */
+      variant: 'completed'
+    }
+  | {
+      /**
+       * Failed view: all steps shown as completed (project is back online)
+       */
+      variant: 'failed'
+    }
 
 export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
   const { variant } = props
@@ -29,12 +41,15 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
   const progress = variant === 'upgrading' ? props.progress : undefined
   const progressStage = Number((progress || '').split('_')[0])
 
-  const showProgress = variant === 'upgrading' || variant === 'backingUp'
-  const allUpgradeStepsCompleted = variant === 'backingUp'
+  const isTerminalState = variant === 'completed' || variant === 'failed'
+  const showProgress = variant === 'upgrading' || variant === 'backingUp' || isTerminalState
+  const allUpgradeStepsCompleted = variant === 'backingUp' || isTerminalState
 
-  // Append backup step when in backingUp state
+  // Append backup step when in backingUp, completed, or failed states
   const steps =
-    variant === 'backingUp' ? [...DATABASE_UPGRADE_STEPS, BACKUP_STEP] : DATABASE_UPGRADE_STEPS
+    variant === 'backingUp' || isTerminalState
+      ? [...DATABASE_UPGRADE_STEPS, BACKUP_STEP]
+      : DATABASE_UPGRADE_STEPS
 
   return (
     <Card>
@@ -49,11 +64,21 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
         <TableBody>
           {steps.map((step, idx) => {
             const isBackupStep = step.key === BACKUP_STEP.key
-            const isCurrentStep = isBackupStep
-              ? variant === 'backingUp'
-              : showProgress && !allUpgradeStepsCompleted && step.key === progress
-            const isCompletedStep =
-              !isBackupStep && showProgress && (allUpgradeStepsCompleted || progressStage > idx)
+            const isFirstStep = idx === 0
+
+            // Show the first step as current immediately when upgrade starts (progress is undefined)
+            // This is to give visual feedback that something is happening
+            const isCurrentStep = isTerminalState
+              ? false // No step is "current" in terminal states
+              : isBackupStep
+                ? variant === 'backingUp'
+                : showProgress &&
+                  !allUpgradeStepsCompleted &&
+                  (step.key === progress || (progress === undefined && isFirstStep))
+
+            const isCompletedStep = isTerminalState
+              ? true // All steps are completed in terminal states
+              : !isBackupStep && showProgress && (allUpgradeStepsCompleted || progressStage > idx)
 
             const statusText = 'offline' in step && step.offline ? 'Project offline' : null
 
@@ -61,21 +86,27 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
               <TableRow
                 key={step.key}
                 className={cn(
-                  '[&_td]:px-2.5 md:[&_td]:px-3 [&_td]:py-3 md:[&_td]:py-3.5',
-                  isCurrentStep
-                    ? 'bg-surface-75'
-                    : isCompletedStep
-                      ? 'bg-surface-200/50'
-                      : 'bg-inherit'
+                  '[&_td]:px-2.5 md:[&_td]:px-3 [&_td]:py-3 transition-colors duration-300',
+                  !allUpgradeStepsCompleted &&
+                    (isCurrentStep
+                      ? 'bg-inherit'
+                      : isCompletedStep
+                        ? 'bg-surface-200/50'
+                        : 'bg-surface-75')
                 )}
               >
                 <TableCell className="border-r border-border w-1">
-                  <StepIndicator isCurrentStep={isCurrentStep} isCompletedStep={isCompletedStep} />
+                  <div className="flex items-center justify-center">
+                    <StepIndicator
+                      isCurrentStep={isCurrentStep}
+                      isCompletedStep={isCompletedStep}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell>
                   <p
                     className={cn(
-                      'text-sm truncate',
+                      'text-sm truncate transition-colors duration-300',
                       isCurrentStep
                         ? 'text-foreground'
                         : isCompletedStep
@@ -86,9 +117,11 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
                     )}
                   >
                     {isCompletedStep && !isCurrentStep ? (
-                      <span className="relative inline-block leading-none after:content-[''] after:absolute after:left-0 after:right-0 after:top-[0.55em] after:h-[1.5px] after:bg-foreground-muted">
-                        {step.title}
+                      <span className="relative inline-block leading-none animate-in fade-in duration-300 after:content-[''] after:absolute after:left-0 after:right-0 after:top-[0.55em] after:h-[1.5px] after:bg-foreground-muted after:animate-in after:fade-in after:duration-300 after:delay-150">
+                        {isCurrentStep ? step.activeTitle : step.title}
                       </span>
+                    ) : isCurrentStep ? (
+                      step.activeTitle
                     ) : (
                       step.title
                     )}
@@ -96,7 +129,14 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
                 </TableCell>
                 <TableCell className="justify-end">
                   {statusText && (
-                    <p className="text-sm text-foreground-muted text-right whitespace-nowrap">
+                    <p
+                      className={cn(
+                        'text-sm text-foreground-muted text-right whitespace-nowrap',
+                        isCompletedStep && !isCurrentStep
+                          ? 'text-foreground-muted/50'
+                          : 'text-foreground-muted'
+                      )}
+                    >
                       {statusText}
                     </p>
                   )}
@@ -126,7 +166,7 @@ const StepIndicator = ({ isCurrentStep, isCompletedStep }: StepIndicatorProps) =
 
   if (isCompletedStep) {
     return (
-      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-brand-500 dark:bg-brand">
+      <div className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-brand-500 dark:bg-brand">
         <Check size={12} className="text-contrast" strokeWidth={3} />
       </div>
     )
