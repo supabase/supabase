@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Database, Users } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { cn } from 'ui'
-import { ShimmeringLoader } from 'components/ui/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns'
 import type { SearchContextValue } from './ContextSearchCommands'
 
 interface SearchResult {
