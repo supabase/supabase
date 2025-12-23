@@ -190,3 +190,27 @@ export function getScanBorderColor(operation: string): string {
   // Default neutral color for other operations
   return 'border-l-border-muted'
 }
+
+export function splitSqlStatements(sql: string): string[] {
+  const tokens =
+    sql.match(/'([^']|'')*'|"([^"]|"")*"|\$[a-zA-Z0-9_]*\$[\s\S]*?\$[a-zA-Z0-9_]*\$|;|[^'"$;]+/g) ||
+    []
+
+  const statements: string[] = []
+  let current = ''
+
+  for (const token of tokens) {
+    if (token === ';') {
+      if (current.trim()) statements.push(current.trim())
+      current = ''
+    } else {
+      current += token
+    }
+  }
+
+  if (current.trim()) {
+    statements.push(current.trim())
+  }
+
+  return statements
+}

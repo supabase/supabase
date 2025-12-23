@@ -12,7 +12,6 @@ import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
-import type { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import type { SqlSnippets } from 'types'
 
 export type StateSnippetFolder = {
@@ -59,7 +58,7 @@ export const sqlEditorState = proxy({
   explainResults: {} as {
     [snippetId: string]: {
       rows: QueryPlanRow[]
-      error?: QueryResponseError & { formattedError?: string }
+      error?: { message: string; formattedError?: string }
     }
   },
   // Synchronous saving of folders and snippets (debounce behavior)
@@ -276,7 +275,7 @@ export const sqlEditorState = proxy({
     sqlEditorState.explainResults[id] = { rows: ref(results) }
   },
 
-  addExplainResultError: (id: string, error: QueryResponseError & { formattedError?: string }) => {
+  addExplainResultError: (id: string, error: { message: string; formattedError?: string }) => {
     sqlEditorState.explainResults[id] = { rows: ref([]), error }
   },
 

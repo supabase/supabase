@@ -10,6 +10,7 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   isExplainQuery,
   isExplainSql,
+  splitSqlStatements,
 } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
@@ -217,7 +218,7 @@ export const SQLEditor = () => {
         setActiveUtilityTab('explain')
       }
     },
-    onError(error: any) {
+    onError(error) {
       if (id) {
         snapV2.addExplainResultError(id, error)
         setActiveUtilityTab('explain')
@@ -381,6 +382,17 @@ export const SQLEditor = () => {
         ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
         : selectedValue || editorRef.current?.getValue()
 
+      // Check for multiple statements - EXPLAIN only works on a single statement
+      const statements = splitSqlStatements(sql)
+      if (statements.length > 1) {
+        snapV2.addExplainResultError(id, {
+          message:
+            'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
+        })
+        setActiveUtilityTab('explain')
+        return
+      }
+
       if (lineHighlights.length > 0) {
         editor?.deltaDecorations(lineHighlights, [])
         setLineHighlights([])
@@ -417,6 +429,7 @@ export const SQLEditor = () => {
     databaseSelectorState.selectedDatabaseId,
     databases,
     lineHighlights,
+    snapV2,
   ])
 
   const handleNewQuery = useCallback(
