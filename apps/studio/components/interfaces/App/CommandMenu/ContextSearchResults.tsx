@@ -21,6 +21,15 @@ const UserSearchResults = dynamic(
   }
 )
 
+// Lazy load table search results component
+const TableSearchResults = dynamic(
+  () => import('./TableSearchResults').then((mod) => ({ default: mod.TableSearchResults })),
+  {
+    loading: () => <SkeletonResults />,
+    ssr: false,
+  }
+)
+
 interface ContextSearchResultsProps {
   context: SearchContextValue
   query: string
@@ -66,11 +75,6 @@ const MOCK_RESULTS: Record<SearchContextValue, SearchResult[]> = {
     { id: '2', name: 'jane@example.com', description: 'User ID: def-456' },
     { id: '3', name: 'admin@example.com', description: 'User ID: ghi-789' },
   ],
-  'database-tables': [
-    { id: '1', name: 'public.users', description: '12 columns • 1,234 rows' },
-    { id: '2', name: 'public.posts', description: '8 columns • 5,678 rows' },
-    { id: '3', name: 'public.comments', description: '6 columns • 9,012 rows' },
-  ],
   'auth-policies': [
     { id: '1', name: 'Users can view own data', description: 'SELECT on public.users' },
     { id: '2', name: 'Users can update own profile', description: 'UPDATE on public.profiles' },
@@ -94,7 +98,7 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
 
   // Mock data for other contexts - always compute, even if we return early
   const mockResults = useMemo(() => {
-    if (context === 'users') return []
+    if (context === 'users' || context === 'database-tables') return []
     const mockData = MOCK_RESULTS[context] || []
     return query.trim()
       ? mockData.filter(
@@ -108,6 +112,11 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
   // Delegate to UserSearchResults for users context
   if (context === 'users') {
     return <UserSearchResults query={query} />
+  }
+
+  // Delegate to TableSearchResults for database-tables context
+  if (context === 'database-tables') {
+    return <TableSearchResults query={query} />
   }
 
   // Show empty state immediately if no query and context requires input
