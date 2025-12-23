@@ -20,25 +20,29 @@ export const UpgradingState = ({
     .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   return (
+    // TODO: this is basically the same as the BackingUpState component, so we should refactor it to be a shared component
     <PageSection>
-      <h3 className="text-lg">{content.stepsHeading}</h3>
-      <UpgradeStepsTable variant="upgrading" progress={progress} />
-
-      {initiatedAt !== undefined && (
-        <p className="text-sm text-foreground-lighter">
-          Upgrade began at{' '}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="underline decoration-dotted underline-offset-2 decoration-foreground-muted cursor-help">
-                {initiatedAtUTC} (UTC)
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-center">
-              {initiatedAtLocal}
-            </TooltipContent>
-          </Tooltip>
-        </p>
-      )}
+      {/* Steps table */}
+      <div className="flex flex-col gap-y-3">
+        <h3 className="text-lg">{content.stepsHeading}</h3>
+        <UpgradeStepsTable variant="upgrading" progress={progress} />
+        {/* Upgrade metadata */}
+        {initiatedAt !== undefined && (
+          <p className="text-sm text-foreground-lighter">
+            Upgrade began at{' '}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="underline decoration-dotted underline-offset-2 decoration-foreground-muted cursor-help">
+                  {initiatedAtUTC} (UTC)
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-center">
+                {initiatedAtLocal}
+              </TooltipContent>
+            </Tooltip>
+          </p>
+        )}
+      </div>
     </PageSection>
   )
 }

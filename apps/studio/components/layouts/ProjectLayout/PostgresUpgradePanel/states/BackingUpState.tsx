@@ -19,10 +19,14 @@ export const BackingUpState = ({
     .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   return (
+    // TODO: this is basically the same as the UpgradingState component, so we should refactor it to be a shared component
     <PageSection>
-      <h3 className="text-lg">{content.stepsHeading}</h3>
-      <UpgradeStepsTable variant="backingUp" />
-
+      {/* Steps table */}
+      <div className="flex flex-col gap-y-3">
+        <h3 className="text-lg">{content.stepsHeading}</h3>
+        <UpgradeStepsTable variant="backingUp" />
+      </div>
+      {/* Backup metadata */}
       {initiatedAt !== undefined && (
         <p className="text-sm text-foreground-lighter">
           Upgrade began at{' '}
@@ -41,4 +45,3 @@ export const BackingUpState = ({
     </PageSection>
   )
 }
-

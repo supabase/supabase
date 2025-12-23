@@ -258,7 +258,9 @@ const UpgradePanelHeaderDescription = ({
         <p>
           Something went wrong while upgrading{' '}
           <strong className="text-foreground font-medium">{projectName}</strong>. Your project is
-          back online and your data is not affected.
+          <strong className="text-foreground font-medium">back online</strong> and your{' '}
+          <strong className="text-foreground font-medium">data is not affected.</strong> Please
+          reach out to us via our support form for assistance with the upgrade.
         </p>
       )
   }
