@@ -21,7 +21,6 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
   const { data: project } = useSelectedProjectQuery()
 
   const trimmedQuery = query.trim()
-  const hasQueryInput = trimmedQuery.length > 0
 
   const {
     data: tables,
@@ -35,7 +34,7 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
       sortByProperty: 'name',
     },
     {
-      enabled: hasQueryInput && !!project?.ref,
+      enabled: !!project?.ref,
     }
   )
 
@@ -78,11 +77,6 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
       }
     })
   }, [tables, trimmedQuery])
-
-  // Show empty state immediately if no query
-  if (!query.trim()) {
-    return <EmptyState icon={Database} label="Database Tables" query="" />
-  }
 
   if (isLoadingTables) {
     return <SkeletonResults />

@@ -30,6 +30,15 @@ const TableSearchResults = dynamic(
   }
 )
 
+// Lazy load policy search results component
+const PolicySearchResults = dynamic(
+  () => import('./PolicySearchResults').then((mod) => ({ default: mod.PolicySearchResults })),
+  {
+    loading: () => <SkeletonResults />,
+    ssr: false,
+  }
+)
+
 interface ContextSearchResultsProps {
   context: SearchContextValue
   query: string
@@ -52,11 +61,12 @@ const CONTEXT_CONFIG: Record<
   'database-tables': {
     icon: Database,
     label: 'Database Tables',
-    requiresInput: true,
+    requiresInput: false,
   },
   'auth-policies': {
     icon: Auth,
-    label: 'Auth Policies',
+    label: 'RLS Policies',
+    requiresInput: false,
   },
   'edge-functions': {
     icon: EdgeFunctions,
@@ -75,11 +85,8 @@ const MOCK_RESULTS: Record<SearchContextValue, SearchResult[]> = {
     { id: '2', name: 'jane@example.com', description: 'User ID: def-456' },
     { id: '3', name: 'admin@example.com', description: 'User ID: ghi-789' },
   ],
-  'auth-policies': [
-    { id: '1', name: 'Users can view own data', description: 'SELECT on public.users' },
-    { id: '2', name: 'Users can update own profile', description: 'UPDATE on public.profiles' },
-    { id: '3', name: 'Admins have full access', description: 'ALL on public.* (admin role)' },
-  ],
+  'database-tables': [],
+  'auth-policies': [],
   'edge-functions': [
     { id: '1', name: 'send-email', description: 'Last deployed: 2 days ago' },
     { id: '2', name: 'process-webhook', description: 'Last deployed: 1 week ago' },
@@ -98,7 +105,8 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
 
   // Mock data for other contexts - always compute, even if we return early
   const mockResults = useMemo(() => {
-    if (context === 'users' || context === 'database-tables') return []
+    if (context === 'users' || context === 'database-tables' || context === 'auth-policies')
+      return []
     const mockData = MOCK_RESULTS[context] || []
     return query.trim()
       ? mockData.filter(
@@ -117,6 +125,11 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
   // Delegate to TableSearchResults for database-tables context
   if (context === 'database-tables') {
     return <TableSearchResults query={query} />
+  }
+
+  // Delegate to PolicySearchResults for auth-policies context
+  if (context === 'auth-policies') {
+    return <PolicySearchResults query={query} />
   }
 
   // Show empty state immediately if no query and context requires input

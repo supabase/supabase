@@ -80,7 +80,7 @@ export function ResultsList({ results, icon: Icon, onResultClick, getRoute }: Re
 
   return (
     <CommandList_Shadcn_
-      className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden bg-transparent')}
+      className={cn('max-h-[initial] overflow-y-auto overflow-x-hidden bg-transparent')}
     >
       <CommandGroup>
         {commands.map((command) => (
