@@ -38,6 +38,10 @@ export const Index = {
     "infinite-query-hook-demo": {
       component: React.lazy(() => import("@/registry/default/examples/infinite-query-hook-demo.tsx")),
     }
+    ,
+    "assistant-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/assistant-demo.tsx")),
+    }
     
   },
 } as const
