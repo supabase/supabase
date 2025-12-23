@@ -18,7 +18,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { CompletedState, FailedState, UpgradingState, WaitingState } from './states'
+import { BackingUpState, CompletedState, FailedState, UpgradingState, WaitingState } from './states'
 import { deriveUpgradeState, UPGRADE_STATE_CONTENT, UpgradeTargetVersion } from './types'
 
 const formatValue = (version: UpgradeTargetVersion) => {
@@ -173,9 +173,12 @@ export const PostgresUpgradePanel = () => {
           <UpgradingState
             {...sharedProps}
             progress={upgradeState.progress}
-            isPerformingBackup={upgradeState.isPerformingBackup}
             initiatedAt={initiated_at}
           />
+        )}
+
+        {upgradeState.status === 'backingUp' && (
+          <BackingUpState {...sharedProps} initiatedAt={initiated_at} />
         )}
 
         {upgradeState.status === 'waiting' && (
@@ -224,6 +227,22 @@ const UpgradePanelHeaderDescription = ({
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong>. This may
           take a few minutes to several hours depending on your database size.
         </p>
+      )
+    case 'backingUp':
+      return (
+        <>
+          <p>
+            Your project <strong className="text-foreground font-medium">{projectName}</strong> has
+            been upgraded to Postgres{' '}
+            <strong className="text-foreground font-medium">{displayTargetVersion}</strong>, and is
+            back online.
+          </p>
+          <p>
+            A full backup is now being performed to ensure that there is a proper base backup
+            available post-upgrade. This can take from a few minutes up to several hours depending
+            on the size of your database.
+          </p>
+        </>
       )
     case 'completed':
       return (

@@ -2,16 +2,15 @@ import dayjs from 'dayjs'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { PageSection } from 'ui-patterns/PageSection'
 import { UpgradeStepsTable } from '../UpgradeStepsTable'
-import { UPGRADE_STATE_CONTENT, UpgradingStateProps } from '../types'
+import { BackingUpStateProps, UPGRADE_STATE_CONTENT } from '../types'
 
-export const UpgradingState = ({
+export const BackingUpState = ({
   projectRef,
   projectName,
   displayTargetVersion,
-  progress,
   initiatedAt,
-}: UpgradingStateProps) => {
-  const content = UPGRADE_STATE_CONTENT.upgrading
+}: BackingUpStateProps) => {
+  const content = UPGRADE_STATE_CONTENT.backingUp
 
   const initiatedAtUTC = dayjs.utc(initiatedAt ?? 0).format('DD MMM YYYY HH:mm:ss')
   const initiatedAtLocal = dayjs
@@ -22,7 +21,7 @@ export const UpgradingState = ({
   return (
     <PageSection>
       <h3 className="text-lg">{content.stepsHeading}</h3>
-      <UpgradeStepsTable variant="upgrading" progress={progress} />
+      <UpgradeStepsTable variant="backingUp" />
 
       {initiatedAt !== undefined && (
         <p className="text-sm text-foreground-lighter">
@@ -42,3 +41,4 @@ export const UpgradingState = ({
     </PageSection>
   )
 }
+

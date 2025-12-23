@@ -1,23 +1,40 @@
 import { Check, Circle, Loader2 } from 'lucide-react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from 'ui'
-import { DATABASE_UPGRADE_STEPS } from './UpgradingState.constants'
+import { BACKUP_STEP, DATABASE_UPGRADE_STEPS } from './UpgradingState.constants'
 
-interface UpgradeStepsTableProps {
-  /**
-   * Current progress step (if actively upgrading)
-   * When undefined, all steps are shown as pending
-   */
-  progress?: string
-  /**
-   * Whether to show progress indicators
-   * false = all steps pending (pre-upgrade view)
-   * true = show current/completed step indicators
-   */
-  showProgress: boolean
-}
+type UpgradeStepsTableProps =
+  | {
+      /**
+       * Pre-upgrade view: all steps shown as pending
+       */
+      variant: 'pending'
+    }
+  | {
+      /**
+       * Active upgrade view: shows current progress through steps
+       */
+      variant: 'upgrading'
+      progress: string | undefined
+    }
+  | {
+      /**
+       * Backing up view: all upgrade steps completed, backup step in progress
+       */
+      variant: 'backingUp'
+    }
 
-export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableProps) => {
+export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
+  const { variant } = props
+
+  const progress = variant === 'upgrading' ? props.progress : undefined
   const progressStage = Number((progress || '').split('_')[0])
+
+  const showProgress = variant === 'upgrading' || variant === 'backingUp'
+  const allUpgradeStepsCompleted = variant === 'backingUp'
+
+  // Append backup step when in backingUp state
+  const steps =
+    variant === 'backingUp' ? [...DATABASE_UPGRADE_STEPS, BACKUP_STEP] : DATABASE_UPGRADE_STEPS
 
   return (
     <Card>
@@ -30,17 +47,21 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
           </TableRow>
         </TableHeader>
         <TableBody>
-          {DATABASE_UPGRADE_STEPS.map((step, idx: number) => {
-            const isCurrentStep = showProgress && step.key === progress
-            const isCompletedStep = showProgress && progressStage > idx
+          {steps.map((step, idx) => {
+            const isBackupStep = step.key === BACKUP_STEP.key
+            const isCurrentStep = isBackupStep
+              ? variant === 'backingUp'
+              : showProgress && !allUpgradeStepsCompleted && step.key === progress
+            const isCompletedStep =
+              !isBackupStep && showProgress && (allUpgradeStepsCompleted || progressStage > idx)
+
+            const statusText = 'offline' in step && step.offline ? 'Project offline' : null
 
             return (
               <TableRow
                 key={step.key}
                 className={cn(
-                  // Tighten up child cell padding
                   '[&_td]:px-2.5 md:[&_td]:px-3 [&_td]:py-3 md:[&_td]:py-3.5',
-                  // Handle conditional row background color
                   isCurrentStep
                     ? 'bg-surface-75'
                     : isCompletedStep
@@ -74,9 +95,9 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
                   </p>
                 </TableCell>
                 <TableCell className="justify-end">
-                  {step.offline && (
+                  {statusText && (
                     <p className="text-sm text-foreground-muted text-right whitespace-nowrap">
-                      Project offline
+                      {statusText}
                     </p>
                   )}
                 </TableCell>

@@ -90,7 +90,7 @@ export const WaitingState = ({
       <PageSection>
         <div className="flex flex-col gap-y-3">
           <h3 className="text-lg">{content.stepsHeading}</h3>
-          <UpgradeStepsTable showProgress={false} />
+          <UpgradeStepsTable variant="pending" />
         </div>
       </PageSection>
 

@@ -37,3 +37,12 @@ export const DATABASE_UPGRADE_STEPS = [
     title: 'Optimize database',
   },
 ]
+
+/**
+ * Special step shown when performing post-upgrade backup.
+ * This step is appended to the upgrade steps table in the backingUp state.
+ */
+export const BACKUP_STEP = {
+  key: 'backup',
+  title: 'Perform full backup',
+} as const

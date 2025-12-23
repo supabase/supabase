@@ -14,7 +14,8 @@ export interface UpgradeTargetVersion {
  */
 export type UpgradeState =
   | { status: 'waiting' }
-  | { status: 'upgrading'; progress: string | undefined; isPerformingBackup: boolean }
+  | { status: 'upgrading'; progress: string | undefined }
+  | { status: 'backingUp' }
   | { status: 'completed'; targetVersion: string }
   | {
       status: 'failed'
@@ -35,6 +36,11 @@ export const UPGRADE_STATE_CONTENT = {
   upgrading: {
     label: 'Upgrading',
     headline: 'We’re upgrading your project',
+    stepsHeading: 'Steps we’re taking',
+  },
+  backingUp: {
+    label: 'Backing up',
+    headline: 'We’re backing up your project',
     stepsHeading: 'Steps we’re taking',
   },
   completed: {
@@ -76,13 +82,18 @@ export function deriveUpgradeState(params: {
   }
 
   if (isUpgradeInProgress) {
+    // After upgrade completes, we may enter a backup phase
     const isPerformingBackup =
       status === DatabaseUpgradeStatus.Upgrading &&
       progress === DatabaseUpgradeProgress.CompletedUpgrade
+
+    if (isPerformingBackup) {
+      return { status: 'backingUp' }
+    }
+
     return {
       status: 'upgrading',
       progress: progress as DatabaseUpgradeProgress | undefined,
-      isPerformingBackup,
     }
   }
 
@@ -131,7 +142,13 @@ export interface WaitingStateProps extends SharedUpgradeProps {
  */
 export interface UpgradingStateProps extends SharedUpgradeProps {
   progress: string | undefined
-  isPerformingBackup: boolean
+  initiatedAt: string | undefined
+}
+
+/**
+ * Props for the backing up state component
+ */
+export interface BackingUpStateProps extends SharedUpgradeProps {
   initiatedAt: string | undefined
 }
 
