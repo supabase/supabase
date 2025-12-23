@@ -47,6 +47,7 @@ interface RequestUpgradeToBillingOwnersProps {
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
+  className?: string
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -55,6 +56,7 @@ export const RequestUpgradeToBillingOwners = ({
   addon,
   featureProposition,
   children,
+  className,
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -154,7 +156,7 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary">
+        <Button block={block} type="primary" className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>

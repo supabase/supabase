@@ -2,7 +2,6 @@ import { AlertCircle, HelpCircle } from 'lucide-react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { DOCS_URL } from 'lib/constants'
@@ -24,6 +23,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { MemberRow } from './MemberRow'
 
 export interface MembersViewProps {
