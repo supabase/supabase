@@ -85,14 +85,14 @@ interface FilterCondition {
 
 ### Component Props
 
-| Prop                 | Type                           | Description                              |
-| -------------------- | ------------------------------ | ---------------------------------------- |
-| filterProperties     | FilterProperty[]               | Array of properties that can be filtered |
-| filters              | FilterGroup                    | Current filter state                     |
-| onFilterChange       | (filters: FilterGroup) => void | Callback when filters change             |
-| freeformText         | string                         | Current free-form search text            |
-| onFreeformTextChange | (text: string) => void         | Callback when free-form text changes     |
-| actions              | FilterBarAction[]?             | Optional custom actions to show in the menu |
+| Prop                 | Type                           | Description                                     |
+| -------------------- | ------------------------------ | ----------------------------------------------- |
+| filterProperties     | FilterProperty[]               | Array of properties that can be filtered        |
+| filters              | FilterGroup                    | Current filter state                            |
+| onFilterChange       | (filters: FilterGroup) => void | Callback when filters change                    |
+| freeformText         | string                         | Current free-form search text                   |
+| onFreeformTextChange | (text: string) => void         | Callback when free-form text changes            |
+| actions              | FilterBarAction[]?             | Optional custom actions to show in the menu     |
 | isLoading            | boolean?                       | If true, dims the bar while work is in progress |
 
 ## Custom actions (e.g. AI)
