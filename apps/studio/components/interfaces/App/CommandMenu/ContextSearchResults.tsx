@@ -51,6 +51,15 @@ const EdgeFunctionSearchResults = dynamic(
   }
 )
 
+// Lazy load storage search results component
+const StorageSearchResults = dynamic(
+  () => import('./StorageSearchResults').then((mod) => ({ default: mod.StorageSearchResults })),
+  {
+    loading: () => <SkeletonResults />,
+    ssr: false,
+  }
+)
+
 interface ContextSearchResultsProps {
   context: SearchContextValue
   query: string
@@ -88,6 +97,7 @@ const CONTEXT_CONFIG: Record<
   storage: {
     icon: Storage,
     label: 'Storage',
+    requiresInput: false,
   },
 }
 
@@ -101,11 +111,7 @@ const MOCK_RESULTS: Record<SearchContextValue, SearchResult[]> = {
   'database-tables': [],
   'auth-policies': [],
   'edge-functions': [],
-  storage: [
-    { id: '1', name: 'avatars', description: 'Public bucket • 234 files' },
-    { id: '2', name: 'documents', description: 'Private bucket • 567 files' },
-    { id: '3', name: 'uploads', description: 'Public bucket • 890 files' },
-  ],
+  storage: [],
 }
 
 export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
@@ -118,7 +124,8 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
       context === 'users' ||
       context === 'database-tables' ||
       context === 'auth-policies' ||
-      context === 'edge-functions'
+      context === 'edge-functions' ||
+      context === 'storage'
     )
       return []
     const mockData = MOCK_RESULTS[context] || []
@@ -149,6 +156,11 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
   // Delegate to EdgeFunctionSearchResults for edge-functions context
   if (context === 'edge-functions') {
     return <EdgeFunctionSearchResults query={query} />
+  }
+
+  // Delegate to StorageSearchResults for storage context
+  if (context === 'storage') {
+    return <StorageSearchResults query={query} />
   }
 
   // Show empty state immediately if no query and context requires input
