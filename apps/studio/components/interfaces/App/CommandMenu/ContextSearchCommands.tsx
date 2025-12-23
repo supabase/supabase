@@ -15,6 +15,7 @@ import {
   useQuery,
 } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
 import { useFlag } from 'common'
@@ -94,6 +95,7 @@ function ContextSearchPage({
 
 export function useContextSearchCommands() {
   const enableSearchEntitiesCommandMenu = useFlag('enableSearchEntitiesCommandMenu')
+  const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
   // Register pages for each context
@@ -156,6 +158,6 @@ export function useContextSearchCommands() {
   useRegisterCommands(COMMAND_MENU_SECTIONS.QUERY, contextCommands, {
     orderSection: orderCommandSectionsByPriority,
     sectionMeta: { priority: 3 },
-    enabled: enableSearchEntitiesCommandMenu,
+    enabled: enableSearchEntitiesCommandMenu && !!project,
   })
 }
