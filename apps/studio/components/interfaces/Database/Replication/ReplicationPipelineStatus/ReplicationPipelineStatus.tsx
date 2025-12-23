@@ -35,8 +35,30 @@ import {
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import { BatchResetButtons } from '../BatchResetButtons'
 import { ErroredTableDetails } from '../ErroredTableDetails'
+import { TableActionsMenu } from '../TableActionsMenu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  CodeBlock,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+} from 'ui'
 import {
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
@@ -58,6 +80,17 @@ export const ReplicationPipelineStatus = () => {
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
+  const [showErrorDialog, setShowErrorDialog] = useState(false)
+  const [selectedTableError, setSelectedTableError] = useState<{
+    tableName: string
+    reason: string
+    solution?: string
+  } | null>(null)
+  const [showRestartDialog, setShowRestartDialog] = useState(false)
+  const [selectedTableForRestart, setSelectedTableForRestart] = useState<{
+    tableId: number
+    tableName: string
+  } | null>(null)
 
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
@@ -366,7 +399,7 @@ export const ReplicationPipelineStatus = () => {
                 <p className="text-sm text-foreground-light">
                   {tableStatuses.length} table{tableStatuses.length !== 1 ? 's' : ''} in pipeline
                   {hasErroredTables && (
-                    <span className="text-warning-600">
+                    <span className="text-destructive-600 font-medium">
                       {' '}
                       · {erroredTables.length} failed
                     </span>
@@ -388,12 +421,13 @@ export const ReplicationPipelineStatus = () => {
                   <Table.th key="table">Table</Table.th>,
                   <Table.th key="status">Status</Table.th>,
                   <Table.th key="details">Details</Table.th>,
+                  <Table.th key="actions"></Table.th>,
                 ]}
                 body={
                   <>
                     {filteredTableStatuses.length === 0 && hasTableData && (
                       <Table.tr>
-                        <Table.td colSpan={3}>
+                        <Table.td colSpan={4}>
                           <div className="space-y-1">
                             <p className="text-sm text-foreground">No results found</p>
                             <p className="text-sm text-foreground-light">
@@ -441,7 +475,7 @@ export const ReplicationPipelineStatus = () => {
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="flex flex-col gap-y-2">
+                              <div className="flex flex-col gap-y-3">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
@@ -452,6 +486,36 @@ export const ReplicationPipelineStatus = () => {
                                     tableId={table.table_id}
                                   />
                                 )}
+                              </div>
+                            )}
+                          </Table.td>
+                          <Table.td className="align-top">
+                            {!showDisabledState && (
+                              <div className="flex items-center justify-end">
+                                <TableActionsMenu
+                                  tableId={table.table_id}
+                                  tableName={table.table_name}
+                                  tableState={table.state}
+                                  onRestartClick={() => {
+                                    setSelectedTableForRestart({
+                                      tableId: table.table_id,
+                                      tableName: table.table_name,
+                                    })
+                                    setShowRestartDialog(true)
+                                  }}
+                                  onShowErrorClick={
+                                    table.state.name === 'error'
+                                      ? () => {
+                                          setSelectedTableError({
+                                            tableName: table.table_name,
+                                            reason: table.state.reason,
+                                            solution: table.state.solution,
+                                          })
+                                          setShowErrorDialog(true)
+                                        }
+                                      : undefined
+                                  }
+                                />
                               </div>
                             )}
                           </Table.td>
@@ -500,6 +564,168 @@ export const ReplicationPipelineStatus = () => {
             : 'Update version'
         }
       />
+
+      {/* Restart Table Confirmation Dialog */}
+      {selectedTableForRestart && (
+        <RestartTableDialog
+          open={showRestartDialog}
+          onOpenChange={setShowRestartDialog}
+          projectRef={projectRef}
+          pipelineId={pipelineId}
+          tableId={selectedTableForRestart.tableId}
+          tableName={selectedTableForRestart.tableName}
+        />
+      )}
+
+      {/* Error Details Dialog */}
+      {selectedTableError && (
+        <ErrorDetailsDialog
+          open={showErrorDialog}
+          onOpenChange={setShowErrorDialog}
+          tableName={selectedTableError.tableName}
+          reason={selectedTableError.reason}
+          solution={selectedTableError.solution}
+        />
+      )}
     </>
+  )
+}
+
+// Restart Table Dialog Component
+interface RestartTableDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  projectRef?: string
+  pipelineId: number
+  tableId: number
+  tableName: string
+}
+
+const RestartTableDialog = ({
+  open,
+  onOpenChange,
+  projectRef,
+  pipelineId,
+  tableId,
+  tableName,
+}: RestartTableDialogProps) => {
+  const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
+    onSuccess: () => {
+      toast.success(
+        `Replication restarted for "${tableName}" and pipeline is being restarted automatically`
+      )
+      onOpenChange(false)
+    },
+    onError: (error) => {
+      toast.error(`Failed to restart replication: ${error.message}`)
+      onOpenChange(false)
+    },
+  })
+
+  const handleReset = () => {
+    if (!projectRef) return toast.error('Project ref is required')
+
+    rollbackTables({
+      projectRef,
+      pipelineId,
+      target: { type: 'single_table', table_id: tableId },
+      rollbackType: 'full',
+    })
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Restart replication for {tableName}</AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            <div className="space-y-3 text-sm">
+              <p>
+                This will restart replication for{' '}
+                <code className="text-code-inline">{tableName}</code> from scratch:
+              </p>
+              <ul className="list-disc list-inside space-y-1.5 pl-2">
+                <li>
+                  <strong>The table copy will be re-initialized.</strong> All data will be copied
+                  again from the source.
+                </li>
+                <li>
+                  <strong>Existing downstream data will be deleted.</strong> Any replicated data for
+                  this table will be removed.
+                </li>
+                <li>
+                  <strong>All other tables remain untouched.</strong> Only this table is affected.
+                </li>
+                <li>
+                  <strong>The pipeline will restart automatically.</strong> This is required to apply
+                  this change.
+                </li>
+              </ul>
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
+            {isResetting ? 'Restarting replication...' : 'Restart replication'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+// Error Details Dialog Component
+interface ErrorDetailsDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  tableName: string
+  reason: string
+  solution?: string
+}
+
+const ErrorDetailsDialog = ({
+  open,
+  onOpenChange,
+  tableName,
+  reason,
+  solution,
+}: ErrorDetailsDialogProps) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent size="xlarge" aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Replication error on "{tableName}"</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="!p-0">
+          <div className="px-4 py-3">
+            <p className="text-sm text-foreground-light">
+              The following error occurred during replication:
+            </p>
+          </div>
+          <CodeBlock
+            hideLineNumbers
+            wrapLines={false}
+            wrapperClassName={cn(
+              '[&_pre]:px-4 [&_pre]:py-3 [&>pre]:border-x-0 [&>pre]:rounded-none'
+            )}
+            language="bash"
+            value={reason}
+            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:!text-foreground"
+          />
+          {solution && (
+            <div className="px-4 py-3">
+              <p className="text-sm">{solution}</p>
+            </div>
+          )}
+        </DialogSection>
+        <DialogFooter>
+          <DialogClose>
+            <Button type="default">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

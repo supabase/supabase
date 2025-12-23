@@ -36,12 +36,12 @@ export const BatchResetButtons = ({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
-        `${count} table${count > 1 ? 's' : ''} reset successfully and pipeline is being restarted automatically`
+        `Replication restarted for ${count} table${count > 1 ? 's' : ''} and pipeline is being restarted automatically`
       )
       setResetMode(null)
     },
     onError: (error) => {
-      toast.error(`Failed to reset tables: ${error.message}`)
+      toast.error(`Failed to restart replication: ${error.message}`)
       setResetMode(null)
     },
   })
@@ -63,28 +63,60 @@ export const BatchResetButtons = ({
   const getDialogContent = () => {
     if (resetMode === 'all') {
       return {
-        title: 'Reset all tables and restart',
+        title: 'Restart all tables',
         description: (
-          <>
-            This will reset replication for <strong>all {totalTables} tables</strong> in this
-            pipeline. All tables will be copied again from scratch, and any existing downstream data
-            will be deleted. The pipeline will restart automatically to apply this reset.
-          </>
+          <div className="space-y-3 text-sm">
+            <p>
+              This will restart replication for <strong>all {totalTables} tables</strong> in this
+              pipeline from scratch:
+            </p>
+            <ul className="list-disc list-inside space-y-1.5 pl-2">
+              <li>
+                <strong>All table copies will be re-initialized.</strong> Every table will be copied
+                again from the source.
+              </li>
+              <li>
+                <strong>All downstream data will be deleted.</strong> All replicated data will be
+                removed.
+              </li>
+              <li>
+                <strong>The pipeline will restart automatically.</strong> This is required to apply
+                this change.
+              </li>
+            </ul>
+          </div>
         ),
-        action: 'Reset all tables and restart',
+        action: 'Restart all tables',
       }
     } else {
       return {
-        title: 'Reset all failed tables and restart',
+        title: 'Restart failed tables',
         description: (
-          <>
-            This will reset replication for <strong>all {erroredTablesCount} failed tables</strong>{' '}
-            in this pipeline. These tables will be copied again from scratch, and any existing
-            downstream data for them will be deleted. Other tables are not affected, but the
-            pipeline will restart automatically to apply this reset.
-          </>
+          <div className="space-y-3 text-sm">
+            <p>
+              This will restart replication for{' '}
+              <strong>all {erroredTablesCount} failed tables</strong> from scratch:
+            </p>
+            <ul className="list-disc list-inside space-y-1.5 pl-2">
+              <li>
+                <strong>Failed table copies will be re-initialized.</strong> These tables will be
+                copied again from the source.
+              </li>
+              <li>
+                <strong>Existing downstream data will be deleted.</strong> Replicated data for these
+                tables will be removed.
+              </li>
+              <li>
+                <strong>All other tables remain untouched.</strong> Only failed tables are affected.
+              </li>
+              <li>
+                <strong>The pipeline will restart automatically.</strong> This is required to apply
+                this change.
+              </li>
+            </ul>
+          </div>
         ),
-        action: 'Reset failed tables and restart',
+        action: 'Restart failed tables',
       }
     }
   }
@@ -103,20 +135,20 @@ export const BatchResetButtons = ({
           icon={<RotateCcw />}
           onClick={() => setResetMode('all')}
         >
-          Reset all tables
+          Restart all tables
         </Button>
 
         {hasErroredTables && (
           <Button
             size="tiny"
-            type="warning"
+            type="danger"
             loading={isResetting && resetMode === 'errored'}
             disabled={isResetting}
             className="w-min"
             icon={<AlertTriangle />}
             onClick={() => setResetMode('errored')}
           >
-            Reset all failed tables
+            Restart failed tables
           </Button>
         )}
       </div>
@@ -135,9 +167,7 @@ export const BatchResetButtons = ({
                 onClick={() => handleReset(resetMode)}
                 variant="danger"
               >
-                {isResetting
-                  ? 'Resetting tables and restarting pipeline...'
-                  : dialogContent.action}
+                {isResetting ? 'Restarting replication...' : dialogContent.action}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

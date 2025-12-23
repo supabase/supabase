@@ -19,7 +19,7 @@ import {
 interface ResetTableButtonProps {
   tableId: number
   tableName: string
-  variant?: 'default' | 'warning'
+  variant?: 'default' | 'warning' | 'danger'
 }
 
 export const ResetTableButton = ({
@@ -33,12 +33,12 @@ export const ResetTableButton = ({
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
-        `Table "${tableName}" reset successfully and pipeline is being restarted automatically`
+        `Replication restarted for "${tableName}" and pipeline is being restarted automatically`
       )
       setIsOpen(false)
     },
     onError: (error) => {
-      toast.error(`Failed to reset table: ${error.message}`)
+      toast.error(`Failed to restart replication: ${error.message}`)
       setIsOpen(false)
     },
   })
@@ -66,25 +66,44 @@ export const ResetTableButton = ({
         disabled={isResetting}
         className="w-min"
         icon={<RotateCcw />}
-        aria-label={`Reset and restart table ${tableName}`}
+        aria-label={`Restart replication for ${tableName}`}
         onClick={() => setIsOpen(true)}
       >
-        Reset table and restart
+        Restart replication
       </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset table and restart</AlertDialogTitle>
-          <AlertDialogDescription>
-            This will reset replication for <code className="text-code-inline">{tableName}</code>{' '}
-            only. The table will be copied again from scratch, and any existing downstream data for
-            it will be deleted. Other tables in the pipeline are not affected, but the pipeline will
-            restart automatically to apply this reset.
+          <AlertDialogTitle>Restart replication for {tableName}</AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            <div className="space-y-3 text-sm">
+              <p>
+                This will restart replication for{' '}
+                <code className="text-code-inline">{tableName}</code> from scratch:
+              </p>
+              <ul className="list-disc list-inside space-y-1.5 pl-2">
+                <li>
+                  <strong>The table copy will be re-initialized.</strong> All data will be copied
+                  again from the source.
+                </li>
+                <li>
+                  <strong>Existing downstream data will be deleted.</strong> Any replicated data for
+                  this table will be removed.
+                </li>
+                <li>
+                  <strong>All other tables remain untouched.</strong> Only this table is affected.
+                </li>
+                <li>
+                  <strong>The pipeline will restart automatically.</strong> This is required to apply
+                  this change.
+                </li>
+              </ul>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
-            {isResetting ? 'Resetting table and restarting pipeline...' : 'Reset and restart'}
+            {isResetting ? 'Restarting replication...' : 'Restart replication'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
