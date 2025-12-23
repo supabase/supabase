@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-12-23T09:54:57.853Z
+Last updated: 2025-12-23T10:16:25.134Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -37,6 +37,8 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/nuxtjs/password-based-auth)
     - Password-based authentication block for Nuxt.js
+- [Realtime Cursor](https://supabase.com/ui/docs/nuxtjs/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/nuxtjs/social-auth)
     - Social authentication block for Nuxt.js
 - [Platform Kit](https://supabase.com/ui/docs/platform/platform-kit)
@@ -95,5 +97,7 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/vue/password-based-auth)
     - Password-based authentication block for Vue Single Page Applications
+- [Realtime Cursor](https://supabase.com/ui/docs/vue/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/vue/social-auth)
     - Social authentication block for Vue Single Page Applications
