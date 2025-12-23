@@ -40,6 +40,7 @@ export const BackingUpState = ({
               {initiatedAtLocal}
             </TooltipContent>
           </Tooltip>
+          .
         </p>
       )}
     </PageSection>

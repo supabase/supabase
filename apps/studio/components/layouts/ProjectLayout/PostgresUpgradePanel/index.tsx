@@ -211,7 +211,7 @@ const UpgradePanelHeaderDescription = ({
   switch (upgradeState.status) {
     case 'waiting':
       return (
-        <p>
+        <p className="text-foreground-light">
           Postgres version{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong> is now
           available for your project{' '}
@@ -221,23 +221,23 @@ const UpgradePanelHeaderDescription = ({
       )
     case 'upgrading':
       return (
-        <p>
+        <p className="text-foreground-light">
           Your project <strong className="text-foreground font-medium">{projectName}</strong> is
           being upgraded to Postgres{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong>. This may
-          take a few minutes to several hours depending on your database size.
+          take a few minutes to several hours depending on the size of your database.
         </p>
       )
     case 'backingUp':
       return (
         <>
-          <p>
+          <p className="text-foreground-light">
             Your project <strong className="text-foreground font-medium">{projectName}</strong> has
             been upgraded to Postgres{' '}
             <strong className="text-foreground font-medium">{displayTargetVersion}</strong>, and is
             back online.
           </p>
-          <p>
+          <p className="text-foreground-light">
             A full backup is now being performed to ensure that there is a proper base backup
             available post-upgrade. This can take from a few minutes up to several hours depending
             on the size of your database.
@@ -246,7 +246,7 @@ const UpgradePanelHeaderDescription = ({
       )
     case 'completed':
       return (
-        <p>
+        <p className="text-foreground-light">
           Your project <strong className="text-foreground font-medium">{projectName}</strong> has
           been upgraded to Postgres{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong>, and is
@@ -255,7 +255,7 @@ const UpgradePanelHeaderDescription = ({
       )
     case 'failed':
       return (
-        <p>
+        <p className="text-foreground-light">
           Something went wrong while upgrading{' '}
           <strong className="text-foreground font-medium">{projectName}</strong>. Your project is
           <strong className="text-foreground font-medium">back online</strong> and your{' '}

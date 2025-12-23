@@ -40,6 +40,7 @@ export const UpgradingState = ({
                 {initiatedAtLocal}
               </TooltipContent>
             </Tooltip>
+            .
           </p>
         )}
       </div>

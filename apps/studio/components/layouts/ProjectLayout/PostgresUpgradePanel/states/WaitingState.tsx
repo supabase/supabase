@@ -4,6 +4,7 @@ import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutatio
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -38,6 +39,7 @@ export const WaitingState = ({
 }: WaitingStateProps) => {
   const router = useRouter()
   const { setProjectStatus } = useSetProjectStatus()
+  const [upgradeError, setUpgradeError] = useState<string | null>(null)
 
   const durationEstimateHours = eligibilityData?.duration_estimate_hours || 1
   // TODO: Remove this mock for production - only for browser testing
@@ -54,11 +56,12 @@ export const WaitingState = ({
       router.push(`/project/${variables.ref}?upgrade=true&trackingId=${res.tracking_id}`)
     },
     onError: (error) => {
-      toast.error(`Failed to start upgrade: ${error.message}`)
+      setUpgradeError(error.message)
     },
   })
 
   const onConfirmUpgrade = () => {
+    setUpgradeError(null)
     if (!projectRef) return toast.error('Project ref not found')
 
     const versionDetails = extractPostgresVersionDetails(selectedVersionValue)
@@ -70,6 +73,11 @@ export const WaitingState = ({
       target_version: versionDetails.postgresEngine,
       release_channel: versionDetails.releaseChannel,
     })
+  }
+
+  const handleVersionChange = (value: string) => {
+    setUpgradeError(null)
+    onVersionChange(value)
   }
 
   const content = UPGRADE_STATE_CONTENT.waiting
@@ -196,49 +204,60 @@ export const WaitingState = ({
           </div>
         </div>
 
-        {/* Version selector and buttons */}
-        <div className="flex flex-row gap-4 justify-between">
-          {hasMultipleVersions && (
-            <Select_Shadcn_ value={selectedVersionValue} onValueChange={onVersionChange}>
-              <SelectTrigger_Shadcn_ size="tiny" className="w-auto">
-                <div className="flex gap-1 items-center">
-                  <span className="text-foreground-lighter">Postgres version</span>
-                  <SelectValue_Shadcn_ placeholder="Select a version">
-                    {selectedDisplayVersion}
-                  </SelectValue_Shadcn_>
-                </div>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  {targetVersions.map((version) => {
-                    const postgresVersion = version.app_version.split('supabase-postgres-')[1]
-                    return (
-                      <SelectItem_Shadcn_
-                        key={formatValue(version)}
-                        value={formatValue(version)}
-                        className="w-full [&>:nth-child(2)]:w-full"
-                      >
-                        <div className="flex flex-row items-center justify-between w-full gap-3">
-                          <span className="text-foreground">{postgresVersion}</span>
-                          {version.release_channel !== 'ga' && (
-                            <Badge variant="warning">{version.release_channel}</Badge>
-                          )}
-                        </div>
-                      </SelectItem_Shadcn_>
-                    )
-                  })}
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          )}
+        {/* Error handling for failed upgrade */}
+        {upgradeError && (
+          <Admonition
+            type="destructive"
+            title="Failed to start upgrade"
+            description={upgradeError}
+          />
+        )}
 
-          <div className="flex items-center justify-end space-x-2 ml-auto">
-            <Button type="default" onClick={onCancel} disabled={isUpgrading}>
-              Cancel
-            </Button>
-            <Button onClick={onConfirmUpgrade} disabled={isUpgrading} loading={isUpgrading}>
-              Confirm upgrade
-            </Button>
+        {/* Version selector and buttons */}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-row gap-4 justify-between">
+            {hasMultipleVersions && (
+              <Select_Shadcn_ value={selectedVersionValue} onValueChange={handleVersionChange}>
+                <SelectTrigger_Shadcn_ size="tiny" className="w-auto">
+                  <div className="flex gap-1 items-center">
+                    <span className="text-foreground-lighter">Postgres version</span>
+                    <SelectValue_Shadcn_ placeholder="Select a version">
+                      {selectedDisplayVersion}
+                    </SelectValue_Shadcn_>
+                  </div>
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    {targetVersions.map((version) => {
+                      const postgresVersion = version.app_version.split('supabase-postgres-')[1]
+                      return (
+                        <SelectItem_Shadcn_
+                          key={formatValue(version)}
+                          value={formatValue(version)}
+                          className="w-full [&>:nth-child(2)]:w-full"
+                        >
+                          <div className="flex flex-row items-center justify-between w-full gap-3">
+                            <span className="text-foreground">{postgresVersion}</span>
+                            {version.release_channel !== 'ga' && (
+                              <Badge variant="warning">{version.release_channel}</Badge>
+                            )}
+                          </div>
+                        </SelectItem_Shadcn_>
+                      )
+                    })}
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            )}
+
+            <div className="flex items-center justify-end space-x-2 ml-auto">
+              <Button type="default" onClick={onCancel} disabled={isUpgrading}>
+                Cancel
+              </Button>
+              <Button onClick={onConfirmUpgrade} disabled={isUpgrading} loading={isUpgrading}>
+                Confirm upgrade
+              </Button>
+            </div>
           </div>
         </div>
       </PageSection>
