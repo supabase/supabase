@@ -23,7 +23,10 @@
     "prettier:write": "prettier --cache --write .",
     "build:deno-types": "tsx scripts/deno-types.ts",
     "build:graphql-types": "tsx scripts/download-graphql-schema.mts && pnpm graphql-codegen --config scripts/codegen.ts",
-    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
+    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch",
+    "evals:setup": "cp node_modules/libpg-query/wasm/libpg-query.wasm evals/libpg-query.wasm",
+    "evals:run": "braintrust eval --no-send-logs evals/assistant.eval.ts",
+    "evals:upload": "braintrust eval evals/assistant.eval.ts"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^3.0.0",
@@ -183,6 +186,8 @@
     "@vitest/coverage-v8": "^3.2.0",
     "@vitest/ui": "^3.2.0",
     "api-types": "workspace:*",
+    "autoevals": "^0.0.131",
+    "braintrust": "^1.0.2",
     "common": "workspace:*",
     "config": "workspace:*",
     "date-fns": "^2.30.0",
@@ -191,6 +196,7 @@
     "graphql-ws": "5.14.1",
     "import-in-the-middle": "^2.0.0",
     "jsdom-testing-mocks": "^1.13.1",
+    "libpg-query": "17.6.0",
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
     "node-mocks-http": "^1.17.2",
