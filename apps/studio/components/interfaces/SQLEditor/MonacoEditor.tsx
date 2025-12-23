@@ -198,8 +198,6 @@ const MonacoEditor = ({
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
         router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-        // needed to invalidate all data in the snippets list so that the new snippet is shown in the list.
-        snapV2.addNeedsSaving(snippet.id)
       }
       setValue(value)
     }
