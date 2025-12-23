@@ -15,10 +15,10 @@ import {
 import DefaultLayout from '~/components/Layouts/Default'
 import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
 import Image from 'next/image'
-import { Separator } from 'ui'
+import { Separator, cn } from 'ui'
 import ApplyToSupaSquadForm from '~/components/Forms/ApplyToSupaSquadForm'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import FeaturesSection from '~/components/Solutions/FeaturesSection'
+import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
 
 const githubUsers = [
   'aantti',
@@ -160,6 +160,7 @@ export default function AboutPage() {
             heading={<span className="text-foreground">Want to get involved?</span>}
             subheading="There are many ways to get involved in the Supabase community. Whether you want to write code, polish documentation, or help others build with Supabase, there's a place for you."
             features={waysToContribute}
+            columns={2}
           />
 
           <FeaturesSection
@@ -200,5 +201,51 @@ export default function AboutPage() {
         </div>
       </main>
     </DefaultLayout>
+  )
+}
+
+const FeaturesSection = ({
+  id,
+  label,
+  heading,
+  subheading,
+  features,
+  columns = 3,
+}: FeaturesSectionType & { columns?: 2 | 3 | 4 }) => {
+  return (
+    <SectionContainer id={id} className="flex flex-col gap-4 md:gap-8">
+      <div className="flex flex-col gap-2 max-w-xl">
+        <span className="label">{label}</span>
+        <h2 className="h2 text-foreground-lighter">{heading}</h2>
+        {subheading && <p className="text-foreground-lighter mb-8">{subheading}</p>}
+      </div>
+      <ul
+        className={cn(
+          'grid grid-cols-1 gap-4 gap-y-10 md:gap-12 xl:gap-20',
+          columns === 2 && 'md:grid-cols-2',
+          columns === 3 && 'md:grid-cols-3',
+          columns === 4 && 'md:grid-cols-2 xl:grid-cols-4'
+        )}
+      >
+        {features?.map((feature: Feature, index: number) => (
+          <FeatureItem feature={feature} key={index} />
+        ))}
+      </ul>
+    </SectionContainer>
+  )
+}
+
+const FeatureItem = ({ feature }: { feature: Feature }) => {
+  const Icon = feature.icon
+
+  return (
+    <li className="flex flex-col gap-2 text-sm text-foreground-lighter">
+      {Icon && <Icon className="mb-2 text-current w-7 h-7" strokeWidth={1.5} />}
+      <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
+        <span className="h-full bg-foreground-lighter w-7" />
+      </div>
+      <h4 className="text-foreground text-lg lg:text-xl mt-1">{feature.heading}</h4>
+      <p className="text-foreground-lighter text-sm">{feature.subheading}</p>
+    </li>
   )
 }
