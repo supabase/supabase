@@ -547,12 +547,7 @@ export const PostgresUpgradePanel = () => {
                         <Button type="default" onClick={handleCancel} disabled={isUpgrading}>
                           Cancel
                         </Button>
-                        <Button
-                          type="warning"
-                          htmlType="submit"
-                          disabled={isUpgrading}
-                          loading={isUpgrading}
-                        >
+                        <Button htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
                           Confirm upgrade
                         </Button>
                       </div>
