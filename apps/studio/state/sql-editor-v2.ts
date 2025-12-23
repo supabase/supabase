@@ -282,6 +282,11 @@ export const sqlEditorState = proxy({
   resetExplainResult: (id: string) => {
     sqlEditorState.explainResults[id] = { rows: [] }
   },
+
+  resetResults: (id: string) => {
+    sqlEditorState.resetResult(id)
+    sqlEditorState.resetExplainResult(id)
+  },
 })
 
 // ========================================================================
