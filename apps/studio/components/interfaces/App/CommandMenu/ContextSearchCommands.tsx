@@ -152,8 +152,8 @@ export function useContextSearchCommands() {
     [setPage]
   )
 
-  useRegisterCommands('Search your data', contextCommands, {
+  useRegisterCommands(COMMAND_MENU_SECTIONS.QUERY, contextCommands, {
     orderSection: orderCommandSectionsByPriority,
-    sectionMeta: { priority: 2 },
+    sectionMeta: { priority: 3 },
   })
 }
