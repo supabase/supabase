@@ -35,6 +35,7 @@ import {
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { BatchResetButtons } from '../BatchResetButtons'
 import { ErroredTableDetails } from '../ErroredTableDetails'
 import {
   PIPELINE_ACTIONABLE_STATES,
@@ -121,6 +122,13 @@ export const ReplicationPipelineStatus = () => {
           table.table_name.toLowerCase().includes(searchString.toLowerCase())
         )
   const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
+  const erroredTables = tableStatuses.filter(
+    (table) =>
+      table.state.name === 'error' &&
+      'retry_policy' in table.state &&
+      table.state.retry_policy?.policy === 'manual_retry'
+  )
+  const hasErroredTables = erroredTables.length > 0
 
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
@@ -353,6 +361,26 @@ export const ReplicationPipelineStatus = () => {
 
         {hasTableData && (
           <div className="flex flex-col gap-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-x-2">
+                <p className="text-sm text-foreground-light">
+                  {tableStatuses.length} table{tableStatuses.length !== 1 ? 's' : ''} in pipeline
+                  {hasErroredTables && (
+                    <span className="text-warning-600">
+                      {' '}
+                      · {erroredTables.length} failed
+                    </span>
+                  )}
+                </p>
+              </div>
+              {!showDisabledState && (
+                <BatchResetButtons
+                  hasErroredTables={hasErroredTables}
+                  totalTables={tableStatuses.length}
+                  erroredTablesCount={erroredTables.length}
+                />
+              )}
+            </div>
             <div className="w-full overflow-hidden overflow-x-auto">
               {/* [Joshen] Should update to use new Table components next time */}
               <Table

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTableReset } from 'data/replication/use-table-reset'
+import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,16 +19,28 @@ import {
 interface ResetTableButtonProps {
   tableId: number
   tableName: string
+  variant?: 'default' | 'warning'
 }
 
-export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) => {
+export const ResetTableButton = ({
+  tableId,
+  tableName,
+  variant = 'default',
+}: ResetTableButtonProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  const { resetTable, isRollingBack, isRestartingPipeline, isResetting } = useTableReset({
-    tableName,
-    onSuccess: () => setIsOpen(false),
-    onError: () => setIsOpen(false),
+  const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
+    onSuccess: () => {
+      toast.success(
+        `Table "${tableName}" reset successfully and pipeline is being restarted automatically`
+      )
+      setIsOpen(false)
+    },
+    onError: (error) => {
+      toast.error(`Failed to reset table: ${error.message}`)
+      setIsOpen(false)
+    },
   })
 
   const handleReset = () => {
@@ -37,10 +49,10 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
 
     const pipelineId = Number(_pipelineId)
 
-    resetTable({
+    rollbackTables({
       projectRef,
       pipelineId,
-      tableId,
+      target: { type: 'single_table', table_id: tableId },
       rollbackType: 'full',
     })
   }
@@ -49,7 +61,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <Button
         size="tiny"
-        type="default"
+        type={variant}
         loading={isResetting}
         disabled={isResetting}
         className="w-min"
@@ -66,17 +78,13 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
             This will reset replication for <code className="text-code-inline">{tableName}</code>{' '}
             only. The table will be copied again from scratch, and any existing downstream data for
             it will be deleted. Other tables in the pipeline are not affected, but the pipeline will
-            restart to apply this reset.
+            restart automatically to apply this reset.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
-            {isRollingBack
-              ? 'Resetting table...'
-              : isRestartingPipeline
-                ? 'Restarting pipeline...'
-                : 'Reset and restart'}
+            {isResetting ? 'Resetting table and restarting pipeline...' : 'Reset and restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
