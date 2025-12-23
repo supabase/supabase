@@ -94,7 +94,17 @@ export const PostgresUpgradePanel = () => {
   // Get the target version for display - use upgrade status if available, otherwise use selected version
   const displayTargetVersion = (() => {
     // If upgrading/completed/failed, use the target version from the upgrade status
-    if (target_version) return target_version
+    // Look up the full version string from eligibility data by matching postgres_version
+    if (target_version) {
+      const matchingVersion = targetVersions.find(
+        (v) => v.postgres_version === String(target_version)
+      )
+      if (matchingVersion) {
+        return getVersionDisplayString(matchingVersion)
+      }
+      // Fallback to string conversion if no match found (shouldn't happen in practice)
+      return String(target_version)
+    }
 
     // Otherwise, derive from the selected version in the form
     const selectedVersion = targetVersions.find((v) => formatValue(v) === selectedVersionValue)
@@ -201,9 +211,9 @@ const UpgradePanelHeaderDescription = ({
         <p>
           Postgres version{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong> is now
-          available for the project{' '}
+          available for your project{' '}
           <strong className="text-foreground font-medium">{projectName}</strong>. Supabase can
-          upgrade your project to this version on your behalf. Here's what's involved.
+          upgrade your project to this version on your behalf. Here’s what’s involved.
         </p>
       )
     case 'upgrading':
@@ -219,8 +229,9 @@ const UpgradePanelHeaderDescription = ({
       return (
         <p>
           Your project <strong className="text-foreground font-medium">{projectName}</strong> has
-          been successfully upgraded to Postgres{' '}
-          <strong className="text-foreground font-medium">{upgradeState.targetVersion}</strong>.
+          been upgraded to Postgres{' '}
+          <strong className="text-foreground font-medium">{displayTargetVersion}</strong>, and is
+          now back online.
         </p>
       )
     case 'failed':

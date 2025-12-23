@@ -58,16 +58,29 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
                       isCurrentStep
                         ? 'text-foreground'
                         : isCompletedStep
-                          ? 'text-foreground-muted line-through'
-                          : 'text-foreground-foreground'
+                          ? 'text-foreground-muted'
+                          : showProgress
+                            ? 'text-foreground-lighter'
+                            : 'text-foreground'
                     )}
                   >
-                    {step.title}
+                    {isCompletedStep && !isCurrentStep ? (
+                      <span className="relative inline-block leading-none after:content-[''] after:absolute after:left-0 after:right-0 after:top-[0.55em] after:h-[1.5px] after:bg-foreground-muted">
+                        {step.title}
+                      </span>
+                    ) : (
+                      step.title
+                    )}
                   </p>
                 </TableCell>
                 <TableCell className="justify-end">
                   {step.offline && (
-                    <p className="text-sm text-foreground-muted text-right whitespace-nowrap">
+                    <p
+                      className={cn(
+                        'text-sm text-foreground-muted text-right whitespace-nowrap',
+                        isCompletedStep ? 'text-foreground-muted' : 'text-foreground-lighter'
+                      )}
+                    >
                       Project will be offline
                     </p>
                   )}

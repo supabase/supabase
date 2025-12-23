@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { PageSection } from 'ui-patterns/PageSection'
 import { UpgradeStepsTable } from '../UpgradeStepsTable'
 import { UPGRADE_STATE_CONTENT, UpgradingStateProps } from '../types'
 
@@ -20,7 +21,7 @@ export const UpgradingState = ({
     .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   return (
-    <div className="grid w-[480px] gap-4">
+    <PageSection>
       <div className="space-y-2">
         {isPerformingBackup ? (
           <div>
@@ -46,21 +47,22 @@ export const UpgradingState = ({
         <UpgradeStepsTable progress={progress} showProgress={true} />
 
         {initiatedAt !== undefined && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="block w-full text-center">
-                <p className="text-sm text-center text-foreground-light">
-                  Upgrade began at {initiatedAtUTC} (UTC)
-                </p>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-center">
-              {initiatedAtLocal}
-            </TooltipContent>
-          </Tooltip>
+          <p className="text-sm text-center text-foreground-light">
+            Upgrade began at{' '}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="underline decoration-dotted underline-offset-2 decoration-foreground-muted cursor-help">
+                  {initiatedAtUTC}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-center">
+                {initiatedAtLocal}
+              </TooltipContent>
+            </Tooltip>{' '}
+            (UTC)
+          </p>
         )}
       </div>
-    </div>
+    </PageSection>
   )
 }
-
