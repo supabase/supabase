@@ -38,14 +38,14 @@ const PageSectionRoot = ({
   ...props
 }: PageSectionRootProps) => {
   return (
-    <div
+    <section
       data-slot="page-section"
       data-orientation={orientation}
       className={cn(pageSectionRootVariants({ orientation }), className)}
       {...props}
     >
       {children}
-    </div>
+    </section>
   )
 }
 
