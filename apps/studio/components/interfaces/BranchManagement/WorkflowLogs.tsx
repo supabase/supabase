@@ -122,7 +122,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                               {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
                             </span>
                           </div>
-                          <ArrowRight size={16} />
+                          {workflowRun.id !== projectRef && <ArrowRight size={16} />}
                         </button>
                       </li>
                     ))}
