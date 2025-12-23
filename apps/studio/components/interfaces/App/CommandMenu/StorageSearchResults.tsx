@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import { Storage } from 'icons'
 import { useParams } from 'common'
 import { useBucketsQuery, type Bucket } from 'data/storage/buckets-query'
@@ -162,6 +162,37 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     return [...fileBucketResults, ...analyticsBucketResults, ...vectorBucketResults].slice(0, 20)
   }, [fileBucketResults, analyticsBucketResults, vectorBucketResults])
 
+  const getRoute = useCallback(
+    (result: SearchResult) => {
+      if (!projectRef) return `/project/${projectRef}/storage/files` as `/${string}`
+
+      const extendedResult = result as ExtendedSearchResult
+
+      if (extendedResult.bucketType && extendedResult.bucket) {
+        const bucketType = extendedResult.bucketType
+
+        if (bucketType === 'file') {
+          const fileBucket = extendedResult.bucket as Bucket
+          return `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(fileBucket.name)}` as `/${string}`
+        }
+
+        if (bucketType === 'analytics') {
+          const analyticsBucket = extendedResult.bucket as AnalyticsBucket
+          return `/project/${projectRef}/storage/analytics/buckets/${encodeURIComponent(analyticsBucket.name)}` as `/${string}`
+        }
+
+        if (bucketType === 'vector') {
+          const vectorBucket = extendedResult.bucket as { vectorBucketName: string }
+          return `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(vectorBucket.vectorBucketName)}` as `/${string}`
+        }
+      }
+
+      // Fallback
+      return `/project/${projectRef}/storage/files` as `/${string}`
+    },
+    [projectRef]
+  )
+
   if (isLoading) {
     return <SkeletonResults />
   }
@@ -183,33 +214,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     <ResultsList
       results={allResults}
       icon={Storage}
-      getRoute={(result) => {
-        if (!projectRef) return `/project/${projectRef}/storage/files` as `/${string}`
-
-        const extendedResult = result as ExtendedSearchResult
-
-        if (extendedResult.bucketType && extendedResult.bucket) {
-          const bucketType = extendedResult.bucketType
-
-          if (bucketType === 'file') {
-            const fileBucket = extendedResult.bucket as Bucket
-            return `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(fileBucket.name)}` as `/${string}`
-          }
-
-          if (bucketType === 'analytics') {
-            const analyticsBucket = extendedResult.bucket as AnalyticsBucket
-            return `/project/${projectRef}/storage/analytics/buckets/${encodeURIComponent(analyticsBucket.name)}` as `/${string}`
-          }
-
-          if (bucketType === 'vector') {
-            const vectorBucket = extendedResult.bucket as { vectorBucketName: string }
-            return `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(vectorBucket.vectorBucketName)}` as `/${string}`
-          }
-        }
-
-        // Fallback
-        return `/project/${projectRef}/storage/files` as `/${string}`
-      }}
+      getRoute={getRoute}
     />
   )
 }
