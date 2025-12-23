@@ -1,3 +1,1 @@
-import path from 'path'
-
-export const SNIPPETS_DIR = path.join(process.cwd(), '../..', 'supabase', 'snippets')
+export const SNIPPETS_DIR = process.env.SNIPPETS_MANAGEMENT_FOLDER ?? ''
