@@ -160,11 +160,12 @@ export const SQLEditor = () => {
       if (id) {
         snapV2.addResult(id, data.result, vars.autoLimit)
 
-        // Check if results are from an EXPLAIN query
-        // If so, and the flag is on, store in explainResults and switch to explain tab
         if (showPrettyExplain && isExplainQuery(data.result)) {
           snapV2.addExplainResult(id, data.result)
           setActiveUtilityTab('explain')
+        } else if (activeUtilityTab === 'explain') {
+          // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
+          setActiveUtilityTab('results')
         }
       }
 
