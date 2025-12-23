@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 
 import { useBreakpoint } from 'common'
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,
@@ -13,6 +12,7 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
@@ -33,6 +33,10 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
+  PricingMetric.LOG_INGESTION,
+  PricingMetric.LOG_STORAGE,
+  PricingMetric.LOG_QUERYING,
+  PricingMetric.ACTIVE_COMPUTE_HOURS,
 ]
 
 export const TotalUsage = ({

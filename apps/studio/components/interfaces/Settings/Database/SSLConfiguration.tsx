@@ -8,9 +8,6 @@ import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
@@ -19,7 +16,24 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+  PageSectionContent,
+} from 'ui-patterns'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 const SSLConfiguration = () => {
   const { ref } = useParams()
@@ -88,111 +102,100 @@ const SSLConfiguration = () => {
   }
 
   return (
-    <div id="ssl-configuration">
-      <div className="flex items-center justify-between mb-6">
-        <FormHeader className="mb-0" title="SSL Configuration" description="" />
+    <PageSection id="ssl-configuration">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>SSL Configuration</PageSectionTitle>
+        </PageSectionSummary>
         <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
-      </div>
-      <FormPanel>
-        <FormSection
-          header={
-            <FormSectionLabel
-              className="lg:col-span-7"
-              description={
-                <div className="space-y-4">
-                  <p className="text-sm text-foreground-light">
-                    Reject non-SSL connections to your database
-                  </p>
-                  {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="SSL enforcement was not updated successfully"
-                    >
-                      Please try updating again, or contact{' '}
-                      <SupportLink className={InlineLinkClassName}>support</SupportLink> if this
-                      error persists
-                    </Alert>
-                  )}
-                </div>
-              }
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent className="space-y-4">
+            <FormLayout
+              layout="flex-row-reverse"
+              label="Enforce SSL on incoming connections"
+              description="Reject non-SSL connections to your database"
             >
-              Enforce SSL on incoming connections
-            </FormSectionLabel>
-          }
-        >
-          <FormSectionContent loading={false} className="lg:!col-span-5">
-            <div className="flex items-center justify-end mt-2.5 space-x-2">
-              {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-              )}
-              {isSuccess && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                    <div>
-                      <Switch
-                        size="large"
-                        checked={isEnforced}
-                        disabled={
-                          isLoading ||
-                          isSubmitting ||
-                          !canUpdateSSLEnforcement ||
-                          !hasAccessToSSLEnforcement
-                        }
-                        onCheckedChange={toggleSSLEnforcement}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <TooltipContent side="bottom" className="w-64 text-center">
-                      {!canUpdateSSLEnforcement
-                        ? 'You need additional permissions to update SSL enforcement for your project'
-                        : !hasAccessToSSLEnforcement
-                          ? 'Your project does not have access to SSL enforcement'
-                          : undefined}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              )}
-            </div>
-          </FormSectionContent>
-        </FormSection>
-
-        <div className="grid grid-cols-1 items-center lg:grid-cols-2 p-8">
-          <div className="space-y-2">
-            <p className="block text-sm">SSL Certificate</p>
-            <div style={{ maxWidth: '420px' }}>
-              <p className="text-sm opacity-50">
-                Use this certificate when connecting to your database to prevent snooping and
-                man-in-the-middle attacks.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end justify-end">
-            {!hasSSLCertificate ? (
-              <ButtonTooltip
-                disabled
-                type="default"
-                icon={<Download />}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed',
-                  },
-                }}
+              <div className="flex items-center justify-end mt-2.5 space-x-2">
+                {(isLoading || isSubmitting) && (
+                  <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                )}
+                {isSuccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                      <div>
+                        <Switch
+                          size="large"
+                          checked={isEnforced}
+                          disabled={
+                            isLoading ||
+                            isSubmitting ||
+                            !canUpdateSSLEnforcement ||
+                            !hasAccessToSSLEnforcement
+                          }
+                          onCheckedChange={toggleSSLEnforcement}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
+                      <TooltipContent side="bottom" className="w-64 text-center">
+                        {!canUpdateSSLEnforcement
+                          ? 'You need additional permissions to update SSL enforcement for your project'
+                          : !hasAccessToSSLEnforcement
+                            ? 'Your project does not have access to SSL enforcement'
+                            : undefined}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
+              </div>
+            </FormLayout>
+            {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
+              <Alert
+                withIcon
+                variant="warning"
+                title="SSL enforcement was not updated successfully"
               >
-                Download certificate
-              </ButtonTooltip>
-            ) : (
-              <Button type="default" icon={<Download />}>
-                <a href={sslCertificateUrl}>Download certificate</a>
-              </Button>
+                Please try updating again, or contact{' '}
+                <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
+                persists
+              </Alert>
             )}
-          </div>
-        </div>
-      </FormPanel>
-    </div>
+          </CardContent>
+          <CardContent>
+            <FormLayout
+              layout="flex-row-reverse"
+              label="SSL Certificate"
+              description="Use this certificate when connecting to your database to prevent snooping and man-in-the-middle attacks."
+            >
+              <div className="flex items-end justify-end">
+                {!hasSSLCertificate ? (
+                  <ButtonTooltip
+                    disabled
+                    type="default"
+                    icon={<Download />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed',
+                      },
+                    }}
+                  >
+                    Download certificate
+                  </ButtonTooltip>
+                ) : (
+                  <Button type="default" icon={<Download />}>
+                    <a href={sslCertificateUrl}>Download certificate</a>
+                  </Button>
+                )}
+              </div>
+            </FormLayout>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 

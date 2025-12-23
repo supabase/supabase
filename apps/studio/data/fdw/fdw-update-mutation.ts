@@ -22,6 +22,7 @@ export type FDWUpdateVariables = {
     [k: string]: string
   }
   tables: any[]
+  skipInvalidation?: boolean
 }
 
 export const getUpdateFDWSql = ({
@@ -77,14 +78,16 @@ export const useFDWUpdateMutation = ({
   return useMutation<FDWUpdateData, ResponseError, FDWUpdateVariables>({
     mutationFn: (vars) => updateFDW(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { projectRef, skipInvalidation = false } = variables
 
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: fdwKeys.list(projectRef), refetchType: 'all' }),
-        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: foreignTableKeys.list(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
-      ])
+      if (!skipInvalidation) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: fdwKeys.list(projectRef), refetchType: 'all' }),
+          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: foreignTableKeys.list(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
+        ])
+      }
 
       await onSuccess?.(data, variables, context)
     },

@@ -9,7 +9,7 @@ import {
   convertKVStringArrayToJson,
   formatWrapperTables,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
+import { getDecryptedParameters } from 'components/interfaces/Storage/Storage.utils'
 import { DotPing } from 'components/ui/DotPing'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
@@ -194,6 +194,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
           ref: project?.ref,
           connectionString: project?.connectionString ?? undefined,
           wrapper: wrapperInstance,
+          wrapperMeta,
         })
         const formValues: Record<string, string> = {
           wrapper_name: wrapperInstance.name,

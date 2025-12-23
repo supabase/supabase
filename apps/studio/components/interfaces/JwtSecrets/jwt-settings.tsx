@@ -52,7 +52,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { number, object } from 'yup'
-import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -92,7 +91,7 @@ const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: legacyKey } = useLegacyJWTSigningKeyQuery(
     {
       projectRef,

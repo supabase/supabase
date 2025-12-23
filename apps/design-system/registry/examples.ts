@@ -44,6 +44,24 @@ export const examples: Registry = [
     files: ['example/alert-dialog-demo.tsx'],
   },
   {
+    name: 'alert-dialog-close-only',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-close-only.tsx'],
+  },
+  {
+    name: 'alert-dialog-destructive',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-destructive.tsx'],
+  },
+  {
+    name: 'alert-dialog-warning',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-warning.tsx'],
+  },
+  {
     name: 'aspect-ratio-demo',
     type: 'components:example',
     registryDependencies: ['aspect-ratio'],
@@ -732,6 +750,12 @@ export const examples: Registry = [
     files: ['example/sheet-demo.tsx'],
   },
   {
+    name: 'sheet-nonmodal',
+    type: 'components:example',
+    registryDependencies: ['sheet'],
+    files: ['example/sheet-nonmodal.tsx'],
+  },
+  {
     name: 'sheet-side',
     type: 'components:example',
     registryDependencies: ['sheet'],
@@ -792,10 +816,46 @@ export const examples: Registry = [
     files: ['example/switch-form.tsx'],
   },
   {
+    name: 'table-cross-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-cross-link.tsx'],
+  },
+  {
     name: 'table-demo',
     type: 'components:example',
     registryDependencies: ['table'],
     files: ['example/table-demo.tsx'],
+  },
+  {
+    name: 'table-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-actions.tsx'],
+  },
+  {
+    name: 'table-icons',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-icons.tsx'],
+  },
+  {
+    name: 'table-row-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link.tsx'],
+  },
+  {
+    name: 'table-row-link-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link-actions.tsx'],
+  },
+  {
+    name: 'table-sort',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-sort.tsx'],
   },
   {
     name: 'tabs-demo',
@@ -1002,21 +1062,6 @@ export const examples: Registry = [
     name: 'text-confirm-dialog-demo',
     type: 'components:example',
     files: ['example/text-confirm-dialog-demo.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-info-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-info-alert.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-warning-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-warning-alert.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-destructive-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-destructive-alert.tsx'],
   },
   {
     name: 'text-confirm-dialog-with-size',
@@ -1324,24 +1369,9 @@ export const examples: Registry = [
     files: ['example/tree-view-multi-select.tsx'],
   },
   {
-    name: 'modal-demo',
+    name: 'confirmation-modal-demo',
     type: 'components:example',
-    files: ['example/modal-demo.tsx'],
-  },
-  {
-    name: 'modal-aligned-footer',
-    type: 'components:example',
-    files: ['example/modal-aligned-footer.tsx'],
-  },
-  {
-    name: 'modal-custom-footer',
-    type: 'components:example',
-    files: ['example/modal-custom-footer.tsx'],
-  },
-  {
-    name: 'modal-hide-footer',
-    type: 'components:example',
-    files: ['example/modal-hide-footer.tsx'],
+    files: ['example/confirmation-modal-demo.tsx'],
   },
   {
     name: 'assistant-chat-demo',
@@ -1439,9 +1469,20 @@ export const examples: Registry = [
     files: ['example/empty-state-initial-state-informational.tsx'],
   },
   {
-    name: 'empty-state-zero-items-data-grid',
+    name: 'data-grid-demo',
     type: 'components:example',
-    files: ['example/empty-state-zero-items-data-grid.tsx'],
+    files: ['example/data-grid-demo.tsx'],
+  },
+  {
+    name: 'data-grid-empty-state',
+    type: 'components:example',
+    files: ['example/data-grid-empty-state.tsx'],
+  },
+  {
+    name: 'data-table-demo',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/data-table-demo.tsx'],
   },
   {
     name: 'metric-card',

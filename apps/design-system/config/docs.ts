@@ -9,31 +9,28 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
-      sortOrder: 'manual',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Typography',
-          href: '/docs/typography',
-          items: [],
-        },
-        {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {
@@ -42,8 +39,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Accessibility',
-          href: '/docs/accessibility',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
+          items: [],
+        },
+        {
+          title: 'Theming',
+          href: '/docs/theming',
+          items: [],
+        },
+        {
+          title: 'Typography',
+          href: '/docs/typography',
           items: [],
         },
       ],
@@ -59,13 +66,8 @@ export const docsConfig: DocsConfig = {
           priority: true,
         },
         {
-          title: 'Navigation',
-          href: '/docs/ui-patterns/navigation',
-          items: [],
-        },
-        {
-          title: 'Layout',
-          href: '/docs/ui-patterns/layout',
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
           items: [],
         },
         {
@@ -76,6 +78,26 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Forms',
           href: '/docs/ui-patterns/forms',
+          items: [],
+        },
+        {
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          href: '/docs/ui-patterns/modality',
+          title: 'Modality',
+          items: [],
+        },
+        {
+          href: '/docs/ui-patterns/navigation',
+          title: 'Navigation',
+          items: [],
+        },
+        {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
           items: [],
         },
       ],
@@ -101,7 +123,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'EmptyStatePresentational',
+          title: 'Empty State Presentational',
           href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
@@ -175,6 +197,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/toc',
           items: [],
         },
+        {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
       ],
     },
     {
@@ -244,11 +271,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Chart',
-          href: '/docs/components/chart',
-          items: [],
-        },
-        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
@@ -276,11 +298,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Context Menu',
           href: '/docs/components/context-menu',
-          items: [],
-        },
-        {
-          title: 'Data Table',
-          href: '/docs/components/data-table',
           items: [],
         },
         {
@@ -346,7 +363,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'NavMenu',
+          title: 'Nav Menu',
           href: '/docs/components/nav-menu',
           items: [],
         },
