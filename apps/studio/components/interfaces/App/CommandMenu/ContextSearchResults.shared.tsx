@@ -1,7 +1,11 @@
 'use client'
 
-import { cn } from 'ui'
+import { CommandList_Shadcn_, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
+import { CommandItem } from 'ui-patterns/CommandMenu/internal/Command'
+import { CommandGroup } from 'ui-patterns/CommandMenu/internal/CommandGroup'
+import { TextHighlighter } from 'ui-patterns/CommandMenu'
+import type { IRouteCommand, IActionCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 export interface SearchResult {
   id: string
@@ -42,35 +46,56 @@ export function EmptyState({ icon: Icon, label, query }: EmptyStateProps) {
   )
 }
 
-interface ResultItemProps {
-  result: SearchResult
+interface ResultsListProps {
+  results: SearchResult[]
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  onClick?: () => void
+  onResultClick?: (result: SearchResult) => void
+  getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
 }
 
-export function ResultItem({ result, icon: Icon, onClick }: ResultItemProps) {
+/**
+ * Renders a list of results using CommandMenu components for keyboard accessibility
+ */
+export function ResultsList({ results, icon: Icon, onResultClick, getRoute }: ResultsListProps) {
+  const commands = results.map((result): IRouteCommand | IActionCommand => {
+    const baseCommand = {
+      id: result.id,
+      name: result.name,
+      value: result.description ? `${result.name} ${result.description}` : result.name,
+      icon: () => <Icon className="h-4 w-4" strokeWidth={1.5} />,
+    }
+
+    if (getRoute) {
+      return {
+        ...baseCommand,
+        route: getRoute(result),
+      } as IRouteCommand
+    }
+
+    return {
+      ...baseCommand,
+      action: () => onResultClick?.(result),
+    } as IActionCommand
+  })
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'flex items-center gap-3 w-full px-2 py-2 text-left rounded-md transition-colors',
-        'hover:bg-surface-200 focus:bg-surface-200 focus:outline-none',
-        'group cursor-pointer'
-      )}
+    <CommandList_Shadcn_
+      className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden bg-transparent')}
     >
-      <Icon
-        className="h-4 w-4 text-foreground-muted group-hover:text-foreground-light transition-colors shrink-0"
-        strokeWidth={1.5}
-      />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-foreground-light group-hover:text-foreground truncate">
-          {result.name}
-        </p>
-        {result.description && (
-          <p className="text-xs text-foreground-muted truncate">{result.description}</p>
-        )}
-      </div>
-    </button>
+      <CommandGroup>
+        {commands.map((command) => (
+          <CommandItem key={command.id} command={command}>
+            <div className="flex flex-col min-w-0">
+              <TextHighlighter>{command.name}</TextHighlighter>
+              {command.value && command.value !== command.name && (
+                <p className="text-xs text-foreground-muted truncate mt-0.5">
+                  {command.value.replace(command.name, '').trim()}
+                </p>
+              )}
+            </div>
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    </CommandList_Shadcn_>
   )
 }

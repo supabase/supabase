@@ -8,7 +8,7 @@ import type { SearchContextValue } from './ContextSearchCommands'
 import {
   SkeletonResults,
   EmptyState,
-  ResultItem,
+  ResultsList,
   type SearchResult,
 } from './ContextSearchResults.shared'
 
@@ -92,13 +92,9 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
   const config = CONTEXT_CONFIG[context]
   const requiresInput = config?.requiresInput ?? false
 
-  // Delegate to UserSearchResults for users context
-  if (context === 'users') {
-    return <UserSearchResults query={query} />
-  }
-
-  // Mock data for other contexts
+  // Mock data for other contexts - always compute, even if we return early
   const mockResults = useMemo(() => {
+    if (context === 'users') return []
     const mockData = MOCK_RESULTS[context] || []
     return query.trim()
       ? mockData.filter(
@@ -109,6 +105,11 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
       : mockData
   }, [context, query])
 
+  // Delegate to UserSearchResults for users context
+  if (context === 'users') {
+    return <UserSearchResults query={query} />
+  }
+
   // Show empty state immediately if no query and context requires input
   if (!query.trim() && requiresInput) {
     return <EmptyState icon={config.icon} label={config.label} query="" />
@@ -118,11 +119,5 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
     return <EmptyState icon={config.icon} label={config.label} query={query} />
   }
 
-  return (
-    <div className="p-2 space-y-0.5 overflow-y-auto max-h-[300px]">
-      {mockResults.map((result) => (
-        <ResultItem key={result.id} result={result} icon={config.icon} />
-      ))}
-    </div>
-  )
+  return <ResultsList results={mockResults} icon={config.icon} />
 }
