@@ -108,6 +108,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                       <li key={workflowRun.id} className="py-3">
                         <button
                           type="button"
+                          disabled={workflowRun.id === projectRef}
                           onClick={() => setSelectedWorkflowRun(workflowRun)}
                           className="flex items-center gap-2 w-full justify-between"
                         >
