@@ -20,7 +20,7 @@ import dayjs from 'dayjs'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { AlertCircle, Check, CheckCircle, Circle, Loader2, Settings } from 'lucide-react'
+import { AlertCircle, Check, CheckCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
@@ -30,6 +30,7 @@ import { toast } from 'sonner'
 import {
   Badge,
   Button,
+  Card,
   CodeBlock,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -40,14 +41,21 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
-import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
+import { DATABASE_UPGRADE_STEPS } from './UpgradingState.constants'
 
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
   return `${postgres_version}|${release_channel}`
@@ -67,8 +75,6 @@ export const PostgresUpgradePanel = () => {
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   const [loading, setLoading] = useState(false)
-
-  const isExpanded = true
 
   // Determine if upgrade is in progress based on project status
   const isUpgradeInProgress = project?.status === PROJECT_STATUS.UPGRADING
@@ -197,61 +203,70 @@ export const PostgresUpgradePanel = () => {
 
   // Render the upgrade steps list
   const renderUpgradeSteps = (showProgress: boolean) => (
-    <div
-      className="!mt-4 !mb-2 py-3 px-4 transition-all overflow-hidden border rounded relative"
-      style={{ maxHeight: isExpanded ? '500px' : '110px' }}
-    >
-      <div
-        className="space-y-2 transition-all"
-        style={{
-          translate:
-            isExpanded || !showProgress
-              ? '0px 0px'
-              : `0px ${
-                  (progressStage - 2 <= 0 ? 0 : progressStage > 6 ? 5 : progressStage - 2) * -28
-                }px`,
-        }}
-      >
-        {DATABASE_UPGRADE_MESSAGES.map((message, idx: number) => {
-          const isCurrent = showProgress && message.key === progress
-          const isStepCompleted = showProgress && progressStage > idx
-          return (
-            <div key={message.key} className="flex items-center space-x-4">
-              {isCurrent ? (
-                <div className="flex items-center justify-center w-5 h-5 rounded-full">
-                  <Loader2
-                    size={20}
-                    className="animate-spin text-foreground-light"
-                    strokeWidth={2}
-                  />
-                </div>
-              ) : isStepCompleted ? (
-                <div className="flex items-center justify-center w-5 h-5 rounded-full bg-brand-500 dark:bg-brand">
-                  <Check size={12} className="text-contrast" strokeWidth={3} />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
-              )}
-              <p
-                className={`text-sm ${
-                  isCurrent
-                    ? 'text-foreground'
-                    : isStepCompleted
-                      ? 'text-foreground-light'
-                      : 'text-foreground-lighter'
-                } hover:text-foreground transition`}
+    <Card>
+      {/* <div className="transition-all overflow-hidden border rounded relative"> */}
+      <Table>
+        <TableHeader className="sr-only">
+          <TableRow>
+            <TableHead>Step</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead className="justify-end">Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {DATABASE_UPGRADE_STEPS.map((step, idx: number) => {
+            const isCurrentStep = showProgress && step.key === progress
+            const isCompletedStep = showProgress && progressStage > idx
+            return (
+              <TableRow
+                key={step.key}
+                className={cn(
+                  isCurrentStep
+                    ? 'bg-surface-75'
+                    : isCompletedStep
+                      ? 'bg-surface-200/50'
+                      : 'bg-inherit'
+                )}
               >
-                {isCurrent
-                  ? message.progress
-                  : isStepCompleted
-                    ? message.completed
-                    : message.initial}
-              </p>
-            </div>
-          )
-        })}
-      </div>
-    </div>
+                <TableCell className="border-r border-border w-10">
+                  {isCurrentStep ? (
+                    <div className="flex items-center justify-center w-5 h-5 rounded-full">
+                      <Loader2 size={20} className="animate-spin text-brand-link" strokeWidth={2} />
+                    </div>
+                  ) : isCompletedStep ? (
+                    <div className="flex items-center justify-center w-5 h-5 rounded-full bg-brand-500 dark:bg-brand">
+                      <Check size={12} className="text-contrast" strokeWidth={3} />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
+                  )}
+                </TableCell>
+                <TableCell>
+                  <p
+                    className={`text-sm ${
+                      isCurrentStep
+                        ? 'text-foreground'
+                        : isCompletedStep
+                          ? 'text-foreground-muted line-through'
+                          : 'text-foreground-foreground'
+                    }`}
+                  >
+                    {step.title}
+                  </p>
+                </TableCell>
+                <TableCell className="justify-end">
+                  {step.offline && (
+                    <p className="text-sm text-foreground-muted text-right">
+                      Project will be offline
+                    </p>
+                  )}
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </Card>
   )
 
   return (
@@ -324,16 +339,6 @@ export const PostgresUpgradePanel = () => {
               </div>
             ) : isUpgradeInProgress ? (
               <div className="grid w-[480px] gap-4">
-                <div className="relative mx-auto max-w-[300px]">
-                  <div className="absolute flex items-center justify-center w-full h-full">
-                    <Settings
-                      className="animate-[spin_4s_linear_infinite]"
-                      size={20}
-                      strokeWidth={2}
-                    />
-                  </div>
-                  <Circle className="text-foreground-lighter" size={50} strokeWidth={1} />
-                </div>
                 <div className="space-y-2">
                   {isPerformingFullPhysicalBackup ? (
                     <div>
@@ -356,6 +361,7 @@ export const PostgresUpgradePanel = () => {
                     </div>
                   )}
 
+                  <h3 className="text-lg">Steps we’re taking</h3>
                   {renderUpgradeSteps(true)}
 
                   {initiated_at !== undefined && (
@@ -363,7 +369,7 @@ export const PostgresUpgradePanel = () => {
                       <TooltipTrigger asChild>
                         <div className="block w-full text-center">
                           <p className="text-sm text-center text-foreground-light">
-                            Started on: {initiatedAtUTC} (UTC)
+                            Upgrade began at {initiatedAtUTC} (UTC)
                           </p>
                         </div>
                       </TooltipTrigger>
@@ -391,6 +397,7 @@ export const PostgresUpgradePanel = () => {
                         title={`Your project will be offline for up to ${durationEstimateHours} hour${durationEstimateHours === 1 ? '' : 's'}`}
                         description="Choose a time when the impact to your project will be minimal. This upgrade is permanent and cannot be reversed."
                       />
+                      {/* isDiskSizeUpdated */}
                       {true && (
                         <Admonition
                           type="note"
