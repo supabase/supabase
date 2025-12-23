@@ -19,6 +19,8 @@ interface RestartTableDialogProps {
   pipelineId: number
   tableId: number
   tableName: string
+  onRestartStart?: () => void
+  onRestartComplete?: () => void
 }
 
 export const RestartTableDialog = ({
@@ -28,16 +30,20 @@ export const RestartTableDialog = ({
   pipelineId,
   tableId,
   tableName,
+  onRestartStart,
+  onRestartComplete,
 }: RestartTableDialogProps) => {
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
         `Replication restarted for "${tableName}" and pipeline is being restarted automatically`
       )
+      onRestartComplete?.()
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
+      onRestartComplete?.()
       onOpenChange(false)
     },
   })
@@ -45,6 +51,7 @@ export const RestartTableDialog = ({
   const handleReset = () => {
     if (!projectRef) return toast.error('Project ref is required')
 
+    onRestartStart?.()
     rollbackTables({
       projectRef,
       pipelineId,

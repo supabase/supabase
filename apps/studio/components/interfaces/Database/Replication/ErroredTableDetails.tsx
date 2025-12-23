@@ -39,13 +39,9 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
             >
               support
             </InlineLink>
-            . Alternatively, you may also recreate the pipeline.
+            . Alternatively, you may also recreate the pipeline. Use the table actions menu on the
+            right to view the full error details.
           </p>
-          <ErrorDetailsButton
-            tableName={tableName}
-            reason={state.reason}
-            solution={state.solution}
-          />
         </div>
       ) : retryPolicy === 'manual_retry' ? (
         <div className="flex flex-col gap-y-3">

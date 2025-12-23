@@ -76,6 +76,7 @@ export const ReplicationPipelineStatus = () => {
   } | null>(null)
   const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
   const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
+  const [restartingTableIds, setRestartingTableIds] = useState<Set<number>>(new Set())
 
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
@@ -131,7 +132,9 @@ export const ReplicationPipelineStatus = () => {
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  const tableStatuses = replicationStatusData?.table_statuses || []
+  const tableStatuses = (replicationStatusData?.table_statuses || []).sort((a, b) =>
+    a.table_name.localeCompare(b.table_name)
+  )
   const applyLagMetrics = replicationStatusData?.apply_lag
   const filteredTableStatuses =
     searchString.length === 0
@@ -147,6 +150,7 @@ export const ReplicationPipelineStatus = () => {
       table.state.retry_policy?.policy === 'manual_retry'
   )
   const hasErroredTables = erroredTables.length > 0
+  const isAnyRestartInProgress = restartingTableIds.size > 0
 
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
@@ -398,6 +402,8 @@ export const ReplicationPipelineStatus = () => {
                       size="tiny"
                       type="danger"
                       icon={<AlertTriangle />}
+                      disabled={isAnyRestartInProgress}
+                      loading={isAnyRestartInProgress}
                       onClick={() => {
                         setBatchRestartMode('errored')
                         setShowBatchRestartDialog(true)
@@ -410,7 +416,8 @@ export const ReplicationPipelineStatus = () => {
                     size="tiny"
                     type="default"
                     icon={<RotateCcw />}
-                    disabled={tableStatuses.length === 0}
+                    disabled={tableStatuses.length === 0 || isAnyRestartInProgress}
+                    loading={isAnyRestartInProgress}
                     onClick={() => {
                       setBatchRestartMode('all')
                       setShowBatchRestartDialog(true)
@@ -445,12 +452,23 @@ export const ReplicationPipelineStatus = () => {
                       </Table.tr>
                     )}
                     {filteredTableStatuses.map((table, index) => {
+                      const isRestarting = restartingTableIds.has(table.table_id)
                       const statusConfig = getStatusConfig(table.state as TableState['state'])
+                      const isErrorState = table.state.name === 'error'
+                      const errorReason =
+                        isErrorState && 'reason' in table.state ? table.state.reason : undefined
+                      const errorSolution =
+                        isErrorState && 'solution' in table.state ? table.state.solution : undefined
                       return (
-                        <Table.tr key={`${table.table_name}-${index}`} className="border-t">
+                        <Table.tr
+                          key={`${table.table_name}-${index}`}
+                          className={cn('border-t', isRestarting && 'bg-surface-200/50')}
+                        >
                           <Table.td className="align-top">
                             <div className="flex items-center gap-x-2">
-                              <p>{table.table_name}</p>
+                              <p className={cn(isRestarting && 'text-foreground-light')}>
+                                {table.table_name}
+                              </p>
 
                               <ButtonTooltip
                                 asChild
@@ -470,14 +488,24 @@ export const ReplicationPipelineStatus = () => {
                             </div>
                           </Table.td>
                           <Table.td className="align-top">
-                            {showDisabledState ? (
+                            {isRestarting ? (
+                              <Badge variant="default" className="gap-1.5">
+                                <Activity size={12} className="animate-pulse" />
+                                Restarting
+                              </Badge>
+                            ) : showDisabledState ? (
                               <Badge variant="default">Not Available</Badge>
                             ) : (
                               statusConfig.badge
                             )}
                           </Table.td>
                           <Table.td className="align-top">
-                            {showDisabledState ? (
+                            {isRestarting ? (
+                              <p className="text-sm text-foreground-lighter">
+                                Replication is being restarted for this table. The pipeline will
+                                restart automatically.
+                              </p>
+                            ) : showDisabledState ? (
                               <p className="text-sm text-foreground-lighter">
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
@@ -503,6 +531,7 @@ export const ReplicationPipelineStatus = () => {
                                   tableId={table.table_id}
                                   tableName={table.table_name}
                                   tableState={table.state}
+                                  disabled={isRestarting}
                                   onRestartClick={() => {
                                     setSelectedTableForRestart({
                                       tableId: table.table_id,
@@ -511,12 +540,12 @@ export const ReplicationPipelineStatus = () => {
                                     setShowRestartDialog(true)
                                   }}
                                   onShowErrorClick={
-                                    table.state.name === 'error'
+                                    isErrorState && errorReason
                                       ? () => {
                                           setSelectedTableError({
                                             tableName: table.table_name,
-                                            reason: table.state.reason,
-                                            solution: table.state.solution,
+                                            reason: errorReason,
+                                            solution: errorSolution,
                                           })
                                           setShowErrorDialog(true)
                                         }
@@ -581,6 +610,16 @@ export const ReplicationPipelineStatus = () => {
           pipelineId={pipelineId}
           tableId={selectedTableForRestart.tableId}
           tableName={selectedTableForRestart.tableName}
+          onRestartStart={() => {
+            setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.tableId))
+          }}
+          onRestartComplete={() => {
+            setRestartingTableIds((prev) => {
+              const next = new Set(prev)
+              next.delete(selectedTableForRestart.tableId)
+              return next
+            })
+          }}
         />
       )}
 
@@ -605,6 +644,17 @@ export const ReplicationPipelineStatus = () => {
           mode={batchRestartMode}
           totalTables={tableStatuses.length}
           erroredTablesCount={erroredTables.length}
+          tables={tableStatuses}
+          onRestartStart={(tableIds) => {
+            setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))
+          }}
+          onRestartComplete={(tableIds) => {
+            setRestartingTableIds((prev) => {
+              const next = new Set(prev)
+              tableIds.forEach((id) => next.delete(id))
+              return next
+            })
+          }}
         />
       )}
     </>

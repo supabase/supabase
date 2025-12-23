@@ -20,6 +20,16 @@ interface BatchRestartDialogProps {
   mode: 'all' | 'errored'
   totalTables: number
   erroredTablesCount: number
+  tables: Array<{
+    table_id: number
+    state: {
+      name: string
+      retry_policy?: { policy: string }
+      [key: string]: any
+    }
+  }>
+  onRestartStart?: (tableIds: number[]) => void
+  onRestartComplete?: (tableIds: number[]) => void
 }
 
 export const BatchRestartDialog = ({
@@ -30,23 +40,47 @@ export const BatchRestartDialog = ({
   mode,
   totalTables,
   erroredTablesCount,
+  tables,
+  onRestartStart,
+  onRestartComplete,
 }: BatchRestartDialogProps) => {
+  // Determine which table IDs will be restarted based on mode
+  const getAffectedTableIds = () => {
+    if (mode === 'all') {
+      return tables.map((t) => t.table_id)
+    } else {
+      return tables
+        .filter(
+          (t) =>
+            t.state.name === 'error' &&
+            'retry_policy' in t.state &&
+            t.state.retry_policy?.policy === 'manual_retry'
+        )
+        .map((t) => t.table_id)
+    }
+  }
+
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
         `Replication restarted for ${count} table${count > 1 ? 's' : ''} and pipeline is being restarted automatically`
       )
+      onRestartComplete?.(getAffectedTableIds())
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
+      onRestartComplete?.(getAffectedTableIds())
       onOpenChange(false)
     },
   })
 
   const handleReset = () => {
     if (!projectRef) return toast.error('Project ref is required')
+
+    const affectedTableIds = getAffectedTableIds()
+    onRestartStart?.(affectedTableIds)
 
     rollbackTables({
       projectRef,

@@ -1,7 +1,6 @@
 import { AlertCircle, MoreVertical, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
-import { TableState } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
 import {
   Button,
   DropdownMenu,
@@ -14,7 +13,10 @@ import {
 interface TableActionsMenuProps {
   tableId: number
   tableName: string
-  tableState: TableState['state']
+  tableState: {
+    name: string
+    [key: string]: any
+  }
   onRestartClick: () => void
   onShowErrorClick?: () => void
   disabled?: boolean
