@@ -109,6 +109,32 @@ export const PostgresUpgradePanel = () => {
     upgradeStatusData?.databaseUpgradeStatus ?? {}
   const progressStage = Number((progress || '').split('_')[0])
 
+  // Form for version selection
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      postgresVersionSelection: '',
+    },
+  })
+
+  // Watch the selected version from the form
+  const selectedVersionValue = form.watch('postgresVersionSelection')
+
+  // Get the target version for display - use upgrade status if available, otherwise use selected form value or first eligible version
+  const displayTargetVersion =
+    target_version ||
+    (selectedVersionValue
+      ? (() => {
+          const selectedVersion = eligibilityData?.target_upgrade_versions?.find(
+            (v) => formatValue(v) === selectedVersionValue
+          )
+          return selectedVersion?.app_version?.split('supabase-postgres-')[1] || ''
+        })()
+      : eligibilityData?.target_upgrade_versions?.[0]?.app_version?.split(
+          'supabase-postgres-'
+        )[1] || '')
+
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
 
@@ -121,15 +147,6 @@ export const PostgresUpgradePanel = () => {
     .utc(initiated_at ?? 0)
     .local()
     .format('DD MMM YYYY HH:mm:ss (ZZ)')
-
-  // Form for version selection
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    mode: 'onChange',
-    defaultValues: {
-      postgresVersionSelection: '',
-    },
-  })
 
   useEffect(() => {
     const defaultValue = eligibilityData?.target_upgrade_versions?.[0]
@@ -248,10 +265,10 @@ export const PostgresUpgradePanel = () => {
           <h1>New Postgres version available</h1>
           <p className="text-base text-foreground-light text-balance">
             Postgres version{' '}
-            <strong className="text-foreground font-medium">{target_version}</strong> is now
+            <strong className="text-foreground font-medium">{displayTargetVersion}</strong> is now
             available for the project{' '}
             <strong className="text-foreground font-medium">{project?.name}</strong>. Supabase can
-            upgrade your project to this version on your behalf. Here’s what’s involved.
+            upgrade your project to this version on your behalf. Here's what's involved.
           </p>
         </header>
         {/* Container for the upgrade steps */}
@@ -469,11 +486,28 @@ export const PostgresUpgradePanel = () => {
                         control={form.control}
                         name="postgresVersionSelection"
                         render={({ field }) => (
-                          <FormItemLayout label="Postgres version">
+                          <FormItemLayout>
                             <FormControl_Shadcn_>
                               <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger_Shadcn_>
-                                  <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
+                                <SelectTrigger_Shadcn_ size="tiny" className="w-full">
+                                  <div className="flex gap-1 items-center w-full">
+                                    <p className="text-foreground-lighter">Postgres version</p>
+                                    <SelectValue_Shadcn_ placeholder="Select a version">
+                                      {field.value
+                                        ? (() => {
+                                            const selectedVersion =
+                                              eligibilityData?.target_upgrade_versions?.find(
+                                                (v) => formatValue(v) === field.value
+                                              )
+                                            return selectedVersion
+                                              ? selectedVersion.app_version.split(
+                                                  'supabase-postgres-'
+                                                )[1]
+                                              : null
+                                          })()
+                                        : null}
+                                    </SelectValue_Shadcn_>
+                                  </div>
                                 </SelectTrigger_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectGroup_Shadcn_>
@@ -485,8 +519,9 @@ export const PostgresUpgradePanel = () => {
                                           <SelectItem_Shadcn_
                                             key={formatValue(value)}
                                             value={formatValue(value)}
+                                            className="w-full [&>:nth-child(2)]:w-full"
                                           >
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex flex-row items-center justify-between w-full gap-3">
                                               <span className="text-foreground">
                                                 {postgresVersion}
                                               </span>
@@ -508,7 +543,7 @@ export const PostgresUpgradePanel = () => {
                         )}
                       />
 
-                      <div className="flex items-center justify-end space-x-2 pt-4">
+                      <div className="flex items-center justify-end space-x-2">
                         <Button type="default" onClick={handleCancel} disabled={isUpgrading}>
                           Cancel
                         </Button>
