@@ -7,7 +7,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import {
+  isExplainQuery,
+  isExplainSql,
+} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
@@ -390,8 +393,8 @@ export const SQLEditor = () => {
         return toast.error('Unable to run query: Connection string is missing')
       }
 
-      // Wrap the query with EXPLAIN ANALYZE
-      const explainSql = `EXPLAIN ANALYZE ${sql}`
+      // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
+      const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
 
       executeExplain({
         projectRef: project.ref,

@@ -132,6 +132,10 @@ export function isExplainQuery(rows: readonly any[]): boolean {
   )
 }
 
+export function isExplainSql(sql: string): boolean {
+  return /^\s*explain\b/i.test(sql)
+}
+
 export function formatNodeDuration(ms: number | undefined): string {
   if (ms === undefined) return '-'
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
