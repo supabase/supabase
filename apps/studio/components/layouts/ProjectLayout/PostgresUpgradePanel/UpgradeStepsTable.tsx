@@ -75,13 +75,8 @@ export const UpgradeStepsTable = ({ progress, showProgress }: UpgradeStepsTableP
                 </TableCell>
                 <TableCell className="justify-end">
                   {step.offline && (
-                    <p
-                      className={cn(
-                        'text-sm text-foreground-muted text-right whitespace-nowrap',
-                        isCompletedStep ? 'text-foreground-muted' : 'text-foreground-lighter'
-                      )}
-                    >
-                      Project will be offline
+                    <p className="text-sm text-foreground-muted text-right whitespace-nowrap">
+                      Project offline
                     </p>
                   )}
                 </TableCell>
@@ -118,7 +113,11 @@ const StepIndicator = ({ isCurrentStep, isCompletedStep }: StepIndicatorProps) =
 
   return (
     <div className="flex items-center justify-center w-5 h-5 rounded-full">
-      <Circle size={20} className="text-background-surface-400" strokeWidth={2} />
+      <Circle
+        size={20}
+        className="text-foreground-muted/50 dark:text-foreground-muted/75"
+        strokeWidth={2}
+      />
     </div>
   )
 }
