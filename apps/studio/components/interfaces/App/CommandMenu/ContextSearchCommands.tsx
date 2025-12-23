@@ -17,6 +17,7 @@ import {
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
+import { useFlag } from 'common'
 
 export type SearchContextValue =
   | 'users'
@@ -92,6 +93,7 @@ function ContextSearchPage({
 }
 
 export function useContextSearchCommands() {
+  const enableSearchEntitiesCommandMenu = useFlag('enableSearchEntitiesCommandMenu')
   const setPage = useSetPage()
 
   // Register pages for each context
@@ -154,5 +156,6 @@ export function useContextSearchCommands() {
   useRegisterCommands(COMMAND_MENU_SECTIONS.QUERY, contextCommands, {
     orderSection: orderCommandSectionsByPriority,
     sectionMeta: { priority: 3 },
+    enabled: enableSearchEntitiesCommandMenu,
   })
 }

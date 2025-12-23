@@ -1,16 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useMemo } from 'react'
 import { Database, Users } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import type { SearchContextValue } from './ContextSearchCommands'
-import {
-  SkeletonResults,
-  EmptyState,
-  ResultsList,
-  type SearchResult,
-} from './ContextSearchResults.shared'
+import { SkeletonResults, EmptyState } from './ContextSearchResults.shared'
 
 // Lazy load user search results component
 const UserSearchResults = dynamic(
@@ -101,42 +95,8 @@ const CONTEXT_CONFIG: Record<
   },
 }
 
-// Mock data for different contexts
-const MOCK_RESULTS: Record<SearchContextValue, SearchResult[]> = {
-  users: [
-    { id: '1', name: 'john@example.com', description: 'User ID: abc-123' },
-    { id: '2', name: 'jane@example.com', description: 'User ID: def-456' },
-    { id: '3', name: 'admin@example.com', description: 'User ID: ghi-789' },
-  ],
-  'database-tables': [],
-  'auth-policies': [],
-  'edge-functions': [],
-  storage: [],
-}
-
 export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
   const config = CONTEXT_CONFIG[context]
-  const requiresInput = config?.requiresInput ?? false
-
-  // Mock data for other contexts - always compute, even if we return early
-  const mockResults = useMemo(() => {
-    if (
-      context === 'users' ||
-      context === 'database-tables' ||
-      context === 'auth-policies' ||
-      context === 'edge-functions' ||
-      context === 'storage'
-    )
-      return []
-    const mockData = MOCK_RESULTS[context] || []
-    return query.trim()
-      ? mockData.filter(
-          (item) =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.description?.toLowerCase().includes(query.toLowerCase())
-        )
-      : mockData
-  }, [context, query])
 
   // Delegate to UserSearchResults for users context
   if (context === 'users') {
@@ -163,14 +123,6 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
     return <StorageSearchResults query={query} />
   }
 
-  // Show empty state immediately if no query and context requires input
-  if (!query.trim() && requiresInput) {
-    return <EmptyState icon={config.icon} label={config.label} query="" />
-  }
-
-  if (mockResults.length === 0) {
-    return <EmptyState icon={config.icon} label={config.label} query={query} />
-  }
-
-  return <ResultsList results={mockResults} icon={config.icon} />
+  // Fallback: show empty state for any unhandled contexts
+  return <EmptyState icon={config.icon} label={config.label} query={query} />
 }
