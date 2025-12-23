@@ -72,8 +72,8 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
                   {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'}
                 </p>
                 <p className="text-destructive-800 mt-2">
-                  <strong>To fix this:</strong> Use the actions menu (⋮) to restart table replication
-                  from scratch. The pipeline will restart automatically.
+                  <strong>To fix this:</strong> Use the table actions menu on the right to restart
+                  table replication from scratch. The pipeline will restart automatically.
                 </p>
               </div>
             </div>

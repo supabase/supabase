@@ -8863,6 +8863,10 @@ export interface components {
             /** @enum {string} */
             type: 'all_errored_tables'
           }
+        | {
+            /** @enum {string} */
+            type: 'all_tables'
+          }
     }
     RollbackTablesResponse: {
       /**
