@@ -1,294 +1,50 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useFlag, useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import { z } from 'zod'
-
-import { useFlag, useParams } from 'common'
-import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import { extractPostgresVersionDetails } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import {
-  ProjectUpgradeTargetVersion,
-  useProjectUpgradeEligibilityQuery,
-} from 'data/config/project-upgrade-eligibility-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import {
-  Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Modal,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
-  return `${postgres_version}|${release_channel}`
-}
 
 export const ProjectUpgradeAlert = () => {
-  const router = useRouter()
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { setProjectStatus } = useSetProjectStatus()
-
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
 
-  const planId = org?.plan.id ?? 'free'
-
-  const { data: diskAttributes } = useDiskAttributesQuery({ projectRef: ref })
-  const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
-  const includedDiskGB = includedDiskGBMeta[diskAttributes?.attributes.type ?? 'gp3']
-  const isDiskSizeUpdated = diskAttributes?.attributes.size_gb !== includedDiskGB
-
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
-  const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  const durationEstimateHours = data?.duration_estimate_hours || 1
-  const legacyAuthCustomRoles = data?.legacy_auth_custom_roles || []
-
-  const { mutate: upgradeProject, isPending: isUpgrading } = useProjectUpgradeMutation({
-    onSuccess: (res, variables) => {
-      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.UPGRADING })
-      toast.success('Upgrading project')
-      router.push(`/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
-    },
-  })
-
-  const onConfirmUpgrade = async (values: z.infer<typeof FormSchema>) => {
-    if (!ref) return toast.error('Project ref not found')
-
-    const { postgresVersionSelection } = values
-
-    const versionDetails = extractPostgresVersionDetails(postgresVersionSelection)
-    if (!versionDetails) return toast.error('Invalid Postgres version')
-    if (!versionDetails.postgresEngine) return toast.error('Missing target version')
-
-    upgradeProject({
-      ref,
-      target_version: versionDetails.postgresEngine,
-      release_channel: versionDetails.releaseChannel,
-    })
-  }
-
-  const FormSchema = z.object({
-    postgresVersionSelection: z.string(),
-  })
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    mode: 'onChange',
-    defaultValues: {
-      postgresVersionSelection: '',
-    },
-  })
-
-  useEffect(() => {
-    const defaultValue = data?.target_upgrade_versions?.[0]
-      ? formatValue(data.target_upgrade_versions[0])
-      : ''
-    form.setValue('postgresVersionSelection', defaultValue)
-  }, [data, form])
-
   return (
-    <>
-      <Admonition
-        type="default"
-        layout="vertical"
-        title="Your project can be upgraded to the latest version of Postgres"
-        description={`Postgres version ${latestPgVersion} is now available for your project.`}
-        actions={
-          <div className="self-start mt-3 flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="tiny"
-                  type="default"
-                  onClick={() => setShowUpgradeModal(true)}
-                  disabled={projectUpgradeDisabled}
-                >
-                  Upgrade
-                </Button>
-              </TooltipTrigger>
-              {projectUpgradeDisabled && (
-                <TooltipContent side="bottom" align="center">
-                  Postgres upgrade is currently disabled
-                </TooltipContent>
-              )}
-            </Tooltip>
-            <Button size="tiny" type="text" asChild>
-              <Link href={`${DOCS_URL}/guides/platform/upgrading`} target="_blank" rel="noreferrer">
-                Learn more
-              </Link>
+    <Admonition
+      type="default"
+      title="New Postgres version available"
+      description={`Your project can be upgraded to PostgreSQL ${latestPgVersion}.`}
+      actions={
+        <>
+          {projectUpgradeDisabled ? (
+            <ButtonTooltip
+              size="tiny"
+              type="primary"
+              disabled
+              className="pointer-events-auto"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'Postgres upgrade is currently disabled',
+                },
+              }}
+            >
+              Review upgrade
+            </ButtonTooltip>
+          ) : (
+            <Button size="tiny" type="primary" asChild>
+              <Link href={`/project/${ref}?upgrade=true`}>Review upgrade</Link>
             </Button>
-          </div>
-        }
-      />
-
-      <Modal
-        hideFooter
-        size="small"
-        visible={showUpgradeModal}
-        onCancel={() => setShowUpgradeModal(false)}
-        header="Upgrade Postgres"
-      >
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
-            <Modal.Content>
-              <div className="space-y-4">
-                <p className="text-sm">
-                  Your project will be offline during the upgrade, which may take up to{' '}
-                  {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}. Choose a
-                  time when the impact will be minimal.
-                </p>
-                <p className="text-sm">This upgrade is permanent and cannot be reversed.</p>
-                {isDiskSizeUpdated && (
-                  <Markdown
-                    extLinks
-                    className="text-foreground"
-                    content={`Your current disk size of ${diskAttributes?.attributes.size_gb}GB will also be
-                    [right-sized](${DOCS_URL}/guides/platform/upgrading#disk-sizing) with the upgrade.`}
-                  />
-                )}
-                {/* @ts-ignore */}
-                {(data?.potential_breaking_changes ?? []).length > 0 && (
-                  <Admonition
-                    type="destructive"
-                    title="Breaking changes"
-                    description="Your project will be upgraded across major versions of Postgres. This may
-                        involve breaking changes."
-                    actions={
-                      <div className="self-start mt-3">
-                        <Button size="tiny" type="default" asChild>
-                          <Link
-                            href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Learn more
-                          </Link>
-                        </Button>
-                      </div>
-                    }
-                  />
-                )}
-                {legacyAuthCustomRoles.length > 0 && (
-                  <Admonition
-                    type="warning"
-                    title="Custom Postgres roles will not automatically work after upgrade"
-                    description={
-                      <>
-                        <p className="mb-1">
-                          New Postgres versions use{' '}
-                          <code className="text-code-inline">scram-sha-256</code> authentication by
-                          default and do not support <code className="text-code-inline">md5</code>,
-                          as it has been deprecated.
-                        </p>
-
-                        <p className="mb-1">
-                          Note the following following commands and run them after upgrading:
-                        </p>
-                        <div className="flex items-baseline gap-2">
-                          <code className="text-xs">
-                            {legacyAuthCustomRoles.map((role) => (
-                              <div key={role} className="pb-1">
-                                ALTER ROLE <span className="text-brand-link">{role}</span> WITH
-                                PASSWORD '<span className="text-brand-link">newpassword</span>';
-                              </div>
-                            ))}
-                          </code>
-                        </div>
-                      </>
-                    }
-                    actions={
-                      <div className="self-start mt-3">
-                        <Button size="tiny" type="default" asChild>
-                          <Link
-                            href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Learn more
-                          </Link>
-                        </Button>
-                      </div>
-                    }
-                  />
-                )}
-                <Modal.Separator />
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="postgresVersionSelection"
-                  render={({ field }) => (
-                    <FormItemLayout label="Postgres version">
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
-                              {(data?.target_upgrade_versions || [])?.map((value) => {
-                                const postgresVersion =
-                                  value.app_version.split('supabase-postgres-')[1]
-                                return (
-                                  <SelectItem_Shadcn_
-                                    key={formatValue(value)}
-                                    value={formatValue(value)}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-foreground">{postgresVersion}</span>
-                                      {value.release_channel !== 'ga' && (
-                                        <Badge variant="warning">{value.release_channel}</Badge>
-                                      )}
-                                    </div>
-                                  </SelectItem_Shadcn_>
-                                )
-                              })}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </div>
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center space-x-2 justify-end">
-              <Button
-                type="default"
-                onClick={() => setShowUpgradeModal(false)}
-                disabled={isUpgrading}
-              >
-                Cancel
-              </Button>
-              <Button type="warning" htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
-                Upgrade
-              </Button>
-            </Modal.Content>
-          </form>
-        </Form_Shadcn_>
-      </Modal>
-    </>
+          )}
+          <Button type="default" asChild>
+            <Link href={`${DOCS_URL}/guides/platform/upgrading#in-place-upgrades`}>Learn more</Link>
+          </Button>
+        </>
+      }
+    />
   )
 }

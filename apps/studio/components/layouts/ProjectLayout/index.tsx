@@ -30,6 +30,7 @@ import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { PostgresUpgradePanel } from './PostgresUpgradePanel'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -330,8 +331,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <ResizingState />
   }
 
-  if (isProjectUpgrading && !isBackupsPage) {
-    return <UpgradingState />
+  // Show upgrade panel when reviewing upgrade OR when upgrade is in progress
+  const showUpgradePanel = router.query.upgrade === 'true'
+  if ((showUpgradePanel || isProjectUpgrading) && !isBackupsPage) {
+    return <PostgresUpgradePanel />
   }
 
   if (isProjectPausing) {
