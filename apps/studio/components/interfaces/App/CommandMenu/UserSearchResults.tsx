@@ -6,6 +6,8 @@ import { useParams } from 'common'
 import { useUsersInfiniteQuery, type User } from 'data/auth/users-infinite-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getDisplayName } from 'components/interfaces/Auth/Users/Users.utils'
+import { UUIDV4_LEFT_PREFIX_REGEX } from 'components/interfaces/Auth/Users/Users.constants'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import {
   SkeletonResults,
   EmptyState,
@@ -22,6 +24,24 @@ export function UserSearchResults({ query }: UserSearchResultsProps) {
   const { data: project } = useSelectedProjectQuery()
 
   const hasQueryInput = query.trim().length > 0
+  const trimmedQuery = query.trim()
+
+  // Detect if query looks like a UUID and use optimized ID column search
+  const searchColumn: OptimizedSearchColumns | undefined = useMemo(() => {
+    if (!trimmedQuery) return undefined
+
+    // Check if it matches UUID prefix pattern (for partial UUIDs and full UUIDs)
+    // This regex handles both prefixes and full UUIDs - same as UsersV2.tsx
+    const isUUIDPattern = UUIDV4_LEFT_PREFIX_REGEX.test(trimmedQuery)
+
+    // If query matches UUID pattern (full or prefix), use optimized ID column search
+    // The backend will detect full UUIDs and use exact match: id = '${keywords}'
+    if (isUUIDPattern) {
+      return 'id'
+    }
+    // Otherwise use freeform search to search across all columns
+    return undefined
+  }, [trimmedQuery])
 
   const {
     data: usersData,
@@ -31,9 +51,8 @@ export function UserSearchResults({ query }: UserSearchResultsProps) {
     {
       projectRef,
       connectionString: project?.connectionString,
-      keywords: query.trim(),
-      // Use freeform search (column: undefined) to search across name and email
-      column: undefined,
+      keywords: trimmedQuery,
+      column: searchColumn,
       sort: 'id',
       order: 'asc',
     },
