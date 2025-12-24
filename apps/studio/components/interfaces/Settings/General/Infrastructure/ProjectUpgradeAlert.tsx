@@ -17,7 +17,7 @@ export const ProjectUpgradeAlert = () => {
     <Admonition
       type="default"
       title="New Postgres version available"
-      description={`Your project can be upgraded to Postgres ${latestPgVersion}.`}
+      description={`Your project can be upgraded to ${latestPgVersion ? `Postgres ${latestPgVersion}` : 'the latest version of Postgres'}.`}
       actions={
         <>
           {projectUpgradeDisabled ? (

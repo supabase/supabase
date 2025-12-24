@@ -17,8 +17,10 @@ export const FailedState = ({
 }: FailedStateProps) => {
   const content = UPGRADE_STATE_CONTENT.failed
 
-  const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiatedAt}%0A• Target Version: ${targetVersion}%0A• Error: ${error}`
+  const subject = encodeURIComponent('Upgrade failed for project')
+  const message = encodeURIComponent(
+    `Upgrade information:\n- Initiated at: ${initiatedAt}\n- Target Version: ${targetVersion}\n- Error: ${error}`
+  )
 
   return (
     <PageSection>

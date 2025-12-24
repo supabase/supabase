@@ -123,6 +123,11 @@ export const PostgresUpgradePanel = () => {
   const refetchProjectDetails = async () => {
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(ref)
+    try {
+      if (ref) await invalidateProjectDetailsQuery(ref)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const sharedProps = {
