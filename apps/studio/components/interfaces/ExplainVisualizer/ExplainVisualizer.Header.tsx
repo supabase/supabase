@@ -2,6 +2,12 @@ import { ArrowUp, Eye, Code } from 'lucide-react'
 
 import { useFlag } from 'common'
 import { AiIconAnimation, Button } from 'ui'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { buildExplainPrompt } from './ExplainVisualizer.ai'
+import type { QueryPlanRow } from './ExplainVisualizer.types'
 
 export interface ExplainSummary {
   totalTime: number
@@ -13,16 +19,44 @@ export interface ExplainHeaderProps {
   mode: 'visual' | 'raw'
   onToggleMode: () => void
   summary?: ExplainSummary
-  onExplainWithAI?: () => void
+  id?: string
+  rows?: readonly QueryPlanRow[]
 }
 
 export function ExplainHeader({
   mode,
   onToggleMode,
   summary,
-  onExplainWithAI,
+  id,
+  rows,
 }: ExplainHeaderProps) {
   const isVisual = mode === 'visual'
+
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
+
+  const handleExplainWithAI = () => {
+    if (!id) return
+    const snippet = snapV2.snippets[id]?.snippet
+    if (!snippet?.content?.sql) return
+
+    const { query, prompt } = buildExplainPrompt({
+      sql: snippet.content.sql,
+      explainPlanRows: (rows as QueryPlanRow[]) ?? [],
+    })
+
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      sqlSnippets: [
+        {
+          label: 'Query',
+          content: query,
+        },
+      ],
+      initialMessage: prompt,
+    })
+  }
 
   const hasSummaryStats =
     isVisual && summary && (summary.totalTime > 0 || (summary.hasSeqScan && !summary.hasIndexScan))
@@ -49,12 +83,12 @@ export function ExplainHeader({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {onExplainWithAI && (
+          {id && rows && (
             <Button
               type="default"
               size="tiny"
               icon={<AiIconAnimation size={14} />}
-              onClick={onExplainWithAI}
+              onClick={handleExplainWithAI}
             >
               Explain with AI
             </Button>

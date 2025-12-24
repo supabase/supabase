@@ -7,10 +7,10 @@ import type { QueryPlanRow } from './ExplainVisualizer.types'
 export interface ExplainVisualizerProps {
   rows: readonly QueryPlanRow[]
   onShowRaw?: () => void
-  onExplainWithAI?: () => void
+  id?: string
 }
 
-export function ExplainVisualizer({ rows, onShowRaw, onExplainWithAI }: ExplainVisualizerProps) {
+export function ExplainVisualizer({ rows, onShowRaw, id }: ExplainVisualizerProps) {
   const parsedTree = useMemo(() => createNodeTree(rows), [rows])
   const maxDuration = useMemo(() => calculateMaxDuration(parsedTree), [parsedTree])
   const summary = useMemo(() => calculateSummary(parsedTree), [parsedTree])
@@ -32,7 +32,8 @@ export function ExplainVisualizer({ rows, onShowRaw, onExplainWithAI }: ExplainV
           mode="visual"
           onToggleMode={onShowRaw}
           summary={summary}
-          onExplainWithAI={onExplainWithAI}
+          id={id}
+          rows={rows}
         />
       )}
 
