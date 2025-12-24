@@ -23,7 +23,6 @@ export function ExplainHeader({
   onExplainWithAI,
 }: ExplainHeaderProps) {
   const isVisual = mode === 'visual'
-  const showExplainWithAiInSQLEditor = useFlag('ShowExplainWithAiInQueryPerformance')
 
   const hasSummaryStats =
     isVisual && summary && (summary.totalTime > 0 || (summary.hasSeqScan && !summary.hasIndexScan))
@@ -50,7 +49,7 @@ export function ExplainHeader({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {showExplainWithAiInSQLEditor && onExplainWithAI && (
+          {onExplainWithAI && (
             <Button
               type="default"
               size="tiny"
