@@ -1,5 +1,4 @@
 /* Focus styles for keyboard navigation on buttons */
-/* outline color overriden by variants */
 .button-focus {
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-600 transition-all;
 }
@@ -10,5 +9,5 @@
 
 /* Focus styles for keyboard navigation on interactive table rows */
 .inset-focus {
-  @apply ease-out duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-400 focus-visible:rounded-md transition-all;
+  @apply ease-out duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-600 focus-visible:rounded-md transition-all;
 }

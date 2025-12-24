@@ -29,6 +29,8 @@ const defaults = {
     outline-0
     focus-visible:outline-2
     focus-visible:outline-offset-1
+    focus-visible:outline-brand-500
+    dark:focus-visible:outline-brand-600
   `,
   size: {
     // buttons, inputs, input labels use these sizes
