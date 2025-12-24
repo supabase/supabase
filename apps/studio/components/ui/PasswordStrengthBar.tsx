@@ -1,14 +1,15 @@
 import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
+import { PasswordStrengthScore } from 'lib/password-strength'
 import { InlineLinkClassName } from './InlineLink'
 
 interface Props {
-  passwordStrengthScore: number
+  passwordStrengthScore: PasswordStrengthScore
   passwordStrengthMessage: string
   password: string
   generateStrongPassword: () => void
 }
 
-const PasswordStrengthBar = ({
+export const PasswordStrengthBar = ({
   passwordStrengthScore = 0,
   passwordStrengthMessage = '',
   password = '',
@@ -20,18 +21,16 @@ const PasswordStrengthBar = ({
         <div
           aria-valuemax={100}
           aria-valuemin={0}
-          aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
-          aria-valuetext={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
+          aria-valuenow={PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}
+          aria-valuetext={`${PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}%`}
           role="progressbar"
           className="mb-2 overflow-hidden transition-all border rounded bg-200 w-full"
         >
           <div
             style={{
-              width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
+              width: `${PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}%`,
             }}
-            className={`relative h-1 w-full ${
-              (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
-            } transition-all duration-500 ease-out shadow-inner`}
+            className={`relative h-1 w-full ${PASSWORD_STRENGTH_COLOR[passwordStrengthScore]} transition-all duration-500 ease-out shadow-inner`}
           />
         </div>
       )}
@@ -48,5 +47,3 @@ const PasswordStrengthBar = ({
     </>
   )
 }
-
-export default PasswordStrengthBar
