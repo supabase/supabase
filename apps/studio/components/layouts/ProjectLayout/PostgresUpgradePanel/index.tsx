@@ -9,7 +9,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -149,11 +149,13 @@ export const PostgresUpgradePanel = () => {
             </p>
             <PageHeaderTitle>{content.headline}</PageHeaderTitle>
             <PageHeaderDescription className="text-balance">
-              <UpgradePanelHeaderDescription
-                upgradeState={upgradeState}
-                projectName={project?.name ?? ''}
-                displayTargetVersion={displayTargetVersion}
-              />
+              <HeightTransitionWrapper>
+                <UpgradePanelHeaderDescription
+                  upgradeState={upgradeState}
+                  projectName={project?.name ?? ''}
+                  displayTargetVersion={displayTargetVersion}
+                />
+              </HeightTransitionWrapper>
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -205,6 +207,43 @@ export const PostgresUpgradePanel = () => {
         )}
       </PageContainer>
     </>
+  )
+}
+
+interface HeightTransitionWrapperProps {
+  children: ReactNode
+}
+// Helps to avoid layout shifts when content changes by animating the height of the changing content
+const HeightTransitionWrapper = ({ children }: HeightTransitionWrapperProps) => {
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState<number | 'auto'>('auto')
+
+  useEffect(() => {
+    if (contentRef.current) {
+      // Set initial height immediately
+      setHeight(contentRef.current.scrollHeight)
+
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          setHeight(entry.contentRect.height)
+        }
+      })
+
+      resizeObserver.observe(contentRef.current)
+
+      return () => {
+        resizeObserver.disconnect()
+      }
+    }
+  }, [children])
+
+  return (
+    <div
+      className="overflow-hidden transition-[height] duration-300 ease-in-out"
+      style={{ height: typeof height === 'number' ? `${height}px` : 'auto' }}
+    >
+      <div ref={contentRef}>{children}</div>
+    </div>
   )
 }
 
