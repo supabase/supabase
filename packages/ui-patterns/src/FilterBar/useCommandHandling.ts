@@ -1,13 +1,8 @@
 import { useCallback } from 'react'
 import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
-import {
-  findGroupByPath,
-  addFilterToGroup,
-  addGroupToGroup,
-  isCustomOptionObject,
-} from './utils'
 import { MenuItem } from './menuItems'
+import { FilterGroup, FilterProperty } from './types'
+import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
 
 export function useCommandHandling({
   activeInput,
@@ -74,20 +69,7 @@ export function useCommandHandling({
     [activeInput, handleOperatorChange, setActiveInput]
   )
 
-  const handleCustomPropertySelection = useCallback(
-    (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
-      const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
-      onFilterChange(updatedFilters)
-      const newPath = [...currentPath, group.conditions.length]
-
-      setTimeout(() => {
-        setActiveInput({ type: 'value', path: newPath })
-      }, 0)
-    },
-    [activeFilters, onFilterChange, setActiveInput]
-  )
-
-  const handleNormalPropertySelection = useCallback(
+  const handlePropertySelection = useCallback(
     (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
       const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
       onFilterChange(updatedFilters)
@@ -119,9 +101,9 @@ export function useCommandHandling({
         !Array.isArray(selectedProperty.options) &&
         isCustomOptionObject(selectedProperty.options)
       ) {
-        handleCustomPropertySelection(selectedProperty, currentPath, group)
+        handlePropertySelection(selectedProperty, currentPath, group)
       } else {
-        handleNormalPropertySelection(selectedProperty, currentPath, group)
+        handlePropertySelection(selectedProperty, currentPath, group)
       }
       onFreeformTextChange('')
     },
@@ -130,8 +112,8 @@ export function useCommandHandling({
       filterProperties,
       activeFilters,
       onFreeformTextChange,
-      handleCustomPropertySelection,
-      handleNormalPropertySelection,
+      handlePropertySelection,
+      handlePropertySelection,
     ]
   )
 

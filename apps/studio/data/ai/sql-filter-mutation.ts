@@ -22,17 +22,16 @@ export async function generateSqlFilters({
     body: JSON.stringify({ prompt, filterProperties, currentPath }),
   })
 
-  let body: any
-
-  try {
-    body = await response.json()
-  } catch {}
-
   if (!response.ok) {
-    throw new ResponseError(body?.error || body?.message, response.status)
+    let errorMessage = 'Failed to generate filters'
+    try {
+      const errorBody = await response.json()
+      errorMessage = errorBody?.error || errorBody?.message || errorMessage
+    } catch {}
+    throw new ResponseError(errorMessage, response.status)
   }
 
-  return body as SqlFilterGenerateResponse
+  return (await response.json()) as SqlFilterGenerateResponse
 }
 
 type SqlFilterGenerateData = Awaited<ReturnType<typeof generateSqlFilters>>

@@ -3,14 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useDebounce } from '@uidotdev/usehooks'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import type { Filter, SupaColumn } from 'components/grid/types'
-import {
-  isBoolColumn,
-  isDateColumn,
-  isDateTimeColumn,
-  isEnumColumn,
-  isTimeColumn,
-} from 'components/grid/utils/types'
+import type { Filter } from 'components/grid/types'
 import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Calendar } from 'ui'
@@ -23,7 +16,7 @@ import {
   SerializableFilterProperty,
   updateGroupAtPath,
 } from 'ui-patterns'
-import { FilterOperatorOptions } from './Filter.constants'
+import { columnToFilterProperty } from './FilterPopoverNew.utils'
 
 export interface FilterPopoverProps {
   portal?: boolean
@@ -88,13 +81,6 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
   )
 }
 
-// Check if column is a date/datetime/time type
-function isDateLikeColumn(column: SupaColumn): boolean {
-  return (
-    isDateColumn(column.format) || isDateTimeColumn(column.format) || isTimeColumn(column.format)
-  )
-}
-
 function serializeFilterProperties(
   filterProperties: FilterProperty[]
 ): SerializableFilterProperty[] {
@@ -128,7 +114,7 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
 
   useEffect(() => {
     onApplyFilters(debouncedLocalFilters)
-  }, [debouncedLocalFilters])
+  }, [debouncedLocalFilters, onApplyFilters])
 
   const [freeformText, setFreeformText] = useState('')
   const { mutateAsync: generateFilters, isPending: isGenerating } = useSqlFilterGenerateMutation()
@@ -137,88 +123,24 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   const filterGroup = useMemo(() => filtersToFilterGroup(localFilters), [localFilters])
 
   // Create filter properties from table columns
+  // Add the date picker component for date columns (can't be in utils due to React component)
   const filterProperties: FilterProperty[] = useMemo(() => {
     const columns = snap.table?.columns ?? []
-    const defaultOperators = FilterOperatorOptions.map((op) => ({
-      value: op.value,
-      label: op.label,
-    }))
-    const stringOperators = [
-      { value: '~~*', label: 'ilike operator' },
-      ...defaultOperators.filter((op) => op.value !== '~~*'),
-    ]
-
     return columns.map((column) => {
-      // For enum columns, use the enum values as options
-      if (isEnumColumn(column.dataType) && column.enum) {
+      const property = columnToFilterProperty(column)
+      if (property.type === 'date' && Array.isArray(property.options)) {
         return {
-          label: column.name,
-          name: column.name,
-          type: 'string' as const,
-          options: column.enum.map((value) => ({ label: value, value })),
-          operators: defaultOperators,
-        }
-      }
-
-      // For boolean columns
-      if (isBoolColumn(column.dataType)) {
-        return {
-          label: column.name,
-          name: column.name,
-          type: 'boolean' as const,
+          ...property,
           options: [
-            { label: 'true', value: 'true' },
-            { label: 'false', value: 'false' },
-          ],
-          operators: [
-            { value: '=', label: 'equals' },
-            { value: '<>', label: 'not equal' },
-          ],
-        }
-      }
-
-      // For date/datetime columns, add date picker option
-      if (isDateLikeColumn(column)) {
-        const today = new Date()
-        const yesterday = new Date(Date.now() - 86400000)
-        const lastWeek = new Date(Date.now() - 7 * 86400000)
-        const lastMonth = new Date(Date.now() - 30 * 86400000)
-
-        // Put '>' first so it's the default operator for dates
-        const dateOperators = [
-          { value: '>', label: 'greater than' },
-          { value: '>=', label: 'greater than or equal' },
-          { value: '<', label: 'less than' },
-          { value: '<=', label: 'less than or equal' },
-          { value: '=', label: 'equals' },
-          { value: '<>', label: 'not equal' },
-        ]
-
-        return {
-          label: column.name,
-          name: column.name,
-          type: 'date' as const,
-          options: [
-            { label: 'Today', value: format(today, 'yyyy-MM-dd') },
-            { label: 'Yesterday', value: format(yesterday, 'yyyy-MM-dd') },
-            { label: 'Last 7 days', value: format(lastWeek, 'yyyy-MM-dd') },
-            { label: 'Last 30 days', value: format(lastMonth, 'yyyy-MM-dd') },
+            ...property.options,
             {
               label: 'Pick a date...',
               component: (props: CustomOptionProps) => <DatePickerOption {...props} />,
             },
           ],
-          operators: dateOperators,
         }
       }
-
-      // For other columns, keep a simple text-based filter
-      return {
-        label: column.name,
-        name: column.name,
-        type: 'string' as const,
-        operators: stringOperators,
-      }
+      return property
     })
   }, [snap.table?.columns])
 
