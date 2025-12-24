@@ -7,7 +7,7 @@ import {
   serializeOperators,
   serializeOptions,
   validateFilterGroup,
-} from './filter-v1.utils'
+} from './filterHelpers'
 
 describe('isFilterGroup', () => {
   test('returns true for filter groups', () => {
@@ -65,7 +65,12 @@ describe('serializeOptions', () => {
 
   test('handles mixed option types', () => {
     expect(
-      serializeOptions(['string', { label: 'Label' }, { value: 'value' }, { label: 'L', value: 'v' }])
+      serializeOptions([
+        'string',
+        { label: 'Label' },
+        { value: 'value' },
+        { label: 'L', value: 'v' },
+      ])
     ).toEqual(['string', 'Label', 'value', 'L'])
   })
 

@@ -11,7 +11,7 @@ import {
   serializeOperators,
   serializeOptions,
   validateFilterGroup,
-} from './filter-v1.utils'
+} from 'lib/api/filterHelpers'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
