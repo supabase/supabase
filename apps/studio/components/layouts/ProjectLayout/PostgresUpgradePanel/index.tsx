@@ -116,15 +116,18 @@ export const PostgresUpgradePanel = () => {
 
   const content = UPGRADE_STATE_CONTENT[upgradeState.status]
 
+  // Return users to the infrastructure page via button click on upgrade cancellation, failure, and success
+  const returnPath = `/project/${ref}/settings/infrastructure`
+
   const handleCancel = () => {
-    router.push(`/project/${ref}/settings/infrastructure`)
+    router.push(returnPath)
   }
 
   const refetchProjectDetails = async () => {
     setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(ref)
     try {
       if (ref) await invalidateProjectDetailsQuery(ref)
+      router.push(`/project/${ref}/settings/infrastructure`)
     } finally {
       setLoading(false)
     }
