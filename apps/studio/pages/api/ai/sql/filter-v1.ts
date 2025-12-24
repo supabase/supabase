@@ -1,64 +1,17 @@
 import { generateObject } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
 
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
-
-const filterOptionSchema = z.union([
-  z.string(),
-  z
-    .object({
-      label: z.string().optional(),
-      value: z.string().optional(),
-    })
-    .passthrough(),
-])
-
-const filterOperatorSchema = z.union([
-  z.string(),
-  z
-    .object({
-      label: z.string().optional(),
-      value: z.string().optional(),
-    })
-    .passthrough(),
-])
-
-const filterPropertySchema = z.object({
-  label: z.string(),
-  name: z.string(),
-  type: z.enum(['string', 'number', 'date', 'boolean']),
-  operators: z.array(filterOperatorSchema).optional(),
-  options: z.array(filterOptionSchema).optional(),
-})
-
-const filterConditionSchema = z.object({
-  propertyName: z.string(),
-  value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
-  operator: z.string(),
-})
-
-type FilterGroupType = {
-  logicalOperator: 'AND' | 'OR'
-  conditions: Array<z.infer<typeof filterConditionSchema> | FilterGroupType>
-}
-
-const filterGroupSchema: z.ZodType<FilterGroupType> = z.lazy(() =>
-  z.object({
-    logicalOperator: z.enum(['AND', 'OR']),
-    conditions: z.array(z.union([filterConditionSchema, filterGroupSchema])),
-  })
-)
-
-const requestSchema = z.object({
-  prompt: z.string().min(1, 'Prompt is required'),
-  filterProperties: z
-    .array(filterPropertySchema)
-    .min(1, 'At least one filter property is required'),
-  currentPath: z.array(z.number()).optional(),
-})
+import {
+  enforceAndLogicalOperator,
+  filterGroupSchema,
+  requestSchema,
+  serializeOperators,
+  serializeOptions,
+  validateFilterGroup,
+} from './filter-v1.utils'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -153,71 +106,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error generating filters. Please try again.',
     })
   }
-}
-
-function isFilterGroup(
-  condition: FilterGroupType | z.infer<typeof filterConditionSchema>
-): condition is FilterGroupType {
-  return 'logicalOperator' in condition
-}
-
-function validateFilterGroup(
-  group: FilterGroupType,
-  properties: z.infer<typeof filterPropertySchema>[]
-) {
-  return group.conditions.every((condition) => {
-    if (isFilterGroup(condition)) {
-      return validateFilterGroup(condition, properties)
-    }
-
-    const property = properties.find((prop) => prop.name === condition.propertyName)
-    if (!property) return false
-
-    if (property.operators && property.operators.length > 0) {
-      return property.operators.includes(condition.operator)
-    }
-
-    return true
-  })
-}
-
-function enforceAndLogicalOperator(group: FilterGroupType): FilterGroupType {
-  return {
-    logicalOperator: 'AND',
-    conditions: group.conditions.map((condition) =>
-      isFilterGroup(condition) ? enforceAndLogicalOperator(condition) : condition
-    ),
-  }
-}
-
-function serializeOptions(options?: z.infer<typeof filterPropertySchema>['options']) {
-  if (!options || !Array.isArray(options)) return undefined
-
-  const serialized = options
-    .map((option) => {
-      if (typeof option === 'string') return option
-      if (option?.label) return option.label
-      if (option?.value) return option.value
-      return null
-    })
-    .filter((value): value is string => Boolean(value))
-
-  return serialized.length > 0 ? serialized : undefined
-}
-
-function serializeOperators(operators?: z.infer<typeof filterPropertySchema>['operators']) {
-  if (!operators || !Array.isArray(operators) || operators.length === 0) return ['=']
-
-  const serialized = operators
-    .map((operator) => {
-      if (typeof operator === 'string') return operator
-      if (operator?.value) return operator.value
-      if (operator?.label) return operator.label
-      return null
-    })
-    .filter((value): value is string => Boolean(value))
-
-  return serialized.length > 0 ? serialized : ['=']
 }
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
