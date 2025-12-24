@@ -3,7 +3,7 @@
 import React, { createContext, useCallback, useContext, useRef } from 'react'
 import { ActiveInput, useFilterBarState, useOptionsCache } from './hooks'
 import { MenuItem } from './menuItems'
-import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { FilterBarAction, FilterGroup, FilterOptionObject, FilterProperty } from './types'
 import { useCommandHandling } from './useCommandHandling'
 import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
@@ -42,7 +42,7 @@ export type FilterBarContextValue = {
   handleLogicalOperatorChange: (path: number[]) => void
 
   // Options cache
-  propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>
+  propertyOptionsCache: Record<string, { options: (string | FilterOptionObject)[]; searchValue: string }>
   loadingOptions: Record<string, boolean>
   loadPropertyOptions: (property: FilterProperty, search: string) => void
   optionsError: string | null
