@@ -1,4 +1,5 @@
 import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
+import { InlineLinkClassName } from './InlineLink'
 
 interface Props {
   passwordStrengthScore: number
@@ -39,12 +40,9 @@ const PasswordStrengthBar = ({
           ? passwordStrengthMessage
           : 'This is the password to your Postgres database, so it must be strong and hard to guess.') +
           ' '}
-        <span
-          className="text-inherit underline hover:text-foreground transition-colors cursor-pointer"
-          onClick={generateStrongPassword}
-        >
+        <button type="button" className={InlineLinkClassName} onClick={generateStrongPassword}>
           Generate a password
-        </span>
+        </button>
         .
       </p>
     </>
