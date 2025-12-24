@@ -16,24 +16,27 @@ export function buildExplainPrompt({
 }: ExplainPromptInput): ExplainPromptOutput {
   const explainPlan = explainPlanRows.map((row) => row['QUERY PLAN']).join('\n')
 
-  const prompt = `Analyze this SQL query and its execution plan:
+  const prompt = `Explain this PostgreSQL EXPLAIN ANALYZE output in simple terms:
 
-**SQL Query:**
 \`\`\`sql
 ${sql}
 \`\`\`
 
-**Execution Plan (EXPLAIN ANALYZE):**
 \`\`\`
 ${explainPlan}
 \`\`\`
 
-Provide a concise explanation covering:
-1. What the query does (1-2 sentences)
-2. Performance assessment based on the execution plan (good/concerning, 2-3 sentences)
-3. Actionable optimization suggestions based on any bottlenecks identified (if any, 2-3 sentences)
+Format your response with:
 
-Keep your response concise and focused on actionable insights.`
+**What it does** - 1-2 sentences.
+
+**How it runs** - Briefly explain the plan from bottom to top in plain English. Mention key operations (scans, joins, sorts) and why PostgreSQL chose them.
+
+**Issues** - Identify bottlenecks: slowest steps, sequential scans on large tables, inefficient joins, missing indexes. Be specific with timings from the plan.
+
+**Fixes** - 2-3 specific suggestions with CREATE INDEX statements if applicable.
+
+Keep it concise. Focus on actionable insights.`
 
   return {
     query: sql,
