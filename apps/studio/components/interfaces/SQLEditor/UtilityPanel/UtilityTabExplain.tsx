@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react'
-import { forwardRef, useState } from 'react'
+import { useState } from 'react'
 
 import CopyButton from 'components/ui/CopyButton'
 import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
@@ -94,10 +94,10 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
   return (
     <div className="h-full flex flex-col">
       {mode === 'visual' ? (
-        <ExplainVisualizer rows={explainResult.rows} onShowRaw={toggleMode} />
+        <ExplainVisualizer rows={explainResult.rows} onShowRaw={toggleMode} id={id} />
       ) : (
         <>
-          <ExplainHeader mode="raw" onToggleMode={toggleMode} />
+          <ExplainHeader mode="raw" onToggleMode={toggleMode} id={id} rows={explainResult.rows} />
           <Results rows={explainResult.rows} />
         </>
       )}
