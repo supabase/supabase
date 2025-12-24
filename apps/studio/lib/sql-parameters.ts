@@ -1,3 +1,5 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
+
 export interface Parameter {
   name: string
   value: string
@@ -100,14 +102,17 @@ export const processParameterizedSql = (sql: string, parameters: Record<string, 
   // Remove @set lines from SQL
   let processedSql = sql.replace(/@set\s+\w+(?:\s*:\s*[^=]+)?\s*=\s*[^;\n]+[\n;]*/g, '')
 
-  // Replace :parameters with values
+  // Replace :parameters with properly escaped values
   const paramRegex = /:(\w+)/g
   processedSql = processedSql.replace(paramRegex, (match, paramName) => {
     const value = parameters[paramName] ?? paramDefaults[paramName]?.value
     if (value === undefined) {
       throw new Error(`Missing value for parameter: ${paramName}`)
     }
-    return value
+    
+    // SECURITY FIX: Use literal() to properly escape and quote SQL values
+    // This prevents SQL injection by treating user input as data, not code
+    return literal(value)
   })
 
   return processedSql
