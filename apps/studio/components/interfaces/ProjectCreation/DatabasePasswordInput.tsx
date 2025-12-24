@@ -25,7 +25,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
     const { warning, message, strength } = await passwordStrength(password)
     form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
     form.setValue('dbPassStrengthMessage', message, { shouldValidate: false, shouldDirty: false })
-    form.setValue('dbPassWarning', warning, { shouldValidate: false, shouldDirty: false })
+    form.setValue('dbPassStrengthWarning', warning, { shouldValidate: false, shouldDirty: false })
 
     // Trigger validation after updating strength
     form.trigger('dbPass')
@@ -77,7 +77,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                       shouldValidate: false,
                       shouldDirty: false,
                     })
-                    form.setValue('dbPassWarning', warning, {
+                    form.setValue('dbPassStrengthWarning', warning, {
                       shouldValidate: false,
                       shouldDirty: false,
                     })

@@ -27,19 +27,19 @@ export const FormSchema = z
       .min(1, 'Password is required.'),
     dbPassStrength: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
     dbPassStrengthMessage: z.string(),
-    dbPassWarning: z.string(),
+    dbPassStrengthWarning: z.string(),
     instanceSize: z.string().optional(),
     dataApi: z.boolean(),
     useApiSchema: z.boolean(),
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),
   })
-  .superRefine(async ({ dbPassStrength, dbPassWarning }, ctx) => {
+  .superRefine(async ({ dbPassStrength, dbPassStrengthWarning }, ctx) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['dbPass'],
-        message: dbPassWarning || 'Password not secure enough',
+        message: dbPassStrengthWarning || 'Password not secure enough',
       })
     }
   })
