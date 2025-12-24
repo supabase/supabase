@@ -5,6 +5,7 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
@@ -53,6 +54,13 @@ export const sqlEditorState = proxy({
       autoLimit?: number
     }[]
   },
+  // Explain results, if any, for a snippet
+  explainResults: {} as {
+    [snippetId: string]: {
+      rows: QueryPlanRow[]
+      error?: { message: string; formattedError?: string }
+    }
+  },
   // Synchronous saving of folders and snippets (debounce behavior)
   // key is the snippet id, value is shouldInvalidate
   needsSaving: proxyMap<string, boolean>([]),
@@ -83,6 +91,7 @@ export const sqlEditorState = proxy({
 
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
     sqlEditorState.results[snippet.id] = []
+    sqlEditorState.explainResults[snippet.id] = { rows: [] }
     sqlEditorState.savingStates[snippet.id] = 'IDLE'
   },
 
@@ -153,6 +162,9 @@ export const sqlEditorState = proxy({
 
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
+
+    const { [id]: explainResult, ...otherExplainResults } = sqlEditorState.explainResults
+    sqlEditorState.explainResults = otherExplainResults
 
     if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
@@ -254,6 +266,24 @@ export const sqlEditorState = proxy({
     if (sqlEditorState.results[id]) {
       sqlEditorState.results[id] = []
     }
+  },
+
+  addExplainResult: (id: string, results: QueryPlanRow[]) => {
+    // Use ref() to prevent Valtio from creating proxies for each row object
+    sqlEditorState.explainResults[id] = { rows: ref(results) }
+  },
+
+  addExplainResultError: (id: string, error: { message: string; formattedError?: string }) => {
+    sqlEditorState.explainResults[id] = { rows: ref([]), error }
+  },
+
+  resetExplainResult: (id: string) => {
+    sqlEditorState.explainResults[id] = { rows: [] }
+  },
+
+  resetResults: (id: string) => {
+    sqlEditorState.resetResult(id)
+    sqlEditorState.resetExplainResult(id)
   },
 })
 
