@@ -15,20 +15,28 @@ interface DatabasePasswordInputProps {
   form: UseFormReturn<CreateProjectForm>
 }
 
+const updatePasswordStrength = async (form: UseFormReturn<CreateProjectForm>, value: string) => {
+  const { warning, message, strength } = await passwordStrength(value)
+  form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
+  form.setValue('dbPassStrengthMessage', message ?? '', {
+    shouldValidate: false,
+    shouldDirty: false,
+  })
+  form.setValue('dbPassStrengthWarning', warning ?? '', {
+    shouldValidate: false,
+    shouldDirty: false,
+  })
+
+  form.trigger('dbPass')
+}
+
 export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
   async function generatePassword() {
     const password = generateStrongPassword()
     form.setValue('dbPass', password)
 
-    // Calculate and update password strength
-    const { warning, message, strength } = await passwordStrength(password)
-    form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
-    form.setValue('dbPassStrengthMessage', message, { shouldValidate: false, shouldDirty: false })
-    form.setValue('dbPassStrengthWarning', warning, { shouldValidate: false, shouldDirty: false })
-
-    // Trigger validation after updating strength
-    form.trigger('dbPass')
+    updatePasswordStrength(form, password)
   }
 
   return (
@@ -67,23 +75,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                     const newValue = event.target.value
                     field.onChange(event)
 
-                    // Calculate and update password strength
-                    const { message, strength, warning } = await passwordStrength(newValue)
-                    form.setValue('dbPassStrength', strength, {
-                      shouldValidate: false,
-                      shouldDirty: false,
-                    })
-                    form.setValue('dbPassStrengthMessage', message, {
-                      shouldValidate: false,
-                      shouldDirty: false,
-                    })
-                    form.setValue('dbPassStrengthWarning', warning, {
-                      shouldValidate: false,
-                      shouldDirty: false,
-                    })
-
-                    // Trigger validation after updating strength
-                    form.trigger('dbPass')
+                    updatePasswordStrength(form, newValue)
                   }}
                 />
               </FormControl_Shadcn_>

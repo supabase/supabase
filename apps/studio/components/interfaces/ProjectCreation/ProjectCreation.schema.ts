@@ -26,8 +26,8 @@ export const FormSchema = z
       .string({ required_error: 'Please enter a database password.' })
       .min(1, 'Password is required.'),
     dbPassStrength: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
-    dbPassStrengthMessage: z.string(),
-    dbPassStrengthWarning: z.string(),
+    dbPassStrengthMessage: z.string().default(''),
+    dbPassStrengthWarning: z.string().default(''),
     instanceSize: z.string().optional(),
     dataApi: z.boolean(),
     useApiSchema: z.boolean(),
