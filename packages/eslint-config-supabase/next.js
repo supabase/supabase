@@ -37,8 +37,8 @@ module.exports = defineConfig([
   { ignores: ['.next', 'public', '.contentlayer'] },
   turboConfig,
   prettierConfig,
+  tanstackQuery.configs['flat/recommended'],
   {
-    extends: tanstackQuery.configs['flat/recommended'],
     rules: {
       '@tanstack/query/exhaustive-deps': 'warn',
     },
