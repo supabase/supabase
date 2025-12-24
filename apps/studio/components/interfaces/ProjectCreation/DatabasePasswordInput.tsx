@@ -16,18 +16,22 @@ interface DatabasePasswordInputProps {
 }
 
 const updatePasswordStrength = async (form: UseFormReturn<CreateProjectForm>, value: string) => {
-  const { warning, message, strength } = await passwordStrength(value)
-  form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
-  form.setValue('dbPassStrengthMessage', message ?? '', {
-    shouldValidate: false,
-    shouldDirty: false,
-  })
-  form.setValue('dbPassStrengthWarning', warning ?? '', {
-    shouldValidate: false,
-    shouldDirty: false,
-  })
+  try {
+    const { warning, message, strength } = await passwordStrength(value)
+    form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
+    form.setValue('dbPassStrengthMessage', message ?? '', {
+      shouldValidate: false,
+      shouldDirty: false,
+    })
+    form.setValue('dbPassStrengthWarning', warning ?? '', {
+      shouldValidate: false,
+      shouldDirty: false,
+    })
 
-  form.trigger('dbPass')
+    form.trigger('dbPass')
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {

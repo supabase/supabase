@@ -25,7 +25,9 @@ export const FormSchema = z
     dbPass: z
       .string({ required_error: 'Please enter a database password.' })
       .min(1, 'Password is required.'),
-    dbPassStrength: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+    dbPassStrength: z
+      .union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(4)])
+      .default(0),
     dbPassStrengthMessage: z.string().default(''),
     dbPassStrengthWarning: z.string().default(''),
     instanceSize: z.string().optional(),
@@ -34,7 +36,7 @@ export const FormSchema = z
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),
   })
-  .superRefine(async ({ dbPassStrength, dbPassStrengthWarning }, ctx) => {
+  .superRefine(({ dbPassStrength, dbPassStrengthWarning }, ctx) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
