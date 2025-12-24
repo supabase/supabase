@@ -7,12 +7,12 @@ keywords = [ "smtp", "google", "workspace", "2FA", "TLS", "encryption", "port" ]
 database_id = "4d5390a0-445d-4e0a-ae7e-9b713b7cc4f6"
 ---
 
-Hey everyone, i've been hearing feedback about how challenging it can be to get google SMTP working properly with Supabase. I've tried setting this up with a trial Google Workspace account and this is what i've discovered.
+Hey everyone, I've been hearing feedback about how challenging it can be to get Google SMTP working properly with Supabase. I've tried setting this up with a trial Google Workspace account and this is what I've discovered.
 
 1. The sender email and SMTP username has to be your Google Workspace admin email.
 2. The SMTP password used has to be an app password. Google Workspace doesn't make it easy to figure out how to create this. You need to **enable 2FA** on your workspace account first (not inside the admin console but in https://myaccount.google.com/)
-3. If you want to use `smtp-relay.gmail.com` only port 465 works. If you want to use `smtp.gmail.com`, you can use port 465 or 587.
-   The following screenshots show what those steps look like:
+3. For `smtp-relay.gmail.com`, only port 465 works. For `smtp.gmail.com`, you can use port 465 or 587.
+   The following screenshots show these configuration steps:
 
 ## For `smtp-relay.gmail.com`
 
