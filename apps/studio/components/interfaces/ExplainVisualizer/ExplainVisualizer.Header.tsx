@@ -1,4 +1,4 @@
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Eye, Code } from 'lucide-react'
 
 import { useFlag } from 'common'
 import { AiIconAnimation, Button } from 'ui'
@@ -60,16 +60,14 @@ export function ExplainHeader({
               Explain with AI
             </Button>
           )}
-          <button
-            type="button"
+          <Button
+            type="default"
+            size="tiny"
+            icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
             onClick={onToggleMode}
-            className="font-mono text-xs text-foreground-lighter hover:text-foreground transition-colors"
-            aria-label={
-              isVisual ? 'Switch to raw explain output' : 'Switch to visual explain output'
-            }
           >
-            {isVisual ? '[VISUAL]' : '[RAW]'}
-          </button>
+            {isVisual ? 'Raw' : 'Visual'}
+          </Button>
         </div>
       </div>
 
