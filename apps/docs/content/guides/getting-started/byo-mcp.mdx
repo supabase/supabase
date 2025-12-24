@@ -6,11 +6,10 @@ description: 'Build and deploy remote MCP servers on Supabase Edge Functions'
 
 Build and deploy [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) (MCP) servers on Supabase using [Edge Functions](/docs/guides/functions).
 
-<Admonition type="note">
+This guide covers:
 
-This guide covers MCP servers that do not require authentication. Auth support for MCP on Edge Functions is coming soon.
-
-</Admonition>
+1. [Deploy your MCP server](#deploy-your-mcp-server) - Create and deploy a basic MCP server
+2. [Adding authentication](#adding-authentication) - Secure your MCP server with OAuth 2.1
 
 ## Deploy your MCP server
 
@@ -45,8 +44,7 @@ Create a `deno.json` file in `supabase/functions/mcp/` with the required depende
 ```json
 {
   "imports": {
-    "@hono/mcp": "npm:@hono/mcp@^0.1.1",
-    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.24.3",
+    "@modelcontextprotocol/sdk/": "npm:@modelcontextprotocol/sdk@1.25.1/",
     "hono": "npm:hono@^4.9.2",
     "zod": "npm:zod@^4.1.13"
   }
@@ -55,7 +53,7 @@ Create a `deno.json` file in `supabase/functions/mcp/` with the required depende
 
 <Admonition type="tip">
 
-This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk), but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite), [mcp-use](https://github.com/mcp-use/mcp-use), or [mcp-handler](https://github.com/vercel/mcp-handler).
+This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) with the `WebStandardStreamableHTTPServerTransport`, but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite) or [mcp-handler](https://github.com/vercel/mcp-handler).
 
 </Admonition>
 
@@ -66,7 +64,7 @@ Replace the contents of `supabase/functions/mcp/index.ts` with:
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { StreamableHTTPTransport } from '@hono/mcp'
+import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
 import { Hono } from 'hono'
 import { z } from 'zod'
 
@@ -94,9 +92,9 @@ server.registerTool(
 
 // Handle MCP requests at the root path
 app.all('/', async (c) => {
-  const transport = new StreamableHTTPTransport()
+  const transport = new WebStandardStreamableHTTPServerTransport()
   await server.connect(transport)
-  return transport.handleRequest(c)
+  return transport.handleRequest(c.req.raw)
 })
 
 Deno.serve(app.fetch)
@@ -124,7 +122,7 @@ http://localhost:54321/functions/v1/mcp
 
 <Admonition type="note">
 
-The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer so your MCP server can accept unauthenticated requests. Authenticated MCP support is coming soon.
+The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer. When adding authentication to your MCP server, you'll implement your own OAuth middleware instead. See [Adding authentication](#adding-authentication) below.
 
 </Admonition>
 
@@ -155,11 +153,232 @@ https://<your-project-ref>.supabase.co/functions/v1/mcp
 
 Update your MCP client configuration to use the production URL.
 
+## Adding authentication
+
+For this tutorial, we're using Supabase Auth and configuring Google as our OAuth provider, but you can use any OAuth provider. If you're using a different provider, replace the scopes and configuration with your provider's values.
+
+### Prerequisites for authentication
+
+Before adding authentication to your MCP server:
+
+- Review the [MCP Authentication guide](/docs/guides/auth/oauth-server/mcp-authentication) for configuring OAuth 2.1 with Supabase Auth
+- Configure your OAuth provider (e.g., [Google](/docs/guides/auth/social-login/auth-google)) in the [Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers)
+- Ensure your project uses ECC (P-256) signing keys
+
+<Admonition type="caution">
+
+OAuth requires ECC (P-256) signing keys. If your project still has legacy HSA-256 keys, go to [project settings > JWT Sign](https://supabase.com/dashboard/project/_/settings/jwt) and rotate to an asymmetric key.
+
+</Admonition>
+
+### Configure OAuth server
+
+Update your `supabase/config.toml` to enable the OAuth server:
+
+```toml
+[auth.oauth_server]
+# Enable OAuth server functionality
+enabled = true
+# Path for OAuth consent flow UI (hosted externally)
+authorization_url_path = "/oauth/consent"
+# Allow MCP clients to register themselves
+allow_dynamic_registration = true
+```
+
+Also configure your Edge Function to skip JWT verification (the MCP server handles its own auth):
+
+```toml
+[functions.mcp]
+enabled = true
+verify_jwt = false
+```
+
+### Implement Protected Resource Metadata discovery
+
+According to the [MCP authorization spec](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization#protected-resource-metadata-discovery-requirements), servers must implement at least one of two discovery methods:
+
+1. `WWW-Authenticate` header with `resource_metadata` URL on 401 responses
+2. Well-known URL at `/.well-known/oauth-protected-resource`
+
+Since Edge Functions don't support well-known URLs at the root path, we'll use the `WWW-Authenticate` header approach. When a client makes an unauthenticated request, the server returns a 401 response with a header pointing to the metadata endpoint.
+
+First, add helper functions to construct URLs dynamically from request headers:
+
+```ts
+import { type Context } from 'hono'
+
+/**
+ * Constructs the base URL from the request, using X-Forwarded headers if present.
+ */
+function getBaseUrl(c: Context): string {
+  const url = new URL(c.req.url)
+  const host = c.req.header('X-Forwarded-Host') ?? url.host
+  const proto = c.req.header('X-Forwarded-Proto') ?? url.protocol.replace(':', '')
+  const port = c.req.header('X-Forwarded-Port') ?? url.port
+
+  const isStandardPort =
+    (proto === 'https' && port === '443') || (proto === 'http' && port === '80')
+  const portSuffix = port && !isStandardPort ? `:${port}` : ''
+
+  return `${proto}://${host}${portSuffix}`
+}
+
+/**
+ * Builds the URL to the OAuth Protected Resource Metadata endpoint.
+ */
+function getResourceMetadataUrl(c: Context): string {
+  return `${getBaseUrl(c)}/functions/v1/mcp/oauth-protected-resource`
+}
+
+/**
+ * Builds the authorization server URL.
+ */
+function getAuthServerUrl(c: Context): string {
+  return `${getBaseUrl(c)}/auth/v1`
+}
+```
+
+Next, add the OAuth Protected Resource Metadata endpoint:
+
+```ts
+// OAuth 2.0 Protected Resource Metadata (RFC 9728)
+app.get('/mcp/oauth-protected-resource', (c) => {
+  return c.json({
+    resource: `${getBaseUrl(c)}/functions/v1/mcp`,
+    authorization_servers: [getAuthServerUrl(c)],
+    scopes_supported: ['openid', 'profile', 'email'],
+  })
+})
+```
+
+### Add authentication middleware
+
+Add token validation and the authentication middleware that returns the `WWW-Authenticate` header on 401 responses:
+
+```ts
+/**
+ * Validate access token using Supabase Auth.
+ */
+async function validateToken(c: Context, token: string) {
+  const supabase = createClient(getBaseUrl(c), supabaseAnonKey, {
+    global: {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  })
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+
+  if (error || !user) {
+    return { valid: false, error: error?.message || 'Invalid token' }
+  }
+
+  return { valid: true, user }
+}
+
+/**
+ * Build WWW-Authenticate header for 401 responses.
+ * This header points clients to the Protected Resource Metadata endpoint.
+ */
+function buildWwwAuthenticateHeader(c: Context, error?: string, errorDescription?: string): string {
+  let header = `Bearer resource_metadata="${getResourceMetadataUrl(c)}"`
+
+  if (error) {
+    header += `, error="${error}"`
+  }
+  if (errorDescription) {
+    header += `, error_description="${errorDescription}"`
+  }
+  return header
+}
+
+/**
+ * OAuth authentication middleware.
+ */
+async function authMiddleware(c: Context, next: Next) {
+  const authHeader = c.req.header('Authorization')
+
+  if (!authHeader) {
+    return c.json(
+      { error: 'unauthorized', error_description: 'Missing authorization header' },
+      401,
+      { 'WWW-Authenticate': buildWwwAuthenticateHeader(c) }
+    )
+  }
+
+  const [scheme, token] = authHeader.split(' ')
+  if (scheme?.toLowerCase() !== 'bearer' || !token) {
+    return c.json(
+      { error: 'invalid_request', error_description: 'Bearer token required' },
+      401,
+      { 'WWW-Authenticate': buildWwwAuthenticateHeader(c, 'invalid_request', 'Bearer token required') }
+    )
+  }
+
+  const { valid, user, error } = await validateToken(c, token)
+
+  if (!valid) {
+    return c.json(
+      { error: 'invalid_token', error_description: error || 'Token validation failed' },
+      401,
+      { 'WWW-Authenticate': buildWwwAuthenticateHeader(c, 'invalid_token', error) }
+    )
+  }
+
+  c.set('user', user)
+  await next()
+}
+```
+
+### Apply authentication to MCP routes
+
+Apply the middleware to your MCP endpoint:
+
+```ts
+// Apply auth middleware to the MCP endpoint
+app.use('/mcp', authMiddleware)
+
+// MCP protocol endpoint - now requires authentication
+app.all('/mcp', async (c) => {
+  const transport = new WebStandardStreamableHTTPServerTransport()
+  await server.connect(transport)
+  return transport.handleRequest(c.req.raw)
+})
+```
+
+### Host a consent page
+
+The consent page handles user authentication and authorization approval. Since it's a static web application, you can host it on any platform like Vercel, Netlify, or Render.
+
+1. Deploy the [Next.js consent page example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs-oauth-consent) to your hosting platform
+2. Configure the consent page URL in [Authentication > OAuth Server](https://supabase.com/dashboard/project/_/auth/oauth-server) in your Supabase dashboard
+
+<Admonition type="tip">
+
+The scopes `openid`, `email`, and `profile` are used in this example with Google OAuth. Replace with your provider's scopes if different.
+
+</Admonition>
+
+For important security best practices when building consent pages and handling user approval, see the [Security considerations](/docs/guides/auth/oauth-server/mcp-authentication#security-considerations) guide.
+
+### Complete authenticated example
+
+See the full implementation:
+
+- [Authenticated MCP server example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server)
+- [Next.js consent page example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs-oauth-consent)
+
+For more details on OAuth configuration, see the [OAuth 2.1 Server documentation](/docs/guides/auth/oauth-server).
+
 ## Examples
 
 You can find ready-to-use MCP server implementations here:
 
-- [MCP server examples on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/)
+- [Simple MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/simple-mcp-server) - Basic unauthenticated example
+- [Authenticated MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server) - With OAuth authentication
+- [Consent page](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs-oauth-consent) - Next.js OAuth consent UI
 
 ## Resources
 
@@ -168,5 +387,4 @@ You can find ready-to-use MCP server implementations here:
 - [Supabase Edge Functions](/docs/guides/functions)
 - [OAuth 2.1 Server](/docs/guides/auth/oauth-server)
 - [MCP Authentication](/docs/guides/auth/oauth-server/mcp-authentication)
-- [MCP server examples on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp)
 - [Building MCP servers with mcp-lite](/docs/guides/functions/examples/mcp-server-mcp-lite) - Alternative lightweight framework
