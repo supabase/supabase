@@ -29,7 +29,7 @@ export const FailedState = ({
         <UpgradeStepsTable variant="failed" />
       </div>
 
-      <div className="flex flex-row gap-x-2 items-center">
+      <div className="flex flex-row gap-x-2 items-center justify-end">
         <Button loading={isLoading} disabled={isLoading} onClick={onReturnToProject}>
           Return to project
         </Button>

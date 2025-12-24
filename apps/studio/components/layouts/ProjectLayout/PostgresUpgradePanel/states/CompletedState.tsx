@@ -20,14 +20,16 @@ export const CompletedState = ({
         <UpgradeStepsTable variant="completed" />
       </div>
 
-      <Button
-        className="w-min"
-        loading={isLoading}
-        disabled={isLoading}
-        onClick={onReturnToProject}
-      >
-        Return to project
-      </Button>
+      <div className="flex flex-row gap-x-2 items-center justify-end">
+        <Button
+          className="w-min"
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={onReturnToProject}
+        >
+          Return to project
+        </Button>
+      </div>
     </PageSection>
   )
 }
