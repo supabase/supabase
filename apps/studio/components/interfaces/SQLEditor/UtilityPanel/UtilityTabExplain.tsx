@@ -1,11 +1,15 @@
 import { Loader2 } from 'lucide-react'
-import { forwardRef, useState } from 'react'
+import { useState } from 'react'
 
 import CopyButton from 'components/ui/CopyButton'
 import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
 import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { buildExplainPrompt } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.ai'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
 
@@ -18,6 +22,30 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const explainResult = snapV2.explainResults[id]
   const [mode, setMode] = useState<'visual' | 'raw'>('visual')
+
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
+
+  const handleExplainWithAI = () => {
+    const snippet = snapV2.snippets[id]?.snippet
+    if (!snippet?.content?.sql) return
+
+    const { query, prompt } = buildExplainPrompt({
+      sql: snippet.content.sql,
+      explainPlanRows: [...explainResult.rows] as any,
+    })
+
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      sqlSnippets: [
+        {
+          label: 'Query',
+          content: query,
+        },
+      ],
+      initialMessage: prompt,
+    })
+  }
 
   if (isExecuting) {
     return (
@@ -94,7 +122,11 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
   return (
     <div className="h-full flex flex-col">
       {mode === 'visual' ? (
-        <ExplainVisualizer rows={explainResult.rows} onShowRaw={toggleMode} />
+        <ExplainVisualizer
+          rows={explainResult.rows}
+          onShowRaw={toggleMode}
+          onExplainWithAI={handleExplainWithAI}
+        />
       ) : (
         <>
           <ExplainHeader mode="raw" onToggleMode={toggleMode} />

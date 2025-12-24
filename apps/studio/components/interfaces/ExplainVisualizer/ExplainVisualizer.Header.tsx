@@ -1,5 +1,7 @@
-import { Activity, ArrowUp, Clock, Database, GitMerge, Hash, Zap } from 'lucide-react'
-import { Badge } from 'ui'
+import { ArrowUp } from 'lucide-react'
+
+import { useFlag } from 'common'
+import { AiIconAnimation, Button } from 'ui'
 
 export interface ExplainSummary {
   totalTime: number
@@ -11,10 +13,17 @@ export interface ExplainHeaderProps {
   mode: 'visual' | 'raw'
   onToggleMode: () => void
   summary?: ExplainSummary
+  onExplainWithAI?: () => void
 }
 
-export function ExplainHeader({ mode, onToggleMode, summary }: ExplainHeaderProps) {
+export function ExplainHeader({
+  mode,
+  onToggleMode,
+  summary,
+  onExplainWithAI,
+}: ExplainHeaderProps) {
   const isVisual = mode === 'visual'
+  const showExplainWithAiInSQLEditor = useFlag('ShowExplainWithAiInQueryPerformance')
 
   const hasSummaryStats =
     isVisual && summary && (summary.totalTime > 0 || (summary.hasSeqScan && !summary.hasIndexScan))
@@ -22,30 +31,46 @@ export function ExplainHeader({ mode, onToggleMode, summary }: ExplainHeaderProp
   return (
     <div className="bg-surface-100 border-b px-4 py-3 flex flex-col gap-3 text-xs">
       {/* Title row */}
-      <div className="flex items-center gap-2 text-sm">
-        <h3 className="font-medium text-foreground">Query Execution Plan</h3>
-        {/* Summary stats - only show in visual mode when we have the data */}
-        {hasSummaryStats && (
-          <div className="flex items-center gap-4 flex-wrap">
-            {summary.totalTime > 0 && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-foreground-light">/</span>
-                <span className="text-foreground-light">Total time</span>
-                <span className="font-mono font-medium text-foreground">
-                  {summary.totalTime.toFixed(2)}ms
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={onToggleMode}
-          className="font-mono text-xs text-foreground-lighter hover:text-foreground transition-colors"
-          aria-label={isVisual ? 'Switch to raw explain output' : 'Switch to visual explain output'}
-        >
-          {isVisual ? '[VISUAL]' : '[RAW]'}
-        </button>
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center gap-2">
+          <h3 className="font-medium text-foreground">Query Execution Plan</h3>
+          {/* Summary stats - only show in visual mode when we have the data */}
+          {hasSummaryStats && (
+            <div className="flex items-center gap-4 flex-wrap">
+              {summary.totalTime > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-foreground-light">/</span>
+                  <span className="text-foreground-light">Total time</span>
+                  <span className="font-mono font-medium text-foreground">
+                    {summary.totalTime.toFixed(2)}ms
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {showExplainWithAiInSQLEditor && onExplainWithAI && (
+            <Button
+              type="default"
+              size="tiny"
+              icon={<AiIconAnimation size={14} />}
+              onClick={onExplainWithAI}
+            >
+              Explain with AI
+            </Button>
+          )}
+          <button
+            type="button"
+            onClick={onToggleMode}
+            className="font-mono text-xs text-foreground-lighter hover:text-foreground transition-colors"
+            aria-label={
+              isVisual ? 'Switch to raw explain output' : 'Switch to visual explain output'
+            }
+          >
+            {isVisual ? '[VISUAL]' : '[RAW]'}
+          </button>
+        </div>
       </div>
 
       {/* How to read */}
