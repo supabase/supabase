@@ -56,7 +56,7 @@ module.exports = defineConfig([
   },
   {
     // check for default exports in all files except app and pages folders.
-    ignores: ['pages/**.tsx', 'app/**.tsx'],
+    ignores: ['pages/**/*.ts', 'app/**/*.ts', 'pages/**/*.tsx', 'app/**/*.tsx'],
     rules: {
       'no-restricted-exports': [
         'warn',
