@@ -11,7 +11,8 @@ export const ProjectUpgradeAlert = () => {
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
 
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
-  const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
+  const latestPgVersion =
+    (data?.latest_app_version ?? '').split('supabase-postgres-')[1] ?? 'a newer version'
 
   return (
     <Admonition

@@ -39,7 +39,7 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
   const { variant } = props
 
   const progress = variant === 'upgrading' ? props.progress : undefined
-  const progressStage = Number((progress || '').split('_')[0])
+  const progressStage = progress ? Number(progress.split('_')[0]) : -1
 
   const isTerminalState = variant === 'completed' || variant === 'failed'
   const showProgress = variant === 'upgrading' || variant === 'backingUp' || isTerminalState
