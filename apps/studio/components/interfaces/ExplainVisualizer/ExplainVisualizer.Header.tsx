@@ -23,13 +23,7 @@ export interface ExplainHeaderProps {
   rows?: readonly QueryPlanRow[]
 }
 
-export function ExplainHeader({
-  mode,
-  onToggleMode,
-  summary,
-  id,
-  rows,
-}: ExplainHeaderProps) {
+export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: ExplainHeaderProps) {
   const isVisual = mode === 'visual'
 
   const snapV2 = useSqlEditorV2StateSnapshot()
