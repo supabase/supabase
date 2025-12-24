@@ -91,6 +91,9 @@ export const PostgresUpgradePanel = () => {
     initiatedAt: initiated_at,
   })
 
+  // DEBUG: remove after testing (keep for now)
+  console.log('[PostgresUpgradePanel]', { upgradeState, status, progress, isUpgradeInProgress })
+
   // Get the target version for display - use upgrade status if available, otherwise use selected version
   const displayTargetVersion = (() => {
     // If upgrading/completed/failed, use the target version from the upgrade status
@@ -214,7 +217,7 @@ const UpgradePanelHeaderDescription = ({
         <p className="text-foreground-light">
           Postgres version{' '}
           <strong className="text-foreground font-medium">{displayTargetVersion}</strong> is now
-          available for your project{' '}
+          available for the project{' '}
           <strong className="text-foreground font-medium">{projectName}</strong>. Supabase can
           upgrade your project to this version on your behalf. Here’s what’s involved.
         </p>

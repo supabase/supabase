@@ -45,11 +45,9 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
   const showProgress = variant === 'upgrading' || variant === 'backingUp' || isTerminalState
   const allUpgradeStepsCompleted = variant === 'backingUp' || isTerminalState
 
-  // Append backup step when in backingUp, completed, or failed states
+  // Only append backup step when actively backing up
   const steps =
-    variant === 'backingUp' || isTerminalState
-      ? [...DATABASE_UPGRADE_STEPS, BACKUP_STEP]
-      : DATABASE_UPGRADE_STEPS
+    variant === 'backingUp' ? [...DATABASE_UPGRADE_STEPS, BACKUP_STEP] : DATABASE_UPGRADE_STEPS
 
   return (
     <Card>
@@ -87,9 +85,10 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
                 key={step.key}
                 className={cn(
                   '[&_td]:px-2.5 md:[&_td]:px-3 [&_td]:py-3 transition-colors duration-300',
-                  !allUpgradeStepsCompleted &&
+                  (variant === 'upgrading' || variant === 'backingUp') &&
                     (isCurrentStep
-                      ? 'bg-inherit'
+                      ? // ? 'bg-inherit'
+                        'bg-surface-75'
                       : isCompletedStep
                         ? 'bg-surface-200/50'
                         : 'bg-surface-75')
@@ -116,15 +115,15 @@ export const UpgradeStepsTable = (props: UpgradeStepsTableProps) => {
                             : 'text-foreground'
                     )}
                   >
-                    {isCompletedStep && !isCurrentStep ? (
-                      <span className="relative inline-block leading-none animate-in fade-in duration-300 after:content-[''] after:absolute after:left-0 after:right-0 after:top-[0.55em] after:h-[1.5px] after:bg-foreground-muted after:animate-in after:fade-in after:duration-300 after:delay-150">
-                        {isCurrentStep ? step.activeTitle : step.title}
-                      </span>
-                    ) : isCurrentStep ? (
-                      step.activeTitle
-                    ) : (
-                      step.title
-                    )}
+                    {/* Manual strike-through to ensure proper centering */}
+                    <span
+                      className={cn(
+                        'relative inline-block leading-none after:content-[""] after:absolute after:left-0 after:right-0 after:top-[0.55em] after:h-[1.5px] after:bg-foreground-muted after:transition-opacity after:duration-300',
+                        isCompletedStep && !isCurrentStep ? 'after:opacity-100' : 'after:opacity-0'
+                      )}
+                    >
+                      {isCurrentStep ? step.activeTitle : step.staticTitle}
+                    </span>
                   </p>
                 </TableCell>
                 <TableCell className="justify-end">
