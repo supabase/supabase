@@ -30,7 +30,7 @@ const defaults = {
     outline-none
     transition-all
     outline-0
-    focus-visible:outline-4
+    focus-visible:outline-2
     focus-visible:outline-offset-1
   `,
   size: {
@@ -1083,8 +1083,8 @@ export default {
       outline-none
       outline-offset-1
       transition-all
-      focus:outline-4
-      focus:outline-border-control
+      focus:outline-2
+      focus:outline-brand-500 dark:focus:outline-brand-600
     `,
     content: `
       z-40

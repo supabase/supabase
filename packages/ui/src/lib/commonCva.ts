@@ -27,7 +27,7 @@ const defaults = {
     outline-none
     transition-all
     outline-0
-    focus-visible:outline-4
+    focus-visible:outline-2
     focus-visible:outline-offset-1
   `,
   size: {

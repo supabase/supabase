@@ -1,8 +1,8 @@
 'use client'
 
-import React, { FC, Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React, { FC, Fragment, useEffect, useState } from 'react'
 import {
   Badge,
   cn,
@@ -59,7 +59,7 @@ export const useActiveMenuLabel = (menu: typeof GLOBAL_MENU_ITEMS) => {
 const GlobalNavigationMenu: FC = () => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
   const triggerClassName =
-    'h-[var(--header-height)] p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
+    'h-[var(--header-height)] p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
 
   return (
     <div className="flex relative gap-2 justify-start items-end w-full h-full">
