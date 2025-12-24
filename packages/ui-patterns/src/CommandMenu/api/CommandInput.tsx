@@ -42,16 +42,19 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
   return combinedRef
 }
 
-const CommandInput = forwardRef<
-  React.ElementRef<typeof CommandInput_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CommandInput_Shadcn_>
->(({ className, ...props }, ref) => {
+interface CommandInputProps extends React.ComponentPropsWithoutRef<typeof CommandInput_Shadcn_> {
+  leftIcon?: React.ReactNode
+}
+
+const CommandInput = forwardRef<React.ElementRef<typeof CommandInput_Shadcn_>, CommandInputProps>(
+  ({ className, leftIcon, ...props }, ref) => {
   const inputRef = useFocusInputOnWiderScreens(ref)
 
   const query = useQuery()
   const setQuery = useSetQuery()
 
   const [inputValue, setInputValue] = useState(query)
+
   useEffect(() => {
     setInputValue(query)
     previousValueRef.current = query
@@ -112,11 +115,18 @@ const CommandInput = forwardRef<
     }
   }, [inputValue, imeComposing])
 
+    const hasLeftIcon = !!leftIcon
+
   return (
+      <div className="relative w-full" cmdk-input-wrapper="">
+        {leftIcon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">{leftIcon}</div>
+        )}
     <CommandInput_Shadcn_
       // Focus needs to be manually handled to check breakpoint first, due to
       // delays from useEffect
       autoFocus={false}
+          showSearchIcon={!hasLeftIcon}
       ref={inputRef}
       value={inputValue}
       onValueChange={handleValueChange}
@@ -127,12 +137,15 @@ const CommandInput = forwardRef<
         'flex h-11 w-full rounded-md bg-transparent px-2 py-7 outline-none',
         'focus:shadow-none focus:ring-transparent',
         'text-base text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
+            hasLeftIcon && 'pl-12',
         className
       )}
       {...props}
     />
+      </div>
+    )
+  }
   )
-})
 
 CommandInput.displayName = CommandInput_Shadcn_.displayName
 

@@ -46,7 +46,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
       deps: [ref],
       enabled: (options?.enabled ?? true) && ref !== '_',
       orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
+      sectionMeta: { priority: 2 },
     }
   )
 
