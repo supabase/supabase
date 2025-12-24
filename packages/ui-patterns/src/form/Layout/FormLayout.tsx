@@ -301,9 +301,7 @@ export const FormLayout = React.forwardRef<
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
     const renderError = isReactForm && !hideMessage && (
       <FormMessage_Shadcn_
-        className={cn(
-          layout === 'flex-row-reverse' ? 'mt-0' : 'mt-2'
-        )}
+        className={cn(layout === 'flex-row-reverse' ? 'mt-0' : 'mt-2')}
         data-formlayout-id={'message'}
       />
     )

@@ -55,4 +55,3 @@ export const ActiveUpgradeView = (props: ActiveUpgradeViewProps) => {
     </PageSection>
   )
 }
-
