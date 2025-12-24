@@ -12,6 +12,7 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
+import { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 
 export type UtilityTabExplainProps = {
   id: string
@@ -32,7 +33,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
 
     const { query, prompt } = buildExplainPrompt({
       sql: snippet.content.sql,
-      explainPlanRows: [...explainResult.rows] as any,
+      explainPlanRows: (explainResult?.rows as QueryPlanRow[]) ?? [],
     })
 
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
