@@ -203,12 +203,20 @@ export const AIEditor = ({
     if (language === 'javascript' || language === 'typescript') {
       // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
       // Monaco editor.
-      import('public/deno/edge-runtime.d.ts' as string).then((module) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
-      })
-      import('public/deno/lib.deno.d.ts' as string).then((module) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
-      })
+      import('public/deno/edge-runtime.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno edge-runtime typings:', error)
+        })
+      import('public/deno/lib.deno.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno lib typings:', error)
+        })
     }
 
     if (!!executeQueryRef.current) {
