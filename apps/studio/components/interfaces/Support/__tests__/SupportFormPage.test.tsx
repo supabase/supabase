@@ -75,8 +75,8 @@ const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoist
   const commitTime = '2024-01-01T00:00:00Z'
 
   const createCommitResponse = () => ({
-    commitSha: sha,
-    commitTime,
+    deploymentCommit: { time: commitTime, sha },
+    latestCommit: { time: commitTime, sha },
   })
 
   return {
