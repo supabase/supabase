@@ -38,7 +38,7 @@ interface AIEditorProps {
 // Can we try to de-dupe accordingly? Perhaps the SQL Editor could use this AIEditor
 // We have a tendency to create multiple versions of the monaco editor like RLSCodeEditor
 // so hoping to prevent that from snowballing
-const AIEditor = ({
+export const AIEditor = ({
   language = 'javascript',
   value,
   defaultValue = '',
@@ -456,5 +456,3 @@ const AIEditor = ({
     </div>
   )
 }
-
-export default AIEditor

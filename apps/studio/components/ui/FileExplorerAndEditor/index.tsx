@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import AIEditor from 'components/ui/AIEditor'
 import { toast } from 'sonner'
+
+import { AIEditor } from 'components/ui/AIEditor'
 import {
   Button,
   ContextMenu_Shadcn_,
