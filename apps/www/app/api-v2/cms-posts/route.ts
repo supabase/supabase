@@ -211,11 +211,11 @@ export async function GET(request: NextRequest) {
                       username: a?.username || '',
                     }))
                   : [],
-                thumb: latestVersion.thumb?.url
-                  ? `${baseUrl}${latestVersion.thumb.url}`
+                imgSite: latestVersion.imgSite?.url
+                  ? `${baseUrl}${latestVersion.imgSite.url}`
                   : undefined,
-                image: latestVersion.image?.url
-                  ? `${baseUrl}${latestVersion.image.url}`
+                imgSocial: latestVersion.imgSocial?.url
+                  ? `${baseUrl}${latestVersion.imgSocial.url}`
                   : undefined,
                 meta: latestVersion.meta || null,
                 url: `/blog/${latestVersion.slug}`,
@@ -296,8 +296,8 @@ export async function GET(request: NextRequest) {
                     username: a?.username || '',
                   }))
                 : [],
-              thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
-              image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
+              imgSite: post.imgSite?.url ? `${baseUrl}${post.imgSite.url}` : undefined,
+              imgSocial: post.imgSocial?.url ? `${baseUrl}${post.imgSocial.url}` : undefined,
               meta: post.meta || null,
               url: `/blog/${post.slug}`,
               path: `/blog/${post.slug}`,
@@ -375,8 +375,8 @@ export async function GET(request: NextRequest) {
                     username: a?.username || '',
                   }))
                 : [],
-              thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
-              image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
+              imgSite: post.imgSite?.url ? `${baseUrl}${post.imgSite.url}` : undefined,
+              imgSocial: post.imgSocial?.url ? `${baseUrl}${post.imgSocial.url}` : undefined,
               meta: post.meta || null,
               url: `/blog/${post.slug}`,
               path: `/blog/${post.slug}`,
@@ -461,15 +461,15 @@ export async function GET(request: NextRequest) {
                     username: a?.username || '',
                   }))
                 : [],
-              thumb: post.thumb?.url
-                ? typeof post.thumb.url === 'string' && post.thumb.url.includes('http')
-                  ? post.thumb.url
-                  : `${baseUrl}${post.thumb.url}`
+              imgSite: post.imgSite?.url
+                ? typeof post.imgSite.url === 'string' && post.imgSite.url.includes('http')
+                  ? post.imgSite.url
+                  : `${baseUrl}${post.imgSite.url}`
                 : '',
-              image: post.image?.url
-                ? typeof post.image.url === 'string' && post.image.url.includes('http')
-                  ? post.image.url
-                  : `${baseUrl}${post.image.url}`
+              imgSocial: post.imgSocial?.url
+                ? typeof post.imgSocial.url === 'string' && post.imgSocial.url.includes('http')
+                  ? post.imgSocial.url
+                  : `${baseUrl}${post.imgSocial.url}`
                 : undefined,
               meta: post.meta || null,
               url: `/blog/${post.slug}`,
@@ -575,15 +575,15 @@ export async function GET(request: NextRequest) {
                         username: a?.username || '',
                       }))
                     : [],
-                  thumb: post.thumb?.url
-                    ? typeof post.thumb.url === 'string' && post.thumb.url.includes('http')
-                      ? post.thumb.url
-                      : `${baseUrl}${post.thumb.url}`
+                  imgSite: post.imgSite?.url
+                    ? typeof post.imgSite.url === 'string' && post.imgSite.url.includes('http')
+                      ? post.imgSite.url
+                      : `${baseUrl}${post.imgSite.url}`
                     : '',
-                  image: post.image?.url
-                    ? typeof post.image.url === 'string' && post.image.url.includes('http')
-                      ? post.image.url
-                      : `${baseUrl}${post.image.url}`
+                  imgSocial: post.imgSocial?.url
+                    ? typeof post.imgSocial.url === 'string' && post.imgSocial.url.includes('http')
+                      ? post.imgSocial.url
+                      : `${baseUrl}${post.imgSocial.url}`
                     : undefined,
                   url: `/blog/${post.slug}`,
                   path: `/blog/${post.slug}`,
@@ -672,15 +672,15 @@ export async function GET(request: NextRequest) {
     const posts = docs
       .filter((p: any) => !!p?.slug)
       .map((p: any) => {
-        const thumbUrl = p?.thumb?.url
-          ? typeof p.thumb.url === 'string' && p.thumb.url.includes('http')
-            ? p.thumb.url
-            : `${baseUrl}${p.thumb.url}`
+        const imgSiteUrl = p?.imgSite?.url
+          ? typeof p.imgSite.url === 'string' && p.imgSite.url.includes('http')
+            ? p.imgSite.url
+            : `${baseUrl}${p.imgSite.url}`
           : ''
-        const imageUrl = p?.image?.url
-          ? typeof p.image.url === 'string' && p.image.url.includes('http')
-            ? p.image.url
-            : `${baseUrl}${p.image.url}`
+        const imgSocialUrl = p?.imgSocial?.url
+          ? typeof p.imgSocial.url === 'string' && p.imgSocial.url.includes('http')
+            ? p.imgSocial.url
+            : `${baseUrl}${p.imgSocial.url}`
           : ''
         const date = p.date || p.createdAt || new Date().toISOString()
         const formattedDate = new Date(date).toLocaleDateString('en-IN', dateFmt)
@@ -713,8 +713,8 @@ export async function GET(request: NextRequest) {
           formattedDate,
           readingTime,
           authors,
-          thumb: thumbUrl || imageUrl || '',
-          image: imageUrl || undefined,
+          imgSite: imgSiteUrl || imgSocialUrl || '',
+          imgSocial: imgSocialUrl || undefined,
           meta: p.meta || null,
           url: `/blog/${p.slug}`,
           path: `/blog/${p.slug}`,

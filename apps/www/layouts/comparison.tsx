@@ -79,7 +79,7 @@ const LayoutComparison = ({ components, props }: Props) => {
           images: [
             {
               url: `https://supabase.com${basePath}/images/blog/${
-                props.blog.image ? props.blog.image : props.blog.thumb
+                props.blog.imgSocial ? props.blog.imgSocial : props.blog.imgSite
               }`,
             },
           ],

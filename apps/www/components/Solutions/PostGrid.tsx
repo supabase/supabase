@@ -31,10 +31,10 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
               className="border rounded-md flex flex-col relative overflow-hidden"
               key={post.slug}
             >
-              {post.thumb && (
+              {post.imgSite && (
                 <div className="w-full aspect-video relative rounded-t-md dark:[mask-image:linear-gradient(to_bottom,_#000_0%,_#000_60%,_transparent_100%)]">
                   <Image
-                    src={`/images/blog/${post.thumb}`}
+                    src={`/images/blog/${post.imgSite}`}
                     alt={post.title || ''}
                     className="object-cover"
                     fill
