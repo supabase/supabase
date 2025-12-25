@@ -1,3 +1,4 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -18,7 +19,7 @@ export async function deleteDatabaseIndex({
   name,
   schema,
 }: DatabaseIndexDeleteVariables) {
-  const sql = `drop index if exists "${schema}"."${name}"`
+  const sql = `drop index if exists ${ident(schema)}.${ident(name)}`
 
   const { result } = await executeSql({
     projectRef,

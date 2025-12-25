@@ -146,7 +146,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
 
-  const isSelectEntityDisabled = entityTypes.length === 0
+  const isSelectEntityDisabled = entityTypes.length === 0 && searchTerm.length === 0
 
   return (
     <SidePanel
@@ -189,8 +189,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
@@ -210,7 +208,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             }}
                           >
                             <span>{schema.name}</span>
-                            {selectedEntity === schema.name && (
+                            {selectedSchema === schema.name && (
                               <Check className="text-brand" strokeWidth={2} size={16} />
                             )}
                           </CommandItem_Shadcn_>
