@@ -4,8 +4,11 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 export async function getDeploymentCommit(signal?: AbortSignal) {
-  const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-commit`)
-  return (await response.json()) as { commitSha: string; commitTime: string }
+  const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-commit`, { signal })
+  return (await response.json()) as {
+    deploymentCommit: { time: string; sha: string }
+    latestCommit: { time: string; sha: string }
+  }
 }
 
 export type DeploymentCommitData = Awaited<ReturnType<typeof getDeploymentCommit>>

@@ -82,7 +82,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   const sanitizedLogSnapshot = useConstant(getSanitizedBreadcrumbs)
 
-  const { data: commit } = useDeploymentCommitQuery()
+  const { data } = useDeploymentCommitQuery()
+  const commit = data?.deploymentCommit
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (_, variables) => {

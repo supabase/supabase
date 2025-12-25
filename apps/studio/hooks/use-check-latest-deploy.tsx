@@ -36,35 +36,34 @@ export function useCheckLatestDeploy() {
   const [currentCommitTime, setCurrentCommitTime] = useState('')
   const [isToastShown, setIsToastShown] = useState(false)
 
-  const { data: commit } = useDeploymentCommitQuery()
+  const { data } = useDeploymentCommitQuery()
+  const commit = data?.deploymentCommit
 
   const commitLoggedRef = useRef(false)
   useEffect(() => {
     if (commit && !commitLoggedRef.current) {
       const commitTime =
-        commit.commitTime === 'unknown'
+        commit.time === 'unknown'
           ? 'unknown time'
-          : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')
-      console.log(
-        `Supabase Studio is running commit ${commit.commitSha} deployed at ${commitTime}.`
-      )
+          : dayjs(commit.time).format('YYYY-MM-DD HH:mm:ss Z')
+      console.log(`Supabase Studio is running commit ${commit.sha} deployed at ${commitTime}.`)
       commitLoggedRef.current = true
     }
   }, [commit])
 
   useEffect(() => {
-    if (!commit || commit.commitTime === 'unknown') {
+    if (!commit || commit.time === 'unknown') {
       return
     }
 
     // set the current commit on first load
     if (!currentCommitTime) {
-      setCurrentCommitTime(commit.commitTime)
+      setCurrentCommitTime(commit.time)
       return
     }
 
     // if the current commit is the same as the fetched commit, do nothing
-    if (currentCommitTime === commit.commitTime) {
+    if (currentCommitTime === commit.time) {
       return
     }
 
@@ -74,7 +73,7 @@ export function useCheckLatestDeploy() {
     }
 
     // check if the time difference between commits is more than 24 hours
-    const hourDiff = dayjs(commit.commitTime).diff(dayjs(currentCommitTime), 'hour')
+    const hourDiff = dayjs(commit.time).diff(dayjs(currentCommitTime), 'hour')
     if (hourDiff < 24) {
       return
     }
