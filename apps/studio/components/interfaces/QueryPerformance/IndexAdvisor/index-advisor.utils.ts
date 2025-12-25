@@ -4,6 +4,8 @@ import { DatabaseExtension } from 'data/database-extensions/database-extensions-
 import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 
+import { INTERNAL_SCHEMAS } from 'hooks/useProtectedSchemas'
+
 /**
  * Gets the required extensions for index advisor
  * @param extensions Array of database extensions
@@ -100,4 +102,87 @@ export function hasIndexRecommendations(
   isSuccess: boolean
 ): boolean {
   return Boolean(isSuccess && result?.index_statements && result.index_statements.length > 0)
+}
+
+/**
+ * Filters out index statements that reference protected schemas
+ * Index statements are typically in the format: "CREATE INDEX ON schema.table USING ..."
+ *
+ * @param indexStatements Array of index statement strings
+ * @returns Filtered array excluding statements referencing protected schemas
+ */
+export function filterProtectedSchemaIndexStatements(indexStatements: string[]): string[] {
+  if (!indexStatements || indexStatements.length === 0) {
+    return []
+  }
+
+  return indexStatements.filter((statement) => {
+    // Match patterns like "CREATE INDEX ON schema.table" or "CREATE INDEX ON "schema"."table""
+    // Handle both quoted and unquoted schema names
+    const schemaMatch = statement.match(/ON\s+(?:"?(\w+)"?\.|(\w+)\.)/i)
+
+    if (!schemaMatch) {
+      // If we can't parse the schema, keep it (safer to show than hide)
+      return true
+    }
+
+    // Extract schema name (handle both quoted and unquoted)
+    const schemaName = schemaMatch[1] || schemaMatch[2]
+
+    if (!schemaName) {
+      return true
+    }
+
+    // Check if schema is in the protected schemas list
+    return !INTERNAL_SCHEMAS.includes(schemaName.toLowerCase())
+  })
+}
+
+/**
+ * Filters an index advisor result to remove recommendations for protected schemas
+ *
+ * @param result The index advisor result object
+ * @returns Filtered result with protected schema recommendations removed
+ */
+export function filterProtectedSchemaIndexAdvisorResult(
+  result: GetIndexAdvisorResultResponse | null | undefined
+): GetIndexAdvisorResultResponse | null {
+  if (!result || !result.index_statements) {
+    return result ?? null
+  }
+
+  const filteredStatements = filterProtectedSchemaIndexStatements(result.index_statements)
+
+  // If all statements were filtered out, return null
+  if (filteredStatements.length === 0) {
+    return null
+  }
+
+  return {
+    ...result,
+    index_statements: filteredStatements,
+  }
+}
+
+/**
+ * Checks if a query involves protected schemas by examining the SQL query text
+ *
+ * @param query The SQL query string
+ * @returns Whether the query involves protected schemas
+ */
+export function queryInvolvesProtectedSchemas(query: string | undefined | null): boolean {
+  if (!query) return false
+
+  const queryLower = query.toLowerCase()
+
+  // Check if the query references any protected schemas
+  // Match patterns like "schema.table", "FROM schema.table", "JOIN schema.table", etc.
+  return INTERNAL_SCHEMAS.some((schema) => {
+    // Match schema.table patterns (with or without quotes)
+    const schemaPattern = new RegExp(
+      `(?:from|join|update|insert\\s+into|delete\\s+from)\\s+(?:${schema}\\.|"${schema}"\\.)`,
+      'i'
+    )
+    return schemaPattern.test(queryLower)
+  })
 }

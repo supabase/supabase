@@ -26,7 +26,7 @@ interface SecretRowProps {
   onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowProps) => {
+export const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [revealSecret, setRevealSecret] = useState(false)
@@ -142,16 +142,16 @@ const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowProps) =
 
   return (
     <div className="w-full flex flex-col justify-center">
-      <p className="text-xs text-foreground truncate" title={name}>
+      <p className="text-xs text-foreground truncate select-text" title={name}>
         {name}
       </p>
       {row.description !== undefined && row.description !== '' && (
         <div>
-          <p className="text-xs text-foreground-lighter w-full truncate">{row.description}</p>
+          <p className="text-xs text-foreground-lighter w-full truncate select-text">
+            {row.description}
+          </p>
         </div>
       )}
     </div>
   )
 }
-
-export default SecretRow

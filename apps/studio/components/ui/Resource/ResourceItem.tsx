@@ -1,17 +1,31 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, MoreVertical } from 'lucide-react'
 import { forwardRef, HTMLAttributes, ReactNode } from 'react'
 
-import { CardContent, cn } from 'ui'
+import {
+  Button,
+  CardContent,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
+
+export interface ResourceAction {
+  label: string
+  onClick: () => void
+}
 
 export interface ResourceItemProps extends HTMLAttributes<HTMLDivElement> {
   media?: ReactNode
   meta?: ReactNode
   onClick?: () => void
   children?: ReactNode
+  actions?: ResourceAction[]
 }
 
 export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
-  ({ media, meta, onClick, children, className, ...props }, ref) => {
+  ({ media, meta, onClick, children, className, actions, ...props }, ref) => {
     return (
       <CardContent
         ref={ref}
@@ -29,7 +43,35 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         )}
         <div className="flex-1">{children}</div>
         {meta && <div>{meta}</div>}
-        {onClick && <ChevronRight strokeWidth={1.5} size={16} />}
+        {actions && actions.length > 0 ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="text"
+                className="px-1"
+                icon={<MoreVertical size={16} />}
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {actions.map((action) => (
+                <DropdownMenuItem
+                  key={action.label}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    action.onClick()
+                  }}
+                >
+                  {action.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          onClick && <ChevronRight strokeWidth={1.5} size={16} />
+        )}
       </CardContent>
     )
   }

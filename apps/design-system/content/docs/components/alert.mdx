@@ -7,46 +7,18 @@ source:
   shadcn: true
 ---
 
-The primitive component that forms [Admonition](../fragments/admonition). Do not use this component unless you are intentionally deviating from our consistent callout pattern.
+Alert forms the core primitives for [Admonition](../fragments/admonition). Use the Admonition component unless you must deviate from our consistent patterns. Examples where Alert might make sense include:
 
-<ComponentPreview
-  name="alert-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-  peekCode
-  wide
-/>
+- Bespoke icon requirement
+- Highly custom internal contents
+
+<ComponentPreview name="alert-demo" peekCode wide />
 
 ## Installation
-
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
 
 ```bash
 npx shadcn-ui@latest add alert
 ```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Copy and paste the following code into your project.</Step>
-
-<ComponentSource name="alert" />
-
-<Step>Update the import paths to match your project setup.</Step>
-
-</Steps>
-
-</TabsContent>
-
-</Tabs>
 
 ## Usage
 
@@ -63,19 +35,3 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
   </AlertDescription>
 </Alert>
 ```
-
-## Examples
-
-### Default
-
-<ComponentPreview
-  name="alert-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-/>
-
-### Destructive
-
-<ComponentPreview
-  name="alert-destructive"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>

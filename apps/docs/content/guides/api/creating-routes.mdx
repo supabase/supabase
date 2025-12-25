@@ -52,20 +52,26 @@ create table
 
 Every Supabase project has a unique API URL. Your API is secured behind an API gateway which requires an API Key for every request.
 
-1. Go to the [Settings](/dashboard/project/_/settings/general) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
+{/* TODO: Further consolidate partial */}
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-url-and-key.mp4"
-    type="video/mp4"
-  />
-</video>
+To do this, you need to get the Project URL and key from [the project's **Connect** dialog](/dashboard/project/_?showConnect=true).
+
+<Admonition type="note" title="Changes to API keys">
+
+Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
+
+In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
+
+- **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
+- **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
+
+</Admonition>
+
+[Read the API keys docs](/docs/guides/api/api-keys) for a full explanation of all key types and their uses.
 
 The REST API is accessible through the URL `https://<project_ref>.supabase.co/rest/v1`
 
-Both of these routes require the `anon` key to be passed through an `apikey` header.
+Both of these routes require the key to be passed through an `apikey` header.
 
 ## Using the API
 

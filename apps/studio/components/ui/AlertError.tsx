@@ -41,11 +41,7 @@ const ContactSupportButton = ({
   )
 }
 
-/**
- * @deprecated Use `import { Admonition } from "ui-patterns/admonition"` instead
- */
 // [Joshen] To standardize the language for all error UIs
-
 export const AlertError = ({
   projectRef,
   subject,
@@ -78,10 +74,10 @@ export const AlertError = ({
       }
       actions={
         additionalActions ? (
-          <div className="flex gap-2 mt-3">
+          <>
             {additionalActions}
             <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
-          </div>
+          </>
         ) : (
           <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
         )

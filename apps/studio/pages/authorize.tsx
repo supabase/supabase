@@ -10,7 +10,6 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { AuthorizeRequesterDetails } from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
@@ -40,6 +39,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -66,9 +66,15 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const {
     data: organizations,
     isSuccess: isSuccessOrganizations,
-    isLoading: isLoadingOrganizations,
+    isPending: isLoadingOrganizations,
   } = useOrganizationsQuery()
-  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
+  const {
+    data: requester,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+    error,
+  } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
   const isMcpClient = requester?.registration_type === 'dynamic'

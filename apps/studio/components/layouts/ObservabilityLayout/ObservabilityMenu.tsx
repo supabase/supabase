@@ -9,16 +9,16 @@ import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ObservabilityMenuItem } from './ObservabilityMenuItem'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { ObservabilityMenuItem } from './ObservabilityMenuItem'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -58,11 +58,11 @@ const ObservabilityMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')
