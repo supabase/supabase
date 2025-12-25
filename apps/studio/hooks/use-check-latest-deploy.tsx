@@ -33,11 +33,11 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
 // there's a new version of Studio is available, and the user has been on the old dashboard (based on commit) for more than 24 hours.
 // [Joshen] K-Dog has a suggestion here to bring down the time period here by checking commits
 export function useCheckLatestDeploy() {
-  const [currentCommitTime, setCurrentCommitTime] = useState('')
   const [isToastShown, setIsToastShown] = useState(false)
 
   const { data } = useDeploymentCommitQuery()
   const commit = data?.deploymentCommit
+  const latestCommit = data?.latestCommit
 
   const commitLoggedRef = useRef(false)
   useEffect(() => {
@@ -52,18 +52,12 @@ export function useCheckLatestDeploy() {
   }, [commit])
 
   useEffect(() => {
-    if (!commit || commit.time === 'unknown') {
-      return
-    }
-
-    // set the current commit on first load
-    if (!currentCommitTime) {
-      setCurrentCommitTime(commit.time)
-      return
-    }
-
-    // if the current commit is the same as the fetched commit, do nothing
-    if (currentCommitTime === commit.time) {
+    if (
+      !commit?.time ||
+      commit.time === 'unknown' ||
+      !latestCommit?.time ||
+      latestCommit.time === 'unknown'
+    ) {
       return
     }
 
@@ -73,7 +67,7 @@ export function useCheckLatestDeploy() {
     }
 
     // check if the time difference between commits is more than 24 hours
-    const hourDiff = dayjs(commit.time).diff(dayjs(currentCommitTime), 'hour')
+    const hourDiff = dayjs(latestCommit.time).diff(dayjs(commit.time), 'hour')
     if (hourDiff < 24) {
       return
     }
@@ -84,5 +78,5 @@ export function useCheckLatestDeploy() {
       position: 'bottom-right',
     })
     setIsToastShown(true)
-  }, [commit, isToastShown, currentCommitTime])
+  }, [commit?.time, latestCommit?.time, isToastShown])
 }
