@@ -21,6 +21,6 @@ export const useDeploymentCommitQuery = <TData = DeploymentCommitData>({
     queryKey: ['deployment-commit'],
     queryFn: ({ signal }) => getDeploymentCommit(signal),
     enabled: IS_PLATFORM && enabled,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 60, // 1 hour
     ...options,
   })
