@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchHandler } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 export async function getDeploymentCommit(signal?: AbortSignal) {
@@ -17,5 +17,7 @@ export const useDeploymentCommitQuery = <TData = DeploymentCommitData>({
   useQuery<DeploymentCommitData, ResponseError, TData>({
     queryKey: ['deployment-commit'],
     queryFn: ({ signal }) => getDeploymentCommit(signal),
+    enabled: IS_PLATFORM && enabled,
+    staleTime: 1000 * 60 * 10, // 10 minutes
     ...options,
   })
