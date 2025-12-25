@@ -72,8 +72,15 @@ export const RolesList = () => {
     urlKey: 'delete',
     select: (id: string) => (id ? otherRoles?.find((role) => role.id.toString() === id) : undefined),
     enabled: !!otherRoles,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`),
+    onError: (_error, selectedId) => {
+      const isSupabaseRole = supabaseRoles.find((role) => role.id === Number(selectedId)) !== undefined
+      if (isSupabaseRole) {
+        handleErrorOnDelete(deletingRoleIdRef, selectedId, `Cannot delete role as it is a Supabase role`)
+      } else {
+        handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`)
+      }
+    }
+
   })
 
   return (
