@@ -200,18 +200,16 @@ const AIEditor = ({
       diagnosticCodesToIgnore: [2792],
     })
 
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
-      .then((response) => response.text())
-      .then((code) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+    if (language === 'javascript' || language === 'typescript') {
+      // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
+      // Monaco editor.
+      import('public/deno/edge-runtime.d.ts' as string).then((module) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
       })
-
-    // Add edge runtime types to the TS language service
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
-      .then((response) => response.text())
-      .then((code) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      import('public/deno/lib.deno.d.ts' as string).then((module) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
       })
+    }
 
     if (!!executeQueryRef.current) {
       editor.addAction({
