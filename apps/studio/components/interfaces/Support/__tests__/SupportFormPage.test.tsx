@@ -300,7 +300,10 @@ describe('SupportFormPage', () => {
 
   beforeEach(async () => {
     mockUseDeploymentCommitQuery.mockReturnValue({
-      data: { commitSha: mockCommitSha, commitTime: mockCommitTime },
+      data: {
+        deploymentCommit: { time: mockCommitTime, sha: mockCommitSha },
+        latestCommit: { time: mockCommitTime, sha: mockCommitSha },
+      },
     })
     const { createSupportStorageClient } = await import('../support-storage-client')
     createSupportStorageClientMock = vi.mocked(createSupportStorageClient)
