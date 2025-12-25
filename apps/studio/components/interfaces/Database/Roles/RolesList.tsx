@@ -232,7 +232,7 @@ export const RolesList = () => {
         <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       )}
 
-      <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
+      <CreateRolePanel visible={isCreatingRole} disabled={!canUpdateRoles} onClose={() => setIsCreatingRole(false)} />
 
       <DeleteRoleModal
         role={roleToDelete as unknown as PostgresRole}
