@@ -49,6 +49,14 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return a sql snippet command when the command is using a SQL function from the search path', () => {
+    const command = 'SELECT test_cron_function()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
   it('should return a edge function config when the command posts to its own supabase.co project', () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), body:='', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
