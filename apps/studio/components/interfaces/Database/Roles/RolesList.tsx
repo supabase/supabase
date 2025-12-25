@@ -70,17 +70,22 @@ export const RolesList = () => {
 
   const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
     urlKey: 'delete',
-    select: (id: string) => (id ? otherRoles?.find((role) => role.id.toString() === id) : undefined),
+    select: (id: string) =>
+      id ? otherRoles?.find((role) => role.id.toString() === id) : undefined,
     enabled: !!otherRoles,
     onError: (_error, selectedId) => {
-      const isSupabaseRole = supabaseRoles.find((role) => role.id === Number(selectedId)) !== undefined
+      const isSupabaseRole =
+        supabaseRoles.find((role) => role.id === Number(selectedId)) !== undefined
       if (isSupabaseRole) {
-        handleErrorOnDelete(deletingRoleIdRef, selectedId, `Cannot delete role as it is a Supabase role`)
+        handleErrorOnDelete(
+          deletingRoleIdRef,
+          selectedId,
+          `Cannot delete role as it is a Supabase role`
+        )
       } else {
         handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`)
       }
-    }
-
+    },
   })
 
   return (
@@ -232,7 +237,11 @@ export const RolesList = () => {
         <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       )}
 
-      <CreateRolePanel visible={isCreatingRole} disabled={!canUpdateRoles} onClose={() => setIsCreatingRole(false)} />
+      <CreateRolePanel
+        visible={isCreatingRole}
+        disabled={!canUpdateRoles}
+        onClose={() => setIsCreatingRole(false)}
+      />
 
       <DeleteRoleModal
         role={roleToDelete as unknown as PostgresRole}
