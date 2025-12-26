@@ -1837,6 +1837,10 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Realtime Reports',
+          url: '/guides/realtime/reports' as `/${string}`,
+        },
+        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes' as `/${string}`,
         },
