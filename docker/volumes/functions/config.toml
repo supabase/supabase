@@ -1,0 +1,2 @@
+[functions.hello]
+verify_jwt = true
