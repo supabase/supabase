@@ -17,7 +17,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IncidentInfo[] | { error: string }>
 ) {
-  if (!IS_PLATFORM) {
+  // if (!IS_PLATFORM) {
+  // Allow mock incidents in development even when IS_PLATFORM is false
+  const hasMockIncidents = !!process.env.MOCK_INCIDENT_STATUS
+  if (!IS_PLATFORM && !hasMockIncidents) {
     return res.status(404).end()
   }
 
