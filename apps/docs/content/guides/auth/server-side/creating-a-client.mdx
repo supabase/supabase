@@ -627,7 +627,7 @@ export async function loader({}: LoaderFunctionArgs) {
   return {
     env: {
       SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+      SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
     },
   };
 }
@@ -635,7 +635,7 @@ export async function loader({}: LoaderFunctionArgs) {
 export default function Index() {
   const { env } = useLoaderData<typeof loader>();
 
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
 
   return ...
 }

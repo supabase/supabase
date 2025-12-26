@@ -59,7 +59,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
       ```dart main.dart
       await Supabase.initialize(
         url: 'SUPABASE_URL',
-        anonKey: 'SUPABASE_ANON_KEY',
+        anonKey: 'SUPABASE_PUBLISHABLE_KEY',
         authOptions: const FlutterAuthClientOptions(
           authFlowType: AuthFlowType.pkce,
         ),
@@ -295,7 +295,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
         ```dart
         await Supabase.initialize(
           url: 'SUPABASE_URL',
-          anonKey: 'SUPABASE_ANON_KEY',
+          anonKey: 'SUPABASE_PUBLISHABLE_KEY',
           authFlowType: AuthFlowType.implicit, // set to implicit by default
         );
         ```
@@ -305,7 +305,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
         ```dart
         await Supabase.initialize(
           url: 'SUPABASE_URL',
-          anonKey: 'SUPABASE_ANON_KEY',
+          anonKey: 'SUPABASE_PUBLISHABLE_KEY',
           authOptions: FlutterAuthClientOptions(
             authFlowType: AuthFlowType.pkce, // set to pkce by default
           )
@@ -339,7 +339,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
         ```dart
         await Supabase.initialize(
           url: 'SUPABASE_URL',
-          anonKey: 'SUPABASE_ANON_KEY',
+          anonKey: 'SUPABASE_PUBLISHABLE_KEY',
           authCallbackUrlHostname: 'auth-callback',
         );
         ```
@@ -349,7 +349,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
         ```dart
         await Supabase.initialize(
           url: 'SUPABASE_URL',
-          anonKey: 'SUPABASE_ANON_KEY',
+          anonKey: 'SUPABASE_PUBLISHABLE_KEY',
         );
         ```
 
