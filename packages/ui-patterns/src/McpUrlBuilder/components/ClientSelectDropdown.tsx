@@ -15,6 +15,7 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+
 import type { McpClient } from '../types'
 import { ConnectionIcon } from './ConnectionIcon'
 

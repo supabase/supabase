@@ -5,8 +5,10 @@ import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl, cn } from '@/lib/utils'
+
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
+
 import { allDocs } from 'contentlayer/generated'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'

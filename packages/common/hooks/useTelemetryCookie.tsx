@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+
 import { LOCAL_STORAGE_KEYS } from '../constants'
 import { getSharedTelemetryData, getTelemetryCookieOptions } from '../telemetry-utils'
 

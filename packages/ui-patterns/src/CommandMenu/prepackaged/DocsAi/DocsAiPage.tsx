@@ -1,11 +1,10 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { User } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-
-import { useBreakpoint } from 'common'
 import {
   AiIconAnimation,
   Button,
@@ -15,7 +14,6 @@ import {
   cn,
   markdownComponents,
 } from 'ui'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
@@ -29,6 +27,7 @@ import {
   useSetQuery,
 } from '../..'
 import { AiWarning, Message, MessageRole, MessageStatus, useAiChat } from '../ai'
+import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 const questions = [
   'How do I get started with Supabase?',

@@ -1,20 +1,21 @@
 'use client'
 
 import React, { forwardRef, useEffect } from 'react'
+
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { Button, ButtonVariantProps } from '../Button/Button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  DialogDescription,
-  DialogClose,
 } from '../shadcn/ui/dialog'
 
 export interface ModalProps extends React.ComponentProps<typeof DialogContent> {

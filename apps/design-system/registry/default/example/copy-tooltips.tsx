@@ -1,7 +1,7 @@
 'use client'
 
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { Info } from 'lucide-react'
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 export default function CopyTooltips() {
   return (

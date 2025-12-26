@@ -1,5 +1,5 @@
 import { Label_Shadcn_ } from 'ui'
-import { RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
+import { RadioGroupItem_Shadcn_, RadioGroup_Shadcn_ } from 'ui'
 
 export default function RadioGroupDemo() {
   return (

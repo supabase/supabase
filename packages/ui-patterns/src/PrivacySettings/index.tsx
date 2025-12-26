@@ -1,10 +1,10 @@
 'use client'
 
+import { useConsentState } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useState } from 'react'
-
-import { useConsentState } from 'common'
 import { Modal, Toggle } from 'ui'
+
 import { Admonition } from '../admonition'
 
 interface PrivacySettingsProps {

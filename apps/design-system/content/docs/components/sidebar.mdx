@@ -177,8 +177,8 @@ A `Sidebar` component is composed of the following parts:
 ## Usage
 
 ```tsx showLineNumbers title="app/layout.tsx"
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -225,8 +225,8 @@ Let's start with the most basic sidebar. A collapsible sidebar with a menu.
 <Step>Add a `SidebarProvider` and `SidebarTrigger` at the root of your application.</Step>
 
 ```tsx showLineNumbers title="app/layout.tsx"
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -411,8 +411,8 @@ To persist sidebar state in Next.js, set up your `SidebarProvider` in `app/layou
 ```tsx showLineNumbers title="app/layout.tsx"
 import { cookies } from 'next/headers'
 
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 export async function Layout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()

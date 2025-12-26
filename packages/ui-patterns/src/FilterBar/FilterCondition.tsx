@@ -1,18 +1,19 @@
-import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react'
-import { ActiveInput } from './hooks'
 import { X } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
   PopoverAnchor_Shadcn_,
+  PopoverContent_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
-import { buildOperatorItems, buildValueItems, MenuItem } from './menuItems'
+
+import { DefaultCommandList } from './DefaultCommandList'
+import { ActiveInput } from './hooks'
+import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import { MenuItem, buildOperatorItems, buildValueItems } from './menuItems'
 import { FilterGroup as FilterGroupType } from './types'
 import { FilterCondition as FilterConditionType, FilterProperty } from './types'
-import { useDeferredBlur, useHighlightNavigation } from './hooks'
-import { DefaultCommandList } from './DefaultCommandList'
 
 type FilterConditionProps = {
   condition: FilterConditionType

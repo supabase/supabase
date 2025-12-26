@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+
 import { isAdmin, isAdminFieldLevel } from '../access/isAdmin.ts'
 import { isAdminOrSelf } from '../access/isAdminOrSelf.ts'
 

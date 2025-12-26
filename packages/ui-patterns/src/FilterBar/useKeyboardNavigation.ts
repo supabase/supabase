@@ -1,7 +1,8 @@
 import React, { KeyboardEvent, useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
 import { FilterGroup } from './types'
-import { findGroupByPath, findConditionByPath, removeFromGroup } from './utils'
+import { findConditionByPath, findGroupByPath, removeFromGroup } from './utils'
 
 export function useKeyboardNavigation({
   activeInput,

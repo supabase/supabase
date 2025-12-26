@@ -1,7 +1,8 @@
-import type { Config } from '@/payload-types'
-
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+
+import type { Config } from '@/payload-types'
+
 // Do not import next/cache at module scope to keep migrate step Node-compatible
 
 type Global = keyof Config['globals']

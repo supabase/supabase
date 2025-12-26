@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Button } from 'ui/src/components/Button'
+import { useEffect, useRef } from 'react'
+
 import announcement from '../Banners/data.json'
+import { Button } from 'ui/src/components/Button'
 
 export function LW15Banner() {
   const pathname = usePathname()

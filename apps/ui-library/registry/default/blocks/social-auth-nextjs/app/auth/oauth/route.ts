@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server'
 

@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 

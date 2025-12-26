@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { FilterProperty, FilterGroup as FilterGroupType } from './types'
-import { ActiveInput } from './hooks'
-import { FilterCondition } from './FilterCondition'
-import { Input_Shadcn_, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverAnchor_Shadcn_ } from 'ui'
-import { buildPropertyItems, MenuItem } from './menuItems'
-import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Input_Shadcn_, PopoverAnchor_Shadcn_, PopoverContent_Shadcn_, Popover_Shadcn_ } from 'ui'
+
 import { DefaultCommandList } from './DefaultCommandList'
+import { FilterCondition } from './FilterCondition'
+import { ActiveInput } from './hooks'
+import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import { MenuItem, buildPropertyItems } from './menuItems'
+import { FilterGroup as FilterGroupType, FilterProperty } from './types'
 
 type FilterGroupProps = {
   group: FilterGroupType

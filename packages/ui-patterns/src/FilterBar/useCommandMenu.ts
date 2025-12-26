@@ -1,9 +1,11 @@
+import { Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import * as React from 'react'
-import { Sparkles } from 'lucide-react'
+
 import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
+import { FilterGroup, FilterProperty } from './types'
 import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
+
 // Deprecated soon; kept for compatibility during refactor
 
 export type CommandItem = {

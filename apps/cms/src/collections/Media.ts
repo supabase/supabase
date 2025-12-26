@@ -1,9 +1,9 @@
-import type { CollectionConfig } from 'payload'
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
+import type { CollectionConfig } from 'payload'
 
 import { isAnyone } from '../access/isAnyone.ts'
 import { isAuthenticated } from '../access/isAuthenticated.ts'

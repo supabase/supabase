@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { FilterProperty, FilterOptionObject, AsyncOptionsFunction } from './types'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { AsyncOptionsFunction, FilterOptionObject, FilterProperty } from './types'
 import { isAsyncOptionsFunction } from './utils'
 
 export type ActiveInput =

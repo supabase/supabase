@@ -1,6 +1,6 @@
-import { Announcement } from 'ui/src/layout/banners'
 import LW15Banner from './LW15Banner'
 import announcementJSON from './data.json'
+import { Announcement } from 'ui/src/layout/banners'
 
 export const announcement = announcementJSON
 

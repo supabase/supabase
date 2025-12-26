@@ -1,6 +1,5 @@
 import { Microscope } from 'lucide-react'
-
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, cn } from 'ui'
 
 const AiWarning = ({ className }: { className?: string }) => (
   <Alert_Shadcn_ className={cn('!m-0', className)} variant="warning">
