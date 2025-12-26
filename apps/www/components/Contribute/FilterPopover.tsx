@@ -1,17 +1,16 @@
 'use client'
 
+import { X } from 'lucide-react'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { X, Check } from 'lucide-react'
-import { useQueryState, parseAsArrayOf, parseAsString } from 'nuqs'
 import {
   Button,
+  cn,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  cn,
   ScrollArea,
 } from 'ui'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 interface FilterPopoverProps {
   allProductAreas: string[]
@@ -68,8 +67,16 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
         <div className="">
           {/* Header */}
           <div className="flex flex-row items-center justify-between px-4 py-2 bg-muted dark:bg-foreground-muted/10 border-b rounded-t-md">
-            <h3 className="text-base text-foreground">Filter Threads</h3>
-            <div className="flex items-center gap-2">
+            <h3 className="font-mono uppercase text-xs font-normal text-foreground-lighter">
+              Filter threads
+            </h3>
+            <div
+              className={cn(
+                'flex items-center gap-2',
+                // Set a min-height to avoid layout shift when the button is hidden/shown
+                'min-h-8'
+              )}
+            >
               {((productAreas && productAreas.length > 0) || (stacks && stacks.length > 0)) && (
                 <Button
                   type="outline"
@@ -87,8 +94,8 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
             <div className="grid gap-8 p-4">
               {/* Product Area Section */}
               <div className="grid gap-3 pb-0">
-                <h3 className="text-sm  text-muted-foreground">Product Area</h3>
-                <div className="flex flex-wrap gap-2">
+                <h3 className="text-sm  text-muted-foreground">Product area</h3>
+                <div className="flex flex-wrap gap-1.5">
                   {allProductAreas
                     .filter((area) => area !== 'Other')
                     .map((area) => {
@@ -96,10 +103,9 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                       return (
                         <Button
                           key={area}
-                          type={isSelected ? 'primary' : 'dashed'}
+                          type={isSelected ? 'secondary' : 'dashed'}
                           size="tiny"
                           onClick={() => handleProductAreaClick(area)}
-                          icon={isSelected ? <Check className="h-3.5 w-3.5 shrink-0" /> : undefined}
                           className="justify-start w-fit"
                         >
                           {area}
@@ -111,8 +117,8 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
 
               {/* Tech Stack Section */}
               <div className="grid gap-3">
-                <h3 className="text-sm  text-muted-foreground">Tech Stack</h3>
-                <div className="flex flex-wrap gap-2">
+                <h3 className="text-sm  text-muted-foreground">Tech stack</h3>
+                <div className="flex flex-wrap gap-1.5">
                   {allStacks
                     .filter((tech) => tech !== 'Other')
                     .map((tech) => {
@@ -120,10 +126,10 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                       return (
                         <Button
                           key={tech}
-                          type={isSelected ? 'primary' : 'dashed'}
+                          // [Danny] We should switch to using Toggle component here, like downgrade plan flow
+                          type={isSelected ? 'secondary' : 'dashed'}
                           size="tiny"
                           onClick={() => handleStackClick(tech)}
-                          icon={isSelected ? <Check className="h-3.5 w-3.5 shrink-0" /> : undefined}
                           className="justify-start w-fit"
                         >
                           {tech}
