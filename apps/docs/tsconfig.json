@@ -4,7 +4,9 @@
     "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
+      // @deprecated: use @/ instead of ~/
       "~/*": ["./*"],
+      "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"]
     },
     "target": "ES2021",

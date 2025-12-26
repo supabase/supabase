@@ -3,7 +3,9 @@
     "baseUrl": ".",
     "paths": {
       "contentlayer/generated": ["./.contentlayer/generated"],
+      // ~/ is deprecated, use @/ instead
       "~/*": ["./*"],
+      "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"]
     },
     "downlevelIteration": true,
@@ -21,6 +23,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
