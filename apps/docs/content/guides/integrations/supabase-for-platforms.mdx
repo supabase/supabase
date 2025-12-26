@@ -28,6 +28,7 @@ We recommend:
 - **a _very_ secure password for each database**. Do not reuse the same password across databases.
 - **storing the encrypted version of the password**. Once you set the password during project creation, there is no way to programmatically change the password but you can do so manually in the Supabase Dashboard.
 - **using smart region selection to ensure there's enough capacity**. The available smart region codes are `americas`, `emea`, and `apac` and you can make a request to [`GET /v1/projects/available-regions`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/available-regions) for region details.
+- **using an appropriate instance size**. Scale to zero pricing only applies to `pico` instances, make sure to not pass in a `desired_instance_size` when creating a project. >= Micro instances are not able to scale to zero.
 - **make sure that the services are `ACTIVE_HEALTHY` after project creation**. After creating project, confirm the service that you want to make a request to has a status of `ACTIVE_HEALTHY` by polling [`GET /v1/projects/{ref}/health`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/{ref}/health). For example, before making a request to set an Auth configuration confirm that the Auth service has a status of `ACTIVE_HEALTHY`.
 
 ```sh
