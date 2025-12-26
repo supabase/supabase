@@ -16,15 +16,41 @@ import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
   GENERAL_PROMPT,
-  PG_BEST_PRACTICES,
-  RLS_PROMPT,
-  REALTIME_PROMPT,
-  SECURITY_PROMPT,
   LIMITATIONS_PROMPT,
+  PG_BEST_PRACTICES,
+  REALTIME_PROMPT,
+  RLS_PROMPT,
+  SECURITY_PROMPT,
 } from 'lib/ai/prompts'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+import { getActiveIncidents, type IncidentInfo } from 'lib/api/incident-status'
 
 const { streamText } = wrapAISDK(ai)
+
+/**
+ * Fetches active incidents and formats them into a context string for the AI.
+ * Returns an empty string if there are no incidents or if fetching fails.
+ */
+async function getIncidentContext(): Promise<string> {
+  try {
+    const incidents = await getActiveIncidents()
+
+    if (incidents.length === 0) {
+      return ''
+    }
+
+    const incidentSummaries = incidents
+      .map((incident: IncidentInfo) => `"${incident.name}" (status: ${incident.status})`)
+      .join(', ')
+
+    const isPlural = incidents.length > 1
+    return `IMPORTANT: There ${isPlural ? 'are' : 'is'} currently ${incidents.length} active incident${isPlural ? 's' : ''} on Supabase's infrastructure: ${incidentSummaries}. If the user is asking about issues that may be related to these incidents, inform them about the ongoing incident(s) and direct them to https://status.supabase.com for real-time updates.`
+  } catch (error) {
+    // Silently fail - don't block AI responses if incident fetch fails
+    console.warn('Failed to fetch incident status for AI context:', error)
+    return ''
+  }
+}
 
 export async function generateAssistantResponse({
   messages: rawMessages,
@@ -75,10 +101,13 @@ export async function generateAssistantResponse({
     return msg
   })
 
-  const schemasString =
+  // Fetch schemas and incident context in parallel
+  const [schemasString, incidentContext] = await Promise.all([
     aiOptInLevel !== 'disabled' && getSchemas
-      ? await getSchemas()
-      : "You don't have access to any schemas."
+      ? getSchemas()
+      : Promise.resolve("You don't have access to any schemas."),
+    getIncidentContext(),
+  ])
 
   // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
   const system = source`
@@ -94,10 +123,12 @@ export async function generateAssistantResponse({
 
   // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
   // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-  const assistantContent =
+  const baseContext =
     projectRef || chatName || schemasString !== "You don't have access to any schemas."
-      ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}`
+      ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
       : undefined
+
+  const assistantContent = [baseContext, incidentContext].filter(Boolean).join(' ') || undefined
 
   const coreMessages: ModelMessage[] = [
     {

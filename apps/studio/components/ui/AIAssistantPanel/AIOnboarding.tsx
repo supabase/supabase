@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion'
-import { BarChart, FileText, Shield } from 'lucide-react'
+import { AlertTriangle, BarChart, ExternalLink, FileText, Shield } from 'lucide-react'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
 import { type Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { Button, Skeleton } from 'ui'
+import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
+import { processIncidentData } from 'data/platform/incident-status-utils'
+import { Button, cn, Skeleton } from 'ui'
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
 import type { SqlSnippet } from './AIAssistant.types'
 
@@ -43,6 +46,10 @@ export const AIOnboarding = ({
   } = useProjectLintsQuery({ projectRef })
   const isLintsLoading = isLoadingLints || isFetchingLints
 
+  const { data: incidents } = useIncidentStatusQuery()
+  const hasActiveIncidents = incidents && incidents.length > 0
+  const incidentData = hasActiveIncidents ? processIncidentData(incidents) : null
+
   const errorLints: Lint[] = (lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ??
     []) as Lint[]
   const securityErrorLints = errorLints.filter((lint) => lint.categories?.[0] === 'SECURITY')
@@ -52,6 +59,48 @@ export const AIOnboarding = ({
     <div className="flex-1 overflow-y-auto">
       <div className="w-full flex-1 max-h-full min-h-full px-4 flex flex-col gap-0">
         <div className="mt-auto w-full space-y-6 py-8 ">
+          {hasActiveIncidents && incidentData && (
+            <motion.div
+              initial={{ y: 5, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="mx-4 mb-2"
+            >
+              <div className="rounded-md border border-warning-500 bg-warning-200 p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle
+                    size={16}
+                    strokeWidth={1.5}
+                    className="text-warning-600 mt-0.5 flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-warning-600">
+                      {incidents.length === 1
+                        ? 'Active incident'
+                        : `${incidents.length} active incidents`}
+                    </p>
+                    <p className="text-xs text-warning-600/80 mt-0.5">
+                      {incidentData.mostCriticalIncident?.name}
+                      {incidents.length > 1 &&
+                        ` and ${incidents.length - 1} other${incidents.length > 2 ? 's' : ''}`}
+                    </p>
+                    <Link
+                      href="https://status.supabase.com"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cn(
+                        'inline-flex items-center gap-1 text-xs mt-2',
+                        'text-warning-600 hover:text-warning-700 underline underline-offset-2'
+                      )}
+                    >
+                      View status page
+                      <ExternalLink size={12} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
           <h2 className="heading-section text-foreground mx-4">How can I assist you?</h2>
           {suggestions?.prompts?.length ? (
             <div>
