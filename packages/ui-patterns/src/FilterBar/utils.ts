@@ -6,8 +6,8 @@ import {
   FilterOperatorObject,
   FilterOptionObject,
   FilterProperty,
-  SyncOptionsFunction,
   isGroup,
+  SyncOptionsFunction,
 } from './types'
 
 export function pathsEqual(a: number[], b: number[]): boolean {
