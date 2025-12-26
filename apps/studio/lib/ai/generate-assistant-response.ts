@@ -123,10 +123,12 @@ export async function generateAssistantResponse({
 
   // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
   // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-  const baseContext =
+  const hasProjectContext =
     projectRef || chatName || schemasString !== "You don't have access to any schemas."
-      ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
-      : undefined
+
+  const baseContext = hasProjectContext
+    ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
+    : undefined
 
   const assistantContent = [baseContext, incidentContext].filter(Boolean).join(' ') || undefined
 

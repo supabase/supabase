@@ -20,9 +20,12 @@ const STATUSPAGE_API_KEY = process.env.STATUSPAGE_API_KEY
  * Example in .env.local:
  * MOCK_INCIDENT_STATUS='[{"id":"123","name":"Test incident","status":"investigating","impact":"major","active_since":"2025-01-15T08:00:00Z"}]'
  */
-const MOCK_INCIDENT_STATUS = process.env.MOCK_INCIDENT_STATUS
+// const MOCK_INCIDENT_STATUS = process.env.MOCK_INCIDENT_STATUS
+const MOCK_INCIDENT_STATUS = false
 
-const INCIDENTS_ENDPOINT = `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/incidents/unresolved`
+function getIncidentsEndpoint(): string {
+  return `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/incidents/unresolved`
+}
 
 const StatusPageIncidentsSchema = z.array(
   z.object({
@@ -81,7 +84,7 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
     throw new InternalServerError('StatusPage API key is not configured')
   }
 
-  const response = await fetch(INCIDENTS_ENDPOINT, {
+  const response = await fetch(getIncidentsEndpoint(), {
     headers: {
       Authorization: `OAuth ${STATUSPAGE_API_KEY}`,
       Accept: 'application/json',
@@ -119,12 +122,14 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
 
   const now = Date.now()
   const activeIncidents = result.data.filter((incident) => {
-    if (!incident.scheduled_for) {
+    const hasNoScheduledTime = !incident.scheduled_for
+    if (hasNoScheduledTime) {
       return true
     }
 
-    const scheduledTime = Date.parse(incident.scheduled_for)
-    if (Number.isNaN(scheduledTime)) {
+    const scheduledTime = Date.parse(incident.scheduled_for!)
+    const isScheduledTimeInvalid = Number.isNaN(scheduledTime)
+    if (isScheduledTimeInvalid) {
       // Keep the record but note it locally for debugging
       console.warn('Encountered incident with invalid scheduled_for date', {
         incidentId: incident.id,
@@ -133,7 +138,8 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
       return true
     }
 
-    return scheduledTime <= now
+    const hasScheduledTimePassed = scheduledTime <= now
+    return hasScheduledTimePassed
   })
 
   return activeIncidents.map((incident) => ({
