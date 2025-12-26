@@ -1,10 +1,9 @@
 'use client'
 
 import * as React from 'react'
-
-import { cn } from 'ui'
-import { Button } from 'ui'
 import {
+  Button,
+  cn,
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
