@@ -75,8 +75,8 @@ const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoist
   const commitTime = '2024-01-01T00:00:00Z'
 
   const createCommitResponse = () => ({
-    commitSha: sha,
-    commitTime,
+    deploymentCommit: { time: commitTime, sha },
+    latestCommit: { time: commitTime, sha },
   })
 
   return {
@@ -300,7 +300,10 @@ describe('SupportFormPage', () => {
 
   beforeEach(async () => {
     mockUseDeploymentCommitQuery.mockReturnValue({
-      data: { commitSha: mockCommitSha, commitTime: mockCommitTime },
+      data: {
+        deploymentCommit: { time: mockCommitTime, sha: mockCommitSha },
+        latestCommit: { time: mockCommitTime, sha: mockCommitSha },
+      },
     })
     const { createSupportStorageClient } = await import('../support-storage-client')
     createSupportStorageClientMock = vi.mocked(createSupportStorageClient)

@@ -82,9 +82,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   const sanitizedLogSnapshot = useConstant(getSanitizedBreadcrumbs)
 
-  const { data: commit } = useDeploymentCommitQuery({
-    staleTime: 1000 * 60 * 10, // 10 minutes
-  })
+  const { data } = useDeploymentCommitQuery()
+  const commit = data?.deploymentCommit
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (_, variables) => {
