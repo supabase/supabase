@@ -1,12 +1,12 @@
-import { Badge } from 'ui'
-import { getThreadRepliesById } from '~/data/contribute'
+import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { RepliesList } from './RepliesList'
-import Link from 'next/link'
-import { markdownComponents } from './markdownComponents'
-import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { Badge } from 'ui'
+import { getThreadRepliesById } from '~/data/contribute'
 import type { ThreadRow } from '~/types/contribute'
+import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { markdownComponents } from './markdownComponents'
+import { RepliesList } from './RepliesList'
 
 export async function Conversation({ thread }: { thread: ThreadRow }) {
   const { question, replies } = await getThreadRepliesById(thread.thread_key)
@@ -32,7 +32,7 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
               <span className="text-sm text-foreground-lighter">•</span>
               <span className="text-sm text-foreground-lighter">{thread.posted}</span>
             </div>
-            <h1 className="text-2xl font-semibold text-foreground mb-2">{thread.title}</h1>
+            <h1 className="text-2xl font-medium text-foreground mb-2">{thread.title}</h1>
             <p className="text-sm text-foreground-lighter">
               by{' '}
               <Link
@@ -85,8 +85,8 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
       {thread.summary && (
         <div className="mb-6">
           <div className="p-4 min-w-0 border border-border rounded-lg bg-surface-100">
-            <h3 className="text-sm font-semibold text-foreground mb-2">Thread summary</h3>
-            <p className="text-sm text-foreground-light">{thread.summary}</p>
+            <h3 className="text-sm font-medium text-foreground mb-2">Thread summary</h3>
+            <p className="text-base text-foreground-light">{thread.summary}</p>
           </div>
         </div>
       )}

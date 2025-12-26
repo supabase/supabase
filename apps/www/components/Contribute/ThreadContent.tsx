@@ -21,10 +21,10 @@ export async function ThreadContent({ id }: { id: string }) {
 
       {/* Metadata and Actions Section */}
       <div className="border border-border rounded-lg p-6 bg-surface-200">
-        <div className="grid gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
           {thread.product_areas.filter((area: string) => area !== 'Other').length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-2">Product Areas</h3>
+              <h3 className="text-sm font-medium text-foreground mb-2">Product areas</h3>
               <div className="flex flex-wrap gap-2">
                 {thread.product_areas
                   .filter((area: string) => area !== 'Other')
@@ -39,7 +39,7 @@ export async function ThreadContent({ id }: { id: string }) {
 
           {thread.stack.filter((tech: string) => tech !== 'Other').length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-2">Stack</h3>
+              <h3 className="text-sm font-medium text-foreground mb-2">Stack</h3>
               <div className="flex flex-wrap gap-2">
                 {thread.stack
                   .filter((tech: string) => tech !== 'Other')

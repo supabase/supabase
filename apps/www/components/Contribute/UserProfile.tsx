@@ -1,8 +1,8 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Badge, Button } from 'ui'
-import { getUserActivity } from '~/data/contribute'
 import { DiscordIcon, GitHubIcon, RedditIcon } from '~/components/Contribute/Icons'
-import Link from 'next/link'
+import { getUserActivity } from '~/data/contribute'
 import type { ThreadRow } from '~/types/contribute'
 
 function ThreadCard({ thread }: { thread: ThreadRow }) {
@@ -124,7 +124,7 @@ export async function UserProfile({ username }: { username: string }) {
       {/* Threads Section */}
       {threads.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl  text-foreground mb-4">Threads</h2>
+          <h2 className="text-xl  text-foreground mb-4">Threads created</h2>
           <div className="grid gap-3">
             {threads.map((thread) => (
               <ThreadCard key={thread.id} thread={thread} />
@@ -136,7 +136,7 @@ export async function UserProfile({ username }: { username: string }) {
       {/* Replies Section */}
       {replies.length > 0 && (
         <div>
-          <h2 className="text-xl text-foreground mb-4">Recent Replies</h2>
+          <h2 className="text-xl text-foreground mb-4">Recent replies</h2>
           <div className="grid gap-3">
             {replies.map((reply) => {
               const thread = replyThreads.find((t) => t.thread_key === reply.thread_key)
