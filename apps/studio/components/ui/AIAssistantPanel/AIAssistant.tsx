@@ -534,7 +534,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </AnimatePresence>
 
         <div className="px-3 pb-3 z-20 relative flex flex-col gap-y-3">
-          {hasActiveIncidents && incidentData && (
+          {!hasMessages && hasActiveIncidents && incidentData && (
             <Admonition
               showIcon={false}
               type="warning"
