@@ -1,6 +1,6 @@
-import type { QuoteBlock as QuoteBlockProps } from '@/payload-types'
-
 import React from 'react'
+
+import type { QuoteBlock as QuoteBlockProps } from '@/payload-types'
 
 type Props = {
   className?: string
