@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react'
 import {
   MetricCard,
+  MetricCardContent,
+  MetricCardDifferential,
   MetricCardHeader,
   MetricCardLabel,
-  MetricCardContent,
   MetricCardValue,
-  MetricCardDifferential,
 } from 'ui-patterns/MetricCard'
 
 export default function MetricsCardDemo() {
