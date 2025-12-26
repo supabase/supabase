@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "contentlayer/generated": ["./.contentlayer/generated"],
       // ~/ is deprecated, use @/ instead
