@@ -45,19 +45,6 @@ export const RolesList = () => {
     connectionString: project?.connectionString,
   })
 
-  const [isCreatingRole, setIsCreatingRole] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
-    enabled: !!data,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`),
-  })
-
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
   const filteredRoles = (
@@ -75,6 +62,31 @@ export const RolesList = () => {
     roles.filter((role) => role.activeConnections > 0),
     (r) => -r.activeConnections
   )
+
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) =>
+      id ? otherRoles?.find((role) => role.id.toString() === id) : undefined,
+    enabled: !!otherRoles,
+    onError: (_error, selectedId) => {
+      const isSupabaseRole =
+        supabaseRoles.find((role) => role.id === Number(selectedId)) !== undefined
+      if (isSupabaseRole) {
+        handleErrorOnDelete(
+          deletingRoleIdRef,
+          selectedId,
+          `Cannot delete role as it is a Supabase role`
+        )
+      } else {
+        handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`)
+      }
+    },
+  })
 
   return (
     <>
@@ -225,7 +237,11 @@ export const RolesList = () => {
         <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       )}
 
-      <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
+      <CreateRolePanel
+        visible={isCreatingRole}
+        disabled={!canUpdateRoles}
+        onClose={() => setIsCreatingRole(false)}
+      />
 
       <DeleteRoleModal
         role={roleToDelete as unknown as PostgresRole}
