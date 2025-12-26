@@ -1,5 +1,6 @@
-import * as React from 'react'
 import { Sparkles } from 'lucide-react'
+import * as React from 'react'
+
 import { ActiveInput } from './hooks'
 import { FilterGroup, FilterProperty } from './types'
 import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'

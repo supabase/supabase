@@ -1,7 +1,8 @@
-import type OpenAI from 'openai'
-import { ContextLengthError } from '../errors'
-import { jsonrepair } from 'jsonrepair'
 import { codeBlock } from 'common-tags'
+import { jsonrepair } from 'jsonrepair'
+import type OpenAI from 'openai'
+
+import { ContextLengthError } from '../errors'
 
 // Responds to a natural language request for cron syntax.
 export async function generateCron(openai: OpenAI, prompt: string) {

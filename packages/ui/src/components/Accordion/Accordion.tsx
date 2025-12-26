@@ -1,9 +1,9 @@
 'use client'
 
 import * as RadixAccordion from '@radix-ui/react-accordion'
+import { ChevronDown } from 'lucide-react'
 import React, { createContext, useContext, useState } from 'react'
 
-import { ChevronDown } from 'lucide-react'
 import styleHandler from '../../lib/theme/styleHandler'
 
 type Type = 'default' | 'bordered'

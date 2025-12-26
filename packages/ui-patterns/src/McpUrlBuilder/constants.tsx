@@ -1,4 +1,3 @@
-import { CodeBlock } from 'ui/src/components/CodeBlock'
 import type {
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
@@ -11,6 +10,7 @@ import type {
   WindsurfMcpConfig,
 } from './types'
 import { getMcpUrl } from './types'
+import { CodeBlock } from 'ui/src/components/CodeBlock'
 
 export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {

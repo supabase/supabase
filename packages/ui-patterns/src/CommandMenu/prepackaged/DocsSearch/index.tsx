@@ -1,12 +1,12 @@
 import { Book } from 'lucide-react'
 
 import {
+  type CommandOptions,
+  type ICommand,
   PageType,
   useRegisterCommands,
   useRegisterPage,
   useSetPage,
-  type CommandOptions,
-  type ICommand,
 } from '../..'
 import { DocsSearchPage } from './DocsSearchPage'
 

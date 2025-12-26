@@ -3,6 +3,7 @@
 import { useBreakpoint } from 'common'
 import { noop } from 'lodash'
 import { Button } from 'ui'
+
 import { PrivacySettings } from '../PrivacySettings'
 
 interface ConsentToastProps {

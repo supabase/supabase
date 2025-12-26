@@ -1,5 +1,5 @@
-import { forwardRef, type CSSProperties } from 'react'
-import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { type CSSProperties, forwardRef } from 'react'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from 'ui'
 
 export interface ShimmeringLoader {
   className?: string

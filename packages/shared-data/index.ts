@@ -1,7 +1,7 @@
 import config from './config'
 import extensions from './extensions.json'
 import logConstants from './logConstants'
-import { plans, PricingInformation } from './plans'
+import { PricingInformation, plans } from './plans'
 import { pricing } from './pricing'
 import { PRODUCT_MODULES, products } from './products'
 import questions from './questions'

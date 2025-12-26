@@ -1,9 +1,9 @@
 'use client'
 
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
+import { Circle } from 'lucide-react'
 import * as React from 'react'
 
-import { Circle } from 'lucide-react'
 import { Label } from '../components/shadcn/ui/label'
 import { cn } from '../lib/utils/cn'
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { VERSION_SQL } from './sql/version'
 
 export const pgVersionZod = z.object({

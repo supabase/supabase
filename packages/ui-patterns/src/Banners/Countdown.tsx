@@ -1,4 +1,5 @@
 import Countdown from 'react-countdown'
+
 import { CountdownWidget } from '../CountdownWidget'
 
 const CountdownComponent = ({

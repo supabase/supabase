@@ -14,6 +14,7 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
 interface MultiSelectOption {

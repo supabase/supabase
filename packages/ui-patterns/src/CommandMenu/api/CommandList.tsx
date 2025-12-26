@@ -1,15 +1,14 @@
 'use client'
 
 import { forwardRef, useRef } from 'react'
-
 import { CommandList_Shadcn_, cn } from 'ui'
 
 import { CommandItem } from '../internal/Command'
 import { CommandEmpty } from '../internal/CommandEmpty'
 import { CommandGroup } from '../internal/CommandGroup'
+import { TextHighlighter } from './TextHighlighter'
 import { useCommands } from './hooks/commandsHooks'
 import { useQuery } from './hooks/queryHooks'
-import { TextHighlighter } from './TextHighlighter'
 
 const CommandList = forwardRef<
   React.ElementRef<typeof CommandList_Shadcn_>,

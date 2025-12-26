@@ -1,7 +1,7 @@
 'use client'
 
-import { cn, Switch } from 'ui'
-import { Label } from 'ui/src/components/shadcn/ui/label'
+import { Switch, cn } from 'ui'
+
 import { InfoTooltip } from '../../info-tooltip'
 import {
   MultiSelector,
@@ -11,6 +11,7 @@ import {
   MultiSelectorTrigger,
 } from '../../multi-select'
 import type { McpFeatureGroup } from '../types'
+import { Label } from 'ui/src/components/shadcn/ui/label'
 
 interface McpConfigurationOptionsProps {
   isPlatform: boolean

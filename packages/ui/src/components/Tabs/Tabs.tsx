@@ -3,12 +3,13 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import {
   Children,
-  useMemo,
-  useState,
   type KeyboardEvent,
   type PropsWithChildren,
   type RefObject,
+  useMemo,
+  useState,
 } from 'react'
+
 import styleHandler from '../../lib/theme/styleHandler'
 
 export interface TabsProps {

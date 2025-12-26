@@ -2,7 +2,7 @@ import { AiIconAnimation } from 'ui'
 
 import { useRegisterCommands } from '../../api/hooks/commandsHooks'
 import { useRegisterPage, useSetPage } from '../../api/hooks/pagesHooks'
-import type { ICommand, CommandOptions } from '../../api/types'
+import type { CommandOptions, ICommand } from '../../api/types'
 import { PageType } from '../../api/utils'
 import { DocsAiPage } from './DocsAiPage'
 

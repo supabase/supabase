@@ -1,20 +1,21 @@
-import { describe, it, expect } from 'vitest'
 import * as React from 'react'
+import { describe, expect, it } from 'vitest'
+
+import { FilterGroup, FilterProperty } from './types'
 import {
-  findGroupByPath,
-  findConditionByPath,
   addFilterToGroup,
   addGroupToGroup,
-  removeFromGroup,
-  updateNestedValue,
-  updateNestedOperator,
-  updateNestedLogicalOperator,
+  findConditionByPath,
+  findGroupByPath,
+  isAsyncOptionsFunction,
   isCustomOptionObject,
   isFilterOptionObject,
-  isAsyncOptionsFunction,
   isSyncOptionsFunction,
+  removeFromGroup,
+  updateNestedLogicalOperator,
+  updateNestedOperator,
+  updateNestedValue,
 } from './utils'
-import { FilterGroup, FilterProperty } from './types'
 
 const mockProperty: FilterProperty = {
   label: 'Test Property',

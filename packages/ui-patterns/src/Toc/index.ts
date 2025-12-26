@@ -1,6 +1,6 @@
+import { TOCItems, TOCScrollArea, Toc } from './toc'
 import * as TocPrimitive from './toc-primitive'
-import { ScrollProvider, TOCItem, type AnchorProviderProps, AnchorProvider } from './toc-primitive'
-import { Toc, TOCScrollArea, TOCItems } from './toc'
+import { AnchorProvider, type AnchorProviderProps, ScrollProvider, TOCItem } from './toc-primitive'
 import { TocThumb } from './toc-thumb'
 import { type TOCThumb } from './toc-thumb'
 

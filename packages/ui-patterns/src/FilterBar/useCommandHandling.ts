@@ -1,16 +1,16 @@
 import { useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
+import { MenuItem } from './menuItems'
+import { FilterGroup, FilterProperty } from './types'
 import {
-  findGroupByPath,
   addFilterToGroup,
   addGroupToGroup,
+  findGroupByPath,
   isCustomOptionObject,
-  updateNestedValue,
   removeFromGroup,
+  updateNestedValue,
 } from './utils'
-
-import { MenuItem } from './menuItems'
 
 export function useCommandHandling({
   activeInput,

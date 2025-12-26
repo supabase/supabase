@@ -1,23 +1,24 @@
 'use client'
 
-import React, { useRef, useCallback } from 'react'
 import { Search } from 'lucide-react'
+import React, { useCallback, useRef } from 'react'
 import { cn } from 'ui'
+
 import { FilterGroup as FilterGroupComponent } from './FilterGroup'
-import { FilterProperty, FilterGroup } from './types'
+import { useFilterBarState, useOptionsCache } from './hooks'
+import { MenuItem } from './menuItems'
+import { FilterGroup, FilterProperty } from './types'
+import { useAIFilter } from './useAIFilter'
+import { useCommandHandling } from './useCommandHandling'
+import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
   findConditionByPath,
   isAsyncOptionsFunction,
   removeFromGroup,
-  updateNestedValue,
-  updateNestedOperator,
   updateNestedLogicalOperator,
+  updateNestedOperator,
+  updateNestedValue,
 } from './utils'
-import { useFilterBarState, useOptionsCache } from './hooks'
-import { useKeyboardNavigation } from './useKeyboardNavigation'
-import { useAIFilter } from './useAIFilter'
-import { useCommandHandling } from './useCommandHandling'
-import { MenuItem } from './menuItems'
 
 export type FilterBarProps = {
   filterProperties: FilterProperty[]
