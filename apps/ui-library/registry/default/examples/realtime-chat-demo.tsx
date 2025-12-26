@@ -1,9 +1,10 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 import { RealtimeChat } from '@/registry/default/blocks/realtime-chat/components/realtime-chat'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { useEffect, useState } from 'react'
 
 const names = [
   'Ava',

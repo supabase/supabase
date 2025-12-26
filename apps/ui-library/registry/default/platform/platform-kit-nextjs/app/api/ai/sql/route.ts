@@ -1,8 +1,9 @@
-import type { paths } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api-schema'
-import { listTablesSql } from '@/registry/default/platform/platform-kit-nextjs/lib/pg-meta'
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import createClient from 'openapi-fetch'
+
+import type { paths } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api-schema'
+import { listTablesSql } from '@/registry/default/platform/platform-kit-nextjs/lib/pg-meta'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

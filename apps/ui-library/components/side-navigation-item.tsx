@@ -3,11 +3,11 @@
 import Link, { LinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import { Badge, cn } from 'ui'
 
 import { useFramework } from '@/context/framework-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { SidebarNavItem } from '@/types/nav'
-import { Badge, cn } from 'ui'
 
 // We extend:
 // 1. LinkProps - for Next.js Link component props (prefetch, etc)
