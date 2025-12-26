@@ -21,7 +21,7 @@ if (process.env.SORT_IMPORTS !== 'false') {
   options = {
     ...options,
     plugins: [...options.plugins, '@trivago/prettier-plugin-sort-imports'],
-    importOrder: ['<THIRD_PARTY_MODULES>', '^[@.]+\/(.*)$'],
+    importOrder: ['<THIRD_PARTY_MODULES>', '^(@|\.{1,2})(.*)$'],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true,
     importOrderSideEffects: false,
