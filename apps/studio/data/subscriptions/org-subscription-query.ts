@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
 
@@ -52,10 +53,6 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 }
 
 export const useHasAccessToProjectLevelPermissions = (slug: string) => {
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  return (
-    subscription?.plan.id === 'enterprise' ||
-    subscription?.plan.id === 'team' ||
-    subscription?.plan.id === 'platform'
-  )
+  const { hasAccess } = useCheckEntitlements('project_scoped_roles', slug)
+  return hasAccess
 }

@@ -227,6 +227,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/contract-linking-eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Check whether the buyer's latest contract can be linked to an organization
+     * @description Cases where linking is not possible/needed include contracts that stem from an Agreement Based Offer or contracts for the AWS Activate Credits Deal
+     */
+    get: operations['ClazarController_checkContractLinkingEligibility']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
     parameters: {
       query?: never
@@ -1536,7 +1556,7 @@ export interface paths {
      * Gets all projects for the given organization
      * @description Returns a paginated list of projects for the specified organization.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
@@ -2028,7 +2048,7 @@ export interface paths {
      * Gets all projects that belong to the authenticated user
      * @description Returns a paginated list of projects across all organizations the user has access to.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['ProjectsController_getProjects']
     put?: never
@@ -4562,7 +4582,6 @@ export interface components {
       }
       pitr_enabled: boolean
       region: string
-      tierKey: string
       walg_enabled: boolean
     }
     BillingCustomerUpdateBody: {
@@ -4601,7 +4620,6 @@ export interface components {
       region: string
       target_compute_size: string
       target_volume_size_gb: number
-      tierKey: string
       walg_enabled: boolean
     }
     CloneProject: {
@@ -4609,6 +4627,17 @@ export interface components {
       newDbPass: string
       newProjectName: string
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceContractLinkingEligibilityResponse: {
+      eligibility: {
+        aws_agreement_id?: string
+        is_eligible: boolean
+        reasons: (
+          | 'AWS_ACTIVATE_CREDITS_DEAL'
+          | 'AGREEMENT_BASED_OFFER'
+          | 'NO_ACTIVE_CONTRACT_FOUND'
+        )[]
+      }
     }
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
@@ -5369,7 +5398,10 @@ export interface components {
       name: string
       organization_slugs?: string[]
       permissions: (
+<<<<<<< Updated upstream
         | 'available_regions_read'
+=======
+>>>>>>> Stashed changes
         | 'organizations_read'
         | 'organizations_create'
         | 'projects_read'
@@ -5781,7 +5813,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
-            throughput_mbps: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
+            throughput_mbps?: number
+            throughput_mibps?: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -5797,7 +5834,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
             throughput_mbps: number
+            throughput_mibps: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -5812,7 +5854,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
             throughput_mbps: number
+            throughput_mibps: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -6298,7 +6345,6 @@ export interface components {
       /** @enum {string} */
       billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
-      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance?: number
@@ -6905,6 +6951,8 @@ export interface components {
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
+            | 'security.soc2_report'
+            | 'security.private_link'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
@@ -6918,6 +6966,16 @@ export interface components {
             | 'auth.hooks'
             | 'auth.platform.sso'
             | 'backup.retention_days'
+            | 'function.max_count'
+            | 'function.size_limit_mb'
+            | 'realtime.max_concurrent_users'
+            | 'realtime.max_events_per_second'
+            | 'realtime.max_joins_per_second'
+            | 'realtime.max_channels_per_client'
+            | 'realtime.max_bytes_per_second'
+            | 'realtime.max_presence_events_per_second'
+            | 'realtime.max_payload_size_in_kb'
+            | 'project_scoped_roles'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -11114,6 +11172,34 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve CLI login session */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ClazarController_checkContractLinkingEligibility: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceContractLinkingEligibilityResponse']
+        }
+      }
+      /** @description Failed to get info about contract linking eligibility */
       500: {
         headers: {
           [name: string]: unknown
