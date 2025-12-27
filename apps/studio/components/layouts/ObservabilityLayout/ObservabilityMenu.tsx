@@ -19,6 +19,7 @@ import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
+import { useQueryState, parseAsBoolean } from 'nuqs'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -74,7 +75,10 @@ const ObservabilityMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
   const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
 

@@ -1,19 +1,14 @@
 import { ChevronDown, Code, Terminal } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
-  Dialog,
-  DialogContent,
-  DialogSection,
-  DialogTitle,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -29,6 +24,7 @@ export const DeployEdgeFunctionButton = () => {
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
+  const [, setCreateMethod] = useQueryState('create', parseAsString)
 
   return (
     <DropdownMenu>
@@ -55,35 +51,23 @@ export const DeployEdgeFunctionButton = () => {
             <p>Write and deploy in the browser</p>
           </div>
         </DropdownMenuItem>
-        <Dialog>
-          <DialogTrigger asChild>
-            <DropdownMenuItem
-              className="gap-4"
-              onSelect={(e) => {
-                e.preventDefault()
-                sendEvent({
-                  action: 'edge_function_via_cli_button_clicked',
-                  properties: { origin: 'secondary_action' },
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
-              }}
-            >
-              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
-              <div>
-                <span className="text-foreground">Via CLI</span>
-                <p>Write locally, deploy with the CLI</p>
-              </div>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent size="large">
-            <DialogTitle className="sr-only">
-              Create your first Edge Function via the CLI
-            </DialogTitle>
-            <DialogSection padding="small">
-              <TerminalInstructions />
-            </DialogSection>
-          </DialogContent>
-        </Dialog>
+        <DropdownMenuItem
+          className="gap-4"
+          onSelect={() => {
+            setCreateMethod('cli')
+            sendEvent({
+              action: 'edge_function_via_cli_button_clicked',
+              properties: { origin: 'secondary_action' },
+              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+            })
+          }}
+        >
+          <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+          <div>
+            <span className="text-foreground">Via CLI</span>
+            <p>Write locally, deploy with the CLI</p>
+          </div>
+        </DropdownMenuItem>
         <DropdownMenuItem
           className="gap-4"
           onSelect={() => {

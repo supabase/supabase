@@ -124,7 +124,7 @@ export const TerminalInstructions = forwardRef<
       <CollapsibleContent_Shadcn_ className="w-full transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         <CommandRender commands={commands} className="my-4" />
         {tokens && tokens.length === 0 ? (
-          <div className="px-8 py-4 space-y-3 border-t">
+          <div className="py-4 space-y-3 border-t">
             <div>
               <p className="text-sm text-foreground">You may need to create an access token</p>
               <p className="text-sm text-foreground-light">

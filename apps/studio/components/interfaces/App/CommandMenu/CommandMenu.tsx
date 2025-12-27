@@ -17,6 +17,7 @@ import { useApiUrlCommand } from './ApiUrl'
 import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useCreateCommands } from './CreateCommands'
 
 export default function StudioCommandMenu() {
   useApiKeysCommands()
@@ -38,6 +39,7 @@ export default function StudioCommandMenu() {
   useSupportCommands()
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
+  useCreateCommands()
 
   return (
     <CommandMenu>
