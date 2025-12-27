@@ -11,7 +11,7 @@ database_id = "188986c9-019d-4f26-baaf-6f58cec8fa7a"
 
 # Navigating the API logs:
 
-The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
+The Database API is powered by a [PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
 
 The log table that contains API requests is `edge_logs`.
 
@@ -71,12 +71,12 @@ select
   city
 from
   edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'cf' from 'request'
-cross join unnest(cf) AS cf;
+  -- Unpack 'metadata' field
+  cross join unnest(metadata) as metadata
+  -- unpack 'request' from 'metadata'
+  cross join unnest(request) as request
+  -- unpack 'cf' from 'request'
+  cross join unnest(cf) as cf;
 ```
 
 ### IP and browser/environment data:
@@ -99,12 +99,12 @@ select
   cf_connecting_ip
 from
   edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'headers' from 'request'
-cross join unnest(headers) AS headers;
+  -- Unpack 'metadata' field
+  cross join unnest(metadata) as metadata
+  -- unpack 'request' from 'metadata'
+  cross join unnest(request) as request
+  -- unpack 'headers' from 'request'
+  cross join unnest(headers) as headers;
 ```
 
 ### Query type and formatting data:
@@ -129,12 +129,12 @@ select
   auth_users
 from
   edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'sb' from 'request'
-cross join unnest(sb) AS sb;
+  -- Unpack 'metadata' field
+  cross join unnest(metadata) as metadata
+  -- unpack 'request' from 'metadata'
+  cross join unnest(request) as request
+  -- unpack 'sb' from 'request'
+  cross join unnest(sb) as sb;
 ```
 
 ## Response object
@@ -203,7 +203,7 @@ where
   -- find all errors
   status_code >= 400
     and
-  -- find queries featuring the a specific <table_name> and <column_name>
+  -- find queries featuring a specific <table_name> and <column_name>
   (
     regexp_contains(url, '<table_name>')
     and
@@ -250,7 +250,7 @@ Like PostgREST, Postgres has a [reference table](https://www.postgresql.org/docs
 
 ## PostgREST server and Cloudflare errors
 
-In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout))
+In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout)
 
 # Practical examples:
 
@@ -335,7 +335,7 @@ order by ip_count;
 
 ```sql
 select
-  -- only available for front-end clients
+  -- only available for frontend clients
   auth_users,
   path,
   count(auth_users) as ip_count

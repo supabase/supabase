@@ -23,7 +23,7 @@ A pooler is ultimately a load balancer for database connections. It maintains se
 
 All database connection libraries, such as Prisma, SQLAlchemy, and Postgres.js have built-in poolers. These are known as application-side poolers and they are fundamental for sustainable connection management. Most libraries have default pool sizes that may need to be changed for specific workloads. As an example, most edge/serverless functions are called to service a single user's request. They usually require significantly fewer connections (often 1 is optimal) than a dedicated application server.
 
-Note, that like databases, servers can only maintain a certain amount of connections themselves. If you were to increase the number aggressively, the server may not be able gracefully orchestrate them. For instance, Prisma's [default pool size](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections/connection-pool#connection-pool-size) is automatically set to one more than twice the server's CPU count (1 + 2 \* num_of_CPUs). The Prisma Team chose this value because it is generally performant with ORM's internal architecture.
+Note, that like databases, servers can only maintain a certain amount of connections themselves. If you were to increase the number aggressively, the server may not be able to gracefully orchestrate them. For instance, Prisma's [default pool size](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections/connection-pool#connection-pool-size) is automatically set to one more than twice the server's CPU count (1 + 2 \* num_of_CPUs). The Prisma Team chose this value because it is generally performant with ORM's internal architecture.
 
 When deploying to static architecture, such as long-standing containers or VMs, application-side poolers are satisfactory on their own.
 
@@ -43,7 +43,7 @@ Supabase provides 3 database connection strings that can be used simultaneously 
 
 #### Direct connections:
 
-> "Note uses an IPv6 address by default. [Check here to see if your network is IPv6 compatible](https://github.com/orgs/supabase/discussions/27034)"
+> "Note: This uses an IPv6 address by default. [Check here to see if your network is IPv6 compatible](https://github.com/orgs/supabase/discussions/27034)"
 
 ```sh
 # Example connection string
@@ -80,7 +80,7 @@ When clients connect to either Postgres or Supavisor, they do so with the Postgr
 
 ### What are "client connections"?
 
-In summary, they have nothing to do with front-end clients. They are the amount of backend-server connections that can connect to a serverside pooler.
+In summary, they have nothing to do with frontend clients. They are the amount of backend-server connections that can connect to a serverside pooler.
 Imagine a chess tournament with 60 boards. Each board represents a connection in a database. When a player sits down at a board, it's like a client connecting to the database. They can take their time with their moves or just sit there, not making any.
 
 But when the tournament fills up and all the boards are taken, new players are turned away, and told to check back at a later time to see if a table becomes available.
@@ -103,7 +103,7 @@ CREATE DATABASE another_database;
 Similarly, a database can have many database users, but most people just rely on the default user `postgres`.
 
 ```sql
-CREATE USER postgres WITH PASSWORD 'super-secret-password;
+CREATE USER postgres WITH PASSWORD 'super-secret-password';
 CREATE USER some_new_user WITH PASSWORD 'password';
 ```
 
@@ -123,7 +123,7 @@ No, it doesn't. Let's break it down:
 
 - In transaction mode, the pooler will only add connections if there are not enough connections to service all pending queries simultaneously. If 10 clients connect, but a single direct connection can comfortably accommodate them all, the pooler will not create more.
 - If necessary, it can create as many connections to prevent queries from pending up to the limit specified by the "Pool Size".
-- In session mode, it will immediately create a new a direct connection for a new client unless the "Pool Size" is reached
+- In session mode, it will immediately create a new direct connection for a new client unless the "Pool Size" is reached
 - In transaction mode, once a direct connection is established, the pooler will keep it available for reuse for another client. However, if the connection remains unused for 5 minutes, the pooler will close it to free up database resources. In session mode, the connection will be immediately closed.
 - If a client is connected to the pooler, then at least 1 hot connection will be sustained, even if no client needs it.
 

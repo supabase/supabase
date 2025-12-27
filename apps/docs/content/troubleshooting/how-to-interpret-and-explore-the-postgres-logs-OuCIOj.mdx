@@ -122,7 +122,7 @@ cross join unnest(parsed) AS parsed;
 - Filter connections by IP
 - Identify connections to specific databases
 - Filter connections by sessions for debugging
-- identify extension events
+- Identify extension events
 
 ## Filtering logs
 
@@ -136,7 +136,7 @@ When exploring the logs for atypical behavior, it's often strategic to filter ou
 ...query
 where
   -- Excluding routine events related to cron, PgBouncer, checkpoints, and successful connections
-  not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized';
+  not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized')
 ```
 
 ### By timeframe
@@ -187,7 +187,7 @@ Queries can use complex syntax, so it is often helpful to isolate by referenced 
 - `^`: look for values at start of string
 - `|`: or operator
 
-## By APIs/roles
+### By APIs/roles
 
 All failed queries, including those from PostgREST, Auth, and external libraries (e.g., Prisma) are logged with helpful error messages for debugging.
 
@@ -217,7 +217,7 @@ where
 ...
 ```
 
-## By Dashboard queries
+### By Dashboard queries
 
 Queries from the Supabase Dashboard are executed under the `postgres` role and include the comment `-- source: dashboard`. To isolate or exclude Dashboard requests during debugging, you can filter by this comment.
 
@@ -228,7 +228,7 @@ where
   regexp_contains(parsed.query, '-- source: dashboard')
 ```
 
-## Full example for finding errors
+### Full example for finding errors
 
 ```sql
 select
@@ -319,7 +319,7 @@ The settings that affect logs are categorized under:
 | Category | Description |
 |----------|-------------|
 | `Reporting and Logging / What to Log` | Specifies system events worth logging.|
-| `Reporting and Logging / When to Log` | Specifies certain conditions or rules for logging
+| `Reporting and Logging / When to Log` | Specifies certain conditions or rules for logging.
 | `Customized Options` | Configures extensions and loaded modules, including those enhancing logging like auto_explain and pg_audit. |
 
 To view all log settings for your database, you can execute the following SQL:
