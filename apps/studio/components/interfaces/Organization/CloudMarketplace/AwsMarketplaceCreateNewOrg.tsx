@@ -17,6 +17,7 @@ import NewAwsMarketplaceOrgForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
   NewMarketplaceOrgForm,
 } from './NewAwsMarketplaceOrgForm'
+import AwsMarketplaceOnboardingPlaceholder from './AwsMarketplaceOnboardingPlaceholder'
 
 const AwsMarketplaceCreateNewOrg = () => {
   const router = useRouter()
@@ -24,9 +25,10 @@ const AwsMarketplaceCreateNewOrg = () => {
     query: { buyer_id: buyerId },
   } = router
 
-  const { data: onboardingInfo } = useCloudMarketplaceOnboardingInfoQuery({
-    buyerId: buyerId as string,
-  })
+  const { data: onboardingInfo, isPending: isLoadingOnboardingInfo } =
+    useCloudMarketplaceOnboardingInfoQuery({
+      buyerId: buyerId as string,
+    })
 
   const { mutate: createOrganization, isPending: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
@@ -55,41 +57,45 @@ const AwsMarketplaceCreateNewOrg = () => {
             awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
           />
         )}
-      <ScaffoldSection>
-        <ScaffoldSectionDetail className="text-base">
-          <p>
-            You’ve subscribed to the Supabase {onboardingInfo?.plan_name_selected_on_marketplace}{' '}
-            Plan via the AWS Marketplace. As a final step, you need to create a Supabase
-            organization. That organization will be managed and billed through AWS Marketplace.
-          </p>
-          <p>
-            You can read more on billing through AWS in our {''}
-            <Link
-              href={`${DOCS_URL}/guides/platform/aws-marketplace`}
-              target="_blank"
-              className="underline"
-            >
-              Billing Docs.
-            </Link>
-          </p>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent className="lg:ml-10">
-          <div className="border-l px-10 pt-10">
-            <NewAwsMarketplaceOrgForm onSubmit={onSubmit} />
-
-            <div className="flex justify-end mt-10">
-              <Button
-                form={CREATE_AWS_MANAGED_ORG_FORM_ID}
-                htmlType="submit"
-                loading={isCreatingOrganization}
-                size="medium"
+      {isLoadingOnboardingInfo ? (
+        <AwsMarketplaceOnboardingPlaceholder />
+      ) : (
+        <ScaffoldSection>
+          <ScaffoldSectionDetail className="text-base">
+            <p>
+              You’ve subscribed to the Supabase {onboardingInfo?.plan_name_selected_on_marketplace}{' '}
+              Plan via the AWS Marketplace. As a final step, you need to create a Supabase
+              organization. That organization will be managed and billed through AWS Marketplace.
+            </p>
+            <p>
+              You can read more on billing through AWS in our {''}
+              <Link
+                href={`${DOCS_URL}/guides/platform/aws-marketplace`}
+                target="_blank"
+                className="underline"
               >
-                Create organization
-              </Button>
+                Billing Docs.
+              </Link>
+            </p>
+          </ScaffoldSectionDetail>
+          <ScaffoldSectionContent className="lg:ml-10">
+            <div className="border-l px-10 pt-10">
+              <NewAwsMarketplaceOrgForm onSubmit={onSubmit} />
+
+              <div className="flex justify-end mt-10">
+                <Button
+                  form={CREATE_AWS_MANAGED_ORG_FORM_ID}
+                  htmlType="submit"
+                  loading={isCreatingOrganization}
+                  size="medium"
+                >
+                  Create organization
+                </Button>
+              </div>
             </div>
-          </div>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+          </ScaffoldSectionContent>
+        </ScaffoldSection>
+      )}
     </>
   )
 }
