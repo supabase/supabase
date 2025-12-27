@@ -112,8 +112,8 @@ export const LOCAL_STORAGE_KEYS = {
    */
   BLOG_VIEW: 'supabase-blog-view',
 
-  // Used to track if user has dismissed table editor quickstart prompt
-  TABLE_QUICKSTART_DISMISSED: 'table-quickstart-dismissed',
+  // Used to track if user has been exposed to table quickstart experiment (prevents duplicate exposure events)
+  TABLE_QUICKSTART_EXPOSURE_TRACKED: 'table-quickstart-exposure-tracked',
 } as const
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
@@ -135,7 +135,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
-  LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
+  LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_EXPOSURE_TRACKED,
 ]
 
 export function clearLocalStorage() {
