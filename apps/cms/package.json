@@ -17,7 +17,7 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "vercel-build": "pnpm migrate && pnpm build",
-    "typecheck_IGNORED": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "^3.52.0",

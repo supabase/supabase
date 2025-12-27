@@ -1,4 +1,4 @@
-import { SidebarNavGroup } from 'types/nav'
+import { SidebarNavGroup } from '@/types/nav'
 
 export const gettingStarted: SidebarNavGroup = {
   title: 'Getting Started',
