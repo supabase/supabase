@@ -11,7 +11,7 @@ interface IncidentAdmonitionProps {
   isActive: boolean
 }
 
-const STATUS_DESCRIPTION_SIGN_OFF = 'Please follow the status page for updates.'
+const STATUS_DESCRIPTION_SIGN_OFF = 'Follow the status page for updates.'
 
 const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
