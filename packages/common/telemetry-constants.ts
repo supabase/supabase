@@ -2602,7 +2602,7 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
- * User succesfully installed an integration via the integrations marketplace in the dashboard.
+ * User successfully installed an integration via the integrations marketplace in the dashboard.
  * Note: This excludes Wrappers and Postgres Extensions.
  *
  * @group Events
