@@ -28,6 +28,8 @@ export const LOCAL_STORAGE_KEYS = {
   AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,
   AUTH_USERS_SORT_BY_VALUE: (ref: string) => `auth-users-sort-by-value-${ref}`,
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  AUTH_USERS_IMPROVED_SEARCH_DISMISSED: (ref: string) =>
+    `auth-users-improved-search-dismissed-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
