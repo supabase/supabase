@@ -1,8 +1,8 @@
 # Usage
 #   Start:              docker compose up
-#   With helpers:       docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+#   With helpers:       docker compose -f compose.yaml -f ./dev/compose.dev.yaml up
 #   Stop:               docker compose down
-#   Destroy:            docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
+#   Destroy:            docker compose -f compose.yaml -f ./dev/compose.dev.yaml down -v --remove-orphans
 #   Reset everything:  ./reset.sh
 
 name: supabase
@@ -232,7 +232,7 @@ services:
       SEED_SELF_HOST: "true"
       RUN_JANITOR: "true"
 
-  # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
+  # To use S3 backed storage: docker compose -f compose.yaml -f compose.s3.yaml up
   storage:
     container_name: supabase-storage
     image: supabase/storage-api:v1.33.0

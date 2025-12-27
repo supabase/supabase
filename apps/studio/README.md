@@ -60,7 +60,7 @@ Follow the [self-hosting guide](https://supabase.com/docs/guides/hosting/docker)
 ```
 cd ..
 cd docker
-docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+docker compose -f compose.yaml -f ./dev/compose.dev.yaml up
 ```
 
 Once you've got that set up, update `.env` in the studio folder with the corresponding values.
