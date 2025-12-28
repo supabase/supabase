@@ -5,6 +5,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { escapeSqlString } from './utils'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
@@ -34,24 +35,22 @@ export async function updateEnumeratedType({
           // Consider if any new enums were added before any existing enums
           const firstExistingEnumValue = values.find((x) => !x.isNew)
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+            `alter type "${schema}"."${name.updated}" add value '${escapeSqlString(x.updated)}' before '${escapeSqlString(firstExistingEnumValue?.original ?? '')}';`
           )
         } else {
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' after '${
-              values[idx - 1].updated
-            }';`
+            `alter type "${schema}"."${name.updated}" add value '${escapeSqlString(x.updated)}' after '${escapeSqlString(values[idx - 1].updated)}';`
           )
         }
       } else if (x.original !== x.updated) {
         statements.push(
-          `alter type "${schema}"."${name.updated}" rename value '${x.original}' to '${x.updated}';`
+          `alter type "${schema}"."${name.updated}" rename value '${escapeSqlString(x.original)}' to '${escapeSqlString(x.updated)}';`
         )
       }
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
+    statements.push(`comment on type "${schema}"."${name.updated}" is '${escapeSqlString(description)}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
