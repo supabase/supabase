@@ -1,250 +1,56 @@
 'use client'
 
-import React, { useRef, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { cn } from 'ui'
-import { FilterGroup as FilterGroupComponent } from './FilterGroup'
-import { FilterProperty, FilterGroup } from './types'
-import {
-  findConditionByPath,
-  isAsyncOptionsFunction,
-  removeFromGroup,
-  updateNestedValue,
-  updateNestedOperator,
-  updateNestedLogicalOperator,
-} from './utils'
-import { useFilterBarState, useOptionsCache } from './hooks'
-import { useKeyboardNavigation } from './useKeyboardNavigation'
-import { useAIFilter } from './useAIFilter'
-import { useCommandHandling } from './useCommandHandling'
-import { MenuItem } from './menuItems'
+import { FilterBarRoot, useFilterBar, type FilterBarVariant } from './FilterBarContext'
+import { FilterGroup } from './FilterGroup'
+import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
 
 export type FilterBarProps = {
   filterProperties: FilterProperty[]
-  onFilterChange: (filters: FilterGroup) => void
+  onFilterChange: (filters: FilterGroupType) => void
   freeformText: string
   onFreeformTextChange: (freeformText: string) => void
-  filters: FilterGroup
-  aiApiUrl?: string
+  filters: FilterGroupType
+  actions?: FilterBarAction[]
+  isLoading?: boolean
   className?: string
   supportsOperators?: boolean
+  variant?: FilterBarVariant
 }
 
-export function FilterBar({
-  filterProperties,
-  filters: activeFilters,
-  onFilterChange,
-  freeformText,
-  onFreeformTextChange,
-  aiApiUrl,
-  className,
-  supportsOperators = false,
-}: FilterBarProps) {
-  const rootRef = useRef<HTMLDivElement>(null)
-  const {
-    isLoading,
-    setIsLoading,
-    error,
-    setError,
-    isCommandMenuVisible,
-    setIsCommandMenuVisible,
-    hideTimeoutRef,
-    activeInput,
-    setActiveInput,
-    newPathRef,
-  } = useFilterBarState()
-
-  const {
-    loadingOptions,
-    propertyOptionsCache,
-    loadPropertyOptions,
-    optionsError,
-    setOptionsError,
-  } = useOptionsCache()
-
-  const { handleAIFilter } = useAIFilter({
-    activeInput,
-    aiApiUrl,
-    freeformText,
-    filterProperties,
-    activeFilters,
-    onFilterChange,
-    onFreeformTextChange,
-    setIsLoading,
-    setError,
-    setIsCommandMenuVisible,
-  })
-
-  const handleInputChange = useCallback(
-    (path: number[], value: string) => {
-      const updatedFilters = updateNestedValue(activeFilters, path, value)
-      onFilterChange(updatedFilters)
-
-      // Load async options for this property when value changes
-      const condition = findConditionByPath(updatedFilters, path)
-      if (condition) {
-        const property = filterProperties.find((p) => p.name === condition.propertyName)
-        if (
-          property &&
-          property.options &&
-          !Array.isArray(property.options) &&
-          isAsyncOptionsFunction(property.options)
-        ) {
-          loadPropertyOptions(property, value)
-        }
-      }
-    },
-    [activeFilters, onFilterChange, filterProperties, loadPropertyOptions]
-  )
-
-  const handleOperatorChange = useCallback(
-    (path: number[], value: string) => {
-      const updatedFilters = updateNestedOperator(activeFilters, path, value)
-      onFilterChange(updatedFilters)
-    },
-    [activeFilters, onFilterChange]
-  )
-
-  const { handleItemSelect } = useCommandHandling({
-    activeInput,
-    setActiveInput,
-    activeFilters,
-    onFilterChange,
-    filterProperties,
-    freeformText,
-    onFreeformTextChange,
-    handleInputChange,
-    handleOperatorChange,
-    newPathRef,
-    handleAIFilter,
-  })
-
-  const { handleKeyDown } = useKeyboardNavigation({
-    activeInput,
-    setActiveInput,
-    activeFilters,
-    onFilterChange,
-  })
-
-  const handleInputFocus = useCallback(
-    (path: number[]) => {
-      setActiveInput({ type: 'value', path })
-      setIsCommandMenuVisible(true)
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current)
-      }
-
-      // Load async options for this property
-      const condition = findConditionByPath(activeFilters, path)
-      if (condition) {
-        const property = filterProperties.find((p) => p.name === condition.propertyName)
-        if (
-          property &&
-          property.options &&
-          !Array.isArray(property.options) &&
-          isAsyncOptionsFunction(property.options)
-        ) {
-          loadPropertyOptions(property, condition.value?.toString() || '')
-        }
-      }
-    },
-    [activeFilters, filterProperties, loadPropertyOptions]
-  )
-
-  const handleOperatorFocus = useCallback((path: number[]) => {
-    setActiveInput({ type: 'operator', path })
-    setIsCommandMenuVisible(true)
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current)
-    }
-  }, [])
-
-  const handleGroupFreeformFocus = useCallback((path: number[]) => {
-    setActiveInput({ type: 'group', path })
-    setIsCommandMenuVisible(true)
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current)
-    }
-  }, [])
-
-  const handleInputBlur = useCallback(() => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current)
-    }
-    // Defer and only clear active state if focus moved outside the entire FilterBar
-    hideTimeoutRef.current = setTimeout(() => {
-      const activeEl = document.activeElement as HTMLElement | null
-      if (activeEl && rootRef.current && rootRef.current.contains(activeEl)) {
-        return
-      }
-      setIsCommandMenuVisible(false)
-      setActiveInput(null)
-    }, 0)
-  }, [setIsCommandMenuVisible, setActiveInput])
-
-  const handleGroupFreeformChange = useCallback((path: number[], value: string) => {
-    onFreeformTextChange(value)
-  }, [])
-
-  const handleLabelClick = useCallback((path: number[]) => {
-    setActiveInput({ type: 'value', path })
-  }, [])
-
-  const handleLogicalOperatorChange = useCallback(
-    (path: number[]) => {
-      const updatedFilters = updateNestedLogicalOperator(activeFilters, path)
-      onFilterChange(updatedFilters)
-    },
-    [activeFilters, onFilterChange]
-  )
-
-  const handleRemoveCondition = useCallback(
-    (path: number[]) => {
-      const updatedFilters = removeFromGroup(activeFilters, path)
-      onFilterChange(updatedFilters)
-      setActiveInput(null)
-    },
-    [activeFilters, onFilterChange, setActiveInput]
-  )
+function FilterBarContent({ className }: { className?: string }) {
+  const { filters, error, optionsError, isLoading, variant } = useFilterBar()
 
   return (
-    <div ref={rootRef} className="w-full space-y-2 relative" data-filterbar-root>
+    <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-center gap-2 w-full border rounded-md h-10 bg-foreground/[.026] cursor-text p-0 px-2 overflow-auto',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
           className
         )}
       >
-        <Search className="text-foreground-muted w-4 h-4 sticky left-0 shrink-0" />
-        <div className="flex-1 flex flex-wrap items-center gap-1 h-full">
-          <FilterGroupComponent
-            group={activeFilters}
-            rootFilters={activeFilters}
-            filterProperties={filterProperties}
-            path={[]}
-            isLoading={isLoading}
-            activeInput={activeInput}
-            onOperatorChange={handleOperatorChange}
-            onValueChange={handleInputChange}
-            onOperatorFocus={handleOperatorFocus}
-            onValueFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            onLabelClick={handleLabelClick}
-            onKeyDown={handleKeyDown}
-            onGroupFreeformChange={handleGroupFreeformChange}
-            onGroupFreeformFocus={handleGroupFreeformFocus}
-            groupFreeformValue={freeformText}
-            isGroupFreeformActive={Boolean(activeInput?.type === 'group')}
-            onLogicalOperatorChange={supportsOperators ? handleLogicalOperatorChange : undefined}
-            supportsOperators={supportsOperators}
-            onRemove={handleRemoveCondition}
-            propertyOptionsCache={propertyOptionsCache}
-            loadingOptions={loadingOptions}
-            aiApiUrl={aiApiUrl}
-            onSelectMenuItem={(item: MenuItem) => handleItemSelect(item)}
-            setActiveInput={setActiveInput}
-          />
+        <div
+          className={cn(
+            'flex items-center shrink-0 px-2 bg-surface-200',
+            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
+          )}
+        >
+          <Search className="text-foreground-muted w-4 h-4 sticky" />
         </div>
+        <motion.div
+          className="flex-1 flex flex-wrap items-stretch gap-0"
+          animate={{ opacity: isLoading ? 0.5 : 1 }}
+          transition={{
+            duration: 1,
+            repeat: isLoading ? Infinity : 0,
+            repeatType: 'reverse',
+            ease: 'easeInOut',
+          }}
+        >
+          <FilterGroup group={filters} path={[]} />
+        </motion.div>
       </div>
       {(error || optionsError) && (
         <div className="text-red-500 text-xs mt-1">{error || optionsError}</div>
@@ -252,3 +58,64 @@ export function FilterBar({
     </div>
   )
 }
+
+/**
+ * FilterBar - A composable filter bar component
+ *
+ * Simple usage:
+ * ```tsx
+ * <FilterBar
+ *   filterProperties={filterProperties}
+ *   filters={filters}
+ *   onFilterChange={setFilters}
+ *   freeformText={freeformText}
+ *   onFreeformTextChange={setFreeformText}
+ * />
+ * ```
+ *
+ * Composable usage:
+ * ```tsx
+ * <FilterBar.Root
+ *   filterProperties={filterProperties}
+ *   filters={filters}
+ *   onFilterChange={setFilters}
+ *   freeformText={freeformText}
+ *   onFreeformTextChange={setFreeformText}
+ * >
+ *   <FilterBar.Content />
+ * </FilterBar.Root>
+ * ```
+ */
+export function FilterBar({
+  filterProperties,
+  filters,
+  onFilterChange,
+  freeformText,
+  onFreeformTextChange,
+  actions,
+  isLoading,
+  className,
+  supportsOperators = false,
+  variant = 'default',
+}: FilterBarProps) {
+  return (
+    <FilterBarRoot
+      filterProperties={filterProperties}
+      filters={filters}
+      onFilterChange={onFilterChange}
+      freeformText={freeformText}
+      onFreeformTextChange={onFreeformTextChange}
+      actions={actions}
+      isLoading={isLoading}
+      supportsOperators={supportsOperators}
+      variant={variant}
+    >
+      <FilterBarContent className={className} />
+    </FilterBarRoot>
+  )
+}
+
+// Composable API exports
+FilterBar.Root = FilterBarRoot
+FilterBar.Content = FilterBarContent
+FilterBar.Group = FilterGroup

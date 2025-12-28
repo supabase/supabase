@@ -49,28 +49,20 @@ export type HeaderProps = {
   tableQueriesEnabled?: boolean
 }
 
-export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
-  const snap = useTableEditorTableStateSnapshot()
-
+const DefaultHeader = () => {
   return (
-    <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
-        {customHeader ? (
-          customHeader
-        ) : snap.selectedRows.size > 0 ? (
-          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
-        ) : (
-          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
-        )}
-        <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
+    <div className="flex-1 min-w-0 flex items-center gap-2 flex-1 h-full">
+      <div className="flex-1 min-w-0 h-full">
+        <FilterPopover />
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        <SortPopover />
       </div>
     </div>
   )
 }
 
-const DefaultHeader = ({
-  tableQueriesEnabled = true,
-}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
+const InsertButton = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -89,128 +81,127 @@ const DefaultHeader = ({
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
+  if (!canAddNew || !canCreateColumns) return null
+
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        <FilterPopover />
-        <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          data-testid="table-editor-insert-new-row"
+          type="primary"
+          size="tiny"
+          icon={<ChevronDown strokeWidth={1.5} />}
+        >
+          Insert
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="end">
+        {[
+          ...(onAddRow !== undefined
+            ? [
+                <DropdownMenuItem key="add-row" className="group space-x-2" onClick={onAddRow}>
+                  <div className="-mt-2 pr-1.5">
+                    <div className="border border-foreground-lighter w-[15px] h-[4px]" />
+                    <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
+                    <div
+                      className={cn([
+                        'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
+                        'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
+                      ])}
+                    />
+                  </div>
+                  <div>
+                    <p>Insert row</p>
+                    <p className="text-foreground-light">Insert a new row into {snap.table.name}</p>
+                  </div>
+                </DropdownMenuItem>,
+              ]
+            : []),
+          ...(onAddColumn !== undefined
+            ? [
+                <DropdownMenuItem
+                  key="add-column"
+                  className="group space-x-2"
+                  onClick={onAddColumn}
+                >
+                  <div className="flex -mt-2 pr-1.5">
+                    <div className="border border-foreground-lighter w-[4px] h-[15px]" />
+                    <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
+                    <div
+                      className={cn([
+                        'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
+                        'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
+                      ])}
+                    />
+                  </div>
+                  <div>
+                    <p>Insert column</p>
+                    <p className="text-foreground-light">
+                      Insert a new column into {snap.table.name}
+                    </p>
+                  </div>
+                </DropdownMenuItem>,
+              ]
+            : []),
+          ...(onImportData !== undefined
+            ? [
+                <DropdownMenuItem
+                  key="import-data"
+                  className="group space-x-2"
+                  onClick={() => {
+                    onImportData()
+                    sendEvent({
+                      action: 'import_data_button_clicked',
+                      properties: { tableType: 'Existing Table' },
+                      groups: {
+                        project: projectRef ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
+                  }}
+                >
+                  <div className="relative -mt-2">
+                    <FileText size={18} strokeWidth={1.5} className="-translate-x-[2px]" />
+                    <ArrowUp
+                      className={cn(
+                        'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
+                        'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
+                      )}
+                      strokeWidth={3}
+                      size={12}
+                    />
+                  </div>
+                  <div>
+                    <p>Import data from CSV</p>
+                    <p className="text-foreground-light">Insert new rows from a CSV</p>
+                  </div>
+                </DropdownMenuItem>,
+              ]
+            : []),
+        ]}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+
+  return (
+    <div>
+      <div className="flex h-10 items-stretch justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-0 gap-2 overflow-x-auto ">
+        {customHeader ? (
+          customHeader
+        ) : snap.selectedRows.size > 0 ? (
+          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+        ) : (
+          <DefaultHeader />
+        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
+          <InsertButton />
+        </div>
       </div>
-      {canAddNew && (
-        <>
-          <div className="h-[20px] w-px border-r border-control" />
-          <div className="flex items-center gap-2">
-            {canCreateColumns && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    data-testid="table-editor-insert-new-row"
-                    type="primary"
-                    size="tiny"
-                    icon={<ChevronDown strokeWidth={1.5} />}
-                  >
-                    Insert
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start">
-                  {[
-                    ...(onAddRow !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-row"
-                            className="group space-x-2"
-                            onClick={onAddRow}
-                          >
-                            <div className="-mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[15px] h-[4px]" />
-                              <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert row</p>
-                              <p className="text-foreground-light">
-                                Insert a new row into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onAddColumn !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-column"
-                            className="group space-x-2"
-                            onClick={onAddColumn}
-                          >
-                            <div className="flex -mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[4px] h-[15px]" />
-                              <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert column</p>
-                              <p className="text-foreground-light">
-                                Insert a new column into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onImportData !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="import-data"
-                            className="group space-x-2"
-                            onClick={() => {
-                              onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: projectRef ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
-                            }}
-                          >
-                            <div className="relative -mt-2">
-                              <FileText
-                                size={18}
-                                strokeWidth={1.5}
-                                className="-translate-x-[2px]"
-                              />
-                              <ArrowUp
-                                className={cn(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
-                                )}
-                                strokeWidth={3}
-                                size={12}
-                              />
-                            </div>
-                            <div>
-                              <p>Import data from CSV</p>
-                              <p className="text-foreground-light">Insert new rows from a CSV</p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                  ]}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </>
-      )}
     </div>
   )
 }
