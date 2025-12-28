@@ -37,6 +37,36 @@ This Docker Compose configuration includes the following services:
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 
+## Critical Note: Changing Database Passwords and Sensitive Variables
+
+Simply changing sensitive variables, such as the `POSTGRES_PASSWORD` in the `.env` file, and then running `docker compose up -d` **will cause a connection error**.
+
+This happens because the persistent database volume was initialized with the old credentials.
+
+**To successfully apply a new database password or other volume-dependent variables, you MUST destroy the existing database volume so it can be re-initialized.**
+
+1.  Update the new password in your `.env` file.
+2.  **STOP and REMOVE** containers and volumes (this destroys the volume):
+
+    ```bash
+    docker compose down -v
+    ```
+
+3.  **Ensure all residual database data is cleared** (this step is sometimes necessary if the volume isn't fully removed):
+
+    ```bash
+    # Run this command from the root of your Supabase self-hosting directory:
+    rm -rf volumes/db/data/
+    ```
+
+4.  Start services again. A new database volume will be created with the new password:
+
+    ```bash
+    docker compose up -d
+    ```
+
+**DATA LOSS WARNING:** Performing these steps will **PERMANENTLY DELETE ALL DATA** in your self-hosted database. **Always back up your data** before performing this procedure.
+
 ## Updates
 
 To update your self-hosted Supabase instance:
