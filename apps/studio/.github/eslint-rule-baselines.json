@@ -1,9 +1,9 @@
 {
   "rules": {
     "react-hooks/exhaustive-deps": 219,
-    "import/no-anonymous-default-export": 62,
-    "@tanstack/query/exhaustive-deps": 18,
-    "@typescript-eslint/no-explicit-any": 1316
+    "import/no-anonymous-default-export": 57,
+    "@tanstack/query/exhaustive-deps": 14,
+    "@typescript-eslint/no-explicit-any": 1310
   },
   "ruleFiles": {
     "react-hooks/exhaustive-deps": {
@@ -204,11 +204,6 @@
       "pages/api/platform/projects/[ref]/billing/addons.ts": 1,
       "pages/api/platform/projects/[ref]/config/index.ts": 1,
       "pages/api/platform/projects/[ref]/config/postgrest.ts": 1,
-      "pages/api/platform/projects/[ref]/content/count.ts": 1,
-      "pages/api/platform/projects/[ref]/content/folders/[id].ts": 1,
-      "pages/api/platform/projects/[ref]/content/folders/index.ts": 1,
-      "pages/api/platform/projects/[ref]/content/index.ts": 1,
-      "pages/api/platform/projects/[ref]/content/item/[id].ts": 1,
       "pages/api/platform/projects/[ref]/databases.ts": 1,
       "pages/api/platform/projects/[ref]/index.ts": 1,
       "pages/api/platform/projects/[ref]/infra-monitoring.ts": 1,
@@ -244,8 +239,6 @@
       "data/table-rows/table-rows-query.ts": 1,
       "data/tables/tables-query.ts": 2,
       "hooks/analytics/useDbQuery.tsx": 1,
-      "hooks/analytics/useLogsPreview.tsx": 3,
-      "hooks/analytics/useProjectUsageStats.tsx": 1,
       "hooks/analytics/useSingleLog.tsx": 1
     },
     "@typescript-eslint/no-explicit-any": {
@@ -277,7 +270,7 @@
       "components/interfaces/Auth/AuthProvidersForm/AuthProvidersForm.types.ts": 1,
       "components/interfaces/Auth/AuthProvidersForm/FormField.tsx": 4,
       "components/interfaces/Auth/AuthProvidersForm/ProviderForm.tsx": 6,
-      "components/interfaces/Auth/AuthProvidersForm/index.tsx": 5,
+      "components/interfaces/Auth/AuthProvidersForm/index.tsx": 6,
       "components/interfaces/Auth/AuthProvidersFormValidation.tsx": 2,
       "components/interfaces/Auth/BasicAuthSettingsForm.tsx": 1,
       "components/interfaces/Auth/EmailTemplates/EmailTemplates.tsx": 1,
@@ -348,7 +341,6 @@
       "components/interfaces/Docs/ResourceContent.tsx": 1,
       "components/interfaces/Docs/RpcContent.tsx": 4,
       "components/interfaces/Docs/Snippets.ts": 1,
-      "components/interfaces/ExplainVisualizer/ExplainVisualizer.utils.ts": 1,
       "components/interfaces/Functions/CommandRender.tsx": 4,
       "components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.tsx": 1,
       "components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.utils.tsx": 3,
@@ -413,7 +405,6 @@
       "components/interfaces/ProjectAPIDocs/Content/RPC.tsx": 1,
       "components/interfaces/ProjectAPIDocs/ProjectAPIDocs.constants.ts": 2,
       "components/interfaces/ProjectAPIDocs/ResourceContent.tsx": 1,
-      "components/interfaces/ProjectCreation/DatabasePasswordInput.tsx": 1,
       "components/interfaces/ProjectCreation/PostgresVersionSelector.tsx": 2,
       "components/interfaces/ProjectCreation/SchemaGenerator.tsx": 1,
       "components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton.tsx": 1,
@@ -623,7 +614,6 @@
       "components/ui/FilterPopover.tsx": 1,
       "components/ui/Forms/Form.constants.ts": 1,
       "components/ui/Logs/LogsExplorerHeader.tsx": 2,
-      "components/ui/PasswordStrengthBar.tsx": 4,
       "components/ui/ProductMenu/ProductMenu.types.ts": 1,
       "components/ui/ProjectSettings/DisplayApiSettings.tsx": 1,
       "components/ui/QueryBlock/QueryBlock.tsx": 4,
@@ -730,6 +720,7 @@
       "hooks/ui/useHotKey.ts": 1,
       "hooks/useStaticEffectEvent.ts": 1,
       "instrumentation-client.ts": 5,
+      "lib/ai/generate-assistant-response.ts": 2,
       "lib/ai/model.ts": 2,
       "lib/ai/model.utils.ts": 4,
       "lib/ai/test-fixtures.ts": 1,
@@ -747,7 +738,6 @@
       "pages/_app.tsx": 1,
       "pages/account/tokens.tsx": 1,
       "pages/api/ai/feedback/rate.ts": 2,
-      "pages/api/ai/sql/generate-v4.ts": 3,
       "pages/api/check-cname.ts": 1,
       "pages/api/edge-functions/test.ts": 1,
       "pages/api/integrations/stripe-sync.ts": 1,
@@ -755,8 +745,8 @@
       "pages/api/platform/database/[ref]/pooling.ts": 1,
       "pages/api/platform/integrations/github/authorization.ts": 1,
       "pages/api/platform/projects/[ref]/analytics/log-drains.ts": 1,
+      "pages/api/platform/projects/[ref]/content/count.ts": 1,
       "pages/api/platform/projects/[ref]/content/index.ts": 1,
-      "pages/api/platform/projects/[ref]/content/item/[id].ts": 1,
       "pages/api/platform/projects/[ref]/databases.ts": 1,
       "pages/cli/login.tsx": 1,
       "pages/integrations/vercel/[slug]/deploy-button/new-project.tsx": 1,
