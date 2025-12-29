@@ -8,7 +8,7 @@ export const RESTRICTION_MESSAGES = {
     description: (date: string, slug: string): ReactNode => (
       <>
         You have been given a grace period until {date}.{' '}
-        <InlineLink href={`/org/${slug}/billing`}>Review usage</InlineLink>
+        <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink>
       </>
     ),
   },
