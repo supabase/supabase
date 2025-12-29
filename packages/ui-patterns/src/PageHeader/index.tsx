@@ -201,7 +201,7 @@ export type PageHeaderMetaProps = React.ComponentProps<'div'>
 /**
  * Meta wrapper for page header.
  * Contains icon, summary, and aside components with proper layout.
- * Should be placed after PageHeaderBreadcrumb (if present) and before PageHeaderFooter.
+ * Should be placed after PageHeaderBreadcrumb (if present) and before PageHeaderNavigationTabs.
  * Uses CSS to style children based on their data-slot attributes.
  */
 const PageHeaderMeta = ({ className, children, ...props }: PageHeaderMetaProps) => {
@@ -259,14 +259,14 @@ PageHeaderAside.displayName = 'PageHeaderAside'
 // Navigation
 // ============================================================================
 
-export type PageHeaderFooterProps = React.ComponentProps<'div'>
+export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
 
 /**
  * Navigation component for page header.
  * Container for tab navigation (NavMenu).
  * Should be placed as the last child of PageHeader.
  */
-const PageHeaderFooter = ({ className, ...props }: PageHeaderFooterProps) => {
+const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
   const { size } = usePageHeaderContext()
   return (
     <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
@@ -278,7 +278,7 @@ const PageHeaderFooter = ({ className, ...props }: PageHeaderFooterProps) => {
     </PageContainer>
   )
 }
-PageHeaderFooter.displayName = 'PageHeaderFooter'
+PageHeaderNavigationTabs.displayName = 'PageHeaderNavigationTabs'
 
 // ============================================================================
 // Exports
@@ -295,9 +295,9 @@ export {
   PageHeaderAside,
   PageHeaderBreadcrumb,
   PageHeaderDescription,
-  PageHeaderFooter,
   PageHeaderIcon,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 }

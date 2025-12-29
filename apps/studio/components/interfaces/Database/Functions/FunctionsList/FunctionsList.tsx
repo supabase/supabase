@@ -15,7 +15,6 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
 import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
@@ -37,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -151,7 +151,7 @@ const FunctionsList = () => {
   const {
     data: functions,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
   } = useDatabaseFunctionsQuery({
     projectRef: project?.ref,
@@ -257,7 +257,7 @@ const FunctionsList = () => {
               <Input
                 placeholder="Search for a function"
                 size="tiny"
-                icon={<Search size={14} />}
+                icon={<Search />}
                 value={filterString}
                 className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}

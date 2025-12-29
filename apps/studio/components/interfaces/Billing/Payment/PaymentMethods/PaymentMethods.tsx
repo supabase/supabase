@@ -16,14 +16,15 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { getURL } from 'lib/helpers'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
@@ -39,7 +40,7 @@ const PaymentMethods = () => {
   const {
     data: paymentMethods,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
@@ -93,14 +94,15 @@ const PaymentMethods = () => {
               {isSuccess && (
                 <>
                   {subscription?.payment_method_type === 'invoice' && (
-                    <Alert
-                      withIcon
-                      variant="info"
+                    <Admonition
+                      type="note"
+                      layout="horizontal"
                       title="Payment is currently by invoice"
-                      actions={[
-                        <Button key="payment-method-support" asChild type="default">
+                      description="You get a monthly invoice and payment link via email. To change your payment
+                      method, please contact us via our support form."
+                      actions={
+                        <Button asChild key="payment-method-support" type="default">
                           <SupportLink
-                            className="ml-3"
                             queryParams={{
                               category: SupportCategories.BILLING,
                               subject: 'Request to change payment method',
@@ -108,12 +110,9 @@ const PaymentMethods = () => {
                           >
                             Contact support
                           </SupportLink>
-                        </Button>,
-                      ]}
-                    >
-                      You get a monthly invoice and payment link via email. To change your payment
-                      method, please contact us via our support form.
-                    </Alert>
+                        </Button>
+                      }
+                    />
                   )}
                   <FormPanel
                     footer={

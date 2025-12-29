@@ -5,15 +5,14 @@ import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import { BASE_PATH } from 'lib/constants'
+import { useSearchParams } from 'next/navigation'
+import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
-import { parseAsNativeArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-import { useSearchParams } from 'next/navigation'
-
-export const LOAD_TAB_FROM_CACHE_PARAM = 'loadFromCache'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -29,7 +28,7 @@ export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] 
   return []
 }
 
-export function sortsToUrlParams(sorts: Sort[]) {
+export function sortsToUrlParams(sorts: { column: string; ascending?: boolean }[]) {
   return sorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`)
 }
 
@@ -54,7 +53,9 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export function filtersToUrlParams(filters: Filter[]) {
+export function filtersToUrlParams(
+  filters: { column: string | Array<string>; operator: string; value: string }[]
+) {
   return filters.map((filter) => {
     const selectedOperator = FilterOperatorOptions.find(
       (option) => option.value === filter.operator
@@ -67,6 +68,7 @@ export function filtersToUrlParams(filters: Filter[]) {
 export function parseSupaTable(table: Entity): SupaTable {
   const columns = table.columns
   const primaryKeys = isTableLike(table) ? table.primary_keys : []
+  const uniqueIndexes = isTableLike(table) ? table.unique_indexes : []
   const relationships = isTableLike(table) ? table.relationships : []
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
@@ -116,8 +118,14 @@ export function parseSupaTable(table: Entity): SupaTable {
     name: table.name,
     comment: table.comment,
     schema: table.schema,
+    type: table.entity_type,
     columns: supaColumns,
     estimateRowCount: isTableLike(table) ? table.live_rows_estimate : 0,
+    primaryKey: primaryKeys?.length > 0 ? primaryKeys.map((col) => col.name) : undefined,
+    uniqueIndexes:
+      !!uniqueIndexes && uniqueIndexes.length > 0
+        ? uniqueIndexes.map(({ columns }) => columns)
+        : undefined,
   }
 }
 
@@ -127,50 +135,75 @@ export function getStorageKey(prefix: string, ref: string) {
 
 export function loadTableEditorStateFromLocalStorage(
   projectRef: string,
-  tableName: string,
-  schema?: string | null
+  tableId: number
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   // Prefer sessionStorage (scoped to current tab) over localStorage
   const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  return json[tableKey]
+  return json[tableId]
+}
+
+/**
+ * Builds a table editor URL with the given project reference, table ID. It will load the saved state from local storage
+ * and add the sort and filter parameters to the URL.
+ */
+export function buildTableEditorUrl({
+  projectRef = 'default',
+  tableId,
+  schema,
+}: {
+  projectRef?: string
+  tableId: number
+  schema?: string
+}) {
+  const url = new URL(`${BASE_PATH}/project/${projectRef}/editor/${tableId}`, location.origin)
+
+  // If the schema is provided, add it to the URL so that the left sidebar is opened to the correct schema
+  if (schema) {
+    url.searchParams.set('schema', schema)
+  }
+
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
+  if (savedState?.sorts && savedState.sorts.length > 0) {
+    savedState.sorts?.forEach((sort) => url.searchParams.append('sort', sort))
+  }
+  if (savedState?.filters && savedState.filters.length > 0) {
+    savedState.filters?.forEach((filter) => url.searchParams.append('filter', filter))
+  }
+  return url.toString()
 }
 
 export function saveTableEditorStateToLocalStorage({
   projectRef,
-  tableName,
-  schema,
+  tableId,
   gridColumns,
   sorts,
   filters,
 }: {
   projectRef: string
-  tableName: string
-  schema?: string | null
+  tableId: number
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
-    ...(sorts !== undefined && { sorts }),
-    ...(filters !== undefined && { filters }),
+    ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
+    ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
   }
 
   let savedJson
   if (savedStr) {
     savedJson = JSON.parse(savedStr)
-    const previousConfig = savedJson[tableKey]
-    savedJson = { ...savedJson, [tableKey]: { ...previousConfig, ...config } }
+    const previousConfig = savedJson[tableId]
+    savedJson = { ...savedJson, [tableId]: { ...previousConfig, ...config } }
   } else {
-    savedJson = { [tableKey]: config }
+    savedJson = { [tableId]: config }
   }
   // Save to both localStorage and sessionStorage so it's consistent to current tab
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
@@ -186,8 +219,7 @@ function getLatestParams() {
   const queryParams = new URLSearchParams(window.location.search)
   const sort = queryParams.getAll('sort')
   const filter = queryParams.getAll('filter')
-  const loadFromCache = !!queryParams.get(LOAD_TAB_FROM_CACHE_PARAM)
-  return { sort, filter, loadFromCache }
+  return { sort, filter }
 }
 
 export function useSyncTableEditorStateFromLocalStorageWithUrl({
@@ -202,7 +234,6 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
     {
       sort: parseAsNativeArrayOf(parseAsString),
       filter: parseAsNativeArrayOf(parseAsString),
-      [LOAD_TAB_FROM_CACHE_PARAM]: parseAsBoolean.withDefault(false),
     },
     {
       history: 'replace',
@@ -213,8 +244,7 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   const urlParams = useMemo(() => {
     const sort = searchParams.getAll('sort')
     const filter = searchParams.getAll('filter')
-    const loadFromCache = !!searchParams.get(LOAD_TAB_FROM_CACHE_PARAM)
-    return { sort, filter, loadFromCache }
+    return { sort, filter }
   }, [searchParams])
 
   useEffect(() => {
@@ -225,25 +255,12 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
     // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
     const latestUrlParams = getLatestParams()
 
-    if (latestUrlParams.loadFromCache) {
-      const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
-      updateUrlParams(
-        {
-          sort: savedState?.sorts ?? [],
-          filter: savedState?.filters ?? [],
-          loadFromCache: false,
-        },
-        { clearOnDefault: true }
-      )
-    } else {
-      saveTableEditorStateToLocalStorage({
-        projectRef,
-        tableName: table.name,
-        schema: table.schema,
-        sorts: latestUrlParams.sort,
-        filters: latestUrlParams.filter,
-      })
-    }
+    saveTableEditorStateToLocalStorage({
+      projectRef,
+      tableId: table.id,
+      sorts: latestUrlParams.sort,
+      filters: latestUrlParams.filter,
+    })
   }, [urlParams, table, projectRef])
 }
 

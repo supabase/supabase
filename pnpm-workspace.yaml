@@ -5,14 +5,15 @@ packages:
   - e2e/*
 
 catalog:
-  '@supabase/auth-js': 2.83.0
-  '@supabase/realtime-js': 2.83.0
-  '@supabase/supabase-js': 2.83.0
-  '@supabase/postgrest-js': 2.83.0
+  '@sentry/nextjs': ^10.26.0
+  '@supabase/auth-js': 2.87.0
+  '@supabase/postgrest-js': 2.87.0
+  '@supabase/realtime-js': 2.87.0
+  '@supabase/supabase-js': 2.87.0
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
-  next: ^15.5.2
+  next: ^15.5.9
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -42,19 +43,29 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
+  - 'next'
+  - '@next/*'
   - ai
+  - js-yaml
   - supabase
+  - iceberg-js
+  - '@vitejs/plugin-rsc'
+  - stripe-experiment-sync # TODO(matlin) remove, temp just to unblock launch
+  - braintrust
 
 onlyBuiltDependencies:
   - supabase
 
 overrides:
+  '@eslint/eslintrc>js-yaml': ^4.1.1
   '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
-  '@supabase/supabase-js>@supabase/auth-js': 'catalog:'
+  '@redocly/respect-core>js-yaml': ^4.1.1
   '@tanstack/directive-functions-plugin>vite': 'catalog:'
   '@tanstack/react-start-plugin>vite': 'catalog:'
-  'vinxi>vite': 'catalog:'
-  'refractor>prismjs': ^1.30.0
   esbuild: ^0.25.2
+  nodemailer: ^7.0.11
+  refractor>prismjs: ^1.30.0
+  tar: ^7.0.0
   tmp: ^0.2.4
+  vinxi>vite: 'catalog:'
