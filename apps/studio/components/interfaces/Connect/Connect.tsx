@@ -493,7 +493,7 @@ export const Connect = () => {
                       <>
                         <p>
                           View your publishable and secret API keys from the project{' '}
-                          <Link href={`${BASE_PATH}/project/${projectRef}/settings/api-keys`}>
+                          <Link href={`/project/${projectRef}/settings/api-keys`}>
                             API settings page
                           </Link>
                         </p>
