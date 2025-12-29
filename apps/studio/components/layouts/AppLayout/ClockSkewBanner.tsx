@@ -49,7 +49,11 @@ export const ClockSkewBanner = () => {
       description={
         <>
           This can cause issues with certain features.{' '}
-          <Link href={`${DOCS_URL}`} target="_blank" rel="noopener noreferrer">
+          <Link
+            href={`${DOCS_URL}/guides/troubleshooting/jwt-expired-error-in-supabase-dashboard-F06k3x`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Learn more
           </Link>
         </>
