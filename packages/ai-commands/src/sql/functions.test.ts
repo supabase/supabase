@@ -21,10 +21,7 @@ const buildToolCallResponse = (payload: unknown) => ({
   ],
 })
 
-const mockCompletionsCreate = vi.fn<
-  Parameters<OpenAI['chat']['completions']['create']>,
-  ReturnType<OpenAI['chat']['completions']['create']>
->()
+const mockCompletionsCreate = vi.fn()
 
 const openai = {
   chat: {
