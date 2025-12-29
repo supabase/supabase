@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback } from 'react'
 import { Storage } from 'icons'
+import { Loader2 } from 'lucide-react'
 import { useParams } from 'common'
 import { useBucketsQuery, type Bucket } from 'data/storage/buckets-query'
 import {
@@ -193,22 +194,67 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     [projectRef]
   )
 
+  const totalBuckets =
+    (fileBuckets?.length ?? 0) + (analyticsBuckets?.length ?? 0) + (vectorBuckets?.length ?? 0)
+
+  const renderFooter = () => (
+    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
+      <div className="flex items-center gap-x-2">
+        {isLoading ? (
+          <span className="flex items-center gap-2">
+            <Loader2 size={14} className="animate-spin" /> Loading...
+          </span>
+        ) : (
+          <span>
+            Total: {totalBuckets.toLocaleString()} bucket{totalBuckets !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+
   if (isLoading) {
-    return <SkeletonResults />
+    return (
+      <div className="relative h-full flex flex-col">
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <SkeletonResults />
+        </div>
+        {renderFooter()}
+      </div>
+    )
   }
 
   if (isError) {
     return (
-      <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
-        <Storage className="h-6 w-6" strokeWidth={1.5} />
-        <p className="text-sm">Failed to load storage buckets</p>
+      <div className="relative h-full flex flex-col">
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
+            <Storage className="h-6 w-6" strokeWidth={1.5} />
+            <p className="text-sm">Failed to load storage buckets</p>
+          </div>
+        </div>
+        {renderFooter()}
       </div>
     )
   }
 
   if (allResults.length === 0) {
-    return <EmptyState icon={Storage} label="Storage" query={query} />
+    return (
+      <div className="relative h-full flex flex-col">
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <EmptyState icon={Storage} label="Storage" query={query} />
+        </div>
+        {renderFooter()}
+      </div>
+    )
   }
 
-  return <ResultsList results={allResults} icon={Storage} getRoute={getRoute} />
+  return (
+    <div className="relative h-full flex flex-col">
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ResultsList results={allResults} icon={Storage} getRoute={getRoute} className="pb-9" />
+      </div>
+      {renderFooter()}
+    </div>
+  )
 }

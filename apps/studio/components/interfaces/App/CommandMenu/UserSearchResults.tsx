@@ -47,7 +47,7 @@ export function UserSearchResults({ query }: UserSearchResultsProps) {
     return undefined
   }, [trimmedQuery])
 
-  // Fetch user count for footer display - always enabled to show total count
+  // Fetch user count for footer display - always show absolute total count (not filtered)
   const {
     data: countData,
     isPending: isLoadingCount,
@@ -56,12 +56,11 @@ export function UserSearchResults({ query }: UserSearchResultsProps) {
     {
       projectRef,
       connectionString: project?.connectionString,
-      keywords: trimmedQuery || '',
+      keywords: '', // Always use empty string to get absolute total count
       filter: undefined,
       providers: [],
       forceExactCount: false,
-      // Use optimized search when filtering by specific column
-      ...(searchColumn !== undefined ? { column: searchColumn } : { column: undefined }),
+      column: undefined,
     },
     {
       placeholderData: keepPreviousData,
