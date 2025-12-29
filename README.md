@@ -24,7 +24,9 @@
 
 Watch "releases" of this repo to get notified of major updates.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd>
+  <img src="https://github.com/user-attachments/assets/b6e5c132-6a6e-4472-8e4b-616f50db6df2" alt="Watch this repo" width="500"/>
+</kbd>
 
 ## Documentation
 
