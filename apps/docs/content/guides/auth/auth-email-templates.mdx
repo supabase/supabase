@@ -136,9 +136,9 @@ const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'ema
 - Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action
 
 ```html
-<a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
-  >Confirm your signup</a
->
+<a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}">
+  Confirm your signup
+</a>
 ```
 
 - The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
@@ -156,7 +156,8 @@ You can customize the email link in the email template to redirect the user to a
 ```html
 <a
   href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite&redirect_to={{ .RedirectTo }}"
-  >Accept the invite
+>
+  Accept the invite
 </a>
 ```
 
