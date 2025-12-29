@@ -69,7 +69,7 @@ const PageSectionSummary = ({ className, children, ...props }: PageSectionSummar
       className={cn(
         'flex flex-col gap-1',
         // Center alignment with PageSection Aside in case no PageSectionDescription present
-        'xl:self-center',
+        '@xl:self-center',
         className
       )}
       {...props}
