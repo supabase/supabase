@@ -42,7 +42,7 @@ export const ProjectTableRow = ({
 
   const infraInformation = project.databases.find((x) => x.identifier === project.ref)
 
-  const handleNavigation = createNavigationHandler(`/project/${project.ref}`, router)
+  const handleNavigation = createNavigationHandler(url, router)
 
   return (
     <TableRow
