@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { formatSql } from '../../test/util'
 import { debugSql, titleSql } from './functions'
 
+// Minimal chat completion response shape used by tests.
 const buildToolCallResponse = (payload: unknown) => ({
   choices: [
     {
@@ -55,6 +56,7 @@ beforeEach(() => {
 })
 
 describe('debug', () => {
+  // Run sequentially so each test can provide its own mocked completion response.
   test('fix order of operations', async ({ expect }) => {
     mockCompletionsCreate.mockResolvedValueOnce(
       buildToolCallResponse({

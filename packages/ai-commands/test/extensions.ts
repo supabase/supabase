@@ -2,16 +2,18 @@ import { expect } from 'vitest'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
 
-const openAiKey = process.env.OPENAI_API_KEY
+const MIN_WORD_LENGTH = 3
 
 expect.extend({
   async toMatchCriteria(received: string, criteria: string) {
+    const openAiKey = process.env.OPENAI_API_KEY
+
     if (!openAiKey) {
       const receivedLower = received.toLowerCase()
       const ignoredWords = new Set(['relates', 'describes'])
       const requiredWords = criteria
         .split(/\W+/)
-        .filter((word) => word.length > 3 && !ignoredWords.has(word.toLowerCase()))
+        .filter((word) => word.length > MIN_WORD_LENGTH && !ignoredWords.has(word.toLowerCase()))
         .map((word) => word.toLowerCase())
 
       const missing = requiredWords.filter((word) => !receivedLower.includes(word))
