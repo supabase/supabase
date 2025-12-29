@@ -13,7 +13,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -493,7 +493,7 @@ export const Connect = () => {
                       <>
                         <p>
                           View your publishable and secret API keys from the project{' '}
-                          <Link href={`/project/${projectRef}/settings/api-keys`}>
+                          <Link href={`${BASE_PATH}/project/${projectRef}/settings/api-keys`}>
                             API settings page
                           </Link>
                         </p>
@@ -509,7 +509,7 @@ export const Connect = () => {
                         </p>
                       </>
                     }
-                    href={`/project/${projectRef}/settings/api-keys`}
+                    href={`${BASE_PATH}/project/${projectRef}/settings/api-keys`}
                     buttonText="View API keys"
                   />
                 )}
