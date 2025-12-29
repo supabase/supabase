@@ -27,7 +27,7 @@ export const createSqlSnippetSkeletonV2 = ({
    */
   idOverride?: string
 }): SnippetWithContent => {
-  const id = idOverride ?? generateUuid([folder_id, name])
+  const id = idOverride ?? generateUuid([folder_id, `${name}.sql`])
 
   return {
     ...NEW_SQL_SNIPPET_SKELETON,

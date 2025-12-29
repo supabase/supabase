@@ -31,13 +31,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OrganizationCard } from '../OrganizationCard'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
 import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
-import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
+import { useCloudMarketplaceOnboardingInfoQuery } from './cloud-marketplace-query'
 import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
+import AwsMarketplaceOnboardingPlaceholder from './AwsMarketplaceOnboardingPlaceholder'
 
 interface AwsMarketplaceLinkExistingOrgProps {
   organizations?: Organization[] | undefined
-  onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
-  isLoadingOnboardingInfo: boolean
 }
 
 const FormSchema = z.object({
@@ -48,13 +47,16 @@ type LinkExistingOrgForm = z.infer<typeof FormSchema>
 
 export const AwsMarketplaceLinkExistingOrg = ({
   organizations,
-  onboardingInfo,
-  isLoadingOnboardingInfo,
 }: AwsMarketplaceLinkExistingOrgProps) => {
   const router = useRouter()
   const {
     query: { buyer_id: buyerId },
   } = router
+
+  const { data: onboardingInfo, isPending: isLoadingOnboardingInfo } =
+    useCloudMarketplaceOnboardingInfoQuery({
+      buyerId: buyerId as string,
+    })
 
   const form = useForm<LinkExistingOrgForm>({
     resolver: zodResolver(FormSchema),
@@ -126,175 +128,179 @@ export const AwsMarketplaceLinkExistingOrg = ({
             awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
           />
         )}
-      <ScaffoldSection>
-        <ScaffoldSectionDetail className="text-base">
-          <>
-            <p>
-              You’ve subscribed to the Supabase {onboardingInfo?.plan_name_selected_on_marketplace}{' '}
-              Plan via the AWS Marketplace. As a final step, you need to link a Supabase
-              organization to that subscription. Select the organization you want to be managed and
-              billed through AWS.
-            </p>
+      {isLoadingOnboardingInfo ? (
+        <AwsMarketplaceOnboardingPlaceholder />
+      ) : (
+        <ScaffoldSection>
+          <ScaffoldSectionDetail className="text-base">
+            <>
+              <p>
+                You’ve subscribed to the Supabase{' '}
+                {onboardingInfo?.plan_name_selected_on_marketplace} Plan via the AWS Marketplace. As
+                a final step, you need to link a Supabase organization to that subscription. Select
+                the organization you want to be managed and billed through AWS.
+              </p>
 
-            <p>
-              You can read more on billing through AWS in our {''}
-              <Link
-                href={`${DOCS_URL}/guides/platform/aws-marketplace`}
-                target="_blank"
-                className="underline"
+              <p>
+                You can read more on billing through AWS in our {''}
+                <Link
+                  href={`${DOCS_URL}/guides/platform/aws-marketplace`}
+                  target="_blank"
+                  className="underline"
+                >
+                  Billing Docs.
+                </Link>
+              </p>
+
+              <p className="mt-10">
+                <span className="font-bold text-foreground-light">Want to start fresh?</span> Create
+                a new organization and it will be linked automatically.
+              </p>
+              <Button
+                size="tiny"
+                htmlType="submit"
+                type="primary"
+                onClick={async (e) => {
+                  e.preventDefault()
+                  setShowOrgCreationDialog(true)
+                }}
               >
-                Billing Docs.
-              </Link>
-            </p>
+                Create organization
+              </Button>
+            </>
+          </ScaffoldSectionDetail>
 
-            <p className="mt-10">
-              <span className="font-bold text-foreground-light">Want to start fresh?</span> Create a
-              new organization and it will be linked automatically.
-            </p>
-            <Button
-              size="tiny"
-              htmlType="submit"
-              type="primary"
-              onClick={async (e) => {
-                e.preventDefault()
-                setShowOrgCreationDialog(true)
-              }}
-            >
-              Create organization
-            </Button>
-          </>
-        </ScaffoldSectionDetail>
-
-        <ScaffoldSectionContent className="lg:ml-10">
-          <Form_Shadcn_ {...form}>
-            <form className="flex flex-col">
-              <FormField_Shadcn_
-                name="orgSlug"
-                control={form.control}
-                render={({ field }) => (
-                  <RadioGroupCard
-                    {...field}
-                    defaultValue={field.value}
-                    onValueChange={(value: string) => {
-                      form.setValue('orgSlug', value, {
-                        shouldDirty: true,
-                        shouldValidate: false,
-                      })
-                    }}
-                  >
-                    <FormItemLayout id={field.name}>
-                      <div className={'grid gap-4 grid-cols-1'}>
-                        {isLoadingOnboardingInfo ? (
-                          Array(3)
-                            .fill(0)
-                            .map((_, i) => (
-                              <Skeleton key={i} className="w-full h-[110px] rounded-md" />
-                            ))
-                        ) : (
-                          <>
-                            <p className="font-bold text-foreground-light">
-                              Organizations that can be linked
-                            </p>
-                            {orgsLinkable.length === 0 ? (
-                              <p className="text-sm text-foreground-light">
-                                None of your organizations can be linked to your AWS Marketplace
-                                subscription at the moment.
-                              </p>
-                            ) : (
-                              orgsLinkable.map((org) => (
-                                <RadioGroupCardItem
-                                  id={org.slug}
-                                  key={org.slug}
-                                  showIndicator={false}
-                                  value={org.slug}
-                                  className={cn(
-                                    'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group w-full'
-                                  )}
-                                  label={
-                                    <OrganizationCard
-                                      key={org.id}
-                                      isLink={false}
-                                      organization={org}
-                                    />
-                                  }
-                                />
+          <ScaffoldSectionContent className="lg:ml-10">
+            <Form_Shadcn_ {...form}>
+              <form className="flex flex-col">
+                <FormField_Shadcn_
+                  name="orgSlug"
+                  control={form.control}
+                  render={({ field }) => (
+                    <RadioGroupCard
+                      {...field}
+                      defaultValue={field.value}
+                      onValueChange={(value: string) => {
+                        form.setValue('orgSlug', value, {
+                          shouldDirty: true,
+                          shouldValidate: false,
+                        })
+                      }}
+                    >
+                      <FormItemLayout id={field.name}>
+                        <div className={'grid gap-4 grid-cols-1'}>
+                          {isLoadingOnboardingInfo ? (
+                            Array(3)
+                              .fill(0)
+                              .map((_, i) => (
+                                <Skeleton key={i} className="w-full h-[110px] rounded-md" />
                               ))
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </FormItemLayout>
-                  </RadioGroupCard>
-                )}
-              />
-            </form>
-          </Form_Shadcn_>
-
-          {orgsNotLinkable.length > 0 && !isLoadingOnboardingInfo && (
-            <Collapsible_Shadcn_
-              className="-space-y-px"
-              open={isNotLinkableOrgListOpen || orgsLinkable.length === 0}
-              onOpenChange={() => setIsNotLinkableOrgListOpen((prev) => !prev)}
-            >
-              <CollapsibleTrigger_Shadcn_ className="py-2 w-full flex items-center group justify-between">
-                <p className="text-xs font-bold text-foreground-light">
-                  Organizations that can't be linked
-                </p>
-                <ChevronRight
-                  size={16}
-                  className="text-foreground-lighter transition-all group-data-[state=open]:rotate-90"
-                  strokeWidth={1}
+                          ) : (
+                            <>
+                              <p className="font-bold text-foreground-light">
+                                Organizations that can be linked
+                              </p>
+                              {orgsLinkable.length === 0 ? (
+                                <p className="text-sm text-foreground-light">
+                                  None of your organizations can be linked to your AWS Marketplace
+                                  subscription at the moment.
+                                </p>
+                              ) : (
+                                orgsLinkable.map((org) => (
+                                  <RadioGroupCardItem
+                                    id={org.slug}
+                                    key={org.slug}
+                                    showIndicator={false}
+                                    value={org.slug}
+                                    className={cn(
+                                      'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group w-full'
+                                    )}
+                                    label={
+                                      <OrganizationCard
+                                        key={org.id}
+                                        isLink={false}
+                                        organization={org}
+                                      />
+                                    }
+                                  />
+                                ))
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </FormItemLayout>
+                    </RadioGroupCard>
+                  )}
                 />
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_
-                className={cn(
-                  'flex flex-col gap-4 transition-all',
-                  'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
-                )}
-              >
-                <p className="text-foreground-light text-xs">
-                  The following organizations can’t be linked to your AWS Marketplace subscription
-                  at the moment. This may be due to missing permissions, outstanding invoices, or an
-                  existing marketplace link. If you'd like to link one of these organizations,
-                  please review the organization settings. You need to be Owner or Administrator of
-                  the organization to link it.
-                </p>
-                <div className="text-sm text-left flex flex-col gap-4 p-0 [&_label]:w-full group] w-full opacity-60">
-                  {orgsNotLinkable.map((org) => (
-                    <OrganizationCard
-                      isLink={false}
-                      key={org.id}
-                      organization={org}
-                      className="cursor-not-allowed"
-                    />
-                  ))}
-                </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
-          )}
+              </form>
+            </Form_Shadcn_>
 
-          <div className={cn('flex gap-3 justify-end')}>
-            <ButtonTooltip
-              size="medium"
-              htmlType="submit"
-              type="primary"
-              onClick={async () => {
-                await onSubmit(form.getValues())
-              }}
-              loading={isLinkingOrganization}
-              disabled={!isDirty || isLinkingOrganization || isLoadingOnboardingInfo}
-              tooltip={{
-                content: {
-                  side: 'top',
-                  text: !isDirty ? 'No organization selected' : undefined,
-                },
-              }}
-            >
-              Link organization
-            </ButtonTooltip>
-          </div>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+            {orgsNotLinkable.length > 0 && !isLoadingOnboardingInfo && (
+              <Collapsible_Shadcn_
+                className="-space-y-px"
+                open={isNotLinkableOrgListOpen || orgsLinkable.length === 0}
+                onOpenChange={() => setIsNotLinkableOrgListOpen((prev) => !prev)}
+              >
+                <CollapsibleTrigger_Shadcn_ className="py-2 w-full flex items-center group justify-between">
+                  <p className="text-xs font-bold text-foreground-light">
+                    Organizations that can't be linked
+                  </p>
+                  <ChevronRight
+                    size={16}
+                    className="text-foreground-lighter transition-all group-data-[state=open]:rotate-90"
+                    strokeWidth={1}
+                  />
+                </CollapsibleTrigger_Shadcn_>
+                <CollapsibleContent_Shadcn_
+                  className={cn(
+                    'flex flex-col gap-4 transition-all',
+                    'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  )}
+                >
+                  <p className="text-foreground-light text-xs">
+                    The following organizations can’t be linked to your AWS Marketplace subscription
+                    at the moment. This may be due to missing permissions, outstanding invoices, or
+                    an existing marketplace link. If you'd like to link one of these organizations,
+                    please review the organization settings. You need to be Owner or Administrator
+                    of the organization to link it.
+                  </p>
+                  <div className="text-sm text-left flex flex-col gap-4 p-0 [&_label]:w-full group] w-full opacity-60">
+                    {orgsNotLinkable.map((org) => (
+                      <OrganizationCard
+                        isLink={false}
+                        key={org.id}
+                        organization={org}
+                        className="cursor-not-allowed"
+                      />
+                    ))}
+                  </div>
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
+            )}
+
+            <div className={cn('flex gap-3 justify-end')}>
+              <ButtonTooltip
+                size="medium"
+                htmlType="submit"
+                type="primary"
+                onClick={async () => {
+                  await onSubmit(form.getValues())
+                }}
+                loading={isLinkingOrganization}
+                disabled={!isDirty || isLinkingOrganization || isLoadingOnboardingInfo}
+                tooltip={{
+                  content: {
+                    side: 'top',
+                    text: !isDirty ? 'No organization selected' : undefined,
+                  },
+                }}
+              >
+                Link organization
+              </ButtonTooltip>
+            </div>
+          </ScaffoldSectionContent>
+        </ScaffoldSection>
+      )}
 
       <AwsMarketplaceOnboardingSuccessModal
         visible={orgLinkedSuccessfully}
