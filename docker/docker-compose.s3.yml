@@ -22,20 +22,16 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set supa-minio http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD &&
-      /usr/bin/mc mb supa-minio/$$GLOBAL_S3_BUCKET &&
-      exit 0
+      /usr/bin/mc alias set supa-minio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc mb supa-minio/${GLOBAL_S3_BUCKET};
+      exit 0;
       "
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.25.7
+    image: supabase/storage-api:v1.33.3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
