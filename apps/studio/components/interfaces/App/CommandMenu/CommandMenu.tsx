@@ -18,6 +18,7 @@ import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgP
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useContextSearchCommands } from './ContextSearchCommands'
+import { useCreateCommands } from './CreateCommands'
 
 export default function StudioCommandMenu() {
   useApiKeysCommands()
@@ -39,6 +40,7 @@ export default function StudioCommandMenu() {
   useSupportCommands()
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
+  useCreateCommands()
   useContextSearchCommands()
 
   return (

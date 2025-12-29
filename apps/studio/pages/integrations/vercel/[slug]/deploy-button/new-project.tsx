@@ -7,7 +7,7 @@ import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelInt
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
@@ -17,7 +17,7 @@ import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { passwordStrength } from 'lib/password-strength'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
@@ -232,7 +232,7 @@ const CreateProject = () => {
           onChange={onDbPassChange}
           descriptionText={
             <PasswordStrengthBar
-              passwordStrengthScore={passwordStrengthScore}
+              passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
               generateStrongPassword={generatePassword}
