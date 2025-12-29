@@ -334,7 +334,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }, [q])
 
   useEffect(() => {
-    setDatePickerValue(initialDatePickerValue)
+    // prevents overwriting when the user selects a helper.
+    // without this, if the user selects "last 3 days" it would overwrite it with "last hour"
+    // its the simplest solution I could come up with - jordi
+    if (!initialDatePickerValue.isHelper) {
+      setDatePickerValue(initialDatePickerValue)
+    }
   }, [initialDatePickerValue])
 
   useEffect(() => {
