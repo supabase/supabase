@@ -29,6 +29,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
+  Separator,
   Switch,
   Table,
   TableBody,
@@ -156,13 +157,13 @@ export const S3Connection = () => {
                   <GenericSkeletonLoader />
                 ) : isProjectActive ? (
                   <Card>
-                    <CardContent className="pt-6">
+                    <CardContent>
                       <FormField_Shadcn_
                         name="s3ConnectionEnabled"
                         control={form.control}
                         render={({ field }) => (
                           <FormItemLayout
-                            layout="horizontal"
+                            layout="flex-row-reverse"
                             className="[&>*>label]:text-foreground"
                             label="S3 protocol connection"
                             description="Allow clients to connect to Supabase Storage via the S3 protocol"
@@ -180,23 +181,34 @@ export const S3Connection = () => {
                       />
                     </CardContent>
 
-                    <CardContent className="py-6">
-                      <div className="flex flex-col gap-y-4">
-                        <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-                          <Input readOnly copy value={s3connectionUrl} />
-                        </FormItemLayout>
-                        <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                          <Input
-                            readOnly
-                            copy
-                            value={project?.region}
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                          />
-                        </FormItemLayout>
-                      </div>
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
+                        label="Endpoint"
+                        isReactForm={false}
+                      >
+                        <Input readOnly copy value={s3connectionUrl} />
+                      </FormItemLayout>
+                    </CardContent>
+
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
+                        label="Region"
+                        isReactForm={false}
+                      >
+                        <Input
+                          readOnly
+                          copy
+                          value={project?.region}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
+                      </FormItemLayout>
                     </CardContent>
 
                     {!isLoadingPermissions && !canUpdateStorageSettings && (
