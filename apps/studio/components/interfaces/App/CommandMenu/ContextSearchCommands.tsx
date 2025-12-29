@@ -99,49 +99,24 @@ export function useContextSearchCommands() {
   const setPage = useSetPage()
 
   // Register pages for each context
-  useRegisterPage('Search Users', {
-    type: PageType.Component,
-    component: () => (
-      <ContextSearchPage context="users" placeholder={SEARCH_CONTEXT_OPTIONS[0].placeholder} />
-    ),
-  })
+  const pageDefinitions = [
+    { title: 'Search Users', context: 'users' as const },
+    { title: 'Search Database Tables', context: 'database-tables' as const },
+    { title: 'Search RLS Policies', context: 'auth-policies' as const },
+    { title: 'Search Edge Functions', context: 'edge-functions' as const },
+    { title: 'Search Storage', context: 'storage' as const },
+  ]
 
-  useRegisterPage('Search Database Tables', {
-    type: PageType.Component,
-    component: () => (
-      <ContextSearchPage
-        context="database-tables"
-        placeholder={SEARCH_CONTEXT_OPTIONS[1].placeholder}
-      />
-    ),
-  })
-
-  useRegisterPage('Search RLS Policies', {
-    type: PageType.Component,
-    component: () => (
-      <ContextSearchPage
-        context="auth-policies"
-        placeholder={SEARCH_CONTEXT_OPTIONS[2].placeholder}
-      />
-    ),
-  })
-
-  useRegisterPage('Search Edge Functions', {
-    type: PageType.Component,
-    component: () => (
-      <ContextSearchPage
-        context="edge-functions"
-        placeholder={SEARCH_CONTEXT_OPTIONS[3].placeholder}
-      />
-    ),
-  })
-
-  useRegisterPage('Search Storage', {
-    type: PageType.Component,
-    component: () => (
-      <ContextSearchPage context="storage" placeholder={SEARCH_CONTEXT_OPTIONS[4].placeholder} />
-    ),
-  })
+  // Register pages - pageDefinitions is constant, so hooks are called in consistent order
+  for (const { title, context } of pageDefinitions) {
+    const placeholder =
+      SEARCH_CONTEXT_OPTIONS.find((opt) => opt.value === context)?.placeholder ?? ''
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useRegisterPage(title, {
+      type: PageType.Component,
+      component: () => <ContextSearchPage context={context} placeholder={placeholder} />,
+    })
+  }
 
   // Register top-level commands
   const contextCommands = useMemo(
