@@ -36,6 +36,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
+import Link from 'next/link'
 
 export const Connect = () => {
   const router = useRouter()
@@ -485,12 +486,30 @@ export const Connect = () => {
                 />
                 <Panel.Notice
                   className="border border-t-0 rounded-lg rounded-t-none"
-                  title="New API keys coming 2025"
-                  description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
-`}
-                  href="https://github.com/orgs/supabase/discussions/29260"
-                  buttonText="Read the announcement"
+                  badgeLabel="Changelog"
+                  title="New publishable and secret API keys"
+                  description={
+                    <>
+                      <p>
+                        View your publishable and secret API keys from the project{' '}
+                        <Link href={`/project/${projectRef}/settings/api-keys`}>
+                          API settings page
+                        </Link>
+                      </p>
+                      <p>
+                        To learn more about the new API keys, read the{' '}
+                        <a
+                          href="https://supabase.com/docs/guides/api/api-keys"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          documentation
+                        </a>
+                      </p>
+                    </>
+                  }
+                  href={`/project/${projectRef}/settings/api-keys`}
+                  buttonText="View API keys"
                 />
               </TabsContent_Shadcn_>
             )
