@@ -426,7 +426,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <Form
           initialValues={{
             name: '',
-            desdcription: '',
+            description: '',
           }}
           onSubmit={handleCreateQuery}
         >
