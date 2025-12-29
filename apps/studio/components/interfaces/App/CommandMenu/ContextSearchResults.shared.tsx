@@ -51,12 +51,19 @@ interface ResultsListProps {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   onResultClick?: (result: SearchResult) => void
   getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
+  className?: string
 }
 
 /**
  * Renders a list of results using CommandMenu components for keyboard accessibility
  */
-export function ResultsList({ results, icon: Icon, onResultClick, getRoute }: ResultsListProps) {
+export function ResultsList({
+  results,
+  icon: Icon,
+  onResultClick,
+  getRoute,
+  className,
+}: ResultsListProps) {
   const commands = results.map((result): IRouteCommand | IActionCommand => {
     const baseCommand = {
       id: result.id,
@@ -80,7 +87,7 @@ export function ResultsList({ results, icon: Icon, onResultClick, getRoute }: Re
 
   return (
     <CommandList_Shadcn_
-      className={cn('max-h-[initial] overflow-y-auto overflow-x-hidden bg-transparent')}
+      className={cn('h-full overflow-y-auto overflow-x-hidden bg-transparent', className)}
     >
       <CommandGroup>
         {commands.map((command) => (
