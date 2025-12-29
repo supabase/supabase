@@ -6,12 +6,12 @@ import { useClockSkewQuery } from 'data/misc/clock-skew-query'
 import { DOCS_URL } from 'lib/constants'
 
 export const ClockSkewBanner = () => {
-  const [clockSkew, setClockSkew] = useState(false)
+  const [isClockSkewed, setIsClockSkewed] = useState(false)
 
   const { data } = useClockSkewQuery()
-  useEffect(() => setClockSkew(!!data), [data])
+  useEffect(() => setIsClockSkewed(!!data), [data])
 
-  if (!clockSkew) return null
+  if (!isClockSkewed) return null
 
   return (
     <HeaderBanner

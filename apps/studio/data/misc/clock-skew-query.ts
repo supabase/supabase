@@ -7,7 +7,7 @@ import { miscKeys } from './keys'
 
 // Warn if the clock skew is greater than 2 minutes
 const CLOCK_SKEW_THRESHOLD = 2 * 60 * 1000
-// Check every 5 minutes
+// Check every 30 minutes
 const CLOCK_SKEW_CHECK_INTERVAL = 30 * 60 * 1000
 
 export async function getClockSkew() {
