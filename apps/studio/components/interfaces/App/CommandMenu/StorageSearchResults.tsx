@@ -165,7 +165,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
 
   const getRoute = useCallback(
     (result: SearchResult) => {
-      if (!projectRef) return `/project/${projectRef}/storage/files` as `/${string}`
+      if (!projectRef) return '/storage/files' as `/${string}`
 
       const extendedResult = result as ExtendedSearchResult
 
