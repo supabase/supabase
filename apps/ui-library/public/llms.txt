@@ -67,6 +67,8 @@ Library of components for your project. The components integrate with Supabase a
     - Avatar stack in realtime
 - [Realtime Chat](https://supabase.com/ui/docs/react/realtime-chat)
     - Real-time chat component for collaborative applications
+- [Realtime Chat](https://supabase.com/ui/docs/expo/realtime-chat)
+    - Real-time chat component for Expo and React Native applications
 - [Realtime Cursor](https://supabase.com/ui/docs/react/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/react/social-auth)
