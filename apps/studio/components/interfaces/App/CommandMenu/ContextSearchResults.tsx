@@ -100,29 +100,53 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
 
   // Delegate to UserSearchResults for users context
   if (context === 'users') {
-    return <UserSearchResults query={query} />
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <UserSearchResults query={query} />
+      </div>
+    )
   }
 
   // Delegate to TableSearchResults for database-tables context
   if (context === 'database-tables') {
-    return <TableSearchResults query={query} />
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <TableSearchResults query={query} />
+      </div>
+    )
   }
 
   // Delegate to PolicySearchResults for auth-policies context
   if (context === 'auth-policies') {
-    return <PolicySearchResults query={query} />
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <PolicySearchResults query={query} />
+      </div>
+    )
   }
 
   // Delegate to EdgeFunctionSearchResults for edge-functions context
   if (context === 'edge-functions') {
-    return <EdgeFunctionSearchResults query={query} />
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <EdgeFunctionSearchResults query={query} />
+      </div>
+    )
   }
 
   // Delegate to StorageSearchResults for storage context
   if (context === 'storage') {
-    return <StorageSearchResults query={query} />
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <StorageSearchResults query={query} />
+      </div>
+    )
   }
 
   // Fallback: show empty state for any unhandled contexts
-  return <EmptyState icon={config.icon} label={config.label} query={query} />
+  return (
+    <div className="flex-1 min-h-0 flex flex-col">
+      <EmptyState icon={config.icon} label={config.label} query={query} />
+    </div>
+  )
 }

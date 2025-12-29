@@ -107,7 +107,7 @@ export function UserSearchResults({ query }: UserSearchResultsProps) {
   }, [usersData])
 
   const renderFooter = () => (
-    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
+    <div className="absolute bottom-0 left-0 right-0 flex-shrink-0 w-full flex items-center justify-between py-2 px-4 border-t bg-surface-200 text-xs text-foreground-light">
       <div className="flex items-center gap-x-2">
         {isLoadingCount || isFetchingCount || countData === undefined ? (
           <span className="flex items-center gap-2">
@@ -203,14 +203,16 @@ export function UserSearchResults({ query }: UserSearchResultsProps) {
 
   return (
     <div className="relative h-full flex flex-col">
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div
+        className="flex-1 min-h-0 flex flex-col overflow-hidden"
+        style={{ maxHeight: 'calc(100% - 40px)' }}
+      >
         <ResultsList
           results={userResults}
           icon={Users}
           getRoute={(result) =>
             `/project/${projectRef}/auth/users?show=${result.id}` as `/${string}`
           }
-          className="pb-9"
         />
       </div>
       {renderFooter()}

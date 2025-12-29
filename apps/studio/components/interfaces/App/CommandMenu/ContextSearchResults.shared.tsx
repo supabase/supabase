@@ -87,7 +87,10 @@ export function ResultsList({
 
   return (
     <CommandList_Shadcn_
-      className={cn('h-full overflow-y-auto overflow-x-hidden bg-transparent', className)}
+      className={cn(
+        '!max-h-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
+        className
+      )}
     >
       <CommandGroup>
         {commands.map((command) => (
