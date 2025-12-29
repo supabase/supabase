@@ -1,8 +1,9 @@
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
-import Link from 'next/link'
+import { InlineLink } from 'components/ui/InlineLink'
 
-// Used to display ongoing incidents
-
+/**
+ * Used to display ongoing incidents
+ */
 export const IncidentBanner = () => {
   return (
     <HeaderBanner
@@ -10,11 +11,8 @@ export const IncidentBanner = () => {
       title="We are investigating a technical issue"
       description={
         <>
-          Follow the{' '}
-          <Link href="https://status.supabase.com" target="_blank" rel="noopener noreferrer">
-            status page
-          </Link>{' '}
-          for updates
+          Follow the <InlineLink href="https://status.supabase.com">status page</InlineLink> for
+          updates
         </>
       }
     />

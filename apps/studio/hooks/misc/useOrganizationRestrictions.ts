@@ -47,9 +47,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
-      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.description(
-        `/org/${org.slug}/billing#address`
-      ),
+      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.description(org.slug),
     })
   }
 
@@ -57,9 +55,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.description(
-        `/org/${org?.slug}/billing#invoices`
-      ),
+      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES.description(org?.slug ?? 'default'),
     })
   }
 
@@ -71,7 +67,7 @@ export function useOrganizationRestrictions() {
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
       description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description(
-        `/org/${otherOrgSlug ?? org?.slug}/billing#invoices`
+        otherOrgSlug ?? org?.slug ?? 'default'
       ),
     })
   }
@@ -82,7 +78,7 @@ export function useOrganizationRestrictions() {
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
       description: RESTRICTION_MESSAGES.GRACE_PERIOD.description(
         dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY'),
-        `/org/${org.slug}/billing`
+        org.slug
       ),
     })
   }
@@ -91,7 +87,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.title,
-      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.description(`/org/${org.slug}/billing`),
+      description: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.description(org.slug),
     })
   }
 
@@ -99,7 +95,7 @@ export function useOrganizationRestrictions() {
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
-      description: RESTRICTION_MESSAGES.RESTRICTED.description(`/org/${org.slug}/billing`),
+      description: RESTRICTION_MESSAGES.RESTRICTED.description(org.slug),
     })
   }
 
