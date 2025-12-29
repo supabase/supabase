@@ -3,14 +3,7 @@
 import { Database, Info, Search, Users } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-
-export type SearchContextValue =
-  | 'commands'
-  | 'users'
-  | 'database-tables'
-  | 'auth-policies'
-  | 'edge-functions'
-  | 'storage'
+import type { SearchContextValue } from './SearchContext.types'
 
 interface SearchContextOption {
   value: SearchContextValue

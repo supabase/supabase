@@ -12,14 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-
-export type SearchContextValue =
-  | 'commands'
-  | 'users'
-  | 'database-tables'
-  | 'auth-policies'
-  | 'edge-functions'
-  | 'storage'
+import type { SearchContextValue } from './SearchContext.types'
 
 interface SearchContextOption {
   value: SearchContextValue
