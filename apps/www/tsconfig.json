@@ -45,7 +45,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".contentlayer/generated"
+    "./../../packages/ui/src/**/*.d.ts",
+    ".contentlayer/generated",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules", "supabase"]
 }
