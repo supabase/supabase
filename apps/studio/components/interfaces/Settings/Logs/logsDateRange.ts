@@ -53,4 +53,3 @@ export const buildLogQueryParams = (
     to: range.to,
   }
 }
-

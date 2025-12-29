@@ -84,4 +84,3 @@ describe('buildLogQueryParams', () => {
     vi.useRealTimers()
   })
 })
-
