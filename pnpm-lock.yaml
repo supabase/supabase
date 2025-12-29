@@ -1610,11 +1610,11 @@ importers:
         specifier: ^3.0.0
         version: 3.1.1(@types/react@19.2.14)(react@19.2.6)
       '@next/bundle-analyzer':
-        specifier: 15.3.1
-        version: 15.3.1
+        specifier: ^16.0.0
+        version: 16.2.3
       '@next/mdx':
-        specifier: 15.3.1
-        version: 15.3.1(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2)))(@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.6))
+        specifier: ^16.0.0
+        version: 16.2.6(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2)))(@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.6))
       '@octokit/auth-app':
         specifier: ^7.0.0
         version: 7.1.5
@@ -1632,7 +1632,7 @@ importers:
         version: 21.1.1
       '@sentry/nextjs':
         specifier: 'catalog:'
-        version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react@19.2.6)(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
+        version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react@19.2.6)(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
       '@supabase/ssr':
         specifier: 'catalog:'
         version: 0.10.2(@supabase/supabase-js@2.107.0)
@@ -1724,20 +1724,20 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       next:
-        specifier: ^15.5.18
-        version: 15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
+        specifier: 'catalog:'
+        version: 16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       next-mdx-remote-client:
         specifier: ^1.1.7
         version: 1.1.7(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@8.1.1)(unified@11.0.5)
       next-seo:
         specifier: ^6.5.0
-        version: 6.5.0(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 6.5.0(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next-themes:
         specifier: 'catalog:'
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       nuqs:
         specifier: ^2.8.1
-        version: 2.8.1(@tanstack/react-router@1.170.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.13.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
+        version: 2.8.1(@tanstack/react-router@1.170.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.13.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.21.0)(zod@3.25.76)
@@ -1803,7 +1803,7 @@ importers:
         version: link:../../packages/ui-patterns
       unicornstudio-react:
         specifier: 2.0.1-1
-        version: 2.0.1-1(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 2.0.1-1(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       use-debounce:
         specifier: ^7.0.1
         version: 7.0.1(react@19.2.6)
@@ -4646,6 +4646,17 @@ packages:
 
   '@next/mdx@15.3.1':
     resolution: {integrity: sha512-dnpuJRfqqCPFfLDy2hIej41JAl424zk1JOgRd7jjWu2aTeX6oi0gXdcnMAK4lhf7Xl9zSkL2stzDc1YtlB1xyg==}
+    peerDependencies:
+      '@mdx-js/loader': '>=0.15.0'
+      '@mdx-js/react': '>=0.15.0'
+    peerDependenciesMeta:
+      '@mdx-js/loader':
+        optional: true
+      '@mdx-js/react':
+        optional: true
+
+  '@next/mdx@16.2.6':
+    resolution: {integrity: sha512-0hdoSkzRbyud1dNRRDiyqD9FrxR2wwdiW+ffhYx+n+fXrFOJ7Nwpi8o7nUz2LiiM44BB9M0eIO1Evy3BBrS50A==}
     peerDependencies:
       '@mdx-js/loader': '>=0.15.0'
       '@mdx-js/react': '>=0.15.0'
@@ -20599,6 +20610,13 @@ snapshots:
       '@mdx-js/loader': 3.1.1(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
       '@mdx-js/react': 3.1.1(@types/react@19.2.14)(react@19.2.6)
 
+  '@next/mdx@16.2.6(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2)))(@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.6))':
+    dependencies:
+      source-map: 0.7.6
+    optionalDependencies:
+      '@mdx-js/loader': 3.1.1(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
+      '@mdx-js/react': 3.1.1(@types/react@19.2.14)(react@19.2.6)
+
   '@next/swc-darwin-arm64@15.5.18':
     optional: true
 
@@ -31422,9 +31440,9 @@ snapshots:
       next: 16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       react: 19.2.6
 
-  next-seo@6.5.0(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  next-seo@6.5.0(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
-      next: 15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
+      next: 16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
@@ -31758,13 +31776,13 @@ snapshots:
       next: 16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       react-router: 7.13.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
 
-  nuqs@2.8.1(@tanstack/react-router@1.170.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.13.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6):
+  nuqs@2.8.1(@tanstack/react-router@1.170.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.13.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6):
     dependencies:
       '@standard-schema/spec': 1.0.0
       react: 19.2.6
     optionalDependencies:
       '@tanstack/react-router': 1.170.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      next: 15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
+      next: 16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       react-router: 7.13.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
 
   nuxt@4.4.6(@babel/plugin-syntax-jsx@7.27.1(@babel/core@7.29.0(supports-color@8.1.1)))(@babel/plugin-syntax-typescript@7.28.6(@babel/core@7.29.0(supports-color@8.1.1)))(@electric-sql/pglite@0.4.5)(@parcel/watcher@2.5.6)(@types/node@22.13.14)(@vue/compiler-sfc@3.5.35)(aws4fetch@1.0.20)(cac@6.7.14)(db0@0.3.4(@electric-sql/pglite@0.4.5))(encoding@0.1.13)(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))(ioredis@5.10.1(supports-color@8.1.1))(lightningcss@1.32.0)(magicast@0.5.2)(rolldown@1.0.2)(rollup-plugin-visualizer@7.0.1(rolldown@1.0.2)(rollup@4.60.3))(rollup@4.60.3)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@6.0.2)(vite@7.3.3(@types/node@22.13.14)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))(yaml@2.9.0):
@@ -35112,12 +35130,12 @@ snapshots:
 
   unicorn-magic@0.4.0: {}
 
-  unicornstudio-react@2.0.1-1(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  unicornstudio-react@2.0.1-1(next@16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
     optionalDependencies:
-      next: 15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
+      next: 16.2.6(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
 
   unified@10.1.2:
     dependencies:
