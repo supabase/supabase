@@ -8,6 +8,7 @@ import {
   completenessScorer,
   concisenessScorer,
   docsFaithfulnessScorer,
+  factualityScorer,
   goalCompletionScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
@@ -85,6 +86,7 @@ Eval('Assistant', {
     concisenessScorer,
     completenessScorer,
     docsFaithfulnessScorer,
+    factualityScorer,
   ],
 })
 

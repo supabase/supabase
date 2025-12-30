@@ -17,6 +17,7 @@ type Output = {
 
 export type Expected = {
   requiredTools?: string[]
+  factualAnswer?: string
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -190,6 +191,45 @@ export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async
 
   return await docsFaithfulnessEvaluator({
     docs: docsText,
+    output: output.textOnly,
+  })
+}
+
+const factualityEvaluator = LLMClassifierFromTemplate<{ expected: string }>({
+  name: 'Factuality',
+  promptTemplate: stripIndent`
+    Evaluate whether the assistant's answer is factually accurate.
+
+    Question:
+    {{input}}
+    
+    Ground Truth:
+    {{expected}}
+    
+    Assistant Response:
+    {{output}}
+    
+    Is the assistant's response factually accurate according to the ground truth?
+    a) Factually accurate - response is consistent with the ground truth, no contradictions
+    b) Partially accurate - mostly accurate but has minor inaccuracies or unclear statements
+    c) Factually inaccurate - contradicts the ground truth or makes incorrect claims
+  `,
+  choiceScores: { a: 1, b: 0.5, c: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const factualityScorer: EvalScorer<Input, Output, Expected> = async ({
+  output,
+  expected,
+}) => {
+  // Skip scoring if no ground truth is provided
+  if (!expected.factualAnswer) {
+    return null
+  }
+
+  return await factualityEvaluator({
+    expected: expected.factualAnswer,
     output: output.textOnly,
   })
 }
