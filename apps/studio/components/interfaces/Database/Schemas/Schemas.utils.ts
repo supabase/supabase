@@ -69,21 +69,26 @@ export async function getGraphDataFromTables(
 
     // Create additional [this->foreign] node that we can point to on the graph.
     if (rel.target_table_schema !== currentSchema) {
-      const data: TableNodeData = {
-        id: rel.id,
-        ref: ref!,
-        schema: rel.target_table_schema,
-        name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
-        isForeign: true,
-        columns: [],
-      }
+      const targetId = `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`
 
-      nodes.push({
-        data,
-        id: rel.constraint_name,
-        type: 'table',
-        position: { x: 0, y: 0 },
-      })
+      const targetNode = nodes.find((n) => n.id === targetId)
+      if (!targetNode) {
+        const data: TableNodeData = {
+          id: rel.id,
+          ref: ref!,
+          schema: rel.target_table_schema,
+          name: targetId,
+          isForeign: true,
+          columns: [],
+        }
+
+        nodes.push({
+          id: targetId,
+          type: 'table',
+          data: data,
+          position: { x: 0, y: 0 },
+        })
+      }
 
       const [source, sourceHandle] = findTablesHandleIds(
         tables,
@@ -96,8 +101,8 @@ export async function getGraphDataFromTables(
           id: String(rel.id),
           source,
           sourceHandle,
-          target: rel.constraint_name,
-          targetHandle: rel.constraint_name,
+          target: targetId,
+          targetHandle: targetId,
         })
       }
 

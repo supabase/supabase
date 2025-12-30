@@ -3,13 +3,7 @@ import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
 import { InternalServerError } from 'lib/api/apiHelpers'
-
-type IncidentInfo = {
-  id: string
-  name: string
-  status: string
-  active_since: string
-}
+import type { IncidentInfo } from 'lib/api/incident-status'
 
 const STATUSPAGE_API_URL = 'https://api.statuspage.io/v1'
 const STATUSPAGE_PAGE_ID = process.env.STATUSPAGE_PAGE_ID
@@ -31,6 +25,7 @@ const StatusPageIncidentsSchema = z.array(
     status: z.string(),
     created_at: z.string(),
     scheduled_for: z.string().nullable(),
+    impact: z.string(),
   })
 )
 
@@ -102,6 +97,7 @@ const getActiveIncidents = async (): Promise<IncidentInfo[]> => {
     id: incident.id,
     name: incident.name,
     status: incident.status,
+    impact: incident.impact,
     active_since: incident.scheduled_for ?? incident.created_at,
   }))
 }
