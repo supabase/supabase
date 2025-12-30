@@ -1,16 +1,13 @@
 import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
@@ -20,15 +17,7 @@ export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
-
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys, isFetched } = useAPIKeysQuery(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys }
-  )
-  const { serviceKey, secretKey } = getKeys(apiKeys)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
@@ -70,15 +59,15 @@ export const GraphiQLTab = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${secretKey?.api_key ?? serviceKey?.api_key}`,
+            accessToken,
         },
       })
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey, secretKey?.api_key])
+  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken])
 
-  if ((IS_PLATFORM && !accessToken) || !isFetched) {
+  if (IS_PLATFORM && !accessToken) {
     return <LogoLoader />
   }
 
