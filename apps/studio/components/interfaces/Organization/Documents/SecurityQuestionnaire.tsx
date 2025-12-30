@@ -37,8 +37,20 @@ export const SecurityQuestionnaire = () => {
       })
       if (questionnaireLink?.fileUrl) window.open(questionnaireLink.fileUrl, '_blank')
     } catch (error: unknown) {
-      toast.error(`Failed to download Security Questionnaire: ${(error as Error).message}`)
+      const message = error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error(`Failed to download Security Questionnaire: ${message}`)
     }
+  }
+
+  const handleDownloadClick = () => {
+    if (!slug) return
+
+    sendEvent({
+      action: 'document_view_button_clicked',
+      properties: { documentName: 'Standard Security Questionnaire' },
+      groups: { organization: slug },
+    })
+    fetchQuestionnaire(slug)
   }
 
   return (
@@ -73,14 +85,8 @@ export const SecurityQuestionnaire = () => {
               <Button
                 type="default"
                 icon={<Download />}
-                onClick={() => {
-                  sendEvent({
-                    action: 'document_view_button_clicked',
-                    properties: { documentName: 'Standard Security Questionnaire' },
-                    groups: { organization: organization?.slug ?? 'Unknown' },
-                  })
-                  if (slug) fetchQuestionnaire(slug)
-                }}
+                onClick={handleDownloadClick}
+                disabled={!slug}
               >
                 Download Questionnaire
               </Button>
