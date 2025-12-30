@@ -1,8 +1,10 @@
 {
-  "extends": "./node_modules/solid-start/env",
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "allowJs": true
+    "allowJs": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["vite/client"]
   }
 }

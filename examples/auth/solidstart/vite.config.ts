@@ -1,4 +1,4 @@
-import { defineConfig } from "@solidjs/start/config";
+import { defineConfig } from "solid-start/config";
 
 export default defineConfig({
   server: {

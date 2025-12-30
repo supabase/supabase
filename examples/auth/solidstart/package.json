@@ -1,8 +1,9 @@
 {
   "name": "solidstart-supabase-ssr",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js"
+    "dev": "solid-start dev",
+    "build": "solid-start build",
+    "start": "solid-start start"
   },
   "type": "module",
   "devDependencies": {
@@ -12,10 +13,13 @@
     "vite": "^5.4.2"
   },
   "dependencies": {
+    "@solidjs/meta": "^0.29.3",
+    "@solidjs/router": "^0.13.3",
+    "@solidjs/start": "^1.0.3",
+    "solid-js": "^1.8.16",
+    "solid-start": "^1.0.3",
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.55.0",
-    "dotenv": "^16.6.1",
-    "express": "^4.18.2"
+    "@supabase/supabase-js": "^2.55.0"
   },
   "engines": {
     "node": ">=18"

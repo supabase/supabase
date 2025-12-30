@@ -1,6 +1,6 @@
 <a href="https://supabase.com/docs/guides/auth/server-side/creating-a-client">
   <img alt="Supabase SSR Auth Example - Server-side authentication with Supabase" src="https://supabase.com/docs/img/supabase-logo-wordmark--dark.svg">
-  <h1 align="center">Express + Supabase SSR Auth Example</h1>
+  <h1 align="center">SolidStart + Supabase SSR Auth Example</h1>
 </a>
 
 <p align="center">

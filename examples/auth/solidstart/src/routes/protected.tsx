@@ -13,11 +13,11 @@ export const routeData = createServerData$(async (_, { request }) => {
   return { session, user }
 })
 
-export default function Protected() {
+export default function ProtectedPage() {
   const data = useRouteData<typeof routeData>()
 
   return (
-    <div class="container">
+    <div>
       <h1>Protected Route</h1>
       <p>This page is protected and can only be accessed by authenticated users.</p>
 
@@ -25,7 +25,7 @@ export default function Protected() {
         <h2>User Information</h2>
         <p>Email: {data()?.user?.email}</p>
         <p>User ID: {data()?.user?.id}</p>
-        <p>Last sign in: {new Date(data()?.user?.last_sign_in_at!).toLocaleString()}</p>
+        <p>Last sign in: {new Date(data()?.user?.last_sign_in_at).toLocaleString()}</p>
       </div>
 
       <div style={{ marginTop: '2rem' }}>

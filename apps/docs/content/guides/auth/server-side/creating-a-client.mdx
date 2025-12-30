@@ -141,6 +141,14 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
+<TabPanel id="solidstart" label="SolidStart">
+
+```bash .env
+PUBLIC_SUPABASE_URL=supabase_project_url
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+</TabPanel>
 </Tabs>
 
 ## Create a client
@@ -740,6 +748,168 @@ language="typescript"
 
 </TabPanel>
 </Tabs>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="solidstart-middleware"
+  queryGroup="solidstart-environment"
+>
+
+<TabPanel id="solidstart-middleware" label="Middleware">
+
+SolidStart uses middleware to handle authentication and session management. Create a `src/middleware.ts` file to set up your Supabase server client.
+
+```ts src/middleware.ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { createMiddleware } from '@solidjs/start/middleware'
+
+export default createMiddleware({
+  onRequest: async (event) => {
+    const supabase = createServerClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+      {
+        cookies: {
+          getAll() {
+            return parseCookieHeader(event.request.headers.get('Cookie') ?? '')
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              event.response.headers.set(
+                'Set-Cookie',
+                `${name}=${value}; ${Object.entries(options)
+                  .map(([key, value]) => `${key}=${value}`)
+                  .join('; ')}`
+              )
+            })
+          },
+        },
+      }
+    )
+
+    event.locals.supabase = supabase
+
+    // Helper function to safely get session
+    event.locals.safeGetSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) {
+        return { session: null, user: null }
+      }
+
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+      if (error) {
+        return { session: null, user: null }
+      }
+
+      return { session, user }
+    }
+  },
+})
+```
+
+</TabPanel>
+
+<TabPanel id="solidstart-route" label="Route Loader">
+
+Use the Supabase client in your route loaders for server-side authentication checks.
+
+```ts src/routes/protected.tsx
+import { createServerData$ } from 'solid-start/server'
+import { redirect } from 'solid-start/server'
+
+export const routeData = createServerData$(async (_, { request }) => {
+  const { supabase, safeGetSession } = request.locals
+
+  const { session, user } = await safeGetSession()
+
+  if (!session) {
+    throw redirect('/login')
+  }
+
+  return { session, user }
+})
+
+export default function ProtectedPage() {
+  const data = useRouteData<typeof routeData>()
+
+  return (
+    <div>
+      <h1>Protected Page</h1>
+      <p>Welcome, {data()?.user?.email}</p>
+    </div>
+  )
+}
+```
+
+</TabPanel>
+
+<TabPanel id="solidstart-client" label="Client Component">
+
+Create a browser client for use in client components.
+
+```ts src/lib/supabase.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export const createClient = () =>
+  createBrowserClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  )
+```
+
+Then use it in your components:
+
+```tsx src/components/AuthButton.tsx
+import { createClient } from '~/lib/supabase'
+import { createSignal } from 'solid-js'
+
+export default function AuthButton() {
+  const [session, setSession] = createSignal(null)
+  const supabase = createClient()
+
+  // Handle auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    setSession(session)
+  })
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+  }
+
+  return (
+    <div>
+      {session() ? (
+        <button onClick={signOut}>Sign Out</button>
+      ) : (
+        <button onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}>
+          Sign In with Google
+        </button>
+      )}
+    </div>
+  )
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Set up middleware to create a request-specific Supabase client and handle session management.
+- Created a Supabase client for use in route loaders and server-side authentication checks.
+- Set up a browser client for client components to handle authentication state.
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 </Tabs>
