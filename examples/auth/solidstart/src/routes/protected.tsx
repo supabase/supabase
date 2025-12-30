@@ -25,7 +25,7 @@ export default function ProtectedPage() {
         <h2>User Information</h2>
         <p>Email: {data()?.user?.email}</p>
         <p>User ID: {data()?.user?.id}</p>
-        <p>Last sign in: {new Date(data()?.user?.last_sign_in_at).toLocaleString()}</p>
+        <p>Last sign in: {data()?.user?.last_sign_in_at ? new Date(data()?.user?.last_sign_in_at).toLocaleString() : 'Never signed in'}</p>
       </div>
 
       <div style={{ marginTop: '2rem' }}>

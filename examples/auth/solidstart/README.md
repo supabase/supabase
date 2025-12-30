@@ -21,7 +21,7 @@
 - **Cookie-based sessions** - Sessions persist across requests using HTTP cookies
 - **Route protection** - Unauthenticated users automatically redirected
 - **Safe session management** - Server-side validation prevents client-side spoofing
-- **Express.js implementation** - Demonstrates SSR concepts applicable to any framework
+- **SolidStart implementation** - Uses SolidStart's middleware and route loaders
 - **Complete authentication flow** - Login, logout, and protected routes
 
 ## Run Locally
