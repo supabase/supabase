@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    // @deprecated: use @/ instead of importing from root
+    "baseUrl": ".",
     "paths": {
       "contentlayer/generated": ["./.contentlayer/generated"],
       // ~/ is deprecated, use @/ instead
@@ -22,7 +24,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
