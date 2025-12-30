@@ -92,7 +92,7 @@ export const RolesList = () => {
 
       setRoleToDeleteId(null)
     }
-  }, [isLoading, roleToDeleteId, roleToDelete, deletingRoleIdRef.current])
+  }, [isLoading, roleToDeleteId, roleToDelete])
 
   return (
     <>
