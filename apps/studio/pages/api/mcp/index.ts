@@ -2,12 +2,12 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
 import { stripIndent } from 'common-tags'
 import { commaSeparatedStringIntoArray, fromNodeHeaders, zBooleanString } from 'lib/api/apiHelpers'
+import { DEFAULT_PROJECT } from 'lib/api/self-hosted/constants'
 import {
   getDatabaseOperations,
   getDebuggingOperations,
   getDevelopmentOperations,
 } from 'lib/api/self-hosted/mcp'
-import { DEFAULT_PROJECT } from 'lib/constants/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 

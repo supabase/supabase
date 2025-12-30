@@ -1,9 +1,9 @@
-import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
-import { WrappedResult } from './types'
-import { assertSelfHosted } from './util'
-import assert from 'node:assert'
 import { LogsService } from '@supabase/mcp-server-supabase/platform'
 import { stripIndent } from 'common-tags'
+import { PROJECT_ANALYTICS_URL } from 'lib/api/self-hosted/constants'
+import assert from 'node:assert'
+import { WrappedResult } from './types'
+import { assertSelfHosted } from './util'
 
 export type RetrieveAnalyticsDataOptions = {
   name: string

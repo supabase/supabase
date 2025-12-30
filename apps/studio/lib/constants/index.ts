@@ -17,9 +17,6 @@ export const API_URL = (() => {
   return '/api'
 })()
 
-export const PG_META_URL = IS_PLATFORM
-  ? process.env.PLATFORM_PG_META_URL
-  : process.env.STUDIO_PG_META_URL
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 /**
