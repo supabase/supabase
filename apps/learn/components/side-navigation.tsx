@@ -2,10 +2,63 @@ import Link from 'next/link'
 
 import NavigationItem from '@/components/side-navigation-item'
 import { courses } from '@/config/docs'
+import { getInternalContentPaths } from '@/lib/get-internal-content'
+import { mergeInternalContentIntoSections } from '@/lib/merge-internal-content'
+import { SidebarNavItem } from '@/types/nav'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 function SideNavigation() {
+  // const { user } = useAuth()
+  // const isLoggedIn = !!user
+
+  //  toggle to test auth states
+  const isLoggedIn = true
+
+  // Get all internal content paths
+  const internalPaths = getInternalContentPaths()
+
+  // First, merge orphaned internal content into their respective sections
+  const coursesWithInternalContent = {
+    ...courses,
+    items: mergeInternalContentIntoSections(courses.items, internalPaths),
+  }
+
+  // Recursive function to filter items based on auth
+  const filterItemsByAuth = (items: SidebarNavItem[]): SidebarNavItem[] => {
+    return items
+      .map((item): SidebarNavItem | null => {
+        // If item requires auth and user is not logged in, hide it
+        if (item.requiresAuth && !isLoggedIn) {
+          return null
+        }
+
+        // If item has sub-items, recursively filter them
+        if (item.items) {
+          const filteredSubItems: SidebarNavItem[] = filterItemsByAuth(item.items)
+
+          // If all sub-items are filtered out, hide the parent too
+          if (filteredSubItems.length === 0) {
+            return null
+          }
+
+          return {
+            ...item,
+            items: filteredSubItems,
+          }
+        }
+
+        return item
+      })
+      .filter((item): item is SidebarNavItem => item !== null)
+  }
+
+  // Then filter based on auth
+  const filteredCourses = {
+    ...coursesWithInternalContent,
+    items: filterItemsByAuth(coursesWithInternalContent.items),
+  }
+
   return (
     <nav className="flex flex-col h-full min-w-[220px]">
       <div className="p-6">
@@ -71,8 +124,13 @@ function SideNavigation() {
           {courses.title}
         </h3>
         <ul className="space-y-1">
-          {courses.items.map((item, i) => (
-            <NavigationItem item={item} key={`${item.href}-${i}`} />
+          {filteredCourses.items.map((item: SidebarNavItem, i: number) => (
+            <NavigationItem
+              item={item}
+              key={`${item.href}-${i}`}
+              internalPaths={internalPaths}
+              isLoggedIn={isLoggedIn}
+            />
           ))}
         </ul>
       </div>

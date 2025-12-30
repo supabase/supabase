@@ -3,7 +3,7 @@
 import Link, { LinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Lock } from 'lucide-react'
 
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { SidebarNavItem } from '@/types/nav'
@@ -19,9 +19,11 @@ interface NavigationItemProps
   item: SidebarNavItem
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
   level?: number
+  internalPaths?: Set<string>
+  isLoggedIn?: boolean
 }
 
-const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 0, ...props }) => {
+const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 0, internalPaths, isLoggedIn = true, ...props }) => {
   const { setOpen } = useMobileMenu()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
@@ -30,6 +32,9 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
   const slug = pathParts[pathParts.length - 1]
 
   const hasChildren = item.items && item.items.length > 0
+
+  // Check if internal content exists for this item and user is logged in
+  const hasInternal = item.href && internalPaths?.has(item.href) && isLoggedIn
 
   // Auto-expand if any child is active
   useEffect(() => {
@@ -89,6 +94,9 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
             )}
           >
             <span className="flex items-center gap-2 flex-1 min-w-0">
+              {item.requiresAuth && (
+                <Lock className="w-3 h-3 text-foreground-muted flex-shrink-0" />
+              )}
               {item.title}
               {item.new && (
                 <Badge variant="brand" className="capitalize flex-shrink-0">
@@ -107,27 +115,56 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
           {isOpen && (
             <ul className="mt-1 ml-3 space-y-1 border-l border-border pl-3">
               {item.items?.map((childItem, i) => (
-                <NavigationItem item={childItem} key={`${childItem.href}-${i}`} level={level + 1} />
+                <NavigationItem
+                  item={childItem}
+                  key={`${childItem.href}-${i}`}
+                  level={level + 1}
+                  internalPaths={internalPaths}
+                  isLoggedIn={isLoggedIn}
+                />
               ))}
             </ul>
           )}
         </>
       ) : (
-        <Link
-          href={href || '#'}
-          {...props}
-          onClick={handleLinkClick}
-          className={itemClasses}
-        >
-          <span className="flex items-center gap-2">
-            <span className="truncate">{item.title}</span>
-            {item.new && (
-              <Badge variant="brand" className="capitalize flex-shrink-0">
-                NEW
-              </Badge>
-            )}
-          </span>
-        </Link>
+        <>
+          <Link
+            href={href || '#'}
+            {...props}
+            onClick={handleLinkClick}
+            className={itemClasses}
+          >
+            <span className="flex items-center gap-2">
+              {item.requiresAuth && (
+                <Lock className="w-3 h-3 text-foreground-muted flex-shrink-0" />
+              )}
+              <span className="truncate">{item.title}</span>
+              {item.new && (
+                <Badge variant="brand" className="capitalize flex-shrink-0">
+                  NEW
+                </Badge>
+              )}
+            </span>
+          </Link>
+          {hasInternal && (
+            <Link
+              href={`/internal${href}`}
+              onClick={handleLinkClick}
+              className={cn(
+                'flex text-sm rounded-md transition-colors mt-1',
+                level === 0 ? 'px-3 py-2' : 'px-3 py-1.5',
+                pathname === `/internal${href}`
+                  ? 'bg-surface-200 text-foreground'
+                  : 'text-foreground-lighter hover:bg-surface-100 hover:text-foreground'
+              )}
+            >
+              <span className="flex items-center gap-2">
+                <Lock className="w-3 h-3 text-foreground-muted flex-shrink-0" />
+                <span className="truncate">{item.title} (Internal)</span>
+              </span>
+            </Link>
+          )}
+        </>
       )}
     </li>
   )

@@ -8,6 +8,7 @@ export interface NavItem {
   icon?: any // to do: clean up later | keyof typeof Icons
   label?: string
   supportedFrameworks?: supportedFrameworks[]
+  requiresAuth?: boolean
 }
 
 export interface NavItemWithChildren extends NavItem {

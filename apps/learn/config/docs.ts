@@ -7,6 +7,7 @@ export const courses: SidebarNavGroup = {
       title: 'Foundations',
       href: '/foundations',
       items: [
+        // ✅ Always visible (no requiresAuth)
         {
           title: 'Introduction',
           href: '/foundations/introduction',
@@ -39,6 +40,7 @@ export const courses: SidebarNavGroup = {
           title: 'Edge Functions',
           href: '/foundations/edge-functions',
         },
+
         {
           title: 'Vector Search',
           href: '/foundations/vector',
