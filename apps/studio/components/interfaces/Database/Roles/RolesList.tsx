@@ -75,6 +75,7 @@ export const RolesList = () => {
 
   const roleToDelete = otherRoles.find((role) => role.id === roleToDeleteId)
 
+  // In case user tries to bypass restrictions by manually typing role id in the URL
   useEffect(() => {
     if (
       !isLoading &&
