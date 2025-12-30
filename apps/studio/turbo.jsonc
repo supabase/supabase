@@ -5,94 +5,125 @@
     "build": {
       "dependsOn": ["^build"],
       "env": [
+        // Build-time configuration
         "ANALYZE",
-        "NEXT_PUBLIC_SUPPORT_API_URL",
-        "NEXT_PUBLIC_CONTENT_API_URL",
-        "NEXT_PUBLIC_BASE_PATH",
-        "NEXT_PUBLIC_STRIPE_PUBLIC_KEY",
-        "NEXT_PUBLIC_SUPPORT_ANON_KEY",
-        "NEXT_PUBLIC_ENVIRONMENT",
-        "NEXT_PUBLIC_IS_PLATFORM",
-        "NEXT_PUBLIC_SITE_URL",
-        "NEXT_PUBLIC_API_URL",
-        "NEXT_PUBLIC_DOCS_URL",
-        "NEXT_PUBLIC_CONFIGCAT_SDK_KEY",
-        "NEXT_PUBLIC_CONFIGCAT_PROXY_URL",
-        "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
-        "NEXT_PUBLIC_SUPABASE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "NEXT_PUBLIC_NODE_ENV",
-        "NEXT_PUBLIC_GOTRUE_URL",
-        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
-        "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
-        "NEXT_RUNTIME",
-        "NIMBUS_PROD_PROJECTS_URL",
-        "NIMBUS_PROD_PROJECTS_URL_WS",
+        "MAINTENANCE_MODE",
         "NODE_ENV",
-        "SUPABASE_URL",
+        "NEXT_RUNTIME",
         "VERCEL",
         "VERCEL_ENV",
-        "MAINTENANCE_MODE",
-        // These envs are used in the packages
-        "NEXT_PUBLIC_STORAGE_KEY",
+        "FORCE_ASSET_CDN",
+        "SITE_NAME",
+
+        // Client-side public vars (embedded in bundle)
+        "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
-        "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
-        "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
+        "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_CONFIGCAT_PROXY_URL",
+        "NEXT_PUBLIC_CONFIGCAT_SDK_KEY",
+        "NEXT_PUBLIC_CONTENT_API_URL",
+        "NEXT_PUBLIC_DOCS_URL",
+        "NEXT_PUBLIC_ENVIRONMENT",
+        "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
         "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
-        "NEXT_PUBLIC_VERCEL_ENV",
-        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
-        "NEXT_PUBLIC_MCP_URL",
+        "NEXT_PUBLIC_GOTRUE_URL",
+        "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
         "NEXT_PUBLIC_IS_NIMBUS",
+        "NEXT_PUBLIC_IS_PLATFORM",
+        "NEXT_PUBLIC_MCP_URL",
+        "NEXT_PUBLIC_NODE_ENV",
         "NEXT_PUBLIC_ONGOING_INCIDENT",
-        // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_STORAGE_KEY",
+        "NEXT_PUBLIC_STRIPE_PUBLIC_KEY",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPPORT_ANON_KEY",
+        "NEXT_PUBLIC_SUPPORT_API_URL",
+        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_VERCEL_ENV"
+      ],
+      "passThroughEnv": [
+        // Git/deployment metadata
+        "CURRENT_CLI_VERSION",
+        "VERCEL_GIT_COMMIT_SHA",
+        "VERCEL_URL",
+        "SNIPPETS_MANAGEMENT_FOLDER",
+
+        // Database configuration
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
-        "POSTGRES_PASSWORD",
-        "POSTGRES_HOST",
-        "POSTGRES_USER_READ_WRITE",
-        "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
+        "POSTGRES_HOST",
+        "POSTGRES_PASSWORD",
         "POSTGRES_PORT",
-        "READ_ONLY_URL",
-        "READ_ONLY_API_KEY",
-        "SUPABASE_SERVICE_KEY",
+        "POSTGRES_USER_READ_ONLY",
+        "POSTGRES_USER_READ_WRITE",
+
+        // Supabase configuration
         "SUPABASE_ANON_KEY",
         "SUPABASE_PUBLIC_URL",
-        "DEFAULT_PROJECT_NAME",
+        "SUPABASE_SERVICE_KEY",
+        "SUPABASE_URL",
+
+        // Read-only API
+        "READ_ONLY_API_KEY",
+        "READ_ONLY_URL",
+
+        // Default names
         "DEFAULT_ORGANIZATION_NAME",
+        "DEFAULT_PROJECT_NAME",
+
+        // Authentication
+        "AUTH_JWT_SECRET",
+
+        // AI services
+        "AI_NORMAL_MODEL",
+        "AI_PRO_MODEL",
         "OPENAI_API_KEY",
         "BRAINTRUST_API_KEY",
         "BRAINTRUST_PROJECT_ID",
-        "AUTH_JWT_SECRET",
-        "LOGFLARE_API_KEY",
-        "LOGFLARE_PUBLIC_ACCESS_TOKEN",
-        "LOGFLARE_PRIVATE_ACCESS_KEY",
-        "LOGFLARE_URL",
-        "SENTRY_ORG",
-        "SENTRY_PROJECT",
-        "SENTRY_AUTH_TOKEN",
-        "NEXT_PUBLIC_SENTRY_DSN",
+
+        // AWS
+        "AWS_ACCESS_KEY_ID",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",
-        "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
-        "FORCE_ASSET_CDN",
+
+        // Asset CDN
         "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME",
-        "VERCEL_URL",
-        "IS_THROTTLED",
-        "AI_PRO_MODEL",
-        "AI_NORMAL_MODEL",
+
+        // Logflare
+        "LOGFLARE_API_KEY",
+        "LOGFLARE_PRIVATE_ACCESS_KEY",
+        "LOGFLARE_PRIVATE_ACCESS_TOKEN",
+        "LOGFLARE_PUBLIC_ACCESS_TOKEN",
+        "LOGFLARE_URL",
+
+        // Sentry
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+
+        // Support
         "SUPPORT_SUPABASE_SECRET_KEY",
+
+        // Statuspage
         "STATUSPAGE_API_KEY",
-        "STATUSPAGE_PAGE_ID"
-      ],
-      "passThroughEnv": [
-        "CURRENT_CLI_VERSION",
-        "VERCEL_GIT_COMMIT_SHA",
-        "SNIPPETS_MANAGEMENT_FOLDER"
+        "STATUSPAGE_PAGE_ID",
+
+        // Nimbus
+        "NIMBUS_PROD_PROJECTS_URL",
+        "NIMBUS_PROD_PROJECTS_URL_WS",
+
+        // Throttling
+        "IS_THROTTLED"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     }
