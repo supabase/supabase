@@ -35,4 +35,11 @@ export const dataset: AssistantEvalCase[] = [
     },
     metadata: { category: ['sql_generation', 'database_optimization'] },
   },
+  {
+    input: 'How do I restore objects in Storage buckets when versioning is enabled?',
+    expected: {
+      requiredTools: ['search_docs'],
+    },
+    metadata: { category: ['general_help'] },
+  },
 ]
