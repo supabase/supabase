@@ -3,8 +3,8 @@ import { Suspense } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
 import { UserProfile } from '~/components/Contribute/UserProfile'
-import type { Metadata }
-import { ContributeGuard } from '../../ContributeGuard' from 'next'
+import type { Metadata } from 'next'
+import { ContributeGuard } from '../../ContributeGuard'
 
 export const metadata: Metadata = {
   robots: {
