@@ -42,6 +42,59 @@ export type DiscussionsResponse = {
   }
 }
 
+// uses the graphql api
+async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
+  const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+  type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+
+  const octokit = new ExtendedOctokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.GITHUB_CHANGELOG_APP_ID,
+      installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
+      privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
+    },
+  })
+
+  const query = `
+    query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+      repository(owner: $owner, name: $repo) {
+        discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          totalCount
+          pageInfo {
+            hasPreviousPage
+            hasNextPage
+            startCursor
+            endCursor
+          }
+          nodes {
+            id
+            publishedAt
+            createdAt
+            url
+            title
+            body
+          }
+        }
+      }
+    }
+  `
+  const queryVars = {
+    owner,
+    repo,
+    categoryId,
+    cursor,
+  }
+
+  // fetch discussions
+  const {
+    repository: {
+      discussions: { nodes: discussions, pageInfo },
+    },
+  } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
+
+  return { discussions, pageInfo }
+}
 /**
  * [Terry]
  * this page powers supabase.com/changelog
@@ -55,7 +108,7 @@ export type DiscussionsResponse = {
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
   // refresh every 15 minutes
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-  const next = query.next ?? (null as string | null)
+  const next = (query.next ?? null) as string | null
   const restPage = query.restPage ? Number(query.restPage) : 1
 
   const octokitRest = new OctokitRest({
@@ -92,60 +145,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   const releases = (await fetchGitHubReleases()).filter(
     (release) => release.id && oldReleases.includes(release.id)
   )
-
-  // uses the graphql api
-  async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
-    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-    type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
-
-    const octokit = new ExtendedOctokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId: process.env.GITHUB_CHANGELOG_APP_ID,
-        installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
-        privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
-      },
-    })
-
-    const query = `
-      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
-        repository(owner: $owner, name: $repo) {
-          discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
-            totalCount
-            pageInfo {
-              hasPreviousPage
-              hasNextPage
-              startCursor
-              endCursor
-            }
-            nodes {
-              id
-              publishedAt
-              createdAt
-              url
-              title
-              body
-            }
-          }
-        }
-      }
-    `
-    const queryVars = {
-      owner,
-      repo,
-      categoryId,
-      cursor: next,
-    }
-
-    // fetch discussions
-    const {
-      repository: {
-        discussions: { nodes: discussions, pageInfo },
-      },
-    } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
-
-    return { discussions, pageInfo }
-  }
 
   const { discussions, pageInfo } = await fetchDiscussions(
     'supabase',
