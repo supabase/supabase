@@ -43,7 +43,12 @@ export type DiscussionsResponse = {
 }
 
 // uses the graphql api
-async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
+async function fetchDiscussions(
+  owner: string,
+  repo: string,
+  categoryId: string,
+  cursor: string | null = null
+) {
   const ExtendedOctokit = Octokit.plugin(paginateGraphql)
   type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
 
@@ -96,13 +101,13 @@ async function fetchDiscussions(owner: string, repo: string, categoryId: string,
   return { discussions, pageInfo }
 }
 
-function isEncoded(uri: string) {
+function isEncoded(uri: string | null | undefined) {
   uri = uri ?? ''
   return uri !== decodeURIComponent(uri)
 }
 
 // Decodes a URI if it is encoded
-const decodeURI = (uri: string | null) => {
+const recursiveDecodeURI = (uri: string | null) => {
   if (!uri) {
     return uri
   }
@@ -133,7 +138,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
   const encodedNext = (query.next ?? null) as string | null
   // in some cases the next cursor is encoded twice or more times due to the user pasting the url, so we need to decode it multiple times.
-  const next = decodeURI(encodedNext)
+  const next = recursiveDecodeURI(encodedNext)
   const restPage = query.restPage ? Number(query.restPage) : 1
 
   const octokitRest = new OctokitRest({
@@ -175,7 +180,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     'supabase',
     'supabase',
     'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
-    next as string
+    next
   )
 
   if (!discussions) {
