@@ -37,9 +37,7 @@ export const AWSPrivateLinkSection = () => {
     },
   })
 
-  const { hasAccess: hasPrivateLinkAccess } = useCheckEntitlements(
-    'security.private_link' as FeatureKey
-  )
+  const { hasAccess: hasPrivateLinkAccess } = useCheckEntitlements('security.private_link')
   const promptPlanUpgrade = IS_PLATFORM && !hasPrivateLinkAccess
 
   const onAddAccount = () => {
