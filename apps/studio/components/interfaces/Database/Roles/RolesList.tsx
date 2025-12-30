@@ -1,8 +1,9 @@
+import { PGRole } from '@supabase/pg-meta/src/pg-meta-roles'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { useQueryState, parseAsBoolean, parseAsInteger } from 'nuqs'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -26,6 +27,7 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
+  const deletingRoleIdRef = useRef<number | null>(null)
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -65,7 +67,7 @@ export const RolesList = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  
+
   const [roleToDeleteId, setRoleToDeleteId] = useQueryState(
     'delete',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
@@ -74,9 +76,13 @@ export const RolesList = () => {
   const roleToDelete = otherRoles.find((role) => role.id === roleToDeleteId)
 
   useEffect(() => {
-    if (!isLoading && roleToDeleteId !== null && roleToDelete === undefined) {
-      const isSupabaseRole =
-        supabaseRoles.find((role) => role.id === roleToDeleteId) !== undefined
+    if (
+      !isLoading &&
+      roleToDeleteId !== null &&
+      roleToDelete === undefined &&
+      deletingRoleIdRef.current === null
+    ) {
+      const isSupabaseRole = supabaseRoles.find((role) => role.id === roleToDeleteId) !== undefined
       if (isSupabaseRole) {
         toast.error('Cannot delete role as it is a Supabase role')
       } else {
@@ -85,7 +91,7 @@ export const RolesList = () => {
 
       setRoleToDeleteId(null)
     }
-  }, [isLoading, roleToDeleteId, roleToDelete])
+  }, [isLoading, roleToDeleteId, roleToDelete, deletingRoleIdRef.current])
 
   return (
     <>
@@ -205,12 +211,7 @@ export const RolesList = () => {
           {isLoading
             ? Array.from({ length: 5 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
             : supabaseRoles.map((role) => (
-                <RoleRow
-                  disabled
-                  key={role.id}
-                  role={role}
-                  onSelectDelete={setRoleToDeleteId}
-                />
+                <RoleRow disabled key={role.id} role={role} onSelectDelete={setRoleToDeleteId} />
               ))}
         </div>
 
@@ -242,11 +243,16 @@ export const RolesList = () => {
         onClose={() => setIsCreatingRole(false)}
       />
 
-      {roleToDelete !== undefined && <DeleteRoleModal
-        role={roleToDelete}
+      <DeleteRoleModal
+        role={roleToDelete as PGRole}
         visible={roleToDelete !== undefined}
         onClose={() => setRoleToDeleteId(null)}
-      />}
+        onDelete={() => {
+          if (roleToDelete) {
+            deletingRoleIdRef.current = roleToDeleteId
+          }
+        }}
+      />
     </>
   )
 }
