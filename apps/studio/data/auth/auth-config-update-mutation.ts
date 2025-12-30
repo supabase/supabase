@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
+import { lintKeys } from 'data/lint/keys'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { authKeys } from './keys'
 
@@ -42,6 +43,7 @@ export const useAuthConfigUpdateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) })
+      await queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
