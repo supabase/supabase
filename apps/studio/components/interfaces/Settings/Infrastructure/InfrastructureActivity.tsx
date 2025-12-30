@@ -17,11 +17,10 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
 import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
@@ -37,6 +36,7 @@ import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } fr
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 import { useShowNewReplicaPanel } from './InfrastructureConfiguration/use-show-new-replica'
 
@@ -212,11 +212,7 @@ export const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          <DatabaseSelector
-            onCreateReplicaClick={() => {
-              setShowNewReplicaPanel(true)
-            }}
-          />
+          <DatabaseSelector />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker

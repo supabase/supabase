@@ -5,7 +5,6 @@ import { MfaAuthSettingsForm } from 'components/interfaces/Auth/MfaAuthSettingsF
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -19,6 +18,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const MfaPage: NextPageWithLayout = () => {
   const { ref } = useParams()

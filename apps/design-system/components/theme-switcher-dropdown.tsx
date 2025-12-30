@@ -3,7 +3,6 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import SVG from 'react-inlinesvg'
 import {
   Button,
   DropdownMenu,
@@ -13,8 +12,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  RadioGroupLargeItem_Shadcn_,
-  RadioGroup_Shadcn_,
   Theme,
   singleThemes,
 } from 'ui'
@@ -36,22 +33,7 @@ const ThemeSwitcherDropdown = () => {
     return null
   }
 
-  function SingleThemeSelection() {
-    return (
-      <form>
-        <RadioGroup_Shadcn_
-          name="theme"
-          onValueChange={setTheme}
-          aria-label="Choose a theme"
-          defaultValue={theme}
-          value={theme}
-          className="flex flex-wrap gap-3"
-        ></RadioGroup_Shadcn_>
-      </form>
-    )
-  }
-
-  const iconClasses = 'text-foreground-light group-data-[state=open]:text-foreground'
+  const iconClasses = 'text-foreground-lighter group-data-[state=open]:text-foreground'
 
   return (
     <>
@@ -68,7 +50,7 @@ const ThemeSwitcherDropdown = () => {
                 <Moon className={iconClasses} />
               )
             }
-          ></Button>
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
           <DropdownMenuLabel>Theme</DropdownMenuLabel>

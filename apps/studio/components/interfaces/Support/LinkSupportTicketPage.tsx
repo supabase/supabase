@@ -5,17 +5,12 @@ import { useState } from 'react'
 
 import { Button, cn, DialogSectionSeparator } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { HighlightProjectRefProvider } from './HighlightContext'
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
 
 export function LinkSupportTicketPage() {
   return (
-    <div className="h-full relative overflow-y-auto overflow-x-hidden">
-      <div className="h-full flex flex-col gap-y-8 items-center justify-center mx-auto max-w-2xl w-full px-4 lg:px-6">
-        <HighlightProjectRefProvider>
-          <LinkSupportTicketPageContent />
-        </HighlightProjectRefProvider>
-      </div>
+    <div className="mx-auto my-16 max-w-2xl w-full px-4 lg:px-6">
+      <LinkSupportTicketPageContent />
     </div>
   )
 }
@@ -65,11 +60,11 @@ function LinkSupportTicketSuccess() {
         <div className="relative">
           <Mail strokeWidth={1.5} size={60} className="text-brand" />
           <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
-            <Check strokeWidth={4} size={18} />
+            <Check strokeWidth={4} size={16} className="text-contrast" />
           </div>
         </div>
         <div className="flex items-center flex-col gap-y-2 text-center">
-          <h3 className="text-xl">Support ticket linked successfully!</h3>
+          <h3 className="text-xl">Support ticket linked</h3>
           <p className="text-sm text-foreground-light">
             Your support conversation has been linked to your account.
           </p>
@@ -77,9 +72,9 @@ function LinkSupportTicketSuccess() {
       </div>
       <DialogSectionSeparator />
       <div className="w-full py-4 px-4 flex items-center justify-end">
-        <Link href="/">
-          <Button>Go back</Button>
-        </Link>
+        <Button asChild type="default">
+          <Link href="/">Finish</Link>
+        </Button>
       </div>
     </div>
   )

@@ -19,13 +19,12 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
@@ -61,6 +60,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 
@@ -470,7 +470,11 @@ export const TableList = ({
                                     className="flex items-center space-x-2"
                                     onClick={() =>
                                       router.push(
-                                        `/project/${project?.ref}/editor/${x.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+                                        buildTableEditorUrl({
+                                          projectRef: project?.ref,
+                                          tableId: x.id,
+                                          schema: x.schema,
+                                        })
                                       )
                                     }
                                     onMouseEnter={() =>
