@@ -235,7 +235,13 @@ export default function AboutPage() {
             </h2>
 
             <Button asChild type="primary" size="small">
-              <Link href="/contribute/about">Apply to join</Link>
+              <Link
+                href="https://supabase.notion.site/2ce5004b775f80a38acdc3ca5df7b9d3"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Apply to join
+              </Link>
             </Button>
           </SectionContainer>
         </div>

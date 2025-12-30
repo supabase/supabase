@@ -25,13 +25,19 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
         <div className="bg-surface-200 p-6 rounded-lg border border-border">
           {/* Title */}
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              {thread.channel === 'discord' && <DiscordIcon className="h-5 w-5 text-[#5865F2]" />}
-              {thread.channel === 'reddit' && <RedditIcon className="h-5 w-5 text-[#FF4500]" />}
-              {thread.channel === 'github' && <GitHubIcon className="h-5 w-5 text-foreground" />}
-              <span className="text-sm text-foreground-lighter capitalize">{thread.channel}</span>
-              <span className="text-sm text-foreground-lighter">·</span>
-              <span className="text-sm text-foreground-lighter">{thread.posted}</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                {thread.channel === 'discord' && <DiscordIcon className="h-5 w-5 text-[#5865F2]" />}
+                {thread.channel === 'reddit' && <RedditIcon className="h-5 w-5 text-[#FF4500]" />}
+                {thread.channel === 'github' && <GitHubIcon className="h-5 w-5 text-foreground" />}
+                <span className="text-sm text-foreground-lighter capitalize">{thread.channel}</span>
+                <span className="text-sm text-foreground-lighter">·</span>
+                <span className="text-sm text-foreground-lighter">{thread.posted}</span>
+              </div>
+              <HelpOnPlatformButton
+                channel={thread.channel}
+                externalActivityUrl={thread.external_activity_url}
+              />
             </div>
             <h1 className="text-2xl font-medium text-foreground mb-2">{thread.title}</h1>
             <p className="text-sm text-foreground-lighter">
@@ -88,12 +94,11 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
           <h3 className="text-sm font-medium text-foreground">How to help</h3>
           <Card>
             <CardContent className="px-6 py-8 flex flex-col gap-6">
-              <p className="text-base text-foreground">{thread.summary}</p>
-
-              <HelpOnPlatformButton
-                channel={thread.channel}
-                externalActivityUrl={thread.external_activity_url}
-              />
+              <div className="text-base text-foreground">
+                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                  {thread.summary}
+                </ReactMarkdown>
+              </div>
             </CardContent>
           </Card>
         </div>
