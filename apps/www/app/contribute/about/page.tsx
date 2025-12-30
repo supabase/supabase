@@ -21,7 +21,6 @@ import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
-import { ContributeGuard } from '../ContributeGuard'
 
 const githubUsers = [
   'aantti',
@@ -144,106 +143,104 @@ const especially = [
 // eslint-disable-next-line no-restricted-exports
 export default function AboutPage() {
   return (
-    <ContributeGuard>
-      <DefaultLayout>
-        <main className="min-h-screen flex flex-col items-center">
-          <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-16">
-            <Link
-              href="/contribute"
-              className="inline-flex items-center gap-2 text-foreground-lighter hover:text-foreground transition-colors mb-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Contribute
-            </Link>
+    <DefaultLayout>
+      <main className="min-h-screen flex flex-col items-center">
+        <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-16">
+          <Link
+            href="/contribute"
+            className="inline-flex items-center gap-2 text-foreground-lighter hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Contribute
+          </Link>
 
-            <h1 className="sr-only">About the contributors program</h1>
-            <SectionContainer
-              id="mission"
-              className="sm:py-18 md:py-24 lg:px-16 lg:py-24 xl:px-0 grid gap-y-4"
-            >
-              <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-6xl tracking-[-1px] text-foreground">
-                Our mission
-              </h1>
-              <p className="text-xl text-foreground-light mt-4">
-                We&apos;re building a community of helpers and contributors who help developers
-                succeed. We work in the open anywhere our developers are: Discord, GitHub, Reddit,
-                Twitter, Stack Overflow, and more.
-              </p>
-            </SectionContainer>
+          <h1 className="sr-only">About the contributors program</h1>
+          <SectionContainer
+            id="mission"
+            className="sm:py-18 md:py-24 lg:px-16 lg:py-24 xl:px-0 grid gap-y-4"
+          >
+            <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-6xl tracking-[-1px] text-foreground">
+              Our mission
+            </h1>
+            <p className="text-xl text-foreground-light mt-4">
+              We’re building a community of helpers and contributors who help developers succeed. We
+              work in the open anywhere our developers are: Discord, GitHub, Reddit, Twitter, Stack
+              Overflow, and more.
+            </p>
+          </SectionContainer>
 
-            <Separator className="my-12 mx-auto border-foreground" />
+          <Separator className="my-12 mx-auto border-foreground" />
 
-            <FeaturesSection
-              id="ways-to-contribute"
-              heading="Want to get involved?"
-              subheading="There are many ways to get involved in the Supabase community. Whether you want to write code, polish documentation, or help others build with Supabase, there's a place for you."
-              features={waysToContribute}
-              columns={2}
-            />
+          <FeaturesSection
+            id="ways-to-contribute"
+            heading="Want to get involved?"
+            subheading="There are many ways to get involved in the Supabase community. Whether you want to write code, polish documentation, or help others build with Supabase, there’s a place for you."
+            features={waysToContribute}
+            columns={2}
+          />
 
-            <Image
-              src="/images/contribute/ask-supabase.jpg"
-              alt="Ask Supabase"
-              width={1000}
-              height={1000}
-              className="rounded-md border"
-            />
+          <Image
+            src="/images/contribute/ask-supabase.jpg"
+            alt="Ask Supabase"
+            width={1000}
+            height={1000}
+            className="rounded-md border"
+          />
 
-            <FeaturesSection
-              id="benefits"
-              columns={2}
-              heading="Benefits for contributors"
-              subheading="Becoming a contributor comes with real benefits. From community recognition to paid opportunities, we value your time and impact."
-              features={benefits}
-            />
+          <FeaturesSection
+            id="benefits"
+            columns={2}
+            heading="Benefits for contributors"
+            subheading="Becoming a contributor comes with real benefits. From community recognition to paid opportunities, we value your time and impact."
+            features={benefits}
+          />
 
-            <FeaturesSection
-              id="especially"
-              columns={2}
-              heading="We're especially looking for..."
-              subheading="These are the areas where we need the most help right now. If you have expertise in any of these domains, we'd love to hear from you."
-              features={especially}
-            />
+          <FeaturesSection
+            id="especially"
+            columns={2}
+            heading="We’re especially looking for..."
+            subheading="These are the areas where we need the most help right now. If you have expertise in any of these domains, we’d love to hear from you."
+            features={especially}
+          />
 
-            <SectionContainer id="who-are-we" className="border-b border-border xl:px-0">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="flex gap-4 flex-wrap mt-2">
-                  {githubUsers.map((username) => (
-                    <GithubAvatar
-                      key={username}
-                      username={username}
-                      size={80}
-                      className="rounded-full"
-                    />
-                  ))}
-                  <div className="w-[80px] h-[80px] rounded-full bg-foreground flex items-center justify-center text-background hover:opacity-80 transition-opacity">
-                    <span className="text-sm font-medium">You?</span>
-                  </div>
-                </div>
-                <div>
-                  <h2 className="h2 text-foreground">Who are we?</h2>
-                  <p className="text-lg text-foreground-lighter mt-4">
-                    We are a team of developers who are passionate about building the best developer
-                    platform. We help support the community on Discord, GitHub, Reddit, Twitter, and
-                    anywhere else we can find them.
-                  </p>
+          <SectionContainer id="who-are-we" className="border-b border-border xl:px-0">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="flex gap-4 flex-wrap mt-2">
+                {githubUsers.map((username) => (
+                  <GithubAvatar
+                    key={username}
+                    username={username}
+                    size={80}
+                    className="rounded-full"
+                  />
+                ))}
+                <div className="w-[80px] h-[80px] rounded-full bg-foreground flex items-center justify-center text-background hover:opacity-80 transition-opacity">
+                  <span className="text-sm font-medium">You?</span>
                 </div>
               </div>
-            </SectionContainer>
+              <div>
+                <h2 className="h2 text-foreground">Who are we?</h2>
+                <p className="text-lg text-foreground-lighter mt-4">
+                  We are a team of developers who are passionate about building the best developer
+                  platform. We help support the community on Discord, GitHub, Reddit, Twitter, and
+                  anywhere else we can find them.
+                </p>
+              </div>
+            </div>
+          </SectionContainer>
 
-            <SectionContainer id="apply" className="text-center">
-              <h2 className="text-foreground text-2xl lg:text-3xl leading-tight mb-8">
-                Ready to start contributing?
-              </h2>
+          <SectionContainer id="apply" className="text-center">
+            <h2 className="text-foreground text-2xl lg:text-3xl leading-tight mb-8">
+              Ready to start contributing?
+            </h2>
 
-              <Button asChild type="primary" size="small">
-                <Link href="/contribute/about">Apply to join</Link>
-              </Button>
-            </SectionContainer>
-          </div>
-        </main>
-      </DefaultLayout>
-    </ContributeGuard>
+            <Button asChild type="primary" size="small">
+              <Link href="/contribute/about">Apply to join</Link>
+            </Button>
+          </SectionContainer>
+        </div>
+      </main>
+    </DefaultLayout>
   )
 }
 
