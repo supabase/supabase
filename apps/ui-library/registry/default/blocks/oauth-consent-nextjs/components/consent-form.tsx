@@ -67,9 +67,8 @@ export function ConsentForm({ className, ...props }: React.ComponentPropsWithout
         setUser({ email: session.user.email })
 
         // Get authorization details from Supabase
-        const { data, error: authError } = await supabase.auth.oauth.getAuthorizationDetails(
-          authorizationId
-        )
+        const { data, error: authError } =
+          await supabase.auth.oauth.getAuthorizationDetails(authorizationId)
 
         if (authError) {
           throw authError
@@ -170,12 +169,7 @@ export function ConsentForm({ className, ...props }: React.ComponentPropsWithout
           </div>
         </CardContent>
         <CardFooter className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={handleDeny}
-            disabled={submitting}
-          >
+          <Button variant="outline" className="flex-1" onClick={handleDeny} disabled={submitting}>
             {submitting ? '...' : 'Deny'}
           </Button>
           <Button className="flex-1" onClick={handleAllow} disabled={submitting}>

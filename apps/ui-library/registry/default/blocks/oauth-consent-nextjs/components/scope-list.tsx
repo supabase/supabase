@@ -8,9 +8,7 @@ interface ScopeListProps {
 
 export function ScopeList({ scopes }: ScopeListProps) {
   const displayScopes =
-    scopes.length > 0
-      ? scopes
-      : ['Access your account information', 'Use MCP tools on your behalf']
+    scopes.length > 0 ? scopes : ['Access your account information', 'Use MCP tools on your behalf']
 
   return (
     <ul className="space-y-2">
