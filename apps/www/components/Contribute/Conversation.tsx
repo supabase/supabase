@@ -1,12 +1,13 @@
-import { Badge } from 'ui'
-import { getThreadRepliesById } from '~/data/contribute'
+import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { RepliesList } from './RepliesList'
-import Link from 'next/link'
-import { markdownComponents } from './markdownComponents'
-import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { Badge, Card, CardContent } from 'ui'
+import { getThreadRepliesById } from '~/data/contribute'
 import type { ThreadRow } from '~/types/contribute'
+import { HelpOnPlatformButton } from './HelpOnPlatformButton'
+import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { markdownComponents } from './markdownComponents'
+import { RepliesList } from './RepliesList'
 
 export async function Conversation({ thread }: { thread: ThreadRow }) {
   const { question, replies } = await getThreadRepliesById(thread.thread_key)
@@ -18,21 +19,21 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
   const validReplies = replies.filter((reply: { content: string | null }) => reply.content)
 
   return (
-    <div className="mb-6 ">
+    <div className="flex flex-col gap-10">
       {/* Title, Question, and First Reply Section */}
       {question && question.content && (
-        <div className="mb-6 bg-surface-200 p-6 rounded-lg border border-border">
+        <div className="bg-surface-200 p-6 rounded-lg border border-border">
           {/* Title */}
           <div className="mb-6">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-2 mb-4">
               {thread.channel === 'discord' && <DiscordIcon className="h-5 w-5 text-[#5865F2]" />}
               {thread.channel === 'reddit' && <RedditIcon className="h-5 w-5 text-[#FF4500]" />}
               {thread.channel === 'github' && <GitHubIcon className="h-5 w-5 text-foreground" />}
               <span className="text-sm text-foreground-lighter capitalize">{thread.channel}</span>
-              <span className="text-sm text-foreground-lighter">•</span>
+              <span className="text-sm text-foreground-lighter">·</span>
               <span className="text-sm text-foreground-lighter">{thread.posted}</span>
             </div>
-            <h1 className="text-2xl font-semibold text-foreground mb-2">{thread.title}</h1>
+            <h1 className="text-2xl font-medium text-foreground mb-2">{thread.title}</h1>
             <p className="text-sm text-foreground-lighter">
               by{' '}
               <Link
@@ -63,7 +64,7 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
                   </Link>
                 </>
               )}
-              {question.author && question.ts && <span>•</span>}
+              {question.author && question.ts && <span>·</span>}
               {question.ts && question.external_activity_url ? (
                 <a
                   href={question.external_activity_url}
@@ -83,11 +84,18 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
 
       {/* Summary Section */}
       {thread.summary && (
-        <div className="mb-6">
-          <div className="p-4 min-w-0 border border-border rounded-lg bg-surface-100">
-            <h3 className="text-sm font-semibold text-foreground mb-2">Thread summary</h3>
-            <p className="text-sm text-foreground-light">{thread.summary}</p>
-          </div>
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm font-medium text-foreground">How to help</h3>
+          <Card>
+            <CardContent className="px-6 py-8 flex flex-col gap-6">
+              <p className="text-base text-foreground">{thread.summary}</p>
+
+              <HelpOnPlatformButton
+                channel={thread.channel}
+                externalActivityUrl={thread.external_activity_url}
+              />
+            </CardContent>
+          </Card>
         </div>
       )}
 

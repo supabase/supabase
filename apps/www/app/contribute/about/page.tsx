@@ -1,3 +1,4 @@
+import { Realtime } from 'icons'
 import {
   ArrowLeft,
   Award,
@@ -59,32 +60,32 @@ const waysToContribute = [
     icon: Sparkles,
     heading: 'That thing you do better than anyone',
     subheading:
-      "Do you have a unique skill or perspective that you can share with the community? Got a unique perspective that you can share? Got a niche skill that not many people have? Know one of our core tools better than anyone else? We'd love to hear from you.",
+      'Do you have a unique skill or perspective that you can share with the community? Got a unique perspective that you can share? Got a niche skill that not many people have? Know one of our core tools better than anyone else? We’d love to hear from you.',
   },
 ]
 
 const benefits = [
   {
     icon: DollarSign,
-    heading: 'Paid Contributions',
+    heading: 'Paid contributions',
     subheading:
       'Top contributors get paid for their efforts. We pay a stipend that recognizes your time and expertise.',
   },
   {
     icon: Award,
-    heading: 'Community Recognition',
+    heading: 'Community recognition',
     subheading:
       'Get a Badge on Discord and flair on Reddit showcasing your SupaSquad status in the community.',
   },
   {
     icon: Zap,
-    heading: 'Early Access',
+    heading: 'Early access',
     subheading:
       'Get first access to new Supabase features and provide feedback directly to our team.',
   },
   {
     icon: MessageCircle,
-    heading: 'Direct Team Access',
+    heading: 'Direct team access',
     subheading:
       'Direct communication channel with Supabase team members for questions, suggestions and support.',
   },
@@ -96,7 +97,7 @@ const benefits = [
   },
   {
     icon: TrendingUp,
-    heading: 'Growth Opportunities',
+    heading: 'Growth opportunities',
     subheading:
       'Room to grow from volunteer to paid contributor to paid employee. Your path is up to you.',
   },
@@ -107,8 +108,8 @@ const especially = [
     id: 'expo',
     icon: Smartphone,
     heading: (
-      <div className="flex items-center gap-2">
-        Expo <Badge variant="success">High Priority</Badge>
+      <div className="flex items-center gap-x-3">
+        Expo <Badge variant="success">Priority</Badge>
       </div>
     ),
     subheading:
@@ -118,25 +119,25 @@ const especially = [
     id: 'ai',
     icon: Bot,
     heading: (
-      <div className="flex items-center gap-2">
-        AI / Vectors <Badge variant="success">High Priority</Badge>
+      <div className="flex items-center gap-x-3">
+        AI / Vectors <Badge variant="success">Priority</Badge>
       </div>
     ),
     subheading: 'Help the team keep our AI / Vector docs and examples up to date. ',
   },
   {
     id: 'realtime',
-    icon: Zap,
-    heading: <div className="flex items-center gap-2">Realtime</div>,
+    icon: Realtime,
+    heading: 'Realtime',
     subheading:
       'Help the team by writing docs, creating examples, and making sure our guides are up to date. Experience with React and friends is an extra bonus.',
   },
   {
     id: 'branching',
     icon: Split,
-    heading: <div className="flex items-center gap-2">Branching</div>,
+    heading: 'Branching',
     subheading:
-      "We're looking for a branching power user to help the team by writing docs, creating examples, and making sure our guides are up to date. ",
+      'We’re looking for a branching power user to help the team by writing docs, creating examples, and making sure our guides are up to date. ',
   },
 ]
 
@@ -158,15 +159,17 @@ export default function AboutPage() {
           <SectionContainer id="mission" className="sm:py-18 md:py-24 lg:px-16 lg:py-24 xl:px-0 ">
             <div className="grid gap-y-4">
               <div className="pb-4">
-                <h2 className="h2 text-foreground">Our Mission</h2>
-                <p className="text-lg text-foreground mt-4">
-                  We're building a community of helpers and contributors who help developers
+                <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-6xl tracking-[-1px] text-foreground">
+                  Our mission
+                </h1>
+                <p className="text-xl text-foreground mt-4">
+                  We’re building a community of helpers and contributors who help developers
                   succeed. We work in the open anywhere our developers are: Discord, GitHub, Reddit,
                   Twitter, Stack Overflow, and more. We want to grow this community to reflect the
                   diversity of our users and their needs.
                 </p>
-                <p className="text-foreground-light mt-4">
-                  One of Supabase's biggest strengths is its flexibility. You can adopt a single
+                <p className="text-md text-foreground-light mt-4">
+                  One of Supabase’s biggest strengths is its flexibility. You can adopt a single
                   part of the platform or use it end-to-end, and pair it with almost any framework
                   or runtime. That means you might use just the database in a SvelteKit app, or run
                   Edge Functions in a Python app. This openness enables a huge range of technical
@@ -179,11 +182,11 @@ export default function AboutPage() {
               <div className="grid md:grid-cols-2 mt-6 gap-12">
                 <div>
                   <p className="text-foreground text-lg">
-                    We're looking for people who can help support these many technical combinations.
+                    We’re looking for people who can help support these many technical combinations.
                   </p>
                   <p className="text-foreground-light mt-4">
-                    If you're skilled in a couple of different areas, and interested in helping
-                    other developers, we'd love to have your help!
+                    If you’re skilled in a couple of different areas, and interested in helping
+                    other developers, we’d love to have your help!
                   </p>
                 </div>
                 <Image
@@ -200,7 +203,7 @@ export default function AboutPage() {
           <FeaturesSection
             id="ways-to-contribute"
             heading={<span className="text-foreground">Want to get involved?</span>}
-            subheading="There are many ways to get involved in the Supabase community. Whether you want to write code, polish documentation, or help others build with Supabase, there's a place for you."
+            subheading="There are many ways to get involved in the Supabase community. Whether you want to write code, polish documentation, or help others build with Supabase, there’s a place for you."
             features={waysToContribute}
             columns={2}
           />
@@ -224,8 +227,8 @@ export default function AboutPage() {
           <FeaturesSection
             id="especially"
             columns={2}
-            heading={<span className="text-foreground">We're especially looking for:</span>}
-            subheading="These are the areas where we need the most help right now. If you have expertise in any of these domains, we'd love to hear from you!"
+            heading={<span className="text-foreground">We’re especially looking for</span>}
+            subheading="These are the areas where we need the most help right now. If you have expertise in any of these domains, we’d love to hear from you!"
             features={especially}
           />
 
@@ -256,7 +259,7 @@ export default function AboutPage() {
           </SectionContainer>
 
           <SectionContainer id="apply" className="text-center">
-            <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight mb-8">
+            <h2 className="text-foreground text-2xl lg:text-3xl leading-tight mb-8">
               Ready to start contributing?
             </h2>
 
@@ -310,7 +313,7 @@ const FeatureItem = ({ feature }: { feature: Feature }) => {
       <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
         <span className="h-full bg-foreground-lighter w-7" />
       </div>
-      <h4 className="text-foreground text-lg lg:text-xl mt-1">{feature.heading}</h4>
+      <h4 className="text-foreground text-lg lg:text-xl mt-1 text-balance">{feature.heading}</h4>
       <p className="text-foreground-lighter text-sm">{feature.subheading}</p>
     </li>
   )
