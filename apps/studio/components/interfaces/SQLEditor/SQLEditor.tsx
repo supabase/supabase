@@ -20,6 +20,7 @@ import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { wrapWithRollback } from 'data/sql/utils/transaction'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -409,10 +410,16 @@ export const SQLEditor = () => {
       // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
       const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
 
+      // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
+      // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
+      const explainSqlWithTransaction = wrapWithRollback(
+        wrapWithRoleImpersonation(explainSql, impersonatedRoleState)
+      )
+
       executeExplain({
         projectRef: project.ref,
         connectionString: connectionString,
-        sql: wrapWithRoleImpersonation(explainSql, impersonatedRoleState),
+        sql: explainSqlWithTransaction,
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
         handleError: (error) => {
           throw error
