@@ -1,17 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { useQueryState, parseAsBoolean, parseAsInteger } from 'nuqs'
+import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
@@ -27,7 +26,6 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const deletingRoleIdRef = useRef<string | null>(null)
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -67,26 +65,27 @@ export const RolesList = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+  
+  const [roleToDeleteId, setRoleToDeleteId] = useQueryState(
+    'delete',
+    parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
-  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id: string) =>
-      id ? otherRoles?.find((role) => role.id.toString() === id) : undefined,
-    enabled: !!otherRoles,
-    onError: (_error, selectedId) => {
+  const roleToDelete = otherRoles.find((role) => role.id === roleToDeleteId)
+
+  useEffect(() => {
+    if (!isLoading && roleToDeleteId !== null && roleToDelete === undefined) {
       const isSupabaseRole =
-        supabaseRoles.find((role) => role.id === Number(selectedId)) !== undefined
+        supabaseRoles.find((role) => role.id === roleToDeleteId) !== undefined
       if (isSupabaseRole) {
-        handleErrorOnDelete(
-          deletingRoleIdRef,
-          selectedId,
-          `Cannot delete role as it is a Supabase role`
-        )
+        toast.error('Cannot delete role as it is a Supabase role')
       } else {
-        handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`)
+        toast.error('Database Role not found')
       }
-    },
-  })
+
+      setRoleToDeleteId(null)
+    }
+  }, [isLoading, roleToDeleteId, roleToDelete])
 
   return (
     <>
@@ -210,7 +209,7 @@ export const RolesList = () => {
                   disabled
                   key={role.id}
                   role={role}
-                  onSelectDelete={setSelectedRoleIdToDelete}
+                  onSelectDelete={setRoleToDeleteId}
                 />
               ))}
         </div>
@@ -227,7 +226,7 @@ export const RolesList = () => {
                   key={role.id}
                   disabled={!canUpdateRoles}
                   role={role}
-                  onSelectDelete={setSelectedRoleIdToDelete}
+                  onSelectDelete={setRoleToDeleteId}
                 />
               ))}
         </div>
@@ -243,16 +242,11 @@ export const RolesList = () => {
         onClose={() => setIsCreatingRole(false)}
       />
 
-      <DeleteRoleModal
-        role={roleToDelete as unknown as PostgresRole}
-        visible={!!roleToDelete}
-        onClose={() => setSelectedRoleIdToDelete(null)}
-        onDelete={() => {
-          if (roleToDelete) {
-            deletingRoleIdRef.current = roleToDelete.id.toString()
-          }
-        }}
-      />
+      {roleToDelete !== undefined && <DeleteRoleModal
+        role={roleToDelete}
+        visible={roleToDelete !== undefined}
+        onClose={() => setRoleToDeleteId(null)}
+      />}
     </>
   )
 }
