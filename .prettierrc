@@ -11,6 +11,10 @@
     {
       "files": "**/*.json",
       "options": { "parser": "json" }
+    },
+    {
+      "files": ["**/*.jsonc"],
+      "options": { "trailingComma": "none" }
     }
   ]
 }
