@@ -39,8 +39,20 @@ export const SOC2 = () => {
       if (soc2Link?.fileUrl) window.open(soc2Link.fileUrl, '_blank')
       setIsOpen(false)
     } catch (error: unknown) {
-      toast.error(`Failed to download SOC2 report: ${(error as Error).message}`)
+      const message = error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error(`Failed to download SOC2 report: ${message}`)
     }
+  }
+
+  const handleDownloadClick = () => {
+    if (!slug) return
+
+    sendEvent({
+      action: 'document_view_button_clicked',
+      properties: { documentName: 'SOC2' },
+      groups: { organization: slug },
+    })
+    setIsOpen(true)
   }
 
   return (
@@ -71,14 +83,8 @@ export const SOC2 = () => {
             <Button
               type="default"
               icon={<Download />}
-              onClick={() => {
-                sendEvent({
-                  action: 'document_view_button_clicked',
-                  properties: { documentName: 'SOC2' },
-                  groups: { organization: organization?.slug ?? 'Unknown' },
-                })
-                setIsOpen(true)
-              }}
+              onClick={handleDownloadClick}
+              disabled={!slug}
             >
               Download SOC2 Type 2 Report
             </Button>
