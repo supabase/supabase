@@ -22,7 +22,7 @@
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.15"
+    "vite": "^7.2.2"
   },
   "scripts": {
     "dev": "refine dev",
