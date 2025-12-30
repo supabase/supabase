@@ -68,6 +68,7 @@ export interface CodeBlockProps {
   children?: string
   wrapLines?: boolean
   focusable?: boolean
+  spellCheck?: boolean
   renderer?: SyntaxHighlighterProps['renderer']
   handleCopy?: (value?: string) => void
   onCopyCallback?: () => void
@@ -89,6 +90,7 @@ export interface CodeBlockProps {
  * @param {boolean} [props.hideLineNumbers=false] - Whether to hide line numbers.
  * @param {SyntaxHighlighterProps['renderer']} [props.renderer] - Custom renderer for syntax highlighting.
  * @param {boolean} [props.focusable=true] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
+ * @param {boolean} [props.spellCheck=true] - Whether to enable spell check.
  * @param {function} [props.handleCopy] - Optional override behaviour for copying value. For e.g if the code block contains obfuscated values, but the copy behaviour should reveal those values instead.
  */
 export const CodeBlock = ({
@@ -107,6 +109,7 @@ export const CodeBlock = ({
   wrapLines = true,
   renderer,
   focusable = true,
+  spellCheck = true,
   onCopyCallback = noop,
   handleCopy,
 }: CodeBlockProps) => {
@@ -178,7 +181,8 @@ export const CodeBlock = ({
         <div
           className={cn(
             'group relative max-w-[90vw] md:max-w-none overflow-auto',
-            wrapperClassName
+            wrapperClassName,
+            className
           )}
         >
           {/* @ts-ignore */}
@@ -190,9 +194,9 @@ export const CodeBlock = ({
             className={cn(
               'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
               `${!title ? 'rounded-md' : 'rounded-t-none rounded-b-md'}`,
-              `${!showLineNumbers ? 'pl-6' : ''}`,
-              className
+              `${!showLineNumbers ? 'pl-6' : ''}`
             )}
+            spellCheck={spellCheck}
             customStyle={{
               fontSize: large ? 18 : 13,
               lineHeight: large ? 1.5 : 1.4,
