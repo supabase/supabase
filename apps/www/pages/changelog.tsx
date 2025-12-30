@@ -95,6 +95,29 @@ async function fetchDiscussions(owner: string, repo: string, categoryId: string,
 
   return { discussions, pageInfo }
 }
+
+function isEncoded(uri: string) {
+  uri = uri ?? ''
+  return uri !== decodeURIComponent(uri)
+}
+
+// Decodes a URI if it is encoded
+const decodeURI = (uri: string | null) => {
+  if (!uri) {
+    return uri
+  }
+  let tries = 0
+  while (isEncoded(uri)) {
+    uri = decodeURIComponent(uri)
+    tries++
+    if (tries > 10) {
+      break
+    }
+  }
+
+  return uri
+}
+
 /**
  * [Terry]
  * this page powers supabase.com/changelog
@@ -108,7 +131,9 @@ async function fetchDiscussions(owner: string, repo: string, categoryId: string,
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
   // refresh every 15 minutes
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-  const next = (query.next ?? null) as string | null
+  const encodedNext = (query.next ?? null) as string | null
+  // in some cases the next cursor is encoded twice or more times due to the user pasting the url, so we need to decode it multiple times.
+  const next = decodeURI(encodedNext)
   const restPage = query.restPage ? Number(query.restPage) : 1
 
   const octokitRest = new OctokitRest({
