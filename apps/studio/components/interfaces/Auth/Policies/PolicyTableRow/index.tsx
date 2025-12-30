@@ -73,9 +73,10 @@ const PolicyTableRowComponent = ({
   })
 
   const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
-  const isPubliclyReadableWritable =
-    !isRLSEnabled && isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
-  const rlsEnabledNoPolicies = isRLSEnabled && policies.length === 0
+  const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
+  const isPubliclyReadableWritable = !isRLSEnabled && hasApiAccess
+  const rlsEnabledNoPolicies = isRLSEnabled && hasApiAccess && policies.length === 0
+  const isApiDisabledDueToRoles = isTableExposedThroughAPI && !hasAnonAuthenticatedRolesAccess
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
@@ -87,13 +88,17 @@ const PolicyTableRowComponent = ({
       <CardHeader
         className={cn(
           'py-3 px-4',
-          (isPubliclyReadableWritable || rlsEnabledNoPolicies || !isTableExposedThroughAPI) &&
+          (isPubliclyReadableWritable ||
+            rlsEnabledNoPolicies ||
+            !isTableExposedThroughAPI ||
+            isApiDisabledDueToRoles) &&
             'border-b-0'
         )}
       >
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
+          hasApiAccess={hasApiAccess}
           onSelectToggleRLS={onSelectToggleRLS}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
@@ -113,19 +118,22 @@ const PolicyTableRowComponent = ({
         </Admonition>
       )}
 
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && isTableExposedThroughAPI && (
-        <Admonition
-          showIcon={false}
-          type={isPubliclyReadableWritable ? 'warning' : 'default'}
-          className="border-0 border-y rounded-none min-h-12 flex items-center"
-        >
-          <p>
-            {isPubliclyReadableWritable
-              ? 'Anyone with your project’s anonymous key can read, modify, or delete your data.'
-              : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
-          </p>
-        </Admonition>
-      )}
+      {(isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
+        isTableExposedThroughAPI && (
+          <Admonition
+            showIcon={false}
+            type={isPubliclyReadableWritable ? 'warning' : 'default'}
+            className="border-0 border-y rounded-none min-h-12 flex items-center"
+          >
+            <p>
+              {isPubliclyReadableWritable
+                ? 'This table can be accessed by anyone via the Data API as RLS is disabled.'
+                : isApiDisabledDueToRoles
+                  ? 'This table cannot be accessed via the Data API as no permissions exist for the anon or authenticated roles.'
+                  : 'This table can be accessed via the Data API but no RLS policies exist so no data will be returned.'}
+            </p>
+          </Admonition>
+        )}
 
       {isPoliciesLoading && (
         <CardContent>
