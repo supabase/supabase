@@ -7,8 +7,8 @@ import { dataset } from './dataset'
 import {
   completenessScorer,
   concisenessScorer,
+  correctnessScorer,
   docsFaithfulnessScorer,
-  factualityScorer,
   goalCompletionScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
@@ -86,7 +86,7 @@ Eval('Assistant', {
     concisenessScorer,
     completenessScorer,
     docsFaithfulnessScorer,
-    factualityScorer,
+    correctnessScorer,
   ],
 })
 

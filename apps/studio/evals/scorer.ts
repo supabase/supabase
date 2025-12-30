@@ -17,7 +17,7 @@ type Output = {
 
 export type Expected = {
   requiredTools?: string[]
-  factualAnswer?: string
+  correctAnswer?: string
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -195,41 +195,44 @@ export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async
   })
 }
 
-const factualityEvaluator = LLMClassifierFromTemplate<{ expected: string }>({
-  name: 'Factuality',
+const correctnessEvaluator = LLMClassifierFromTemplate<{ expected: string }>({
+  name: 'Correctness',
   promptTemplate: stripIndent`
-    Evaluate whether the assistant's answer is factually accurate.
+    Evaluate whether the assistant's answer is correct according to the expected answer.
 
     Question:
     {{input}}
     
-    Ground Truth:
+    Expected Answer:
     {{expected}}
     
     Assistant Response:
     {{output}}
     
-    Is the assistant's response factually accurate according to the ground truth?
-    a) Factually accurate - response is consistent with the ground truth, no contradictions
-    b) Partially accurate - mostly accurate but has minor inaccuracies or unclear statements
-    c) Factually inaccurate - contradicts the ground truth or makes incorrect claims
+    Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
+    - Include the expected answer (or equivalent information)
+    - Not contradict the expected answer
+    
+    a) Correct - response includes the expected answer, no contradictions or omissions
+    b) Partially correct - includes most of the expected answer but has minor omissions or contradictions
+    c) Incorrect - contradicts or fails to provide the expected answer
   `,
   choiceScores: { a: 1, b: 0.5, c: 0 },
   useCoT: true,
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const factualityScorer: EvalScorer<Input, Output, Expected> = async ({
+export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
   output,
   expected,
 }) => {
   // Skip scoring if no ground truth is provided
-  if (!expected.factualAnswer) {
+  if (!expected.correctAnswer) {
     return null
   }
 
-  return await factualityEvaluator({
-    expected: expected.factualAnswer,
+  return await correctnessEvaluator({
+    expected: expected.correctAnswer,
     output: output.textOnly,
   })
 }

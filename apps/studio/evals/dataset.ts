@@ -39,7 +39,7 @@ export const dataset: AssistantEvalCase[] = [
     input: 'How do I restore objects in Storage buckets when versioning is enabled?',
     expected: {
       requiredTools: ['search_docs'],
-      factualAnswer:
+      correctAnswer:
         'Object restoration is not possible in Storage buckets with versioning. Database backups do not include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.',
     },
     metadata: { category: ['general_help'] },
@@ -48,7 +48,7 @@ export const dataset: AssistantEvalCase[] = [
     input: 'How many projects are included in the free tier?',
     expected: {
       requiredTools: ['search_docs'],
-      factualAnswer: '2',
+      correctAnswer: '2',
     },
     metadata: { category: ['general_help'] },
   },
