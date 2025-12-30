@@ -23,9 +23,9 @@
         "S3_SECRET_ACCESS_KEY",
         "S3_REGION",
         "S3_ENDPOINT",
-        "VERCEL_PROJECT_PRODUCTION_URL"
+        "VERCEL_PROJECT_PRODUCTION_URL",
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
     },
     "design-system#build": {
       "dependsOn": ["^build"],
@@ -39,9 +39,9 @@
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"],
     },
     "studio#build": {
       "dependsOn": ["^build"],
@@ -128,14 +128,14 @@
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
         "STATUSPAGE_API_KEY",
-        "STATUSPAGE_PAGE_ID"
+        "STATUSPAGE_PAGE_ID",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_SHA",
-        "SNIPPETS_MANAGEMENT_FOLDER"
+        "SNIPPETS_MANAGEMENT_FOLDER",
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
     },
     "www#build": {
       "dependsOn": ["^build"],
@@ -208,9 +208,9 @@
         "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY"
+        "CUSTOMERIO_APP_API_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"],
     },
     "ui-library#build": {
       "dependsOn": ["^build"],
@@ -233,9 +233,9 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "SUPABASE_MANAGEMENT_API_TOKEN",
-        "OPENAI_API_KEY"
+        "OPENAI_API_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"],
     },
     "lint": {
       "outputs": []
