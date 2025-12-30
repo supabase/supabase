@@ -51,7 +51,7 @@
 
 ## Project Structure
 
-```
+```text
 ├── server.js              # Express server with Supabase SSR implementation
 ├── package.json           # Dependencies and scripts
 ├── .env.example           # Environment variables template
