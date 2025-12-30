@@ -98,6 +98,11 @@ export const data = {
           url: '/events',
           icon: Calendar,
         },
+        {
+          text: 'Contribute',
+          url: '/contribute',
+          icon: HardHat,
+        },
       ],
     },
   ],
