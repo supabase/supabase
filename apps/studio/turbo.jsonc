@@ -9,18 +9,22 @@
         "ANALYZE",
         "MAINTENANCE_MODE",
         "NODE_ENV",
-        "NEXT_RUNTIME",
         "VERCEL",
         "VERCEL_ENV",
         "FORCE_ASSET_CDN",
         "SITE_NAME",
+
+        // Needed during build time in order to generate the CSP
+        "NIMBUS_PROD_PROJECTS_URL",
+        "NIMBUS_PROD_PROJECTS_URL_WS",
+        "VERCEL_URL",
+        "SUPABASE_URL",
 
         // Client-side public vars (embedded in bundle)
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
-        "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_CONFIGCAT_PROXY_URL",
         "NEXT_PUBLIC_CONFIGCAT_SDK_KEY",
@@ -52,7 +56,6 @@
         // Git/deployment metadata
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_SHA",
-        "VERCEL_URL",
         "SNIPPETS_MANAGEMENT_FOLDER",
 
         // Database configuration
@@ -70,11 +73,6 @@
         "SUPABASE_ANON_KEY",
         "SUPABASE_PUBLIC_URL",
         "SUPABASE_SERVICE_KEY",
-        "SUPABASE_URL",
-
-        // Read-only API
-        "READ_ONLY_API_KEY",
-        "READ_ONLY_URL",
 
         // Default names
         "DEFAULT_ORGANIZATION_NAME",
@@ -84,10 +82,8 @@
         "AUTH_JWT_SECRET",
 
         // AI services
-        "AI_NORMAL_MODEL",
-        "AI_PRO_MODEL",
         "OPENAI_API_KEY",
-        "BRAINTRUST_API_KEY",
+        "BRAINTRUST_API_KEY", // needed by a Github Action
         "BRAINTRUST_PROJECT_ID",
 
         // AWS
@@ -110,6 +106,7 @@
         "SENTRY_AUTH_TOKEN",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
+        "NEXT_RUNTIME",
 
         // Support
         "SUPPORT_SUPABASE_SECRET_KEY",
@@ -117,10 +114,6 @@
         // Statuspage
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
-
-        // Nimbus
-        "NIMBUS_PROD_PROJECTS_URL",
-        "NIMBUS_PROD_PROJECTS_URL_WS",
 
         // Throttling
         "IS_THROTTLED"
