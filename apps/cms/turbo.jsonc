@@ -1,0 +1,27 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "BLOG_APP_URL",
+        "CRON_SECRET",
+        "DATABASE_URI",
+        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_SERVER_URL",
+        "NEXT_PUBLIC_VERCEL_ENV",
+        "NODE_ENV",
+        "PAYLOAD_SECRET",
+        "PREVIEW_SECRET",
+        "S3_BUCKET",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY",
+        "S3_REGION",
+        "S3_ENDPOINT",
+        "VERCEL_PROJECT_PRODUCTION_URL"
+      ],
+      "outputs": [".next/**", "!.next/cache/**"]
+    }
+  }
+}
