@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
 import { DEFAULT_PROJECT } from 'lib/constants/api'
+import { IS_PLATFORM } from 'lib/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -35,5 +36,10 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     ],
   }
+
+  if (!IS_PLATFORM) {
+    response.disabled_features = process.env.DISABLED_FEATURES?.split(',') ?? []
+  }
+
   return res.status(200).json(response)
 }
