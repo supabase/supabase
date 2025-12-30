@@ -495,7 +495,239 @@ export default function () {
   )
 }
 ```
+### Production-Ready Google Authentication Pattern
 
+This example demonstrates a complete Google authentication implementation for Expo React Native with proper error handling, session persistence, and user data extraction.
+
+**Important:** This requires Expo Dev Builds or production builds. It will not work in Expo Go due to native module requirements.
+
+#### Conditional Module Loading
+
+Handle environments where native modules aren't available:
+
+```typescript
+import Constants from 'expo-constants';
+
+let GoogleSignin: any = null;
+let statusCodes: any = null;
+
+// Only load native modules outside of Expo Go
+if (Constants.appOwnership !== 'expo') {
+  const GoogleSignInModule = require('@react-native-google-signin/google-signin');
+  GoogleSignin = GoogleSignInModule.GoogleSignin;
+  statusCodes = GoogleSignInModule.statusCodes;
+}
+```
+
+#### Complete Authentication Flow
+
+```typescript
+import { supabase } from './supabase';
+import { Platform } from 'react-native';
+
+async function googleLogin() {
+  try {
+    // Check Play Services (Android only)
+    if (Platform.OS === 'android') {
+      await GoogleSignin.hasPlayServices();
+    }
+    
+    // Prompt user to sign in
+    const userInfo = await GoogleSignin.signIn();
+    
+    // Get ID token
+    const tokens = await GoogleSignin.getTokens();
+    if (!tokens.idToken) {
+      throw new Error("Failed to get ID token from Google");
+    }
+    
+    // Authenticate with Supabase
+    const { data: sessionData, error: authError } = await supabase.auth.signInWithIdToken({
+      provider: "google",
+      token: tokens.idToken,
+    });
+    
+    if (authError || !sessionData?.session) {
+      throw new Error(authError?.message || "Authentication failed");
+    }
+    
+    const user = sessionData.session.user;
+    console.log("Successfully authenticated:", user.id);
+    
+    // Session is now active - handle navigation or state updates in your app
+    
+  } catch (error: any) {
+    // Handle specific Google Sign-In errors
+    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      console.log("User cancelled sign in");
+    } else if (error.code === statusCodes.IN_PROGRESS) {
+      console.log("Sign in already in progress");
+    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      console.log("Play services not available or outdated");
+    } else {
+      console.error("Google sign in error:", error);
+    }
+    throw error;
+  }
+}
+```
+
+#### Session Management
+
+Store the Supabase session securely for persistence across app restarts:
+
+```typescript
+import * as SecureStore from 'expo-secure-store';
+
+// Save session token securely
+async function saveSession(accessToken: string, refreshToken: string): Promise<void> {
+  await SecureStore.setItemAsync('supabase_access_token', accessToken);
+  await SecureStore.setItemAsync('supabase_refresh_token', refreshToken);
+}
+
+// Restore session on app launch
+async function restoreSession() {
+  const accessToken = await SecureStore.getItemAsync('supabase_access_token');
+  const refreshToken = await SecureStore.getItemAsync('supabase_refresh_token');
+  
+  if (accessToken && refreshToken) {
+    const { error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+    
+    if (!error) {
+      console.log("Session restored successfully");
+      return true;
+    }
+  }
+  return false;
+}
+
+// Clear session on logout
+async function clearSession(): Promise<void> {
+  await SecureStore.deleteItemAsync('supabase_access_token');
+  await SecureStore.deleteItemAsync('supabase_refresh_token');
+  if (GoogleSignin) await GoogleSignin.signOut();
+  await supabase.auth.signOut();
+}
+```
+
+#### Accessing User Information
+
+After successful authentication, access user data from the session:
+
+```typescript
+// Get current user info
+const { data: { user } } = await supabase.auth.getUser();
+
+if (user) {
+  console.log("User email:", user.email);
+  console.log("User ID:", user.id);
+  
+  // Access Google-specific data from user_metadata
+  console.log("Name:", user.user_metadata?.full_name);
+  console.log("Avatar:", user.user_metadata?.avatar_url);
+}
+```
+
+#### Parsing Google User Data
+
+Extract name components with proper fallbacks:
+
+```typescript
+// After successful Google sign-in
+const userInfo = await GoogleSignin.signIn();
+
+// Parse first and last name with fallbacks
+const firstName = userInfo.data.user.givenName || 
+                 userInfo.data.user.name?.split(' ')[0] || '';
+const lastName = userInfo.data.user.familyName || 
+                userInfo.data.user.name?.split(' ').slice(1).join(' ') || '';
+const email = userInfo.data.user.email;
+const photoUrl = userInfo.data.user.photo;
+
+console.log("Parsed user data:", { firstName, lastName, email, photoUrl });
+```
+
+#### Session Restoration on App Launch
+
+```typescript
+import { useEffect } from 'react';
+
+useEffect(() => {
+  async function checkExistingSession() {
+    try {
+      // Check if there's an existing Google session
+      if (GoogleSignin) {
+        const isSignedIn = await GoogleSignin.hasPreviousSignIn();
+        if (isSignedIn) {
+          console.log("Found existing Google session");
+        }
+      }
+      
+      // Check Supabase session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        console.log("Active Supabase session found");
+        // User is authenticated - update your app state
+      } else {
+        // Try to restore from secure storage
+        const restored = await restoreSession();
+        if (restored) {
+          console.log("Session restored from storage");
+        }
+      }
+    } catch (error) {
+      console.error("Session check error:", error);
+    }
+  }
+  
+  checkExistingSession();
+}, []);
+```
+
+#### Usage Example
+
+```typescript
+// In your login screen component
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+// Configure Google Sign-In (do this once, typically in your app root)
+GoogleSignin.configure({
+  webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+});
+
+function LoginScreen() {
+  const handleGoogleLogin = async () => {
+    try {
+      await googleLogin();
+      console.log("Login successful!");
+      // Update your app state or navigation here
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Show error to user
+    }
+  };
+  
+  return (
+    <Button title="Sign in with Google" onPress={handleGoogleLogin} />
+  );
+}
+```
+
+#### Important Implementation Notes
+
+1. **Name Parsing**: Google provides `givenName` and `familyName` separately, but these can be null. Always provide a fallback to splitting the full `name` field.
+
+2. **Error Handling**: The `@react-native-google-signin/google-signin` package provides specific error codes (`SIGN_IN_CANCELLED`, `IN_PROGRESS`, `PLAY_SERVICES_NOT_AVAILABLE`) that should be handled appropriately.
+
+3. **Session Tokens**: Store Supabase access and refresh tokens securely using `expo-secure-store`. Never use AsyncStorage for sensitive authentication tokens.
+
+4. **Android Play Services**: Always check for Play Services availability on Android before attempting sign-in to provide better error messages.
+
+5. **Expo Go Limitation**: This implementation requires native modules that aren't available in Expo Go. You must use Expo Dev Builds or create a production build.
 </TabPanel>
 
 <TabPanel id="flutter-mobile" label="Flutter (iOS and Android)">
