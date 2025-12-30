@@ -9,6 +9,7 @@ type Input = string
 
 type Output = {
   stepsSerialized: string
+  textOnly: string
   toolNames: string[]
   sqlQueries: string[]
   docs: string[]
@@ -155,5 +156,40 @@ export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async (
   return await goalCompletionEvaluator({
     input,
     output: output.stepsSerialized,
+  })
+}
+
+const docsFaithfulnessEvaluator = LLMClassifierFromTemplate<{ docs: string }>({
+  name: 'Docs Faithfulness',
+  promptTemplate: stripIndent`
+    Evaluate whether the assistant's response accurately reflects the information in the retrieved documentation.
+    
+    Retrieved Documentation:
+    {{docs}}
+    
+    Assistant Response:
+    {{output}}
+    
+    Does the assistant's response accurately reflect the documentation without contradicting it or adding unsupported claims?
+    a) Faithful - response accurately reflects the docs, no contradictions or unsupported claims
+    b) Partially faithful - mostly accurate but has minor inaccuracies or unsupported details
+    c) Not faithful - contradicts the docs or makes significant unsupported claims
+  `,
+  choiceScores: { a: 1, b: 0.5, c: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+  // Skip scoring if no docs were retrieved
+  if (!output.docs || output.docs.length === 0) {
+    return null
+  }
+
+  const docsText = output.docs.join('\n\n')
+
+  return await docsFaithfulnessEvaluator({
+    docs: docsText,
+    output: output.textOnly,
   })
 }

@@ -7,6 +7,7 @@ import { dataset } from './dataset'
 import {
   completenessScorer,
   concisenessScorer,
+  docsFaithfulnessScorer,
   goalCompletionScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
@@ -40,6 +41,11 @@ Eval('Assistant', {
       })
       .join('\n')
 
+    const textOnly = steps
+      .map((step) => step.text)
+      .filter((text) => text && text.trim().length > 0)
+      .join('\n')
+
     const toolNames: string[] = []
     const sqlQueries: string[] = []
     const docs: string[] = []
@@ -66,6 +72,7 @@ Eval('Assistant', {
 
     return {
       stepsSerialized,
+      textOnly,
       toolNames,
       sqlQueries,
       docs,
@@ -77,6 +84,7 @@ Eval('Assistant', {
     goalCompletionScorer,
     concisenessScorer,
     completenessScorer,
+    docsFaithfulnessScorer,
   ],
 })
 
