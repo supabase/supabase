@@ -30,6 +30,7 @@ const defaultEnv = {
   NEXT_PUBLIC_GOTRUE_URL: '$SUPABASE_PUBLIC_URL/auth/v1',
   NEXT_PUBLIC_HCAPTCHA_SITE_KEY: '10000000-ffff-ffff-ffff-000000000001',
   NEXT_PUBLIC_NODE_ENV: 'test',
+  SNIPPETS_MANAGEMENT_FOLDER: '../../supabase/snippets',
 }
 
 const environment = { ...generatedEnv, ...defaultEnv }

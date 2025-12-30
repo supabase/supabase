@@ -24,6 +24,8 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/generate-attachment-url',
+  '/incident-status',
+  '/api/integrations/stripe-sync',
 ]
 
 export function proxy(request: NextRequest) {

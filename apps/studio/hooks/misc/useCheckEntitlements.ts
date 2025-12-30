@@ -96,15 +96,17 @@ export function useCheckEntitlements(
     }
   }, [entitlementsData, featureKey, finalOrgSlug])
 
-  const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
+  const isLoading = shouldGetSelectedOrg
+    ? isLoadingSelectedOrg || isLoadingEntitlements
+    : isLoadingEntitlements
   const isSuccess = shouldGetSelectedOrg
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
   return {
     hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
-    isLoading,
-    isSuccess,
+    isLoading: IS_PLATFORM ? isLoading : false,
+    isSuccess: IS_PLATFORM ? isSuccess : true,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
     isEntitlementUnlimited: () => isEntitlementUnlimited(entitlement),
     getEntitlementSetValues: () => getEntitlementSetValues(entitlement),

@@ -140,11 +140,10 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'dev-cli',
             href: '/guides/local-development' as `/${string}`,
             level: 'local_development',
-            enabled: localDevelopmentEnabled,
           },
           {
-            label: 'Deployment',
-            icon: 'deployment',
+            label: 'Deployment & Branching',
+            icon: 'git-branch',
             href: '/guides/deployment' as `/${string}`,
             level: 'deployment',
           },
@@ -357,6 +356,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/hono',
         },
         {
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
         },
@@ -373,6 +376,15 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
         {
+          name: 'Flask (Python)',
+          url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+        },
+        {
           name: 'Laravel PHP',
           url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
           enabled: !jsOnly,
@@ -382,7 +394,6 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
           enabled: !jsOnly,
         },
-
         {
           name: 'SolidJS',
           url: '/guides/getting-started/quickstarts/solidjs',
@@ -496,7 +507,7 @@ export const gettingstarted: NavMenuConstant = {
         },
         {
           name: 'Deploy MCP servers',
-          url: '/guides/getting-started/byom' as `/${string}`,
+          url: '/guides/getting-started/byo-mcp' as `/${string}`,
         },
       ],
     },
@@ -911,18 +922,6 @@ export const auth: NavMenuConstant = {
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac' as `/${string}`,
-        },
-      ],
-    },
-    {
-      name: 'Auth UI',
-      url: undefined,
-      enabled: allAuthProvidersEnabled,
-      items: [
-        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
-        {
-          name: 'Flutter Auth UI',
-          url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
         },
       ],
     },
@@ -2266,7 +2265,6 @@ export const ai: NavMenuConstant = {
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
-  enabled: localDevelopmentEnabled,
   url: '/guides/local-development',
   items: [
     { name: 'Overview', url: '/guides/local-development' },
@@ -2275,7 +2273,11 @@ export const local_development: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
-        { name: 'Configuration', url: '/guides/local-development/cli/config' },
+        {
+          name: 'Configuration',
+          url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
@@ -2299,16 +2301,19 @@ export const local_development: NavMenuConstant = {
         {
           name: 'Restoring downloaded backup',
           url: '/guides/local-development/restoring-downloaded-backup' as `/${string}`,
+          enabled: localDevelopmentEnabled,
         },
         {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates' as `/${string}`,
+          enabled: localDevelopmentEnabled,
         },
       ],
     },
     {
       name: 'Testing',
       url: undefined,
+      enabled: localDevelopmentEnabled,
       items: [
         { name: 'Getting started', url: '/guides/local-development/testing/overview' },
         {
@@ -2864,9 +2869,9 @@ export const self_hosting: NavMenuConstant = {
 }
 
 export const deployment: NavMenuConstant = {
-  title: 'Deployment',
+  title: 'Deployment & Branching',
   url: '/guides/deployment',
-  icon: 'deployment',
+  icon: 'git-branch',
   items: [
     { name: 'Overview', url: '/guides/deployment' },
     {
