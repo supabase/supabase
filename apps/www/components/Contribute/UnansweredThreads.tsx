@@ -1,3 +1,4 @@
+import { Admonition } from 'ui-patterns'
 import {
   getAllProductAreas,
   getAllStacks,
@@ -36,11 +37,12 @@ export async function UnansweredThreads({
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return (
-      <section className="w-full max-w-7xl mx-auto px-4">
-        <div className="border border-border rounded-lg p-8 text-center">
-          <p className="text-destructive">Error loading threads: {errorMessage}</p>
-        </div>
-      </section>
+      <Admonition
+        type="destructive"
+        title="Error loading threads"
+        description={errorMessage}
+        className="max-w-md mx-auto"
+      />
     )
   }
 }

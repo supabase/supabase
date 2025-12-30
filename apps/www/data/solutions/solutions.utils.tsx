@@ -66,7 +66,7 @@ export interface Feature {
 export interface FeaturesSection {
   id: string
   label?: string
-  heading: JSX.Element
+  heading: string | JSX.Element
   subheading?: string
   features: Feature[]
   // {

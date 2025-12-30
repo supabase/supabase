@@ -25,7 +25,7 @@ import {
 
 import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
-import { AllIcon, DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
 
 interface TabConfig {
   id: string
@@ -49,7 +49,7 @@ function ThreadsTable({
 }) {
   return (
     <Card>
-      <Table className="min-w-[900px] mt-0">
+      <Table className="w-full mt-0">
         <TableHeader className="sr-only">
           <TableRow>
             <TableHead>Thread</TableHead>
@@ -245,7 +245,7 @@ export function UnansweredThreadsTable({
 
       {/* Channel Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-4">
-        <div className="flex items-center flex-wrap gap-3 overflow-x-auto">
+        <div className="flex items-center flex-wrap gap-x-1.5 overflow-x-auto">
           {tabs.map((tab) => {
             const isActive = currentTab === tab.id
             const Icon = tab.icon
@@ -279,12 +279,13 @@ export function UnansweredThreadsTable({
           })}
         </div>
 
-        <div className="flex items-center gap-2 flex-1 md:justify-end w-full md:w-auto">
+        <div className="flex items-center gap-x-1.5 flex-1 md:justify-end w-full md:w-auto">
           {/* Search Input */}
-          <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full flex-1">
+          <form onSubmit={handleSearchSubmit} className="relative md:max-w-xs w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-lighter" />
             <Input_Shadcn_
               type="text"
+              size="tiny"
               placeholder="Search threads by title..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -308,7 +309,7 @@ export function UnansweredThreadsTable({
             allProductAreas={allProductAreas}
             allStacks={allStacks}
             trigger={
-              <Button type="default" icon={<Filter size={12} />} className="h-8">
+              <Button type="default" icon={<Filter size={12} />}>
                 <span className="flex items-center gap-2">
                   Filters
                   {activeFilterCount > 0 && (
@@ -327,7 +328,7 @@ export function UnansweredThreadsTable({
         <div className="flex justify-center mt-4">
           <Button
             type="default"
-            size="small"
+            size="tiny"
             onClick={handleLoadMore}
             loading={isLoadingMore}
             disabled={isLoadingMore}
