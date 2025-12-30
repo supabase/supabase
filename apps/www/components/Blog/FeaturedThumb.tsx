@@ -52,15 +52,15 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
   const imageUrl = blog.isCMS
-    ? blog.thumb
-      ? blog.thumb
-      : blog.image
-        ? blog.image
+    ? blog.imgSite
+      ? blog.imgSite
+      : blog.imgSocial
+        ? blog.imgSocial
         : '/images/blog/blog-placeholder.png'
-    : blog.thumb
-      ? `/images/blog/${blog.thumb}`
-      : blog.image
-        ? `/images/blog/${blog.image}`
+    : blog.imgSite
+      ? `/images/blog/${blog.imgSite}`
+      : blog.imgSocial
+        ? `/images/blog/${blog.imgSocial}`
         : '/images/blog/blog-placeholder.png'
 
   return (
