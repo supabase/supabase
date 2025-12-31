@@ -147,7 +147,7 @@ export const AnalyticsBuckets = () => {
                             )}
                             {analyticsBuckets.map((bucket) => {
                               const handleBucketNavigation = createNavigationHandler(
-                                `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`,
+                                `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.name)}`,
                                 router
                               )
 
