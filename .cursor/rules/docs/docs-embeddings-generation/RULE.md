@@ -1,3 +1,10 @@
+---
+description: "Docs: embeddings generation pipeline (apps/docs/scripts/search)"
+globs:
+  - apps/docs/scripts/search/**/*.ts
+alwaysApply: false
+---
+
 # Documentation Embeddings Generation System
 
 ## Overview
@@ -12,31 +19,34 @@ The documentation embeddings generation system processes various documentation s
 ## Architecture
 
 ### Main Entry Point
-- `generate-embeddings.ts` - Main script that orchestrates the entire process
+
+- `apps/docs/scripts/search/generate-embeddings.ts` - Main script that orchestrates the entire process
 - Supports `--refresh` flag to force regeneration of all content
 
 ### Content Sources (`sources/` directory)
 
 #### Base Classes
+
 - `BaseLoader` - Abstract class for loading content from different sources
 - `BaseSource` - Abstract class for processing and formatting content
 
 #### Source Types
-1. **Markdown Sources** (`markdown.ts`)
+
+1. **Markdown Sources** (`apps/docs/scripts/search/sources/markdown.ts`)
    - Processes `.mdx` files from guides and documentation
    - Extracts frontmatter metadata and content sections
 
-2. **Reference Documentation** (`reference-doc.ts`)
+2. **Reference Documentation** (`apps/docs/scripts/search/sources/reference-doc.ts`)
    - **OpenAPI References** - Management API documentation from OpenAPI specs
    - **Client Library References** - JavaScript, Dart, Python, C#, Swift, Kotlin SDKs
    - **CLI References** - Command-line interface documentation
    - Processes YAML/JSON specs and matches with common sections
 
-3. **GitHub Discussions** (`github-discussion.ts`)
+3. **GitHub Discussions** (`apps/docs/scripts/search/sources/github-discussion.ts`)
    - Fetches troubleshooting discussions from GitHub using GraphQL API
    - Uses GitHub App authentication for access
 
-4. **Partner Integrations** (`partner-integrations.ts`)
+4. **Partner Integrations** (`apps/docs/scripts/search/sources/partner-integrations.ts`)
    - Fetches approved partner integration documentation from Supabase database
    - Technology integrations only (excludes agencies)
 
@@ -56,4 +66,3 @@ The documentation embeddings generation system processes various documentation s
 
 - **`page`** table: Stores page metadata, content, checksum, version
 - **`page_section`** table: Stores individual sections with embeddings, token counts
-
