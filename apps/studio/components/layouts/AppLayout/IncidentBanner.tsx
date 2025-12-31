@@ -7,7 +7,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 export const IncidentBanner = () => {
   return (
     <HeaderBanner
-      variant="note"
+      variant="warning"
       title="We are investigating a technical issue"
       description={
         <>
