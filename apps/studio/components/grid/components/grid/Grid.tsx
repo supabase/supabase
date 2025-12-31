@@ -1,19 +1,25 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { forwardRef, memo, Ref, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { ref as valtioRef } from 'valtio'
 
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
+import NoPermission from 'components/ui/NoPermission'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { isTableLike, isForeignTable } from 'data/table-editor/table-editor-types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
@@ -74,9 +80,24 @@ export const Grid = memo(
 
       const page = snap.page
       const table = snap.table
-      const tableEntityType = snap.originalTable?.entity_type
-      const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
+      const isSelectedTable = isTableLike(snap.originalTable)
+      const isSelectedForeignTable = isForeignTable(snap.originalTable)
       const isTableEmpty = (rows ?? []).length === 0
+
+      const { can: canEditTables } = useAsyncCheckPermissions(
+        PermissionAction.TENANT_SQL_ADMIN_WRITE,
+        'tables'
+      )
+
+      const { can: canEditColumns } = useAsyncCheckPermissions(
+        PermissionAction.TENANT_SQL_ADMIN_WRITE,
+        'columns'
+      )
+
+      const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema ?? '' })
+
+      const hasPermissionToImportData = canEditTables && canEditColumns
+      const canImportData = !isSchemaLocked && isSelectedTable && hasPermissionToImportData
 
       const { mutate: sendEvent } = useSendEventMutation()
 
@@ -86,7 +107,7 @@ export const Grid = memo(
         onDragOver,
         onFileDrop,
       } = useCsvFileDrop({
-        enabled: isTableEmpty && !isForeignTable,
+        enabled: isTableEmpty && canImportData,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
           sendEvent({
@@ -98,6 +119,14 @@ export const Grid = memo(
           })
         },
       })
+
+      const emptyStateMessage = isDraggedOver
+        ? isValidFileDraggedOver
+          ? 'Drop your CSV file here'
+          : 'Only CSV files are accepted'
+        : 'This table is empty'
+
+      const messageClassName = isDraggedOver && !isValidFileDraggedOver ? 'text-destructive' : ''
 
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
@@ -174,52 +203,60 @@ export const Grid = memo(
                       </div>
                     </div>
                   ) : (filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light pointer-events-auto">
-                        {isDraggedOver ? (
-                          isValidFileDraggedOver ? (
-                            'Drop your CSV file here'
-                          ) : (
-                            <span className="text-destructive">Only CSV files are accepted</span>
-                          )
-                        ) : (
-                          'This table is empty'
-                        )}
-                      </p>
-                      {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
-                        <div className="flex items-center space-x-2 mt-4">
-                          <p className="text-sm text-light pointer-events-auto">
-                            This table is a foreign table. Add data to the connected source to get
-                            started.
-                          </p>
+                    <>
+                      {!canImportData ? (
+                        <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center pointer-events-auto">
+                          <div className="max-w-xl">
+                            {isSelectedForeignTable ? (
+                              <p className="text-sm text-light text-center">
+                                This table is a foreign table. Add data to the connected source to
+                                get started.
+                              </p>
+                            ) : !isSelectedTable ? (
+                              <Admonition
+                                type="default"
+                                className="max-w-sm"
+                                title="Can't import data into a non-table entity"
+                              />
+                            ) : isSchemaLocked ? (
+                              <ProtectedSchemaWarning schema={table.schema ?? ''} entity="table" />
+                            ) : (
+                              <NoPermission isFullPage resourceText="import data" />
+                            )}
+                          </div>
                         </div>
                       ) : (
-                        !isDraggedOver && (
-                          <div className="flex flex-col items-center gap-4 mt-4">
-                            <Button
-                              type="default"
-                              className="pointer-events-auto"
-                              onClick={() => {
-                                tableEditorSnap.onImportData()
-                                sendEvent({
-                                  action: 'import_data_button_clicked',
-                                  properties: { tableType: 'Existing Table' },
-                                  groups: {
-                                    project: project?.ref ?? 'Unknown',
-                                    organization: org?.slug ?? 'Unknown',
-                                  },
-                                })
-                              }}
-                            >
-                              Import data from CSV
-                            </Button>
-                            <p className="text-xs text-foreground-light pointer-events-auto">
-                              or drag and drop a CSV file here
-                            </p>
-                          </div>
-                        )
+                        <div className="flex flex-col items-center justify-center col-span-full h-full">
+                          <p className="text-sm text-light pointer-events-auto">
+                            <span className={messageClassName}>{emptyStateMessage}</span>
+                          </p>
+                          {!isDraggedOver && (
+                            <div className="flex flex-col items-center gap-4 mt-4">
+                              <Button
+                                type="default"
+                                className="pointer-events-auto"
+                                onClick={() => {
+                                  tableEditorSnap.onImportData()
+                                  sendEvent({
+                                    action: 'import_data_button_clicked',
+                                    properties: { tableType: 'Existing Table' },
+                                    groups: {
+                                      project: project?.ref ?? 'Unknown',
+                                      organization: org?.slug ?? 'Unknown',
+                                    },
+                                  })
+                                }}
+                              >
+                                Import data from CSV
+                              </Button>
+                              <p className="text-xs text-foreground-light pointer-events-auto">
+                                or drag and drop a CSV file here
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       )}
-                    </div>
+                    </>
                   ) : (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light pointer-events-auto">
