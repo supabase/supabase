@@ -25,8 +25,8 @@ Before you begin, make sure you have:
 
 **For authentication (Part 2):**
 
-- A sign-in method configured (e.g., [Google](/docs/guides/auth/social-login/auth-google)) in the [Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) - see [Auth Providers](/docs/guides/auth#providers) for email, phone, and social login options
-- ECC (P-256) signing keys enabled - [rotate keys here](https://supabase.com/dashboard/project/_/settings/jwt) if needed
+- A sign-in method configured (e.g., [Google](/docs/guides/auth/social-login/auth-google)) in the [Supabase dashboard](/dashboard/project/_/auth/providers) - see [Auth Providers](/docs/guides/auth#providers) for email, phone, and social login options
+- ECC (P-256) signing keys enabled - [rotate keys here](/dashboard/project/_/settings/jwt) if needed
 
 <Admonition type="caution">
 
@@ -225,7 +225,7 @@ This guide uses Supabase Auth, but you can use any OAuth-compatible provider. Su
 
 </Admonition>
 
-#### How MCP oauth authentication works
+#### How MCP OAuth authentication works
 
 Before implementing, understand the flow:
 
@@ -532,7 +532,7 @@ Since the consent page is a web application with its own UI, it needs to be host
    ```
 
 2. Deploy your app to your hosting platform (Vercel, Netlify, Render, etc.)
-3. Configure the consent page URL in [Authentication > OAuth Server](https://supabase.com/dashboard/project/_/auth/oauth-server) in your Supabase dashboard
+3. Configure the consent page URL in [Authentication > OAuth Server](/dashboard/project/_/auth/oauth-server) in your Supabase dashboard
 
 <Admonition type="tip">
 
