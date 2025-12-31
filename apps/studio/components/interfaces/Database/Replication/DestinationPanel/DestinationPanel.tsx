@@ -17,6 +17,7 @@ import { ReadReplicaForm } from './ReadReplicaForm'
 
 interface DestinationPanelProps {
   visible: boolean
+  type?: DestinationType
   existingDestination?: {
     sourceId?: number
     destinationId: number
@@ -29,13 +30,14 @@ interface DestinationPanelProps {
 
 export const DestinationPanel = ({
   visible,
+  type,
   existingDestination,
   onClose,
 }: DestinationPanelProps) => {
   const unifiedReplication = useFlag('unifiedReplication')
 
   const [selectedType, setSelectedType] = useState<DestinationType>(
-    unifiedReplication ? 'Read Replica' : 'BigQuery'
+    type || (unifiedReplication ? 'Read Replica' : 'BigQuery')
   )
 
   const editMode = !!existingDestination
