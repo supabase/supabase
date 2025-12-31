@@ -137,6 +137,18 @@ const Indexes = () => {
     }
   }, [isLoadingIndexes, selectedIndexName, setSelectedIndexName, selectedIndex])
 
+  useEffect(() => {
+    if (!isLoadingIndexes && indexNameToDelete !== null) {
+      if (isSchemaLocked) {
+        toast.error("Can't delete index because it is applied on a protected schema")
+        setIndexNameToDelete(null)
+      } else if (indexToDelete === undefined) {
+        toast.error('Index not found')
+        setIndexNameToDelete(null)
+      }
+    }
+  }, [isLoadingIndexes, indexNameToDelete, setIndexNameToDelete, isSchemaLocked])
+
   return (
     <>
       <div className="pb-8">
@@ -290,7 +302,7 @@ const Indexes = () => {
         variant="warning"
         size="medium"
         loading={isExecuting}
-        visible={indexToDelete !== undefined}
+        visible={!isSchemaLocked && indexToDelete !== undefined}
         title={
           <>
             Confirm to delete index <code className="text-sm">{indexToDelete?.name}</code>
