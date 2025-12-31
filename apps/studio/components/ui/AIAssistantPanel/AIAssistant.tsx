@@ -2,8 +2,7 @@ import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eraser, ExternalLink, Info, Pencil, X } from 'lucide-react'
-import Link from 'next/link'
+import { Eraser, Info, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -13,8 +12,6 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
-import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
-import { processIncidentData } from 'data/platform/incident-status-utils'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -108,10 +105,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = !!check?.hasKey
-
-  const { data: incidents } = useIncidentStatusQuery()
-  const hasActiveIncidents = incidents && incidents.length > 0
-  const incidentData = hasActiveIncidents ? processIncidentData(incidents) : null
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 
@@ -533,32 +526,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative flex flex-col gap-y-3">
-          {!hasMessages && hasActiveIncidents && incidentData && (
-            <Admonition
-              showIcon={false}
-              type="warning"
-              title={
-                incidents.length === 1 ? 'Active incident' : `${incidents.length} active incidents`
-              }
-              description={
-                <>
-                  {incidentData.mostCriticalIncident?.name}
-                  {incidents.length > 1 &&
-                    ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`}
-                  {'. '}
-                </>
-              }
-              actions={
-                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                    Status page
-                  </Link>
-                </Button>
-              }
-            />
-          )}
-
+        <div className="px-3 pb-3 z-20 relative">
           {disablePrompts && (
             <Admonition
               showIcon={false}
