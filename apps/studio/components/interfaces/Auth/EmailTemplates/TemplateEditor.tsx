@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'

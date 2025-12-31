@@ -1,3 +1,4 @@
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
@@ -5,8 +6,6 @@ import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { proxy, useSnapshot } from 'valtio'
 
-import { createClient } from '@supabase/supabase-js'
-import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   inverseValidObjectKeyRegex,
@@ -37,7 +36,7 @@ import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/
 import { InlineLink } from 'components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
@@ -49,6 +48,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
+import { createProjectSupabaseClient } from 'lib/project-supabase-client'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 
 type UploadProgress = {
@@ -97,29 +97,6 @@ function createStorageExplorerState({
     connectionString,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
-
-    supabaseClient: async () => {
-      try {
-        const { apiKey } = await getOrRefreshTemporaryApiKey(projectRef)
-
-        return createClient(clientEndpoint, apiKey, {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false,
-            storage: {
-              getItem: (key) => {
-                return null
-              },
-              setItem: (key, value) => {},
-              removeItem: (key) => {},
-            },
-          },
-        })
-      } catch (error) {
-        throw error
-      }
-    },
 
     // abortController,
     abortApiCalls: () => {
@@ -313,8 +290,6 @@ function createStorageExplorerState({
       columnIndex: number
       onError?: () => void
     }) => {
-      if (!state.supabaseClient) return console.error('Supabase Client is missing')
-
       const autofix = false
       const formattedName = state.sanitizeNameForDuplicateInColumn({
         name: folderName,
@@ -347,7 +322,8 @@ function createStorageExplorerState({
       const formattedPathToEmptyPlaceholderFile =
         pathToFolder.length > 0 ? `${pathToFolder}/${emptyPlaceholderFile}` : emptyPlaceholderFile
 
-      await (await state.supabaseClient()).storage
+      const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+      await client.storage
         .from(state.selectedBucket.name)
         .upload(
           formattedPathToEmptyPlaceholderFile,
@@ -362,7 +338,7 @@ function createStorageExplorerState({
         })
       }
 
-      const newFolder = state.columns[columnIndex].items?.find((x) => x.name === formattedName)
+      const newFolder = state.columns[columnIndex]?.items?.find((x) => x?.name === formattedName)
       if (newFolder) state.openFolder(columnIndex, newFolder)
     },
 
@@ -597,7 +573,8 @@ function createStorageExplorerState({
 
         if (data.length === 0) {
           const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
-          await (await state.supabaseClient!())?.storage
+          const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+          await client.storage
             .from(state.selectedBucket.name)
             .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
         }
@@ -818,9 +795,6 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
-        // Get authenticated Supabase client for Storage API access
-        const client = state.supabaseClient ? await state.supabaseClient() : undefined
-
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
           return () => {
@@ -833,9 +807,9 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
-                if (!client) {
-                  throw new Error('Supabase client not available')
-                }
+                // Get authenticated Supabase client for Storage API access
+                const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+
                 // Use Storage API directly instead of Management API to avoid throttling
                 const { data, error } = await client.storage
                   .from(state.selectedBucket.id)
@@ -1013,7 +987,7 @@ function createStorageExplorerState({
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
-        .find(configKeys.storage(state.projectRef))?.state.data as
+        .find({ queryKey: configKeys.storage(state.projectRef) })?.state.data as
         | ProjectStorageConfigResponse
         | undefined
       const fileSizeLimit = storageConfiguration?.fileSizeLimit
@@ -1517,10 +1491,7 @@ function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const client = state.supabaseClient ? await state.supabaseClient() : undefined
-        if (!client) {
-          throw new Error('Supabase client not available')
-        }
+        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
 
         // Use Storage API directly instead of Management API to avoid throttling
         const { data, error } = await client.storage
@@ -1564,10 +1535,7 @@ function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const client = state.supabaseClient ? await state.supabaseClient() : undefined
-        if (!client) {
-          throw new Error('Supabase client not available')
-        }
+        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
 
         const { data, error } = await client.storage
           .from(state.selectedBucket.id)
@@ -1756,7 +1724,10 @@ function createStorageExplorerState({
 
       if (hasSameNameInColumn) {
         if (autofix) {
-          const [fileName, fileExt] = name.split('.')
+          const fileNameSegments = name.split('.')
+          const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
+          const fileExt = fileNameSegments[fileNameSegments.length - 1]
+
           const dupeNameRegex = new RegExp(
             `${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`
           )
@@ -1899,14 +1870,9 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsV2Query({
+  const { data: endpointData, isSuccess: isSuccessSettings } = useProjectEndpointQuery({
     projectRef: project?.ref,
   })
-
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
-  const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
-  const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1918,6 +1884,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
+      const clientEndpoint = endpointData.endpoint
+      const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
@@ -1933,9 +1901,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     project?.connectionString,
     stateRef,
     isPaused,
-    resumableUploadUrl,
-    protocol,
-    endpoint,
+    endpointData?.endpoint,
     isSuccessSettings,
   ])
 

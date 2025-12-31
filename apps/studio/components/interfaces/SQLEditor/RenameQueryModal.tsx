@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { getContentById } from 'data/content/content-id-query'
@@ -13,6 +15,8 @@ import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
@@ -32,6 +36,7 @@ const RenameQueryModal = ({
   onComplete,
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
+  const router = useRouter()
   const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -51,7 +56,7 @@ const RenameQueryModal = ({
   const [nameInput, setNameInput] = useState(name)
   const [descriptionInput, setDescriptionInput] = useState(description)
 
-  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+  const { mutate: titleSql, isPending: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
     onSuccess: (data) => {
       const { title, description } = data
       setNameInput(title)
@@ -61,6 +66,8 @@ const RenameQueryModal = ({
       toast.error(`Failed to rename query: ${error.message}`)
     },
   })
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
 
   const generateTitle = async () => {
     if ('content' in snippet && isSQLSnippet) {
@@ -97,7 +104,7 @@ const RenameQueryModal = ({
         snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
       }
 
-      await upsertContent({
+      const changedSnippet = await upsertContent({
         projectRef: ref,
         payload: {
           ...localSnippet,
@@ -106,10 +113,27 @@ const RenameQueryModal = ({
         } as UpsertContentPayload,
       })
 
-      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      if (IS_PLATFORM) {
+        snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
 
-      const tabId = createTabId('sql', { id })
-      tabsSnap.updateTab(tabId, { label: nameInput })
+        const tabId = createTabId('sql', { id })
+        tabsSnap.updateTab(tabId, { label: nameInput })
+      } else if (changedSnippet) {
+        // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
+        // is removed, new one is added, tab state is updated and the router is updated.
+
+        // remove the old snippet from the state without saving to API
+        snapV2.removeSnippet(id, true)
+
+        snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
+
+        // remove the tab for the old snippet if the snippet was open. Renaming can also happen when the tab is not open.
+        const tabId = createTabId('sql', { id })
+        if (tabsSnap.hasTab(tabId)) {
+          tabsSnap.removeTab(tabId)
+          await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+        }
+      }
 
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()
@@ -149,11 +173,19 @@ const RenameQueryModal = ({
               />
               <div className="flex w-full justify-end mt-2">
                 {!hasHipaaAddon && (
-                  <Button
+                  <ButtonTooltip
                     type="default"
                     onClick={() => generateTitle()}
                     size="tiny"
-                    disabled={isTitleGenerationLoading}
+                    disabled={isTitleGenerationLoading || !isApiKeySet}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isApiKeySet
+                          ? undefined
+                          : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                      },
+                    }}
                   >
                     <div className="flex items-center gap-1">
                       <div className="scale-75">
@@ -161,7 +193,7 @@ const RenameQueryModal = ({
                       </div>
                       <span>Rename with Supabase AI</span>
                     </div>
-                  </Button>
+                  </ButtonTooltip>
                 )}
               </div>
               <Input.TextArea

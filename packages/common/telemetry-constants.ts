@@ -1083,6 +1083,94 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
+ * User clicks on Metrics API banner CTA button in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface MetricsAPIBannerCtaButtonClickedEvent {
+  action: 'metrics_api_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on a banner in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface MetricsAPIBannerDismissButtonClickedEvent {
+  action: 'metrics_api_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor banner enable button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorBannerEnableButtonClickedEvent {
+  action: 'index_advisor_banner_enable_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor dialog enable button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorDialogEnableButtonClickedEvent {
+  action: 'index_advisor_dialog_enable_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor banner dimissed event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorBannerDismissButtonClickedEvent {
+  action: 'index_advisor_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor tab clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorTabClickedEvent {
+  action: 'index_advisor_tab_clicked'
+  properties: {
+    hasRecommendations: boolean
+    isIndexAdvisorEnabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor create indexes button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorCreateIndexesButtonClickedEvent {
+  action: 'index_advisor_create_indexes_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the deploy button for an Edge Function.
  *
  * @group Events
@@ -1617,24 +1705,6 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
- * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorAskAssistantClickedEvent {
-  action: 'home_advisor_ask_assistant_clicked'
-  properties: {
-    /**
-     * Number of issues found by the advisor
-     */
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User was exposed to the realtime experiment (shown or not shown the Enable Realtime button).
  *
  * @group Events
@@ -1656,51 +1726,6 @@ export interface RealtimeExperimentExposedEvent {
      * Days since project creation (to segment by new user cohorts)
      */
     days_since_project_creation: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on an issue card in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorIssueCardClickedEvent {
-  action: 'home_advisor_issue_card_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the Fix Issue button on an advisor card in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorFixIssueClickedEvent {
-  action: 'home_advisor_fix_issue_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
   }
   groups: TelemetryGroups
 }
@@ -1908,6 +1933,10 @@ export interface TableCreatedEvent {
      * Name of the table created
      */
     table_name?: string
+    /**
+     * Whether RLS policies were generated and saved with the table
+     */
+    has_generated_policies?: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -1962,6 +1991,104 @@ export interface TableRLSEnabledEvent {
     table_name?: string
   }
   groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the generate policies button in the table editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RLSGeneratePoliciesClickedEvent {
+  action: 'rls_generate_policies_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User removed a generated policy from the table editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RLSGeneratedPolicyRemovedEvent {
+  action: 'rls_generated_policy_removed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully created generated RLS policies for a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RLSGeneratedPoliciesCreatedEvent {
+  action: 'rls_generated_policies_created'
+  groups: TelemetryGroups
+}
+
+/**
+ * Conversion event for the generate policies experiment.
+ * Fires when a user in the experiment creates a new table via table editor.
+ * This is separate from TableCreatedEvent to keep experiment tracking isolated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
+  action: 'table_create_generate_policies_experiment_converted'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'tableCreateGeneratePolicies'
+    /**
+     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     */
+    variant: 'control' | 'treatment'
+    /**
+     * Whether RLS was enabled on the table
+     */
+    has_rls_enabled: boolean
+    /**
+     * Whether the table was created with any RLS policies (manual or generated)
+     */
+    has_rls_policies: boolean
+    /**
+     * Whether AI-generated policies were used (only possible in treatment)
+     */
+    has_generated_policies: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the generate policies experiment (shown or not shown the Generate Policies button).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableCreateGeneratePoliciesExperimentExposedEvent {
+  action: 'table_create_generate_policies_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'tableCreateGeneratePolicies'
+    /**
+     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     */
+    variant: 'control' | 'treatment'
+    /**
+     * Days since project creation (to segment by new user cohorts)
+     */
+    days_since_project_creation: number
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -2349,6 +2476,223 @@ export interface LogDrainConfirmButtonSubmittedEvent {
   groups: TelemetryGroups
 }
 
+type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
+
+/**
+ * User opened an advisor detail page to view a specific advisor (lint or notification).
+ * This tracks when users engage with advisor recommendations.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ */
+export interface AdvisorDetailOpenedEvent {
+  action: 'advisor_detail_opened'
+  properties: {
+    /**
+     * Where the advisor was viewed from
+     */
+    origin: 'homepage' | 'advisor_panel' | 'advisors_page'
+    /**
+     * Source of the advisor
+     */
+    advisorSource: 'lint' | 'notification'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategory?: AdvisorCategory
+    /**
+     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     */
+    advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Assistant button to get AI help with an advisor issue.
+ * This opens the AI Assistant sidebar with a pre-filled prompt about the issue.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ */
+export interface AdvisorAssistantButtonClickedEvent {
+  action: 'advisor_assistant_button_clicked'
+  properties: {
+    /**
+     * Where the button was clicked
+     */
+    origin: 'homepage' | 'lint_detail'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategory?: AdvisorCategory
+    /**
+     * Specific advisor type/name
+     */
+    advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+    /**
+     * Number of issues found (only included when origin is 'homepage')
+     */
+    issuesCount?: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on "Explain with AI" button in Query Performance detail panel
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/query-performance
+ */
+export interface QueryPerformanceAIExplanationButtonClickedEvent {
+  action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the request upgrade modal (for users without billing permissions).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RequestUpgradeModalOpenedEvent {
+  action: 'request_upgrade_modal_opened'
+  properties: {
+    /** Target plan being requested */
+    requestedPlan: 'Pro' | 'Team' | 'Enterprise'
+    /** Addon being requested, if applicable */
+    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    /** Current organization plan */
+    currentPlan?: string
+    /** Feature context driving the upgrade request */
+    featureProposition?: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User submitted a request upgrade form to billing owners.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RequestUpgradeSubmittedEvent {
+  action: 'request_upgrade_submitted'
+  properties: {
+    /** Target plan being requested */
+    requestedPlan: 'Pro' | 'Team' | 'Enterprise'
+    /** Addon being requested, if applicable */
+    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    /** Current organization plan */
+    currentPlan?: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User successfully installed an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstalledEvent {
+  action: 'integration_installed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started installing an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallStartedEvent {
+  action: 'integration_install_started'
+  properties: {
+    /**
+     * The name of the integration being installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started uninstalling an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallStartedEvent {
+  action: 'integration_uninstall_started'
+  properties: {
+    /**
+     * The name of the integration being uninstalled
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Installation failed for an integration.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallFailedEvent {
+  action: 'integration_install_failed'
+  properties: {
+    /**
+     * The name of the integration whose installation failed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User uninstalled an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstalledEvent {
+  action: 'integration_uninstalled'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -2421,6 +2765,13 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
+  | MetricsAPIBannerCtaButtonClickedEvent
+  | MetricsAPIBannerDismissButtonClickedEvent
+  | IndexAdvisorBannerEnableButtonClickedEvent
+  | IndexAdvisorBannerDismissButtonClickedEvent
+  | IndexAdvisorDialogEnableButtonClickedEvent
+  | IndexAdvisorTabClickedEvent
+  | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent
@@ -2451,9 +2802,6 @@ export type TelemetryEvent =
   | HomeGettingStartedClosedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
-  | HomeAdvisorAskAssistantClickedEvent
-  | HomeAdvisorIssueCardClickedEvent
-  | HomeAdvisorFixIssueClickedEvent
   | RealtimeExperimentExposedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
@@ -2465,6 +2813,11 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | RLSGeneratePoliciesClickedEvent
+  | RLSGeneratedPolicyRemovedEvent
+  | RLSGeneratedPoliciesCreatedEvent
+  | TableCreateGeneratePoliciesExperimentExposedEvent
+  | TableCreateGeneratePoliciesExperimentConvertedEvent
   | TableQuickstartOpenedEvent
   | TableQuickstartAIPromptSubmittedEvent
   | TableQuickstartAIGenerationCompletedEvent
@@ -2480,3 +2833,13 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
+  | AdvisorDetailOpenedEvent
+  | AdvisorAssistantButtonClickedEvent
+  | QueryPerformanceAIExplanationButtonClickedEvent
+  | RequestUpgradeModalOpenedEvent
+  | RequestUpgradeSubmittedEvent
+  | IntegrationInstalledEvent
+  | IntegrationInstallStartedEvent
+  | IntegrationUninstallStartedEvent
+  | IntegrationInstallFailedEvent
+  | IntegrationUninstalledEvent

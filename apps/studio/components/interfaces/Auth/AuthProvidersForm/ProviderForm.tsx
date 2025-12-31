@@ -4,6 +4,7 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
+import { useTheme } from 'next-themes'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -33,12 +34,13 @@ interface ProviderFormProps {
 const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
 
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
 
   const [open, setOpen] = useState(false)
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -141,7 +143,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         onClick={handleProviderClick}
         media={
           <img
-            src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
+            src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}${provider.misc.hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
             width={18}
             height={18}
             alt={`${provider.title} auth icon`}
@@ -169,7 +171,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         <SheetContent className="flex flex-col gap-0">
           <SheetHeader className="shrink-0 flex items-center gap-4">
             <img
-              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
+              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}${provider.misc.hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
               width={18}
               height={18}
               alt={`${provider.title} auth icon`}

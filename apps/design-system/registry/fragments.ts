@@ -8,15 +8,15 @@ export const fragments: Registry = [
     optionalPath: '/Dialogs',
   },
   {
+    name: 'EmptyStatePresentational',
+    type: 'components:fragment',
+    files: ['/EmptyStatePresentational/index.tsx'],
+    optionalPath: '/EmptyStatePresentational',
+  },
+  {
     name: 'TextConfirmModal',
     type: 'components:fragment',
     files: ['/Dialogs/TextConfirmModal.tsx'],
-    optionalPath: '/Dialogs',
-  },
-  {
-    name: 'ConfirmDialog',
-    type: 'components:fragment',
-    files: ['/Dialogs/ConfirmDialog.tsx'],
     optionalPath: '/Dialogs',
   },
   {
