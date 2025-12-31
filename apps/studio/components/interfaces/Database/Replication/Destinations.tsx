@@ -62,7 +62,8 @@ export const Destinations = () => {
     projectRef,
   })
 
-  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+  const hasDestinations =
+    isDestinationsSuccess && destinationsData && destinationsData.destinations.length > 0
 
   const filteredDestinations =
     filterString.length === 0
