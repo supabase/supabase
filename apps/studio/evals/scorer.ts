@@ -1,5 +1,6 @@
-import { EvalCase, EvalScorer } from 'braintrust'
+import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
+import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 
@@ -8,6 +9,7 @@ const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 type Input = string
 
 type Output = {
+  finishReason: FinishReason
   stepsSerialized: string
   textOnly: string
   toolNames: string[]

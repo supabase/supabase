@@ -28,6 +28,8 @@ Eval('Assistant', {
       tools: await getMockTools(),
     })
 
+    const finishReason = await result.finishReason
+
     // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
     const steps = await result.steps
 
@@ -72,6 +74,7 @@ Eval('Assistant', {
     }
 
     return {
+      finishReason,
       stepsSerialized,
       textOnly,
       toolNames,
