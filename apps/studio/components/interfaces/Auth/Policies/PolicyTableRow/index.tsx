@@ -1,6 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { memo, useMemo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -83,18 +83,25 @@ const PolicyTableRowComponent = ({
 
   const showPolicies = !isPoliciesLoading && !isPoliciesError
 
+  const shouldHideHeaderBorder =
+    isPubliclyReadableWritable ||
+    rlsEnabledNoPolicies ||
+    !isTableExposedThroughAPI ||
+    isApiDisabledDueToRoles
+
+  const getAdmonitionMessage = useCallback(() => {
+    if (isPubliclyReadableWritable) {
+      return 'This table can be accessed by anyone via the Data API as RLS is disabled.'
+    }
+    if (isApiDisabledDueToRoles) {
+      return 'This table cannot be accessed via the Data API as no permissions exist for the anon or authenticated roles.'
+    }
+    return 'This table can be accessed via the Data API but no RLS policies exist so no data will be returned.'
+  }, [isPubliclyReadableWritable, isApiDisabledDueToRoles])
+
   return (
     <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
-      <CardHeader
-        className={cn(
-          'py-3 px-4',
-          (isPubliclyReadableWritable ||
-            rlsEnabledNoPolicies ||
-            !isTableExposedThroughAPI ||
-            isApiDisabledDueToRoles) &&
-            'border-b-0'
-        )}
-      >
+      <CardHeader className={cn('py-3 px-4', shouldHideHeaderBorder && 'border-b-0')}>
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
@@ -125,13 +132,7 @@ const PolicyTableRowComponent = ({
             type={isPubliclyReadableWritable ? 'warning' : 'default'}
             className="border-0 border-y rounded-none min-h-12 flex items-center"
           >
-            <p>
-              {isPubliclyReadableWritable
-                ? 'This table can be accessed by anyone via the Data API as RLS is disabled.'
-                : isApiDisabledDueToRoles
-                  ? 'This table cannot be accessed via the Data API as no permissions exist for the anon or authenticated roles.'
-                  : 'This table can be accessed via the Data API but no RLS policies exist so no data will be returned.'}
-            </p>
+            <p>{getAdmonitionMessage()}</p>
           </Admonition>
         )}
 
