@@ -12,7 +12,7 @@ import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from 'lib/constants'
 import { Button, cn, Input } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -22,8 +22,8 @@ import { EnableReplicationModal } from './EnableReplicationModal'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 export const Destinations = () => {
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
+  const { hasAccess: hasReplicationAccess, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('replication.etl')
 
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [filterString, setFilterString] = useState<string>('')
@@ -132,19 +132,19 @@ export const Destinations = () => {
           />
         )}
 
-        {isSourcesLoading || isDestinationsLoading ? (
+        {isSourcesLoading || isDestinationsLoading || isLoadingEntitlement ? (
           <GenericSkeletonLoader />
         ) : replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
               <h3>Replicate data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating
-                your database changes to data warehouses and analytics platforms
+                {hasReplicationAccess ? 'Enable replication' : 'Upgrade to the Pro plan'} to start
+                replicating your database changes to data warehouses and analytics platforms
               </p>
             </div>
             <div className="flex gap-x-2">
-              {isPaidPlan ? (
+              {hasReplicationAccess ? (
                 <EnableReplicationModal />
               ) : (
                 <UpgradePlanButton source="replication" featureProposition="use replication" />
