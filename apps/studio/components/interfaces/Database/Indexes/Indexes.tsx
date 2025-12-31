@@ -69,7 +69,10 @@ const Indexes = () => {
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const indexToDelete = allIndexes !== undefined ? allIndexes.find((index) => index.name === indexNameToDelete) : undefined
+  const indexToDelete =
+    allIndexes !== undefined
+      ? allIndexes.find((index) => index.name === indexNameToDelete)
+      : undefined
 
   const {
     data: schemas,
@@ -280,9 +283,7 @@ const Indexes = () => {
         }
         confirmLabel="Confirm delete"
         confirmLabelLoading="Deleting..."
-        onConfirm={() =>
-          indexToDelete !== undefined ? onConfirmDeleteIndex(indexToDelete) : {}
-        }
+        onConfirm={() => (indexToDelete !== undefined ? onConfirmDeleteIndex(indexToDelete) : {})}
         onCancel={() => setIndexNameToDelete(null)}
         alert={{
           title: 'This action cannot be undone',

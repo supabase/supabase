@@ -38,6 +38,7 @@ import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -48,6 +49,8 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
+  const { data: protectedSchemas } = useProtectedSchemas()
+
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
@@ -56,10 +59,13 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: AllSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = (AllSchemas ?? []).filter(
+    (schema) => !protectedSchemas.some((_schema) => _schema.name === schema.name)
+  )
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
@@ -187,9 +193,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 sameWidthAsTrigger
               >
                 <Command_Shadcn_>
-                  <CommandInput_Shadcn_
-                    placeholder="Find table..."
-                  />
+                  <CommandInput_Shadcn_ placeholder="Find table..." />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
