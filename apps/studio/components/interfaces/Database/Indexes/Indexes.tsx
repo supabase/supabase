@@ -11,7 +11,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -64,14 +64,12 @@ const Indexes = () => {
     onError: () => toast.error(`Index not found`),
   })
 
-  const { setValue: setSelectedIndexNameToDelete, value: selectedIndexToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'delete',
-      select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-      enabled: !!allIndexes,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingIndexNameRef, selectedId, `Index not found`),
-    })
+  const [indexNameToDelete, setIndexNameToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const indexToDelete = allIndexes !== undefined ? allIndexes.find((index) => index.name === indexNameToDelete) : undefined
 
   const {
     data: schemas,
@@ -85,7 +83,7 @@ const Indexes = () => {
 
   const { mutate: deleteIndex, isPending: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setSelectedIndexNameToDelete(null)
+      setIndexNameToDelete(null)
       toast.success('Successfully deleted index')
     },
   })
@@ -230,7 +228,7 @@ const Indexes = () => {
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}
-                                  onClick={() => setSelectedIndexNameToDelete(index.name)}
+                                  onClick={() => setIndexNameToDelete(index.name)}
                                 />
                               )}
                             </div>
@@ -274,18 +272,18 @@ const Indexes = () => {
         variant="warning"
         size="medium"
         loading={isExecuting}
-        visible={!!selectedIndexToDelete}
+        visible={indexToDelete !== undefined}
         title={
           <>
-            Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index <code className="text-sm">{indexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"
         confirmLabelLoading="Deleting..."
         onConfirm={() =>
-          selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
+          indexToDelete !== undefined ? onConfirmDeleteIndex(indexToDelete) : {}
         }
-        onCancel={() => setSelectedIndexNameToDelete(null)}
+        onCancel={() => setIndexNameToDelete(null)}
         alert={{
           title: 'This action cannot be undone',
           description:
