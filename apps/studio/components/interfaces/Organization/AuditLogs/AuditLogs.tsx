@@ -76,6 +76,7 @@ export const AuditLogs = () => {
     isSuccess,
     isError,
     isRefetching,
+    fetchStatus,
     refetch,
   } = useOrganizationAuditLogsQuery(
     {
@@ -256,7 +257,9 @@ export const AuditLogs = () => {
               </div>
             )}
 
-            {isLoading || isLoadingPermissions || isLoadingEntitlements ? (
+            {(isLoading && fetchStatus !== 'idle') ||
+            isLoadingPermissions ||
+            isLoadingEntitlements ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
