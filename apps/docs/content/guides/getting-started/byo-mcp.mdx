@@ -457,11 +457,9 @@ async function authMiddleware(c: Context, next: Next) {
 
   const [scheme, token] = authHeader.split(' ')
   if (scheme?.toLowerCase() !== 'bearer' || !token) {
-    return c.json(
-      { error: 'invalid_request', error_description: 'Bearer token required' },
-      401,
-      { 'WWW-Authenticate': buildWwwAuthenticateHeader(c, 'invalid_request', 'Bearer token required') }
-    )
+    return c.json({ error: 'invalid_request', error_description: 'Bearer token required' }, 401, {
+      'WWW-Authenticate': buildWwwAuthenticateHeader(c, 'invalid_request', 'Bearer token required'),
+    })
   }
 
   const { valid, user, error } = await validateToken(c, token)
