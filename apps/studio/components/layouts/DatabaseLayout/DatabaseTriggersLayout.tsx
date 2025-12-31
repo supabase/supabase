@@ -22,8 +22,8 @@ const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
       href: `/project/${ref}/database/triggers/data`,
     },
     {
-      label: 'Events',
-      href: `/project/${ref}/database/triggers/events`,
+      label: 'Event',
+      href: `/project/${ref}/database/triggers/event`,
     },
   ]
 

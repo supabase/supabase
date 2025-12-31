@@ -97,7 +97,7 @@ export const BannerRlsEventTrigger = () => {
         <div className="flex gap-2">
           {hasCreated ? (
             <Button asChild type="default" size="tiny">
-              <Link href={`/project/${ref}/database/triggers/events`}>View triggers</Link>
+              <Link href={`/project/${ref}/database/triggers/event`}>View triggers</Link>
             </Button>
           ) : (
             <ButtonTooltip
