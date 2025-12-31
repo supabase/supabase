@@ -238,7 +238,7 @@ services:
     image: supabase/storage-api:v1.33.0
     restart: unless-stopped
     volumes:
-      - storage_data:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
     healthcheck:
       test:
         [
@@ -282,7 +282,7 @@ services:
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     volumes:
-      - storage_data:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
     healthcheck:
       test:
         [
@@ -533,4 +533,3 @@ services:
 
 volumes:
   db-config:
-  storage_data:
