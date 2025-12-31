@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -11,7 +11,6 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -57,12 +56,18 @@ const Indexes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { setValue: setSelectedIndexName, value: selectedIndex } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-    enabled: !!allIndexes,
-    onError: () => toast.error(`Index not found`),
-  })
+  const [selectedIndexName, setSelectedIndexName] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const selectedIndex = useMemo(
+    () =>
+      allIndexes !== undefined
+        ? allIndexes.find((index) => index.name === selectedIndexName)
+        : undefined,
+    [selectedIndexName, allIndexes]
+  )
 
   const [indexNameToDelete, setIndexNameToDelete] = useQueryState(
     'delete',
@@ -121,6 +126,13 @@ const Indexes = () => {
   useEffect(() => {
     if (table !== undefined) setSearch(table)
   }, [table])
+
+  useEffect(() => {
+    if (!isLoadingIndexes && selectedIndexName !== null && selectedIndex === undefined) {
+      toast.error('Index not found')
+      setSelectedIndexName(null)
+    }
+  }, [isLoadingIndexes, selectedIndexName, setSelectedIndexName, selectedIndex])
 
   return (
     <>
@@ -248,7 +260,7 @@ const Indexes = () => {
 
       <SidePanel
         size="xlarge"
-        visible={!!selectedIndex}
+        visible={selectedIndex !== undefined}
         header={
           <>
             <span>Index:</span>
