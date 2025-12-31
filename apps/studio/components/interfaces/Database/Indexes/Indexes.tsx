@@ -147,7 +147,7 @@ const Indexes = () => {
         setIndexNameToDelete(null)
       }
     }
-  }, [isLoadingIndexes, indexNameToDelete, setIndexNameToDelete, isSchemaLocked])
+  }, [isLoadingIndexes, indexNameToDelete, setIndexNameToDelete, isSchemaLocked, indexToDelete])
 
   return (
     <>
