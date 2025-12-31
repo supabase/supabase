@@ -36,11 +36,11 @@ export const dataset: AssistantEvalCase[] = [
     metadata: { category: ['sql_generation', 'database_optimization'] },
   },
   {
-    input: 'How do I restore objects in Storage buckets when versioning is enabled?',
+    input: 'Restore my Supabase Storage files to the state from 3 days ago',
     expected: {
       requiredTools: ['search_docs'],
       correctAnswer:
-        'Object restoration is not possible in Storage buckets with versioning. Database backups do not include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.',
+        'There is no way to restore these files. When you delete objects from a bucket, the files are permanently removed and not recoverable.',
     },
     metadata: { category: ['general_help'] },
   },
