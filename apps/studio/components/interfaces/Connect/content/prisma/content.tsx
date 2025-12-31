@@ -50,6 +50,7 @@ DATABASE_URL="${IS_PLATFORM ? `${connectionStringPooler.transactionShared}?pgbou
 DIRECT_URL="${IS_PLATFORM ? connectionStringPooler.sessionShared : connectionStringPooler.direct}"
 `}
         </SimpleCodeBlock>
+        
       </ConnectTabContent>
 
       <ConnectTabContent value="prisma/schema.prisma">
