@@ -525,8 +525,14 @@ Since the consent page is a web application with its own UI, it needs to be host
 
 #### Deploy the consent page
 
-1. Clone or deploy the [Next.js consent page example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs-oauth-consent) to your hosting platform
-2. Configure the consent page URL in [Authentication > OAuth Server](https://supabase.com/dashboard/project/_/auth/oauth-server) in your Supabase dashboard
+1. Add the OAuth consent page to your Next.js app using the [Supabase UI Library](https://ui.supabase.com/docs/nextjs/oauth-consent):
+
+   ```bash
+   npx shadcn@latest add https://ui.supabase.com/r/oauth-consent-nextjs.json
+   ```
+
+2. Deploy your app to your hosting platform (Vercel, Netlify, Render, etc.)
+3. Configure the consent page URL in [Authentication > OAuth Server](https://supabase.com/dashboard/project/_/auth/oauth-server) in your Supabase dashboard
 
 <Admonition type="tip">
 
@@ -667,8 +673,7 @@ You can find ready-to-use MCP server implementations here:
 
 - [Simple MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/simple-mcp-server) - Basic unauthenticated example
 - [Authenticated MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server) - With OAuth authentication
-- [Consent page](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs-oauth-consent) - Next.js OAuth consent UI
-- [OAuth Consent Page block](https://ui.supabase.com/docs/nextjs/oauth-consent) - Supabase UI Kit block for consent pages
+- [OAuth Consent Page](https://ui.supabase.com/docs/nextjs/oauth-consent) - Supabase UI Library block for consent pages
 
 ## Resources
 
