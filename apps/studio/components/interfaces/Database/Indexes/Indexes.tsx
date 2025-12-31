@@ -74,10 +74,13 @@ const Indexes = () => {
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const indexToDelete =
-    allIndexes !== undefined
-      ? allIndexes.find((index) => index.name === indexNameToDelete)
-      : undefined
+  const indexToDelete = useMemo(
+    () =>
+      allIndexes !== undefined
+        ? allIndexes.find((index) => index.name === indexNameToDelete)
+        : undefined,
+    [indexNameToDelete, allIndexes]
+  )
 
   const {
     data: schemas,
