@@ -15,14 +15,6 @@ const STATUSPAGE_API_URL = 'https://api.statuspage.io/v1'
 const STATUSPAGE_PAGE_ID = process.env.STATUSPAGE_PAGE_ID
 const STATUSPAGE_API_KEY = process.env.STATUSPAGE_API_KEY
 
-/**
- * For development testing: Set MOCK_INCIDENT_STATUS env var with JSON array of incidents.
- * Example in .env.local:
- * MOCK_INCIDENT_STATUS='[{"id":"123","name":"Test incident","status":"investigating","impact":"major","active_since":"2025-01-15T08:00:00Z"}]'
- */
-// const MOCK_INCIDENT_STATUS = process.env.MOCK_INCIDENT_STATUS
-const MOCK_INCIDENT_STATUS = false
-
 function getIncidentsEndpoint(): string {
   return `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/incidents/unresolved`
 }
@@ -38,40 +30,14 @@ const StatusPageIncidentsSchema = z.array(
   })
 )
 
-const IncidentInfoSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    status: z.string(),
-    impact: z.string().optional().default('none'),
-    active_since: z.string(),
-  })
-)
-
 /**
  * Fetches active incidents from the StatusPage API.
  * This function is used both by the API route and the AI assistant.
- *
- * For development testing, set MOCK_INCIDENT_STATUS env var with JSON array of incidents.
  *
  * @returns Array of active incidents
  * @throws InternalServerError if StatusPage is not configured or returns an error
  */
 export async function getActiveIncidents(): Promise<IncidentInfo[]> {
-  // Development mock support
-  if (MOCK_INCIDENT_STATUS) {
-    try {
-      const mockData = JSON.parse(MOCK_INCIDENT_STATUS)
-      const result = IncidentInfoSchema.safeParse(mockData)
-      if (result.success) {
-        return result.data
-      }
-      console.warn('MOCK_INCIDENT_STATUS is invalid, ignoring:', result.error.issues)
-    } catch (e) {
-      console.warn('MOCK_INCIDENT_STATUS is not valid JSON, ignoring')
-    }
-  }
-
   if (!IS_PLATFORM) {
     return []
   }
