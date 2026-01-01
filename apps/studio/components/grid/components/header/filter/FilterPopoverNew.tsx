@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useDebounce } from '@uidotdev/usehooks'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
@@ -162,11 +162,11 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   )
 
   // Handle filter changes from FilterBar
-  const handleFilterChange = (newFilterGroup: FilterGroup) => {
+  const handleFilterChange = useCallback((newFilterGroup: FilterGroup) => {
     const newFilters = filterGroupToFilters(newFilterGroup)
     // Update local state immediately for responsive UI
     setLocalFilters(newFilters)
-  }
+  }, [])
 
   const actions = useMemo(
     () => [
@@ -192,7 +192,7 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
         },
       },
     ],
-    [generateFilters, serializableFilterProperties]
+    [generateFilters, serializableFilterProperties, handleFilterChange, setFreeformText]
   )
 
   return (
