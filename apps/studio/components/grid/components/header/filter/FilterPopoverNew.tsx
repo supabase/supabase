@@ -91,8 +91,8 @@ const toOptionText = (option: OptionLike): string | null => {
   if (typeof option === 'string') return option
   if (!isOptionRecord(option)) return null
 
-  const value = option.value
-  const label = option.label
+  const value = 'value' in option ? option.value : undefined
+  const label = 'label' in option ? option.label : undefined
   const hasValue = typeof value === 'string'
   const hasLabel = typeof label === 'string'
 
