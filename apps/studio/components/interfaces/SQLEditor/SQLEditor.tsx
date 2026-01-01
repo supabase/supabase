@@ -231,7 +231,8 @@ export const SQLEditor = () => {
     async (id: string, sql: string) => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
-        snapV2.renameSnippet({ id, name })
+        snapV2.updateSnippet({ id, snippet: { name } })
+        snapV2.addNeedsSaving(id)
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
       } catch (error) {
