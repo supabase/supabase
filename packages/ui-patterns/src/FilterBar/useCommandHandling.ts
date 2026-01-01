@@ -107,14 +107,7 @@ export function useCommandHandling({
       }
       onFreeformTextChange('')
     },
-    [
-      activeInput,
-      filterProperties,
-      activeFilters,
-      onFreeformTextChange,
-      handlePropertySelection,
-      handlePropertySelection,
-    ]
+    [activeInput, filterProperties, activeFilters, onFreeformTextChange, handlePropertySelection]
   )
 
   const handleItemSelect = useCallback(
@@ -153,6 +146,7 @@ export function useCommandHandling({
       activeInput,
       activeFilters,
       freeformText,
+      setActiveInput,
       handleGroupCommand,
       handleValueCommand,
       handleOperatorCommand,

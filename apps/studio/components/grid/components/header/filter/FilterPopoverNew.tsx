@@ -11,6 +11,7 @@ import {
   CustomOptionProps,
   FilterBar,
   FilterGroup,
+  FilterOption,
   FilterProperty,
   isGroup,
   SerializableFilterProperty,
@@ -81,6 +82,25 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
   )
 }
 
+type OptionLike = FilterOption | null | undefined
+
+const isOptionRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const toOptionText = (option: OptionLike): string | null => {
+  if (typeof option === 'string') return option
+  if (!isOptionRecord(option)) return null
+
+  const value = option.value
+  const label = option.label
+  const hasValue = typeof value === 'string'
+  const hasLabel = typeof label === 'string'
+
+  if (hasValue && hasLabel) return value || label
+  if (hasLabel) return label
+  return null
+}
+
 function serializeFilterProperties(
   filterProperties: FilterProperty[]
 ): SerializableFilterProperty[] {
@@ -90,16 +110,7 @@ function serializeFilterProperties(
     type: property.type,
     operators: property.operators,
     options: Array.isArray(property.options)
-      ? property.options
-          .map((option) => {
-            if (typeof option === 'string') return option
-            const hasValue = typeof (option as any)?.value === 'string'
-            const hasLabel = typeof (option as any)?.label === 'string'
-            if (hasValue && hasLabel) return (option as any).value || (option as any).label
-            if (hasLabel) return (option as any).label
-            return null
-          })
-          .filter((value): value is string => Boolean(value))
+      ? property.options.map(toOptionText).filter((value): value is string => Boolean(value))
       : undefined,
   }))
 }
@@ -122,10 +133,11 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   // Convert filters to FilterGroup for the FilterBar
   const filterGroup = useMemo(() => filtersToFilterGroup(localFilters), [localFilters])
 
+  const columns = useMemo(() => snap.table?.columns ?? [], [snap.table?.columns])
+
   // Create filter properties from table columns
   // Add the date picker component for date columns (can't be in utils due to React component)
   const filterProperties: FilterProperty[] = useMemo(() => {
-    const columns = snap.table?.columns ?? []
     return columns.map((column) => {
       const property = columnToFilterProperty(column)
       if (property.type === 'date' && Array.isArray(property.options)) {
@@ -142,7 +154,7 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
       }
       return property
     })
-  }, [snap.table?.columns])
+  }, [columns])
 
   const serializableFilterProperties = useMemo(
     () => serializeFilterProperties(filterProperties),
