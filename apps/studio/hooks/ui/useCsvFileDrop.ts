@@ -2,6 +2,7 @@ import { type DragEvent, useCallback, useState } from 'react'
 
 import { type ImportDataFileDroppedEvent } from 'common/telemetry-constants'
 import { flagInvalidFileImport } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+import { UPLOAD_FILE_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.constants'
 
 interface UseCsvFileDropOptions {
   enabled: boolean
@@ -35,7 +36,10 @@ export function useCsvFileDrop({
 
       if (event.type === 'dragover' && !isDraggedOver) {
         setIsDraggedOver(true)
-        setIsValidFile(item.type === 'text/csv')
+        // Can't check extension because browsers don't expose the files while being dragged
+        // for security reasons. Only their metadata (mime type) is available to us before the drop
+        // event
+        setIsValidFile(item.type.length === 0 || UPLOAD_FILE_TYPES.includes(item.type))
       } else if (event.type === 'dragleave' || event.type === 'drop') {
         setIsDraggedOver(false)
         setIsValidFile(false)

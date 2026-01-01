@@ -140,9 +140,9 @@ export const SpreadsheetImport = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handler = useCallback(debounce(readSpreadsheetText, debounceDuration), [])
-  const onInputChange = (event: any) => {
-    setInput(event.target.value)
-    handler(event.target.value)
+  const onInputChange = (value: string) => {
+    setInput(value)
+    handler(value)
   }
 
   const onToggleHeader = (header: string) => {
