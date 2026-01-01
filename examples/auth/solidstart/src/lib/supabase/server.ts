@@ -1,10 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { getCookie, getHeader, setCookie } from 'vinxi/http'
+import { getSupabaseConfig } from './config'
 
 export function getSupabaseServerClient() {
+  const { url, anonKey } = getSupabaseConfig()
   return createServerClient(
-    import.meta.env.VITE_SUPABASE_URL!,
-    import.meta.env.VITE_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {

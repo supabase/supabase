@@ -1,10 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
-import { getCookie, getHeader, setCookie } from 'vinxi/http'
+import { getHeader, setCookie } from 'vinxi/http'
+import { getSupabaseConfig } from './config'
 
 export async function updateSession() {
+  const { url, anonKey } = getSupabaseConfig()
   const supabase = createServerClient(
-    import.meta.env.VITE_SUPABASE_URL!,
-    import.meta.env.VITE_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {

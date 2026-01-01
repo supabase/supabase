@@ -3,8 +3,20 @@ import { getSupabaseServerClient } from '~/lib/supabase/server'
 
 const loginAction = action(async (formData: FormData) => {
   'use server'
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const emailEntry = formData.get('email')
+  const passwordEntry = formData.get('password')
+
+  // Validate that fields exist and are non-empty
+  if (!emailEntry || typeof emailEntry !== 'string' || !emailEntry.trim()) {
+    return { error: 'Email is required' }
+  }
+
+  if (!passwordEntry || typeof passwordEntry !== 'string' || !passwordEntry.trim()) {
+    return { error: 'Password is required' }
+  }
+
+  const email = emailEntry.toString()
+  const password = passwordEntry.toString()
 
   const supabase = getSupabaseServerClient()
   const { error } = await supabase.auth.signInWithPassword({

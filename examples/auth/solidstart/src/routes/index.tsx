@@ -38,9 +38,9 @@ export default function Home() {
           <button>Visit Protected Page</button>
         </A>
         <br /><br />
-        <A href="/logout">
-          <button>Sign Out</button>
-        </A>
+        <form action="/logout" method="post">
+          <button type="submit">Sign Out</button>
+        </form>
       </Show>
     </main>
   )
