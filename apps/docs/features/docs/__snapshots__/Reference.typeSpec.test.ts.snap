@@ -239,6 +239,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
+      "@supabase/supabase-js.AuthPKCECodeVerifierMissingError.constructor": {
+        "name": "@supabase/supabase-js.AuthPKCECodeVerifierMissingError.constructor",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "AuthPKCECodeVerifierMissingError"
+          }
+        }
+      },
       "@supabase/supabase-js.AuthPKCEGrantCodeExchangeError.constructor": {
         "name": "@supabase/supabase-js.AuthPKCEGrantCodeExchangeError.constructor",
         "params": [
@@ -6354,10 +6364,57 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "detectSessionInUrl",
                   "type": {
-                    "type": "intrinsic",
-                    "name": "boolean"
+                    "type": "union",
+                    "subTypes": [
+                      {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      },
+                      {
+                        "type": "function",
+                        "params": [
+                          {
+                            "name": "url",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "URL"
+                            }
+                          },
+                          {
+                            "name": "params",
+                            "type": {
+                              "type": "index signature",
+                              "keyType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              },
+                              "valueType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            }
+                          }
+                        ],
+                        "ret": {
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
+                          }
+                        }
+                      }
+                    ]
                   },
-                  "isOptional": true
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Set to \\"true\\" if you want to automatically detect OAuth grants in the URL and sign in the user.\\nSet to \\"false\\" to disable automatic detection.\\nSet to a function to provide custom logic for determining if a URL contains a Supabase auth callback.\\nThe function receives the current URL and parsed parameters, and should return true if the URL\\nshould be processed as a Supabase auth callback, or false to ignore it.\\n\\nThis is useful when your app uses other OAuth providers (e.g., Facebook Login) that also return\\naccess_token in the URL fragment, which would otherwise be incorrectly intercepted by Supabase Auth.",
+                    "examples": [
+                      {
+                        "id": "example-1",
+                        "name": "Example 1",
+                        "code": "\`\`\`ts\\ndetectSessionInUrl: (url, params) => {\\n  // Ignore Facebook OAuth redirects\\n  if (url.pathname === '/facebook/redirect') return false\\n  // Use default detection for other URLs\\n  return Boolean(params.access_token || params.error_description)\\n}\\n\`\`\`"
+                      }
+                    ]
+                  }
                 },
                 {
                   "name": "fetch",
@@ -38002,12 +38059,56 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       {
                         "name": "detectSessionInUrl",
                         "type": {
-                          "type": "intrinsic",
-                          "name": "boolean"
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "intrinsic",
+                              "name": "boolean"
+                            },
+                            {
+                              "type": "function",
+                              "params": [
+                                {
+                                  "name": "url",
+                                  "type": {
+                                    "type": "nameOnly",
+                                    "name": "URL"
+                                  }
+                                },
+                                {
+                                  "name": "params",
+                                  "type": {
+                                    "type": "index signature",
+                                    "keyType": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "valueType": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                }
+                              ],
+                              "ret": {
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "boolean"
+                                }
+                              }
+                            }
+                          ]
                         },
                         "isOptional": true,
                         "comment": {
-                          "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
+                          "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true.\\n\\nCan be set to a function to provide custom logic for determining if a URL contains\\na Supabase auth callback. The function receives the current URL and parsed parameters,\\nand should return true if the URL should be processed as a Supabase auth callback.\\n\\nThis is useful when your app uses other OAuth providers (e.g., Facebook Login) that\\nalso return access_token in the URL fragment, which would otherwise be incorrectly\\nintercepted by Supabase Auth.",
+                          "examples": [
+                            {
+                              "id": "example-1",
+                              "name": "Example 1",
+                              "code": "\`\`\`ts\\ndetectSessionInUrl: (url, params) => {\\n  // Ignore Facebook OAuth redirects\\n  if (url.pathname === '/facebook/redirect') return false\\n  // Use default detection for other URLs\\n  return Boolean(params.access_token || params.error_description)\\n}\\n\`\`\`"
+                            }
+                          ]
                         }
                       },
                       {
@@ -38522,7 +38623,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "@supabase/postgrest-js.default"
+            "name": "PostgrestQueryBuilder"
           }
         },
         "altSignatures": [
@@ -38539,7 +38640,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "@supabase/postgrest-js.default"
+                "name": "PostgrestQueryBuilder"
               }
             }
           }
@@ -38719,7 +38820,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "@supabase/postgrest-js.default"
+            "name": "PostgrestFilterBuilder"
           }
         },
         "comment": {
@@ -38743,7 +38844,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "@supabase/postgrest-js.default"
+            "name": "PostgrestClient"
           }
         },
         "comment": {
@@ -39786,6 +39887,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "type": {
             "type": "nameOnly",
             "name": "AuthInvalidTokenResponseError"
+          }
+        }
+      },
+      "@supabase/auth-js.AuthPKCECodeVerifierMissingError.constructor": {
+        "name": "@supabase/auth-js.AuthPKCECodeVerifierMissingError.constructor",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "AuthPKCECodeVerifierMissingError"
           }
         }
       },
@@ -45812,10 +45923,57 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "detectSessionInUrl",
                   "type": {
-                    "type": "intrinsic",
-                    "name": "boolean"
+                    "type": "union",
+                    "subTypes": [
+                      {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      },
+                      {
+                        "type": "function",
+                        "params": [
+                          {
+                            "name": "url",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "URL"
+                            }
+                          },
+                          {
+                            "name": "params",
+                            "type": {
+                              "type": "index signature",
+                              "keyType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              },
+                              "valueType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            }
+                          }
+                        ],
+                        "ret": {
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
+                          }
+                        }
+                      }
+                    ]
                   },
-                  "isOptional": true
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Set to \\"true\\" if you want to automatically detect OAuth grants in the URL and sign in the user.\\nSet to \\"false\\" to disable automatic detection.\\nSet to a function to provide custom logic for determining if a URL contains a Supabase auth callback.\\nThe function receives the current URL and parsed parameters, and should return true if the URL\\nshould be processed as a Supabase auth callback, or false to ignore it.\\n\\nThis is useful when your app uses other OAuth providers (e.g., Facebook Login) that also return\\naccess_token in the URL fragment, which would otherwise be incorrectly intercepted by Supabase Auth.",
+                    "examples": [
+                      {
+                        "id": "example-1",
+                        "name": "Example 1",
+                        "code": "\`\`\`ts\\ndetectSessionInUrl: (url, params) => {\\n  // Ignore Facebook OAuth redirects\\n  if (url.pathname === '/facebook/redirect') return false\\n  // Use default detection for other URLs\\n  return Boolean(params.access_token || params.error_description)\\n}\\n\`\`\`"
+                      }
+                    ]
+                  }
                 },
                 {
                   "name": "fetch",
@@ -73955,6 +74113,39 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             }
           }
         ]
+      },
+      "@supabase/postgrest-js.PostgrestFilterBuilder.notIn": {
+        "name": "@supabase/postgrest-js.PostgrestFilterBuilder.notIn",
+        "params": [
+          {
+            "name": "column",
+            "type": {
+              "type": "nameOnly",
+              "name": "ColumnName"
+            },
+            "comment": {
+              "shortText": "The column to filter on"
+            }
+          },
+          {
+            "name": "values",
+            "type": {
+              "type": "array"
+            },
+            "comment": {
+              "shortText": "The values array to filter with"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "this"
+          }
+        },
+        "comment": {
+          "shortText": "Match only rows where \`column\` is NOT included in the \`values\` array."
+        }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.or": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.or",

@@ -121,6 +121,18 @@ export interface CodexMcpConfig {
   }
 }
 
+/**
+ * Configuration format for Gemini CLI MCP client.
+ * Uses httpUrl instead of url to match Gemini CLI's expected format.
+ */
+export interface GeminiMcpConfig {
+  mcpServers: {
+    supabase: {
+      httpUrl: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | ClaudeCodeMcpConfig
@@ -128,6 +140,7 @@ export type McpClientConfig =
   | CodexMcpConfig
   | CursorMcpConfig
   | FactoryMcpConfig
+  | GeminiMcpConfig
   | GooseMcpConfig
   | McpClientBaseConfig
   | OtherMcpConfig
@@ -147,6 +160,14 @@ export function isCodexMcpConfig(config: McpClientConfig): config is CodexMcpCon
   return 'mcp_servers' in config && 'supabase' in config.mcp_servers
 }
 
+export function isGeminiMcpConfig(config: McpClientConfig): config is GeminiMcpConfig {
+  return (
+    'mcpServers' in config &&
+    'supabase' in config.mcpServers &&
+    'httpUrl' in config.mcpServers.supabase
+  )
+}
+
 export function isMcpServersConfig(
   config: McpClientConfig
 ): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
@@ -163,6 +184,9 @@ export function getMcpUrl(config: McpClientConfig): string {
   }
   if (isCodexMcpConfig(config)) {
     return config.mcp_servers.supabase.url
+  }
+  if (isGeminiMcpConfig(config)) {
+    return config.mcpServers.supabase.httpUrl
   }
   if (isMcpServersConfig(config)) {
     return config.mcpServers.supabase.url

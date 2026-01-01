@@ -1089,8 +1089,20 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface ObservabilityBannerCtaButtonClickedEvent {
-  action: 'observability_banner_cta_button_clicked'
+export interface MetricsAPIBannerCtaButtonClickedEvent {
+  action: 'metrics_api_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on a banner in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface MetricsAPIBannerDismissButtonClickedEvent {
+  action: 'metrics_api_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1155,18 +1167,6 @@ export interface IndexAdvisorTabClickedEvent {
  */
 export interface IndexAdvisorCreateIndexesButtonClickedEvent {
   action: 'index_advisor_create_indexes_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on a banner in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface ObservabilityBannerDismissButtonClickedEvent {
-  action: 'observability_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2550,6 +2550,18 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User clicked on "Explain with AI" button in Query Performance detail panel
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/query-performance
+ */
+export interface QueryPerformanceAIExplanationButtonClickedEvent {
+  action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2587,6 +2599,98 @@ export interface RequestUpgradeSubmittedEvent {
     currentPlan?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User successfully installed an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstalledEvent {
+  action: 'integration_installed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started installing an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallStartedEvent {
+  action: 'integration_install_started'
+  properties: {
+    /**
+     * The name of the integration being installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started uninstalling an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallStartedEvent {
+  action: 'integration_uninstall_started'
+  properties: {
+    /**
+     * The name of the integration being uninstalled
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Installation failed for an integration.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallFailedEvent {
+  action: 'integration_install_failed'
+  properties: {
+    /**
+     * The name of the integration whose installation failed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User uninstalled an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstalledEvent {
+  action: 'integration_uninstalled'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -2661,8 +2765,8 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | ObservabilityBannerCtaButtonClickedEvent
-  | ObservabilityBannerDismissButtonClickedEvent
+  | MetricsAPIBannerCtaButtonClickedEvent
+  | MetricsAPIBannerDismissButtonClickedEvent
   | IndexAdvisorBannerEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorDialogEnableButtonClickedEvent
@@ -2731,5 +2835,11 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
+  | IntegrationInstalledEvent
+  | IntegrationInstallStartedEvent
+  | IntegrationUninstallStartedEvent
+  | IntegrationInstallFailedEvent
+  | IntegrationUninstalledEvent
