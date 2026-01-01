@@ -62,18 +62,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
 
-  if (!ref) {
-    return (
-      <div className="h-full flex flex-col p-6">
-        <Admonition
-          type="destructive"
-          title="Invalid project reference"
-          description="Unable to load query performance data. Please ensure you have selected a valid project."
-        />
-      </div>
-    )
-  }
-
   if (!isLoadingProject && !project) {
     return (
       <div className="h-full flex flex-col p-6">
