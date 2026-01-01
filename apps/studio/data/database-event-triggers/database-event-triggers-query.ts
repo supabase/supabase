@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseEventTriggerKeys } from './keys'
@@ -17,7 +18,7 @@ export type DatabaseEventTrigger = {
   tags: string[] | null
   function_name: string | null
   function_schema: string | null
-  owner: string | null
+  owner: (typeof SYSTEM_ROLES)[number]
   function_definition: string | null
 }
 

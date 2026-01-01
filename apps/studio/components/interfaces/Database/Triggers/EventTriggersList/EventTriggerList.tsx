@@ -6,7 +6,6 @@ import { useParams } from 'common'
 import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { DatabaseEventTrigger } from 'data/database-event-triggers/database-event-triggers-query'
-import { INTERNAL_SCHEMAS } from 'hooks/useProtectedSchemas'
 import {
   Badge,
   Button,
@@ -42,7 +41,6 @@ export const EventTriggerList = ({
 }: EventTriggerListProps) => {
   const { ref: projectRef } = useParams()
   const searchValue = filterString.toLowerCase()
-  const systemSchemas = new Set([...INTERNAL_SCHEMAS, 'pg_catalog'])
   const systemOwners = new Set(SYSTEM_ROLES.filter((role) => role !== 'postgres'))
   const ownerFilterSet = new Set(ownerFilter)
 
@@ -93,10 +91,7 @@ export const EventTriggerList = ({
   return (
     <>
       {orderedTriggers.map((trigger) => {
-        const isSystemTrigger =
-          !trigger.function_schema ||
-          systemSchemas.has(trigger.function_schema) ||
-          (trigger.owner ? systemOwners.has(trigger.owner) : false)
+        const isSystemTrigger = trigger.owner !== 'postgres' && systemOwners.has(trigger.owner)
         const canEditTrigger = !isSystemTrigger && canEdit
         const disabledReason = !canEdit
           ? 'You need additional permissions to update event triggers'
@@ -171,10 +166,7 @@ export const EventTriggerList = ({
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">
-                    <DropdownMenuItem
-                      className="space-x-2"
-                      onClick={() => onEditTrigger(trigger)}
-                    >
+                    <DropdownMenuItem className="space-x-2" onClick={() => onEditTrigger(trigger)}>
                       <Edit2 size={14} />
                       <p>Edit trigger</p>
                     </DropdownMenuItem>
