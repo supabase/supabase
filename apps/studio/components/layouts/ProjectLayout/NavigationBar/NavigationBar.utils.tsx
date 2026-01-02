@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
@@ -159,12 +159,6 @@ export const generateOtherRoutes = (
           : unifiedLogsEnabled
             ? `/project/${ref}/logs`
             : `/project/${ref}/logs/explorer`),
-    },
-    {
-      key: 'api',
-      label: 'API Docs',
-      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
     {
       key: 'integrations',

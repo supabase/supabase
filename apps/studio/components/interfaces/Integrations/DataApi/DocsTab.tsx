@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -7,6 +8,7 @@ import { ResourceContent } from 'components/interfaces/Docs/ResourceContent'
 import { RpcContent } from 'components/interfaces/Docs/RpcContent'
 import { generateDocsMenu } from 'components/layouts/DocsLayout/DocsLayout.utils'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
@@ -15,7 +17,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { snakeToCamel } from 'lib/helpers'
-import { cn } from 'ui'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 import { LangSelector } from '../../Docs/LangSelector'
 
 export const DataApiDocsTab = () => {
@@ -28,10 +31,16 @@ export const DataApiDocsTab = () => {
   const [selectedLang, setSelectedLang] = useState<'js' | 'bash'>('js')
   const [selectedApikey, setSelectedApiKey] = useState<any>(DEFAULT_KEY)
 
+  const { data: config, isPending: isConfigLoading } = useProjectPostgrestConfigQuery({
+    projectRef,
+  })
+
+  const isEnabled = !!config?.db_schema?.trim()
+
   const { data: openApiSpec } = useOpenAPISpecQuery(
     { projectRef },
     {
-      enabled: !!projectRef && !isPaused,
+      enabled: !!projectRef && !isPaused && isEnabled,
     }
   )
 
@@ -55,6 +64,35 @@ export const DataApiDocsTab = () => {
     if (!projectRef) return []
     return generateDocsMenu(projectRef, tableNames, functionNames, { authEnabled }, docsBasePath)
   }, [projectRef, tableNames, functionNames, authEnabled, docsBasePath])
+
+  if (isConfigLoading) {
+    return (
+      <div className="flex w-full bg-surface-100 flex-1 items-stretch p-10">
+        <ShimmeringLoader />
+      </div>
+    )
+  }
+
+  if (!isEnabled) {
+    return (
+      <div className="flex w-full bg-surface-100 flex-1 items-center justify-center p-10">
+        <Alert_Shadcn_ className="max-w-md">
+          <AlertCircle size={16} />
+          <AlertTitle_Shadcn_>Data API is disabled</AlertTitle_Shadcn_>
+          <div className="text-foreground-light text-sm mt-2">
+            You must enable the Data API in the{' '}
+            <Link
+              href={`/project/${projectRef}/integrations/data_api/overview`}
+              className="text-primary hover:underline"
+            >
+              Overview
+            </Link>{' '}
+            tab to view the documentation.
+          </div>
+        </Alert_Shadcn_>
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full bg-surface-100 flex-1 items-stretch">
@@ -161,8 +199,11 @@ const DocView = ({
 
   if (isLoading || !settings || !jsonSchema) {
     return (
-      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-        <h3 className="text-xl">Building docs ...</h3>
+      <div className="w-full h-full overflow-y-auto flex flex-col py-10 space-y-2">
+        <ShimmeringLoader className="h-2 w-24" />
+        <ShimmeringLoader className="h-2 w-96" />
+        <ShimmeringLoader className="h-2 w-96" />
+        <ShimmeringLoader className="h-2 w-96" />
       </div>
     )
   }

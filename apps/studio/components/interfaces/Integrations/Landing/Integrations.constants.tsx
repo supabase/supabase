@@ -1,4 +1,4 @@
-import { Clock5, Layers, Timer, Vault, Webhook, Receipt, Code2 } from 'lucide-react'
+import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -268,13 +268,17 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
     icon: ({ className, ...props } = {}) => (
       <Code2 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
-    description: 'Configure your project API endpoints and PostgREST settings',
+    description: 'Auto-generate an API directly from your database schema',
     docsUrl: `${DOCS_URL}/guides/api`,
     author: authorSupabase,
     navigation: [
       {
         route: 'overview',
         label: 'Overview',
+      },
+      {
+        route: 'settings',
+        label: 'Settings',
       },
       {
         route: 'docs',
@@ -288,6 +292,16 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
             () =>
               import('components/interfaces/Integrations/DataApi/OverviewTab').then(
                 (mod) => mod.DataApiOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'settings':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/SettingsTab').then(
+                (mod) => mod.DataApiSettingsTab
               ),
             {
               loading: Loading,

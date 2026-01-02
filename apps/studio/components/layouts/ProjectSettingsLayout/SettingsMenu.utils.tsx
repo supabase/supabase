@@ -74,13 +74,6 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/integrations`,
           items: [],
         },
-
-        {
-          name: 'Data API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
         {
           name: 'API Keys',
           key: 'api-keys',
@@ -108,19 +101,18 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
-        {
-          name: 'Vault',
-          key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
-          items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'Beta',
-        },
       ],
     },
     {
       title: 'Configuration',
       items: [
+        {
+          name: 'Data API',
+          key: 'api',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/overview`,
+          items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+        },
         {
           name: 'Database',
           key: 'database',
@@ -163,6 +155,14 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
+        {
+          name: 'Vault',
+          key: 'vault',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
+          items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          label: 'Beta',
+        },
       ],
     },
 
