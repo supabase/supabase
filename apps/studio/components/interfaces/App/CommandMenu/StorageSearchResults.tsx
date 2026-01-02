@@ -84,7 +84,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     }
   )
 
-  const vectorBuckets = vectorBucketsData?.vectorBuckets ?? []
+  const vectorBuckets = useMemo(() => vectorBucketsData?.vectorBuckets ?? [], [vectorBucketsData])
 
   const isLoading = isLoadingFileBuckets || isLoadingAnalyticsBuckets || isLoadingVectorBuckets
   const isError = isErrorFileBuckets || isErrorAnalyticsBuckets || isErrorVectorBuckets
