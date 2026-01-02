@@ -19,6 +19,8 @@ import socialAuthReactRouter from './default/blocks/social-auth-react-router/reg
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
 import socialAuthTanstack from './default/blocks/social-auth-tanstack/registry-item.json' with { type: 'json' }
 
+import oauthConsentNextjs from './default/blocks/oauth-consent-nextjs/registry-item.json' with { type: 'json' }
+
 const combine = (component: RegistryItem) => {
   return clients.flatMap((client) => {
     return registryItemAppend(
@@ -46,6 +48,8 @@ export const blocks = [
   registryItemAppend(socialAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(socialAuthReactRouter as RegistryItem, [reactRouterClient!]),
   registryItemAppend(socialAuthTanstack as RegistryItem, [tanstackClient!]),
+
+  registryItemAppend(oauthConsentNextjs as RegistryItem, [nextjsClient!]),
 
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
