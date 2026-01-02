@@ -139,11 +139,82 @@ Currently, all BigQuery datasets stored and managed by Analytics, whether via CL
 
 ## Vector Usage
 
-In the Docker Compose example, Vector is used for the logging pipieline, where log events are forwarded to the Analytics API for ingestion.
+In the Docker Compose example, Vector is used for the logging pipeline, where log events are forwarded to the Analytics API for ingestion.
 
 Please refer to the [Vector configuration file](https://github.com/supabase/supabase/blob/master/docker/volumes/logs/vector.yml) when customizing your own setup.
 
-You **must** ensure that the payloads matches the expected event schema structure. Without the correct structure, it would cause the Studio Logs UI features to break.
+You **must** ensure that the payloads match the expected event schema structure. Without the correct structure, Studio queries and field references will not work.
+
+### Expected Schema Structure
+
+Studio expects specific top-level fields and nested metadata paths to exist in each log event.
+
+- `project`: Must be set to `"default"` for local or Docker-based self-hosting.
+- `timestamp`: An ISO 8601 timestamp string.
+- `event_message`: A string containing the log message.
+- `metadata`: A JSON object containing structured metadata.
+
+The specific metadata fields expected by Studio vary by log source. You can find the canonical list of field paths used by Studio in [packages/shared-data/logConstants.ts](https://github.com/supabase/supabase/blob/master/packages/shared-data/logConstants.ts). This file defines what appears in the Field Reference panel in Studio.
+
+### Test ingestion with curl (recommended)
+
+You can verify your Analytics setup by sending a test log event via `curl`.
+
+Vector uses the `LOGFLARE_PUBLIC_ACCESS_TOKEN` as the `x-api-key` header, which matches the configuration in `docker/volumes/logs/vector.yml`.
+
+#### Example: Send a Postgres log event
+
+Note that in the default Docker Compose setup, Postgres logs are routed through Kong. The payload must include `project: "default"` and `metadata.parsed.error_severity` for Studio's queries to work correctly.
+
+```bash
+curl -X POST "http://localhost:8000/analytics/v1/api/logs?source_name=postgres.logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <LOGFLARE_PUBLIC_ACCESS_TOKEN>" \
+  -d '{
+    "project": "default",
+    "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",
+    "event_message": "test connection",
+    "metadata": {
+      "host": "db-default",
+      "parsed": {
+        "error_severity": "INFO"
+      }
+    }
+  }'
+```
+
+#### Example: Send an Auth log event
+
+Auth logs are sent directly to the Analytics server.
+
+```bash
+curl -X POST "http://localhost:4000/api/logs?source_name=gotrue.logs.prod" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <LOGFLARE_PUBLIC_ACCESS_TOKEN>" \
+  -d '{
+    "project": "default",
+    "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",
+    "event_message": "User signed in",
+    "metadata": {
+      "level": "info",
+      "method": "POST",
+      "path": "/auth/v1/token"
+    }
+  }'
+```
+
+### Custom Sink Checklist
+
+If you replace Vector with your own logging pipeline, follow this checklist to ensure Studio compatibility:
+
+- **Preserve Required Fields**: Ensure `project`, `timestamp`, `event_message`, and `metadata` are present at the top level.
+- **Set Project Field**: The `project` field must be set to `"default"` for Docker Compose and local setups, otherwise Studio may not display the logs.
+- **Match Metadata Paths**: Ensure nested paths within `metadata` match the expectations defined in `logConstants.ts`.
+- **Use Correct Source Names**: Use the exact `source_name` values expected by Studio (e.g., `postgres.logs`, `gotrue.logs.prod`, `cloudflare.logs.prod`).
+- **Correct API Key**: Use the `x-api-key` header with your `LOGFLARE_PUBLIC_ACCESS_TOKEN`.
+- **Compare Payloads**: If things aren't working, compare your payloads to the events produced by the default [vector.yml](https://github.com/supabase/supabase/blob/master/docker/volumes/logs/vector.yml).
+
+For a full end-to-end setup and troubleshooting guide, see [Self-hosting Logs and Analytics](/docs/guides/self-hosting/logs-and-analytics).
 
 ## Differences from Platform
 
