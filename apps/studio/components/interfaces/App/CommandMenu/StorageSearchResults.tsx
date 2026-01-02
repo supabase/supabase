@@ -11,6 +11,10 @@ import {
 } from 'data/storage/analytics-buckets-query'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import {
+  useIsAnalyticsBucketsEnabled,
+  useIsVectorBucketsEnabled,
+} from 'data/config/project-storage-config-query'
+import {
   SkeletonResults,
   EmptyState,
   ResultsList,
@@ -45,6 +49,9 @@ function filterBuckets<T>(
 export function StorageSearchResults({ query }: StorageSearchResultsProps) {
   const { ref: projectRef } = useParams()
 
+  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef })
+  const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef })
+
   const {
     data: fileBuckets,
     isLoading: isLoadingFileBuckets,
@@ -67,7 +74,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
       projectRef: projectRef ?? undefined,
     },
     {
-      enabled: !!projectRef,
+      enabled: !!projectRef && isAnalyticsBucketsEnabled,
     }
   )
 
@@ -80,14 +87,20 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
       projectRef: projectRef ?? undefined,
     },
     {
-      enabled: !!projectRef,
+      enabled: !!projectRef && isVectorBucketsEnabled,
     }
   )
 
   const vectorBuckets = useMemo(() => vectorBucketsData?.vectorBuckets ?? [], [vectorBucketsData])
 
-  const isLoading = isLoadingFileBuckets || isLoadingAnalyticsBuckets || isLoadingVectorBuckets
-  const isError = isErrorFileBuckets || isErrorAnalyticsBuckets || isErrorVectorBuckets
+  const isLoading =
+    isLoadingFileBuckets ||
+    (isAnalyticsBucketsEnabled && isLoadingAnalyticsBuckets) ||
+    (isVectorBucketsEnabled && isLoadingVectorBuckets)
+  const isError =
+    isErrorFileBuckets ||
+    (isAnalyticsBucketsEnabled && isErrorAnalyticsBuckets) ||
+    (isVectorBucketsEnabled && isErrorVectorBuckets)
 
   const fileBucketResults: ExtendedSearchResult[] = useMemo(() => {
     return filterBuckets(
@@ -161,8 +174,21 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
   }, [vectorBuckets, query])
 
   const allResults: ExtendedSearchResult[] = useMemo(() => {
-    return [...fileBucketResults, ...analyticsBucketResults, ...vectorBucketResults].slice(0, 20)
-  }, [fileBucketResults, analyticsBucketResults, vectorBucketResults])
+    const results = [fileBucketResults]
+    if (isAnalyticsBucketsEnabled) {
+      results.push(analyticsBucketResults)
+    }
+    if (isVectorBucketsEnabled) {
+      results.push(vectorBucketResults)
+    }
+    return results.flat().slice(0, 20)
+  }, [
+    fileBucketResults,
+    analyticsBucketResults,
+    vectorBucketResults,
+    isAnalyticsBucketsEnabled,
+    isVectorBucketsEnabled,
+  ])
 
   const getRoute = useCallback(
     (result: SearchResult) => {
@@ -194,8 +220,22 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     [projectRef]
   )
 
-  const totalBuckets =
-    (fileBuckets?.length ?? 0) + (analyticsBuckets?.length ?? 0) + (vectorBuckets?.length ?? 0)
+  const totalBuckets = useMemo(() => {
+    let total = fileBuckets?.length ?? 0
+    if (isAnalyticsBucketsEnabled) {
+      total += analyticsBuckets?.length ?? 0
+    }
+    if (isVectorBucketsEnabled) {
+      total += vectorBuckets?.length ?? 0
+    }
+    return total
+  }, [
+    fileBuckets?.length,
+    analyticsBuckets?.length,
+    vectorBuckets?.length,
+    isAnalyticsBucketsEnabled,
+    isVectorBucketsEnabled,
+  ])
 
   const getIcon = useCallback((result: SearchResult) => {
     const extendedResult = result as ExtendedSearchResult
