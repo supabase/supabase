@@ -330,34 +330,22 @@ After this step, your project should have OAuth 2.1 enabled with dynamic client 
 
 ### Step 6: Implement authentication middleware
 
-Now you'll add OAuth authentication to your MCP server. This requires updating the dependencies and replacing the server implementation.
+Now you'll add OAuth authentication to your MCP server.
 
-First, update `supabase/functions/mcp/deno.json` to include the Supabase client:
-
-```json name=supabase/functions/mcp/deno.json
-{
-  "imports": {
-    "@modelcontextprotocol/sdk/": "npm:@modelcontextprotocol/sdk@1.25.1/",
-    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
-    "hono": "npm:hono@^4.9.2",
-    "zod": "npm:zod@^4.1.13"
-  }
-}
-```
-
-Then, replace the contents of `supabase/functions/mcp/index.ts` with the authenticated implementation:
+Replace the contents of `supabase/functions/mcp/index.ts` with the authenticated implementation:
 
 ```ts name=supabase/functions/mcp/index.ts
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
-import { createClient } from '@supabase/supabase-js'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
-import { Hono, type Context, type Next } from 'hono'
-import { z } from 'zod'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.1/server/mcp.js'
+import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.1/server/webStandardStreamableHttp.js'
+import { Hono, type Context, type Next } from 'npm:hono@^4.9.2'
+import { z } from 'npm:zod@^4.1.13'
 
 // Environment variables
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
 
 // Create Hono app
@@ -436,7 +424,7 @@ app.get('/mcp/oauth-protected-resource', (c) => {
  * Validate access token using Supabase Auth.
  */
 async function validateToken(c: Context, token: string) {
-  const supabase = createClient(getBaseUrl(c), supabaseAnonKey, {
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     global: {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -622,6 +610,7 @@ First, obtain an access token by completing the OAuth flow. Then:
 curl -X POST 'http://localhost:54321/functions/v1/mcp' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
   -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
 ```
 
