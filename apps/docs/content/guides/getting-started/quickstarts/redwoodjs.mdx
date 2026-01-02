@@ -116,10 +116,20 @@ hideToc: true
     <StepHikeCompact.Code>
       ```prisma name=api/db/schema.prisma
       datasource db {
-        provider  = "postgresql"
-        url       = env("DATABASE_URL")
-        directUrl = env("DIRECT_URL")
+        provider = "postgresql"
       }
+      ```
+
+      ```ts name=prisma.config.ts
+      import 'dotenv/config'
+      import { defineConfig, env } from 'prisma/config'
+
+      export default defineConfig({
+        schema: 'api/db/schema.prisma',
+        datasource: {
+          url: env('DIRECT_URL'),
+        },
+      })
       ```
     </StepHikeCompact.Code>
 

@@ -15,6 +15,7 @@ const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
         <ConnectTabTrigger value="prisma/schema.prisma" />
+        <ConnectTabTrigger value="prisma.config.ts" />
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
@@ -59,10 +60,25 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
+        `}
+        </SimpleCodeBlock>
+      </ConnectTabContent>
+
+      <ConnectTabContent value="prisma.config.ts">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
+          {`
+import 'dotenv/config'
+import { defineConfig, env } from 'prisma/config'
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    // Prisma CLI migrations should use DIRECT_URL (session/direct connection)
+    url: env('DIRECT_URL'),
+  },
+})
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>

@@ -151,11 +151,23 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-  schemas   = ["public", "other_schema"] //list out relevant schemas
+  provider = "postgresql"
+  schemas  = ["public", "other_schema"] //list out relevant schemas
 }
+```
+
+Then, configure the datasource in `prisma.config.ts`:
+
+```ts prisma.config.ts
+import 'dotenv/config'
+import { defineConfig, env } from 'prisma/config'
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    url: env('DIRECT_URL'),
+  },
+})
 ```
 
 - Supabase managed schemas: Schemas managed by Supabase, such as `auth` and `storage`, may be changed to support new features. Referencing these schemas directly will cause schema drift in the future. It is best to remove references to these schemas from your migrations.
