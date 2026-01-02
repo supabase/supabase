@@ -159,26 +159,31 @@ export const EditWrapperSheet = ({
             // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               const fetchEncryptedValues = async (ids: string[]) => {
-                setLoadingSecrets(true)
-                // If the secrets haven't loaded, escape and run the effect again when they're loaded
-                const decryptedValues = await getDecryptedValues({
-                  projectRef: project?.ref,
-                  connectionString: project?.connectionString,
-                  ids: ids,
-                })
-
-                // replace all values which are in the decryptedValues object with the decrypted value
-                const transformValues = (values: Record<string, string>) => {
-                  return mapValues(values, (value) => {
-                    return decryptedValues[value] ?? value
+                try {
+                  setLoadingSecrets(true)
+                  // If the secrets haven't loaded, escape and run the effect again when they're loaded
+                  const decryptedValues = await getDecryptedValues({
+                    projectRef: project?.ref,
+                    connectionString: project?.connectionString,
+                    ids: ids,
                   })
-                }
 
-                resetForm({
-                  values: transformValues(values),
-                  initialValues: transformValues(initialValues),
-                })
-                setLoadingSecrets(false)
+                  // replace all values which are in the decryptedValues object with the decrypted value
+                  const transformValues = (values: Record<string, string>) => {
+                    return mapValues(values, (value) => {
+                      return decryptedValues[value] ?? value
+                    })
+                  }
+
+                  resetForm({
+                    values: transformValues(values),
+                    initialValues: transformValues(initialValues),
+                  })
+                } catch (error) {
+                  toast.error('Failed to fetch encrypted values')
+                } finally {
+                  setLoadingSecrets(false)
+                }
               }
 
               const encryptedOptions = wrapperMeta.server.options.filter(
