@@ -70,6 +70,8 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ![Kakao consent items configuration](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
+**Note:** On the Kakao Developers Portal, the `account_email` consent item is only available for apps that are registered as `Biz App`. To convert your app to a `Biz App`, go to `App Settings` > `App` > `General`, and complete the required fields in the `Business Information` section.
+
 ## Add your OAuth credentials to Supabase
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Kakao" }} />
