@@ -44,22 +44,22 @@ export const EVENT_TRIGGER_TEMPLATES = [
   {
     name: 'Prevent table drops',
     description: 'Block dropping tables using the sql_drop event trigger.',
-    content: `CREATE OR REPLACE FUNCTION dont_drop_function()
-RETURNS event_trigger
-LANGUAGE plpgsql
-AS $$
+    content: `-- Function
+CREATE OR REPLACE FUNCTION dont_drop_function()
+  RETURNS event_trigger LANGUAGE plpgsql AS $$
 DECLARE
-  obj record;
+    obj record;
+    tbl_name text;
 BEGIN
-  FOR obj IN SELECT * FROM pg_event_trigger_dropped_objects()
-  LOOP
-    IF obj.object_type = 'table' THEN
-      RAISE EXCEPTION 'ERROR: All tables in this schema are protected and cannot be dropped';
-    END IF;
-  END LOOP;
+    FOR obj IN SELECT * FROM pg_event_trigger_dropped_objects()
+    LOOP
+        IF obj.object_type = 'table' THEN
+            RAISE EXCEPTION 'ERROR: All tables in this schema are protected and cannot be dropped';
+        END IF;
+    END LOOP;
 END;
 $$;
-
+-- Event trigger
 CREATE EVENT TRIGGER dont_drop_trigger
 ON sql_drop
 EXECUTE FUNCTION dont_drop_function();
