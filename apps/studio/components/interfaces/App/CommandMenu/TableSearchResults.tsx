@@ -77,19 +77,6 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
     })
   }, [tables, trimmedQuery])
 
-  if (isLoadingTables) {
-    return <SkeletonResults />
-  }
-
-  if (isErrorTables) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
-        <Database className="h-6 w-6" strokeWidth={1.5} />
-        <p className="text-sm">Failed to load tables</p>
-      </div>
-    )
-  }
-
   const totalTables = tables?.length ?? 0
 
   const renderFooter = () => (

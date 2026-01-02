@@ -1,6 +1,1 @@
-export type SearchContextValue =
-  | 'commands'
-  | 'database-tables'
-  | 'auth-policies'
-  | 'edge-functions'
-  | 'storage'
+export type SearchContextValue = 'database-tables' | 'auth-policies' | 'edge-functions' | 'storage'

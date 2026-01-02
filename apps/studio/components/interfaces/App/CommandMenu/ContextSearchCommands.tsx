@@ -19,8 +19,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
 import { useFlag } from 'common'
-
-export type SearchContextValue = 'database-tables' | 'auth-policies' | 'edge-functions' | 'storage'
+import type { SearchContextValue } from './SearchContext.types'
 
 interface SearchContextOption {
   value: SearchContextValue
