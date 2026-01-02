@@ -171,7 +171,7 @@ const Column = ({
                               </div>
                             ) : (
                               <div className="flex items-center gap-x-2 truncate">
-                                <Badge variant={status === 'ADD' ? 'brand' : 'warning'}>
+                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
                                   {status}
                                 </Badge>
                                 <p className="truncate">

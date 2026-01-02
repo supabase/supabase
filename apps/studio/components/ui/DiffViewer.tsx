@@ -1,5 +1,5 @@
 import { DiffEditor } from '@monaco-editor/react'
-import { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor } from 'monaco-editor'
 
 interface DiffViewerProps {
   /** Original/left hand side content (optional) */

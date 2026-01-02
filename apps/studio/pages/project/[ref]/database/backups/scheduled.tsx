@@ -10,7 +10,6 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
@@ -20,17 +19,24 @@ import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const {
+    data: backups,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef })
 
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled
@@ -48,9 +54,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
             <PageHeaderTitle>Database Backups</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
-        <PageHeaderFooter>
+        <PageHeaderNavigationTabs>
           <DatabaseBackupsNav active="scheduled" />
-        </PageHeaderFooter>
+        </PageHeaderNavigationTabs>
       </PageHeader>
       <PageContainer>
         <PageSection>

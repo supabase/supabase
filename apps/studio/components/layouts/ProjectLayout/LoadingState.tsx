@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const LoadingState = () => {
   const { ref } = useParams()
-  const { data: project, isLoading } = useProjectDetailQuery({ ref })
+  const { data: project, isPending: isLoading } = useProjectDetailQuery({ ref })
 
   const projectName = ref !== 'default' ? project?.name : 'Welcome to your project'
 

@@ -8,15 +8,17 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import CopyButton from 'components/ui/CopyButton'
-import InformationBox from 'components/ui/InformationBox'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useStateTransition } from 'hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { AIAssistantOption } from './AIAssistantOption'
-import { HighlightProjectRefProvider, useHighlightProjectRefContext } from './HighlightContext'
+import { DiscordCTACard } from './DiscordCTACard'
+import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -26,6 +28,7 @@ import {
   supportFormReducer,
   type SupportFormState,
 } from './SupportForm.state'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
 
@@ -57,17 +60,24 @@ function useSupportFormTelemetry() {
 }
 
 export function SupportFormPage() {
-  return (
-    <HighlightProjectRefProvider>
-      <SupportFormPageContent />
-    </HighlightProjectRefProvider>
-  )
+  return <SupportFormPageContent />
 }
 
 function SupportFormPageContent() {
+  const { data: organizations } = useOrganizationsQuery()
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
 
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
+  const selectedOrg = organizations?.find((org) => org.slug === orgSlug)
+  const isFreePlan = selectedOrg?.plan.id === 'free'
+
+  const {
+    data: incidents,
+    isPending: isIncidentsPending,
+    isError: isIncidentsError,
+  } = useIncidentStatusQuery()
+  const hasActiveIncidents =
+    !isIncidentsPending && !isIncidentsError && incidents && incidents.length > 0
 
   const sendTelemetry = useSupportFormTelemetry()
   useStateTransition(state, 'submitting', 'success', (_, curr) => {
@@ -85,10 +95,22 @@ function SupportFormPageContent() {
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
+  const isSuccess = state.type === 'success'
+
   return (
     <SupportFormWrapper>
       <SupportFormHeader />
-      <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+
+      <IncidentAdmonition isActive={hasActiveIncidents} />
+
+      {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
+      {!isSuccess && !hasActiveIncidents && (
+        <div className="flex flex-col gap-y-4">
+          <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+          <DiscordCTACard organizationSlug={orgSlug} />
+        </div>
+      )}
+
       <SupportFormBody
         form={form}
         state={state}
@@ -96,7 +118,7 @@ function SupportFormPageContent() {
         initialError={initialError}
         selectedProjectRef={projectRef}
       />
-      <SupportFormDirectEmailInfo />
+      {!isSuccess && <SupportFormDirectEmailInfo projectRef={projectRef} />}
     </SupportFormWrapper>
   )
 }
@@ -112,7 +134,7 @@ function SupportFormWrapper({ children }: PropsWithChildren) {
 }
 
 function SupportFormHeader() {
-  const { data, isLoading, isError } = usePlatformStatusQuery()
+  const { data, isPending: isLoading, isError } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
   return (
@@ -159,7 +181,7 @@ function SupportFormHeader() {
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center">
-            Check Supabase status page
+            Check the Supabase status page
           </TooltipContent>
         </Tooltip>
       </div>
@@ -167,44 +189,57 @@ function SupportFormHeader() {
   )
 }
 
-function SupportFormDirectEmailInfo() {
-  const { scrollToRef, setShouldHighlightRef: setHighlight } = useHighlightProjectRefContext()
+interface SupportFormDirectEmailInfoProps {
+  projectRef: string | null
+}
+
+function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoProps) {
+  const hasProjectRef = projectRef && projectRef !== NO_PROJECT_MARKER
 
   return (
-    <InformationBox
+    <Admonition
+      type="default"
       title="Having trouble submitting the form?"
       description={
-        <div className="flex flex-col gap-y-4">
-          <p className="flex items-center gap-x-1 ">
-            Email us directly at{' '}
-            <InlineLink href="mailto:support@supabase.com" className="font-mono">
-              support@supabase.com
-            </InlineLink>
-            <CopyButton
-              type="text"
-              text="support@supabase.com"
-              iconOnly
-              onClick={() => toast.success('Copied to clipboard')}
-            />
+        <>
+          <p className="!mb-2.5">
+            Please email us directly. Include your project ID and as much information as possible.
           </p>
-          <p>
-            Please, make sure to{' '}
-            <button
-              type="button"
-              className={cn(InlineLinkClassName, 'cursor-pointer')}
-              onClick={() => {
-                scrollToRef()
-                setHighlight(true)
-              }}
-            >
-              include your project ID
-            </button>{' '}
-            and as much information as possible.
+          <p className="flex items-center gap-x-1.5 flex-wrap">
+            Email:{' '}
+            <span className="inline-flex items-center gap-x-1">
+              <a
+                href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
+                className="hover:text-foreground transition-colors duration-100"
+              >
+                <code className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                  support@supabase.com
+                </code>
+              </a>
+              <CopyButton
+                type="text"
+                text="support@supabase.com"
+                iconOnly
+                onClick={() => toast.success('Copied email address to clipboard')}
+              />
+            </span>
           </p>
-        </div>
+          {hasProjectRef && (
+            <p className="flex items-center gap-x-1.5 flex-wrap">
+              Project ID:{' '}
+              <span className="inline-flex items-center gap-x-1">
+                <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+                <CopyButton
+                  iconOnly
+                  type="text"
+                  text={projectRef}
+                  onClick={() => toast.success('Copied project ID to clipboard')}
+                />
+              </span>
+            </p>
+          )}
+        </>
       }
-      defaultVisibility={true}
-      hideCollapse={true}
     />
   )
 }
@@ -224,17 +259,17 @@ function SupportFormBody({
   initialError,
   selectedProjectRef,
 }: SupportFromBodyProps) {
-  const showSuccessMessage = state.type === 'success'
+  const isSuccess = state.type === 'success'
 
   return (
     <div
       className={cn(
         'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
-        `${showSuccessMessage ? 'pt-8' : 'py-8'}`,
+        `${isSuccess ? 'pt-8' : 'py-8'}`,
         'border-default'
       )}
     >
-      {showSuccessMessage ? (
+      {isSuccess ? (
         <Success
           selectedProject={selectedProjectRef ?? undefined}
           sentCategory={state.sentCategory}

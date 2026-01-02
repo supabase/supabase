@@ -18,7 +18,6 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -42,6 +41,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 /**
  * Filter tables by table name and policy name
@@ -117,7 +117,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const {
     data: policies,
-    isLoading: isLoadingPolicies,
+    isPending: isLoadingPolicies,
     isError: isPoliciesError,
     error: policiesError,
   } = useDatabasePoliciesQuery({
@@ -136,7 +136,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const {
     data: tables,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,

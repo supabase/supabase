@@ -9,8 +9,8 @@ import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -32,9 +32,9 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
             <PageHeaderTitle>Database Backups</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
-        <PageHeaderFooter>
+        <PageHeaderNavigationTabs>
           <DatabaseBackupsNav active="rtnp" />
-        </PageHeaderFooter>
+        </PageHeaderNavigationTabs>
       </PageHeader>
       <PageContainer>
         <PageSection>

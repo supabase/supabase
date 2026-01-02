@@ -5,11 +5,11 @@ import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const RealtimePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -20,7 +20,7 @@ export const RealtimePolicies = () => {
 
   const {
     data: tables,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -40,7 +40,7 @@ export const RealtimePolicies = () => {
   )
   const {
     data: policies,
-    isLoading: isLoadingPolicies,
+    isPending: isLoadingPolicies,
     isError: isPoliciesError,
     error: policiesError,
   } = useDatabasePoliciesQuery({

@@ -3,6 +3,7 @@ import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import AIEditor from 'components/ui/AIEditor'
+import { toast } from 'sonner'
 import {
   Button,
   ContextMenu_Shadcn_,
@@ -113,8 +114,52 @@ export const FileExplorerAndEditor = ({
     }
   }
 
+  const handleStartRename = (id: number) => {
+    // Force re-render of the TreeView with the updated metadata
+    setTreeData({
+      name: '',
+      children: files.map((file) => ({
+        id: file.id.toString(),
+        name: file.name,
+        metadata: {
+          isEditing: file.id === id,
+          originalId: file.id,
+        },
+      })),
+    })
+  }
+
+  const exitEditMode = () => {
+    // Force re-render of the TreeView with the updated metadata
+    setTreeData({
+      name: '',
+      children: files.map((file) => ({
+        id: file.id.toString(),
+        name: file.name,
+        metadata: {
+          isEditing: false,
+          originalId: file.id,
+        },
+      })),
+    })
+  }
+
   const handleFileNameChange = (id: number, newName: string) => {
-    if (!newName.trim()) return // Don't allow empty names
+    // Don't allow empty names
+    if (!newName.trim()) {
+      toast.error('File name cannot be empty')
+      return exitEditMode()
+    }
+
+    // Check if the new name already exists in other files
+    const isDuplicate = files.some((file) => file.id !== id && file.name === newName)
+    if (isDuplicate) {
+      toast.error(
+        `The name ${newName} already exists in the current directory. Please use a different name.`
+      )
+      return exitEditMode()
+    }
+
     const updatedFiles = files.map((file) =>
       file.id === id
         ? {
@@ -155,23 +200,6 @@ export const FileExplorerAndEditor = ({
       selected: file.id === id,
     }))
     onFilesChange(updatedFiles)
-  }
-
-  const handleStartRename = (id: number) => {
-    const updatedTreeData = {
-      name: '',
-      children: files.map((file) => ({
-        id: file.id.toString(),
-        name: file.name,
-        metadata: {
-          isEditing: file.id === id,
-          originalId: file.id,
-        },
-      })),
-    }
-
-    // Force re-render of the TreeView with the updated metadata
-    setTreeData(updatedTreeData)
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -271,7 +299,9 @@ export const FileExplorerAndEditor = ({
                           }
                         }}
                         onClick={() => {
-                          if (originalId !== null) handleFileSelect(originalId)
+                          if (originalId !== null && !element.metadata?.isEditing) {
+                            handleFileSelect(originalId)
+                          }
                         }}
                         onDoubleClick={() => {
                           if (originalId !== null) {

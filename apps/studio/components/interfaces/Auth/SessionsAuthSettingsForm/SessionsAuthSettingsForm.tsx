@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -66,7 +66,7 @@ export const SessionsAuthSettingsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
@@ -207,7 +207,7 @@ export const SessionsAuthSettingsForm = () => {
               className="space-y-4"
             >
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={refreshTokenForm.control}
                     name="REFRESH_TOKEN_ROTATION_ENABLED"
@@ -238,7 +238,7 @@ export const SessionsAuthSettingsForm = () => {
                         label="Refresh token reuse interval"
                         description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl_Shadcn_ className="w-full">
                           <PrePostTab postTab="seconds">
                             <Input_Shadcn_
                               type="number"
@@ -322,18 +322,16 @@ export const SessionsAuthSettingsForm = () => {
                         label="Time-box user sessions"
                         description="The amount of time before a user is forced to sign in again. Use 0 for never."
                       >
-                        <div className="flex items-center">
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig || !isProPlanAndUp}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </div>
+                        <FormControl_Shadcn_ className="w-full">
+                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                            <Input_Shadcn_
+                              type="number"
+                              min={0}
+                              {...field}
+                              disabled={!canUpdateConfig || !isProPlanAndUp}
+                            />
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -349,17 +347,16 @@ export const SessionsAuthSettingsForm = () => {
                         label="Inactivity timeout"
                         description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
                       >
-                        <div className="flex items-center">
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                              <Input_Shadcn_
-                                type="number"
-                                {...field}
-                                disabled={!canUpdateConfig || !isProPlanAndUp}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </div>
+                        <FormControl_Shadcn_ className="w-full">
+                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                            <Input_Shadcn_
+                              type="number"
+                              {...field}
+                              className="flex-1"
+                              disabled={!canUpdateConfig || !isProPlanAndUp}
+                            />
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -368,6 +365,8 @@ export const SessionsAuthSettingsForm = () => {
                 {promptProPlanUpgrade && (
                   <UpgradeToPro
                     fullWidth
+                    source="authSessions"
+                    featureProposition="configure user sessions"
                     primaryText="Configuring user sessions is only available on the Pro Plan and above"
                     secondaryText="Upgrade to the Pro plan to configure settings for user sessions"
                   />
