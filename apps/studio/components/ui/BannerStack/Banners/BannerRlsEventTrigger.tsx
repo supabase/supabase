@@ -21,10 +21,11 @@ export const BannerRlsEventTrigger = () => {
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
   const { data: project } = useSelectedProjectQuery()
+  const projectRef = ref ?? project?.ref
   const [hasCreated, setHasCreated] = useState(false)
   const track = useTrack()
   const [, setIsDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(ref ?? ''),
+    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? 'unknown'),
     false
   )
 
@@ -64,7 +65,7 @@ export const BannerRlsEventTrigger = () => {
     })
   }
 
-  if (isLoadingEventTriggers) return null
+  if (!projectRef || isLoadingEventTriggers) return null
 
   return (
     <BannerCard
@@ -97,7 +98,7 @@ export const BannerRlsEventTrigger = () => {
         <div className="flex gap-2">
           {hasCreated ? (
             <Button asChild type="default" size="tiny">
-              <Link href={`/project/${ref}/database/triggers/event`}>View triggers</Link>
+              <Link href={`/project/${projectRef}/database/triggers/event`}>View triggers</Link>
             </Button>
           ) : (
             <ButtonTooltip

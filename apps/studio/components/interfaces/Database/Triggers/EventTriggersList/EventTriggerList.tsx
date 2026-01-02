@@ -41,12 +41,12 @@ export const EventTriggerList = ({
 }: EventTriggerListProps) => {
   const { ref: projectRef } = useParams()
   const searchValue = filterString.toLowerCase()
-  const systemOwners = new Set(SYSTEM_ROLES.filter((role) => role !== 'postgres'))
+  const systemOwners = new Set<string>(SYSTEM_ROLES)
   const ownerFilterSet = new Set(ownerFilter)
 
   const filteredEventTriggers = eventTriggers.filter((trigger) => {
     const matchesOwner =
-      ownerFilterSet.size === 0 ? true : !!trigger.owner && ownerFilterSet.has(trigger.owner)
+      ownerFilterSet.size === 0 ? true : trigger.owner ? ownerFilterSet.has(trigger.owner) : false
 
     return (
       matchesOwner &&
@@ -91,7 +91,7 @@ export const EventTriggerList = ({
   return (
     <>
       {orderedTriggers.map((trigger) => {
-        const isSystemTrigger = trigger.owner !== 'postgres' && systemOwners.has(trigger.owner)
+        const isSystemTrigger = trigger.owner ? systemOwners.has(trigger.owner) : false
         const canEditTrigger = !isSystemTrigger && canEdit
         const disabledReason = !canEdit
           ? 'You need additional permissions to update event triggers'

@@ -6,6 +6,7 @@ const ensureSemicolon = (statement: string) => {
 }
 
 const escapeLiteral = (value: string) => value.replace(/'/g, "''")
+const escapeIdentifier = (value: string) => value.replace(/"/g, '""')
 
 export const generateEventTriggerCreateSQL = (trigger: DatabaseEventTrigger) => {
   const statements: string[] = []
@@ -15,15 +16,17 @@ export const generateEventTriggerCreateSQL = (trigger: DatabaseEventTrigger) => 
   }
 
   if (trigger.event && trigger.function_schema && trigger.function_name) {
-    statements.push(`DROP EVENT TRIGGER IF EXISTS "${trigger.name}";`)
+    statements.push(`DROP EVENT TRIGGER IF EXISTS "${escapeIdentifier(trigger.name)}";`)
     statements.push(
       [
-        `CREATE EVENT TRIGGER "${trigger.name}"`,
+        `CREATE EVENT TRIGGER "${escapeIdentifier(trigger.name)}"`,
         `ON ${trigger.event}`,
         trigger.tags && trigger.tags.length > 0
           ? `WHEN TAG IN (${trigger.tags.map((tag) => `'${escapeLiteral(tag)}'`).join(', ')})`
           : null,
-        `EXECUTE FUNCTION "${trigger.function_schema}"."${trigger.function_name}"();`,
+        `EXECUTE FUNCTION "${escapeIdentifier(trigger.function_schema)}"."${escapeIdentifier(
+          trigger.function_name
+        )}"();`,
       ]
         .filter(Boolean)
         .join('\n')

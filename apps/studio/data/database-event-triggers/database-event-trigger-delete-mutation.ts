@@ -5,6 +5,8 @@ import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { DatabaseEventTrigger } from './database-event-triggers-query'
 import { databaseEventTriggerKeys } from './keys'
 
+const escapeIdentifier = (value: string) => value.replace(/"/g, '""')
+
 export type DatabaseEventTriggerDeleteVariables = {
   trigger: DatabaseEventTrigger
   projectRef: string
@@ -16,7 +18,7 @@ export async function deleteDatabaseEventTrigger({
   projectRef,
   connectionString,
 }: DatabaseEventTriggerDeleteVariables) {
-  const sql = `DROP EVENT TRIGGER IF EXISTS "${trigger.name}";`
+  const sql = `DROP EVENT TRIGGER IF EXISTS "${escapeIdentifier(trigger.name)}";`
 
   const { result } = await executeSql({
     projectRef,
