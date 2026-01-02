@@ -1,4 +1,4 @@
-import { Clock5, Layers, Timer, Vault, Webhook, Receipt } from 'lucide-react'
+import { Clock5, Layers, Timer, Vault, Webhook, Receipt, Code2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -251,6 +251,53 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
             () =>
               import('components/interfaces/Integrations/Webhooks/ListTab').then(
                 (mod) => mod.WebhooksListTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
+  },
+  {
+    id: 'data_api',
+    type: 'custom' as const,
+    requiredExtensions: [],
+    name: `Data API`,
+    icon: ({ className, ...props } = {}) => (
+      <Code2 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description: 'Configure your project API endpoints and PostgREST settings',
+    docsUrl: `${DOCS_URL}/guides/api`,
+    author: authorSupabase,
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+      {
+        route: 'docs',
+        label: 'Docs',
+      },
+    ],
+    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/OverviewTab').then(
+                (mod) => mod.DataApiOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'docs':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/DocsTab').then(
+                (mod) => mod.DataApiDocsTab
               ),
             {
               loading: Loading,

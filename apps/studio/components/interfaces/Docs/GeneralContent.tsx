@@ -3,6 +3,7 @@ import Introduction from 'components/interfaces/Docs/Introduction'
 import RpcIntroduction from 'components/interfaces/Docs/Pages/Rpc/Introduction'
 import TablesIntroduction from 'components/interfaces/Docs/Pages/Tables/Introduction'
 import { UserManagement } from 'components/interfaces/Docs/Pages/UserManagement'
+import { DocSection } from './DocSection'
 
 interface GeneralContentProps {
   page?: string
@@ -21,9 +22,9 @@ export const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralConten
   if (selected == 'rpc-intro') return <RpcIntroduction />
   else
     return (
-      <div>
-        <h2 className="m-4">Not found</h2>
-        <p className="m-4"> Looks like you went somewhere that nobody knows.</p>
-      </div>
+      <DocSection
+        title="Not found"
+        content={<p>Looks like you went somewhere that nobody knows.</p>}
+      />
     )
 }

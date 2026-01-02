@@ -1,16 +1,22 @@
-import { ServiceList } from 'components/interfaces/Settings/API/ServiceList'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+
+import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
 const ApiSettings: NextPageWithLayout = () => {
-  return (
-    <ScaffoldContainer bottomPadding>
-      <ServiceList />
-    </ScaffoldContainer>
-  )
+  const router = useRouter()
+  const { ref } = useParams()
+
+  useEffect(() => {
+    if (!ref) return
+    router.replace(`/project/${ref}/integrations/data_api/overview`)
+  }, [ref, router])
+
+  return null
 }
 
 ApiSettings.getLayout = (page) => (

@@ -5,6 +5,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
+import { DocSection } from './DocSection'
 import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
 
 interface Props {
@@ -27,10 +28,10 @@ export default function Introduction({ selectedLang }: Props) {
     .includes('public')
 
   return (
-    <>
-      <h2 className="doc-heading">Connect to your project</h2>
-      <div className="doc-section">
-        <article className="code-column text-foreground">
+    <DocSection
+      title="Connect to your project"
+      content={
+        <>
           <p>
             All projects have a RESTful endpoint that you can use with your project's API key to
             query and manage your database. These can be obtained from the{' '}
@@ -41,12 +42,14 @@ export default function Introduction({ selectedLang }: Props) {
             The Supabase client is your entrypoint to the rest of the Supabase functionality and is
             the easiest way to interact with everything we offer within the Supabase ecosystem.
           </p>
-        </article>
-        <article className="code flex flex-col gap-y-2">
+        </>
+      }
+      snippets={
+        <>
           <CodeSnippet selectedLang={selectedLang} snippet={Snippets.init(endpoint)} />
           {isSuccess && !isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
-        </article>
-      </div>
-    </>
+        </>
+      }
+    />
   )
 }

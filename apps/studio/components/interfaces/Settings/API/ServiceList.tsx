@@ -52,7 +52,7 @@ export const ServiceList = () => {
         : selectedDatabase?.restUrl
 
   return (
-    <ScaffoldSection isFullWidth id="api-settings" className="gap-6">
+    <ScaffoldSection isFullWidth id="api-settings" className="gap-6 first:pt-0">
       {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle size={16} />

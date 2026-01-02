@@ -21,7 +21,7 @@ export const InlineLink = ({
   title,
   ...props
 }: PropsWithChildren<InlineLinkProps>) => {
-  const className = cn(InlineLinkClassName, _className)
+  const className = cn('text-link', _className)
   if (href.startsWith('http')) {
     return (
       <a

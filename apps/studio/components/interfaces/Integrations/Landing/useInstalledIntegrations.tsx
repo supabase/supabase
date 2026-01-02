@@ -76,6 +76,9 @@ export const useInstalledIntegrations = () => {
         if (integration.id === 'webhooks') {
           return isHooksEnabled
         }
+        if (integration.id === 'data_api') {
+          return true
+        }
         if (integration.id === 'stripe_sync_engine') {
           const stripeSchema = schemas?.find(({ name }) => name === 'stripe')
           return (
