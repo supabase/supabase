@@ -1,19 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Database, Users } from 'lucide-react'
+import { Database } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import type { SearchContextValue } from './ContextSearchCommands'
 import { SkeletonResults, EmptyState } from './ContextSearchResults.shared'
-
-// Lazy load user search results component
-const UserSearchResults = dynamic(
-  () => import('./UserSearchResults').then((mod) => ({ default: mod.UserSearchResults })),
-  {
-    loading: () => <SkeletonResults />,
-    ssr: false,
-  }
-)
 
 // Lazy load table search results component
 const TableSearchResults = dynamic(
@@ -68,11 +59,6 @@ const CONTEXT_CONFIG: Record<
     requiresInput?: boolean
   }
 > = {
-  users: {
-    icon: Users,
-    label: 'Users',
-    requiresInput: true,
-  },
   'database-tables': {
     icon: Database,
     label: 'Database Tables',
@@ -97,15 +83,6 @@ const CONTEXT_CONFIG: Record<
 
 export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
   const config = CONTEXT_CONFIG[context]
-
-  // Delegate to UserSearchResults for users context
-  if (context === 'users') {
-    return (
-      <div className="flex-1 min-h-0 flex flex-col">
-        <UserSearchResults query={query} />
-      </div>
-    )
-  }
 
   // Delegate to TableSearchResults for database-tables context
   if (context === 'database-tables') {

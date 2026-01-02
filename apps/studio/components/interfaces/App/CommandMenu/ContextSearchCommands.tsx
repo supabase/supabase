@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Database, Users } from 'lucide-react'
+import { Database } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
@@ -20,12 +20,7 @@ import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
 import { useFlag } from 'common'
 
-export type SearchContextValue =
-  | 'users'
-  | 'database-tables'
-  | 'auth-policies'
-  | 'edge-functions'
-  | 'storage'
+export type SearchContextValue = 'database-tables' | 'auth-policies' | 'edge-functions' | 'storage'
 
 interface SearchContextOption {
   value: SearchContextValue
@@ -36,13 +31,6 @@ interface SearchContextOption {
 }
 
 const SEARCH_CONTEXT_OPTIONS: SearchContextOption[] = [
-  {
-    value: 'users',
-    label: 'Users',
-    pageName: 'Search Users',
-    placeholder: 'Search users...',
-    icon: Users,
-  },
   {
     value: 'database-tables',
     label: 'Database Tables',
@@ -100,7 +88,6 @@ export function useContextSearchCommands() {
 
   // Register pages for each context
   const pageDefinitions = [
-    { title: 'Search Users', context: 'users' as const },
     { title: 'Search Database Tables', context: 'database-tables' as const },
     { title: 'Search RLS Policies', context: 'auth-policies' as const },
     { title: 'Search Edge Functions', context: 'edge-functions' as const },
