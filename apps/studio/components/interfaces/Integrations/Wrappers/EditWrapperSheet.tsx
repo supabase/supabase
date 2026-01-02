@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty } from 'lodash'
+import { compact, isEmpty, mapValues } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -8,8 +8,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { FDW } from 'data/fdw/fdws-query'
-import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
@@ -43,11 +42,6 @@ export const EditWrapperSheet = ({
 }: EditWrapperSheetProps) => {
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-
-  const { data: secrets, isPending: isSecretsLoading } = useVaultSecretsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
@@ -137,7 +131,15 @@ export const EditWrapperSheet = ({
           onSubmit={onSubmit}
           className="h-full flex flex-col"
         >
-          {({ values, initialValues, resetForm }: any) => {
+          {({
+            values,
+            initialValues,
+            resetForm,
+          }: {
+            values: Record<string, string>
+            initialValues: Record<string, string>
+            resetForm: any
+          }) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -152,50 +154,51 @@ export const EditWrapperSheet = ({
             const hasChanges = hasFormChanges || hasTableChanges
             hasChangesRef.current = hasChanges
 
-            const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
-
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
-              const fetchEncryptedValues = async () => {
+              const fetchEncryptedValues = async (ids: string[]) => {
                 setLoadingSecrets(true)
                 // If the secrets haven't loaded, escape and run the effect again when they're loaded
-                if (isSecretsLoading) {
-                  return
+                const decryptedValues = await getDecryptedValues({
+                  projectRef: project?.ref,
+                  connectionString: project?.connectionString,
+                  ids: ids,
+                })
+
+                // replace all values which are in the decryptedValues object with the decrypted value
+                const transformValues = (values: Record<string, string>) => {
+                  return mapValues(values, (value) => {
+                    return decryptedValues[value] ?? value
+                  })
                 }
 
-                const res = await Promise.all(
-                  encryptedOptions.map(async (option) => {
-                    const secret = secrets?.find(
-                      (secret) => secret.name === `${wrapper.name}_${option.name}`
-                    )
-                    if (secret !== undefined) {
-                      const value = await getDecryptedValue({
-                        projectRef: project?.ref,
-                        connectionString: project?.connectionString,
-                        id: secret.id,
-                      })
-                      return { [option.name]: value[0]?.decrypted_secret ?? '' }
-                    } else {
-                      return { [option.name]: '' }
-                    }
-                  })
-                )
-                const secretValues = res.reduce((a: any, b: any) => {
-                  const [key] = Object.keys(b)
-                  return { ...a, [key]: b[key] }
-                }, {})
-
                 resetForm({
-                  values: { ...values, ...secretValues },
-                  initialValues: { ...initialValues, ...secretValues },
+                  values: transformValues(values),
+                  initialValues: transformValues(initialValues),
                 })
                 setLoadingSecrets(false)
               }
 
-              if (encryptedOptions.length > 0) fetchEncryptedValues()
-            }, [isSecretsLoading])
+              const encryptedOptions = wrapperMeta.server.options.filter(
+                (option) => option.encrypted
+              )
+
+              const encryptedIdsToFetch = compact(
+                encryptedOptions.map((option) => {
+                  const value = initialValues[option.name]
+                  if (value) {
+                    return value as string
+                  }
+                  return null
+                })
+              )
+
+              if (encryptedIdsToFetch.length > 0) {
+                fetchEncryptedValues(encryptedIdsToFetch)
+              }
+            }, [])
 
             return (
               <>
