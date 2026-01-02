@@ -1,5 +1,6 @@
-import { EvalCase, EvalScorer } from 'braintrust'
+import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
+import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 
@@ -8,7 +9,9 @@ const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 type Input = string
 
 type Output = {
+  finishReason: FinishReason
   stepsSerialized: string
+  textOnly: string
   toolNames: string[]
   sqlQueries: string[]
   docs: string[]
@@ -16,6 +19,7 @@ type Output = {
 
 export type Expected = {
   requiredTools?: string[]
+  correctAnswer?: string
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -155,5 +159,82 @@ export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async (
   return await goalCompletionEvaluator({
     input,
     output: output.stepsSerialized,
+  })
+}
+
+const docsFaithfulnessEvaluator = LLMClassifierFromTemplate<{ docs: string }>({
+  name: 'Docs Faithfulness',
+  promptTemplate: stripIndent`
+    Evaluate whether the assistant's response accurately reflects the information in the retrieved documentation.
+    
+    Retrieved Documentation:
+    {{docs}}
+    
+    Assistant Response:
+    {{output}}
+    
+    Does the assistant's response accurately reflect the documentation without contradicting it or adding unsupported claims?
+    a) Faithful - response accurately reflects the docs, no contradictions or unsupported claims
+    b) Partially faithful - mostly accurate but has minor inaccuracies or unsupported details
+    c) Not faithful - contradicts the docs or makes significant unsupported claims
+  `,
+  choiceScores: { a: 1, b: 0.5, c: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+  // Skip scoring if no docs were retrieved
+  if (!output.docs || output.docs.length === 0) {
+    return null
+  }
+
+  const docsText = output.docs.join('\n\n')
+
+  return await docsFaithfulnessEvaluator({
+    docs: docsText,
+    output: output.textOnly,
+  })
+}
+
+const correctnessEvaluator = LLMClassifierFromTemplate<{ expected: string }>({
+  name: 'Correctness',
+  promptTemplate: stripIndent`
+    Evaluate whether the assistant's answer is correct according to the expected answer.
+
+    Question:
+    {{input}}
+    
+    Expected Answer:
+    {{expected}}
+    
+    Assistant Response:
+    {{output}}
+    
+    Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
+    - Include the expected answer (or equivalent information)
+    - Not contradict the expected answer
+    
+    a) Correct - response includes the expected answer, no contradictions or omissions
+    b) Partially correct - includes most of the expected answer but has minor omissions or contradictions
+    c) Incorrect - contradicts or fails to provide the expected answer
+  `,
+  choiceScores: { a: 1, b: 0.5, c: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
+  output,
+  expected,
+}) => {
+  // Skip scoring if no ground truth is provided
+  if (!expected.correctAnswer) {
+    return null
+  }
+
+  return await correctnessEvaluator({
+    expected: expected.correctAnswer,
+    output: output.textOnly,
   })
 }

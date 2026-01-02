@@ -35,4 +35,21 @@ export const dataset: AssistantEvalCase[] = [
     },
     metadata: { category: ['sql_generation', 'database_optimization'] },
   },
+  {
+    input: 'Restore my Supabase Storage files to the state from 3 days ago',
+    expected: {
+      requiredTools: ['search_docs'],
+      correctAnswer:
+        'There is no way to restore these files. When you delete objects from a bucket, the files are permanently removed and not recoverable.',
+    },
+    metadata: { category: ['general_help'] },
+  },
+  {
+    input: 'How many projects are included in the free tier?',
+    expected: {
+      requiredTools: ['search_docs'],
+      correctAnswer: '2',
+    },
+    metadata: { category: ['general_help'] },
+  },
 ]
