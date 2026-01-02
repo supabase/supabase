@@ -278,7 +278,6 @@ services:
       IMGPROXY_URL: http://imgproxy:5001
       S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
       S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
-      S3_PROTOCOL_PREFIX: ${S3_PROTOCOL_PREFIX}
 
   imgproxy:
     container_name: supabase-imgproxy

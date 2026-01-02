@@ -61,6 +61,7 @@ services:
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: s3
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
@@ -78,7 +79,6 @@ services:
       IMGPROXY_URL: http://imgproxy:5001
       S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
       S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
-      S3_PROTOCOL_PREFIX: ${S3_PROTOCOL_PREFIX}
     volumes:
       - ./volumes/storage:/var/lib/storage:z
 
