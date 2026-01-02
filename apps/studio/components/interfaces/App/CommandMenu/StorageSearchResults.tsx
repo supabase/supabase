@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useCallback } from 'react'
-import { Storage } from 'icons'
+import { Storage, FilesBucket, AnalyticsBucket as AnalyticsBucketIcon, VectorBucket } from 'icons'
 import { Loader2 } from 'lucide-react'
 import { useParams } from 'common'
 import { useBucketsQuery, type Bucket } from 'data/storage/buckets-query'
@@ -26,10 +26,24 @@ type ExtendedSearchResult = SearchResult & {
   bucket?: unknown
 }
 
-export function StorageSearchResults({ query }: StorageSearchResultsProps) {
-  const { ref: projectRef } = useParams()
+function filterBuckets<T>(
+  buckets: T[] | null | undefined,
+  query: string,
+  filterFn: (bucket: T, searchLower: string) => boolean,
+  mapFn: (bucket: T) => ExtendedSearchResult
+): ExtendedSearchResult[] {
+  if (!buckets) return []
 
   const trimmedQuery = query.trim()
+  const filtered = trimmedQuery
+    ? buckets.filter((bucket) => filterFn(bucket, trimmedQuery.toLowerCase()))
+    : buckets
+
+  return filtered.slice(0, 10).map(mapFn)
+}
+
+export function StorageSearchResults({ query }: StorageSearchResultsProps) {
+  const { ref: projectRef } = useParams()
 
   const {
     data: fileBuckets,
@@ -70,93 +84,84 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     }
   )
 
-  const vectorBuckets = useMemo(() => vectorBucketsData?.vectorBuckets ?? [], [vectorBucketsData])
+  const vectorBuckets = vectorBucketsData?.vectorBuckets ?? []
 
   const isLoading = isLoadingFileBuckets || isLoadingAnalyticsBuckets || isLoadingVectorBuckets
   const isError = isErrorFileBuckets || isErrorAnalyticsBuckets || isErrorVectorBuckets
 
   // Filter and format file buckets
   const fileBucketResults: ExtendedSearchResult[] = useMemo(() => {
-    if (!fileBuckets) return []
+    return filterBuckets(
+      fileBuckets,
+      query,
+      (bucket, searchLower) => {
+        const bucketName = bucket.name?.toLowerCase() || ''
+        const bucketId = bucket.id?.toLowerCase() || ''
+        return bucketName.includes(searchLower) || bucketId.includes(searchLower)
+      },
+      (bucket) => {
+        const displayName = bucket.name || bucket.id || 'Untitled Bucket'
+        const visibility = bucket.public ? 'Public' : 'Private'
+        const description = `File bucket • ${visibility}`
 
-    const filtered = trimmedQuery
-      ? fileBuckets.filter((bucket) => {
-          const searchLower = trimmedQuery.toLowerCase()
-          const bucketName = bucket.name?.toLowerCase() || ''
-          const bucketId = bucket.id?.toLowerCase() || ''
-
-          return bucketName.includes(searchLower) || bucketId.includes(searchLower)
-        })
-      : fileBuckets
-
-    return filtered.slice(0, 10).map((bucket) => {
-      const displayName = bucket.name || bucket.id || 'Untitled Bucket'
-      const visibility = bucket.public ? 'Public' : 'Private'
-      const description = `File bucket • ${visibility}`
-
-      return {
-        id: `file-bucket-${bucket.id || bucket.name}`,
-        name: displayName,
-        description,
-        bucketType: 'file' as const,
-        bucket,
+        return {
+          id: `file-bucket-${bucket.id || bucket.name}`,
+          name: displayName,
+          description,
+          bucketType: 'file' as const,
+          bucket,
+        }
       }
-    })
-  }, [fileBuckets, trimmedQuery])
+    )
+  }, [fileBuckets, query])
 
   // Filter and format analytics buckets
   const analyticsBucketResults: ExtendedSearchResult[] = useMemo(() => {
-    if (!analyticsBuckets) return []
+    return filterBuckets(
+      analyticsBuckets,
+      query,
+      (bucket, searchLower) => {
+        const bucketName = bucket.name?.toLowerCase() || ''
+        return bucketName.includes(searchLower)
+      },
+      (bucket) => {
+        const displayName = bucket.name || 'Untitled Bucket'
+        const description = 'Analytics bucket'
 
-    const filtered = trimmedQuery
-      ? analyticsBuckets.filter((bucket) => {
-          const searchLower = trimmedQuery.toLowerCase()
-          const bucketName = bucket.name?.toLowerCase() || ''
-
-          return bucketName.includes(searchLower)
-        })
-      : analyticsBuckets
-
-    return filtered.slice(0, 10).map((bucket) => {
-      const displayName = bucket.name || 'Untitled Bucket'
-      const description = 'Analytics bucket'
-
-      return {
-        id: `analytics-bucket-${bucket.name}`,
-        name: displayName,
-        description,
-        bucketType: 'analytics' as const,
-        bucket,
+        return {
+          id: `analytics-bucket-${bucket.name}`,
+          name: displayName,
+          description,
+          bucketType: 'analytics' as const,
+          bucket,
+        }
       }
-    })
-  }, [analyticsBuckets, trimmedQuery])
+    )
+  }, [analyticsBuckets, query])
 
   // Filter and format vector buckets
   const vectorBucketResults: ExtendedSearchResult[] = useMemo(() => {
-    if (!vectorBuckets) return []
+    return filterBuckets(
+      vectorBuckets,
+      query,
+      (bucket, searchLower) => {
+        const bucketName = bucket.vectorBucketName?.toLowerCase() || ''
+        return bucketName.includes(searchLower)
+      },
+      (bucket) => {
+        const displayName = bucket.vectorBucketName || 'Untitled Bucket'
+        const description = 'Vector bucket'
 
-    const filtered = trimmedQuery
-      ? vectorBuckets.filter((bucket) => {
-          const searchLower = trimmedQuery.toLowerCase()
-          const bucketName = bucket.vectorBucketName?.toLowerCase() || ''
-
-          return bucketName.includes(searchLower)
-        })
-      : vectorBuckets
-
-    return filtered.slice(0, 10).map((bucket) => {
-      const displayName = bucket.vectorBucketName || 'Untitled Bucket'
-      const description = 'Vector bucket'
-
-      return {
-        id: `vector-bucket-${bucket.vectorBucketName}`,
-        name: displayName,
-        description,
-        bucketType: 'vector' as const,
-        bucket,
+        return {
+          id: `vector-bucket-${bucket.vectorBucketName}`,
+          name: displayName,
+          description,
+          bucketType: 'vector' as const,
+          bucket,
+        }
       }
-    })
-  }, [vectorBuckets, trimmedQuery])
+    )
+  }, [vectorBuckets, query])
 
   // Combine all bucket types
   const allResults: ExtendedSearchResult[] = useMemo(() => {
@@ -196,6 +201,14 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
 
   const totalBuckets =
     (fileBuckets?.length ?? 0) + (analyticsBuckets?.length ?? 0) + (vectorBuckets?.length ?? 0)
+
+  const getIcon = useCallback((result: SearchResult) => {
+    const extendedResult = result as ExtendedSearchResult
+    if (extendedResult.bucketType === 'file') return FilesBucket
+    if (extendedResult.bucketType === 'analytics') return AnalyticsBucketIcon
+    if (extendedResult.bucketType === 'vector') return VectorBucket
+    return Storage
+  }, [])
 
   const renderFooter = () => (
     <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
@@ -252,7 +265,13 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
   return (
     <div className="relative h-full flex flex-col">
       <div className="flex-1 min-h-0 overflow-hidden">
-        <ResultsList results={allResults} icon={Storage} getRoute={getRoute} className="pb-9" />
+        <ResultsList
+          results={allResults}
+          icon={Storage}
+          getIcon={getIcon}
+          getRoute={getRoute}
+          className="pb-9"
+        />
       </div>
       {renderFooter()}
     </div>

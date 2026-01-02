@@ -32,7 +32,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
       ...options,
       deps: [ref],
       orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 1 },
+      sectionMeta: { priority: 2 },
     }
   )
 

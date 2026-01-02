@@ -49,6 +49,7 @@ export function EmptyState({ icon: Icon, label, query }: EmptyStateProps) {
 interface ResultsListProps {
   results: SearchResult[]
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  getIcon?: (result: SearchResult) => React.ComponentType<React.SVGProps<SVGSVGElement>>
   onResultClick?: (result: SearchResult) => void
   getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
   className?: string
@@ -60,16 +61,18 @@ interface ResultsListProps {
 export function ResultsList({
   results,
   icon: Icon,
+  getIcon,
   onResultClick,
   getRoute,
   className,
 }: ResultsListProps) {
   const commands = results.map((result): IRouteCommand | IActionCommand => {
+    const ResultIcon = getIcon ? getIcon(result) : Icon
     const baseCommand = {
       id: result.id,
       name: result.name,
       value: result.description ? `${result.name} ${result.description}` : result.name,
-      icon: () => <Icon className="h-4 w-4" strokeWidth={1.5} />,
+      icon: () => <ResultIcon className="h-4 w-4" strokeWidth={1.5} />,
     }
 
     if (getRoute) {
