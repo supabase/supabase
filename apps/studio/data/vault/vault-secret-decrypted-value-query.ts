@@ -87,5 +87,5 @@ export const getDecryptedValues = async (
   const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
   return result.reduce((a: any, b: any) => {
     return { ...a, [b.id]: b.decrypted_secret }
-  }, {})
+  }, {}) as { [key: string]: string }
 }
