@@ -18,7 +18,8 @@ import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
-import { useFlag } from 'common'
+import { useFlag, IS_PLATFORM } from 'common'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { SearchContextValue } from './SearchContext.types'
 
 interface SearchContextOption {
@@ -84,6 +85,12 @@ export function useContextSearchCommands() {
   const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+
   const pageDefinitions = [
     { title: 'Search Database Tables', context: 'database-tables' as const },
     { title: 'Search RLS Policies', context: 'auth-policies' as const },
@@ -102,20 +109,44 @@ export function useContextSearchCommands() {
     })
   }
 
-  const contextCommands = useMemo(
-    () =>
-      SEARCH_CONTEXT_OPTIONS.map((option) => ({
-        id: `search-${option.value}`,
-        name: `Search ${option.label}...`,
-        action: () => setPage(option.pageName),
-        icon: () => <option.icon className="h-4 w-4" strokeWidth={1.5} />,
-      })) as ICommand[],
-    [setPage]
-  )
+  const contextCommands = useMemo(() => {
+    return SEARCH_CONTEXT_OPTIONS.filter((option) => {
+      let isFeatureEnabled = false
+      switch (option.value) {
+        case 'database-tables':
+          isFeatureEnabled = true
+          break
+        case 'auth-policies':
+          isFeatureEnabled = authEnabled
+          break
+        case 'edge-functions':
+          isFeatureEnabled = edgeFunctionsEnabled
+          break
+        case 'storage':
+          isFeatureEnabled = storageEnabled
+          break
+      }
+
+      if (!isFeatureEnabled) return false
+
+      // If self-hosted, show if feature is enabled
+      if (!IS_PLATFORM) {
+        return true
+      }
+
+      // only show when inside a project if not self-hosted
+      return !!project
+    }).map((option) => ({
+      id: `search-${option.value}`,
+      name: `Search ${option.label}...`,
+      action: () => setPage(option.pageName),
+      icon: () => <option.icon className="h-4 w-4" strokeWidth={1.5} />,
+    })) as ICommand[]
+  }, [setPage, authEnabled, edgeFunctionsEnabled, storageEnabled, project])
 
   useRegisterCommands(COMMAND_MENU_SECTIONS.QUERY, contextCommands, {
     orderSection: orderCommandSectionsByPriority,
     sectionMeta: { priority: 3 },
-    enabled: enableSearchEntitiesCommandMenu && !!project,
+    enabled: !IS_PLATFORM || (enableSearchEntitiesCommandMenu && !!project),
   })
 }
