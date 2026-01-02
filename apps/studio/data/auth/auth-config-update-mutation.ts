@@ -44,7 +44,7 @@ export const useAuthConfigUpdateMutation = ({
       const { projectRef } = variables
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },
