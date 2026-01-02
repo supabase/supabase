@@ -37,7 +37,6 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
     }
   )
 
-  // Filter policies based on query
   const policyResults: SearchResult[] = useMemo(() => {
     if (!policies) return []
 
@@ -143,7 +142,6 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
             if (!policy || !projectRef)
               return `/project/${projectRef}/auth/policies` as `/${string}`
 
-            // Build route to policies page with edit query param and schema
             const params = new URLSearchParams()
             params.set('edit', String(policy.id))
             if (policy.schema) {

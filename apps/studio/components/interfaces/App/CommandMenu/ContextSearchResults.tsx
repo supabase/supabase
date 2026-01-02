@@ -6,7 +6,6 @@ import { Auth, EdgeFunctions, Storage } from 'icons'
 import type { SearchContextValue } from './ContextSearchCommands'
 import { SkeletonResults, EmptyState } from './ContextSearchResults.shared'
 
-// Lazy load table search results component
 const TableSearchResults = dynamic(
   () => import('./TableSearchResults').then((mod) => ({ default: mod.TableSearchResults })),
   {
@@ -15,7 +14,6 @@ const TableSearchResults = dynamic(
   }
 )
 
-// Lazy load policy search results component
 const PolicySearchResults = dynamic(
   () => import('./PolicySearchResults').then((mod) => ({ default: mod.PolicySearchResults })),
   {
@@ -24,7 +22,6 @@ const PolicySearchResults = dynamic(
   }
 )
 
-// Lazy load edge function search results component
 const EdgeFunctionSearchResults = dynamic(
   () =>
     import('./EdgeFunctionSearchResults').then((mod) => ({
@@ -36,7 +33,6 @@ const EdgeFunctionSearchResults = dynamic(
   }
 )
 
-// Lazy load storage search results component
 const StorageSearchResults = dynamic(
   () => import('./StorageSearchResults').then((mod) => ({ default: mod.StorageSearchResults })),
   {
@@ -55,8 +51,7 @@ const CONTEXT_CONFIG: Record<
   {
     icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
     label: string
-    /** If true, requires user input before showing results */
-    requiresInput?: boolean
+    requiresInput?: boolean // requires user input before showing results
   }
 > = {
   'database-tables': {
@@ -84,7 +79,6 @@ const CONTEXT_CONFIG: Record<
 export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
   const config = CONTEXT_CONFIG[context]
 
-  // Delegate to TableSearchResults for database-tables context
   if (context === 'database-tables') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
@@ -93,7 +87,6 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
     )
   }
 
-  // Delegate to PolicySearchResults for auth-policies context
   if (context === 'auth-policies') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
@@ -102,7 +95,6 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
     )
   }
 
-  // Delegate to EdgeFunctionSearchResults for edge-functions context
   if (context === 'edge-functions') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
@@ -111,7 +103,6 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
     )
   }
 
-  // Delegate to StorageSearchResults for storage context
   if (context === 'storage') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
@@ -120,7 +111,6 @@ export function ContextSearchResults({ context, query }: ContextSearchResultsPro
     )
   }
 
-  // Fallback: show empty state for any unhandled contexts
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <EmptyState icon={config.icon} label={config.label} query={query} />

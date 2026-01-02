@@ -55,9 +55,6 @@ interface ResultsListProps {
   className?: string
 }
 
-/**
- * Renders a list of results using CommandMenu components for keyboard accessibility
- */
 export function ResultsList({
   results,
   icon: Icon,
@@ -98,10 +95,10 @@ export function ResultsList({
       <CommandGroup>
         {commands.map((command) => (
           <CommandItem key={command.id} command={command}>
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 text-foreground-light">
               <TextHighlighter>{command.name}</TextHighlighter>
               {command.value && command.value !== command.name && (
-                <p className="text-xs text-foreground-muted truncate mt-0.5">
+                <p className="text-xs text-foreground-lighter/70 truncate mt-0.5">
                   {command.value.replace(command.name, '').trim()}
                 </p>
               )}

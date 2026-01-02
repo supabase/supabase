@@ -89,7 +89,6 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
   const isLoading = isLoadingFileBuckets || isLoadingAnalyticsBuckets || isLoadingVectorBuckets
   const isError = isErrorFileBuckets || isErrorAnalyticsBuckets || isErrorVectorBuckets
 
-  // Filter and format file buckets
   const fileBucketResults: ExtendedSearchResult[] = useMemo(() => {
     return filterBuckets(
       fileBuckets,
@@ -115,7 +114,6 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     )
   }, [fileBuckets, query])
 
-  // Filter and format analytics buckets
   const analyticsBucketResults: ExtendedSearchResult[] = useMemo(() => {
     return filterBuckets(
       analyticsBuckets,
@@ -139,7 +137,6 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     )
   }, [analyticsBuckets, query])
 
-  // Filter and format vector buckets
   const vectorBucketResults: ExtendedSearchResult[] = useMemo(() => {
     return filterBuckets(
       vectorBuckets,
@@ -163,7 +160,6 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     )
   }, [vectorBuckets, query])
 
-  // Combine all bucket types
   const allResults: ExtendedSearchResult[] = useMemo(() => {
     return [...fileBucketResults, ...analyticsBucketResults, ...vectorBucketResults].slice(0, 20)
   }, [fileBucketResults, analyticsBucketResults, vectorBucketResults])
@@ -193,7 +189,6 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
         }
       }
 
-      // Fallback
       return `/project/${projectRef}/storage/files` as `/${string}`
     },
     [projectRef]

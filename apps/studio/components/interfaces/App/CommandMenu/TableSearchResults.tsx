@@ -38,7 +38,6 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
     }
   )
 
-  // Filter tables based on query
   const tableResults: SearchResult[] = useMemo(() => {
     if (!tables) return []
 
@@ -155,7 +154,6 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
             const table = tables?.find((t) => String(t.id) === result.id)
             if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
 
-            // Build relative path similar to buildTableEditorUrl but without full URL
             const schemaParam = table.schema ? `?schema=${table.schema}` : ''
             return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
           }}

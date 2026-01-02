@@ -34,7 +34,6 @@ export function EdgeFunctionSearchResults({ query }: EdgeFunctionSearchResultsPr
     }
   )
 
-  // Filter functions based on query
   const functionResults: SearchResult[] = useMemo(() => {
     if (!functions) return []
 

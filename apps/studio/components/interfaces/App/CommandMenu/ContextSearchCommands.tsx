@@ -73,7 +73,6 @@ function ContextSearchPage({
   return (
     <CommandWrapper>
       <CommandHeader>
-        {/* <Breadcrumb /> */}
         <CommandInput placeholder={placeholder} />
       </CommandHeader>
       <ContextSearchResults context={context} query={query} />
@@ -86,7 +85,6 @@ export function useContextSearchCommands() {
   const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
-  // Register pages for each context
   const pageDefinitions = [
     { title: 'Search Database Tables', context: 'database-tables' as const },
     { title: 'Search RLS Policies', context: 'auth-policies' as const },
@@ -105,7 +103,6 @@ export function useContextSearchCommands() {
     })
   }
 
-  // Register top-level commands
   const contextCommands = useMemo(
     () =>
       SEARCH_CONTEXT_OPTIONS.map((option) => ({
