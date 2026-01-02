@@ -19,9 +19,10 @@ If you get stuck while working through this guide, refer to the full examples on
 
 Before you begin, make sure you have:
 
-- [Docker](https://docs.docker.com/get-docker/) installed (required for local development)
+- [Docker](https://docs.docker.com/get-docker/) installed and running (required for local development)
 - [Deno](https://deno.land/) installed (Supabase Edge Functions runtime)
-- [Supabase CLI](/docs/guides/cli/getting-started) installed
+- [Supabase CLI](/docs/guides/local-development) installed
+- [Node.js 20 or later](https://nodejs.org/) (required by Supabase CLI)
 
 **For authentication (Part 2):**
 
@@ -77,18 +78,6 @@ Create a new Edge Function for your MCP server:
 supabase functions new mcp
 ```
 
-Create a `deno.json` file in `supabase/functions/mcp/` with the required dependencies:
-
-```json name=supabase/functions/mcp/deno.json
-{
-  "imports": {
-    "@modelcontextprotocol/sdk/": "npm:@modelcontextprotocol/sdk@1.25.1/",
-    "hono": "npm:hono@^4.9.2",
-    "zod": "npm:zod@^4.1.13"
-  }
-}
-```
-
 <Admonition type="tip">
 
 This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) with the `WebStandardStreamableHTTPServerTransport`, but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite) or [mcp-handler](https://github.com/vercel/mcp-handler).
@@ -101,10 +90,10 @@ Replace the contents of `supabase/functions/mcp/index.ts` with:
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
-import { Hono } from 'hono'
-import { z } from 'zod'
+import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.1/server/mcp.js'
+import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.1/server/webStandardStreamableHttp.js'
+import { Hono } from 'npm:hono@^4.9.2'
+import { z } from 'npm:zod@^4.1.13'
 
 // Create Hono app
 const app = new Hono()
@@ -128,8 +117,8 @@ server.registerTool(
   })
 )
 
-// Handle MCP requests at the root path
-app.all('/', async (c) => {
+// Handle MCP requests
+app.all('*', async (c) => {
   const transport = new WebStandardStreamableHTTPServerTransport()
   await server.connect(transport)
   return transport.handleRequest(c.req.raw)
@@ -140,7 +129,7 @@ Deno.serve(app.fetch)
 
 <Admonition type="note">
 
-After this step, you should have a new file at `supabase/functions/mcp/index.ts` and `supabase/functions/mcp/deno.json`.
+After this step, you should have a new file at `supabase/functions/mcp/index.ts`.
 
 </Admonition>
 
@@ -171,6 +160,44 @@ http://localhost:54321/functions/v1/mcp
 The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer. When adding authentication to your MCP server, you'll implement your own OAuth middleware instead. See [Part 2: Adding authentication](#part-2-adding-authentication) below.
 
 </Admonition>
+
+
+#### Test with curl
+
+You can also test your MCP server directly with curl. Call the `add` tool:
+
+```bash
+curl -X POST 'http://localhost:54321/functions/v1/mcp' \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "add",
+      "arguments": {
+        "a": 5,
+        "b": 3
+      }
+    }
+  }'
+```
+
+<Admonition type="note">
+
+The MCP Streamable HTTP transport requires the `Accept: application/json, text/event-stream` header to indicate the client supports both JSON and Server-Sent Events responses.
+
+</Admonition>
+
+**Expected response:**
+
+The response uses Server-Sent Events (SSE) format:
+
+```
+event: message
+data: {"result":{"content":[{"type":"text","text":"8"}]},"jsonrpc":"2.0","id":1}
+```
 
 #### Test with MCP Inspector
 
@@ -229,12 +256,14 @@ This guide uses Supabase Auth, but you can use any OAuth-compatible provider. Su
 
 Before implementing, understand the flow:
 
-1. Client requests MCP endpoint -> Server returns 401 with `WWW-Authenticate` header containing metadata URL
-2. Client discovers OAuth config -> Fetches `/mcp/oauth-protected-resource` to find authorization server
-3. User authenticates -> Redirected to consent page, logs in, approves access
-4. Client receives token -> Authorization server issues access token
-5. Client retries request -> Includes token in `Authorization: Bearer` header
-6. Server validates token -> Uses Supabase Auth to verify, grants access to MCP tools
+1. Client requests MCP endpoint -> Server returns 401 with `WWW-Authenticate` header containing `resource_metadata` URL
+2. Client fetches protected resource metadata -> Requests the URL from the `resource_metadata` field (e.g., `/.well-known/oauth-protected-resource/...`)
+3. Client discovers authorization server -> Parses the metadata response to find the `authorization_servers` URL
+4. Client fetches authorization server metadata -> Requests `/.well-known/oauth-authorization-server/` to get OAuth endpoints
+5. User authenticates -> Redirected to consent page, logs in, approves access
+6. Client receives token -> Authorization server issues access token
+7. Client retries request -> Includes token in `Authorization: Bearer` header
+8. Server validates token -> Uses Supabase Auth to verify, grants access to MCP tools
 
 For the complete authorization flow specification, see the [MCP Authorization documentation](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization#authorization-flow-steps).
 
