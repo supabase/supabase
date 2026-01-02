@@ -97,8 +97,10 @@ export function ApiKeyPill({
         return ''
       }
     } catch (error) {
-      console.error('Failed to fetch API key:', error)
-      return ''
+      const message =
+        error instanceof Error ? error.message : 'Failed to create API key'
+      toast.error(message)
+        return ''
     }
 
     // Fallback to the masked version if fetch fails
