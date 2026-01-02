@@ -96,7 +96,7 @@ export function ApiKeyPill({
         toast.error('Failed to copy secret API key')
         return ''
       }
-    } catch (error) {
+    } catch (error:unknown) {
       console.error('Failed to fetch API key:', error)
       return ''
     }
