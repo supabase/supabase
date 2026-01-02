@@ -193,17 +193,14 @@ export const EditWrapperSheet = ({
               const encryptedIdsToFetch = compact(
                 encryptedOptions.map((option) => {
                   const value = initialValues[option.name]
-                  if (value) {
-                    return value as string
-                  }
-                  return null
+                  return value ?? null
                 })
               )
 
               if (encryptedIdsToFetch.length > 0) {
                 fetchEncryptedValues(encryptedIdsToFetch)
               }
-            }, [])
+            }, [project?.ref, project?.connectionString])
 
             return (
               <>
