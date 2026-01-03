@@ -3,14 +3,6 @@ title: Migrating within Supabase
 subtitle: Learn how to migrate from one Supabase project to another
 ---
 
-<Admonition type="note" title="" className="mt-3">
-
-If you are on a Paid plan and physical backups for your Supabase project, you should use the Restore to a new project feature instead.
-
-[Learn more about the Restore to a new project feature](/docs/guides/platform/clone-project)
-
-</Admonition>
-
 ### Caveats
 
 - If you need to move your project to a different organization, see [project transfers](/docs/guides/platform/project-transfer).
@@ -237,3 +229,4 @@ className="text-foreground-light mt-8 mb-6"
 
 - If you have created any custom roles with login attribute, you have to manually set their passwords in the new project.
 - If you get this error: **"...received invalid response to GSSAPI negotiation..."**. You are likely using psql and Postgres version 15 or lower. Install the latest version to resolve this issue.
+- If you are still getting connection errors, try adding this to the end of the connection string: "?sslmode=require&gssencmode=disable"
