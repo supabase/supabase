@@ -1949,60 +1949,231 @@ export const WRAPPERS: WrapperMeta[] = [
     },
     tables: [
       {
-        label: 'Redis Table',
-        description: 'Map to an Redis Table',
+        label: 'List',
+        description: 'Redis list data structure',
+        availableColumns: [
+          {
+            name: 'element',
+            type: 'text',
+          },
+        ],
         options: [
           {
             name: 'src_type',
-            label: 'Source Type',
-            editable: true,
-            required: true,
-            type: 'select',
             defaultValue: 'list',
-            options: [
-              {
-                label: 'list',
-                value: 'list',
-              },
-              {
-                label: 'set',
-                value: 'set',
-              },
-              {
-                label: 'hash',
-                value: 'hash',
-              },
-              {
-                label: 'zset',
-                value: 'zset',
-              },
-              {
-                label: 'stream',
-                value: 'stream',
-              },
-              {
-                label: 'multi_list',
-                value: 'multi_list',
-              },
-              {
-                label: 'multi_set',
-                value: 'multi_set',
-              },
-              {
-                label: 'multi_hash',
-                value: 'multi_hash',
-              },
-              {
-                label: 'multi_zset',
-                value: 'multi_zset',
-              },
-            ],
+            editable: false,
+            required: true,
+            type: 'text',
           },
           {
             name: 'src_key',
             label: 'Source Key',
             editable: true,
-            required: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Set',
+        description: 'Redis set data structure',
+        availableColumns: [
+          {
+            name: 'element',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'set',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Sorted Set (zset)',
+        description: 'Redis sorted set data structure',
+        availableColumns: [
+          {
+            name: 'element',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'zset',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Hash',
+        description: 'Redis hash data structure',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'value',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'hash',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Stream',
+        description: 'Redis stream data structure',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'stream',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi List',
+        description: 'Query multiple Redis lists',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_list',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi Set',
+        description: 'Query multiple Redis sets',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_set',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi Hash',
+        description: 'Query multiple Redis hashes',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_hash',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi Sorted Set (multi_zset)',
+        description: 'Query multiple Redis sorted sets',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_zset',
+            editable: false,
+            required: true,
             type: 'text',
           },
         ],
