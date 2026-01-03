@@ -6935,6 +6935,7 @@ export interface components {
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
+            | 'security.soc2_report'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
