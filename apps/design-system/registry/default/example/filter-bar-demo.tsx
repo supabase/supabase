@@ -1,10 +1,11 @@
 import { format } from 'date-fns'
 import { useState } from 'react'
-import { Button, Button_Shadcn_, Calendar, Input_Shadcn_ } from 'ui'
+import { DateRange } from 'react-day-picker'
+import { Button, Calendar } from 'ui'
 import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns'
 
 function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<any | undefined>(
+  const [date, setDate] = useState<DateRange | undefined>(
     search
       ? {
           from: new Date(search),
@@ -46,46 +47,18 @@ function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
   )
 }
 
-function CustomTimePicker({ onChange, onCancel, search }: CustomOptionProps) {
-  const [time, setTime] = useState(search || '')
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Select Time</h3>
-      <Input_Shadcn_ type="time" value={time} onChange={(e) => setTime(e.target.value)} />
-      <div className="flex justify-end gap-2">
-        <Button_Shadcn_ variant="outline" onClick={onCancel}>
-          Cancel
-        </Button_Shadcn_>
-        <Button_Shadcn_ onClick={() => onChange(time)}>Apply</Button_Shadcn_>
-      </div>
-    </div>
-  )
-}
-
-function CustomRangePicker({ onChange, onCancel, search }: CustomOptionProps) {
-  const [range, setRange] = useState(search || '')
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Select Range</h3>
-      <Input_Shadcn_ type="range" value={range} onChange={(e) => setRange(e.target.value)} />
-      <div className="flex justify-end gap-2">
-        <Button_Shadcn_ variant="outline" onClick={onCancel}>
-          Cancel
-        </Button_Shadcn_>
-        <Button_Shadcn_ onClick={() => onChange(range)}>Apply</Button_Shadcn_>
-      </div>
-    </div>
-  )
-}
-
 const filterProperties = [
   {
     label: 'Name',
     name: 'name',
     type: 'string' as const,
-    operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+    operators: [
+      { value: '=', label: 'Equals' },
+      { value: '!=', label: 'Not equals' },
+      { value: 'CONTAINS', label: 'Contains' },
+      { value: 'STARTS WITH', label: 'Starts with' },
+      { value: 'ENDS WITH', label: 'Ends with' },
+    ],
   },
   {
     label: 'Status',
@@ -138,7 +111,6 @@ const filterProperties = [
         </div>
       ),
     },
-    triggerOnPropertyClick: true,
     operators: ['=', '!=', '>', '<', '>=', '<='],
   },
 ]
