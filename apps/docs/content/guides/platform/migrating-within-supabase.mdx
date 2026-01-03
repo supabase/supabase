@@ -59,9 +59,9 @@ className="text-foreground-light mt-8 mb-6"
         id="backup-project"
         >
         <StepHikeCompact>
-        The database backup can be downloaded from the [Database backups](dashboard/project/_/database/backups/scheduled) page or from the [paused project](dashboard/project/_) page if paused for greater than 90 days.
+        Database backups can be downloaded from the [Database backups](dashboard/project/_/database/backups/scheduled) page or from the [paused project](dashboard/project/_) page if paused for greater than 90 days.
         
-        How to manually take a database backup if you do not have a database backup:
+        How to manually take a database backup:
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Install the Supabase CLI" fullWidth>
     Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
@@ -83,7 +83,9 @@ className="text-foreground-light mt-8 mb-6"
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Get the database password" fullWidth>
-      Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in connection string with the database password.
+      If you do not have your database password, reset and note the new password in the [Database Settings](/dashboard/project/_/settings/database). 
+      
+      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
@@ -128,13 +130,15 @@ className="text-foreground-light mt-8 mb-6"
     <StepHikeCompact.Step step={3}>
 
     <StepHikeCompact.Details title="Get the database password for the new project" fullWidth>
-      Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in the database connection string from step 2.
+      If you do not have your database password, reset and note the new password in the [Database Settings](/dashboard/project/_/settings/database). 
+      
+      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
     </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={4}>
-      <StepHikeCompact.Details title="Restore your database backup with psql" fullWidth>
-          Replace ```[CONNECTION_STRING]``` with your connection string. Select the appropriate option and run the command:
+      <StepHikeCompact.Details title="Restore the database backup with psql" fullWidth>
+          Replace ```[CONNECTION_STRING]``` with the connection string. Select the appropriate option and run the command:
 
         <Tabs
           scrollable
