@@ -24,7 +24,7 @@ if you are on a Paid plan and physical backups for your Supabase project, you sh
 
 - What needs manual reconfiguration?
 
-  - Storage objects & settings (See [storage object migration guide](/docs/guides/platform/migrating-within-supabase#migrate-storage) below)
+  - Storage objects & settings (See [storage object migration guide](/docs/guides/platform/migrating-within-supabase#migrate-storage) at the end of this page)
   - Edge Functions
   - Auth settings & API keys
   - Realtime settings
@@ -32,6 +32,8 @@ if you are on a Paid plan and physical backups for your Supabase project, you sh
   - Read replicas
 
 ### Before you begin
+
+
 
     <Accordion
 
@@ -63,10 +65,13 @@ className="text-foreground-light mt-8 mb-6"
 >
     <div className="border-b mt-3 pb-3">
         <AccordionItem
-        header={<span className="text-foreground">Manual database backup if needed</span>}
+        header={<span className="text-foreground">Database backup file (*.backup or *.sql only. <strong>Decompress the file if it is *.backup.gz</strong>)</span>}
         id="backup-project"
         >
         <StepHikeCompact>
+        The database backup can be downloaded from the [Database backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) page or from the [paused project](https://supabase.com/dashboard/project/_) page if paused for greater than 90 days.
+        
+        How to manually take a database backup if you do not have a database backup:
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Install the Supabase CLI" fullWidth>
     Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
@@ -80,25 +85,22 @@ className="text-foreground-light mt-8 mb-6"
 </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
-      Get your Session pooler connection string from your [Connect page](https://supabase.com/dashboard/project/_?showConnect=true). Example connection string:
-      ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[PROJECT-REGION].pooler.supabase.com:5432/postgres
-      ```
+    <StepHikeCompact.Details title="Get the new project's database connection string" fullWidth>
+      <ProjectConfigVariables variable="sessionpooler" />
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Get the database password" fullWidth>
-      Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in step 3 with the database password.
+      Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in connection string with the database password.
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
       <StepHikeCompact.Details title="Backup database" fullWidth>
-       Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
+       Run these commands after replacing ```[CONNECTION_STRING]``` with your updated connection string from the previous steps:
 
         ```bash
         supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
@@ -119,8 +121,8 @@ className="text-foreground-light mt-8 mb-6"
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Create and configure new Supabase project" fullWidth>
           Create a [new project](https://database.new). In the new project:
-            - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/database/hooks).
-            - If any extensions were used in the old project, enable the [Extensions](/dashboard/project/_/database/extensions).
+            - Enable [Database Webhooks](/dashboard/project/_/database/hooks) as needed.
+            - Enable the [Extensions](/dashboard/project/_/database/extensions) used in the old project.
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
