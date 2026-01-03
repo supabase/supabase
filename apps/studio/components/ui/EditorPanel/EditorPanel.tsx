@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
@@ -40,11 +42,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
-import AIEditor from '../AIEditor'
+import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
-import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 export const EditorPanel = () => {
   const {
