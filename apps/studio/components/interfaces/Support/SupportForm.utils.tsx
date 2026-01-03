@@ -33,7 +33,7 @@ export const formatMessage = ({
   message: string
   attachments?: string[]
   error: string | null | undefined
-  commit: { commitSha: string; commitTime: string } | undefined
+  commit: { time: string; sha: string } | undefined
   dashboardLogUrl?: string
 }) => {
   const errorString = error != null ? `\n\nError: ${error}` : ''
@@ -41,7 +41,7 @@ export const formatMessage = ({
     attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
   const commitString =
     commit != undefined
-      ? `\n\n---\nSupabase Studio version: SHA ${commit.commitSha} deployed at ${commit.commitTime === 'unknown' ? 'unknown time' : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
+      ? `\n\n---\nSupabase Studio version: SHA ${commit.sha} deployed at ${commit.time === 'unknown' ? 'unknown time' : dayjs(commit.time).format('YYYY-MM-DD HH:mm:ss Z')}`
       : ''
   const logString = dashboardLogUrl ? `\nDashboard logs: ${dashboardLogUrl}` : ''
   return `${message}${errorString}${attachmentsString}${commitString}${logString}`
