@@ -199,11 +199,13 @@ Avoid adding other actions when using row-level navigation, as multiple interact
 
 <ComponentPreview name="table-row-link" />
 
-When implementing row-level navigation, pay close attention to [Accessibility](/accessibility#focus-management) requirements. The row must be keyboard accessible with proper focus management, including:
+When implementing row-level navigation, pay close attention to [Accessibility](/accessibility#focus-management) requirements. The row must be keyboard accessible with proper focus management. Also consider these affordances:
 
-- Handling `Enter` and `Space` key presses for activation
-- Providing visual focus indicators using classes like `inset-focus`
-- Supporting modifier keys (`Ctrl`/`Cmd`) for opening links in new tabs
+- Handle `Enter` and `Space` key presses for activation
+- Provide visual focus indicators using classes like `inset-focus`
+- Support modifier keys (`Ctrl`/`Cmd`, middle-click) for opening links in new tabs
+  - Consider using the shared `createNavigationHandler` function to handle modifier keys
+- Avoid bubbling up action events from _within_ the row
 
 #### Row navigation with actions
 

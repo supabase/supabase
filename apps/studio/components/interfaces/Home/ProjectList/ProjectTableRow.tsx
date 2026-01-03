@@ -7,6 +7,7 @@ import type { IntegrationProjectConnection } from 'data/integrations/integration
 import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
+import { createNavigationHandler } from 'lib/navigation'
 import type { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -41,16 +42,15 @@ export const ProjectTableRow = ({
 
   const infraInformation = project.databases.find((x) => x.identifier === project.ref)
 
+  const handleNavigation = createNavigationHandler(url, router)
+
   return (
     <TableRow
-      className="cursor-pointer hover:bg-surface-200"
-      onClick={(event) => {
-        if (event.metaKey) {
-          window.open(`${BASE_PATH}/${url}`, '_blank')
-        } else {
-          router.push(url)
-        }
-      }}
+      className="cursor-pointer hover:bg-surface-200 inset-focus"
+      onClick={handleNavigation}
+      onAuxClick={handleNavigation}
+      onKeyDown={handleNavigation}
+      tabIndex={0}
     >
       <TableCell>
         <div className="flex flex-col gap-y-2">
