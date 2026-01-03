@@ -43,6 +43,10 @@ export type MultiAttribute = {
     light: string
     dark: string
   }
+  fill?: {
+    light?: string
+    dark?: string
+  }
   statusCode?: string
   grantType?: string
   providerType?: string

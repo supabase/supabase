@@ -24,6 +24,7 @@ import {
   CHART_COLORS,
   DateTimeFormats,
   STACKED_CHART_COLORS,
+  STACKED_CHART_FILLS,
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
@@ -240,7 +241,28 @@ export function ComposedChart({
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
-  const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
+  const referenceLines = attributes.filter((attribute) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'ComposedChart.tsx:243',
+        message: 'Filtering referenceLines by provider',
+        data: {
+          provider: attribute?.provider,
+          isReferenceLine: attribute?.isReferenceLine,
+          attribute: attribute?.attribute,
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'D',
+      }),
+    }).catch(() => {})
+    // #endregion
+    return attribute?.provider === 'reference-line'
+  })
 
   const resolvedHighlightedLabel = getHeaderLabel()
 
@@ -268,13 +290,19 @@ export function ComposedChart({
           )
           .map((att, index) => {
             const attribute = attributes.find((attr) => attr.attribute === att.name)
+            const isDark = resolvedTheme?.includes('dark')
             return {
               ...att,
               color: attribute?.color
-                ? resolvedTheme?.includes('dark')
+                ? isDark
                   ? attribute.color.dark
                   : attribute.color.light
                 : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+              fill: attribute?.fill
+                ? isDark
+                  ? attribute.fill.dark
+                  : attribute.fill.light
+                : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
             }
           })
       : []
@@ -456,18 +484,21 @@ export function ComposedChart({
                   key={attribute.name}
                   type="step"
                   dataKey={attribute.name}
-                  stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
-                  fill={attribute.color}
+                  stackId={
+                    attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? `stack-${i}`
+                  }
+                  fill={attribute.fill}
+                  fillOpacity={1}
                   stroke={attribute.color}
                   radius={20}
                   animationDuration={375}
-                  fillOpacity={
-                    hoveredLabel && hoveredLabel !== attribute.name
-                      ? 0.075
-                      : hoveredLabel === attribute.name
-                        ? 0.3
-                        : 0.25
-                  }
+                  // fillOpacity={
+                  //   hoveredLabel && hoveredLabel !== attribute.name
+                  //     ? 0.075
+                  //     : hoveredLabel === attribute.name
+                  //       ? 0.3
+                  //       : 0.25
+                  // }
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
@@ -488,26 +519,96 @@ export function ComposedChart({
             />
           )}
           {referenceLines
-            .filter((line) => line.isReferenceLine)
-            .map((line) => (
-              <ReferenceLine
-                key={line.attribute}
-                y={line.value}
-                strokeWidth={1}
-                {...line}
-                color={line.color?.dark}
-                strokeDasharray={line.strokeDasharray ?? '3 3'}
-                label={undefined}
-              >
-                <Label
-                  value={line.label}
-                  position="insideTopRight"
-                  fill={CHART_COLORS.REFERENCE_LINE_TEXT}
-                  className="text-xs"
-                  style={{ fill: CHART_COLORS.REFERENCE_LINE_TEXT }}
-                />
-              </ReferenceLine>
-            ))}
+            .filter((line) => {
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  location: 'ComposedChart.tsx:499',
+                  message: 'Filtering referenceLine',
+                  data: {
+                    isReferenceLine: line.isReferenceLine,
+                    provider: line.provider,
+                    attribute: line.attribute,
+                    hasValue: line.value !== undefined,
+                    value: line.value,
+                  },
+                  timestamp: Date.now(),
+                  sessionId: 'debug-session',
+                  runId: 'run1',
+                  hypothesisId: 'D',
+                }),
+              }).catch(() => {})
+              // #endregion
+              return line.isReferenceLine
+            })
+            .map((line) => {
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  location: 'ComposedChart.tsx:500',
+                  message: 'Mapping referenceLine props',
+                  data: {
+                    attribute: line.attribute,
+                    value: line.value,
+                    hasColor: !!line.color,
+                    colorDark: line.color?.dark,
+                    hasStrokeDasharray: !!line.strokeDasharray,
+                    allKeys: Object.keys(line),
+                  },
+                  timestamp: Date.now(),
+                  sessionId: 'debug-session',
+                  runId: 'run1',
+                  hypothesisId: 'A,B,C',
+                }),
+              }).catch(() => {})
+              // #endregion
+              try {
+                return (
+                  <ReferenceLine
+                    key={line.attribute}
+                    y={line.value}
+                    strokeWidth={1}
+                    // {...line}
+                    color={line.color?.dark}
+                    strokeDasharray={line.strokeDasharray ?? '3 3'}
+                    label={undefined}
+                  >
+                    <Label
+                      value={line.label}
+                      position="insideTopRight"
+                      fill={CHART_COLORS.REFERENCE_LINE_TEXT}
+                      className="text-xs"
+                      style={{ fill: CHART_COLORS.REFERENCE_LINE_TEXT }}
+                    />
+                  </ReferenceLine>
+                )
+              } catch (error) {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    location: 'ComposedChart.tsx:501',
+                    message: 'ReferenceLine render error',
+                    data: {
+                      error: error instanceof Error ? error.message : String(error),
+                      attribute: line.attribute,
+                      value: line.value,
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'run1',
+                    hypothesisId: 'A,B,C,E',
+                  }),
+                }).catch(() => {})
+                // #endregion
+                throw error
+              }
+            })}
           {/* Selection highlight */}
           {showHighlightActions && (
             <ReferenceArea

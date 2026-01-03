@@ -45,6 +45,7 @@ export type ChartHighlightAction = {
 export interface ChartLineProps {
   data: ChartLineTick[]
   dataKey: string
+  dataKeys?: string[] // Add this line
   config?: ChartConfig
   onLineClick?: (datum: ChartLineTick, tooltipData?: CategoricalChartState) => void
   DateTimeFormat?: string
@@ -72,6 +73,7 @@ export interface ChartLineProps {
 export const ChartLine = ({
   data,
   dataKey,
+  dataKeys, // Add this line
   config,
   onLineClick,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
@@ -98,11 +100,14 @@ export const ChartLine = ({
     return null
   }
 
-  const chartConfig: ChartConfig = config || {
-    [dataKey]: {
-      label: dataKey,
-    },
-  }
+  const keysToRender = dataKeys || [dataKey]
+
+  const chartConfig: ChartConfig =
+    config ||
+    keysToRender.reduce((acc, key) => {
+      acc[key] = { label: key }
+      return acc
+    }, {} as ChartConfig)
 
   const showHighlightActions =
     showHighlightArea &&
@@ -209,14 +214,33 @@ export const ChartLine = ({
               fillOpacity={0.2}
             />
           )}
-          <Area
-            type="step"
-            dataKey={dataKey}
-            fill={focusDataIndex !== null ? hoverColor : color}
-            fillOpacity={0.1}
-            stroke={focusDataIndex !== null ? hoverColor : color}
-            strokeWidth={strokeWidth}
-          />
+          {keysToRender.map((key, index) => {
+            const keyConfig = chartConfig[key]
+            const lineColor =
+              keyConfig?.color ||
+              (keyConfig?.theme
+                ? isDarkMode
+                  ? keyConfig.theme.dark
+                  : keyConfig.theme.light
+                : color)
+            const baseOpacity = 0.2
+            const opacityIncrement = 0.1
+            const maxOpacity = 0.6
+            const fillOpacity = Math.min(baseOpacity + index * opacityIncrement, maxOpacity)
+
+            return (
+              <Area
+                key={key}
+                type="step"
+                dataKey={key}
+                fill={lineColor}
+                fillOpacity={fillOpacity}
+                stroke={lineColor}
+                strokeWidth={strokeWidth}
+                stackId={`stack-${key}`}
+              />
+            )
+          })}
         </RechartAreaChart>
       </ChartContainer>
       {data && data.length > 0 && (
