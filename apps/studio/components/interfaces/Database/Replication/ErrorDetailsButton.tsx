@@ -27,7 +27,13 @@ export const ErrorDetailsButton = ({ tableName, reason, solution }: ErrorDetails
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="tiny" type="default" className="w-min" aria-label="Show error details">
+        <Button
+          size="tiny"
+          type="default"
+          className="w-min"
+          icon={<AlertCircle />}
+          aria-label="Show error details"
+        >
           Show error
         </Button>
       </DialogTrigger>

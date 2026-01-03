@@ -1,8 +1,5 @@
-import { RotateCcw } from 'lucide-react'
-import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
 import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
@@ -13,42 +10,48 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Button,
 } from 'ui'
 
-interface ResetTableButtonProps {
+interface RestartTableDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  projectRef?: string
+  pipelineId: number
   tableId: number
   tableName: string
-  variant?: 'default' | 'warning' | 'danger'
+  onRestartStart?: () => void
+  onRestartComplete?: () => void
 }
 
-export const ResetTableButton = ({
+export const RestartTableDialog = ({
+  open,
+  onOpenChange,
+  projectRef,
+  pipelineId,
   tableId,
   tableName,
-  variant = 'default',
-}: ResetTableButtonProps) => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const [isOpen, setIsOpen] = useState(false)
-
+  onRestartStart,
+  onRestartComplete,
+}: RestartTableDialogProps) => {
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
-        `Replication restarted for "${tableName}" and pipeline is being restarted automatically`
+        `Restarting replication for "${tableName}". Pipeline will restart automatically.`
       )
-      setIsOpen(false)
+      onRestartComplete?.()
+      onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      setIsOpen(false)
+      onRestartComplete?.()
+      onOpenChange(false)
     },
   })
 
   const handleReset = () => {
     if (!projectRef) return toast.error('Project ref is required')
-    if (!_pipelineId) return toast.error('Pipeline ID is required')
 
-    const pipelineId = Number(_pipelineId)
-
+    onRestartStart?.()
     rollbackTables({
       projectRef,
       pipelineId,
@@ -58,22 +61,12 @@ export const ResetTableButton = ({
   }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <Button
-        size="tiny"
-        type={variant}
-        loading={isResetting}
-        disabled={isResetting}
-        className="w-min"
-        icon={<RotateCcw />}
-        aria-label={`Restart replication for ${tableName}`}
-        onClick={() => setIsOpen(true)}
-      >
-        Restart replication
-      </Button>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Restart replication for {tableName}</AlertDialogTitle>
+          <AlertDialogTitle>
+            Restart replication for <code className="text-code-inline">{tableName}</code>
+          </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-3 text-sm">
               <p>

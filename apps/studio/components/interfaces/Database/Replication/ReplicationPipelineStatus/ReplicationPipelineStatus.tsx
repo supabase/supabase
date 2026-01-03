@@ -1,5 +1,6 @@
 import {
   Activity,
+  AlertTriangle,
   ArrowUpCircle,
   Ban,
   ChevronLeft,
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -35,7 +36,12 @@ import {
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { BatchRestartDialog } from '../BatchRestartDialog'
+import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
 import { ErroredTableDetails } from '../ErroredTableDetails'
+import { RestartTableDialog } from '../RestartTableDialog'
+import { TableActionsMenu } from '../TableActionsMenu'
 import {
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
@@ -57,6 +63,20 @@ export const ReplicationPipelineStatus = () => {
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
+  const [showErrorDialog, setShowErrorDialog] = useState(false)
+  const [selectedTableError, setSelectedTableError] = useState<{
+    tableName: string
+    reason: string
+    solution?: string
+  } | null>(null)
+  const [showRestartDialog, setShowRestartDialog] = useState(false)
+  const [selectedTableForRestart, setSelectedTableForRestart] = useState<{
+    tableId: number
+    tableName: string
+  } | null>(null)
+  const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
+  const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
+  const [restartingTableIds, setRestartingTableIds] = useState<Set<number>>(new Set())
 
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
@@ -112,15 +132,46 @@ export const ReplicationPipelineStatus = () => {
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  const tableStatuses = replicationStatusData?.table_statuses || []
+  // Sort tables by name for consistent ordering (memoized)
+  const tableStatuses = useMemo(
+    () =>
+      (replicationStatusData?.table_statuses || []).sort((a, b) =>
+        a.table_name.localeCompare(b.table_name)
+      ),
+    [replicationStatusData?.table_statuses]
+  )
+
   const applyLagMetrics = replicationStatusData?.apply_lag
-  const filteredTableStatuses =
-    searchString.length === 0
-      ? tableStatuses
-      : tableStatuses.filter((table) =>
-          table.table_name.toLowerCase().includes(searchString.toLowerCase())
-        )
-  const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
+
+  // Filter tables based on search (memoized)
+  const filteredTableStatuses = useMemo(
+    () =>
+      searchString.length === 0
+        ? tableStatuses
+        : tableStatuses.filter((table) =>
+            table.table_name.toLowerCase().includes(searchString.toLowerCase())
+          ),
+    [tableStatuses, searchString]
+  )
+
+  const tablesWithLag = useMemo(
+    () => tableStatuses.filter((table) => Boolean(table.table_sync_lag)),
+    [tableStatuses]
+  )
+
+  const erroredTables = useMemo(
+    () =>
+      tableStatuses.filter(
+        (table) =>
+          table.state.name === 'error' &&
+          'retry_policy' in table.state &&
+          table.state.retry_policy?.policy === 'manual_retry'
+      ),
+    [tableStatuses]
+  )
+
+  const hasErroredTables = erroredTables.length > 0
+  const isAnyRestartInProgress = restartingTableIds.size > 0
 
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
@@ -266,30 +317,6 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
 
-        {showDisabledState && (
-          <div
-            className={cn(
-              'p-4 border border-default rounded-lg flex items-center justify-between',
-              config.colors.bg
-            )}
-          >
-            <div className="flex items-center gap-x-3">
-              <div
-                className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center',
-                  config.colors.iconBg
-                )}
-              >
-                <div className={config.colors.icon}>{config.icon}</div>
-              </div>
-              <div className="flex-1">
-                <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
-                <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {(isPipelineLoading || isStatusLoading) && (
           <div className="space-y-3">
             <div className="flex items-center gap-x-3">
@@ -353,6 +380,51 @@ export const ReplicationPipelineStatus = () => {
 
         {hasTableData && (
           <div className="flex flex-col gap-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-x-2">
+                <p className="text-sm text-foreground-light">
+                  {tableStatuses.length} table{tableStatuses.length !== 1 ? 's' : ''} in pipeline
+                  {hasErroredTables && !isAnyRestartInProgress && (
+                    <span className="text-destructive-600 font-medium">
+                      {' '}
+                      · {erroredTables.length} failed
+                    </span>
+                  )}
+                </p>
+              </div>
+              {!showDisabledState && (
+                <div className="flex items-center gap-x-2">
+                  {hasErroredTables && (
+                    <Button
+                      size="tiny"
+                      type="danger"
+                      icon={<AlertTriangle />}
+                      disabled={isAnyRestartInProgress}
+                      loading={isAnyRestartInProgress}
+                      onClick={() => {
+                        setBatchRestartMode('errored')
+                        setShowBatchRestartDialog(true)
+                      }}
+                    >
+                      Restart failed tables
+                    </Button>
+                  )}
+                  <Button
+                    size="tiny"
+                    type="default"
+                    icon={<RotateCcw />}
+                    disabled={tableStatuses.length === 0 || isAnyRestartInProgress}
+                    loading={isAnyRestartInProgress}
+                    onClick={() => {
+                      setBatchRestartMode('all')
+                      setShowBatchRestartDialog(true)
+                    }}
+                  >
+                    Restart all tables
+                  </Button>
+                </div>
+              )}
+            </div>
             <div className="w-full overflow-hidden overflow-x-auto">
               {/* [Joshen] Should update to use new Table components next time */}
               <Table
@@ -360,12 +432,13 @@ export const ReplicationPipelineStatus = () => {
                   <Table.th key="table">Table</Table.th>,
                   <Table.th key="status">Status</Table.th>,
                   <Table.th key="details">Details</Table.th>,
+                  <Table.th key="actions"></Table.th>,
                 ]}
                 body={
                   <>
                     {filteredTableStatuses.length === 0 && hasTableData && (
                       <Table.tr>
-                        <Table.td colSpan={3}>
+                        <Table.td colSpan={4}>
                           <div className="space-y-1">
                             <p className="text-sm text-foreground">No results found</p>
                             <p className="text-sm text-foreground-light">
@@ -376,12 +449,23 @@ export const ReplicationPipelineStatus = () => {
                       </Table.tr>
                     )}
                     {filteredTableStatuses.map((table, index) => {
+                      const isRestarting = restartingTableIds.has(table.table_id)
                       const statusConfig = getStatusConfig(table.state as TableState['state'])
+                      const isErrorState = table.state.name === 'error'
+                      const errorReason =
+                        isErrorState && 'reason' in table.state ? table.state.reason : undefined
+                      const errorSolution =
+                        isErrorState && 'solution' in table.state ? table.state.solution : undefined
                       return (
-                        <Table.tr key={`${table.table_name}-${index}`} className="border-t">
+                        <Table.tr
+                          key={`${table.table_name}-${index}`}
+                          className={cn('border-t', isRestarting && 'bg-surface-200/50')}
+                        >
                           <Table.td className="align-top">
                             <div className="flex items-center gap-x-2">
-                              <p>{table.table_name}</p>
+                              <p className={cn(isRestarting && 'text-foreground-light')}>
+                                {table.table_name}
+                              </p>
 
                               <ButtonTooltip
                                 asChild
@@ -401,19 +485,26 @@ export const ReplicationPipelineStatus = () => {
                             </div>
                           </Table.td>
                           <Table.td className="align-top">
-                            {showDisabledState ? (
+                            {isRestarting ? (
+                              <Badge variant="default">Restarting</Badge>
+                            ) : showDisabledState ? (
                               <Badge variant="default">Not Available</Badge>
                             ) : (
                               statusConfig.badge
                             )}
                           </Table.td>
                           <Table.td className="align-top">
-                            {showDisabledState ? (
+                            {isRestarting ? (
+                              <p className="text-sm text-foreground-lighter">
+                                Replication is being restarted for this table. The pipeline will
+                                restart automatically.
+                              </p>
+                            ) : showDisabledState ? (
                               <p className="text-sm text-foreground-lighter">
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="flex flex-col gap-y-2">
+                              <div className="flex flex-col gap-y-3">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
@@ -426,6 +517,35 @@ export const ReplicationPipelineStatus = () => {
                                 )}
                               </div>
                             )}
+                          </Table.td>
+                          <Table.td className="align-top">
+                            <div className="flex items-center justify-end">
+                              <TableActionsMenu
+                                tableId={table.table_id}
+                                tableName={table.table_name}
+                                tableState={table.state}
+                                disabled={showDisabledState || isRestarting}
+                                onRestartClick={() => {
+                                  setSelectedTableForRestart({
+                                    tableId: table.table_id,
+                                    tableName: table.table_name,
+                                  })
+                                  setShowRestartDialog(true)
+                                }}
+                                onShowErrorClick={
+                                  isErrorState && errorReason
+                                    ? () => {
+                                        setSelectedTableError({
+                                          tableName: table.table_name,
+                                          reason: errorReason,
+                                          solution: errorSolution,
+                                        })
+                                        setShowErrorDialog(true)
+                                      }
+                                    : undefined
+                                }
+                              />
+                            </div>
                           </Table.td>
                         </Table.tr>
                       )
@@ -472,6 +592,63 @@ export const ReplicationPipelineStatus = () => {
             : 'Update version'
         }
       />
+
+      {/* Restart Table Confirmation Dialog */}
+      {selectedTableForRestart && (
+        <RestartTableDialog
+          open={showRestartDialog}
+          onOpenChange={setShowRestartDialog}
+          projectRef={projectRef}
+          pipelineId={pipelineId}
+          tableId={selectedTableForRestart.tableId}
+          tableName={selectedTableForRestart.tableName}
+          onRestartStart={() => {
+            setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.tableId))
+          }}
+          onRestartComplete={() => {
+            setRestartingTableIds((prev) => {
+              const next = new Set(prev)
+              next.delete(selectedTableForRestart.tableId)
+              return next
+            })
+          }}
+        />
+      )}
+
+      {/* Error Details Dialog */}
+      {selectedTableError && (
+        <ErrorDetailsDialog
+          open={showErrorDialog}
+          onOpenChange={setShowErrorDialog}
+          tableName={selectedTableError.tableName}
+          reason={selectedTableError.reason}
+          solution={selectedTableError.solution}
+        />
+      )}
+
+      {/* Batch Restart Dialog */}
+      {batchRestartMode && (
+        <BatchRestartDialog
+          open={showBatchRestartDialog}
+          onOpenChange={setShowBatchRestartDialog}
+          projectRef={projectRef}
+          pipelineId={pipelineId}
+          mode={batchRestartMode}
+          totalTables={tableStatuses.length}
+          erroredTablesCount={erroredTables.length}
+          tables={tableStatuses}
+          onRestartStart={(tableIds) => {
+            setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))
+          }}
+          onRestartComplete={(tableIds) => {
+            setRestartingTableIds((prev) => {
+              const next = new Set(prev)
+              tableIds.forEach((id) => next.delete(id))
+              return next
+            })
+          }}
+        />
+      )}
     </>
   )
 }
