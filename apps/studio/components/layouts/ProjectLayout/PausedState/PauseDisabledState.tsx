@@ -152,7 +152,7 @@ export const PauseDisabledState = () => {
               <InlineLink
                 href={`${DOCS_URL}/guides/platform/migrating-within-supabase/dashboard-restore`}
               >
-                Migrate to a new Supabase project guide
+                Migrate to a new project guide
               </InlineLink>
             </li>
           </ul>
