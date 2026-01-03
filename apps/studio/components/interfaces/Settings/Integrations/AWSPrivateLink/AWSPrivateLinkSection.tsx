@@ -11,7 +11,7 @@ import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
 import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Card, CardContent, cn } from 'ui'
@@ -22,7 +22,6 @@ import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
 
 export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
 
   const [selectedAccount, setSelectedAccount] = useState<any>(null)
@@ -37,9 +36,8 @@ export const AWSPrivateLinkSection = () => {
     },
   })
 
-  const isTeamsOrEnterpriseAndUp =
-    organization?.plan?.id === 'enterprise' || organization?.plan?.id === 'team'
-  const promptPlanUpgrade = IS_PLATFORM && !isTeamsOrEnterpriseAndUp
+  const { hasAccess: hasPrivateLinkAccess } = useCheckEntitlements('security.private_link')
+  const promptPlanUpgrade = IS_PLATFORM && !hasPrivateLinkAccess
 
   const onAddAccount = () => {
     setSelectedAccount(null)
