@@ -1,0 +1,47 @@
+name: Link Checks
+
+on:
+  pull_request:
+    branches: ['master']
+    paths:
+      - 'apps/docs/**/*.md'
+      - 'apps/docs/**/*.mdx'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+
+jobs:
+  links:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/docs
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --cache --max-cache-age 1d
+            --timeout 20 --max-concurrency 50
+            --exclude "^mailto:" --exclude "^tel:" --exclude "localhost"
+            "apps/docs/**/*.md" "apps/docs/**/*.mdx"
+          format: json
+          output: ./report.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fail: true
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lychee-report
+          path: ./report.json
