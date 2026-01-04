@@ -49,7 +49,7 @@ The browser client ([src/lib/supabase/client.ts](src/lib/supabase/client.ts)) is
 
 ### Protected Routes
 
-Protected routes use a cache function with `"use server"` to check authentication on the server. See [src/routes/protected.tsx](src/routes/protected.tsx) for an example.
+Protected routes use a query function with `"use server"` to check authentication on the server. See [src/routes/protected.tsx](src/routes/protected.tsx) for an example.
 
 ## Key Concepts
 

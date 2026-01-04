@@ -213,7 +213,9 @@ export default function MyRoute() {
 **✅ Correct approach:**
 ```ts
 // ✅ GOOD - Fresh client per request
-const getUser = cache(async () => {
+import { query } from '@solidjs/router'
+
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient() // Created per request
   return await supabase.auth.getUser()

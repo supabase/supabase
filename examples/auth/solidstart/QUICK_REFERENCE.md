@@ -17,7 +17,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ## File Structure
 
-```
+```text
 src/
 ├── middleware.ts                 # Session refresh on every request
 ├── lib/
@@ -476,7 +476,7 @@ export default function MyForm() {
 - ✅ Use `getUser()` for auth checks
 - ✅ Create fresh clients per request
 - ✅ Use `"use server"` in loaders/actions
-- ✅ Use `cache()` for deduplication
+- ✅ Use `query()` for deduplication
 - ✅ Protect routes at loader level
 - ✅ Use middleware for session refresh
 - ✅ Handle errors gracefully

@@ -48,7 +48,7 @@ Added a new `<TabPanel id="solidstart">` section that includes:
 ### Example Code (`examples/auth/solidstart/`)
 
 **Core utilities:**
-```
+```text
 src/lib/supabase/
 ├── client.ts       # Browser client for realtime subscriptions
 ├── server.ts       # Server client with Vinxi cookie adapter
@@ -56,12 +56,12 @@ src/lib/supabase/
 ```
 
 **Middleware:**
-```
+```text
 src/middleware.ts   # SolidStart middleware entry point
 ```
 
 **Routes:**
-```
+```text
 src/routes/
 ├── index.tsx       # Home page with conditional rendering
 ├── login.tsx       # Login form with server action
@@ -70,7 +70,7 @@ src/routes/
 ```
 
 **Configuration:**
-```
+```text
 .env.example        # Environment variable template
 app.config.ts       # SolidStart configuration
 package.json        # Dependencies and scripts
@@ -78,7 +78,7 @@ tsconfig.json       # TypeScript configuration
 ```
 
 **Documentation:**
-```
+```text
 README.md                 # Quick start guide
 IMPLEMENTATION_GUIDE.md   # Comprehensive best practices (45+ patterns)
 ARCHITECTURE.md           # Architecture diagrams and flow charts
@@ -94,10 +94,14 @@ SolidStart uses Vinxi as its server runtime, which provides different HTTP utili
 
 ```ts
 // Next.js
+```ts
 import { NextRequest, NextResponse } from 'next/server'
+```
 
 // SolidStart
+```ts
 import { getCookie, setCookie, getHeader } from 'vinxi/http'
+```
 ```
 
 Unlike Next.js, SolidStart middleware:
@@ -136,7 +140,7 @@ This is necessary because SolidStart doesn't have a built-in `cookies()` helper 
 Protected routes use cache functions with `"use server"` to check authentication:
 
 ```tsx
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()

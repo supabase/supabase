@@ -2,7 +2,7 @@
 
 ## Request Flow Diagram
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                        User Request to /protected                       │
 └────────────────────────────────┬────────────────────────────────────────┘
@@ -44,7 +44,7 @@
 │                         3. Route Loader                                 │
 │  src/routes/protected.tsx                                               │
 │                                                                         │
-│  const getUser = cache(async () => {                                    │
+│  const getUser = query(async () => {                                    │
 │    'use server' ◄─── Marks this as server-only RPC                     │
 │                                                                         │
 │    const supabase = getSupabaseServerClient()                           │
@@ -401,33 +401,32 @@ Layer 4: Server-Side Checks
 
 ## Performance Considerations
 
-### Cache Function Benefits
+### Query Function Benefits
 
-```
-WITHOUT cache():
-┌──────────────────────────────────────────┐
-│  Request arrives                         │
-├──────────────────────────────────────────┤
-│  Route loader calls getUser() → Query 1  │
-│  Component calls getUser() → Query 2     │
-│  Nested component calls getUser() → Q3   │
-├──────────────────────────────────────────┤
-│  Result: 3 identical database queries    │
-│  Time: ~300ms                            │
-└──────────────────────────────────────────┘
+wihtout query():
 
-WITH cache():
-┌──────────────────────────────────────────┐
-│  Request arrives                         │
-├──────────────────────────────────────────┤
-│  Route loader calls getUser() → Query 1  │
-│  Component calls getUser() → Cached ✓    │
-│  Nested component calls getUser() → ✓    │
-├──────────────────────────────────────────┤
-│  Result: 1 query, 2 cache hits           │
-│  Time: ~100ms                            │
-└──────────────────────────────────────────┘
-```
+Request arrives
+
+Route loader calls getUser() → Query 1
+Component calls getUser() → Query 2
+Nested component calls getUser() → Query 3
+
+Result: 3 identical database queries
+Time: ~300ms
+
+WITH query():
+
+Request arrives
+
+Route loader calls getUser() → Query 1
+Component calls getUser() → Cached
+Nested component calls getUser() → Cached
+
+query hits
+
+Result: 1 query executed instead of 3
+Time: ~100ms
+                                  |
 
 ### Middleware Performance
 
@@ -494,7 +493,7 @@ This architecture provides:
 - ✅ **Automatic session refresh** via middleware
 - ✅ **Secure auth checks** via `getUser()` JWT validation
 - ✅ **Server-side protection** via route loaders
-- ✅ **Efficient data fetching** via cache functions
+- ✅ **Efficient data fetching** via query functions
 - ✅ **Type safety** throughout the stack
 - ✅ **Defense in depth** with multiple security layers
 
