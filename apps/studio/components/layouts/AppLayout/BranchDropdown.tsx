@@ -12,7 +12,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -32,7 +31,9 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { sanitizeRoute } from './ProjectDropdown'
+import { partition } from 'lodash'
 
 const BranchLink = ({
   branch,
@@ -83,7 +84,7 @@ export const BranchDropdown = () => {
 
   const {
     data: branches,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
@@ -101,7 +102,7 @@ export const BranchDropdown = () => {
   const mainBranch = branches?.find((branch) => branch.is_default)
   const restOfBranches = branches
     ?.filter((branch) => !branch.is_default)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   const sortedBranches =
     branches && branches.length > 0
@@ -126,20 +127,28 @@ export const BranchDropdown = () => {
 
       {isSuccess && (
         <>
-          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
-            <span className="text-foreground max-w-32 lg:max-w-none truncate">
+          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 ">
+            <span className="text-sm text-foreground max-w-32 lg:max-w-none truncate">
               {isBranchingEnabled ? selectedBranch?.name : 'main'}
             </span>
             {isBranchingEnabled ? (
               selectedBranch?.is_default ? (
-                <Badge variant="warning">Production</Badge>
+                <Badge variant="warning" className="mt-[1px]">
+                  Production
+                </Badge>
               ) : selectedBranch?.persistent ? (
-                <Badge variant="brand">Persistent</Badge>
+                <Badge variant="success" className="mt-[1px]">
+                  Persistent
+                </Badge>
               ) : (
-                <Badge variant="brand">Preview</Badge>
+                <Badge variant="success" className="mt-[1px]">
+                  Preview
+                </Badge>
               )
             ) : (
-              <Badge variant="warning">Production</Badge>
+              <Badge variant="warning" className="mt-[1px]">
+                Production
+              </Badge>
             )}
           </Link>
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>

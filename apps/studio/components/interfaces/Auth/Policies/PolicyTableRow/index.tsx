@@ -8,8 +8,6 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
   Card,
   CardContent,
   CardHeader,
@@ -21,7 +19,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'
@@ -105,25 +103,28 @@ const PolicyTableRowComponent = ({
         <Admonition
           showIcon={false}
           type="warning"
-          className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
+          className="border-0 border-y rounded-none min-h-12 flex items-center"
         >
-          No data will be selectable via Supabase APIs as this schema is not exposed. You may
-          configure this in your project's{' '}
-          <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+          <p className="text-foreground-light">
+            No data will be selectable via Supabase APIs as this schema is not exposed. You may
+            configure this in your project’s{' '}
+            <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+          </p>
         </Admonition>
       )}
 
       {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && isTableExposedThroughAPI && (
-        <Alert_Shadcn_
-          className="border-0 rounded-none mb-0 border-y h-[50px] py-0 flex items-center"
-          variant={isPubliclyReadableWritable ? 'warning' : 'default'}
+        <Admonition
+          showIcon={false}
+          type={isPubliclyReadableWritable ? 'warning' : 'default'}
+          className="border-0 border-y rounded-none min-h-12 flex items-center"
         >
-          <AlertDescription_Shadcn_>
+          <p>
             {isPubliclyReadableWritable
-              ? "Anyone with your project's anonymous key can read, modify, or delete your data."
+              ? 'Anyone with your project’s anonymous key can read, modify, or delete your data.'
               : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </p>
+        </Admonition>
       )}
 
       {isPoliciesLoading && (

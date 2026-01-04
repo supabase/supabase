@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { snakeCase } from 'lodash'
 import { Loader2, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -8,19 +8,20 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useFlag, useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCreateDestinationPipelineMutation } from 'data/etl/create-destination-pipeline-mutation'
-import { useCreateTenantSourceMutation } from 'data/etl/create-tenant-source-mutation'
-import { useCreatePublicationMutation } from 'data/etl/publication-create-mutation'
-import { useUpdatePublicationMutation } from 'data/etl/publication-update-mutation'
-import { useReplicationSourcesQuery } from 'data/etl/sources-query'
-import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
-import { useReplicationTablesQuery } from 'data/etl/tables-query'
+import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
+import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
+import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
+import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -41,7 +42,10 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { getAnalyticsBucketPublicationName } from './AnalyticsBucketDetails.utils'
+import {
+  getAnalyticsBucketPublicationName,
+  getAnalyticsBucketsDestinationName,
+} from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
@@ -157,7 +161,7 @@ export const ConnectTablesDialogContent = ({
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
@@ -237,7 +241,7 @@ export const ConnectTablesDialogContent = ({
         s3SecretAccessKey,
         s3Region,
       }
-      const destinationName = `${snakeCase(bucketId)}_destination`
+      const destinationName = getAnalyticsBucketsDestinationName(bucketId)
       const { pipeline_id: pipelineId } = await createDestinationPipeline({
         projectRef,
         destinationName,
@@ -420,12 +424,12 @@ export const ConnectTablesDialogContent = ({
 
 const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) => {
   const { ref: projectRef } = useParams()
-  const enablePgReplicate = useFlag('enablePgReplicate')
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const { error } = useReplicationSourcesQuery({ projectRef })
   const noAccessToReplication =
     !enablePgReplicate || error?.message.includes('feature flag is required')
 
-  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
+  const { mutateAsync: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation()
 
   const onEnableReplication = async () => {
@@ -445,7 +449,7 @@ const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) =>
       <DialogSection className="flex flex-col gap-y-2 !p-0">
         <Admonition
           type="warning"
-          className="rounded-none border-0 mb-0"
+          className="rounded-none border-0"
           title={
             noAccessToReplication
               ? 'Replication is currently unavailable for your project'

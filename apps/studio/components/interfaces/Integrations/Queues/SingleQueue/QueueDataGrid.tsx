@@ -70,7 +70,7 @@ const messagesCols = [
 
       return (
         <div className="flex items-center">
-          <Badge variant={isAvailable ? 'brand' : 'warning'}>
+          <Badge variant={isAvailable ? 'success' : 'warning'}>
             {isAvailable ? 'Available ' : `Available at ${dayjs(row.vt).format(DATE_FORMAT)}`}
           </Badge>
         </div>

@@ -2,23 +2,26 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import {
-  useCreateLogDrainMutation,
   LogDrainCreateVariables,
+  useCreateLogDrainMutation,
 } from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronDown } from 'lucide-react'
+import { cloneElement } from 'react'
 import type { NextPageWithLayout } from 'types'
 import {
   Alert_Shadcn_,
@@ -29,9 +32,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ChevronDown } from 'lucide-react'
-import { cloneElement } from 'react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
@@ -48,13 +48,15 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     useState<LogDrainCreateVariables | null>(null)
   const [mode, setMode] = useState<'create' | 'update'>('create')
 
-  const { plan, isLoading: planLoading } = useCurrentOrgPlan()
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('log_drains')
 
-  const logDrainsEnabled = !planLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
+  const { data: logDrains } = useLogDrainsQuery(
+    { ref },
+    { enabled: !isLoadingEntitlement && hasAccessToLogDrains }
+  )
 
-  const { data: logDrains } = useLogDrainsQuery({ ref }, { enabled: logDrainsEnabled })
-
-  const { mutate: createLogDrain, isLoading: createLoading } = useCreateLogDrainMutation({
+  const { mutate: createLogDrain, isPending: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
       setOpen(false)
@@ -65,7 +67,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: updateLogDrain, isLoading: updateLoading } = useUpdateLogDrainMutation({
+  const { mutate: updateLogDrain, isPending: updateLoading } = useUpdateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain updated')
       setOpen(false)
@@ -165,10 +167,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             You are about to create a new log drain destination:{' '}
             <span className="text-foreground">{pendingLogDrainValues?.name}</span>
           </p>
-          <p>
-            This will incur an additional <span className="text-foreground">$60 per month</span>{' '}
-            charge to your subscription.
-          </p>
+          {IS_PLATFORM && (
+            <p>
+              This will incur an additional <span className="text-foreground">$60 per month</span>{' '}
+              charge to your subscription.
+            </p>
+          )}
           <p>Are you sure you want to proceed?</p>
         </div>
       </ConfirmationModal>
@@ -176,7 +180,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   )
 
   // [kemal]: Ordinarily <PageLayout /> would be bundled with the getLayout function below, however in this case we need access to some bits for the "Add destination" button to render as part of the in-built page header in <PageLayout />.
-  if (logDrainsEnabled && !planLoading) {
+  if (!isLoadingEntitlement && hasAccessToLogDrains) {
     return (
       <PageLayout
         title="Log Drains"
@@ -186,7 +190,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             {!(logDrains?.length === 0) && (
               <div className="flex items-center">
                 <Button
-                  disabled={!logDrainsEnabled || !canManageLogDrains}
+                  disabled={!hasAccessToLogDrains || !canManageLogDrains}
                   onClick={() => {
                     setSelectedLogDrain(null)
                     setMode('create')
@@ -216,7 +220,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                           {cloneElement(drainType.icon, { height: 16, width: 16 })}
                           <div className="space-y-1">
                             <p className="block text-foreground">{drainType.name}</p>
-                            <p className="text-xs text-foreground-lighter">Additional $60</p>
+                            {IS_PLATFORM && (
+                              <p className="text-xs text-foreground-lighter">Additional $60</p>
+                            )}
                           </div>
                         </div>
                       </DropdownMenuItem>

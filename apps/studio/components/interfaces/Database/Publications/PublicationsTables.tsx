@@ -34,7 +34,7 @@ export const PublicationsTables = () => {
 
   const {
     data: tablesData = [],
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -69,15 +69,15 @@ export const PublicationsTables = () => {
                 placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size={12} />}
-                className="w-48 pl-8"
+                icon={<Search />}
+                className="w-48"
               />
             </div>
           </div>
           {!isLoadingPermissions && !canUpdatePublications && (
             <Admonition
               type="note"
-              className="w-[500px] m-0"
+              className="w-[500px]"
               title="You need additional permissions to update database replications"
             />
           )}
