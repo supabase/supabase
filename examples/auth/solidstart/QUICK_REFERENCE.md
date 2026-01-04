@@ -147,10 +147,10 @@ export async function updateSession() {
 
 ```tsx
 // src/routes/protected.tsx
-import { createAsync, cache, redirect } from '@solidjs/router'
+import { createAsync, query, redirect } from '@solidjs/router'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -243,11 +243,11 @@ export default function Logout() {
 ```tsx
 // src/routes/index.tsx
 import { A } from '@solidjs/router'
-import { createAsync, cache } from '@solidjs/router'
+import { createAsync, query } from '@solidjs/router'
 import { Show } from 'solid-js'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -320,10 +320,10 @@ export default function Signup() {
 
 ```tsx
 // src/routes/profile.tsx
-import { createAsync, cache, redirect } from '@solidjs/router'
+import { createAsync, query, redirect } from '@solidjs/router'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-const getProfile = cache(async () => {
+const getProfile = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
 
@@ -402,23 +402,18 @@ export default function Messages() {
 ### Pattern: Error Handling
 
 ```tsx
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
 
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-    if (error) {
-      console.error('Auth error:', error.message)
-      throw redirect('/login')
-    }
-
-    return user
-  } catch (err) {
-    console.error('Unexpected error:', err)
-    throw redirect('/error')
+  if (error) {
+    console.error('Auth error:', error.message)
+    throw redirect('/login')
   }
+
+  return user
 }, 'user')
 ```
 
