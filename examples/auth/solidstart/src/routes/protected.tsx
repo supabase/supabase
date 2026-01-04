@@ -1,8 +1,8 @@
 import { A } from '@solidjs/router'
-import { createAsync, cache, redirect } from '@solidjs/router'
+import { createAsync, query, redirect } from '@solidjs/router'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -19,7 +19,7 @@ export const route = {
 }
 
 export default function Protected() {
-  const user = createAsync(() => getUser())
+  const user = createAsync(() => getUser(), { deferStream: true })
 
   return (
     <main>

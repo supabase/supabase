@@ -226,7 +226,7 @@ export default function Login() {
 import { action, redirect } from '@solidjs/router'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-export const GET = action(async () => {
+export const POST = action(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   await supabase.auth.signOut()

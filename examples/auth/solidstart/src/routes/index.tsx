@@ -1,10 +1,10 @@
 import { A } from '@solidjs/router'
 import { createAsync } from '@solidjs/router'
-import { cache } from '@solidjs/router'
+import { query } from '@solidjs/router'
 import { Show } from 'solid-js'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()

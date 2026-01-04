@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
-import { getCookie, getHeader, setCookie } from 'vinxi/http'
+import { getHeader, setCookie } from 'vinxi/http'
 import { getSupabaseConfig } from './config'
 
 /**
@@ -34,8 +34,11 @@ export function getSupabaseServerClient() {
     anonKey,
     {
       cookies: {
+        /**
+         * Parses cookies from the request's Cookie header.
+         * @returns Array of cookie objects with name and value properties
+         */
         getAll() {
-          // Parse cookies from the Cookie header
           const cookieHeader = getHeader('Cookie') ?? ''
           return cookieHeader
             .split(';')
@@ -45,6 +48,10 @@ export function getSupabaseServerClient() {
             })
             .filter((cookie) => cookie.name)
         },
+        /**
+         * Sets multiple cookies on the response.
+         * @param cookiesToSet Array of cookie objects with name, value, and options
+         */
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             setCookie(name, value, options)

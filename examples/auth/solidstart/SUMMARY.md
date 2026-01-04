@@ -116,7 +116,7 @@ Before merging, verify:
 ## Files Changed
 
 ### New Files
-```
+```text
 examples/auth/solidstart/
 ├── .env.example
 ├── app.config.ts
@@ -144,7 +144,7 @@ examples/auth/solidstart/
 ```
 
 ### Modified Files
-```
+```text
 apps/docs/content/guides/auth/server-side/creating-a-client.mdx
 └── Added SolidStart tab panels in two sections:
     ├── Environment variables section (lines 92-99)
