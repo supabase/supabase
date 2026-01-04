@@ -69,7 +69,9 @@ export default createMiddleware({
 })
 
 // routes/protected.tsx
-const getUser = cache(async () => {
+import { query } from '@solidjs/router'
+
+const getUser = query(async () => {
   'use server' // ✅ Use it in route loaders/actions
   const supabase = getSupabaseServerClient()
   return await supabase.auth.getUser()
@@ -113,7 +115,7 @@ Access via `import.meta.env.VITE_*` instead of `process.env.NEXT_PUBLIC_*`.
 
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │  Request Lifecycle                                      │
 ├─────────────────────────────────────────────────────────┤
@@ -300,9 +302,9 @@ export default defineConfig({
 Cache functions prevent duplicate server calls and improve performance:
 
 ```ts
-import { cache } from '@solidjs/router'
+import { query } from '@solidjs/router'
 
-const getUser = cache(async () => {
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -325,7 +327,9 @@ Don't rely on client-side checks for protection:
 
 ```ts
 // ✅ GOOD - Server-side protection
-const getUser = cache(async () => {
+import { query } from '@solidjs/router'
+
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -372,7 +376,7 @@ const loginAction = action(async (formData: FormData) => {
 
 Keep browser and server clients separate:
 
-```
+```text
 src/lib/supabase/
 ├── client.ts      // For browser (realtime, client-side queries)
 ├── server.ts      // For server (loaders, actions)
@@ -392,7 +396,9 @@ src/lib/supabase/
 ### 5. Handle Errors Gracefully
 
 ```ts
-const getUser = cache(async () => {
+import { query } from '@solidjs/router'
+
+const getUser = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
 
@@ -530,10 +536,10 @@ export default function Messages() {
 
 ```ts
 // src/routes/auth/callback.tsx
-import { cache } from '@solidjs/router'
+import { query } from '@solidjs/router'
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
-const handleOAuthCallback = cache(async () => {
+const handleOAuthCallback = query(async () => {
   'use server'
   const supabase = getSupabaseServerClient()
 

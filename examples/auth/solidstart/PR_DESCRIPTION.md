@@ -92,16 +92,14 @@ SUMMARY.md                # This PR summary
 
 SolidStart uses Vinxi as its server runtime, which provides different HTTP utilities than Next.js:
 
-```ts
-// Next.js
+**Next.js:**
 ```ts
 import { NextRequest, NextResponse } from 'next/server'
 ```
 
-// SolidStart
+**SolidStart:**
 ```ts
 import { getCookie, setCookie, getHeader } from 'vinxi/http'
-```
 ```
 
 Unlike Next.js, SolidStart middleware:
@@ -137,7 +135,7 @@ This is necessary because SolidStart doesn't have a built-in `cookies()` helper 
 
 ### Route Protection
 
-Protected routes use cache functions with `"use server"` to check authentication:
+Protected routes use query functions with `"use server"` to check authentication:
 
 ```tsx
 const getUser = query(async () => {
