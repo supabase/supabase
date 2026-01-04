@@ -96,7 +96,7 @@
 │  src/routes/protected.tsx                                               │
 │                                                                         │
 │  export default function Protected() {                                  │
-│    const user = createAsync(() => getUser()) ◄─── Uses cached loader   │
+│    const user = createAsync(() => getUser())    │
 │                                                                         │
 │    return (                                                             │
 │      <main>                                                             │
@@ -162,11 +162,11 @@
 ┌─────────────────────────────────────────────────────┐
 │  Route Loader (Server-Side)                         │
 │  src/routes/dashboard.tsx                           │
-│                                                     │
+│  import { query } from '@solidjs/router'                                                  │
 │  import { getSupabaseServerClient }                 │
 │         from '~/lib/supabase/server'                │
 │                                                     │
-│  const getDashboardData = cache(async () => {       │
+│  const getDashboardData = query(async () => {       │
 │    'use server'                                     │
 │                                                     │
 │    const supabase = getSupabaseServerClient()       │
@@ -403,7 +403,7 @@ Layer 4: Server-Side Checks
 
 ### Query Function Benefits
 
-wihtout query():
+without query():
 
 Request arrives
 
