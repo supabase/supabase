@@ -13,6 +13,9 @@ import { toast } from 'sonner'
  * @returns Object with:
  *   - value: The result of select(selectedId) or undefined
  *   - setValue: Function to set/clear the selected ID in the URL
+ *
+ * @deprecated Avoid using this hook, and use nuqs directly
+ * Refer to this PR for more information: https://github.com/supabase/supabase/pull/41380
  */
 export function useQueryStateWithSelect<T>({
   enabled,
