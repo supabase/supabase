@@ -3,9 +3,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 const { getCSP } = require('./csp')
+const { withWorkflow } = require('./lib/workflow/withWorkflow')
 
 // Required for nextjs standalone build
 const path = require('path')
+const fs = require('node:fs')
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN
@@ -26,6 +28,27 @@ function getAssetPrefix() {
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }
 
+const hasAppDir =
+  fs.existsSync(path.join(__dirname, 'app')) || fs.existsSync(path.join(__dirname, 'src/app'))
+
+const buildPagesWorkflow = () => {
+  if (process.env.WORKFLOW_PAGES_BUILT) return
+  try {
+    const buildScript = path.join(__dirname, 'scripts', 'build-workflows-pages.mjs')
+    require('child_process').execFileSync('node', [buildScript], { stdio: 'inherit' })
+    process.env.WORKFLOW_PAGES_BUILT = '1'
+  } catch (err) {
+    console.warn('workflow pages build failed', err)
+  }
+}
+
+if (!hasAppDir) {
+  buildPagesWorkflow()
+  if (!process.env.WORKFLOW_NEXT_PRIVATE_BUILT) {
+    process.env.WORKFLOW_NEXT_PRIVATE_BUILT = '1'
+  }
+}
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -39,6 +62,10 @@ const nextConfig = {
         source: `/.well-known/vercel/flags`,
         destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false,
+      },
+      {
+        source: '/.well-known/workflow/v1/:path*',
+        destination: '/api/.well-known/workflow/v1/:path*',
       },
     ]
   },
@@ -579,11 +606,13 @@ const nextConfig = {
   },
 }
 
+const workflowConfig = withWorkflow(nextConfig)
+
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(withBundleAnalyzer(nextConfig), {
+    ? withSentryConfig(withBundleAnalyzer(workflowConfig), {
         silent: true,
 
         // For all available options, see:
@@ -609,4 +638,4 @@ module.exports =
         // https://vercel.com/docs/cron-jobs
         automaticVercelMonitors: true,
       })
-    : nextConfig
+    : workflowConfig
