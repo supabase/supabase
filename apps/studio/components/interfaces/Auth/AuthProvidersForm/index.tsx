@@ -105,6 +105,8 @@ export const AuthProvidersForm = () => {
                     isActive = authConfig && (authConfig as any)['EXTERNAL_SLACK_OIDC_ENABLED']
                   } else if (providerSchema.title.includes('Web3')) {
                     isActive = authConfig && (authConfig as any)['EXTERNAL_WEB3_SOLANA_ENABLED']
+                  } else if (providerSchema.title.includes('X / Twitter (OAuth 2.0)')) {
+                    isActive = authConfig && (authConfig as any)['EXTERNAL_X_ENABLED']
                   } else {
                     isActive =
                       authConfig &&

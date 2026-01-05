@@ -2046,9 +2046,9 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Whether RLS was enabled on the table
      */
@@ -2058,7 +2058,7 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     has_rls_policies: boolean
     /**
-     * Whether AI-generated policies were used (only possible in treatment)
+     * Whether AI-generated policies were used (only possible in variation)
      */
     has_generated_policies: boolean
   }
@@ -2080,9 +2080,9 @@ export interface TableCreateGeneratePoliciesExperimentExposedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Days since project creation (to segment by new user cohorts)
      */
@@ -2550,6 +2550,18 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User clicked on "Explain with AI" button in Query Performance detail panel
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/query-performance
+ */
+export interface QueryPerformanceAIExplanationButtonClickedEvent {
+  action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2603,6 +2615,98 @@ export interface DashboardErrorDisplayedEvent {
      * Source of the error
      */
     source?: 'admonition' | 'toast'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully installed an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstalledEvent {
+  action: 'integration_installed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started installing an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallStartedEvent {
+  action: 'integration_install_started'
+  properties: {
+    /**
+     * The name of the integration being installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started uninstalling an integration via the integrations marketplace.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallStartedEvent {
+  action: 'integration_uninstall_started'
+  properties: {
+    /**
+     * The name of the integration being uninstalled
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Installation failed for an integration.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallFailedEvent {
+  action: 'integration_install_failed'
+  properties: {
+    /**
+     * The name of the integration whose installation failed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User uninstalled an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstalledEvent {
+  action: 'integration_uninstalled'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
   }
   groups: TelemetryGroups
 }
@@ -2749,6 +2853,12 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorDisplayedEvent
+  | IntegrationInstalledEvent
+  | IntegrationInstallStartedEvent
+  | IntegrationUninstallStartedEvent
+  | IntegrationInstallFailedEvent
+  | IntegrationUninstalledEvent
