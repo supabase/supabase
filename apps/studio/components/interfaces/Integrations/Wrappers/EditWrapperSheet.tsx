@@ -198,8 +198,14 @@ export const EditWrapperSheet = ({
               )
 
               if (encryptedIdsToFetch.length > 0) {
+                console.log(encryptedIdsToFetch)
                 fetchEncryptedValues(encryptedIdsToFetch)
               }
+              /**
+               * [Joshen] We're deliberately not adding values and initialValues to the dependency array here
+               * as we only want to fetch the encrypted values once on load + values and initialValues will be updated
+               * as a result of that
+               */
               // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [project?.ref, project?.connectionString])
 
