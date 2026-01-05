@@ -95,7 +95,7 @@ export const RestartTableDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
             {isResetting ? 'Restarting replication...' : 'Restart replication'}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
@@ -21,14 +22,7 @@ interface BatchRestartDialogProps {
   mode: 'all' | 'errored'
   totalTables: number
   erroredTablesCount: number
-  tables: Array<{
-    table_id: number
-    state: {
-      name: string
-      retry_policy?: { policy: string }
-      [key: string]: any
-    }
-  }>
+  tables: ReplicationPipelineTableStatus[]
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void
 }
@@ -158,7 +152,7 @@ export const BatchRestartDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="danger">
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
             {isResetting ? 'Restarting replication...' : dialogContent.action}
           </AlertDialogAction>
         </AlertDialogFooter>

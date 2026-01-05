@@ -1,17 +1,19 @@
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
-import { TableState } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
+import { CriticalIcon } from 'ui'
 import { isValidRetryPolicy } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RetryCountdown } from './RetryCountdown'
 
 interface ErroredTableDetailsProps {
-  state: Extract<TableState['state'], { name: 'error' }>
-  tableName: string
-  tableId: number
+  table: ReplicationPipelineTableStatus
 }
 
-export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableDetailsProps) => {
+export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
   const { ref: projectRef } = useParams()
+
+  const state = table.state as Extract<ReplicationPipelineTableStatus['state'], { name: 'error' }>
+  const tableName = table.table_name
   const retryPolicy = state.retry_policy.policy
 
   if (!isValidRetryPolicy(state.retry_policy)) {
@@ -47,29 +49,16 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
         <div className="flex flex-col gap-y-3">
           <div className="rounded-md border border-destructive-400 bg-destructive-100 px-3 py-3 space-y-2">
             <div className="flex items-start gap-x-2">
-              <div className="min-w-4 mt-0.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-destructive-600"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
+              <CriticalIcon />
               <div className="flex-1 text-xs text-destructive-900">
                 <p className="font-semibold mb-1">Action required to continue replication</p>
-                <p className="text-destructive-800">
+                <p className="text-foreground-light">
                   {state.solution}
                   {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'}
                 </p>
-                <p className="text-destructive-800 mt-2">
-                  <strong>To fix this:</strong> Use the table actions menu on the right to restart
-                  table replication from scratch. The pipeline will restart automatically.
+                <p className="text-foreground-light mt-2">
+                  Restart table replication from the table actions menu on the right. The pipeline
+                  will restart automatically.
                 </p>
               </div>
             </div>

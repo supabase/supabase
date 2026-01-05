@@ -1,10 +1,9 @@
 import {
   Activity,
-  AlertTriangle,
   ArrowUpCircle,
   Ban,
+  ChevronDown,
   ChevronLeft,
-  ExternalLink,
   Info,
   Pause,
   Play,
@@ -19,9 +18,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
@@ -33,26 +30,37 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
-import { ErroredTableDetails } from '../ErroredTableDetails'
-import { RestartTableDialog } from '../RestartTableDialog'
-import { TableActionsMenu } from '../TableActionsMenu'
 import {
+  getStatusName,
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
-  getStatusName,
 } from '../Pipeline.utils'
 import { PipelineStatus } from '../PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { RestartTableDialog } from '../RestartTableDialog'
 import { UpdateVersionModal } from '../UpdateVersionModal'
-import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
-import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
+import { SlotLagMetrics } from './ReplicationPipelineStatus.types'
+import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
 import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
+import { TableReplicationRow } from './TableReplicationRow'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -196,7 +204,7 @@ export const ReplicationPipelineStatus = () => {
         ? 'Stop'
         : statusName === 'failed'
           ? 'Restart'
-          : 'Action unavailable'
+          : statusName
 
   const icon =
     statusName === 'stopped' ? (
@@ -235,7 +243,7 @@ export const ReplicationPipelineStatus = () => {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-3">
             <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
@@ -265,27 +273,6 @@ export const ReplicationPipelineStatus = () => {
                 Update available
               </Button>
             )}
-            <Input
-              icon={<Search />}
-              className="text-xs"
-              placeholder="Search for tables"
-              value={searchString}
-              disabled={isPipelineError}
-              onChange={(e) => setSearchString(e.target.value)}
-              actions={
-                searchString.length > 0
-                  ? [
-                      <X
-                        key="close"
-                        className="mx-2 cursor-pointer text-foreground"
-                        size={14}
-                        strokeWidth={1.5}
-                        onClick={() => setSearchString('')}
-                      />,
-                    ]
-                  : undefined
-              }
-            />
 
             <Button asChild type="default">
               <Link href={logsUrl}>View logs</Link>
@@ -300,6 +287,7 @@ export const ReplicationPipelineStatus = () => {
                 !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
               }
               icon={icon}
+              className="capitalize"
             >
               {label}
             </Button>
@@ -381,20 +369,29 @@ export const ReplicationPipelineStatus = () => {
         {hasTableData && (
           <div className="flex flex-col gap-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-x-2">
-                <p className="text-sm text-foreground-light">
-                  {tableStatuses.length} table{tableStatuses.length !== 1 ? 's' : ''} in pipeline
-                  {hasErroredTables && !isAnyRestartInProgress && (
-                    <span className="text-destructive-600 font-medium">
-                      {' '}
-                      · {erroredTables.length} failed
-                    </span>
-                  )}
-                </p>
-              </div>
+              <Input
+                icon={<Search />}
+                size="tiny"
+                className="text-xs w-52"
+                placeholder="Search for tables"
+                value={searchString}
+                disabled={isPipelineError}
+                onChange={(e) => setSearchString(e.target.value)}
+                actions={
+                  searchString.length > 0 && [
+                    <X
+                      key="close"
+                      className="mx-2 cursor-pointer text-foreground"
+                      size={14}
+                      strokeWidth={1.5}
+                      onClick={() => setSearchString('')}
+                    />,
+                  ]
+                }
+              />
               {!showDisabledState && (
-                <div className="flex items-center gap-x-2">
-                  {hasErroredTables && (
+                <div className="flex items-center">
+                  {/* {hasErroredTables && (
                     <Button
                       size="tiny"
                       type="danger"
@@ -408,10 +405,11 @@ export const ReplicationPipelineStatus = () => {
                     >
                       Restart failed tables
                     </Button>
-                  )}
+                  )} */}
                   <Button
                     size="tiny"
                     type="default"
+                    className="rounded-r-none hover:z-[2]"
                     icon={<RotateCcw />}
                     disabled={tableStatuses.length === 0 || isAnyRestartInProgress}
                     loading={isAnyRestartInProgress}
@@ -422,138 +420,82 @@ export const ReplicationPipelineStatus = () => {
                   >
                     Restart all tables
                   </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        icon={<ChevronDown />}
+                        className="w-7 rounded-l-none -ml-[1px]"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        disabled={!hasErroredTables || isAnyRestartInProgress}
+                        onClick={() => {
+                          setBatchRestartMode('errored')
+                          setShowBatchRestartDialog(true)
+                        }}
+                      >
+                        Restart failed tables only
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               )}
             </div>
-            <div className="w-full overflow-hidden overflow-x-auto">
-              {/* [Joshen] Should update to use new Table components next time */}
-              <Table
-                head={[
-                  <Table.th key="table">Table</Table.th>,
-                  <Table.th key="status">Status</Table.th>,
-                  <Table.th key="details">Details</Table.th>,
-                  <Table.th key="actions"></Table.th>,
-                ]}
-                body={
-                  <>
-                    {filteredTableStatuses.length === 0 && hasTableData && (
-                      <Table.tr>
-                        <Table.td colSpan={4}>
-                          <div className="space-y-1">
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{searchString}" did not return any results
-                            </p>
-                          </div>
-                        </Table.td>
-                      </Table.tr>
-                    )}
-                    {filteredTableStatuses.map((table, index) => {
+
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead key="table">Table</TableHead>
+                      <TableHead key="status">Status</TableHead>
+                      <TableHead key="details">Details</TableHead>
+                      <TableHead key="actions" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTableStatuses.map((table) => {
                       const isRestarting = restartingTableIds.has(table.table_id)
-                      const statusConfig = getStatusConfig(table.state as TableState['state'])
                       const isErrorState = table.state.name === 'error'
                       const errorReason =
                         isErrorState && 'reason' in table.state ? table.state.reason : undefined
                       const errorSolution =
                         isErrorState && 'solution' in table.state ? table.state.solution : undefined
                       return (
-                        <Table.tr
-                          key={`${table.table_name}-${index}`}
-                          className={cn('border-t', isRestarting && 'bg-surface-200/50')}
-                        >
-                          <Table.td className="align-top">
-                            <div className="flex items-center gap-x-2">
-                              <p className={cn(isRestarting && 'text-foreground-light')}>
-                                {table.table_name}
-                              </p>
-
-                              <ButtonTooltip
-                                asChild
-                                type="text"
-                                className="px-1.5"
-                                icon={<ExternalLink />}
-                                tooltip={{
-                                  content: { side: 'bottom', text: 'Open in Table Editor' },
-                                }}
-                              >
-                                <Link
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  href={`/project/${projectRef}/editor/${table.table_id}`}
-                                />
-                              </ButtonTooltip>
-                            </div>
-                          </Table.td>
-                          <Table.td className="align-top">
-                            {isRestarting ? (
-                              <Badge variant="default">Restarting</Badge>
-                            ) : showDisabledState ? (
-                              <Badge variant="default">Not Available</Badge>
-                            ) : (
-                              statusConfig.badge
-                            )}
-                          </Table.td>
-                          <Table.td className="align-top">
-                            {isRestarting ? (
-                              <p className="text-sm text-foreground-lighter">
-                                Replication is being restarted for this table. The pipeline will
-                                restart automatically.
-                              </p>
-                            ) : showDisabledState ? (
-                              <p className="text-sm text-foreground-lighter">
-                                Status unavailable while pipeline is {config.badge.toLowerCase()}
-                              </p>
-                            ) : (
-                              <div className="flex flex-col gap-y-3">
-                                <div className="text-sm text-foreground">
-                                  {statusConfig.description}
-                                </div>
-                                {table.state.name === 'error' && (
-                                  <ErroredTableDetails
-                                    state={table.state}
-                                    tableName={table.table_name}
-                                    tableId={table.table_id}
-                                  />
-                                )}
-                              </div>
-                            )}
-                          </Table.td>
-                          <Table.td className="align-top">
-                            <div className="flex items-center justify-end">
-                              <TableActionsMenu
-                                tableId={table.table_id}
-                                tableName={table.table_name}
-                                tableState={table.state}
-                                disabled={showDisabledState || isRestarting}
-                                onRestartClick={() => {
-                                  setSelectedTableForRestart({
-                                    tableId: table.table_id,
+                        <TableReplicationRow
+                          key={table.table_id}
+                          table={table}
+                          config={config}
+                          isRestarting={isRestarting}
+                          showDisabledState={showDisabledState}
+                          onSelectRestart={() => {
+                            setSelectedTableForRestart({
+                              tableId: table.table_id,
+                              tableName: table.table_name,
+                            })
+                            setShowRestartDialog(true)
+                          }}
+                          onSelectShowError={
+                            isErrorState && errorReason
+                              ? () => {
+                                  setSelectedTableError({
                                     tableName: table.table_name,
+                                    reason: errorReason,
+                                    solution: errorSolution,
                                   })
-                                  setShowRestartDialog(true)
-                                }}
-                                onShowErrorClick={
-                                  isErrorState && errorReason
-                                    ? () => {
-                                        setSelectedTableError({
-                                          tableName: table.table_name,
-                                          reason: errorReason,
-                                          solution: errorSolution,
-                                        })
-                                        setShowErrorDialog(true)
-                                      }
-                                    : undefined
+                                  setShowErrorDialog(true)
                                 }
-                              />
-                            </div>
-                          </Table.td>
-                        </Table.tr>
+                              : () => {}
+                          }
+                        />
                       )
                     })}
-                  </>
-                }
-              />
-            </div>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </div>
         )}
 
