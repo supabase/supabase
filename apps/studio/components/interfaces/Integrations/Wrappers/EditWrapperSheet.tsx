@@ -4,6 +4,7 @@ import { Edit, Trash } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { UUID_REGEX } from '@/lib/constants'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
@@ -195,10 +196,10 @@ export const EditWrapperSheet = ({
                   const value = initialValues[option.name]
                   return value ?? null
                 })
-              )
+              ).filter((x) => UUID_REGEX.test(x))
+              // [Joshen] ^ Validate UUID to filter out already encrypted values
 
               if (encryptedIdsToFetch.length > 0) {
-                console.log(encryptedIdsToFetch)
                 fetchEncryptedValues(encryptedIdsToFetch)
               }
               /**
