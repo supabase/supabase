@@ -39,7 +39,7 @@ export function ExplainVisualizer({ rows, onShowRaw, id }: ExplainVisualizerProp
 
       {/* Plan nodes */}
       <div className="flex-1 overflow-auto min-h-0">
-        <div className="flex flex-col min-w-max pb-4">
+        <div className="flex flex-col min-w-max pb-1 divide-y divide-border-muted">
           {parsedTree.map((node, idx) => (
             <ExplainNodeRow key={idx} node={node} depth={0} maxDuration={maxDuration} />
           ))}
