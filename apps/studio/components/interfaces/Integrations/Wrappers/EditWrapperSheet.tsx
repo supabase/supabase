@@ -69,7 +69,7 @@ export const EditWrapperSheet = ({
     ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
   }
 
-  const onUpdateTable = (values: any) => {
+  const onUpdateTable = (values: FormattedWrapperTable) => {
     setWrapperTables((prev) => {
       // if the new values have tableIndex, we are editing an existing table
       if (values.tableIndex !== undefined) {
@@ -85,9 +85,9 @@ export const EditWrapperSheet = ({
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: Record<string, string>) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
-    const errors: any = validate(values)
+    const errors = validate(values)
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
@@ -138,7 +138,7 @@ export const EditWrapperSheet = ({
           }: {
             values: Record<string, string>
             initialValues: Record<string, string>
-            resetForm: any
+            resetForm: (value: Record<string, Record<string, string>>) => void
           }) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
@@ -200,6 +200,7 @@ export const EditWrapperSheet = ({
               if (encryptedIdsToFetch.length > 0) {
                 fetchEncryptedValues(encryptedIdsToFetch)
               }
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [project?.ref, project?.connectionString])
 
             return (
@@ -284,8 +285,7 @@ export const EditWrapperSheet = ({
                                     Target: {target}
                                   </p>
                                   <p className="text-sm text-foreground-light">
-                                    Columns:{' '}
-                                    {table.columns.map((column: any) => column.name).join(', ')}
+                                    Columns: {table.columns.map((column) => column.name).join(', ')}
                                   </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
