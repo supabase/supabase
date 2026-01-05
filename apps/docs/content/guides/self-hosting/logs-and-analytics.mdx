@@ -9,6 +9,7 @@ This guide provides a step-by-step process for setting up the Analytics and Logg
 ## Overview
 
 The Supabase Analytics stack consists of:
+
 - **Studio**: The dashboard interface for viewing logs.
 - **Analytics (Logflare)**: The ingestion and query engine.
 - **Vector**: The log forwarding pipeline that collects logs from Docker containers and sends them to Analytics.
@@ -16,7 +17,7 @@ The Supabase Analytics stack consists of:
 
 By default, the self-hosted setup uses a Postgres backend for logs.
 
-## 1. Enable services in Docker Compose
+## 1. Enable services in Docker compose
 
 Ensure that the `analytics` and `vector` services are enabled in your `docker-compose.yml` file.
 
@@ -37,7 +38,7 @@ LOGFLARE_PRIVATE_ACCESS_TOKEN=your-super-secret-private-token
 
 Refer to the [docker/.env.example](https://github.com/supabase/supabase/blob/master/docker/.env.example) for other necessary variables.
 
-## 3. Ingestion Pipeline (Vector)
+## 3. Ingestion pipeline (Vector)
 
 Vector collects logs from your Docker containers, transforms them into the format expected by Studio, and forwards them to the Analytics server.
 
@@ -49,7 +50,7 @@ If you are using a custom logging pipeline, ensure your payloads match the expec
 
 You can verify that your ingestion pipeline is working by sending a test log event directly to the Analytics server or through the Kong proxy.
 
-### Example: Send a Postgres log event via Kong
+### Example: Send a Postgres log event via kong
 
 Note that for Postgres logs, Studio expects `project: "default"` and `metadata.parsed.error_severity` to be present.
 
@@ -76,11 +77,11 @@ curl -X POST "http://localhost:8000/analytics/v1/api/logs?source_name=postgres.l
 2. Navigate to **Logs** in the sidebar.
 3. You should see the logs appearing in the **Logs Explorer**.
 
-### Field Reference
+### Field reference
 
-The Field Reference panel in the Logs Explorer is based on the definitions in [packages/shared-data/logConstants.ts](https://github.com/supabase/supabase/blob/master/packages/shared-data/logConstants.ts). If you add custom metadata, it must match the paths defined in this file to be easily searchable in Studio.
+The Field Reference panel in the Logs Explorer is based on the definitions in [packages/shared-data/logConstants.ts](https://github.com/supabase/supabase/blob/master/packages/shared-data/logConstants.ts). If you add custom metadata, it must match the paths defined in this file to be searchable in Studio.
 
-## 6. Custom Sink Checklist
+## 6. Custom sink checklist
 
 If you are not using Vector and want to send logs from another source:
 
@@ -91,4 +92,3 @@ If you are not using Vector and want to send logs from another source:
 - **Authentication**: Use the `x-api-key` header with your `LOGFLARE_PUBLIC_ACCESS_TOKEN`.
 
 For more details on the Analytics server configuration, see the [Self-hosting Analytics Reference](/docs/reference/self-hosting-analytics/introduction).
-
