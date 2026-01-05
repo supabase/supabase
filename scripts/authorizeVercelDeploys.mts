@@ -87,10 +87,10 @@ async function main() {
     throw new Error('GITHUB_SHA environment variable is required')
   }
 
-  const vars = Object.keys(process.env).filter((key) => key.startsWith('V'))
-  console.log(vars)
+
 
   const vercelToken = process.env.VERCEL_TOKEN
+  console.log((vercelToken ?? '').slice(0, 3) + '...')
   if (!vercelToken) {
     throw new Error('VERCEL_TOKEN environment variable is required')
   }
