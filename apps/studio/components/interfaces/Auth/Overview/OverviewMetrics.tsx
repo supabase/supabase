@@ -226,11 +226,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               <PageSectionTitle>Usage</PageSectionTitle>
               <Link
                 href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
-                className="text-sm text-link inline-flex items-center gap-x-1.5"
+                className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all text-sm inline-flex items-center gap-x-1.5"
               >
-                <Telescope size={14} />
+                <Telescope size={14} className="text-foreground-lighter" />
                 <span>Go to observability</span>
-                <ChevronRight size={14} />
+                <ChevronRight size={14} className="text-foreground-lighter" />
               </Link>
             </div>
           </PageSectionSummary>
@@ -292,11 +292,13 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   className="p-0"
                   isEmpty={responseErrors.length === 0}
                   emptyState={
-                    <ChartEmptyState
-                      icon={<BarChart2 size={16} />}
-                      title="No data to show"
-                      description="It may take up to 24 hours for data to refresh"
-                    />
+                    <div className="p-6">
+                      <ChartEmptyState
+                        icon={<BarChart2 size={16} />}
+                        title="No data to show"
+                        description="It may take up to 24 hours for data to refresh"
+                      />
+                    </div>
                   }
                   loadingState={
                     <div className="p-6">
@@ -366,11 +368,13 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   className="p-0"
                   isEmpty={errorCodes.length === 0}
                   emptyState={
-                    <ChartEmptyState
-                      icon={<BarChart2 size={16} />}
-                      title="No data to show"
-                      description="It may take up to 24 hours for data to refresh"
-                    />
+                    <div className="p-6">
+                      <ChartEmptyState
+                        icon={<BarChart2 size={16} />}
+                        title="No data to show"
+                        description="It may take up to 24 hours for data to refresh"
+                      />
+                    </div>
                   }
                   loadingState={
                     <div className="p-6">
