@@ -126,8 +126,8 @@ async function main() {
       console.log(`Target URL: ${status.target_url}`)
 
       // Extract job info from target URL
-      const jobInfo = await extractJobInfoFromTargetUrl(status.target_url)
-      console.log(jobInfo)
+      const jobInfo = extractJobInfoFromTargetUrl(status.target_url)
+
       // Authorize the job
       await authorizeVercelJob(jobInfo, vercelToken)
     } catch (error) {
