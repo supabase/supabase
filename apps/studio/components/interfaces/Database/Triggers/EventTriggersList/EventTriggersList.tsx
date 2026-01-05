@@ -1,8 +1,9 @@
 import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { EMPTY_ARR } from '@/lib/void'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DeleteEventTrigger } from 'components/interfaces/Database/Triggers/DeleteEventTrigger'
 import {
@@ -31,6 +32,8 @@ import { EventTriggerList } from './EventTriggerList'
 import { generateEventTriggerCreateSQL } from './EventTriggerList.utils'
 import { DEFAULT_EVENT_TRIGGER_SQL, EVENT_TRIGGER_TEMPLATES } from './EventTriggers.constants'
 
+const DEFAULT_OWNER_FILTER = ['postgres']
+
 export const EventTriggersList = () => {
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useQueryState(
@@ -41,7 +44,7 @@ export const EventTriggersList = () => {
     'owner',
     parseAsJson(selectFilterSchema.parse)
   )
-  const ownerFilterValue = ownerFilter ?? ['postgres']
+  const ownerFilterValue = ownerFilter ?? DEFAULT_OWNER_FILTER
   const [triggerToDelete, setTriggerToDelete] = useState<DatabaseEventTrigger | null>(null)
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -57,7 +60,7 @@ export const EventTriggersList = () => {
   )
 
   const {
-    data: eventTriggers = [],
+    data: eventTriggers = EMPTY_ARR,
     error,
     isPending,
     isError,
@@ -133,6 +136,23 @@ export const EventTriggersList = () => {
     setTriggerToDelete(trigger)
   }
 
+  const ownerOptions = useMemo(() => {
+    const uniqueOwners = Array.from(
+      new Set(eventTriggers.map((trigger) => trigger.owner).filter(Boolean) as string[])
+    ).sort((a, b) => a.localeCompare(b))
+
+    return uniqueOwners.includes('postgres') ? uniqueOwners : ['postgres', ...uniqueOwners]
+  }, [eventTriggers])
+
+  const showEmptyState = useMemo(() => {
+    const hasPostgresOwnerTriggers = eventTriggers.some((trigger) => trigger.owner === 'postgres')
+    return (
+      ownerFilterValue.includes('postgres') &&
+      ownerFilterValue.length === 1 &&
+      !hasPostgresOwnerTriggers
+    )
+  }, [eventTriggers, ownerFilterValue])
+
   if (isPending) {
     return <GenericSkeletonLoader />
   }
@@ -140,19 +160,6 @@ export const EventTriggersList = () => {
   if (isError) {
     return <AlertError error={error} subject="Failed to retrieve event triggers" />
   }
-
-  const uniqueOwners = Array.from(
-    new Set(eventTriggers.map((trigger) => trigger.owner).filter(Boolean) as string[])
-  ).sort((a, b) => a.localeCompare(b))
-  const ownerOptions = uniqueOwners.includes('postgres')
-    ? uniqueOwners
-    : ['postgres', ...uniqueOwners]
-
-  const hasPostgresOwnerTriggers = eventTriggers.some((trigger) => trigger.owner === 'postgres')
-  const showEmptyState =
-    ownerFilterValue.includes('postgres') &&
-    ownerFilterValue.length === 1 &&
-    !hasPostgresOwnerTriggers
 
   return (
     <div className="space-y-4">

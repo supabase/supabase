@@ -1,4 +1,5 @@
 import { includes, sortBy } from 'lodash'
+import { useMemo } from 'react'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,6 +30,8 @@ interface EventTriggerListProps {
   onDeleteTrigger: (trigger: DatabaseEventTrigger) => void
 }
 
+const SYSTEM_OWNERS = new Set<string>(SUPABASE_ROLES)
+
 export const EventTriggerList = ({
   filterString,
   eventTriggers,
@@ -40,25 +43,25 @@ export const EventTriggerList = ({
   onDeleteTrigger,
 }: EventTriggerListProps) => {
   const { ref: projectRef } = useParams()
-  const searchValue = filterString.toLowerCase()
-  const systemOwners = new Set<string>(SUPABASE_ROLES)
-  const ownerFilterSet = new Set(ownerFilter)
 
-  const filteredEventTriggers = eventTriggers.filter((trigger) => {
-    const matchesOwner =
-      ownerFilterSet.size === 0 ? true : trigger.owner ? ownerFilterSet.has(trigger.owner) : false
+  const orderedTriggers = useMemo(() => {
+    const searchValue = filterString.toLowerCase()
+    const ownerFilterSet = new Set(ownerFilter)
 
-    return (
-      matchesOwner &&
-      (includes(trigger.name.toLowerCase(), searchValue) ||
-        includes(trigger.event.toLowerCase(), searchValue) ||
-        (trigger.function_name && includes(trigger.function_name.toLowerCase(), searchValue)))
-    )
-  })
+    const filteredEventTriggers = eventTriggers.filter((trigger) => {
+      const matchesOwner =
+        ownerFilterSet.size === 0 ? true : trigger.owner ? ownerFilterSet.has(trigger.owner) : false
 
-  const orderedTriggers = sortBy(filteredEventTriggers, (trigger) =>
-    trigger.name.toLocaleLowerCase()
-  )
+      return (
+        matchesOwner &&
+        (includes(trigger.name.toLowerCase(), searchValue) ||
+          includes(trigger.event.toLowerCase(), searchValue) ||
+          (trigger.function_name && includes(trigger.function_name.toLowerCase(), searchValue)))
+      )
+    })
+
+    return sortBy(filteredEventTriggers, (trigger) => trigger.name.toLocaleLowerCase())
+  }, [eventTriggers, ownerFilter, filterString])
 
   if (orderedTriggers.length === 0 && filterString.length === 0 && ownerFilter.length === 0) {
     return (
@@ -91,7 +94,7 @@ export const EventTriggerList = ({
   return (
     <>
       {orderedTriggers.map((trigger) => {
-        const isSystemTrigger = trigger.owner ? systemOwners.has(trigger.owner) : false
+        const isSystemTrigger = trigger.owner ? SYSTEM_OWNERS.has(trigger.owner) : false
         const canEditTrigger = !isSystemTrigger && canEdit
         const disabledReason = !canEdit
           ? 'You need additional permissions to update event triggers'

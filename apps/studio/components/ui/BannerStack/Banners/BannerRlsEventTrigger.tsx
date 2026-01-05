@@ -1,6 +1,7 @@
 import { ShieldCheck } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { EMPTY_ARR } from '@/lib/void'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
@@ -34,14 +35,18 @@ export const BannerRlsEventTrigger = () => {
     'triggers'
   )
 
-  const { data: eventTriggers = [], isLoading: isLoadingEventTriggers } =
+  const { data: eventTriggers = EMPTY_ARR, isLoading: isLoadingEventTriggers } =
     useDatabaseEventTriggersQuery({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     })
 
-  const hasDefaultTrigger = eventTriggers.some(
-    (trigger) => trigger.name === 'ensure_rls' || trigger.function_name === 'rls_auto_enable'
+  const hasDefaultTrigger = useMemo(
+    () =>
+      eventTriggers.some(
+        (trigger) => trigger.name === 'ensure_rls' || trigger.function_name === 'rls_auto_enable'
+      ),
+    [eventTriggers]
   )
 
   const { mutate: createEventTrigger, isPending: isCreating } =
