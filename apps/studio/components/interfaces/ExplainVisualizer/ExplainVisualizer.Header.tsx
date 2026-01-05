@@ -76,18 +76,21 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
                 Start at the bottom where data is read from tables, then follow upward as each step
                 processes the results.
               </p>
-              <h3 className="text-xs font-medium mt-4 mb-2">Key</h3>
+
               {isVisual && (
-                <div className="flex flex-col gap-1 text-foreground-light">
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-warning" />
-                    <span>Seq Scan (slow)</span>
+                <>
+                  <h3 className="text-xs font-medium mt-4 mb-2">Key</h3>
+                  <div className="flex flex-col gap-1 text-foreground-light">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-warning" />
+                      <span>Seq Scan (slow)</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand" />
+                      <span>Index Scan (fast)</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand" />
-                    <span>Index Scan (fast)</span>
-                  </div>
-                </div>
+                </>
               )}
             </TooltipContent>
           </Tooltip>
