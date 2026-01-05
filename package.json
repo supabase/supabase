@@ -40,7 +40,7 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
     "knip": "pnpx knip@~5.50.0",
-    "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
+    "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.mts"
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.823.0",
