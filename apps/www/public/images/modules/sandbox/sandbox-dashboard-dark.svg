@@ -1,0 +1,95 @@
+<svg width="490" height="559" viewBox="0 0 490 559" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="490" height="559" fill="#171717"/>
+  
+  <!-- Dashboard header -->
+  <g transform="translate(20, 20)">
+    <rect x="0" y="0" width="450" height="50" rx="8" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    <text x="20" y="32" fill="#fafafa" font-family="sans-serif" font-size="16" font-weight="600">Sandbox Jobs</text>
+    <rect x="330" y="12" width="100" height="26" rx="4" fill="#3ecf8e"/>
+    <text x="380" y="30" fill="#171717" font-family="sans-serif" font-size="12" font-weight="500" text-anchor="middle">New Job</text>
+  </g>
+  
+  <!-- Stats bar -->
+  <g transform="translate(20, 85)">
+    <rect x="0" y="0" width="145" height="60" rx="6" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    <text x="16" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Running</text>
+    <text x="16" y="48" fill="#3ecf8e" font-family="sans-serif" font-size="20" font-weight="600">3</text>
+    
+    <rect x="153" y="0" width="145" height="60" rx="6" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    <text x="169" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Queued</text>
+    <text x="169" y="48" fill="#f59e0b" font-family="sans-serif" font-size="20" font-weight="600">5</text>
+    
+    <rect x="306" y="0" width="144" height="60" rx="6" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    <text x="322" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Completed (24h)</text>
+    <text x="322" y="48" fill="#fafafa" font-family="sans-serif" font-size="20" font-weight="600">127</text>
+  </g>
+  
+  <!-- Job list -->
+  <g transform="translate(20, 165)">
+    <rect x="0" y="0" width="450" height="374" rx="8" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    
+    <!-- Table header -->
+    <rect x="0" y="0" width="450" height="36" rx="8" fill="#262626"/>
+    <text x="20" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Job ID</text>
+    <text x="150" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Task</text>
+    <text x="280" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Status</text>
+    <text x="370" y="24" fill="#a1a1aa" font-family="sans-serif" font-size="11">Duration</text>
+    
+    <!-- Row 1 -->
+    <line x1="0" y1="36" x2="450" y2="36" stroke="#262626" stroke-width="1"/>
+    <circle cx="28" cy="60" r="5" fill="#3ecf8e"/>
+    <text x="44" y="64" fill="#fafafa" font-family="monospace" font-size="11">sbx_a1b2c3</text>
+    <text x="150" y="64" fill="#a1a1aa" font-family="sans-serif" font-size="11">ml-inference</text>
+    <rect x="280" y="50" width="60" height="20" rx="4" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="310" y="64" fill="#3ecf8e" font-family="sans-serif" font-size="10" text-anchor="middle">Running</text>
+    <text x="370" y="64" fill="#a1a1aa" font-family="sans-serif" font-size="11">23m 45s</text>
+    
+    <!-- Row 2 -->
+    <line x1="0" y1="84" x2="450" y2="84" stroke="#262626" stroke-width="1"/>
+    <circle cx="28" cy="108" r="5" fill="#3ecf8e"/>
+    <text x="44" y="112" fill="#fafafa" font-family="monospace" font-size="11">sbx_d4e5f6</text>
+    <text x="150" y="112" fill="#a1a1aa" font-family="sans-serif" font-size="11">data-pipeline</text>
+    <rect x="280" y="98" width="60" height="20" rx="4" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="310" y="112" fill="#3ecf8e" font-family="sans-serif" font-size="10" text-anchor="middle">Running</text>
+    <text x="370" y="112" fill="#a1a1aa" font-family="sans-serif" font-size="11">1h 12m</text>
+    
+    <!-- Row 3 -->
+    <line x1="0" y1="132" x2="450" y2="132" stroke="#262626" stroke-width="1"/>
+    <circle cx="28" cy="156" r="5" fill="#f59e0b"/>
+    <text x="44" y="160" fill="#fafafa" font-family="monospace" font-size="11">sbx_g7h8i9</text>
+    <text x="150" y="160" fill="#a1a1aa" font-family="sans-serif" font-size="11">batch-emails</text>
+    <rect x="280" y="146" width="60" height="20" rx="4" fill="#f59e0b" fill-opacity="0.2"/>
+    <text x="310" y="160" fill="#f59e0b" font-family="sans-serif" font-size="10" text-anchor="middle">Queued</text>
+    <text x="370" y="160" fill="#a1a1aa" font-family="sans-serif" font-size="11">—</text>
+    
+    <!-- Row 4 -->
+    <line x1="0" y1="180" x2="450" y2="180" stroke="#262626" stroke-width="1"/>
+    <circle cx="28" cy="204" r="5" fill="#a1a1aa"/>
+    <text x="44" y="208" fill="#fafafa" font-family="monospace" font-size="11">sbx_j1k2l3</text>
+    <text x="150" y="208" fill="#a1a1aa" font-family="sans-serif" font-size="11">video-transcode</text>
+    <rect x="280" y="194" width="70" height="20" rx="4" fill="#525252" fill-opacity="0.3"/>
+    <text x="315" y="208" fill="#a1a1aa" font-family="sans-serif" font-size="10" text-anchor="middle">Completed</text>
+    <text x="370" y="208" fill="#a1a1aa" font-family="sans-serif" font-size="11">45m 23s</text>
+    
+    <!-- Row 5 -->
+    <line x1="0" y1="228" x2="450" y2="228" stroke="#262626" stroke-width="1"/>
+    <circle cx="28" cy="252" r="5" fill="#a1a1aa"/>
+    <text x="44" y="256" fill="#fafafa" font-family="monospace" font-size="11">sbx_m4n5o6</text>
+    <text x="150" y="256" fill="#a1a1aa" font-family="sans-serif" font-size="11">web-scraper</text>
+    <rect x="280" y="242" width="70" height="20" rx="4" fill="#525252" fill-opacity="0.3"/>
+    <text x="315" y="256" fill="#a1a1aa" font-family="sans-serif" font-size="10" text-anchor="middle">Completed</text>
+    <text x="370" y="256" fill="#a1a1aa" font-family="sans-serif" font-size="11">2h 15m</text>
+    
+    <!-- Row 6 -->
+    <line x1="0" y1="276" x2="450" y2="276" stroke="#262626" stroke-width="1"/>
+    <circle cx="28" cy="300" r="5" fill="#ef4444"/>
+    <text x="44" y="304" fill="#fafafa" font-family="monospace" font-size="11">sbx_p7q8r9</text>
+    <text x="150" y="304" fill="#a1a1aa" font-family="sans-serif" font-size="11">migration-job</text>
+    <rect x="280" y="290" width="50" height="20" rx="4" fill="#ef4444" fill-opacity="0.2"/>
+    <text x="305" y="304" fill="#ef4444" font-family="sans-serif" font-size="10" text-anchor="middle">Failed</text>
+    <text x="370" y="304" fill="#a1a1aa" font-family="sans-serif" font-size="11">12m 08s</text>
+    
+    <!-- Pagination -->
+    <text x="200" y="355" fill="#a1a1aa" font-family="sans-serif" font-size="11" text-anchor="middle">Page 1 of 12</text>
+  </g>
+</svg>

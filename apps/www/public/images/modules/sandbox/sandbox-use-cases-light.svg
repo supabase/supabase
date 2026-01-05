@@ -1,0 +1,65 @@
+<svg width="490" height="432" viewBox="0 0 490 432" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="490" height="432" fill="#fafafa"/>
+  
+  <!-- Use case cards -->
+  <g transform="translate(30, 30)">
+    <rect x="0" y="0" width="200" height="90" rx="8" fill="#ffffff" stroke="#e5e5e5" stroke-width="1"/>
+    <circle cx="24" cy="24" r="12" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="24" y="28" fill="#3ecf8e" font-family="sans-serif" font-size="14" text-anchor="middle">🤖</text>
+    <text x="48" y="28" fill="#171717" font-family="sans-serif" font-size="14" font-weight="500">AI/ML Inference</text>
+    <text x="16" y="55" fill="#525252" font-family="sans-serif" font-size="11">Run model predictions</text>
+    <text x="16" y="72" fill="#525252" font-family="sans-serif" font-size="11">on large datasets</text>
+  </g>
+  
+  <g transform="translate(250, 30)">
+    <rect x="0" y="0" width="200" height="90" rx="8" fill="#ffffff" stroke="#e5e5e5" stroke-width="1"/>
+    <circle cx="24" cy="24" r="12" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="24" y="28" fill="#3ecf8e" font-family="sans-serif" font-size="14" text-anchor="middle">📊</text>
+    <text x="48" y="28" fill="#171717" font-family="sans-serif" font-size="14" font-weight="500">Data Pipelines</text>
+    <text x="16" y="55" fill="#525252" font-family="sans-serif" font-size="11">ETL jobs and data</text>
+    <text x="16" y="72" fill="#525252" font-family="sans-serif" font-size="11">transformations</text>
+  </g>
+  
+  <g transform="translate(30, 140)">
+    <rect x="0" y="0" width="200" height="90" rx="8" fill="#ffffff" stroke="#e5e5e5" stroke-width="1"/>
+    <circle cx="24" cy="24" r="12" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="24" y="28" fill="#3ecf8e" font-family="sans-serif" font-size="14" text-anchor="middle">📧</text>
+    <text x="48" y="28" fill="#171717" font-family="sans-serif" font-size="14" font-weight="500">Batch Processing</text>
+    <text x="16" y="55" fill="#525252" font-family="sans-serif" font-size="11">Email campaigns,</text>
+    <text x="16" y="72" fill="#525252" font-family="sans-serif" font-size="11">notifications, reports</text>
+  </g>
+  
+  <g transform="translate(250, 140)">
+    <rect x="0" y="0" width="200" height="90" rx="8" fill="#ffffff" stroke="#e5e5e5" stroke-width="1"/>
+    <circle cx="24" cy="24" r="12" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="24" y="28" fill="#3ecf8e" font-family="sans-serif" font-size="14" text-anchor="middle">🔄</text>
+    <text x="48" y="28" fill="#171717" font-family="sans-serif" font-size="14" font-weight="500">Migrations</text>
+    <text x="16" y="55" fill="#525252" font-family="sans-serif" font-size="11">Database migrations</text>
+    <text x="16" y="72" fill="#525252" font-family="sans-serif" font-size="11">and data syncing</text>
+  </g>
+  
+  <g transform="translate(30, 250)">
+    <rect x="0" y="0" width="200" height="90" rx="8" fill="#ffffff" stroke="#e5e5e5" stroke-width="1"/>
+    <circle cx="24" cy="24" r="12" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="24" y="28" fill="#3ecf8e" font-family="sans-serif" font-size="14" text-anchor="middle">🎬</text>
+    <text x="48" y="28" fill="#171717" font-family="sans-serif" font-size="14" font-weight="500">Media Processing</text>
+    <text x="16" y="55" fill="#525252" font-family="sans-serif" font-size="11">Video transcoding,</text>
+    <text x="16" y="72" fill="#525252" font-family="sans-serif" font-size="11">image optimization</text>
+  </g>
+  
+  <g transform="translate(250, 250)">
+    <rect x="0" y="0" width="200" height="90" rx="8" fill="#ffffff" stroke="#e5e5e5" stroke-width="1"/>
+    <circle cx="24" cy="24" r="12" fill="#3ecf8e" fill-opacity="0.2"/>
+    <text x="24" y="28" fill="#3ecf8e" font-family="sans-serif" font-size="14" text-anchor="middle">🕷️</text>
+    <text x="48" y="28" fill="#171717" font-family="sans-serif" font-size="14" font-weight="500">Web Scraping</text>
+    <text x="16" y="55" fill="#525252" font-family="sans-serif" font-size="11">Crawling and data</text>
+    <text x="16" y="72" fill="#525252" font-family="sans-serif" font-size="11">extraction at scale</text>
+  </g>
+  
+  <!-- Time indicator -->
+  <g transform="translate(30, 370)">
+    <rect x="0" y="0" width="430" height="40" rx="6" fill="#ffffff" stroke="#3ecf8e" stroke-width="1"/>
+    <text x="16" y="26" fill="#3ecf8e" font-family="monospace" font-size="12">⏱️ Run for hours, not seconds</text>
+    <text x="270" y="26" fill="#525252" font-family="monospace" font-size="12">Max timeout: 24h</text>
+  </g>
+</svg>

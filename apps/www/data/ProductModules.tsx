@@ -40,6 +40,19 @@ const ProductModules: ProductType = {
     label: '',
     url: '/modules/queues',
   },
+  [PRODUCT_MODULES_SHORTNAMES.SANDBOX]: {
+    name: PRODUCT_MODULES_NAMES.SANDBOX,
+    icon: PRODUCT_MODULES.sandbox.icon[24],
+    description: (
+      <>
+        Run long-running jobs in isolated containers with <strong>automatic scaling</strong> and{' '}
+        seamless Postgres integration.
+      </>
+    ),
+    description_short: 'Isolated environments for long-running jobs',
+    label: '',
+    url: '/modules/sandbox',
+  },
 }
 
 export default ProductModules

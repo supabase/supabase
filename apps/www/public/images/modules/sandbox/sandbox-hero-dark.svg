@@ -1,0 +1,76 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="675" fill="#171717"/>
+  
+  <!-- Grid background -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#262626" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+  
+  <!-- Container boxes representing sandboxes -->
+  <g transform="translate(200, 150)">
+    <!-- Main container -->
+    <rect x="0" y="0" width="280" height="180" rx="12" fill="#1c1c1c" stroke="#3ecf8e" stroke-width="2"/>
+    <rect x="16" y="16" width="248" height="32" rx="6" fill="#262626"/>
+    <circle cx="32" cy="32" r="6" fill="#3ecf8e"/>
+    <text x="50" y="37" fill="#a1a1aa" font-family="monospace" font-size="14">sandbox-001</text>
+    <text x="200" y="37" fill="#3ecf8e" font-family="monospace" font-size="12">RUNNING</text>
+    
+    <!-- Progress bar -->
+    <rect x="16" y="64" width="248" height="8" rx="4" fill="#262626"/>
+    <rect x="16" y="64" width="180" height="8" rx="4" fill="#3ecf8e"/>
+    
+    <!-- Logs preview -->
+    <text x="16" y="100" fill="#525252" font-family="monospace" font-size="11">[12:34:56] Processing batch 45/100...</text>
+    <text x="16" y="120" fill="#525252" font-family="monospace" font-size="11">[12:34:57] Rows processed: 45,000</text>
+    <text x="16" y="140" fill="#525252" font-family="monospace" font-size="11">[12:34:58] Memory: 512MB / 2GB</text>
+    <text x="16" y="160" fill="#525252" font-family="monospace" font-size="11">[12:34:59] CPU: 45%</text>
+  </g>
+  
+  <!-- Second container -->
+  <g transform="translate(520, 150)">
+    <rect x="0" y="0" width="280" height="180" rx="12" fill="#1c1c1c" stroke="#525252" stroke-width="2"/>
+    <rect x="16" y="16" width="248" height="32" rx="6" fill="#262626"/>
+    <circle cx="32" cy="32" r="6" fill="#525252"/>
+    <text x="50" y="37" fill="#a1a1aa" font-family="monospace" font-size="14">sandbox-002</text>
+    <text x="200" y="37" fill="#525252" font-family="monospace" font-size="12">QUEUED</text>
+    
+    <text x="16" y="100" fill="#525252" font-family="monospace" font-size="11">Waiting for resources...</text>
+    <text x="16" y="120" fill="#525252" font-family="monospace" font-size="11">Estimated start: ~2 min</text>
+  </g>
+  
+  <!-- Third container -->
+  <g transform="translate(360, 370)">
+    <rect x="0" y="0" width="280" height="180" rx="12" fill="#1c1c1c" stroke="#3ecf8e" stroke-width="2" stroke-dasharray="4 4"/>
+    <rect x="16" y="16" width="248" height="32" rx="6" fill="#262626"/>
+    <circle cx="32" cy="32" r="6" fill="#262626" stroke="#3ecf8e" stroke-width="2"/>
+    <text x="50" y="37" fill="#a1a1aa" font-family="monospace" font-size="14">sandbox-003</text>
+    <text x="195" y="37" fill="#a1a1aa" font-family="monospace" font-size="12">COMPLETE</text>
+    
+    <text x="16" y="100" fill="#525252" font-family="monospace" font-size="11">[DONE] Job completed successfully</text>
+    <text x="16" y="120" fill="#525252" font-family="monospace" font-size="11">Duration: 45m 23s</text>
+    <text x="16" y="140" fill="#525252" font-family="monospace" font-size="11">Rows processed: 1,234,567</text>
+  </g>
+  
+  <!-- Connection lines -->
+  <path d="M 480 240 L 520 240" stroke="#3ecf8e" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 440 330 L 440 370" stroke="#3ecf8e" stroke-width="2" stroke-dasharray="4 4"/>
+  
+  <!-- Floating elements -->
+  <g transform="translate(840, 200)">
+    <rect x="0" y="0" width="160" height="100" rx="8" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    <text x="16" y="30" fill="#3ecf8e" font-family="monospace" font-size="12">METRICS</text>
+    <text x="16" y="55" fill="#a1a1aa" font-family="monospace" font-size="11">Active: 2</text>
+    <text x="16" y="75" fill="#a1a1aa" font-family="monospace" font-size="11">Queued: 1</text>
+    <text x="16" y="95" fill="#a1a1aa" font-family="monospace" font-size="11">Complete: 47</text>
+  </g>
+  
+  <g transform="translate(840, 340)">
+    <rect x="0" y="0" width="160" height="80" rx="8" fill="#1c1c1c" stroke="#262626" stroke-width="1"/>
+    <text x="16" y="30" fill="#3ecf8e" font-family="monospace" font-size="12">RESOURCES</text>
+    <text x="16" y="55" fill="#a1a1aa" font-family="monospace" font-size="11">CPU: 4 cores</text>
+    <text x="16" y="75" fill="#a1a1aa" font-family="monospace" font-size="11">RAM: 8 GB</text>
+  </g>
+</svg>
