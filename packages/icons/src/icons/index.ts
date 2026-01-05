@@ -11,6 +11,7 @@ export { default as Datadog } from './datadog';
 export { default as EdgeFunctions } from './edge-functions';
 export { default as FilesBucket } from './files-bucket';
 export { default as Grafana } from './grafana';
+export { default as Graphql } from './graphql';
 export { default as Home } from './home';
 export { default as InsertCode } from './insert-code';
 export { default as Integrations } from './integrations';

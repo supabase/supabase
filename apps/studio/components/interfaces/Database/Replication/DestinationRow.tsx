@@ -32,7 +32,7 @@ interface DestinationRowProps {
   sourceId?: number
   destinationId: number
   destinationName: string
-  type: DestinationType | 'Other'
+  type?: DestinationType
   pipeline?: Pipeline
   error: ResponseError | null
   isLoading: boolean
@@ -222,6 +222,7 @@ export const DestinationRow = ({
 
       <DestinationPanel
         visible={showEditDestinationPanel}
+        type={type}
         onClose={() => setShowEditDestinationPanel(false)}
         existingDestination={{
           sourceId,

@@ -309,14 +309,6 @@
       "description": "Shows the account deletion section in account preferences"
     },
 
-    "project_connection:javascript_example": {
-      "type": "boolean",
-      "description": "Show the javascript example in the project connection settings. If off, it'll show up as Typescript example instead (both are the same code example)"
-    },
-    "project_connection:dart_example": {
-      "type": "boolean",
-      "description": "Show the dart example in the project connection settings"
-    },
     "project_connection:show_app_frameworks": {
       "type": "boolean",
       "description": "Show the app frameworks tab in the connect modal"
@@ -510,8 +502,6 @@
     "project_settings:log_drains",
     "project_settings:restart_project",
     "project_settings:database_upgrades",
-    "project_connection:javascript_example",
-    "project_connection:dart_example",
     "project_connection:show_app_frameworks",
     "project_connection:show_mobile_frameworks",
     "project_connection:show_orms",
