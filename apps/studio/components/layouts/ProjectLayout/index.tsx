@@ -12,6 +12,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { isHomeNewVariant, type HomeNewFlagValue } from 'lib/featureFlags/homeNew'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -276,7 +277,8 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isHomeNewFlag = usePHFlag('homeNew')
+  const homeNewVariant = usePHFlag<HomeNewFlagValue>('homeNew')
+  const isHomeNewFlag = isHomeNewVariant(homeNewVariant)
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
