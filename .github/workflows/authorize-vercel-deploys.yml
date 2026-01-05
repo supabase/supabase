@@ -16,6 +16,10 @@ permissions:
 jobs:
   authorize-vercel-deploys:
     runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
     steps:
       - name: Check out repo
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -34,7 +38,5 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
       - name: Authorize Vercel Deploys
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |-
           pnpm run authorize-vercel-deploys
