@@ -84,7 +84,7 @@ function TopThreeCard({
   )
 }
 
-function LeaderboardRow({
+function LeaderboardRowItem({
   rank,
   name,
   score,
@@ -156,7 +156,7 @@ export function LeaderboardContent({ leaderboard }: { leaderboard: LeaderboardRo
       {rest.length > 0 && (
         <div className="border border-border rounded-lg bg-surface-200 p-6">
           {rest.map((entry, index) => (
-            <LeaderboardRow
+            <LeaderboardRowItem
               key={entry.author || index}
               rank={index + 4}
               name={entry.author}

@@ -3,11 +3,21 @@ import { getUnansweredThreads } from '~/data/contribute'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
-  const offset = parseInt(searchParams.get('offset') ?? '0', 10)
-  const channel = searchParams.get('channel') ?? undefined
-  const productArea = searchParams.get('product_area') ?? undefined
-  const stack = searchParams.get('stack') ?? undefined
-  const search = searchParams.get('search') ?? undefined
+
+  // Validate and parse offset - must be a valid non-negative integer
+  const offsetParam = searchParams.get('offset')
+  let offset = 0
+  if (offsetParam !== null) {
+    const parsed = parseInt(offsetParam, 10)
+    if (!isNaN(parsed) && parsed >= 0) {
+      offset = parsed
+    }
+  }
+
+  const channel = searchParams.get('channel') || undefined
+  const productArea = searchParams.get('product_area') || undefined
+  const stack = searchParams.get('stack') || undefined
+  const search = searchParams.get('search') || undefined
 
   try {
     const threads = await getUnansweredThreads(productArea, channel, stack, search, offset, 100)

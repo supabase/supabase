@@ -154,7 +154,6 @@ export default function AboutPage() {
             Back to Contribute
           </Link>
 
-          <h1 className="sr-only">About the contributors program</h1>
           <SectionContainer
             id="mission"
             className="sm:py-18 md:py-24 lg:px-16 lg:py-24 xl:px-0 grid gap-y-4"

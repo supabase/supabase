@@ -152,12 +152,6 @@ export async function getUnansweredThreads(
   if (search && search.trim()) {
     const trimmedSearch = search.trim()
     const searchTerm = `%${trimmedSearch}%`
-    console.log('Applying search filter:', {
-      originalSearch: search,
-      trimmedSearch,
-      searchTerm,
-      column: 'subject',
-    })
     query = query.ilike('subject', searchTerm)
   }
 

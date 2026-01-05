@@ -15,7 +15,8 @@ export function PlatformTabs() {
   return (
     <nav className="flex gap-3 border-b pb-2">
       {tabs.map((tab) => {
-        const isActive = pathname ? pathname.startsWith(tab.href) : false
+        const isActive = pathname?.startsWith(tab.href) || false
+
         return (
           <Link
             key={tab.href}

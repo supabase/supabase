@@ -169,7 +169,19 @@ export function UnansweredThreadsTable({
       if (search) params.set('search', search)
 
       const response = await fetch(`/api-v2/contribute/threads?${params.toString()}`)
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          error: `Failed to load threads: ${response.status} ${response.statusText}`,
+        }))
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
       const newThreads = await response.json()
+
+      if (!Array.isArray(newThreads)) {
+        throw new Error('Invalid response format: expected an array of threads')
+      }
 
       if (newThreads.length < 100) {
         setHasMore(false)
@@ -178,6 +190,8 @@ export function UnansweredThreadsTable({
       setThreads((prev) => [...prev, ...newThreads])
     } catch (error) {
       console.error('Error loading more threads:', error)
+      // Optionally show user-facing error message
+      // You could add a toast notification or error state here
     } finally {
       setIsLoadingMore(false)
     }
