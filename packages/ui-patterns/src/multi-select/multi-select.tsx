@@ -95,7 +95,7 @@ function MultiSelector({
   // detect clicks from outside
   useOnClickOutside(ref, () => {
     if (open) {
-      setOpen(!open)
+      setOpen(false)
     }
   })
 
@@ -183,7 +183,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, setOpen } = useMultiSelect()
+    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
+      useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
 
@@ -216,10 +217,11 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
-        setOpen(true)
-        setInputValue('')
+        const willOpen = !open
+        setOpen(willOpen)
+        if (willOpen) setInputValue('')
 
-        if (IS_INLINE_MODE) {
+        if (IS_INLINE_MODE && willOpen) {
           event.stopPropagation()
           event.preventDefault()
 
@@ -228,7 +230,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           }, 100)
         }
       },
-      []
+      [open, setOpen, setInputValue, IS_INLINE_MODE]
     )
 
     return (
