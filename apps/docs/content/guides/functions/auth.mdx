@@ -24,7 +24,7 @@ But, this method is incompatible with the new [JWT Signing Keys](/docs/guides/au
 
 For this reason we decided to no longer implicitly force JWT verification, but instead suggest patterns and templates to handle this task. This allows users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 Following the [upcoming API key changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will still be supported and enabled by default. To move to the new [JWT Signing Keys](/docs/guides/auth/signing-keys), you need to manually [skip the authorization checks](/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps below.
 
