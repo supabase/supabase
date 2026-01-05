@@ -1,6 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -89,7 +89,7 @@ const PolicyTableRowComponent = ({
     !isTableExposedThroughAPI ||
     isApiDisabledDueToRoles
 
-  const getAdmonitionMessage = useCallback(() => {
+  const admonitionMessage = useMemo(() => {
     if (isPubliclyReadableWritable) {
       return 'This table can be accessed by anyone via the Data API as RLS is disabled.'
     }
@@ -132,7 +132,7 @@ const PolicyTableRowComponent = ({
             type={isPubliclyReadableWritable ? 'warning' : 'default'}
             className="border-0 border-y rounded-none min-h-12 flex items-center"
           >
-            <p>{getAdmonitionMessage()}</p>
+            <p>{admonitionMessage}</p>
           </Admonition>
         )}
 

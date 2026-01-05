@@ -14,7 +14,7 @@ export const getEntityLintDetails = (
         lint?.metadata?.name === entityName &&
         lint?.metadata?.schema === schema &&
         lint?.name === lintName &&
-        lintLevels.includes(lint?.level as 'ERROR' | 'WARN' | 'INFO')
+        lintLevels.includes(lint?.level)
     ) || null
 
   return {
