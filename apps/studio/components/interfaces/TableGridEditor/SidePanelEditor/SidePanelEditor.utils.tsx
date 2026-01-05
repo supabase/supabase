@@ -46,6 +46,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { isTsvFile } from './SpreadsheetImport/SpreadsheetImport.utils'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -1027,7 +1028,7 @@ export const insertRowsViaSpreadsheet = async (
       dynamicTyping: false,
       skipEmptyLines: true,
       chunkSize: CHUNK_SIZE,
-      quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
+      quoteChar: isTsvFile(file) ? '' : '"',
       chunk: async (results: any, parser: any) => {
         parser.pause()
 
