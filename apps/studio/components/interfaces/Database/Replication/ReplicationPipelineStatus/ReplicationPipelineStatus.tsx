@@ -391,21 +391,6 @@ export const ReplicationPipelineStatus = () => {
               />
               {!showDisabledState && (
                 <div className="flex items-center">
-                  {/* {hasErroredTables && (
-                    <Button
-                      size="tiny"
-                      type="danger"
-                      icon={<AlertTriangle />}
-                      disabled={isAnyRestartInProgress}
-                      loading={isAnyRestartInProgress}
-                      onClick={() => {
-                        setBatchRestartMode('errored')
-                        setShowBatchRestartDialog(true)
-                      }}
-                    >
-                      Restart failed tables
-                    </Button>
-                  )} */}
                   <Button
                     size="tiny"
                     type="default"
