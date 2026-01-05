@@ -4,43 +4,19 @@ import { toast } from 'sonner'
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { BatchConfig, DestinationConfig } from './create-destination-pipeline-mutation'
 import { replicationKeys } from './keys'
-
-export type BigQueryDestinationConfig = {
-  projectId: string
-  datasetId: string
-  serviceAccountKey: string
-  maxStalenessMins?: number
-}
-
-export type IcebergDestinationConfig = {
-  projectRef: string
-  warehouseName: string
-  namespace: string
-  catalogToken: string
-  s3AccessKeyId: string
-  s3SecretAccessKey: string
-  s3Region: string
-}
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number
   pipelineId: number
   projectRef: string
   destinationName: string
-  destinationConfig:
-    | {
-        bigQuery: BigQueryDestinationConfig
-      }
-    | {
-        iceberg: IcebergDestinationConfig
-      }
+  destinationConfig: DestinationConfig
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch?: {
-      maxFillMs: number
-    }
+    batch?: BatchConfig
   }
 }
 

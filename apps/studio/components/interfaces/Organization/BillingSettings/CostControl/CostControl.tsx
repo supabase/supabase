@@ -14,7 +14,6 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -22,6 +21,7 @@ import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
 
@@ -42,7 +42,7 @@ const CostControl = ({}: CostControlProps) => {
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
@@ -158,10 +158,10 @@ const CostControl = ({}: CostControlProps) => {
                             isUsageBillingEnabled
                               ? `${BASE_PATH}/img/spend-cap-off${
                                   resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png?v=3`
+                                }.png`
                               : `${BASE_PATH}/img/spend-cap-on${
                                   resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png?v=3`
+                                }.png`
                           }
                         />
                       </div>

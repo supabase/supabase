@@ -32,7 +32,7 @@ export const Destinations = () => {
   const {
     data: sourcesData,
     error: sourcesError,
-    isLoading: isSourcesLoading,
+    isPending: isSourcesLoading,
     isError: isSourcesError,
     isSuccess: isSourcesSuccess,
   } = useReplicationSourcesQuery({
@@ -45,7 +45,7 @@ export const Destinations = () => {
   const {
     data: destinationsData,
     error: destinationsError,
-    isLoading: isDestinationsLoading,
+    isPending: isDestinationsLoading,
     isError: isDestinationsError,
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
@@ -55,7 +55,7 @@ export const Destinations = () => {
   const {
     data: pipelinesData,
     error: pipelinesError,
-    isLoading: isPipelinesLoading,
+    isPending: isPipelinesLoading,
     isError: isPipelinesError,
     isSuccess: isPipelinesSuccess,
   } = useReplicationPipelinesQuery({
@@ -147,10 +147,9 @@ export const Destinations = () => {
               {isPaidPlan ? (
                 <EnableReplicationModal />
               ) : (
-                <UpgradePlanButton type="primary" plan="Pro" />
+                <UpgradePlanButton source="replication" featureProposition="use replication" />
               )}
-              {/* [Joshen] Placeholder for when we have documentation */}
-              <DocsButton href={`${DOCS_URL}`} />
+              <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
             </div>
           </div>
         ) : hasDestinations ? (
@@ -172,7 +171,7 @@ export const Destinations = () => {
                   ? 'BigQuery'
                   : 'iceberg' in destination.config
                     ? 'Analytics Bucket'
-                    : 'Other'
+                    : undefined
 
               return (
                 <DestinationRow
@@ -231,7 +230,6 @@ export const Destinations = () => {
 
       <DestinationPanel
         visible={showNewDestinationPanel}
-        sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}
       />
     </>

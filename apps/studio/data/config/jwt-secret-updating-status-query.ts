@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import { get, handleError } from 'data/fetchers'
-import { UseCustomQueryOptions } from 'types'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -45,7 +45,7 @@ export async function getJwtSecretUpdatingStatus(
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>
-export type JwtSecretUpdatingStatusError = unknown
+export type JwtSecretUpdatingStatusError = ResponseError
 
 export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusData>(
   { projectRef }: JwtSecretUpdatingStatusVariables,
@@ -56,16 +56,17 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
 ) => {
   const client = useQueryClient()
 
-  const query = useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>({
+  const query = useQuery({
     queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
     queryFn: ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval(data) {
+    refetchInterval: (query) => {
+      const data = query.state.data
       if (!data) {
         return false
       }
 
-      const { jwtSecretUpdateStatus } = data as unknown as JwtSecretUpdatingStatusResponse
+      const { jwtSecretUpdateStatus } = data
 
       const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
 

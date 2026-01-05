@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Code, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
@@ -15,6 +16,7 @@ import {
   useSnippetFolders,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -63,12 +65,18 @@ interface MoveQueryModalProps {
 export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryModalProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
+  const router = useRouter()
 
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
 
   const { mutateAsync: createFolder, isPending: isCreatingFolder } =
-    useSQLSnippetFolderCreateMutation()
+    useSQLSnippetFolderCreateMutation({
+      onError: (error) => {
+        toast.error(`Failed to create new folder: ${error.message}`)
+      },
+    })
   const { mutateAsync: moveSnippetAsync, isPending: isMovingSnippet } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
@@ -140,7 +148,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           if (snippetContent === undefined) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
           } else {
-            await moveSnippetAsync({
+            const movedSnippet = await moveSnippetAsync({
               projectRef: ref,
               payload: {
                 id: snippet.id,
@@ -154,6 +162,28 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 content: snippetContent as any,
               },
             })
+            if (IS_PLATFORM) {
+              snapV2.updateSnippet({
+                id: snippet.id,
+                snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
+                skipSave: true,
+              })
+            } else if (movedSnippet) {
+              // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
+              // folder_id the moved snippet has a different id than the original snippet.
+
+              // remove the old snippet from the state without saving to API
+              snapV2.removeSnippet(snippet.id, true)
+
+              snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+
+              // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
+              const tabId = createTabId('sql', { id: snippet.id })
+              if (tabsSnap.hasTab(tabId)) {
+                tabsSnap.removeTab(tabId)
+                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
+              }
+            }
           }
         })
       )
@@ -161,16 +191,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       toast.success(
         `Successfully moved ${snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length} snippets`} to ${selectedId === 'root' ? 'the root of the editor' : selectedFolder}`
       )
-      snippets.forEach((snippet) => {
-        snapV2.updateSnippet({
-          id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
-          skipSave: true,
-        })
-      })
+
       onClose()
     } catch (error: any) {
-      toast.error(`Failed to create new folder: ${error.message}`)
+      // error will be handled by the mutation's onError callback
+      console.error('Error moving snippets:', error)
     }
   }
 

@@ -10,9 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-
 jobs:
   autofix:
     runs-on: blacksmith-2vcpu-ubuntu-2404
@@ -23,10 +20,18 @@ jobs:
       - name: Calculate number of commits
         run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
 
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-contents: write
+
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.PAT_AUTOFIX }}
+          token: ${{ steps.app-token.outputs.token }}
           fetch-depth: ${{ env.PR_FETCH_DEPTH }}
           sparse-checkout: |
             packages

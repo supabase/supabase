@@ -2094,6 +2094,10 @@ export interface components {
       external_workos_enabled: boolean | null
       external_workos_secret: string | null
       external_workos_url: string | null
+      external_x_client_id: string | null
+      external_x_email_optional: boolean | null
+      external_x_enabled: boolean | null
+      external_x_secret: string | null
       external_zoom_client_id: string | null
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
@@ -3518,7 +3522,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -3530,7 +3534,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -3676,6 +3680,10 @@ export interface components {
       external_workos_enabled?: boolean | null
       external_workos_secret?: string | null
       external_workos_url?: string | null
+      external_x_client_id?: string | null
+      external_x_email_optional?: boolean | null
+      external_x_enabled?: boolean | null
+      external_x_secret?: string | null
       external_zoom_client_id?: string | null
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
@@ -4044,10 +4052,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {

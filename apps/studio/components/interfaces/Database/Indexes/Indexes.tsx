@@ -1,25 +1,23 @@
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Card,
-  Input,
   SidePanel,
   Table,
   TableBody,
@@ -28,7 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
@@ -36,14 +36,14 @@ const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const deletingIndexNameRef = useRef<string | null>(null)
 
   const {
     data: allIndexes,
     error: indexesError,
-    isLoading: isLoadingIndexes,
+    isPending: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
     isError: isErrorIndexes,
   } = useIndexesQuery({
@@ -75,7 +75,7 @@ const Indexes = () => {
 
   const {
     data: schemas,
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({
@@ -177,14 +177,14 @@ const Indexes = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead key="schema">Schema</TableHead>
                       <TableHead key="table">Table</TableHead>
+                      <TableHead key="columns">Columns</TableHead>
                       <TableHead key="name">Name</TableHead>
-                      <TableHead key="buttons"></TableHead>
+                      <TableHead key="buttons" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedIndexes.length === 0 && search.length === 0 && (
+                    {indexes.length === 0 && search.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No indexes created yet</p>
@@ -194,7 +194,7 @@ const Indexes = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                    {sortedIndexes.length === 0 && search.length > 0 && (
+                    {indexes.length === 0 && search.length > 0 && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No results found</p>
@@ -208,10 +208,10 @@ const Indexes = () => {
                       indexes.map((index) => (
                         <TableRow key={index.name}>
                           <TableCell>
-                            <p title={index.schema}>{index.schema}</p>
+                            <p title={index.table}>{index.table}</p>
                           </TableCell>
                           <TableCell>
-                            <p title={index.table}>{index.table}</p>
+                            <p title={index.columns}>{index.columns}</p>
                           </TableCell>
                           <TableCell>
                             <p title={index.name}>{index.name}</p>

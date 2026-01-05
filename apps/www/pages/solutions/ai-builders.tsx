@@ -1,6 +1,8 @@
 import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
@@ -16,38 +18,54 @@ const FeaturesGrid = dynamic(() => import('components/Solutions/FeaturesGrid'))
 const VideosSection = dynamic(() => import('components/Solutions/Videos'))
 const CTAForm = dynamic(() => import('components/Solutions/CTAForm'))
 
-const Enterprise: NextPage = () => (
-  <>
-    <NextSeo
-      title={content.metadata.metaTitle}
-      description={content.metadata.metaDescription}
-      openGraph={{
-        title: content.metadata.metaTitle,
-        description: content.metadata.metaDescription,
-        url: `https://supabase.com/solutions/ai-builders`,
-        images: [
-          {
-            url: `/images/solutions/ai-builders/ai-builders-og.png`,
-          },
-        ],
-      }}
-    />
-    <Layout className="overflow-visible">
-      <SolutionsStickyNav activeItem={Solutions.aiBuilders} type="skill-based" />
-      <ProductHeader
-        {...content.heroSection}
-        className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
-        sectionContainerClassName="lg:gap-4"
-        footer={<AIBuildersLogos className="mt-16 md:mt-0" />}
-        footerPosition="left"
+const Enterprise: NextPage = () => {
+  const { asPath } = useRouter()
+
+  useEffect(() => {
+    const hash = asPath.split('#')[1]
+    if (!hash) return
+
+    setTimeout(() => {
+      const element = document.getElementById(hash)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 100)
+  }, [asPath])
+
+  return (
+    <>
+      <NextSeo
+        title={content.metadata.metaTitle}
+        description={content.metadata.metaDescription}
+        openGraph={{
+          title: content.metadata.metaTitle,
+          description: content.metadata.metaDescription,
+          url: `https://supabase.com/solutions/ai-builders`,
+          images: [
+            {
+              url: `/images/solutions/ai-builders/ai-builders-og.png`,
+            },
+          ],
+        }}
       />
-      <Quotes {...content.quotes} />
-      <WhySupabase {...content.why} />
-      <FeaturesGrid {...content.features} />
-      <VideosSection {...content.testimonials} />
-      <CTAForm />
-    </Layout>
-  </>
-)
+      <Layout className="overflow-visible">
+        <SolutionsStickyNav activeItem={Solutions.aiBuilders} type="skill-based" />
+        <ProductHeader
+          {...content.heroSection}
+          className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
+          sectionContainerClassName="lg:gap-4"
+          footer={<AIBuildersLogos className="mt-16 md:mt-0" />}
+          footerPosition="left"
+        />
+        <Quotes {...content.quotes} />
+        <WhySupabase {...content.why} />
+        <FeaturesGrid {...content.features} />
+        <VideosSection {...content.testimonials} />
+        <CTAForm />
+      </Layout>
+    </>
+  )
+}
 
 export default Enterprise

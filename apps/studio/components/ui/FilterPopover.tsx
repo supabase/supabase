@@ -2,6 +2,7 @@ import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { noop } from 'lodash'
 import { X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+
 import {
   Button,
   Checkbox_Shadcn_,
@@ -13,7 +14,7 @@ import {
   ScrollArea,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface FilterPopoverProps<T> {
   title?: string

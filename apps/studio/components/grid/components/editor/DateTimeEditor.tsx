@@ -76,7 +76,8 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           {value === null ? 'NULL' : value}
         </div>
       </PopoverTrigger>
-      <PopoverContent align="start" className="p-0 rounded-none w-64">
+      <PopoverContent portal align="start" className="p-0 rounded-none w-64">
+
         <BlockKeys
           ignoreOutsideClicks
           value={inputValue}

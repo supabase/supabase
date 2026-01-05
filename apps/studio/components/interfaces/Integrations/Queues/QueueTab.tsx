@@ -22,7 +22,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, LoadingLine, Popover, PopoverContent, PopoverTrigger, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -38,7 +38,7 @@ export const QueueTab = () => {
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
 
-  const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
+  const { data: tables, isPending: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'pgmq',
@@ -58,7 +58,13 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, fetchNextPage, isFetching } = useQueueMessagesInfiniteQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    fetchNextPage,
+    isFetching,
+  } = useQueueMessagesInfiniteQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

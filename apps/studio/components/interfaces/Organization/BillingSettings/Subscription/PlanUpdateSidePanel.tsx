@@ -9,7 +9,7 @@ import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from 'data/organizations/organization-query'
@@ -26,6 +26,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Organization } from 'types/base'
 import { Button, SidePanel, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import { ExitSurveyModal } from './ExitSurveyModal'
@@ -89,13 +90,13 @@ export const PlanUpdateSidePanel = () => {
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
-  const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
+  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
 
   const {
     data: subscriptionPreview,
     error: subscriptionPreviewError,
-    isLoading: subscriptionPreviewIsLoading,
+    isPending: subscriptionPreviewIsLoading,
     isSuccess: subscriptionPreviewInitialized,
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
@@ -232,6 +233,8 @@ export const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
+                    ) : !canUpdateSubscription ? (
+                      <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
@@ -244,8 +247,7 @@ export const PlanUpdateSidePanel = () => {
                             plan.id !== 'tier_free') ||
                           // Orgs managed by AWS marketplace are not allowed to change the plan
                           selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
-                          hasOrioleProjects ||
-                          !canUpdateSubscription
+                          hasOrioleProjects
                         }
                         onClick={() => {
                           setSelectedTier(plan.id as any)
@@ -268,12 +270,9 @@ export const PlanUpdateSidePanel = () => {
                                 ? 'Reach out to us via support to update your plan'
                                 : hasOrioleProjects
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : !canUpdateSubscription
-                                    ? 'You do not have permission to change the subscription plan'
-                                    : selectedOrganization?.managed_by ===
-                                        MANAGED_BY.AWS_MARKETPLACE
-                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                      : undefined,
+                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
+                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                    : undefined,
                           },
                         }}
                       >

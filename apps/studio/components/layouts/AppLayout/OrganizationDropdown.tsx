@@ -5,7 +5,6 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -25,12 +24,13 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const OrganizationDropdown = () => {
   const router = useRouter()
   const { slug: routeSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const { data: organizations, isPending: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
 

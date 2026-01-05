@@ -17,6 +17,7 @@ export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
 export * from './src/components/SimpleCodeBlock'
+export * from './src/components/Mermaid'
 
 // NAV
 
@@ -125,6 +126,19 @@ export {
   AlertTitle as AlertTitle_Shadcn_,
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
+
+export {
+  Field as Field_Shadcn_,
+  FieldContent as FieldContent_Shadcn_,
+  FieldDescription as FieldDescription_Shadcn_,
+  FieldError as FieldError_Shadcn_,
+  FieldGroup as FieldGroup_Shadcn_,
+  FieldLabel as FieldLabel_Shadcn_,
+  FieldLegend as FieldLegend_Shadcn_,
+  FieldSeparator as FieldSeparator_Shadcn_,
+  FieldSet as FieldSet_Shadcn_,
+  FieldTitle as FieldTitle_Shadcn_,
+} from './src/components/shadcn/ui/field'
 
 export {
   useFormField as useFormField_Shadcn_,

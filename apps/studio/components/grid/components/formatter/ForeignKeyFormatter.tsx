@@ -5,12 +5,12 @@ import type { RenderCellProps } from 'react-data-grid'
 
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Popover, PopoverContent, PopoverTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
@@ -23,7 +23,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   const { tableId, row, column } = props
   const { data: project } = useSelectedProjectQuery()
 
-  const { data, isLoading } = useTableEditorQuery({
+  const { data, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
@@ -38,7 +38,7 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_column_name === column.name
   )
 
-  const { data: targetTable, isLoading: isLoadingTargetTable } = useTableQuery<PostgresTable>(
+  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PostgresTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
