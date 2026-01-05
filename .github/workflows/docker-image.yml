@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ "master" ]
 
+permissions:
+  contents: read
 concurrency:
   group: docker-image-${{ github.ref }}
   cancel-in-progress: true
