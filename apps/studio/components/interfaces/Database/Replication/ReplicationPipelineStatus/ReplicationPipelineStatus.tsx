@@ -525,8 +525,6 @@ export const ReplicationPipelineStatus = () => {
         <RestartTableDialog
           open={showRestartDialog}
           onOpenChange={setShowRestartDialog}
-          projectRef={projectRef}
-          pipelineId={pipelineId}
           tableId={selectedTableForRestart.tableId}
           tableName={selectedTableForRestart.tableName}
           onRestartStart={() => {
@@ -558,8 +556,6 @@ export const ReplicationPipelineStatus = () => {
         <BatchRestartDialog
           open={showBatchRestartDialog}
           onOpenChange={setShowBatchRestartDialog}
-          projectRef={projectRef}
-          pipelineId={pipelineId}
           mode={batchRestartMode}
           totalTables={tableStatuses.length}
           erroredTablesCount={erroredTables.length}

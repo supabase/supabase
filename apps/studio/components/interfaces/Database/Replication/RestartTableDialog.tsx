@@ -1,5 +1,6 @@
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
@@ -15,8 +16,6 @@ import {
 interface RestartTableDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  projectRef?: string
-  pipelineId: number
   tableId: number
   tableName: string
   onRestartStart?: () => void
@@ -26,13 +25,14 @@ interface RestartTableDialogProps {
 export const RestartTableDialog = ({
   open,
   onOpenChange,
-  projectRef,
-  pipelineId,
   tableId,
   tableName,
   onRestartStart,
   onRestartComplete,
 }: RestartTableDialogProps) => {
+  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
+  const pipelineId = Number(_pipelineId)
+
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(

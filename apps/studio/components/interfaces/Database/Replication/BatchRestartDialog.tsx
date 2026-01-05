@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
+import { useParams } from 'common'
 import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
@@ -17,8 +18,6 @@ import {
 interface BatchRestartDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  projectRef?: string
-  pipelineId: number
   mode: 'all' | 'errored'
   totalTables: number
   erroredTablesCount: number
@@ -30,8 +29,6 @@ interface BatchRestartDialogProps {
 export const BatchRestartDialog = ({
   open,
   onOpenChange,
-  projectRef,
-  pipelineId,
   mode,
   totalTables,
   erroredTablesCount,
@@ -39,6 +36,9 @@ export const BatchRestartDialog = ({
   onRestartStart,
   onRestartComplete,
 }: BatchRestartDialogProps) => {
+  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
+  const pipelineId = Number(_pipelineId)
+
   // Calculate which table IDs will be restarted based on mode (memoized)
   const affectedTableIds = useMemo(() => {
     if (mode === 'all') {
