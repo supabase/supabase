@@ -171,7 +171,7 @@ export const Destinations = () => {
                   ? 'BigQuery'
                   : 'iceberg' in destination.config
                     ? 'Analytics Bucket'
-                    : 'Other'
+                    : undefined
 
               return (
                 <DestinationRow
@@ -230,7 +230,6 @@ export const Destinations = () => {
 
       <DestinationPanel
         visible={showNewDestinationPanel}
-        sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}
       />
     </>
