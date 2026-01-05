@@ -151,7 +151,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         {filteredTokens?.map((x) => {
           return (
             <TableRow key={x.token_alias}>
-              <TableCell className="w-auto">
+              <TableCell className="w-auto max-w-96">
                 <p className="truncate" title={x.name}>
                   {x.name}
                 </p>
