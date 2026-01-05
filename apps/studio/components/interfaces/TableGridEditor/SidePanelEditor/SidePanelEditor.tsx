@@ -584,6 +584,7 @@ export const SidePanelEditor = ({
           queryClient.invalidateQueries({
             queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
           }),
+          queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
         ])
 
         toast.success(
