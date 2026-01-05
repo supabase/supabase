@@ -67,7 +67,7 @@ const UtilityActions = ({
   const removeFavorite = () => snapV2.removeFavorite(id)
 
   const onSelectDatabase = (databaseId: string) => {
-    snapV2.resetResult(id)
+    snapV2.resetResults(id)
     setLastSelectedDb(databaseId)
   }
 

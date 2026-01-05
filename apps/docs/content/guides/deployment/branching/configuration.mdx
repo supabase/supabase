@@ -154,7 +154,59 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 
 <Admonition type="note" label="Secret fields">
 
-The `encrypted:` syntax only works for designated "secret" fields in the configuration (like `secret` in auth providers). Using encrypted values in other fields will not be automatically decrypted and may cause issues. For non-secret fields, use environment variables with the `env()` syntax instead.
+The `encrypted:` syntax only works for designated "secret" fields in the configuration. Using encrypted values in other fields will not be automatically decrypted and may cause issues. For non-secret fields, use environment variables with the `env()` syntax instead.
+
+The following fields support the `encrypted:` syntax:
+
+**Studio**
+
+- `studio.openai_api_key`
+
+**Database**
+
+- `db.root_key`
+- `db.vault.*` (any key in the vault map)
+
+**Auth - Core Keys**
+
+- `auth.publishable_key`
+- `auth.secret_key`
+- `auth.jwt_secret`
+- `auth.anon_key`
+- `auth.service_role_key`
+
+**Auth - Email (SMTP)**
+
+- `auth.email.smtp.pass`
+
+**Auth - Captcha**
+
+- `auth.captcha.secret`
+
+**Auth - Hooks**
+
+- `auth.hook.mfa_verification_attempt.secrets`
+- `auth.hook.password_verification_attempt.secrets`
+- `auth.hook.custom_access_token.secrets`
+- `auth.hook.send_sms.secrets`
+- `auth.hook.send_email.secrets`
+- `auth.hook.before_user_created.secrets`
+
+**Auth - SMS Providers**
+
+- `auth.sms.twilio.auth_token`
+- `auth.sms.twilio_verify.auth_token`
+- `auth.sms.messagebird.access_key`
+- `auth.sms.textlocal.api_key`
+- `auth.sms.vonage.api_secret`
+
+**Auth - External OAuth Providers**
+
+- `auth.external.*.secret`
+
+**Edge Runtime**
+
+- `edge_runtime.secrets.*` (any key in the secrets map)
 
 </Admonition>
 

@@ -30,7 +30,10 @@ const IntegrationSettings = () => {
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
   const showAWSPrivateLinkFeature = useIsFeatureEnabled('integrations:aws_private_link')
   const showAWSPrivateLinkConfigCat = useFlag('awsPrivateLinkIntegration')
-  const showAWSPrivateLink = showAWSPrivateLinkFeature && showAWSPrivateLinkConfigCat
+  // PrivateLink is not available in eu-central-2 (Zurich) until Feb 2026
+  const isPrivateLinkUnsupportedRegion = project?.region === 'eu-central-2'
+  const showAWSPrivateLink =
+    showAWSPrivateLinkFeature && showAWSPrivateLinkConfigCat && !isPrivateLinkUnsupportedRegion
 
   return (
     <>

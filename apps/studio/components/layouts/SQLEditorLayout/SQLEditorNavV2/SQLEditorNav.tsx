@@ -90,6 +90,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    error: snippetsFoldersError,
   } = useSQLSnippetFoldersQuery({ projectRef, sort }, { placeholderData: keepPreviousData })
 
   const [subResults, setSubResults] = useState<{
@@ -147,10 +148,19 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   )
   const folders = useSnippetFolders(projectRef!)
 
-  const { data: snippetCountData } = useContentCountQuery({
+  const { data: snippetCountData, error: snippetCountError } = useContentCountQuery({
     projectRef,
     type: 'sql',
   })
+
+  useEffect(() => {
+    if (snippetCountError || snippetsFoldersError) {
+      toast.error(
+        snippetCountError?.message || snippetsFoldersError?.message || 'Failed to load snippets'
+      )
+    }
+  }, [snippetCountError, snippetsFoldersError])
+
   const numPrivateSnippets = snippetCountData?.private ?? 0
 
   const privateSnippetsTreeState = useMemo(
