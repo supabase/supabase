@@ -197,7 +197,7 @@ export const EditWrapperSheet = ({
                   return value ?? null
                 })
               ).filter((x) => UUID_REGEX.test(x))
-              // [Joshen] ^ Validate UUID to filter out already encrypted values
+              // [Joshen] ^ Validate UUID to filter out already decrypted values
 
               if (encryptedIdsToFetch.length > 0) {
                 fetchEncryptedValues(encryptedIdsToFetch)
