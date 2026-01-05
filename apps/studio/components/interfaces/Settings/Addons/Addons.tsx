@@ -24,7 +24,6 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -41,6 +40,7 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -58,7 +58,7 @@ export const Addons = () => {
   ])
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: selectedProject, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({
     ref: selectedProject?.parent_project_ref,
   })
@@ -102,7 +102,7 @@ export const Addons = () => {
   const {
     data: addons,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })

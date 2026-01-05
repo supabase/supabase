@@ -13,7 +13,6 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -27,6 +26,7 @@ import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
@@ -65,7 +65,7 @@ export const TriggersList = () => {
   const {
     data: triggers,
     error,
-    isLoading,
+    isPending,
     isError,
   } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -165,7 +165,7 @@ execute function function_name();`)
     setTriggerToDelete(trigger.id.toString())
   }
 
-  if (isLoading) {
+  if (isPending) {
     return <GenericSkeletonLoader />
   }
 

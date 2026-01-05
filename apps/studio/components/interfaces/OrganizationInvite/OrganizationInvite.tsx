@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -14,7 +14,8 @@ import { OrganizationInviteError } from './OrganizationInviteError'
 
 export const OrganizationInvite = () => {
   const router = useRouter()
-  const { profile } = useProfile()
+  const isLoggedIn = useIsLoggedIn()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { slug, token } = useParams()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
@@ -24,7 +25,7 @@ export const OrganizationInvite = () => {
     error,
     isSuccess: isSuccessInvitation,
     isError: isErrorInvitation,
-    isLoading: isLoadingInvitation,
+    isPending: isLoadingInvitation,
   } = useOrganizationInvitationTokenQuery(
     { slug, token },
     {
@@ -67,13 +68,13 @@ export const OrganizationInvite = () => {
         'md:w-[400px]'
       )}
     >
-      {!profile ? (
+      {!isLoggedIn || (!profile && !isLoadingProfile) ? (
         <>
           <Admonition
             showIcon={false}
             type="default"
             title={`Sign in${isSignUpEnabled ? ' or create an account' : ''} first to view this invitation`}
-            className="mb-0 border-0 rounded-none text-left"
+            className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t flex gap-x-3 justify-center">
             <Button asChild type="default">
@@ -86,7 +87,7 @@ export const OrganizationInvite = () => {
             )}
           </div>
         </>
-      ) : isLoadingInvitation ? (
+      ) : isLoadingProfile || isLoadingInvitation ? (
         <div className="p-5">
           <GenericSkeletonLoader />
         </div>
@@ -96,7 +97,7 @@ export const OrganizationInvite = () => {
             type="default"
             title="Invalid invitation"
             description="This organization invite is no longer valid as it has either been accepted or declined"
-            className="mb-0 border-0 rounded-none text-left"
+            className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t">
             <Button type="default" asChild>

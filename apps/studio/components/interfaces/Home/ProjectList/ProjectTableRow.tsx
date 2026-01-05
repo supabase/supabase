@@ -53,15 +53,17 @@ export const ProjectTableRow = ({
       }}
     >
       <TableCell>
-        <div className="flex flex-col gap-y-1">
+        <div className="flex flex-col gap-y-2">
+          {/* Text */}
           <div>
-            <p className="font-medium">{name}</p>
-            <p className="text-xs text-foreground-lighter">ID: {projectRef}</p>
+            <h5 className="text-sm">{name}</h5>
+            <p className="text-sm text-foreground-lighter">ID: {projectRef}</p>
           </div>
+          {/* Integrations */}
           {(isGithubIntegrated || isVercelIntegrated) && (
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-1.5">
               {isVercelIntegrated && (
-                <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
+                <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
                   <InlineSVG
                     src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                     title="Vercel Icon"
@@ -70,16 +72,14 @@ export const ProjectTableRow = ({
                 </div>
               )}
               {isGithubIntegrated && (
-                <>
-                  <div className="w-fit p-1 border rounded-md flex items-center">
+                <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
+                  <div className="w-5 h-5 p-1 flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
                   {githubRepository && (
-                    <span className="text-xs text-foreground-light truncate max-w-64">
-                      {githubRepository}
-                    </span>
+                    <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
                   )}
-                </>
+                </div>
               )}
             </div>
           )}
@@ -102,7 +102,7 @@ export const ProjectTableRow = ({
               computeSize={getComputeSize(project)}
             />
           ) : (
-            <span className="text-xs text-foreground-light">-</span>
+            <span className="text-xs text-foreground-muted">–</span>
           )}
         </div>
       </TableCell>

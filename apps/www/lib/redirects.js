@@ -1300,8 +1300,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
-    destination: '/docs/guides/auth/auth-helpers/auth-ui',
+    source: '/docs/guides/auth/auth-helpers/:path*',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: false,
@@ -2157,11 +2157,7 @@ module.exports = [
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
-    destination: '/docs/guides/auth/auth-helpers/nextjs',
-  },
+
   {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',
@@ -2434,6 +2430,11 @@ module.exports = [
     source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
     destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
+  },
   { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
   {
     permanent: true,
@@ -2648,12 +2649,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/passwords',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/passwords',
   },
   {
     permanent: true,

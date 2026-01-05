@@ -4,7 +4,7 @@ description: Displays a callout for user attention.
 fragment: true
 ---
 
-Admonition provides focus for situations that require a callout. Use this instead of [Alert](../components/alert) unless you specifically need the primitives.
+Admonition provides focus for situations that require a callout.
 
 <ComponentPreview
   name="admonition-demo"
@@ -12,6 +12,8 @@ Admonition provides focus for situations that require a callout. Use this instea
   peekCode
   wide
 />
+
+Use Admonition instead of [Alert](../components/alert) unless you specifically need the primitives. If in doubt, stick with Admonition.
 
 ## Usage
 
@@ -53,6 +55,13 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
   name="admonition-warning"
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
+
+There are several components that wrap the `warning` Admonition type with reusable text or functionality. These include:
+
+- AlertError
+- NoPermission
+
+AlertError for example rolls up consistent error handling and support contact methods.
 
 ### Destructive
 

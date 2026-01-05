@@ -52,17 +52,11 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  DOCS_URL,
-  PROJECT_STATUS,
-  PROVIDERS,
-  useDefaultProvider,
-} from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
-import { Button, Form_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -104,20 +98,8 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
-  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
-  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
-
-  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
-    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      refinementContext.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dbPass'],
-        message: passwordStrengthWarning || 'Password not secure enough',
-      })
-    }
-  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -129,6 +111,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
+      dbPassStrengthMessage: '',
       dbRegion: undefined,
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
@@ -137,7 +120,12 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
-  const { instanceSize: watchedInstanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  const {
+    instanceSize: watchedInstanceSize,
+    cloudProvider,
+    dbRegion,
+    organization,
+  } = useWatch_Shadcn_({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -225,12 +213,12 @@ const Wizard: NextPageWithLayout = () => {
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
 
-  const dbRegionExact = smartRegionToExactRegion(dbRegion)
+  const dbRegionExact = smartRegionToExactRegion(dbRegion ?? '')
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
+      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion ?? '',
       organizationSlug: organization,
     },
     { enabled: currentOrg !== null }
@@ -421,12 +409,7 @@ const Wizard: NextPageWithLayout = () => {
 
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
-                    <DatabasePasswordInput
-                      form={form}
-                      passwordStrengthMessage={passwordStrengthMessage}
-                      setPasswordStrengthMessage={setPasswordStrengthMessage}
-                      setPasswordStrengthWarning={setPasswordStrengthWarning}
-                    />
+                    <DatabasePasswordInput form={form} />
 
                     <RegionSelector
                       form={form}

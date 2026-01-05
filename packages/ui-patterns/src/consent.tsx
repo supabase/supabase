@@ -1,13 +1,11 @@
 'use client'
 
-import { consentState, isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import { clearTelemetryDataCookie, consentState, isBrowser } from 'common'
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
 import { useSnapshot } from 'valtio'
 import { ConsentToast } from './ConsentToast'
-
-const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 export const useConsentToast = () => {
   const consentToastId = useRef<string | number>()
@@ -27,8 +25,7 @@ export const useConsentToast = () => {
     if (!isBrowser) return
 
     snap.denyAll()
-    // remove the telemetry cookie
-    document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    clearTelemetryDataCookie()
 
     if (consentToastId.current) {
       toast.dismiss(consentToastId.current)
