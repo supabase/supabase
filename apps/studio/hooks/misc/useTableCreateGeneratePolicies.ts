@@ -15,7 +15,10 @@ const VALID_VARIANTS: TableCreateGeneratePoliciesVariant[] = ['control', 'variat
 export function isValidExperimentVariant(
   value: unknown
 ): value is TableCreateGeneratePoliciesVariant {
-  return typeof value === 'string' && VALID_VARIANTS.includes(value as TableCreateGeneratePoliciesVariant)
+  return (
+    typeof value === 'string' &&
+    VALID_VARIANTS.includes(value as TableCreateGeneratePoliciesVariant)
+  )
 }
 
 interface UseTableCreateGeneratePoliciesOptions {
