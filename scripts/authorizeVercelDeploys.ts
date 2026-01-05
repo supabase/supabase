@@ -5,6 +5,8 @@
  * finds authorization-required statuses, and authorizes them via Vercel API.
  */
 
+import { z } from 'zod'
+
 interface GitHubStatus {
   url: string
   avatar_url: string
@@ -18,16 +20,18 @@ interface GitHubStatus {
   updated_at: string
 }
 
-interface JobInfo {
-  job: {
-    headInfo: {
-      sha: string
-    }
-    org: string
-    prId: number
-    repo: string
-  }
-}
+const jobInfoSchema = z.object({
+  job: z.object({
+    headInfo: z.object({
+      sha: z.string().min(1, 'SHA is required'),
+    }),
+    org: z.literal('supabase'),
+    prId: z.number().int().positive('PR ID must be a positive integer'),
+    repo: z.literal('supabase'),
+  }),
+})
+
+type JobInfo = z.infer<typeof jobInfoSchema>
 
 async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
   const url = `https://api.github.com/repos/supabase/supabase/statuses/${sha}`
@@ -51,8 +55,14 @@ function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
 
   try {
     const jobData = JSON.parse(jobParam)
-    return { job: jobData }
+    const parsed = jobInfoSchema.parse({ job: jobData })
+    return parsed
   } catch (e) {
+    if (e instanceof z.ZodError) {
+      throw new Error(
+        `Invalid job info structure: ${e.errors.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ')}`
+      )
+    }
     throw new Error(`Failed to parse job parameter as JSON: ${e}`)
   }
 }
