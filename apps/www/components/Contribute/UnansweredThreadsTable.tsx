@@ -385,7 +385,7 @@ function ThreadRow({
       <TableCell className="min-w-[400px]">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Channel icon */}
-          <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md ">
+          <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md">
             {thread.channel === 'discord' && (
               <DiscordIcon
                 className={cn(

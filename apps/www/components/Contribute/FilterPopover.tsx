@@ -94,7 +94,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
             <div className="grid gap-8 p-4">
               {/* Product Area Section */}
               <div className="grid gap-3 pb-0">
-                <h3 className="text-sm  text-muted-foreground">Product area</h3>
+                <h3 className="text-sm text-muted-foreground">Product area</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {allProductAreas
                     .filter((area) => area !== 'Other')
@@ -117,7 +117,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
 
               {/* Tech Stack Section */}
               <div className="grid gap-3">
-                <h3 className="text-sm  text-muted-foreground">Tech stack</h3>
+                <h3 className="text-sm text-muted-foreground">Tech stack</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {allStacks
                     .filter((tech) => tech !== 'Other')

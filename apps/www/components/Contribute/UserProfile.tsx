@@ -107,7 +107,7 @@ export async function UserProfile({ username }: { username: string }) {
     <div className="border border-border rounded-lg p-8 bg-surface-200">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl  text-foreground mb-2">{username}</h1>
+        <h1 className="text-3xl text-foreground mb-2">{username}</h1>
         <div className="flex items-center gap-3 text-foreground-light">
           <div className="flex items-center gap-2">
             <span>{stats.threadCount}</span>
@@ -124,7 +124,7 @@ export async function UserProfile({ username }: { username: string }) {
       {/* Threads Section */}
       {threads.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl  text-foreground mb-4">Threads created</h2>
+          <h2 className="text-xl text-foreground mb-4">Threads created</h2>
           <div className="grid gap-3">
             {threads.map((thread) => (
               <ThreadCard key={thread.id} thread={thread} />
