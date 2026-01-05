@@ -1,15 +1,12 @@
-// Default supabase JWT verification
-// Use this template to validate tokens issued by Supabase default auth
+// Legacy supabase JWT verification
+// Use this template to validate tokens using the legacy symmetric JWT secret
+
 import * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";
 
-const SUPABASE_JWT_ISSUER = Deno.env.get("SB_JWT_ISSUER") ??
-  Deno.env.get("SUPABASE_URL") + "/auth/v1";
+// Automatically supplied by Supabase
+const JWT_SECRET = Deno.env.get("JWT_SECRET");
 
-const SUPABASE_JWT_KEYS = jose.createRemoteJWKSet(
-  new URL(Deno.env.get("SUPABASE_URL")! + "/auth/v1/.well-known/jwks.json"),
-);
-
-function getAuthToken(req: Request) {
+export function getAuthToken(req: Request) {
   const authHeader = req.headers.get("authorization");
   if (!authHeader) {
     throw new Error("Missing authorization header");
@@ -18,14 +15,19 @@ function getAuthToken(req: Request) {
   if (bearer !== "Bearer") {
     throw new Error(`Auth header is not 'Bearer {token}'`);
   }
-
   return token;
 }
 
-function verifySupabaseJWT(jwt: string) {
-  return jose.jwtVerify(jwt, SUPABASE_JWT_KEYS, {
-    issuer: SUPABASE_JWT_ISSUER,
-  });
+async function verifyJWT(jwt: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const secretKey = encoder.encode(JWT_SECRET);
+  try {
+    await jose.jwtVerify(jwt, secretKey);
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+  return true;
 }
 
 // Validates authorization header
@@ -37,7 +39,7 @@ export async function AuthMiddleware(
 
   try {
     const token = getAuthToken(req);
-    const isValidJWT = await verifySupabaseJWT(token);
+    const isValidJWT = await verifyJWT(token);
 
     if (isValidJWT) return await next(req);
 
@@ -45,6 +47,7 @@ export async function AuthMiddleware(
       status: 401,
     });
   } catch (e) {
+    console.error(e);
     return Response.json({ msg: e?.toString() }, {
       status: 401,
     });

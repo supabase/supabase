@@ -84,8 +84,14 @@ export const getDecryptedValues = async (
   signal?: AbortSignal
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
-  const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
-  return result.reduce((a: any, b: any) => {
-    return { ...a, [b.id]: b.decrypted_secret }
-  }, {})
+  const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
+    { projectRef, connectionString, sql },
+    signal
+  )
+  return result.reduce(
+    (a, b) => {
+      return { ...a, [b.id]: b.decrypted_secret }
+    },
+    {} as Record<string, string>
+  )
 }

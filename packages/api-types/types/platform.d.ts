@@ -227,6 +227,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/contract-linking-eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Check whether the buyer's latest contract can be linked to an organization
+     * @description Cases where linking is not possible/needed include contracts that stem from an Agreement Based Offer or contracts for the AWS Activate Credits Deal
+     */
+    get: operations['ClazarController_checkContractLinkingEligibility']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
     parameters: {
       query?: never
@@ -4601,7 +4621,6 @@ export interface components {
       region: string
       target_compute_size: string
       target_volume_size_gb: number
-      tierKey: string
       walg_enabled: boolean
     }
     CloneProject: {
@@ -4609,6 +4628,17 @@ export interface components {
       newDbPass: string
       newProjectName: string
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceContractLinkingEligibilityResponse: {
+      eligibility: {
+        aws_agreement_id?: string
+        is_eligible: boolean
+        reasons: (
+          | 'AWS_ACTIVATE_CREDITS_DEAL'
+          | 'AGREEMENT_BASED_OFFER'
+          | 'NO_ACTIVE_CONTRACT_FOUND'
+        )[]
+      }
     }
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
@@ -11114,6 +11144,34 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve CLI login session */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ClazarController_checkContractLinkingEligibility: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceContractLinkingEligibilityResponse']
+        }
+      }
+      /** @description Failed to get info about contract linking eligibility */
       500: {
         headers: {
           [name: string]: unknown
