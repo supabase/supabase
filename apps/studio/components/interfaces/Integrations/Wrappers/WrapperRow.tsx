@@ -25,7 +25,6 @@ import { formatWrapperTables } from './Wrappers.utils'
 
 interface WrapperRowProps {
   wrapper: FDW
-  wrappers: FDW[]
   selectedWrapperToEdit?: FDW
   selectedWrapperToDelete?: FDW
   setSelectedWrapperToEdit: (value: string | null) => void
@@ -33,9 +32,8 @@ interface WrapperRowProps {
   deletingWrapperIdRef: MutableRefObject<string | null>
 }
 
-const WrapperRow = ({
+export const WrapperRow = ({
   wrapper,
-  wrappers,
   selectedWrapperToEdit,
   selectedWrapperToDelete,
   setSelectedWrapperToEdit,
@@ -88,17 +86,20 @@ const WrapperRow = ({
 
         <TableCell className="space-y-2 !p-4">
           {_tables?.map((table) => {
-            const target = table.table ?? table.object
+            const target = table.table ?? table.object ?? table.src_key
 
             return (
-              <div key={table.id} className="flex items-center -space-x-3">
-                <Badge className="bg-surface-300 bg-opacity-100 pr-1 gap-2 font-mono text-[0.75rem] h-6 text-foreground">
+              <div key={table.id} className="flex items-center">
+                <Badge className="bg-surface-300 bg-opacity-100 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
                   <div className="relative w-3 h-3 flex items-center justify-center">
                     {integration.icon({ className: 'p-0' })}
                   </div>
                   <Tooltip>
                     <TooltipTrigger className="truncate max-w-28">{target}</TooltipTrigger>
-                    <TooltipContent className="max-w-64 whitespace-pre-wrap break-words">
+                    <TooltipContent
+                      side="bottom"
+                      className="max-w-64 whitespace-pre-wrap break-words"
+                    >
                       {target}
                     </TooltipContent>
                   </Tooltip>
@@ -110,13 +111,16 @@ const WrapperRow = ({
                 </Badge>
 
                 <Link href={`/project/${ref}/editor/${table.id}`}>
-                  <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem] border-l-0">
+                  <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-[0.75rem] border-l-0">
                     <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                     <Tooltip>
                       <TooltipTrigger className="truncate max-w-28">
                         {table.schema}.{table.table_name}
                       </TooltipTrigger>
-                      <TooltipContent className="max-w-64 whitespace-pre-wrap break-words">
+                      <TooltipContent
+                        side="bottom"
+                        className="max-w-64 whitespace-pre-wrap break-words"
+                      >
                         {table.schema}.{table.table_name}
                       </TooltipContent>
                     </Tooltip>
@@ -129,7 +133,6 @@ const WrapperRow = ({
         <TableCell>
           {encryptedMetadata.map((metadata) => (
             <div key={metadata.name} className="flex items-center space-x-2 text-sm">
-              {/* <p className="text-foreground-light">{metadata.label}:</p> */}
               <Link
                 href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                 className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
@@ -212,5 +215,3 @@ const WrapperRow = ({
     </>
   )
 }
-
-export default WrapperRow
