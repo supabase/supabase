@@ -1,6 +1,0 @@
----
-description: 
-globs: apps/studio/**/*.test.ts,apps/studio/**/*.test.tsx
-alwaysApply: false
----
-Make sure to follow the guidelines in this file to write tests: [README.md](mdc:apps/studio/tests/README.md)
