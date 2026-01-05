@@ -6,132 +6,134 @@
  */
 
 interface GitHubStatus {
-    url: string
-    avatar_url: string
-    id: number
-    node_id: string
-    state: 'success' | 'pending' | 'failure' | 'error'
-    description: string
-    target_url: string
-    context: string
-    created_at: string
-    updated_at: string
+  url: string
+  avatar_url: string
+  id: number
+  node_id: string
+  state: 'success' | 'pending' | 'failure' | 'error'
+  description: string
+  target_url: string
+  context: string
+  created_at: string
+  updated_at: string
+}
+
+interface JobInfo {
+  job: {
+    headInfo: {
+      sha: string
+    }
+    org: string
+    prId: number
+    repo: string
   }
-  
-  interface JobInfo {
-    job: {
-      headInfo: {
-        sha: string
-      }
-      org: string
-      prId: number
-      repo: string
-    }
+}
+
+async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
+  const url = `https://api.github.com/repos/supabase/supabase/statuses/${sha}`
+  console.log(`Fetching GitHub statuses for SHA: ${sha}`)
+
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch GitHub statuses: ${response.status} ${response.statusText}`)
   }
-  
-  async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
-    const url = `https://api.github.com/repos/supabase/supabase/statuses/${sha}`
-    console.log(`Fetching GitHub statuses for SHA: ${sha}`)
-  
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch GitHub statuses: ${response.status} ${response.statusText}`)
-    }
-  
-    return response.json()
+
+  return response.json()
+}
+
+function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
+  const url = new URL(targetUrl)
+  const jobParam = url.searchParams.get('job')
+
+  if (!jobParam) {
+    throw new Error('No job parameter found in target URL')
   }
-  
-  function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
-    const url = new URL(targetUrl)
-    const jobParam = url.searchParams.get('job')
-  
-    if (!jobParam) {
-      throw new Error('No job parameter found in target URL')
-    }
-  
-    try {
-      const jobData = JSON.parse(jobParam)
-      return { job: jobData }
-    } catch (e) {
-      throw new Error(`Failed to parse job parameter as JSON: ${e}`)
-    }
+
+  try {
+    const jobData = JSON.parse(jobParam)
+    return { job: jobData }
+  } catch (e) {
+    throw new Error(`Failed to parse job parameter as JSON: ${e}`)
   }
-  
-  async function authorizeVercelJob(jobInfo: JobInfo, vercelToken: string): Promise<void> {
-    const url = 'https://vercel.com/api/v1/integrations/authorize-job'
-    console.log(`Authorizing Vercel job:`, JSON.stringify(jobInfo, null, 2))
-  
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: '*/*',
-        'Content-Type': 'application/json; charset=utf-8',
-        Authorization: `Bearer ${vercelToken}`,
-      },
-      body: JSON.stringify(jobInfo),
-    })
-  
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(
-        `Failed to authorize Vercel job: ${response.status} ${response.statusText}\n${errorText}`
-      )
-    }
-  
-    console.log('✓ Vercel job authorized successfully!')
-  }
-  
-  async function main() {
-    const sha = process.env.GITHUB_SHA 
-    if (!sha) {
-      throw new Error('GITHUB_SHA environment variable is required')
-    }
-  
-    const vercelToken = process.env.VERCEL_TOKEN
-    if (!vercelToken) {
-      throw new Error('VERCEL_TOKEN environment variable is required')
-    }
-  
-    console.log(`Starting authorization process for SHA: ${sha}`)
-  
-    // Fetch GitHub statuses
-    const statuses = await fetchGitHubStatuses(sha)
-    console.log(`Found ${statuses.length} statuses`)
-  
-    // Filter for authorization-required statuses
-    const authRequiredStatuses = statuses.filter(
-      (status) => status.description === 'Authorization required to deploy.'
-    )
-  
-    if (authRequiredStatuses.length === 0) {
-      console.log('No authorization-required statuses found. Nothing to authorize.')
-      return
-    }
-  
-    console.log(`Found ${authRequiredStatuses.length} authorization-required status(es)`)
-  
-    // Process each authorization-required status
-    for (const status of authRequiredStatuses) {
-      try {
-        console.log(`\nProcessing status: ${status.context}`)
-        console.log(`Target URL: ${status.target_url}`)
-  
-        // Extract job info from target URL
-        const jobInfo = await extractJobInfoFromTargetUrl(status.target_url)
-        console.log(jobInfo)
-        // Authorize the job
-        await authorizeVercelJob(jobInfo, vercelToken)
-      } catch (error) {
-        console.error(`Failed to process status ${status.context}:`, error)
-        // Continue with other statuses even if one fails
-      }
-    }
-  
-    console.log('\n✓ Authorization process completed!')
-  }
-  
-  main().catch((error) => {
-    console.error('Fatal error:', error)
-    process.exit(1)
+}
+
+async function authorizeVercelJob(jobInfo: JobInfo, vercelToken: string): Promise<void> {
+  const url = 'https://vercel.com/api/v1/integrations/authorize-job'
+  console.log(`Authorizing Vercel job:`, JSON.stringify(jobInfo, null, 2))
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: '*/*',
+      'Content-Type': 'application/json; charset=utf-8',
+      Authorization: `Bearer ${vercelToken}`,
+    },
+    body: JSON.stringify(jobInfo),
   })
-  
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `Failed to authorize Vercel job: ${response.status} ${response.statusText}\n${errorText}`
+    )
+  }
+
+  console.log('✓ Vercel job authorized successfully!')
+}
+
+async function main() {
+  const sha = process.env.GITHUB_SHA
+  if (!sha) {
+    throw new Error('GITHUB_SHA environment variable is required')
+  }
+
+  const vars = process.env
+  console.log(Object.keys(vars))
+
+  const vercelToken = process.env.VERCEL_TOKEN
+  if (!vercelToken) {
+    throw new Error('VERCEL_TOKEN environment variable is required')
+  }
+
+  console.log(`Starting authorization process for SHA: ${sha}`)
+
+  // Fetch GitHub statuses
+  const statuses = await fetchGitHubStatuses(sha)
+  console.log(`Found ${statuses.length} statuses`)
+
+  // Filter for authorization-required statuses
+  const authRequiredStatuses = statuses.filter(
+    (status) => status.description === 'Authorization required to deploy.'
+  )
+
+  if (authRequiredStatuses.length === 0) {
+    console.log('No authorization-required statuses found. Nothing to authorize.')
+    return
+  }
+
+  console.log(`Found ${authRequiredStatuses.length} authorization-required status(es)`)
+
+  // Process each authorization-required status
+  for (const status of authRequiredStatuses) {
+    try {
+      console.log(`\nProcessing status: ${status.context}`)
+      console.log(`Target URL: ${status.target_url}`)
+
+      // Extract job info from target URL
+      const jobInfo = await extractJobInfoFromTargetUrl(status.target_url)
+      console.log(jobInfo)
+      // Authorize the job
+      await authorizeVercelJob(jobInfo, vercelToken)
+    } catch (error) {
+      console.error(`Failed to process status ${status.context}:`, error)
+      // Continue with other statuses even if one fails
+    }
+  }
+
+  console.log('\n✓ Authorization process completed!')
+}
+
+main().catch((error) => {
+  console.error('Fatal error:', error)
+  process.exit(1)
+})
