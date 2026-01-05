@@ -8,9 +8,9 @@ subtitle: 'Best practices on securing Edge Functions'
 <Admonition type="note">
 
 In the past Supabase Auth used a **symmetric** secret to sign legacy JWTs.
-But it was replaced by the new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), this guide covers the new patterns for securing your Edge Functions.
+But it was replaced by new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today), this guide covers the new patterns for securing your Edge Functions.
 
-If you need to validate using the old method, read the [Legacy JWT Secret](/docs/guides/functions/auth-legacy-jwt) guide
+If you need to validate using the old method, read the [Legacy JWT Secret guide](/docs/guides/functions/auth-legacy-jwt).
 
 </Admonition>
 
@@ -26,7 +26,7 @@ For this reason we decided to no longer implicitly force JWT verification, but i
 
 <Admonition type="warning">
 
-Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will still be supported and enabled by default. To move to the new [JWT Signing Keys](/docs/guides/auth/signing-keys), you need to manually [skip the authorization checks](/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps below.
+Following the [upcoming API key changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will still be supported and enabled by default. To move to the new [JWT Signing Keys](/docs/guides/auth/signing-keys), you need to manually [skip the authorization checks](/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps below.
 
 </Admonition>
 
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
 ### Using JWT library
 
-Use the popular [`jose`](https://www.npmjs.com/package/jose/v/4.10.0) library can be used to verify received JWTs, like the following example:
+You can use the popular [`jose`](https://www.npmjs.com/package/jose/v/4.10.0) library can be used to verify received JWTs, like the following example:
 
 ```ts
 import { createRemoteJWKSet, jwtVerify } from 'https://deno.land/x/jose@v4.14.4/index.ts'

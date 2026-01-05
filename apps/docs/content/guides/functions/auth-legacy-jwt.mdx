@@ -5,13 +5,13 @@ description: 'Supabase Edge Functions and Auth.'
 subtitle: 'Integrate Supabase Auth with Edge Functions'
 ---
 
-Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth).
+Edge Functions work with [Supabase Auth](/docs/guides/auth).
 
 This allows you to:
 
 - Automatically identify users through Legacy JWT tokens
 - Enforce Row Level Security policies
-- Seamlessly integrate with your existing auth flow
+- Integrate with your existing auth flow
 
 ## Setting up auth context
 
@@ -37,9 +37,9 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
-<Admonition type="note">
+<Admonition type="tip">
 
-Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the `Authorization` header is set for each individual request!
+This context setting happens in the `Deno.serve()` callback argument, so that the `Authorization` header is set for each individual request scope!
 
 </Admonition>
 
