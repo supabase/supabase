@@ -65,10 +65,10 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
           {hasSummaryStats && (
             <div className="flex items-center gap-4 flex-wrap">
               {summary.totalTime > 0 && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-foreground-light">/</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground-muted">/</span>
                   <span className="text-foreground-light">Total time</span>
-                  <span className="font-mono font-medium text-foreground">
+                  <span className="font-medium text-foreground">
                     {summary.totalTime.toFixed(2)}ms
                   </span>
                 </div>
