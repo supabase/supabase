@@ -34,5 +34,7 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
       - name: Authorize Vercel Deploys
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |-
           pnpm run authorize-vercel-deploys
