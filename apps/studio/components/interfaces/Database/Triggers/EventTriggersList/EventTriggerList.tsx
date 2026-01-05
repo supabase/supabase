@@ -3,7 +3,7 @@ import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
+import { SUPABASE_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { DatabaseEventTrigger } from 'data/database-event-triggers/database-event-triggers-query'
 import {
@@ -41,7 +41,7 @@ export const EventTriggerList = ({
 }: EventTriggerListProps) => {
   const { ref: projectRef } = useParams()
   const searchValue = filterString.toLowerCase()
-  const systemOwners = new Set<string>(SYSTEM_ROLES)
+  const systemOwners = new Set<string>(SUPABASE_ROLES)
   const ownerFilterSet = new Set(ownerFilter)
 
   const filteredEventTriggers = eventTriggers.filter((trigger) => {
