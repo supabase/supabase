@@ -3,7 +3,6 @@ const js = require('@eslint/js')
 const { FlatCompat } = require('@eslint/eslintrc')
 const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
-const { fixupPluginRules } = require('@eslint/compat')
 const tanstackQuery = require('@tanstack/eslint-plugin-query')
 const tseslint = require('@typescript-eslint/eslint-plugin')
 const tsparser = require('@typescript-eslint/parser')
@@ -13,19 +12,6 @@ const compat = new FlatCompat({
   recommendedConfig: js.configs.recommended,
   allConfig: js.configs.all,
 })
-
-// Tanstack Query config is meant for the old non-flat esling configs. This adapts it to work with flat configs. v5 of
-// the plugin supports flat configs natively.
-const tanstackQueryConfig = {
-  name: '@tanstack/query',
-  plugins: { '@tanstack/query': fixupPluginRules(tanstackQuery) },
-  rules: {
-    '@tanstack/query/exhaustive-deps': 'warn',
-    '@tanstack/query/no-deprecated-options': 'error',
-    '@tanstack/query/prefer-query-object-syntax': 'warn',
-    '@tanstack/query/stable-query-client': 'warn',
-  },
-}
 
 // TypeScript ESLint config for TypeScript files
 const typescriptConfig = {
@@ -48,10 +34,15 @@ const typescriptConfig = {
 
 module.exports = defineConfig([
   // Global ignore for the .next folder
-  { ignores: ['.next', 'public'] },
+  { ignores: ['.next', 'public', '.contentlayer'] },
   turboConfig,
   prettierConfig,
-  tanstackQueryConfig,
+  tanstackQuery.configs['flat/recommended'],
+  {
+    rules: {
+      '@tanstack/query/exhaustive-deps': 'warn',
+    },
+  },
   typescriptConfig,
   {
     extends: compat.extends('next/core-web-vitals'),
@@ -65,7 +56,7 @@ module.exports = defineConfig([
   },
   {
     // check for default exports in all files except app and pages folders.
-    ignores: ['pages/**.tsx', 'app/**.tsx'],
+    ignores: ['pages/**/*.ts', 'app/**/*.ts', 'pages/**/*.tsx', 'app/**/*.tsx'],
     rules: {
       'no-restricted-exports': [
         'warn',

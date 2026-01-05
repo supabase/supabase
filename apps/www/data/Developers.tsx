@@ -80,7 +80,7 @@ export const data = {
           text: 'Contribute',
           description: 'How to contribute to Supabase.',
           url: '/contribute',
-          icon: () => <Pencil className="w-4 h-4  " />,
+          icon: () => <Pencil className="w-4 h-4" />,
         },
         {
           text: 'Become a Partner',

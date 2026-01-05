@@ -1,4 +1,5 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -7,22 +8,24 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
+  Button,
   Input,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import {
@@ -35,6 +38,8 @@ import {
 const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const unifiedReplication = useFlag('unifiedReplication')
 
   const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
     useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
@@ -83,12 +88,31 @@ const InfrastructureInfo = () => {
   return (
     <>
       <ScaffoldDivider />
-      {project?.cloud_provider !== 'FLY' && (
-        <>
-          <InstanceConfiguration />
-          <ScaffoldDivider />
-        </>
-      )}
+      {project?.cloud_provider !== 'FLY' &&
+        (unifiedReplication ? (
+          <ScaffoldContainer>
+            <ScaffoldSection isFullWidth>
+              <NoticeBar
+                visible={true}
+                type="default"
+                title="Management of read replicas has moved"
+                description="Read replicas is now managed under Replication in the Database section."
+                actions={
+                  <Button type="default" asChild>
+                    <Link href={`/project/${ref}/database/replication`} className="!no-underline">
+                      Go to Replication
+                    </Link>
+                  </Button>
+                }
+              />
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        ) : (
+          <>
+            <InstanceConfiguration />
+            <ScaffoldDivider />
+          </>
+        ))}
 
       <ScaffoldContainer>
         <ScaffoldSection>
