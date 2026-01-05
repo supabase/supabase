@@ -1,20 +1,20 @@
 import { useState } from 'react'
 
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { Button, PopoverContent, PopoverTrigger, Popover } from 'ui'
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
         setIsOpen(e)
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
           asChild
           onClick={() => {
@@ -25,15 +25,15 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         >
           <span className={className}>Feedback</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         side="bottom"
         align="end"
         className="p-0 flex flex-col w-[22rem]"
         id="feedback-widget"
       >
         <FeedbackWidget onClose={() => setIsOpen(false)} />
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -13,10 +13,10 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverSeparator,
+  PopoverTrigger,
   SimpleCodeBlock,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -49,13 +49,13 @@ export const LocalVersionPopover = () => {
   if (!isSuccess || !currentCliVersion) return null
 
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ className="flex items-center">
+    <Popover>
+      <PopoverTrigger className="flex items-center">
         <Badge variant={isBeta ? 'warning' : hasUpdate ? 'success' : 'default'}>
           {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}
         </Badge>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="end" className="w-80 px-0">
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 px-0">
         {hasLatestCLIVersion ? (
           !isBeta && hasUpdate ? (
             <div className="px-4 mb-3">
@@ -177,7 +177,7 @@ export const LocalVersionPopover = () => {
             </a>
           </Button>
         </div>
-        <PopoverSeparator_Shadcn_ className="my-4" />
+        <PopoverSeparator className="my-4" />
         <div className="flex items-center gap-x-4 px-4">
           <div className="flex flex-col gap-y-1">
             <p className="text-xs">Current version:</p>
@@ -190,7 +190,7 @@ export const LocalVersionPopover = () => {
             </div>
           )}
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

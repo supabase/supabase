@@ -28,9 +28,9 @@ import {
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -228,15 +228,15 @@ export const TableEditorMenu = () => {
                 </InnerSideBarFilterSortDropdownItem>
               </InnerSideBarFilterSortDropdown>
             </InnerSideBarFilterSearchInput>
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button
                   type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
                   className="h-[32px] md:h-[28px] px-1.5"
                   icon={<Filter />}
                 />
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+              </PopoverTrigger>
+              <PopoverContent className="p-0 w-56" side="bottom" align="center">
                 <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                   <p className="text-xs">Show entity types</p>
                   <div className="flex flex-col">
@@ -271,8 +271,8 @@ export const TableEditorMenu = () => {
                     ))}
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </InnerSideBarFilters>
 
           {isLoading && <EditorMenuListSkeleton />}

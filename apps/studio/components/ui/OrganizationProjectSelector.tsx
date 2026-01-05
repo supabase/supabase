@@ -13,9 +13,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -126,8 +126,8 @@ export const OrganizationProjectSelector = ({
   }, [isLoadingProjects, isSuccessProjects])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
         ) : (
@@ -146,9 +146,8 @@ export const OrganizationProjectSelector = ({
             )}
           </Button>
         )}
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        portal
+      </PopoverTrigger>
+      <PopoverContent
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
         side="bottom"
@@ -243,7 +242,7 @@ export const OrganizationProjectSelector = ({
             )}
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

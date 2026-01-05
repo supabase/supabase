@@ -13,9 +13,9 @@ import {
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
@@ -76,15 +76,15 @@ export const HomePageActions = ({
           ]}
         />
 
-        <Popover_Shadcn_>
-          <PopoverTrigger_Shadcn_ asChild>
+        <Popover>
+          <PopoverTrigger asChild>
             <Button
               type={filterStatus.length === 0 ? 'dashed' : 'secondary'}
               className="h-[26px] w-[26px]"
               icon={<Filter />}
             />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_
+          </PopoverTrigger>
+          <PopoverContent
             className="p-0 w-56"
             side="bottom"
             align="center"
@@ -118,8 +118,8 @@ export const HomePageActions = ({
                 ))}
               </div>
             </div>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>

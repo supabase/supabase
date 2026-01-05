@@ -7,10 +7,10 @@ import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.
 import {
   Button,
   Calendar as CalendarPicker,
+  PopoverContent,
+  PopoverTrigger,
   Popover,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverSeparator,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 import { TimeSplitInput } from './TimeSplitInput'
@@ -210,8 +210,8 @@ export function DatePicker({
   }
 
   return (
-    <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           title={triggerButtonTitle}
           type={triggerButtonType}
@@ -240,8 +240,8 @@ export function DatePicker({
             </>
           )}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="center" side={contentSide} className="p-0">
+      </PopoverTrigger>
+      <PopoverContent align="center" side={contentSide} className="p-0">
         <>
           {hideTime ? null : (
             <>
@@ -307,7 +307,7 @@ export function DatePicker({
             from: startDate?.toISOString() || null,
             to: endDate?.toISOString() || null,
           })}
-          <Popover.Separator />
+          <PopoverSeparator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             {!hideClear && (
               <Button type="default" onClick={() => handleClear()}>
@@ -317,7 +317,7 @@ export function DatePicker({
             <Button onClick={() => handleSubmit()}>Apply</Button>
           </div>
         </>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

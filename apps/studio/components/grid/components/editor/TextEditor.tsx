@@ -9,7 +9,16 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
@@ -102,18 +111,29 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover
-        open={isPopoverOpen}
-        side="bottom"
-        align="start"
-        sideOffset={-35}
-        className="rounded-none"
-        overlay={
-          isTruncated && !isSuccess ? (
-            <div
-              style={{ width: `${column.width}px` }}
-              className="flex items-center justify-center flex-col relative"
-            >
+      <Popover open={isPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="default"
+            className={cn(
+              !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
+              'sb-grid-text-editor__trigger'
+            )}
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent
+          side="bottom"
+          align="start"
+          sideOffset={-35}
+          style={{ width: `${column.width}px` }}
+          className="flex items-center justify-center flex-col relative rounded-none pb-0"
+        >
+          {isTruncated && !isSuccess ? (
+            <>
               <MonacoEditor
                 readOnly
                 onChange={() => {}}
@@ -122,7 +142,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 language="markdown"
               />
               <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
-            </div>
+            </>
           ) : (
             <BlockKeys
               value={value}
@@ -140,13 +160,13 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="w-6 h-8 px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">⏎</span>
                       </div>
                       <p className="text-xs text-foreground-light">Save changes</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="w-6 h-8 px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">Esc</span>
                       </div>
                       <p className="text-xs text-foreground-light">Cancel changes</p>
@@ -178,18 +198,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 </div>
               )}
             </BlockKeys>
-          )
-        }
-      >
-        <div
-          className={cn(
-            !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-            'sb-grid-text-editor__trigger'
           )}
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
-          {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
-        </div>
+        </PopoverContent>
       </Popover>
       <ConfirmationModal
         visible={isConfirmNextModalOpen}

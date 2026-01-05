@@ -16,9 +16,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   cn,
 } from 'ui'
 
@@ -58,8 +58,8 @@ const OrganizationPicker = ({
 
   return (
     <>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             ref={ref}
             type="default"
@@ -83,8 +83,8 @@ const OrganizationPicker = ({
               )}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverTrigger>
+        <PopoverContent
           className="p-0 w-full"
           side="bottom"
           align="center"
@@ -124,8 +124,8 @@ const OrganizationPicker = ({
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </>
   )
 }

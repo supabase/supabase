@@ -47,9 +47,9 @@ import {
   DropdownMenuTrigger,
   Input,
   Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   Table,
   TableBody,
   TableCell,
@@ -226,16 +226,16 @@ export const TableList = ({
             selectedSchemaName={selectedSchema}
             onSelectSchema={setSelectedSchema}
           />
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
                 type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
                 className="px-1"
                 icon={<Filter />}
               />
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={true}>
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-56" side="bottom" align="center" portal={true}>
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                 <p className="text-xs">Show entity types</p>
                 <div className="flex flex-col">
@@ -270,8 +270,8 @@ export const TableList = ({
                   ))}
                 </div>
               </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex flex-grow justify-between gap-2 items-center">
           <Input

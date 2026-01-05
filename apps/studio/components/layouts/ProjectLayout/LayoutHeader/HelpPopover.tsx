@@ -22,9 +22,9 @@ import {
   ButtonGroupItem,
   cn,
   Popover,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  PopoverContent,
+  PopoverSeparator,
+  PopoverTrigger,
 } from 'ui'
 
 export const HelpPopover = () => {
@@ -45,8 +45,8 @@ export const HelpPopover = () => {
   }
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <ButtonTooltip
           id="help-popover-button"
           type="outline"
@@ -72,8 +72,8 @@ export const HelpPopover = () => {
             )}
           />
         </ButtonTooltip>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
+      </PopoverTrigger>
+      <PopoverContent className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
         <div className="flex flex-col gap-4">
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Need help with your project?</h5>
@@ -156,7 +156,7 @@ export const HelpPopover = () => {
             </ButtonGroup>
           </div>
         </div>
-        <Popover.Separator />
+        <PopoverSeparator />
         <div className="flex flex-col gap-4">
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Community support</h5>
@@ -194,7 +194,7 @@ export const HelpPopover = () => {
             </div>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

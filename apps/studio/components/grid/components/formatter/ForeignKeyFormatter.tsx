@@ -9,7 +9,7 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
@@ -73,8 +73,8 @@ export const ForeignKeyFormatter = (props: Props) => {
             </div>
           )}
           {!isLoadingTargetTable && targetTable !== undefined && (
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover>
+              <PopoverTrigger asChild>
                 <ButtonTooltip
                   type="default"
                   className="w-6 h-6"
@@ -82,15 +82,15 @@ export const ForeignKeyFormatter = (props: Props) => {
                   onClick={(e) => e.stopPropagation()}
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
                 />
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
+              </PopoverTrigger>
+              <PopoverContent portal align="end" className="p-0 w-96">
                 <ReferenceRecordPeek
                   table={targetTable}
                   column={relationship.target_column_name}
                   value={formattedValue}
                 />
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
         </>
       )}

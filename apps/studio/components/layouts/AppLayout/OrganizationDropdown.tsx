@@ -18,9 +18,9 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
   cn,
 } from 'ui'
@@ -62,15 +62,15 @@ export const OrganizationDropdown = () => {
           <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
         )}
       </Link>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
           <Button
             type="text"
             className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
             iconRight={<ChevronsUpDown strokeWidth={1.5} />}
           />
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find organization..." />
             <CommandList_Shadcn_>
@@ -142,8 +142,8 @@ export const OrganizationDropdown = () => {
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </>
   )
 }
