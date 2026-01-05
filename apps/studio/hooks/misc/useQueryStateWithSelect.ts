@@ -16,6 +16,7 @@ import { toast } from 'sonner'
  *
  * @deprecated Avoid using this hook, and use nuqs directly
  * Refer to this PR for more information: https://github.com/supabase/supabase/pull/41380
+ * as well as context on how to refactor to remove usage of this hook
  */
 export function useQueryStateWithSelect<T>({
   enabled,
