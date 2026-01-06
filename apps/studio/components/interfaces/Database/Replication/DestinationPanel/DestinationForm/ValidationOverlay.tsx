@@ -40,7 +40,11 @@ export const ValidationOverlay = ({ isVisible, destinationType }: ValidationOver
 
   const validationMessages = useMemo(() => {
     const destinationSpecificMessages =
-      destinationType === 'BigQuery' ? bigQueryMessages : analyticsBucketMessages
+      destinationType === 'BigQuery'
+        ? bigQueryMessages
+        : destinationType === 'Analytics Bucket'
+          ? analyticsBucketMessages
+          : [] // Read Replica or future types
 
     return [...sharedPipelineMessages, ...destinationSpecificMessages, ...finalMessages]
   }, [destinationType])

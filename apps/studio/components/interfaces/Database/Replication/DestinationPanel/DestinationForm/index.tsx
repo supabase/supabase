@@ -579,15 +579,6 @@ export const DestinationForm = ({
         // Validation passed or only has warnings, continue to disclaimer
       }
 
-      // Check if there are critical failures before proceeding
-      const allFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
-      const hasCriticalFailures = allFailures.some((f) => f.failure_type === 'critical')
-
-      if (hasCriticalFailures) {
-        // Don't proceed if there are critical failures
-        return
-      }
-
       // Validation passed or only warnings, proceed to disclaimer
       setPendingFormValues(data)
       setShowDisclaimerDialog(true)
