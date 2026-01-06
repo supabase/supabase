@@ -1,7 +1,7 @@
 ---
 
-Title: SvelteKit SSR Authentication
-Description: Use Supabase Auth with OAuth in SvelteKit using server-side rendering.
+title: SvelteKit SSR Authentication
+description: Use Supabase Auth with OAuth in SvelteKit using server-side rendering.
 -----------------------------------------------------------------------------------
 
 ## Overview
@@ -25,6 +25,7 @@ Before you begin, make sure you have:
 * A SvelteKit app (`@sveltejs/kit`)
 * An OAuth provider configured in the Supabase dashboard
 * The `@supabase/ssr` package installed
+* Environment variables configured for your Supabase project (for example, `PUBLIC_SITE_URL`)
 
 ```bash
 npm install @supabase/ssr @supabase/supabase-js
@@ -143,6 +144,7 @@ export async function load({ cookies }) {
 * OAuth redirect URLs must match the callback URL configured in the Supabase dashboard.
 * Use an environment variable (for example, `PUBLIC_SITE_URL`) for OAuth redirect URLs so they can differ between development and production.
 * `PUBLIC_*` environment variables should be imported from `$env/dynamic/public` in SvelteKit.
+* Ensure `PUBLIC_SITE_URL` is set to your application’s base URL (for example, `http://localhost:5173` in development) and matches the OAuth redirect URLs configured in the Supabase dashboard.
 * Cookies are required for session persistence during SSR.
 * This setup avoids relying on client-only authentication helpers.
 * Error and metadata behavior may differ from controller-based frameworks.
