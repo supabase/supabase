@@ -21,6 +21,7 @@ interface SortDropdownProps {
   showSortByEmail: boolean
   showSortByPhone: boolean
   setSortByValue: (value: string) => void
+  improvedSearchEnabled: boolean
 }
 
 export const SortDropdown = ({
@@ -31,8 +32,9 @@ export const SortDropdown = ({
   showSortByEmail,
   showSortByPhone,
   setSortByValue,
+  improvedSearchEnabled = false,
 }: SortDropdownProps) => {
-  if (specificFilterColumn !== 'freeform') {
+  if (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) {
     return (
       <ButtonTooltip
         disabled

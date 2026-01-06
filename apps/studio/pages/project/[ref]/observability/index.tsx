@@ -12,13 +12,17 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
   const { profile } = useProfile()
-  const [showCreateReportModal, setShowCreateReportModal] = useState(false)
+  const [showCreateReportModal, setShowCreateReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     isPending: isLoading,
