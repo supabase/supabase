@@ -1,12 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import url(../pages/launch-week/launchWeek.css);
-
+@import '../pages/launch-week/launchWeek.css';
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark-combined.css';
 @import './../../../packages/ui/build/css/themes/light.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer utilities {
   .run {
