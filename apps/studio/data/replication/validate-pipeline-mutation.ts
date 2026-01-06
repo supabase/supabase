@@ -1,24 +1,16 @@
 import { useMutation } from '@tanstack/react-query'
+import { components } from 'api-types'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
-export type ValidatePipelineParams = {
+type ValidatePipelineParams = {
   projectRef: string
   sourceId: number
   publicationName: string
   maxFillMs?: number
 }
-
-export type ValidationFailure = {
-  name: string
-  reason: string
-  failure_type: 'critical' | 'warning'
-}
-
-export type ValidatePipelineResponse = {
-  validation_failures: ValidationFailure[]
-}
+type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse']
 
 async function validatePipeline(
   { projectRef, sourceId, publicationName, maxFillMs }: ValidatePipelineParams,
@@ -39,10 +31,7 @@ async function validatePipeline(
     signal,
   })
 
-  if (error) {
-    handleError(error)
-  }
-
+  if (error) handleError(error)
   return data as ValidatePipelineResponse
 }
 

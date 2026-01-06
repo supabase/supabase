@@ -1,98 +1,69 @@
-import { AlertCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import type { ValidationFailure } from 'data/replication/validate-destination-mutation'
+import {
+  Accordion_Shadcn_,
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  AccordionTrigger_Shadcn_,
+  Badge,
+  Card,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
 
 interface ValidationFailuresSectionProps {
-  isValidating: boolean
   destinationFailures: ValidationFailure[]
   pipelineFailures: ValidationFailure[]
 }
 
 export const ValidationFailuresSection = ({
-  isValidating,
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
-  const allFailures = [...destinationFailures, ...pipelineFailures]
+  const validationIssues = [...destinationFailures, ...pipelineFailures]
 
-  const criticalFailures = allFailures.filter((f) => f.failure_type === 'critical')
-  const warnings = allFailures.filter((f) => f.failure_type === 'warning')
+  const criticalFailures = validationIssues.filter((f) => f.failure_type === 'critical')
+  const warnings = validationIssues.filter((f) => f.failure_type === 'warning')
 
   const hasCriticalFailures = criticalFailures.length > 0
   const hasWarnings = warnings.length > 0
 
-  if (isValidating) {
-    return (
-      <div className="rounded-md border border-border bg-surface-100 p-4">
-        <div className="flex items-center gap-3 text-foreground-light">
-          <Loader2 size={18} className="animate-spin" />
-          <div className="space-y-1">
-            <span className="text-sm font-medium">Validating configuration...</span>
-            <p className="text-xs text-foreground-lighter">
-              Checking destination connectivity and pipeline prerequisites
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!hasCriticalFailures && !hasWarnings) {
+  if (validationIssues.length === 0) {
     return null
   }
 
   return (
-    <div className="space-y-3">
-      {hasCriticalFailures && (
-        <div className="rounded-md border border-destructive bg-destructive/5 p-4 space-y-3">
-          <div className="flex items-center gap-2 text-destructive">
-            <AlertCircle size={18} />
-            <h3 className="text-sm font-medium">Configuration Issues</h3>
-          </div>
-          <p className="text-xs text-foreground-light">
-            Please fix the following issues and click "Validate again" to re-check:
-          </p>
-          <div className="space-y-2">
-            {criticalFailures.map((failure, index) => (
-              <div
-                key={`critical-${index}`}
-                className="rounded border border-destructive/20 bg-background p-3 space-y-1"
-              >
-                <div className="text-xs font-medium text-foreground">{failure.name}</div>
-                <div className="text-xs text-foreground-light leading-relaxed whitespace-pre-wrap">
-                  {failure.reason}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {hasWarnings && (
-        <div className="rounded-md border border-warning bg-warning/5 p-4 space-y-3">
-          <div className="flex items-center gap-2 text-warning">
-            <AlertTriangle size={18} />
-            <h3 className="text-sm font-medium">Configuration Warnings</h3>
-          </div>
-          <p className="text-xs text-foreground-light">
-            {hasCriticalFailures
-              ? 'Additionally, review these warnings once the critical issues are resolved:'
-              : 'Review the following warnings. You can proceed, but consider addressing these:'}
-          </p>
-          <div className="space-y-2">
-            {warnings.map((failure, index) => (
-              <div
-                key={`warning-${index}`}
-                className="rounded border border-warning/20 bg-background p-3 space-y-1"
-              >
-                <div className="text-xs font-medium text-foreground">{failure.name}</div>
-                <div className="text-xs text-foreground-light leading-relaxed">
-                  {failure.reason}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    <Admonition
+      type={hasCriticalFailures ? 'warning' : 'default'}
+      className="px-5 rounded-none border-0"
+      title="Destination configuration issues"
+    >
+      <p className="text-sm text-foreground-light !mb-2">
+        {hasCriticalFailures
+          ? `Please fix all required issues below${hasWarnings ? ' and review the others' : ''} before continuing.`
+          : 'The following issues were identified, although you may still proceed to create the destination.'}
+      </p>
+      <Card>
+        <Accordion_Shadcn_ type="multiple">
+          {validationIssues.map((failure, idx) => (
+            <AccordionItem_Shadcn_
+              key={idx}
+              value={`${failure.name}+${idx}`}
+              className="last:border-b-0"
+            >
+              <AccordionTrigger_Shadcn_ className="text-sm px-3 text-foreground decoration-foreground-lighter">
+                <p className="flex items-center gap-x-2">
+                  {failure.name}
+                  {failure.failure_type === 'critical' && <Badge variant="warning">Required</Badge>}
+                </p>
+              </AccordionTrigger_Shadcn_>
+              <AccordionContent_Shadcn_ className="px-3">
+                <p className="whitespace-pre-wrap text-sm">
+                  {failure.reason.replaceAll('\n\n', '\n')}
+                </p>
+              </AccordionContent_Shadcn_>
+            </AccordionItem_Shadcn_>
+          ))}
+        </Accordion_Shadcn_>
+      </Card>
+    </Admonition>
   )
 }

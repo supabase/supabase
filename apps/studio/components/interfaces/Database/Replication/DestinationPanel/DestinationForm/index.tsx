@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AnimatePresence, motion } from 'framer-motion'
 import { snakeCase } from 'lodash'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -24,10 +25,15 @@ import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-help
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import {
+  useValidateDestinationMutation,
+  type ValidationFailure,
+} from 'data/replication/validate-destination-mutation'
+import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2 } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -37,6 +43,7 @@ import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
+import { buildDestinationConfigForValidation } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
 import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
@@ -44,12 +51,6 @@ import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
-import { ValidationOverlay } from './ValidationOverlay'
-import {
-  useValidateDestinationMutation,
-  type ValidationFailure,
-} from 'data/replication/validate-destination-mutation'
-import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 
 const formId = 'destination-editor'
 
@@ -73,7 +74,6 @@ export const DestinationForm = ({
   onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { setRequestStatus } = usePipelineRequestStatus()
 
   const etlEnableBigQuery = useFlag('etlEnableBigQuery')
@@ -245,48 +245,26 @@ export const DestinationForm = ({
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
-  // Helper function to build destination config for validation
-  const buildDestinationConfigForValidation = (data: z.infer<typeof FormSchema>) => {
-    if (!projectRef) throw new Error('Project ref is required')
+  const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
+  const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
 
-    if (selectedType === 'BigQuery') {
-      return {
-        bigQuery: {
-          projectId: data.projectId ?? '',
-          datasetId: data.datasetId ?? '',
-          serviceAccountKey: data.serviceAccountKey ?? '',
-          ...(data.maxStalenessMins !== undefined
-            ? { maxStalenessMins: data.maxStalenessMins }
-            : {}),
-        },
-      }
-    } else if (selectedType === 'Analytics Bucket') {
-      // For validation, use the namespace as-is (even if it's CREATE_NEW_NAMESPACE)
-      // The actual creation will happen later in submitPipeline
-      const validationNamespace =
-        data.namespace === CREATE_NEW_NAMESPACE ? data.newNamespaceName : data.namespace
+  const isSaving =
+    creatingDestinationPipeline ||
+    updatingDestinationPipeline ||
+    startingPipeline ||
+    isCreatingS3AccessKey ||
+    isCreatingNamespace ||
+    isValidating
 
-      // For validation purposes, if CREATE_NEW_KEY is selected, we skip S3 key validation
-      // The actual key creation will happen later in submitPipeline
-      // We'll use placeholder values for validation
-      const s3Keys =
-        data.s3AccessKeyId === CREATE_NEW_KEY
-          ? { accessKey: 'placeholder', secretKey: 'placeholder' }
-          : { accessKey: data.s3AccessKeyId ?? '', secretKey: data.s3SecretAccessKey ?? '' }
+  const isSubmitDisabled =
+    isSaving || isSelectedPublicationMissing || (!editMode && hasNoAvailableDestinations)
 
-      return {
-        iceberg: {
-          projectRef: projectRef,
-          warehouseName: data.warehouseName ?? '',
-          namespace: validationNamespace,
-          catalogToken: data.catalogToken ?? '',
-          s3AccessKeyId: s3Keys.accessKey,
-          s3SecretAccessKey: s3Keys.secretKey,
-          s3Region: data.s3Region ?? '',
-        },
-      }
+  const getSubmitButtonText = () => {
+    if (editMode) {
+      return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
+    } else {
+      return 'Create and start'
     }
-    throw new Error('Invalid destination type')
   }
 
   // Helper function to handle namespace creation if needed
@@ -316,7 +294,7 @@ export const DestinationForm = ({
     const results = await Promise.allSettled([
       validateDestination({
         projectRef,
-        destinationConfig: buildDestinationConfigForValidation(data),
+        destinationConfig: buildDestinationConfigForValidation({ projectRef, selectedType, data }),
       }),
       validatePipeline({
         projectRef,
@@ -527,50 +505,11 @@ export const DestinationForm = ({
     }
   }
 
-  const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
-  const hasCriticalValidationFailures = allValidationFailures.some(
-    (f) => f.failure_type === 'critical'
-  )
-  const hasValidationWarnings = allValidationFailures.some((f) => f.failure_type === 'warning')
-
-  const isSaving =
-    creatingDestinationPipeline ||
-    updatingDestinationPipeline ||
-    startingPipeline ||
-    isCreatingS3AccessKey ||
-    isCreatingNamespace ||
-    isValidating
-
-  const isSubmitDisabled =
-    isSaving || isSelectedPublicationMissing || (!editMode && hasNoAvailableDestinations)
-
-  // Compute submit button text
-  const getSubmitButtonText = () => {
-    if (editMode) {
-      return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
-    }
-
-    if (!hasRunValidation) {
-      return 'Validate and continue'
-    }
-
-    if (hasCriticalValidationFailures) {
-      return 'Validate again'
-    }
-
-    if (hasValidationWarnings) {
-      return 'Continue anyway'
-    }
-
-    // After successful validation with no issues, show "Continue"
-    return 'Continue'
-  }
-
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!editMode) {
       // For new pipelines, validate configuration first if not already validated
       // OR if user has critical failures and clicks "Validate again"
-      if (!hasRunValidation || isValidating || hasCriticalValidationFailures) {
+      if (!hasRunValidation || isValidating || hasValidationFailures) {
         const isValid = await validateConfiguration(data)
         if (!isValid) {
           // Validation failed with critical errors, show inline and stop
@@ -629,8 +568,6 @@ export const DestinationForm = ({
 
   return (
     <>
-      <ValidationOverlay isVisible={!editMode && isValidating} destinationType={selectedType} />
-
       <SheetSection className="flex-grow overflow-auto px-0 py-0">
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
@@ -671,9 +608,8 @@ export const DestinationForm = ({
                 <>
                   <DialogSectionSeparator />
 
-                  <div ref={validationSectionRef} className="p-5">
+                  <div ref={validationSectionRef}>
                     <ValidationFailuresSection
-                      isValidating={false}
                       destinationFailures={destinationValidationFailures}
                       pipelineFailures={pipelineValidationFailures}
                     />
@@ -685,13 +621,35 @@ export const DestinationForm = ({
         )}
       </SheetSection>
 
-      <SheetFooter>
-        <Button disabled={isSaving} type="default" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
-          {getSubmitButtonText()}
-        </Button>
+      <SheetFooter className="!justify-between">
+        <AnimatePresence mode="wait">
+          {isValidating || isSaving ? (
+            <motion.div
+              className="flex items-center gap-x-2"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <Loader2 className="animate-spin" size={14} />
+              <p className="text-foreground-light text-sm">
+                {isValidating
+                  ? 'Validating destination configuration...'
+                  : 'Creating destination...'}
+              </p>
+            </motion.div>
+          ) : (
+            <div />
+          )}
+        </AnimatePresence>
+        <div className="flex items-center gap-x-2">
+          <Button disabled={isSaving} type="default" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
+            {getSubmitButtonText()}
+          </Button>
+        </div>
       </SheetFooter>
 
       <NewPublicationPanel

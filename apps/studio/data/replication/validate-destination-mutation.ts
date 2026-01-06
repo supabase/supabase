@@ -3,42 +3,15 @@ import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { DestinationConfig } from './create-destination-pipeline-mutation'
 
-type DestinationConfig =
-  | {
-      bigQuery: {
-        projectId: string
-        datasetId: string
-        serviceAccountKey: string
-        maxStalenessMins?: number
-      }
-    }
-  | {
-      iceberg: {
-        projectRef: string
-        warehouseName: string
-        namespace?: string
-        catalogToken: string
-        s3AccessKeyId: string
-        s3SecretAccessKey: string
-        s3Region: string
-      }
-    }
-
-export type ValidateDestinationParams = {
+type ValidateDestinationParams = {
   projectRef: string
   destinationConfig: DestinationConfig
 }
 
-export type ValidationFailure = {
-  name: string
-  reason: string
-  failure_type: 'critical' | 'warning'
-}
-
-export type ValidateDestinationResponse = {
-  validation_failures: ValidationFailure[]
-}
+type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse']
+export type ValidationFailure = ValidateDestinationResponse['validation_failures'][number]
 
 async function validateDestination(
   { projectRef, destinationConfig }: ValidateDestinationParams,
@@ -94,10 +67,7 @@ async function validateDestination(
     signal,
   })
 
-  if (error) {
-    handleError(error)
-  }
-
+  if (error) handleError(error)
   return data as ValidateDestinationResponse
 }
 
