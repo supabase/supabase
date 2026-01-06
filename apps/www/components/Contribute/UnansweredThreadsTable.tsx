@@ -198,7 +198,6 @@ export function UnansweredThreadsTable({
   }
 
   function handleSearchSubmit(e: React.FormEvent) {
-    console.log('handleSearchSubmit', searchInput)
     e.preventDefault()
     if (searchInput.trim()) {
       setSearch(searchInput.trim())

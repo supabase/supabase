@@ -11,7 +11,7 @@ const benefits: Benefit[] = [
     icon: DollarSign,
     title: 'Paid Contributions',
     description:
-      'Top contributors get paid for their efforts. We pay a stipend that recognizes pyour time and expertise.',
+      'Top contributors get paid for their efforts. We pay a stipend that recognizes your time and expertise.',
   },
   {
     icon: Award,
