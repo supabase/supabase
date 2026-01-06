@@ -63,9 +63,7 @@ export const PublicationsComboBox = ({
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={
-            <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-          }
+          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
           name={field.name}
           onBlur={field.onBlur}
         >

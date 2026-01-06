@@ -28,10 +28,7 @@ const analyticsBucketMessages = [
   'Verifying catalog token...',
 ]
 
-const finalMessages = [
-  'Running final checks...',
-  'Wrapping things up...',
-]
+const finalMessages = ['Running final checks...', 'Wrapping things up...']
 
 interface ValidationOverlayProps {
   isVisible: boolean
@@ -73,9 +70,7 @@ export const ValidationOverlay = ({ isVisible, destinationType }: ValidationOver
     >
       <div className="flex flex-col items-center gap-2 px-8 max-w-xl w-full">
         {/* Title */}
-        <h3 className="text-lg font-medium text-foreground">
-          Running pre-flight checks
-        </h3>
+        <h3 className="text-lg font-medium text-foreground">Running pre-flight checks</h3>
 
         {/* Cycling Messages */}
         <div className="relative h-12 w-full">

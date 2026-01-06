@@ -1,6 +1,5 @@
 import { AlertCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import type { ValidationFailure } from 'data/replication/validate-destination-mutation'
-import { cn } from 'ui'
 
 interface ValidationFailuresSectionProps {
   isValidating: boolean

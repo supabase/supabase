@@ -542,9 +542,7 @@ export const DestinationForm = ({
     isValidating
 
   const isSubmitDisabled =
-    isSaving ||
-    isSelectedPublicationMissing ||
-    (!editMode && hasNoAvailableDestinations)
+    isSaving || isSelectedPublicationMissing || (!editMode && hasNoAvailableDestinations)
 
   // Compute submit button text
   const getSubmitButtonText = () => {
