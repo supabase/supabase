@@ -74,7 +74,10 @@ The `PublicMovies` class is used to parse `SELECT` results from the `movies` tab
 
 ```py
 from .database_types import PublicMovies, PublicMoviesInsert, PublicMoviesUpdate
-import supabase
+from supabase import create_client
+
+client = create_client("YOUR_SUPABASE_URL", "YOUR_SUPABASE_KEY")
+movies = client.table("movies")
 
 movies = supabase.table("movies")
 
