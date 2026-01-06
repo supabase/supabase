@@ -1,23 +1,91 @@
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useParams } from 'common'
-import { BucketsComingSoon } from 'components/interfaces/Storage/BucketsComingSoon'
 import { BucketsUpgradePlan } from 'components/interfaces/Storage/BucketsUpgradePlan'
 import { VectorsBuckets } from 'components/interfaces/Storage/VectorBuckets'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { StorageBucketsLayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { useIsVectorBucketsEnabled } from 'data/config/project-storage-config-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { VectorBucket } from 'icons'
+import { AWS_REGIONS } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  EmptyStatePresentational,
+  PageContainer,
+  PageSection,
+  PageSectionContent,
+} from 'ui-patterns'
+
+const AVAILABLE_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-central-1', 'ap-southeast-2']
 
 const StorageVectorsPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
+  const { data: project } = useSelectedProjectQuery()
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef })
 
-  if (!isVectorBucketsEnabled) {
-    return <BucketsComingSoon type="vector" />
-  } else if (!isPaidPlan) {
+  // [Joshen] We're actively looking into lifting this restriction so can remove once done
+  const isAvailableInProjectRegion = AVAILABLE_REGIONS.includes(project?.region ?? '')
+  const projectRegion = Object.values(AWS_REGIONS).find(
+    (x) => x.code === project?.region
+  )?.displayName
+
+  if (!isAvailableInProjectRegion) {
+    return (
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent className="flex flex-col gap-y-8">
+            <AlphaNotice
+              entity="Vector buckets"
+              feedbackUrl="https://github.com/orgs/supabase/discussions/40815"
+            />
+            <EmptyStatePresentational
+              icon={VectorBucket}
+              title={
+                <>
+                  Vector buckets are currently not available in your{' '}
+                  <Tooltip>
+                    <TooltipTrigger className={InlineLinkClassName}>
+                      project's region
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">{projectRegion}</TooltipContent>
+                  </Tooltip>
+                </>
+              }
+              description={
+                <p>
+                  Buckets are only available for{' '}
+                  <Tooltip>
+                    <TooltipTrigger className={InlineLinkClassName}>
+                      {AVAILABLE_REGIONS.length} regions
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <ul className="list-disc pl-4">
+                        {AVAILABLE_REGIONS.map((x) => {
+                          const region = Object.values(AWS_REGIONS).find(
+                            (y) => y.code === x
+                          )?.displayName
+                          return (
+                            <li key={x}>
+                              <span>{region}</span>
+                              <span className="text-foreground-lighter ml-2">{x}</span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>{' '}
+                  and we're actively looking to expand that soon.
+                </p>
+              }
+            />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    )
+  } else if (!isVectorBucketsEnabled) {
     return <BucketsUpgradePlan type="vector" />
   } else {
     return <VectorsBuckets />
