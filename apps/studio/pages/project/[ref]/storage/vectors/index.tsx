@@ -43,17 +43,7 @@ const StorageVectorsPage: NextPageWithLayout = () => {
             />
             <EmptyStatePresentational
               icon={VectorBucket}
-              title={
-                <>
-                  Vector buckets are currently not available in your{' '}
-                  <Tooltip>
-                    <TooltipTrigger className={InlineLinkClassName}>
-                      project's region
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">{projectRegion}</TooltipContent>
-                  </Tooltip>
-                </>
-              }
+              title="Vector buckets are currently not available in your project's region"
               description={
                 <p>
                   Buckets are only available for{' '}
