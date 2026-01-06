@@ -10,7 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -21,15 +22,6 @@ jobs:
           ref: master
       - uses: sobolevn/misspell-fixer-action@06ff0b508d4f4c0ba70d15f9a628232c0aade536 # v0.1.0
 
-      - name: Generate token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
-          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
-          permission-contents: write
-          permission-pull-requests: write
-
       - uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
