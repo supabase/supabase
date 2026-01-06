@@ -13,7 +13,35 @@ Check updates for each service to learn more.
 
 ## Unreleased
 
-- Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901)
+---
+
+## [2025-12-18]
+
+### Documentation
+- Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901), PR [#41438](https://github.com/supabase/supabase/pull/41438)
+
+### Utils
+- Added `generate-keys.sh` - PR [#41363](https://github.com/supabase/supabase/pull/41363)
+- Added `db-passwd.sh` - PR [#41432](https://github.com/supabase/supabase/pull/41432)
+- Changed `reset.sh` to POSIX and added more checks - PR [#41361](https://github.com/supabase/supabase/pull/41361)
+
+### Studio
+- Updated to `2025.12.17-sha-43f4f7f`
+- ⚠️ Fixed additional potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- Fixed an issue with the Users page not being updated on changes - PR [#41254](https://github.com/supabase/supabase/pull/41254)
+
+### MCP Server
+- Updated to `v0.5.10` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.10)
+
+### Auth
+- Updated to `v2.184.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.184.0)
+
+### Postgres Meta
+- Updated to `v0.95.1` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.95.1)
+
+### Analytics (Logflare)
+- Updated to `v1.27.0` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.27.0)
+- Fixed multiple issues, including a race condition
 
 ---
 
@@ -23,7 +51,11 @@ Check updates for each service to learn more.
 
 - Updated to `2025.12.09-sha-434634f`
 - ⚠️ Fixed potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
-- ⚠️ Changed MCP tool `get_anon_key` to `get_publishable_keys` - [MCP Server Releases](https://github.com/supabase-community/supabase-mcp/releases)
+
+### MCP Server
+
+- Updated to `v0.5.9` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.9)
+- ⚠️ Changed MCP tool `get_anon_key` to `get_publishable_keys`
 
 ### PostgREST
 
@@ -42,9 +74,9 @@ Check updates for each service to learn more.
 
 - Updated to `v1.69.28` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.69.28)
 
-### Logflare
+### Analytics (Logflare)
 
-- Updated to `1.26.25` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.26.25)
+- Updated to `v1.26.25` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.26.25)
 
 ---
 
@@ -80,7 +112,7 @@ Check updates for each service to learn more.
 - Updated to `2025.11.24-sha-d990ae8` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40734)
 - Fixed Queues configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - PR [#40078](https://github.com/supabase/supabase/pull/40078)
 - Fixed parameterized SQL queries in MCP tools - PR [#40499](https://github.com/supabase/supabase/pull/40499)
-- Fixed Studio showing paid options for log drains - [PR #40510](https://github.com/supabase/supabase/pull/40510)
+- Fixed Studio showing paid options for log drains - PR [#40510](https://github.com/supabase/supabase/pull/40510)
 - Fixed AI Assistant authentication - PR [#40654](https://github.com/supabase/supabase/pull/40654)
 
 ### Auth

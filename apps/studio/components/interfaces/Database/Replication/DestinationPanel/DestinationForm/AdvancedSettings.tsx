@@ -10,6 +10,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DestinationType } from '../DestinationPanel.types'
@@ -47,18 +48,20 @@ export const AdvancedSettings = ({
               name="maxFillMs"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Batch wait time (milliseconds)"
+                  label="Batch wait time"
                   layout="horizontal"
                   description="How long to wait for more changes before sending. Shorter times mean more real-time updates but higher overhead."
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      {...field}
-                      type="number"
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field)}
-                      placeholder="e.g., 5000 (5 seconds)"
-                    />
+                    <PrePostTab postTab="milliseconds">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 10000 (10 seconds)"
+                      />
+                    </PrePostTab>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -73,21 +76,23 @@ export const AdvancedSettings = ({
                   <FormItemLayout
                     label={
                       <div className="flex flex-col gap-y-2">
-                        <span>Maximum staleness (minutes)</span>
+                        <span>Maximum staleness</span>
                         <Badge className="w-min">BigQuery only</Badge>
                       </div>
                     }
                     layout="horizontal"
-                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs."
+                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs. Leave empty for no staleness limit."
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="e.g. 60 (1 hour)"
-                      />
+                      <PrePostTab postTab="minutes">
+                        <Input_Shadcn_
+                          {...field}
+                          type="number"
+                          value={field.value ?? ''}
+                          onChange={handleNumberChange(field)}
+                          placeholder="Default: none"
+                        />
+                      </PrePostTab>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}

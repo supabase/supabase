@@ -727,6 +727,7 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
+            { name: 'Overview', url: '/guides/auth/server-side' },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
@@ -1663,7 +1664,14 @@ export const functions: NavMenuConstant = {
       name: 'Integrations',
       url: undefined,
       items: [
-        { name: 'Supabase Auth', url: '/guides/functions/auth' },
+        {
+          name: 'Supabase Auth',
+          url: '/guides/functions/auth',
+          items: [
+            { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
+          ],
+        },
         { name: 'Supabase Database (Postgres)', url: '/guides/functions/connect-to-postgres' },
         { name: 'Supabase Storage', url: '/guides/functions/storage-caching' },
       ],
