@@ -2608,8 +2608,8 @@ export interface RequestUpgradeSubmittedEvent {
  * @group Events
  * @source studio
  */
-export interface DashboardErrorDisplayedEvent {
-  action: 'dashboard_error_displayed'
+export interface DashboardErrorCreatedEvent {
+  action: 'dashboard_error_created'
   properties: {
     /**
      * Source of the error
@@ -2856,7 +2856,7 @@ export type TelemetryEvent =
   | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
-  | DashboardErrorDisplayedEvent
+  | DashboardErrorCreatedEvent
   | IntegrationInstalledEvent
   | IntegrationInstallStartedEvent
   | IntegrationUninstallStartedEvent
