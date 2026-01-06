@@ -18,7 +18,9 @@ export const ValidationFailuresSection = ({
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
-  const validationIssues = [...destinationFailures, ...pipelineFailures]
+  const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, b) =>
+    a.failure_type === 'critical' ? -1 : 1
+  )
 
   const criticalFailures = validationIssues.filter((f) => f.failure_type === 'critical')
   const warnings = validationIssues.filter((f) => f.failure_type === 'warning')
