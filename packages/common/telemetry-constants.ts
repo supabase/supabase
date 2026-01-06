@@ -2602,6 +2602,24 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
+ * Triggered when a Studio error UI element is displayed (mounted).
+ * This includes error Admonitions and Toast notifications.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DashboardErrorCreatedEvent {
+  action: 'dashboard_error_created'
+  properties: {
+    /**
+     * Source of the error
+     */
+    source?: 'admonition' | 'toast'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User successfully installed an integration via the integrations marketplace in the dashboard.
  * Note: This excludes Wrappers and Postgres Extensions.
  *
@@ -2838,6 +2856,7 @@ export type TelemetryEvent =
   | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
+  | DashboardErrorCreatedEvent
   | IntegrationInstalledEvent
   | IntegrationInstallStartedEvent
   | IntegrationUninstallStartedEvent
