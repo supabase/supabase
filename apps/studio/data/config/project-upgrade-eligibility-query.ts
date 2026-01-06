@@ -7,14 +7,13 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
-import type { ValidationError } from './types'
 
 export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse =
-  components['schemas']['ProjectUpgradeEligibilityResponse'] & {
-    validation_errors?: ValidationError[]
-  }
+  components['schemas']['ProjectUpgradeEligibilityResponse']
+export type ProjectUpgradeEligibilityValidationError =
+  ProjectUpgradeEligibilityResponse['validation_errors'][number]
 
 /**
  * Fetches upgrade eligibility information for a project.

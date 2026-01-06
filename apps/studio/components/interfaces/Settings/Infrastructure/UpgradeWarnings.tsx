@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
+import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
-import type { ValidationError } from 'data/config/types'
 import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -18,7 +18,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
   )
 }
 
-const getValidationErrorKey = (error: ValidationError): string => {
+const getValidationErrorKey = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
       return `pg_cron-${error.dependents.join(',')}`
@@ -39,7 +39,7 @@ const getValidationErrorKey = (error: ValidationError): string => {
   }
 }
 
-const getValidationErrorTitle = (error: ValidationError): string => {
+const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
       return error.dependents.join(', ')
@@ -60,7 +60,7 @@ const getValidationErrorTitle = (error: ValidationError): string => {
   }
 }
 
-const getValidationErrorDescription = (error: ValidationError): string => {
+const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
       return 'Objects depending on pg_cron must be removed'
@@ -85,7 +85,7 @@ const ValidationErrorItem = ({
   error,
   projectRef,
 }: {
-  error: ValidationError
+  error: ProjectUpgradeEligibilityValidationError
   projectRef: string
 }) => {
   const title = getValidationErrorTitle(error)
@@ -107,6 +107,8 @@ const ValidationErrorItem = ({
       case 'objects_depending_on_pg_cron':
       case 'unsupported_fdw_handler':
       case 'active_replication_slot':
+        return null
+      default:
         return null
     }
   }
@@ -141,7 +143,7 @@ const ValidationErrorItem = ({
 export const ValidationErrorsWarning = ({
   validationErrors,
 }: {
-  validationErrors: ValidationError[]
+  validationErrors: ProjectUpgradeEligibilityValidationError[]
 }) => {
   const { ref } = useParams()
   if (!ref) return null
