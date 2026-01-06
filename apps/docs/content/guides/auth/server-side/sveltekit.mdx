@@ -77,7 +77,7 @@ export const actions = {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: 'http://localhost:5173/auth/callback',
+        redirectTo: `${process.env.PUBLIC_SITE_URL}/auth/callback`,
       },
     })
 
@@ -134,6 +134,7 @@ export async function load({ cookies }) {
 ## Notes and considerations
 
 * OAuth redirect URLs must match the callback URL configured in the Supabase dashboard.
+* Use an environment variable (for example, `PUBLIC_SITE_URL`) for OAuth redirect URLs so they can differ between development and production.
 * Cookies are required for session persistence during SSR.
 * This setup avoids relying on client-only authentication helpers.
 * Error and metadata behavior may differ from controller-based frameworks.
