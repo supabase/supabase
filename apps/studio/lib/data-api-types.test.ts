@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { API_ACCESS_ROLES, isApiAccessRole, API_PRIVILEGE_TYPES, isApiPrivilegeType } from './data-api-types'
+import {
+  API_ACCESS_ROLES,
+  isApiAccessRole,
+  API_PRIVILEGE_TYPES,
+  isApiPrivilegeType,
+} from './data-api-types'
 
 describe('data-api-types', () => {
   describe('isApiAccessRole', () => {
@@ -44,4 +49,3 @@ describe('data-api-types', () => {
     })
   })
 })
-

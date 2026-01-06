@@ -91,4 +91,3 @@ describe('getProjectSettings', () => {
     expect(result.status).toBe('ACTIVE_HEALTHY')
   })
 })
-

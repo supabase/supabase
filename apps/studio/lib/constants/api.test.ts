@@ -82,4 +82,3 @@ describe('constants/api', () => {
     expect(DEFAULT_PROJECT).toHaveProperty('inserted_at')
   })
 })
-

@@ -73,4 +73,3 @@ describe('createProjectSupabaseClient', () => {
     expect(createClient).not.toHaveBeenCalled()
   })
 })
-

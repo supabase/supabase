@@ -165,4 +165,3 @@ describe('createNavigationHandler', () => {
     expect(mockWindowOpen).not.toHaveBeenCalled()
   })
 })
-

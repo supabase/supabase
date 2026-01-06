@@ -14,7 +14,13 @@ describe('captureCriticalError', () => {
 
   describe('with ResponseError', () => {
     it('should capture 5XX errors', () => {
-      const error = new ResponseError('Internal server error', 500, undefined, undefined, '/api/test')
+      const error = new ResponseError(
+        'Internal server error',
+        500,
+        undefined,
+        undefined,
+        '/api/test'
+      )
       const context = 'test operation'
 
       captureCriticalError(error, context)
@@ -156,4 +162,3 @@ describe('captureCriticalError', () => {
     })
   })
 })
-

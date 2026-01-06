@@ -165,4 +165,3 @@ describe('bedrockRegionMap', () => {
     expect(bedrockRegionMap.euc1).toBe('eu-central-1')
   })
 })
-

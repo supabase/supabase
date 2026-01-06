@@ -150,4 +150,3 @@ describe('useTrack', () => {
     )
   })
 })
-

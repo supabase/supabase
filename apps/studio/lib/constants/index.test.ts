@@ -122,4 +122,3 @@ describe('constants/index', () => {
     expect(constants.UUID_REGEX).toBeInstanceOf(RegExp)
   })
 })
-

@@ -109,4 +109,3 @@ describe('getConnectionString', () => {
     expect(result).toContain('5432')
   })
 })
-

@@ -105,4 +105,3 @@ describe('prepareMessagesForAPI', () => {
     expect(result[0].id).toBe('msg-3')
   })
 })
-

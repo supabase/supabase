@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  getDatabaseOperations,
-  getDevelopmentOperations,
-  getDebuggingOperations,
-} from './mcp'
+import { getDatabaseOperations, getDevelopmentOperations, getDebuggingOperations } from './mcp'
 import { executeQuery } from './query'
 import { listMigrationVersions, applyAndTrackMigrations } from './migrations'
 import { getProjectSettings } from './settings'
@@ -250,4 +246,3 @@ describe('getDebuggingOperations', () => {
     expect(result[1].name).toBe('lint3')
   })
 })
-

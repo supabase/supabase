@@ -101,4 +101,3 @@ describe('useDefaultProvider', () => {
     expect(constants.PASSWORD_STRENGTH).toHaveProperty(4)
   })
 })
-

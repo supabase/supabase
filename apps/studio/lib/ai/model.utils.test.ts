@@ -26,4 +26,3 @@ describe('getDefaultModelForProvider', () => {
     expect(result).toBeUndefined()
   })
 })
-

@@ -145,4 +145,3 @@ describe('apiWrapper', () => {
     expect(mockRes.json).toHaveBeenCalledWith({ error: authError })
   })
 })
-

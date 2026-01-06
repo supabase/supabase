@@ -51,14 +51,10 @@ describe('getOrgAIDetails', () => {
         Authorization: authorization,
       },
     })
-    expect(getProjectDetail).toHaveBeenCalledWith(
-      { ref: projectRef },
-      undefined,
-      {
-        'Content-Type': 'application/json',
-        Authorization: authorization,
-      }
-    )
+    expect(getProjectDetail).toHaveBeenCalledWith({ ref: projectRef }, undefined, {
+      'Content-Type': 'application/json',
+      Authorization: authorization,
+    })
     expect(result).toEqual({
       aiOptInLevel: 'enabled',
       isLimited: true,
@@ -123,9 +119,7 @@ describe('getOrgAIDetails', () => {
   })
 
   it('should return isLimited false for non-free plan', async () => {
-    ;(getOrganizations as any).mockResolvedValue([
-      { ...mockOrg, plan: { id: 'pro' } },
-    ])
+    ;(getOrganizations as any).mockResolvedValue([{ ...mockOrg, plan: { id: 'pro' } }])
     ;(getProjectDetail as any).mockResolvedValue(mockProject)
 
     const result = await getOrgAIDetails({ orgSlug, authorization, projectRef })
@@ -133,4 +127,3 @@ describe('getOrgAIDetails', () => {
     expect(result.isLimited).toBe(false)
   })
 })
-
