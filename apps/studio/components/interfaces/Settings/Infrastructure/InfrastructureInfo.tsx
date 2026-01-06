@@ -22,7 +22,7 @@ import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAle
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
 
-const InfrastructureInfo = () => {
+export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -217,5 +217,3 @@ const InfrastructureInfo = () => {
     </>
   )
 }
-
-export default InfrastructureInfo

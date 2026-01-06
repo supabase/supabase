@@ -128,6 +128,7 @@ export const ProjectUpgradeAlert = () => {
               <Button
                 size="tiny"
                 type="primary"
+                className="mt-1"
                 onClick={() => setShowUpgradeModal(true)}
                 disabled={projectUpgradeDisabled}
               >
