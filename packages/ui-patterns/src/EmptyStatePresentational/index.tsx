@@ -6,7 +6,7 @@ import { cn } from 'ui'
 
 export interface EmptyStatePresentationalProps {
   icon?: LucideIcon | ReactNode
-  title: string
+  title: string | ReactNode
   description?: string | ReactNode
   children?: ReactNode
   className?: string
