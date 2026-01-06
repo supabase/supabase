@@ -36,6 +36,14 @@ export const dataset: AssistantEvalCase[] = [
     metadata: { category: ['sql_generation', 'database_optimization'] },
   },
   {
+    input: 'How many projects are included in the free tier?',
+    expected: {
+      requiredTools: ['search_docs'],
+      correctAnswer: '2',
+    },
+    metadata: { category: ['general_help'] },
+  },
+  {
     input: 'Restore my Supabase Storage files to the state from 3 days ago',
     expected: {
       requiredTools: ['search_docs'],
@@ -45,10 +53,10 @@ export const dataset: AssistantEvalCase[] = [
     metadata: { category: ['general_help'] },
   },
   {
-    input: 'How many projects are included in the free tier?',
+    input: 'How do I enable S3 versioning in Supabase Storage?',
     expected: {
       requiredTools: ['search_docs'],
-      correctAnswer: '2',
+      correctAnswer: 'S3 versioning is not supported in Supabase Storage.',
     },
     metadata: { category: ['general_help'] },
   },
