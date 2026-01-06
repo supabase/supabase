@@ -18,36 +18,26 @@ describe('FilterBar Hooks', () => {
 
       expect(result.current.isLoading).toBe(false)
       expect(result.current.error).toBeNull()
-      expect(result.current.selectedCommandIndex).toBe(0)
       expect(result.current.isCommandMenuVisible).toBe(false)
       expect(result.current.activeInput).toBeNull()
-      expect(result.current.dialogContent).toBeNull()
-      expect(result.current.isDialogOpen).toBe(false)
-      expect(result.current.pendingPath).toBeNull()
+      expect(result.current.hideTimeoutRef.current).toBeNull()
+      expect(result.current.newPathRef.current).toEqual([])
     })
 
-    it('resets state when resetState is called', () => {
+    it('updates state correctly', () => {
       const { result } = renderHook(() => useFilterBarState())
 
       act(() => {
         result.current.setIsLoading(true)
         result.current.setError('Test error')
-        result.current.setSelectedCommandIndex(5)
         result.current.setIsCommandMenuVisible(true)
         result.current.setActiveInput({ type: 'value', path: [0] })
-        result.current.setIsDialogOpen(true)
       })
 
-      act(() => {
-        result.current.resetState()
-      })
-
-      expect(result.current.isLoading).toBe(true) // Loading state is not reset
-      expect(result.current.error).toBeNull()
-      expect(result.current.selectedCommandIndex).toBe(0)
-      expect(result.current.isCommandMenuVisible).toBe(false)
-      expect(result.current.activeInput).toBeNull()
-      expect(result.current.isDialogOpen).toBe(false)
+      expect(result.current.isLoading).toBe(true)
+      expect(result.current.error).toBe('Test error')
+      expect(result.current.isCommandMenuVisible).toBe(true)
+      expect(result.current.activeInput).toEqual({ type: 'value', path: [0] })
     })
   })
 
