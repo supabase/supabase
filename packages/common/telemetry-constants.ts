@@ -2712,6 +2712,18 @@ export interface IntegrationUninstalledEvent {
 }
 
 /**
+ * User clicked the enable Create rls_ensure trigger button in the RLS Event Trigger banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/auth/policies
+ */
+export interface RlsEventTriggerBannerCreateButtonClickedEvent {
+  action: 'rls_event_trigger_banner_create_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2862,3 +2874,4 @@ export type TelemetryEvent =
   | IntegrationUninstallStartedEvent
   | IntegrationInstallFailedEvent
   | IntegrationUninstalledEvent
+  | RlsEventTriggerBannerCreateButtonClickedEvent
