@@ -3555,7 +3555,7 @@ export interface paths {
     put?: never
     /**
      * Rollback pipeline tables
-     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table or all tables with manual retry errors. Requires bearer auth and an active, healthy project.
+     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
      */
     post: operations['ReplicationPipelinesController_rollbackTables']
     delete?: never
@@ -6965,11 +6965,14 @@ export interface components {
           /** @enum {string} */
           key:
             | 'instances.compute_update_available_sizes'
+            | 'instances.read_replicas'
+            | 'replication.etl'
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
             | 'security.private_link'
+            | 'security.enforce_mfa'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
@@ -6980,8 +6983,14 @@ export interface components {
             | 'branching_persistent'
             | 'auth.mfa_phone'
             | 'auth.mfa_web_authn'
+            | 'auth.mfa_enhanced_security'
             | 'auth.hooks'
             | 'auth.platform.sso'
+            | 'auth.custom_jwt_template'
+            | 'auth.saml_2'
+            | 'auth.user_sessions'
+            | 'auth.leaked_password_protection'
+            | 'auth.advanced_auth_settings'
             | 'backup.retention_days'
             | 'function.max_count'
             | 'function.size_limit_mb'
@@ -6992,6 +7001,10 @@ export interface components {
             | 'realtime.max_bytes_per_second'
             | 'realtime.max_presence_events_per_second'
             | 'realtime.max_payload_size_in_kb'
+            | 'project_scoped_roles'
+            | 'security.member_roles'
+            | 'project_pausing'
+            | 'project_cloning'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7894,14 +7907,14 @@ export interface components {
         | 'billing:payment_methods'
         | 'realtime:all'
       )[]
-      first_name: string
-      free_project_limit: number
+      first_name: string | null
+      free_project_limit: number | null
       gotrue_id: string
       id: number
       is_alpha_user: boolean
       is_sso_user: boolean
-      last_name: string
-      mobile: string
+      last_name: string | null
+      mobile: string | null
       primary_email: string
       username: string
     }
@@ -14634,7 +14647,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description MFA enfocement state on organization. */
+      /** @description MFA enforcement state on organization. */
       201: {
         headers: {
           [name: string]: unknown
@@ -14689,7 +14702,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description MFA enfocement state on organization updated successfully. */
+      /** @description MFA enforcement state on organization updated successfully. */
       201: {
         headers: {
           [name: string]: unknown
