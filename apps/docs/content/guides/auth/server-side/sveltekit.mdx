@@ -1,0 +1,139 @@
+---
+
+title: SvelteKit SSR Authentication
+description: Use Supabase Auth with OAuth in SvelteKit using server-side rendering.
+-----------------------------------------------------------------------------------
+
+## Overview
+
+This guide shows how to use Supabase Auth with OAuth providers (such as GitHub or Google) in a SvelteKit application using server-side rendering (SSR).
+
+It covers:
+
+* Starting an OAuth sign-in flow
+* Handling the OAuth callback
+* Persisting the session using cookies
+* Accessing the authenticated user on the server
+
+This approach is recommended for SvelteKit apps that rely on SSR and need consistent authentication across server and client.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+* A Supabase project
+* A SvelteKit app (`@sveltejs/kit`)
+* An OAuth provider configured in the Supabase dashboard
+* The `@supabase/ssr` package installed
+
+```bash
+npm install @supabase/ssr @supabase/supabase-js
+```
+
+## Creating a Supabase client for SSR
+
+Create a helper to initialize the Supabase client using cookies. This ensures the session is available during server-side rendering.
+
+```ts
+// src/lib/server/supabase.ts
+import { createServerClient } from '@supabase/ssr'
+import { env } from '$env/dynamic/private'
+import type { Cookies } from '@sveltejs/kit'
+
+export function createSupabaseServerClient(cookies: Cookies) {
+  return createServerClient(
+    env.PUBLIC_SUPABASE_URL,
+    env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return cookies.get(name)
+        },
+        set(name, value, options) {
+          cookies.set(name, value, options)
+        },
+        remove(name, options) {
+          cookies.delete(name, options)
+        },
+      },
+    }
+  )
+}
+```
+
+## Starting an OAuth sign-in
+
+Create a server action to start the OAuth flow.
+
+```ts
+// src/routes/login/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export const actions = {
+  default: async ({ cookies }) => {
+    const supabase = createSupabaseServerClient(cookies)
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: 'http://localhost:5173/auth/callback',
+      },
+    })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    throw redirect(303, data.url)
+  },
+}
+```
+
+## Handling the OAuth callback
+
+Supabase redirects back to your app after authentication. Handle this in a server route to exchange the code and persist the session.
+
+```ts
+// src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export async function GET({ url, cookies }) {
+  const code = url.searchParams.get('code')
+
+  if (code) {
+    const supabase = createSupabaseServerClient(cookies)
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  throw redirect(303, '/')
+}
+```
+
+## Accessing the session on the server
+
+Once authenticated, you can access the current user during server-side rendering.
+
+```ts
+// src/routes/+layout.server.ts
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export async function load({ cookies }) {
+  const supabase = createSupabaseServerClient(cookies)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  return {
+    user,
+  }
+}
+```
+
+## Notes and considerations
+
+* OAuth redirect URLs must match the callback URL configured in the Supabase dashboard.
+* Cookies are required for session persistence during SSR.
+* This setup avoids relying on client-only authentication helpers.
+* Error and metadata behavior may differ from controller-based frameworks.
