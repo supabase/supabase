@@ -1556,7 +1556,7 @@ export interface paths {
      * Gets all projects for the given organization
      * @description Returns a paginated list of projects for the specified organization.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
@@ -2048,7 +2048,7 @@ export interface paths {
      * Gets all projects that belong to the authenticated user
      * @description Returns a paginated list of projects across all organizations the user has access to.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['ProjectsController_getProjects']
     put?: never
@@ -4582,7 +4582,6 @@ export interface components {
       }
       pitr_enabled: boolean
       region: string
-      tierKey: string
       walg_enabled: boolean
     }
     BillingCustomerUpdateBody: {
@@ -5399,7 +5398,10 @@ export interface components {
       name: string
       organization_slugs?: string[]
       permissions: (
+<<<<<<< Updated upstream
         | 'available_regions_read'
+=======
+>>>>>>> Stashed changes
         | 'organizations_read'
         | 'organizations_create'
         | 'projects_read'
@@ -5811,7 +5813,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
-            throughput_mbps: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
+            throughput_mbps?: number
+            throughput_mibps?: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -5827,7 +5834,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
             throughput_mbps: number
+            throughput_mibps: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -5842,7 +5854,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
             throughput_mbps: number
+            throughput_mibps: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -6328,7 +6345,6 @@ export interface components {
       /** @enum {string} */
       billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
-      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance?: number
@@ -6935,6 +6951,8 @@ export interface components {
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
+            | 'security.soc2_report'
+            | 'security.private_link'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
@@ -6948,6 +6966,16 @@ export interface components {
             | 'auth.hooks'
             | 'auth.platform.sso'
             | 'backup.retention_days'
+            | 'function.max_count'
+            | 'function.size_limit_mb'
+            | 'realtime.max_concurrent_users'
+            | 'realtime.max_events_per_second'
+            | 'realtime.max_joins_per_second'
+            | 'realtime.max_channels_per_client'
+            | 'realtime.max_bytes_per_second'
+            | 'realtime.max_presence_events_per_second'
+            | 'realtime.max_payload_size_in_kb'
+            | 'project_scoped_roles'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
