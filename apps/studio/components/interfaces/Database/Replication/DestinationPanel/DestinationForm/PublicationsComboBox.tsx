@@ -1,7 +1,9 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
+import type { ReplicationPublication } from 'data/replication/publications-query'
 import {
+  Badge,
   Button,
   cn,
   Command_Shadcn_,
@@ -18,7 +20,7 @@ import {
 } from 'ui'
 
 interface PublicationsComboBoxProps {
-  publications: string[]
+  publications: ReplicationPublication[]
   isLoadingPublications: boolean
   onNewPublicationClick: () => void
   field: ControllerRenderProps<any, 'publicationName'>
@@ -104,19 +106,27 @@ export const PublicationsComboBox = ({
               <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
                 {publications.map((pub) => (
                   <CommandItem_Shadcn_
-                    key={pub}
+                    key={pub.name}
                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                     onSelect={() => {
-                      handlePublicationSelect(pub)
+                      handlePublicationSelect(pub.name)
                     }}
                     onClick={() => {
-                      handlePublicationSelect(pub)
+                      handlePublicationSelect(pub.name)
                     }}
                   >
-                    <span>{pub}</span>
-                    {selectedPublication === pub && (
-                      <Check className="text-brand" strokeWidth={2} size={13} />
-                    )}
+                    <span>{pub.name}</span>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="rounded-full px-2 py-0.5 text-[10px] font-normal border border-border bg-surface-100"
+                      >
+                        {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
+                      </Badge>
+                      {selectedPublication === pub.name && (
+                        <Check className="text-brand" strokeWidth={2} size={13} />
+                      )}
+                    </div>
                   </CommandItem_Shadcn_>
                 ))}
               </ScrollArea>

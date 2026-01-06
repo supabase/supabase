@@ -47,7 +47,7 @@ export const PublicationSelection = ({
         >
           <FormControl_Shadcn_>
             <PublicationsComboBox
-              publications={publicationNames}
+              publications={publications}
               isLoadingPublications={isLoadingPublications}
               field={field}
               onNewPublicationClick={() => onSelectNewPublication()}
