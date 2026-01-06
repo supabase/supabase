@@ -43,16 +43,14 @@ const StorageVectorsPage: NextPageWithLayout = () => {
             />
             <EmptyStatePresentational
               icon={VectorBucket}
-              title="Vector buckets are currently not available in your project's region"
+              title="Coming soon to your project's region"
               description={
                 <p>
-                  Buckets are only available for{' '}
+                  Vector buckets are currently only available for projects created in{' '}
                   <Tooltip>
-                    <TooltipTrigger className={InlineLinkClassName}>
-                      {AVAILABLE_REGIONS.length} regions
-                    </TooltipTrigger>
+                    <TooltipTrigger className={InlineLinkClassName}>some regions</TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <ul className="list-disc pl-4">
+                      <ul>
                         {AVAILABLE_REGIONS.map((x) => {
                           const region = Object.values(AWS_REGIONS).find(
                             (y) => y.code === x
