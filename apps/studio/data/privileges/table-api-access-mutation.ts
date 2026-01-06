@@ -7,6 +7,7 @@ import {
   API_PRIVILEGE_TYPES,
   type ApiPrivilegesByRole,
 } from '@/lib/data-api-types'
+import type { DeepReadonly } from '@/lib/type-helpers'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { UseCustomMutationOptions } from 'types'
 import type { ConnectionVars } from '../common.types'
@@ -14,7 +15,7 @@ import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number
-  privileges: ApiPrivilegesByRole
+  privileges: DeepReadonly<ApiPrivilegesByRole>
 }
 
 export async function updateTableApiAccessPrivileges({
