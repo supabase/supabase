@@ -11,9 +11,11 @@ export const ToastErrorTracker = () => {
     toasts.forEach((toast) => {
       if (toast.type === 'error' && !trackRef.current.has(toast.id)) {
         trackRef.current.add(toast.id)
-        track('dashboard_error_created', {
-          source: 'toast',
-        })
+        if (Math.random() < 0.1) {
+          track('dashboard_error_created', {
+            source: 'toast',
+          })
+        }
       }
     })
   }, [toasts, track])
