@@ -50,6 +50,7 @@ export const RestartTableDialog = ({
 
   const handleReset = () => {
     if (!projectRef) return toast.error('Project ref is required')
+    if (!_pipelineId) return toast.error('Pipeline ID is required')
 
     onRestartStart?.()
     rollbackTables({
