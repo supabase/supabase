@@ -1,7 +1,7 @@
 ---
 
-title: SvelteKit SSR Authentication
-description: Use Supabase Auth with OAuth in SvelteKit using server-side rendering.
+Title: SvelteKit SSR Authentication
+Description: Use Supabase Auth with OAuth in SvelteKit using server-side rendering.
 -----------------------------------------------------------------------------------
 
 ## Overview
@@ -37,7 +37,7 @@ Create a helper to initialize the Supabase client using cookies. This ensures th
 ```ts
 // src/lib/server/supabase.ts
 import { createServerClient } from '@supabase/ssr'
-import { env } from '$env/dynamic/private'
+import { env } from '$env/dynamic/public'
 import type { Cookies } from '@sveltejs/kit'
 
 export function createSupabaseServerClient(cookies: Cookies) {
@@ -68,6 +68,7 @@ Create a server action to start the OAuth flow.
 ```ts
 // src/routes/login/+page.server.ts
 import { redirect } from '@sveltejs/kit'
+import { env } from '$env/dynamic/public'
 import { createSupabaseServerClient } from '$lib/server/supabase'
 
 export const actions = {
@@ -77,7 +78,7 @@ export const actions = {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${process.env.PUBLIC_SITE_URL}/auth/callback`,
+        redirectTo: `${env.PUBLIC_SITE_URL}/auth/callback`,
       },
     })
 
@@ -96,15 +97,21 @@ Supabase redirects back to your app after authentication. Handle this in a serve
 
 ```ts
 // src/routes/auth/callback/+server.ts
-import { redirect } from '@sveltejs/kit'
+import { redirect, error as kitError } from '@sveltejs/kit'
 import { createSupabaseServerClient } from '$lib/server/supabase'
 
 export async function GET({ url, cookies }) {
   const code = url.searchParams.get('code')
 
-  if (code) {
-    const supabase = createSupabaseServerClient(cookies)
-    await supabase.auth.exchangeCodeForSession(code)
+  if (!code) {
+    throw kitError(400, 'Missing OAuth code')
+  }
+
+  const supabase = createSupabaseServerClient(cookies)
+  const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+  if (error) {
+    throw kitError(401, 'Authentication failed')
   }
 
   throw redirect(303, '/')
@@ -135,6 +142,7 @@ export async function load({ cookies }) {
 
 * OAuth redirect URLs must match the callback URL configured in the Supabase dashboard.
 * Use an environment variable (for example, `PUBLIC_SITE_URL`) for OAuth redirect URLs so they can differ between development and production.
+* `PUBLIC_*` environment variables should be imported from `$env/dynamic/public` in SvelteKit.
 * Cookies are required for session persistence during SSR.
 * This setup avoids relying on client-only authentication helpers.
 * Error and metadata behavior may differ from controller-based frameworks.
