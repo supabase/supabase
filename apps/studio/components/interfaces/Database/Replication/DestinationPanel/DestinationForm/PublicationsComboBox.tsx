@@ -1,6 +1,7 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
+
 import type { ReplicationPublication } from 'data/replication/publications-query'
 import {
   Badge,
@@ -118,7 +119,7 @@ export const PublicationsComboBox = ({
                     <span>{pub.name}</span>
                     <div className="flex items-center gap-2">
                       <Badge
-                        variant="outline"
+                        variant="default"
                         className="rounded-full px-2 py-0.5 text-[10px] font-normal border border-border bg-surface-100"
                       >
                         {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
