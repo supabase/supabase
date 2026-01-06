@@ -1,96 +1,159 @@
 ---
 id: 'auth'
-title: 'Integrating With Supabase Auth'
+title: 'Securing Edge Functions'
 description: 'Supabase Edge Functions and Auth.'
-subtitle: 'Integrate Supabase Auth with Edge Functions'
+subtitle: 'Best practices on securing Edge Functions'
 ---
-
-Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth).
-
-This allows you to:
-
-- Automatically identify users through JWT tokens
-- Enforce Row Level Security policies
-- Seamlessly integrate with your existing auth flow
-
----
-
-## Setting up auth context
-
-When a user makes a request to an Edge Function, you can use the `Authorization` header to set the Auth context in the Supabase client and enforce Row Level Security policies.
-
-```js
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
-Deno.serve(async (req: Request) => {
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    // Create client with Auth context of the user that called the function.
-    // This way your row-level-security (RLS) policies are applied.
-    {
-      global: {
-        headers: { Authorization: req.headers.get('Authorization')! },
-      },
-    }
-  );
-
-  //...
-})
-```
 
 <Admonition type="note">
 
-Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the `Authorization` header is set for each individual request!
+In the past Supabase Auth used a **symmetric** secret to sign legacy JWTs.
+But it was replaced by new [JWT Signing Keys](/blog/jwt-signing-keys#start-using-asymmetric-jwts-today). This guide covers the new patterns for securing your Edge Functions.
+
+If you need to validate using the old method, read the [Legacy JWT Secret guide](/docs/guides/functions/auth-legacy-jwt).
 
 </Admonition>
 
----
+Before continuing, read the [JWT Signing Keys guide](/docs/guides/auth/signing-keys) for details about the main differences compared to Legacy JWTs.
 
-## Fetching the user
+## Overview
 
-By getting the JWT from the `Authorization` header, you can provide the token to `getUser()` to fetch the user object to obtain metadata for the logged in user.
+When an HTTP request is sent to Edge Functions, you can use Supabase Auth to secure endpoints. In the past, this verification was controlled by the [`verify_jwt` flag](/docs/guides/functions/function-configuration#skipping-authorization-checks).
 
-```js
-Deno.serve(async (req: Request) => {
-  // ...
-  const authHeader = req.headers.get('Authorization')!
-  const token = authHeader.replace('Bearer ', '')
-  const { data } = await supabaseClient.auth.getUser(token)
-  // ...
-})
+But, this method is incompatible with the new [JWT Signing Keys](/docs/guides/auth/signing-keys) and also caused trouble when attempting [third-party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
+
+For this reason we decided to no longer implicitly force JWT verification, but instead suggest patterns and templates to handle this task. This allows users to own and control the auth code, instead of hiding it internally under Edge Runtime infrastructure.
+
+<Admonition type="caution">
+
+Following the [upcoming API key changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will still be supported and enabled by default. To move to the new [JWT Signing Keys](/docs/guides/auth/signing-keys), you need to manually [skip the authorization checks](/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps below.
+
+</Admonition>
+
+## Verifying JWT
+
+### Using Supabase template
+
+You can see [a custom JWT verification example on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) and a variety of [auth function templates](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt) also on GitHub.
+
+To verify incoming requests, you can download the specified template and start using it:
+
+```bash
+curl -O https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/default.ts
 ```
 
----
+```ts
+import { AuthMiddleware } from '../_shared/jwt/default.ts'
 
-## Row Level Security
+Deno.serve((r) =>
+  AuthMiddleware(r, async (req) => {
+    const { name } = await req.json()
 
-After initializing a Supabase client with the Auth context, all queries will be executed with the context of the user. For database queries, this means [Row Level Security](/docs/guides/database/postgres/row-level-security) will be enforced.
+    return Response.json({ message: `hello ${name}` })
+  })
+)
+```
 
-```js
+### Integrating with Supabase Auth
+
+You can also use the Supabase Auth to verify users
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
+
+<Admonition type="caution">
+
+Currently, the new API keys are not available by default on the Edge Functions environment.
+But you can manually expose them as [secret](/docs/guides/functions/secrets#local-secrets) using the `SB_` prefix.
+
+We're working on exposing these secrets and making them default in the future.
+
+</Admonition>
+
+```ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-Deno.serve(async (req: Request) => {
-  // ...
-  // This query respects RLS - users only see rows they have access to
-  const { data, error } = await supabaseClient.from('profiles').select('*');
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SB_PUBLISHABLE_KEY')!)
 
-  if (error) {
-    return new Response('Database error', { status: 500 })
+Deno.serve(async (req) => {
+  const authHeader = req.headers.get('Authorization')!
+  const token = authHeader.replace('Bearer ', '')
+
+  const { data, error } = await supabase.auth.getClaims(token)
+  const userEmail = data?.claims?.email
+  if (!userEmail || error) {
+    return Response.json(
+      { msg: 'Invalid JWT' },
+      {
+        status: 401,
+      }
+    )
   }
 
-  // ...
+  return Response.json({ message: `hello ${userEmail}` })
 })
 ```
 
----
+### Using JWT library
 
-## Example
+You can use the popular [`jose`](https://www.npmjs.com/package/jose/v/4.10.0) library can be used to verify received JWTs, like the following example:
 
-See the full [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts).
+```ts
+import { createRemoteJWKSet, jwtVerify } from 'https://deno.land/x/jose@v4.14.4/index.ts'
 
-<$CodeSample
-path="/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts"
-title="Select from table with auth RLS"
-language="typescript"
-/>
+// While developing you may populate the 'SB_JWT_ISSUER' to match the same issuer from your local environment
+// The issuer can also be customised from [auth.jwt_issuer] property
+const SUPABASE_JWT_ISSUER =
+  Deno.env.get('SB_JWT_ISSUER') ?? Deno.env.get('SUPABASE_URL') + '/auth/v1'
+
+const SUPABASE_JWT_KEYS = createRemoteJWKSet(
+  new URL(Deno.env.get('SUPABASE_URL')! + '/auth/v1/.well-known/jwks.json')
+)
+
+function getAuthToken(req: Request) {
+  const authHeader = req.headers.get('authorization')
+  if (!authHeader) {
+    throw new Error('Missing authorization header')
+  }
+  const [bearer, token] = authHeader.split(' ')
+  if (bearer !== 'Bearer') {
+    throw new Error(`Auth header is not 'Bearer {token}'`)
+  }
+  return token
+}
+
+function verifySupabaseJWT(jwt: string) {
+  return jwtVerify(jwt, SUPABASE_JWT_KEYS, {
+    issuer: SUPABASE_JWT_ISSUER,
+  })
+}
+
+Deno.serve(async (req: Request) => {
+  if (req.method !== 'OPTIONS') {
+    try {
+      const token = getAuthToken(req)
+      const isValidJWT = await verifySupabaseJWT(token)
+
+      if (!isValidJWT) {
+        return Response.json(
+          { msg: 'Invalid JWT' },
+          {
+            status: 401,
+          }
+        )
+      }
+    } catch (e) {
+      console.error(e)
+      return Response.json(
+        { msg: e.toString() },
+        {
+          status: 401,
+        }
+      )
+    }
+  }
+
+  const { name } = await req.json()
+  return Response.json({ message: `hello ${name}` })
+})
+```
