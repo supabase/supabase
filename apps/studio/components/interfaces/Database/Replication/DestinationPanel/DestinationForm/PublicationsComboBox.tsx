@@ -20,7 +20,6 @@ import {
 interface PublicationsComboBoxProps {
   publications: string[]
   isLoadingPublications: boolean
-  isLoadingCheck: boolean
   onNewPublicationClick: () => void
   field: ControllerRenderProps<any, 'publicationName'>
 }
@@ -28,7 +27,6 @@ interface PublicationsComboBoxProps {
 export const PublicationsComboBox = ({
   publications,
   isLoadingPublications,
-  isLoadingCheck,
   onNewPublicationClick,
   field,
 }: PublicationsComboBoxProps) => {
@@ -66,11 +64,7 @@ export const PublicationsComboBox = ({
             !selectedPublication && 'text-foreground-muted'
           )}
           iconRight={
-            isLoadingCheck ? (
-              <Loader2 className="animate-spin" size={14} />
-            ) : (
-              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-            )
+            <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
           }
           name={field.name}
           onBlur={field.onBlur}
@@ -86,6 +80,11 @@ export const PublicationsComboBox = ({
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
+          <div className="px-2 pt-2 pb-1">
+            <p className="text-xs text-foreground-lighter">
+              Publications with no tables are hidden
+            </p>
+          </div>
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>
               {isLoadingPublications ? (

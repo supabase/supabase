@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -10,7 +10,6 @@ import { useFlag, useParams } from 'common'
 import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import {
   BatchConfig,
   BigQueryDestinationConfig,
@@ -44,6 +43,13 @@ import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
+import { ValidationFailuresSection } from './ValidationFailuresSection'
+import { ValidationOverlay } from './ValidationOverlay'
+import {
+  useValidateDestinationMutation,
+  type ValidationFailure,
+} from 'data/replication/validate-destination-mutation'
+import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 
 const formId = 'destination-editor'
 
@@ -81,6 +87,15 @@ export const DestinationForm = ({
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
+  const [hasRunValidation, setHasRunValidation] = useState(false)
+  const [destinationValidationFailures, setDestinationValidationFailures] = useState<
+    ValidationFailure[]
+  >([])
+  const [pipelineValidationFailures, setPipelineValidationFailures] = useState<ValidationFailure[]>(
+    []
+  )
+
+  const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
 
@@ -141,6 +156,14 @@ export const DestinationForm = ({
   const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
     useIcebergNamespaceCreateMutation()
 
+  const { mutateAsync: validateDestination, isPending: isValidatingDestination } =
+    useValidateDestinationMutation()
+
+  const { mutateAsync: validatePipeline, isPending: isValidatingPipeline } =
+    useValidatePipelineMutation()
+
+  const isValidating = isValidatingDestination || isValidatingPipeline
+
   const defaultValues = useMemo(() => {
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
@@ -150,12 +173,12 @@ export const DestinationForm = ({
       // Common fields
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
-      maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10000, // Default: 10 seconds
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
       serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
-      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined,
+      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
       // Analytics Bucket fields
       warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
       namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
@@ -221,17 +244,50 @@ export const DestinationForm = ({
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
-  const selectedPublication = publications.find((pub) => pub.name === publicationName)
 
-  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      tables: selectedPublication?.tables ?? [],
-    },
-    { enabled: visible && !!selectedPublication }
-  )
-  const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
+  // Helper function to build destination config for validation
+  const buildDestinationConfigForValidation = (data: z.infer<typeof FormSchema>) => {
+    if (!projectRef) throw new Error('Project ref is required')
+
+    if (selectedType === 'BigQuery') {
+      return {
+        bigQuery: {
+          projectId: data.projectId ?? '',
+          datasetId: data.datasetId ?? '',
+          serviceAccountKey: data.serviceAccountKey ?? '',
+          ...(data.maxStalenessMins !== undefined
+            ? { maxStalenessMins: data.maxStalenessMins }
+            : {}),
+        },
+      }
+    } else if (selectedType === 'Analytics Bucket') {
+      // For validation, use the namespace as-is (even if it's CREATE_NEW_NAMESPACE)
+      // The actual creation will happen later in submitPipeline
+      const validationNamespace =
+        data.namespace === CREATE_NEW_NAMESPACE ? data.newNamespaceName : data.namespace
+
+      // For validation purposes, if CREATE_NEW_KEY is selected, we skip S3 key validation
+      // The actual key creation will happen later in submitPipeline
+      // We'll use placeholder values for validation
+      const s3Keys =
+        data.s3AccessKeyId === CREATE_NEW_KEY
+          ? { accessKey: 'placeholder', secretKey: 'placeholder' }
+          : { accessKey: data.s3AccessKeyId ?? '', secretKey: data.s3SecretAccessKey ?? '' }
+
+      return {
+        iceberg: {
+          projectRef: projectRef,
+          warehouseName: data.warehouseName ?? '',
+          namespace: validationNamespace,
+          catalogToken: data.catalogToken ?? '',
+          s3AccessKeyId: s3Keys.accessKey,
+          s3SecretAccessKey: s3Keys.secretKey,
+          s3Region: data.s3Region ?? '',
+        },
+      }
+    }
+    throw new Error('Invalid destination type')
+  }
 
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
@@ -247,6 +303,68 @@ export const DestinationForm = ({
       return data.newNamespaceName
     }
     return data.namespace
+  }
+
+  // Helper function to validate configuration
+  const validateConfiguration = async (data: z.infer<typeof FormSchema>) => {
+    if (!projectRef || !sourceId) return false
+
+    setHasRunValidation(true)
+
+    // Call both validation endpoints in parallel and wait for both to complete
+    // even if one fails - this makes the validation feel like a single operation
+    const results = await Promise.allSettled([
+      validateDestination({
+        projectRef,
+        destinationConfig: buildDestinationConfigForValidation(data),
+      }),
+      validatePipeline({
+        projectRef,
+        sourceId,
+        publicationName: data.publicationName,
+        maxFillMs: data.maxFillMs,
+      }),
+    ])
+
+    // Extract results from settled promises
+    const destResult = results[0]
+    const pipelineResult = results[1]
+
+    // Check if any validation request failed completely
+    const hasRequestError = results.some((r) => r.status === 'rejected')
+
+    if (hasRequestError) {
+      // If any request failed, show a generic error and stop
+      toast.error('Failed to validate configuration. Please try again.')
+      setHasRunValidation(false)
+      return false
+    }
+
+    // Both requests succeeded, extract validation failures
+    const destValidationResult =
+      destResult.status === 'fulfilled' ? destResult.value : { validation_failures: [] }
+    const pipelineValidationResult =
+      pipelineResult.status === 'fulfilled' ? pipelineResult.value : { validation_failures: [] }
+
+    setDestinationValidationFailures(destValidationResult.validation_failures)
+    setPipelineValidationFailures(pipelineValidationResult.validation_failures)
+
+    // Check if there are critical failures or warnings
+    const allFailures = [
+      ...destValidationResult.validation_failures,
+      ...pipelineValidationResult.validation_failures,
+    ]
+    const hasCriticalFailures = allFailures.some((f) => f.failure_type === 'critical')
+    const hasAnyFailures = allFailures.length > 0
+
+    // Scroll to validation section if there are any failures
+    if (hasAnyFailures) {
+      setTimeout(() => {
+        validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+
+    return !hasCriticalFailures
   }
 
   // [Joshen] I reckon this function can be refactored to be a bit more modular, it's currently pretty
@@ -409,22 +527,70 @@ export const DestinationForm = ({
     }
   }
 
+  const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
+  const hasCriticalValidationFailures = allValidationFailures.some(
+    (f) => f.failure_type === 'critical'
+  )
+  const hasValidationWarnings = allValidationFailures.some((f) => f.failure_type === 'warning')
+
   const isSaving =
     creatingDestinationPipeline ||
     updatingDestinationPipeline ||
     startingPipeline ||
     isCreatingS3AccessKey ||
-    isCreatingNamespace
+    isCreatingNamespace ||
+    isValidating
 
   const isSubmitDisabled =
     isSaving ||
     isSelectedPublicationMissing ||
-    (!!selectedPublication && isLoadingCheck) ||
-    hasTablesWithNoPrimaryKeys ||
     (!editMode && hasNoAvailableDestinations)
+
+  // Compute submit button text
+  const getSubmitButtonText = () => {
+    if (editMode) {
+      return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
+    }
+
+    if (!hasRunValidation) {
+      return 'Validate and continue'
+    }
+
+    if (hasCriticalValidationFailures) {
+      return 'Validate again'
+    }
+
+    if (hasValidationWarnings) {
+      return 'Continue anyway'
+    }
+
+    // After successful validation with no issues, show "Continue"
+    return 'Continue'
+  }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!editMode) {
+      // For new pipelines, validate configuration first if not already validated
+      // OR if user has critical failures and clicks "Validate again"
+      if (!hasRunValidation || isValidating || hasCriticalValidationFailures) {
+        const isValid = await validateConfiguration(data)
+        if (!isValid) {
+          // Validation failed with critical errors, show inline and stop
+          return
+        }
+        // Validation passed or only has warnings, continue to disclaimer
+      }
+
+      // Check if there are critical failures before proceeding
+      const allFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
+      const hasCriticalFailures = allFailures.some((f) => f.failure_type === 'critical')
+
+      if (hasCriticalFailures) {
+        // Don't proceed if there are critical failures
+        return
+      }
+
+      // Validation passed or only warnings, proceed to disclaimer
       setPendingFormValues(data)
       setShowDisclaimerDialog(true)
       return
@@ -460,6 +626,9 @@ export const DestinationForm = ({
     if (visible) {
       form.reset(defaultValues)
       setIsFormInteracting(false)
+      setHasRunValidation(false)
+      setDestinationValidationFailures([])
+      setPipelineValidationFailures([])
     }
   }, [visible, defaultValues, form])
 
@@ -471,6 +640,8 @@ export const DestinationForm = ({
 
   return (
     <>
+      <ValidationOverlay isVisible={!editMode && isValidating} destinationType={selectedType} />
+
       <SheetSection className="flex-grow overflow-auto px-0 py-0">
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
@@ -506,6 +677,20 @@ export const DestinationForm = ({
               <DialogSectionSeparator />
 
               <AdvancedSettings type={selectedType} form={form} />
+
+              {!editMode && hasRunValidation && !isValidating && (
+                <>
+                  <DialogSectionSeparator />
+
+                  <div ref={validationSectionRef} className="p-5">
+                    <ValidationFailuresSection
+                      isValidating={false}
+                      destinationFailures={destinationValidationFailures}
+                      pipelineFailures={pipelineValidationFailures}
+                    />
+                  </div>
+                </>
+              )}
             </form>
           </Form_Shadcn_>
         )}
@@ -516,11 +701,7 @@ export const DestinationForm = ({
           Cancel
         </Button>
         <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
-          {editMode
-            ? existingDestination?.enabled
-              ? 'Apply and restart'
-              : 'Apply and start'
-            : 'Create and start'}
+          {getSubmitButtonText()}
         </Button>
       </SheetFooter>
 

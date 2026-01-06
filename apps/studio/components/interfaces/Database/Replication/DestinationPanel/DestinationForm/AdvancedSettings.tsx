@@ -57,7 +57,7 @@ export const AdvancedSettings = ({
                       type="number"
                       value={field.value ?? ''}
                       onChange={handleNumberChange(field)}
-                      placeholder="e.g., 5000 (5 seconds)"
+                      placeholder="Default: 10000 (10 seconds)"
                     />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -78,7 +78,7 @@ export const AdvancedSettings = ({
                       </div>
                     }
                     layout="horizontal"
-                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs."
+                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs. Leave empty for no staleness limit."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -86,7 +86,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="e.g. 60 (1 hour)"
+                        placeholder="Default: none"
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
