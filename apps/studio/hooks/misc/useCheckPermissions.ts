@@ -188,3 +188,6 @@ export function useAsyncCheckPermissions(
 
   return { isLoading, isSuccess, can }
 }
+
+// Backward-compatible export alias for SSR builds
+export const useAsyncCheckProjectPermissions = useAsyncCheckPermissions
