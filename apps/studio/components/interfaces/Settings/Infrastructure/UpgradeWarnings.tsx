@@ -128,8 +128,8 @@ const ValidationErrorItem = ({
 
   return (
     <li className="py-3 last:pb-0 flex flex-row justify-between items-center">
-      <div className="flex flex-col gap-0 flex-1 min-w-0">
-        <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-col gap-y-1 flex-1 min-w-0">
+        <div className="flex flex-row gap-x-2 items-center">
           <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
             {title}
           </h6>
@@ -139,7 +139,7 @@ const ValidationErrorItem = ({
             </Badge>
           )}
         </div>
-        <p className="text-foreground-lighter text-xs">{description}</p>
+        <p className="text-foreground-lighter text-xs mt-1">{description}</p>
       </div>
       {manageLink && (
         <Button size="tiny" type="default" asChild>
