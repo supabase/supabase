@@ -694,7 +694,7 @@ Use this option if you are running Supabase locally via the Supabase CLI or a lo
 
 #### 1) Enable image transformations in `supabase/config.toml`
 
-`supabase/config.toml` is used by the Supabase CLI to configure your local stack (Auth, Storage, Studio, etc.). For the full config reference, see `/docs/guides/local-development/cli/config`.
+`supabase/config.toml` is used by the Supabase CLI to configure your local stack (Auth, Storage, Studio, etc.). For more details, see `/docs/guides/local-development/managing-config`.
 
 Enable image transformations in your local config:
 
@@ -721,11 +721,13 @@ If you are using Supabase’s Docker stack, imgproxy includes a built-in health 
 
 #### 4) Verify end-to-end with a transformed image URL
 
-Hit the `/render/image` route with a simple transformation, for example:
+Hit the `/render/image` route with a simple transformation. In local development, Storage is served via your local API URL (default: `http://localhost:54321`).
 
 ```text
-https://<project-ref>.supabase.co/storage/v1/render/image/public/<bucket>/<path-to-image>?width=200
+http://localhost:54321/storage/v1/render/image/public/<bucket>/<path-to-image>?width=200
 ```
+
+If your local ports differ, run `supabase status` and use the API URL it prints.
 
 ### Option 2: Production self-hosting (your infrastructure)
 
