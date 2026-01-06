@@ -2046,9 +2046,9 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Whether RLS was enabled on the table
      */
@@ -2058,7 +2058,7 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     has_rls_policies: boolean
     /**
-     * Whether AI-generated policies were used (only possible in treatment)
+     * Whether AI-generated policies were used (only possible in variation)
      */
     has_generated_policies: boolean
   }
@@ -2080,9 +2080,9 @@ export interface TableCreateGeneratePoliciesExperimentExposedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Days since project creation (to segment by new user cohorts)
      */

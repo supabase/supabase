@@ -15,6 +15,7 @@ import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints
 import { databaseKeys } from 'data/database/keys'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { lintKeys } from 'data/lint/keys'
 import { privilegeKeys } from 'data/privileges/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -26,6 +27,7 @@ import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { isValidExperimentVariant } from 'hooks/misc/useTableCreateGeneratePolicies'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
@@ -140,7 +142,7 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
-  const generatePoliciesFlag = usePHFlag<boolean>('tableCreateGeneratePolicies')
+  const generatePoliciesFlag = usePHFlag<string>('tableCreateGeneratePolicies')
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -529,6 +531,7 @@ export const SidePanelEditor = ({
           queryClient.invalidateQueries({
             queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
           }),
+          queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
         ])
 
         // Show success toast after everything is complete
@@ -551,10 +554,10 @@ export const SidePanelEditor = ({
         }
 
         // Track experiment conversion if user is in the experiment
-        if (generatePoliciesFlag !== undefined) {
+        if (isValidExperimentVariant(generatePoliciesFlag)) {
           track('table_create_generate_policies_experiment_converted', {
             experiment_id: 'tableCreateGeneratePolicies',
-            variant: generatePoliciesFlag ? 'treatment' : 'control',
+            variant: generatePoliciesFlag,
             has_rls_enabled: isRLSEnabled,
             has_rls_policies: generatedPolicies.length > 0,
             has_generated_policies: generatedPolicies.length > 0,
@@ -582,6 +585,7 @@ export const SidePanelEditor = ({
           queryClient.invalidateQueries({
             queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
           }),
+          queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
         ])
 
         toast.success(
