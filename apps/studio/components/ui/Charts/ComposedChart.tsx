@@ -482,7 +482,7 @@ export function ComposedChart({
             : visibleAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
-                  type="step"
+                  type="natural"
                   dataKey={attribute.name}
                   stackId={
                     attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? `stack-${i}`
@@ -509,7 +509,7 @@ export function ComposedChart({
           {maxAttribute && _showMaxValue && (
             <Line
               key={maxAttribute.attribute}
-              type="stepAfter"
+              type="natural"
               dataKey={maxAttribute.attribute}
               stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
