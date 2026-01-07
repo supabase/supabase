@@ -2602,6 +2602,24 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
+ * Triggered when a Studio error UI element is displayed (mounted).
+ * This includes error Admonitions and Toast notifications.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DashboardErrorCreatedEvent {
+  action: 'dashboard_error_created'
+  properties: {
+    /**
+     * Source of the error
+     */
+    source?: 'admonition' | 'toast'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User successfully installed an integration via the integrations marketplace in the dashboard.
  * Note: This excludes Wrappers and Postgres Extensions.
  *
@@ -2690,6 +2708,18 @@ export interface IntegrationUninstalledEvent {
      */
     integrationName: string
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the enable Create rls_ensure trigger button in the RLS Event Trigger banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/auth/policies
+ */
+export interface RlsEventTriggerBannerCreateButtonClickedEvent {
+  action: 'rls_event_trigger_banner_create_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2838,8 +2868,10 @@ export type TelemetryEvent =
   | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
+  | DashboardErrorCreatedEvent
   | IntegrationInstalledEvent
   | IntegrationInstallStartedEvent
   | IntegrationUninstallStartedEvent
   | IntegrationInstallFailedEvent
   | IntegrationUninstalledEvent
+  | RlsEventTriggerBannerCreateButtonClickedEvent
