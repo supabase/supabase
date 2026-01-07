@@ -28,7 +28,7 @@ export const getReportAttributesV2: (
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
@@ -79,7 +79,7 @@ export const getReportAttributesV2: (
         tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'cpu_usage_busy_system',
@@ -147,7 +147,7 @@ export const getReportAttributesV2: (
         width: 35,
         tickFormatter: (value: any) => numberFormatter(value, 0),
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -234,7 +234,7 @@ export const getReportAttributesV2: (
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -267,7 +267,7 @@ export const getReportAttributesV2: (
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -331,7 +331,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
@@ -363,7 +363,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'supavisor_connections_active',
@@ -389,7 +389,7 @@ export const getReportAttributesV2: (
         tickFormatter: (value: any) => formatBytes(value, 1),
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {
