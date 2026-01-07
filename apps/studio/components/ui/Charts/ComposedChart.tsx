@@ -511,7 +511,7 @@ export function ComposedChart({
                     y={line.value}
                     strokeWidth={1}
                     // {...line}
-                    color={line.color?.dark}
+                    color={isDarkMode ? line.color?.dark : line.color?.light}
                     strokeDasharray={line.strokeDasharray ?? '3 3'}
                     label={undefined}
                   >
