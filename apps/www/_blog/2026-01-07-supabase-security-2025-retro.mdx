@@ -1,0 +1,163 @@
+---
+title: 'Supabase Security Retro: 2025'
+description: 'A summary of Supabase platform security changes made in 2025 and the security defaults planned for 2026.'
+categories:
+  - product
+tags:
+  - security
+date: '2026-01-07'
+toc_depth: 3
+author: paul_copplestone,bil_harmer
+image: 2025-12-19-stripe-sync-engine-integration/og.png
+thumb: 2025-12-19-stripe-sync-engine-integration/thumb.png
+---
+
+Starting a new year is a great opportunity for a retro on Security updates on the Supabase Platform: to keep the community updated, and to give a heads-up on some (possibly breaking) changes that you can expect in 2026. 
+
+Security in Supabase (and in particular Postgres Row Level Security) is not often well-understood. This is mostly our fault: Authorization is challenging for developers, but we pride ourselves on making difficult concepts simple. 
+
+This post outlines the changes we made last year. We finish with some ideas we have to make Supabase - and in particular, Postgres RLS - much simpler for developers in 2026
+
+
+## Disabling the Data API when creating a project
+
+When launching a new project, you have the option to disable the Data API. Alternatively, you can switch the default schema from something like public to a bespoke schema like api.
+
+
+## Disabling the Data API on existing projects
+
+If you are running an existing project and you no longer need to use the Data API, you can disable it in the project settings. If you do this then you can use your Postgres database like RDS, connecting directly or via the connection pooler that we provide. 
+
+## New API keys
+
+We introduced a new API key model to replace long-lived JWT-based anon and service_role keys. This change improves enables safe key rotation and removes several failure modes we have seen in production systems. Projects can now use `publishable` keys for low-privilege access and multiple revocable `secret` keys for elevated access. Keys can be rotated instantly, audited, and scoped more safely. Legacy keys remain available during the migration period, but will be removed in late 2026.
+
+## Asymmetric JWTs
+
+The new API key system added support for asymmetric JWTs, where tokens are signed with private keys and verified with public keys. Asymmetric signing enables safer key distribution, better rotation, and future auth features that were not possible with shared secrets. It also reduces blast radius if a signing key is ever compromised.
+
+## Revoking leaked keys via GitHub Secret Scanning
+
+With the new API key formats, Supabase automatically revokes secret keys that are detected in public GitHub repositories. When a leak is detected, we immediately revoke the key and notify the project owner with instructions to rotate it.
+
+## RLS by default for new tables
+
+* TODO: image
+
+For tables created via the dashboard, RLS is enabled by default. 
+
+
+## Automatically enable RLS when tables are created
+
+If you are using external tools that don't enable RLS, then you can use Event Triggers to enable RLS by default: This year we added Postgres Event Triggers to the platform. We have documented the steps required to enable RLS by default.
+
+
+
+## Clear labels when tables are exposed
+
+<Img
+  alt="Clear labels when tables are exposed"
+  src="/images/blog/2026/security-retro/unrestricted-tables.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+TODO
+
+
+## Security alerts for tables that are insecure
+
+* Show email
+
+If you create any tables with RLS enabled, we send Security emails . We also expose these in the Dashboard.
+
+
+
+## Creating RLS Policies with AI
+
+When viewing Security Alerts in the dashboard, we make it as simple as possible to secure your tables. If you click the ...
+
+
+
+## Custom Claims and RBAC
+
+<Img
+  alt="Clear labels when tables are exposed"
+  src="/images/blog/2026/security-retro/unrestricted-tables.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+If you're not happy with per-table RLS, you can use it to set up more “traditional” security patterns like RBAC. Under this model, security checks are provided within the users' authentication token (custom claims). 
+
+
+
+## Custom security extensions for Postgres
+
+Postgres being extensible, we've made it possible for the community to create and use their own Security extensions. For example this RBAC extension. We'd grade ourselves a C- for this one, largely because it's not very visible to users right now. This will be one focus area in 2026.
+
+
+
+## VPC / Private Link on AWS
+
+AWS Private Link provides a direct connection across AWS infrastructure, without it ever touching the public internet. This is great for security and also a massive win for performance. You can enable Private Link directly from the Supabase dashboard. 
+
+
+
+## Restricting direct access to your Postgres database
+
+Supabase runs fail2ban on all databases - if there are incorrect login attempts the IP address is automatically banned. You can extend this further by restricting all access to your database and then simply allowing access to trusted IP addresses. 
+
+
+
+
+
+
+
+## Continuous Researcher Engagement: HackerOne VDP
+
+Supabase runs continuous security testing using external researchers in both red team and purple team engagements. Red team testing is adversarial and unannounced. Purple team testing is collaborative and focuses on validating controls and isolation boundaries.
+
+In addition to scheduled testing, we operate an active vulnerability disclosure program on HackerOne. Since launch, we have resolved 139 reports from 96 researchers. In the last 90 days, we received 42 reports. The most recent resolution was 13 days ago. This program runs continuously.
+
+Response targets
+- First response: 2 business days (median 8 hours)
+- Triage: 5 business days (median 10 hours)
+- Resolution: severity-dependent (median 2 days)
+
+We prioritize fast responses because slow acknowledgment reduces researcher participation.
+
+### Scope
+
+The VDP covers Supabase platform infrastructure, including PostgREST exposure, authentication flows, service role isolation, Realtime subscriptions, Storage access controls, Edge Functions, and network segmentation. Researchers may only test their own projects. Automated scanning requires prior notice to security@supabase.io.
+
+### Recognition and bounties
+
+The program is currently recognition-only. Paid bounties will launch in 2026, scaled by severity and impact.
+
+### Use of findings
+
+Validated issues are not only patched. They feed into platform hardening, detection rules, and architectural reviews. For example, an auth bypass report triggers audits for similar patterns and often results in new automated checks.
+
+This program complements scheduled testing by providing continuous external validation of the platform security boundaries. Supabase secures the platform. Application-level security remains the responsibility of each customer.
+
+## Ecosystem developments
+
+The Supabase ecosystem has also been hard at work:
+
+* https://github.com/Rodrigotari1/supashield
+* https://x.com/xyborg/status/2008109697006531054?s=46
+
+
+
+
+
+
+## Things we can do better
+
+* Providing other AuthZ patterns like OpenFGA or Zanzibar
+* GitHub “push protection” - We also aren't part of their "push_protection" yet, that happens once they are confident the regex match doesn't have many false positives. 
+* Disabling GraphQL by default - TODO -https://linear.app/supabase/issue/PSQL-812/disable-pg-graphql-by-default
+
+
+ 
