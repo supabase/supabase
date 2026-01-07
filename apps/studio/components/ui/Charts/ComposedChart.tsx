@@ -242,25 +242,6 @@ export function ComposedChart({
   }
 
   const referenceLines = attributes.filter((attribute) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'ComposedChart.tsx:243',
-        message: 'Filtering referenceLines by provider',
-        data: {
-          provider: attribute?.provider,
-          isReferenceLine: attribute?.isReferenceLine,
-          attribute: attribute?.attribute,
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'run1',
-        hypothesisId: 'D',
-      }),
-    }).catch(() => {})
-    // #endregion
     return attribute?.provider === 'reference-line'
   })
 
@@ -520,52 +501,9 @@ export function ComposedChart({
           )}
           {referenceLines
             .filter((line) => {
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  location: 'ComposedChart.tsx:499',
-                  message: 'Filtering referenceLine',
-                  data: {
-                    isReferenceLine: line.isReferenceLine,
-                    provider: line.provider,
-                    attribute: line.attribute,
-                    hasValue: line.value !== undefined,
-                    value: line.value,
-                  },
-                  timestamp: Date.now(),
-                  sessionId: 'debug-session',
-                  runId: 'run1',
-                  hypothesisId: 'D',
-                }),
-              }).catch(() => {})
-              // #endregion
               return line.isReferenceLine
             })
             .map((line) => {
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  location: 'ComposedChart.tsx:500',
-                  message: 'Mapping referenceLine props',
-                  data: {
-                    attribute: line.attribute,
-                    value: line.value,
-                    hasColor: !!line.color,
-                    colorDark: line.color?.dark,
-                    hasStrokeDasharray: !!line.strokeDasharray,
-                    allKeys: Object.keys(line),
-                  },
-                  timestamp: Date.now(),
-                  sessionId: 'debug-session',
-                  runId: 'run1',
-                  hypothesisId: 'A,B,C',
-                }),
-              }).catch(() => {})
-              // #endregion
               try {
                 return (
                   <ReferenceLine
@@ -587,25 +525,6 @@ export function ComposedChart({
                   </ReferenceLine>
                 )
               } catch (error) {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/520b7403-1622-4645-a073-711ded21ea54', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    location: 'ComposedChart.tsx:501',
-                    message: 'ReferenceLine render error',
-                    data: {
-                      error: error instanceof Error ? error.message : String(error),
-                      attribute: line.attribute,
-                      value: line.value,
-                    },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'run1',
-                    hypothesisId: 'A,B,C,E',
-                  }),
-                }).catch(() => {})
-                // #endregion
                 throw error
               }
             })}
