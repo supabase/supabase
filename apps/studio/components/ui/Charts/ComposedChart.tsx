@@ -14,6 +14,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Customized,
 } from 'recharts'
 
 import { CategoricalChartState } from 'recharts/types/chart/types'
@@ -425,24 +426,7 @@ export function ComposedChart({
             minTickGap={3}
             key={xAxisKey}
           />
-          <Tooltip
-            content={(props) =>
-              showTooltip && !showHighlightActions ? (
-                <CustomTooltip
-                  {...props}
-                  format={format}
-                  isPercentage={isPercentage}
-                  label={resolvedHighlightedLabel}
-                  attributes={attributes}
-                  valuePrecision={valuePrecision}
-                  showTotal={showTotal}
-                  isActiveHoveredChart={
-                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
-                  }
-                />
-              ) : null
-            }
-          />
+
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
                 <Bar
@@ -474,6 +458,7 @@ export function ComposedChart({
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
                   dot={false}
+                  activeDot={false}
                 />
               ))}
           {/* Max value, if available */}
@@ -518,6 +503,7 @@ export function ComposedChart({
                 throw error
               }
             })}
+
           {/* Selection highlight */}
           {showHighlightActions && (
             <ReferenceArea
@@ -529,6 +515,61 @@ export function ComposedChart({
               fillOpacity={0.2}
             />
           )}
+          <Tooltip
+            content={(props) =>
+              showTooltip && !showHighlightActions ? (
+                <CustomTooltip
+                  {...props}
+                  format={format}
+                  isPercentage={isPercentage}
+                  label={resolvedHighlightedLabel}
+                  attributes={attributes}
+                  valuePrecision={valuePrecision}
+                  showTotal={showTotal}
+                  isActiveHoveredChart={
+                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
+                  }
+                />
+              ) : null
+            }
+            cursor={{
+              stroke: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+              strokeWidth: 1,
+            }}
+          />
+          <Customized
+            component={(props: any) => {
+              const { formattedGraphicalItems } = props
+              if (!formattedGraphicalItems || focusDataIndex === null) return null
+
+              return (
+                <g>
+                  {formattedGraphicalItems.map((item: any, index: number) => {
+                    const points = item.props?.points || item.item?.props?.points || item.points
+                    const dataKey = item.props?.dataKey || item.item?.props?.dataKey
+
+                    if (!points || !points[focusDataIndex]) return null
+
+                    const point = points[focusDataIndex]
+                    const attribute = visibleAttributes.find((a) => a.name === dataKey)
+                    if (!attribute) return null
+
+                    return (
+                      <circle
+                        key={`custom-dot-${dataKey}-${index}`}
+                        cx={point.x}
+                        cy={point.y}
+                        r={4}
+                        fill={attribute.fill}
+                        stroke={attribute.color}
+                        strokeWidth={1}
+                      />
+                    )
+                  })}
+                </g>
+              )
+            }}
+          />
         </RechartComposedChart>
         <ChartHighlightActions
           chartHighlight={chartHighlight}
