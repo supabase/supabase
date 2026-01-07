@@ -12,46 +12,100 @@ image: 2025-12-19-stripe-sync-engine-integration/og.png
 thumb: 2025-12-19-stripe-sync-engine-integration/thumb.png
 ---
 
-Starting a new year is a great opportunity for a retro on Security updates on the Supabase Platform: to keep the community updated, and to give a heads-up on some (possibly breaking) changes that you can expect in 2026. 
+This post covers security changes made to the Supabase platform in 2025 and what to expect in 2026. Some changes may be breaking.
 
-Security in Supabase (and in particular Postgres Row Level Security) is not often well-understood. This is mostly our fault: Authorization is challenging for developers, but we pride ourselves on making difficult concepts simple. 
+Postgres Row Level Security (RLS) is powerful but can be complex for developers new to the pattern. Most of the changes in 2025 focused on safer defaults and better tooling to make security more accessible.
 
-This post outlines the changes we made last year. We finish with some ideas we have to make Supabase - and in particular, Postgres RLS - much simpler for developers in 2026
+We'll cover what shipped in 2025 and outline planned improvements for 2026.
 
 
 ## Disabling the Data API when creating a project
 
-When launching a new project, you have the option to disable the Data API. Alternatively, you can switch the default schema from something like public to a bespoke schema like api.
+<Img
+  alt="Disabling Data API on project creation"
+  src="/images/blog/2026/security-retro/disable-data-api-create.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
+New projects can disable the Data API entirely or change the default schema from `public` to a custom schema like `api`. This gives you control over what's exposed via the auto-generated REST and GraphQL APIs.
 
 ## Disabling the Data API on existing projects
 
-If you are running an existing project and you no longer need to use the Data API, you can disable it in the project settings. If you do this then you can use your Postgres database like RDS, connecting directly or via the connection pooler that we provide. 
+<Img
+  alt="Disabling Data API in project settings"
+  src="/images/blog/2026/security-retro/disable-data-api-settings.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+Existing projects can disable the Data API in project settings. Once disabled, you can use the database like standard Postgres (similar to RDS), connecting directly or through the connection pooler.
 
 ## New API keys
 
-We introduced a new API key model to replace long-lived JWT-based anon and service_role keys. This change improves enables safe key rotation and removes several failure modes we have seen in production systems. Projects can now use `publishable` keys for low-privilege access and multiple revocable `secret` keys for elevated access. Keys can be rotated instantly, audited, and scoped more safely. Legacy keys remain available during the migration period, but will be removed in late 2026.
+<Img
+  alt="New API key management interface"
+  src="/images/blog/2026/security-retro/api-keys.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+The new API key model replaces long-lived JWT-based anon and service_role keys. Projects now use `publishable` keys for low-privilege access and multiple revocable `secret` keys for elevated access. Keys can be rotated instantly, audited, and scoped more granularly. This improves key management workflows, particularly around rotation and auditing. Legacy keys remain available during migration but will be removed in late 2026.
 
 ## Asymmetric JWTs
 
-The new API key system added support for asymmetric JWTs, where tokens are signed with private keys and verified with public keys. Asymmetric signing enables safer key distribution, better rotation, and future auth features that were not possible with shared secrets. It also reduces blast radius if a signing key is ever compromised.
+<Img
+  alt="Asymmetric JWT signing flow"
+  src="/images/blog/2026/security-retro/asymmetric-jwt.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+The new API key system supports asymmetric JWTs (signed with private keys, verified with public keys). This enables safer key distribution and rotation compared to shared secrets. It also reduces the impact if a signing key is compromised.
+
+## OpenAPI spec restricted with publishable keys
+
+<Img
+  alt="OpenAPI spec access control"
+  src="/images/blog/2026/security-retro/openapi-access.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+The OpenAPI spec is no longer publicly visible when using the new `publishable` keys. Previously, anyone with an anon key could view your complete API schema, including all tables and columns. With publishable keys, the OpenAPI spec requires elevated permissions. This prevents unauthorized schema enumeration and reduces information disclosure.
 
 ## Revoking leaked keys via GitHub Secret Scanning
+
+<Img
+  alt="GitHub secret scanning and key revocation"
+  src="/images/blog/2026/security-retro/github-scanning.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
 With the new API key formats, Supabase automatically revokes secret keys that are detected in public GitHub repositories. When a leak is detected, we immediately revoke the key and notify the project owner with instructions to rotate it.
 
 ## RLS by default for new tables
 
-* TODO: image
+<Img
+  alt="RLS enabled by default for new tables"
+  src="/images/blog/2026/security-retro/rls-default.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-For tables created via the dashboard, RLS is enabled by default. 
-
+For tables created via the dashboard, RLS is enabled by default. Tables are protected from the moment they're created, following the principle of secure by default.
 
 ## Automatically enable RLS when tables are created
 
-If you are using external tools that don't enable RLS, then you can use Event Triggers to enable RLS by default: This year we added Postgres Event Triggers to the platform. We have documented the steps required to enable RLS by default.
+<Img
+  alt="Event trigger configuration for automatic RLS"
+  src="/images/blog/2026/security-retro/event-triggers.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-
+If you create tables using external tools or migrations that don't enable RLS, you can use Postgres [Event Triggers to enforce RLS](/docs/guides/database/postgres/event-triggers#example-trigger-function---auto-enable-row-level-security) automatically. We added Event Triggers to the platform in 2025 and documented how to set up automatic RLS enforcement for any table creation method.
 
 ## Clear labels when tables are exposed
 
@@ -62,59 +116,112 @@ If you are using external tools that don't enable RLS, then you can use Event Tr
   zoomable={true}
 />
 
-TODO
+The Table Editor now shows a clear warning label for any table that has RLS disabled. This makes it immediately obvious which tables are exposed via the API without row-level security policies.
 
 
-## Security alerts for tables that are insecure
-
-* Show email
-
-If you create any tables with RLS enabled, we send Security emails . We also expose these in the Dashboard.
-
-
-
-## Creating RLS Policies with AI
-
-When viewing Security Alerts in the dashboard, we make it as simple as possible to secure your tables. If you click the ...
-
-
-
-## Custom Claims and RBAC
+## Security alerts for tables without RLS
 
 <Img
-  alt="Clear labels when tables are exposed"
-  src="/images/blog/2026/security-retro/unrestricted-tables.png"
+  alt="Security alert for tables without RLS"
+  src="/images/blog/2026/security-retro/security-alerts.png"
   captionAlign="bottom"
   zoomable={true}
 />
 
-If you're not happy with per-table RLS, you can use it to set up more “traditional” security patterns like RBAC. Under this model, security checks are provided within the users' authentication token (custom claims). 
+If you create any tables with RLS disabled, Supabase sends email alerts to project owners. These alerts also appear in the dashboard, making it easy to identify and secure tables before deploying to production.
+
+## Security Advisors
+
+<Img
+  alt="Security Advisors weekly report"
+  src="/images/blog/2026/security-retro/security-advisors.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+Security Advisors scan your project for misconfigurations using [Splinter](https://supabase.github.io/splinter/), an open-source security linter for Postgres. Advisors check for common patterns like tables without RLS, policies that could be more restrictive, and exposed sensitive columns. Organization owners receive weekly security emails summarizing any findings. All detected issues are also visible in the dashboard with recommended fixes.
+
+## Fixing security issues with AI
+
+<Img
+  alt="AI-powered security issue fixes"
+  src="/images/blog/2026/security-retro/ai-security-fixes.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+The dashboard includes an Assistant that helps fix security issues detected by Security Advisors. When viewing alerts, you can ask the Assistant to generate and apply RLS policies. Describe your security requirements in plain text and the Assistant will generate the corresponding policy SQL. The Assistant can also suggest improvements for policies and configurations. This helps developers write correct RLS policies more quickly.
+
+Security Advisors are also available through our MCP server, allowing developers to scan and fix all security issues from their development environment with a simple command. This integrates security checks directly into your workflow.
+
+## Column-level security
+
+<Img
+  alt="Column-level privilege configuration"
+  src="/images/blog/2026/security-retro/column-security.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+Postgres supports column-level privileges that restrict access to specific columns in a table. This is useful for sensitive data like social security numbers, salaries, or other PII. You can grant SELECT access to a table while excluding specific columns, and those columns won't appear in API responses or queries unless the user has explicit column access.
+
+Column-level security works independently from RLS. You can use both together: RLS controls which rows a user can access, while column privileges control which columns they can see within those rows.
+
+## Custom Claims and RBAC
+
+<Img
+  alt="Custom claims for RBAC"
+  src="/images/blog/2026/security-retro/custom-claims.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
+
+Custom claims let you add metadata to JWTs for role-based access control (RBAC). Instead of writing RLS policies for each table, you can embed role information in the authentication token and check it in your policies. This works well if you're migrating from traditional RBAC systems or prefer centralized role management. 
 
 
 
 ## Custom security extensions for Postgres
 
-Postgres being extensible, we've made it possible for the community to create and use their own Security extensions. For example this RBAC extension. We'd grade ourselves a C- for this one, largely because it's not very visible to users right now. This will be one focus area in 2026.
+<Img
+  alt="Custom security extensions catalog"
+  src="/images/blog/2026/security-retro/extensions.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-
+Postgres extensions can implement custom authorization patterns. Community developers have built extensions for alternative security models, including an RBAC extension that simplifies role management. These extensions are available in the Supabase extensions catalog. We're planning improved extension documentation and tighter dashboard integration in 2026.
 
 ## VPC / Private Link on AWS
 
-AWS Private Link provides a direct connection across AWS infrastructure, without it ever touching the public internet. This is great for security and also a massive win for performance. You can enable Private Link directly from the Supabase dashboard. 
+<Img
+  alt="AWS PrivateLink configuration"
+  src="/images/blog/2026/security-retro/privatelink.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-
+AWS PrivateLink connects your VPC directly to Supabase infrastructure without traversing the public internet. This reduces attack surface and improves latency. Enable it from the project settings in the dashboard.
 
 ## Restricting direct access to your Postgres database
 
-Supabase runs fail2ban on all databases - if there are incorrect login attempts the IP address is automatically banned. You can extend this further by restricting all access to your database and then simply allowing access to trusted IP addresses. 
+<Img
+  alt="IP allowlist configuration"
+  src="/images/blog/2026/security-retro/ip-allowlist.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-
-
-
-
+All Supabase databases run fail2ban to automatically block IPs after failed login attempts. You can also configure IP allowlists to restrict database access to specific trusted addresses. 
 
 
 ## Continuous Researcher Engagement: HackerOne VDP
+
+<Img
+  alt="HackerOne vulnerability disclosure program stats"
+  src="/images/blog/2026/security-retro/hackerone.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
 Supabase runs continuous security testing using external researchers in both red team and purple team engagements. Red team testing is adversarial and unannounced. Purple team testing is collaborative and focuses on validating controls and isolation boundaries.
 
@@ -143,21 +250,35 @@ This program complements scheduled testing by providing continuous external vali
 
 ## Ecosystem developments
 
-The Supabase ecosystem has also been hard at work:
+<Img
+  alt="Community security tools"
+  src="/images/blog/2026/security-retro/ecosystem-tools.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-* https://github.com/Rodrigotari1/supashield
-* https://x.com/xyborg/status/2008109697006531054?s=46
+Community developers have built security tooling for Supabase:
 
+* [SupaShield](https://github.com/Rodrigotari1/supashield) - A security scanning tool that analyzes your Supabase project for common misconfigurations and exposed tables
+* [RLS Policy Testing Framework](https://x.com/xyborg/status/2008109697006531054?s=46) - Tools for testing RLS policies before deploying to production
 
+## What's next for 2026
 
+Several security improvements are planned for this year:
 
+**Alternative authorization patterns**: We're exploring integrations with authorization systems like OpenFGA and Zanzibar for developers who need fine-grained permissions beyond RLS.
 
+**GitHub push protection**: Our leaked key detection currently uses GitHub's secret scanning API for post-commit detection. We're working with GitHub to add push protection, which will block commits containing secret keys before they reach the repository.
 
-## Things we can do better
+**GraphQL disabled by default**: pg_graphql will be disabled by default on new projects. You can still enable it manually if needed, but it won't be exposed automatically to reduce the attack surface.
 
-* Providing other AuthZ patterns like OpenFGA or Zanzibar
-* GitHub “push protection” - We also aren't part of their "push_protection" yet, that happens once they are confident the regex match doesn't have many false positives. 
-* Disabling GraphQL by default - TODO -https://linear.app/supabase/issue/PSQL-812/disable-pg-graphql-by-default
+**Expanded Security Advisor lints**: New security checks will be added to Splinter to detect more misconfigurations. This includes detecting weak password policies, excessive function privileges, and insecure extension configurations.
 
+**Hardened project configurations**: New project configuration options will allow developers to choose extremely hardened security environments. This includes strict defaults for all security settings and mandatory security policies. Bring Your Own Cloud will be available to more customers beyond Supabase for Platforms.
 
- 
+**Security-focused test harness**: A dedicated test harness for security will help developers validate RLS policies, test authorization logic, and ensure security configurations are correct before deploying to production.
+
+**Assistant everywhere**: The dashboard Assistant will be available in more locations. You'll be able to fix security issues directly from GitHub, Slack, and email recommendations, rather than needing to go to the dashboard. The Assistant will be integrated into your existing workflows.
+
+**Enhanced security alerts**: Security alerts and recommendations will be enhanced with more detailed explanations of impact, step-by-step remediation guidance, and inline code examples to help developers resolve issues faster.
+
