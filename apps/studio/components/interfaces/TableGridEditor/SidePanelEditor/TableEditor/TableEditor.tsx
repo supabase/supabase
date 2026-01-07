@@ -347,9 +347,10 @@ export const TableEditor = ({
   if (!tableFields) return null
 
   const isApiAccessAndPoliciesSectionShown = isApiGrantTogglesEnabled || generatePoliciesEnabled
-  const isExposed =
-    !!apiAccessToggleHandler.data?.schemaExposed &&
-    checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data?.privileges)
+  const isExposed = isApiGrantTogglesEnabled
+    ? !!apiAccessToggleHandler.data?.schemaExposed &&
+      checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data.privileges)
+    : undefined
 
   return (
     <SidePanel
