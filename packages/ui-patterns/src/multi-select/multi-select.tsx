@@ -259,18 +259,25 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
-        const willOpen = !open
-        setOpen(willOpen)
-        if (willOpen) setInputValue('')
+        if (IS_INLINE_MODE) {
+          if (!open) {
+            setOpen(true)
+            setInputValue('')
+          }
 
-        if (IS_INLINE_MODE && willOpen) {
           event.stopPropagation()
           event.preventDefault()
 
           setTimeout(() => {
             inlineInputRef.current?.focus()
           }, 100)
+
+          return
         }
+
+        const willOpen = !open
+        setOpen(willOpen)
+        if (willOpen) setInputValue('')
       },
       [open, setOpen, setInputValue, IS_INLINE_MODE]
     )
