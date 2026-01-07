@@ -727,6 +727,7 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
+            { name: 'Overview', url: '/guides/auth/server-side' },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
@@ -1479,6 +1480,11 @@ export const api: NavMenuConstant = {
     {
       name: 'Generating TypeScript Types',
       url: '/guides/api/rest/generating-types',
+      items: [],
+    },
+    {
+      name: 'Generating Python Types',
+      url: '/guides/api/rest/generating-python-types',
       items: [],
     },
     {

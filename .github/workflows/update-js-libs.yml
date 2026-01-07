@@ -56,11 +56,18 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
+      
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        with:
+          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+      
       - name: Create pull request
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           commit-message: 'feat: update @supabase/*-js libraries to v${{ github.event.inputs.version }}'
           title: 'feat: update @supabase/*-js libraries to v${{ github.event.inputs.version }}'
           body: |

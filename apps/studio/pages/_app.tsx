@@ -61,6 +61,7 @@ import { Telemetry } from 'lib/telemetry'
 import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
+import { ToastErrorTracker } from 'lib/toast-errors'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
