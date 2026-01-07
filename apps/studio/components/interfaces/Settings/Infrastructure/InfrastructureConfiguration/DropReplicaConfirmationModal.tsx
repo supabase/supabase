@@ -28,16 +28,18 @@ const DropReplicaConfirmationModal = ({
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
 
       // [Joshen] Temporarily optimistic rendering until API supports immediate status update
-      queryClient.setQueriesData({ queryKey: replicaKeys.list(projectRef) }, (old: Database[]) => {
-        const updatedReplicas = old.map((x) => {
-          if (x.identifier === selectedReplica?.identifier) {
-            return { ...x, status: REPLICA_STATUS.GOING_DOWN }
-          } else {
+      queryClient.setQueriesData(
+        { queryKey: replicaKeys.list(projectRef) },
+        (old: Database[] | undefined) => {
+          const updatedReplicas = old?.map((x) => {
+            if (x.identifier === selectedReplica?.identifier) {
+              return { ...x, status: REPLICA_STATUS.GOING_DOWN }
+            }
             return x
-          }
-        })
-        return updatedReplicas
-      })
+          })
+          return updatedReplicas
+        }
+      )
 
       onSuccess()
       onCancel()

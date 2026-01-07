@@ -140,7 +140,7 @@ export const Destinations = () => {
     if (!isSuccessReplicasStatuses) return
 
     const pollReplicas = async () => {
-      const fixedStatues = [
+      const fixedStatuses = [
         REPLICA_STATUS.ACTIVE_HEALTHY,
         REPLICA_STATUS.ACTIVE_UNHEALTHY,
         REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
@@ -148,7 +148,7 @@ export const Destinations = () => {
       const replicasInTransition = statuses.filter((db) => {
         const { status } = db.replicaInitializationStatus || {}
         return (
-          !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+          !fixedStatuses.includes(db.status) || status === ReplicaInitializationStatus.InProgress
         )
       })
       const hasTransientStatus = replicasInTransition.length > 0
@@ -299,7 +299,7 @@ export const Destinations = () => {
                   {!isLoading &&
                     filteredDestinations.length === 0 &&
                     filteredReplicas.length === 0 &&
-                    hasDestinations && (
+                    ((unifiedReplication && hasReplicas) || hasDestinations) && (
                       <TableRow>
                         <TableCell colSpan={5}>
                           <p>No results found</p>

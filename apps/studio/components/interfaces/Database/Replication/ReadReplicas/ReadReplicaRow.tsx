@@ -97,6 +97,8 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
         return 'Restarting'
       case REPLICA_STATUS.RESIZING:
         return 'Resizing'
+      case REPLICA_STATUS.RESTORING:
+        return 'Restoring'
       case REPLICA_STATUS.ACTIVE_HEALTHY:
         return 'Healthy'
       default:
