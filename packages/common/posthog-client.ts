@@ -25,11 +25,13 @@ class PostHogClient {
   constructor(config: PostHogClientConfig = {}) {
     const apiHost =
       config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green'
+    const uiHost =
+      config.uiHost || process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com'
 
     this.config = {
       apiKey: config.apiKey || process.env.NEXT_PUBLIC_POSTHOG_KEY,
       apiHost,
-      uiHost: config.uiHost || process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com',
+      uiHost,
     }
   }
 
