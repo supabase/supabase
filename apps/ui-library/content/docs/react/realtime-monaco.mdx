@@ -1,0 +1,37 @@
+---
+title: Realtime Monaco
+description: Real-time Monaco editor for collaborative applications
+---
+
+<DualRealtimeMonaco />
+
+## Installation
+
+<BlockItem
+  name="realtime-monaco-react"
+  description="Real-time Monaco editor for collaborative applications."
+/>
+
+## Folder structure
+
+<RegistryBlock itemName="realtime-monaco-react" />
+
+## Usage
+
+```tsx
+import { RealtimeMonaco } from '@/components/realtime-monaco'
+
+export default function MonacoPage() {
+  return <RealtimeMonaco channel="realtime-monaco-demo" language="typescript" />
+}
+```
+
+## Props
+
+| Prop         | Type                | Description                                   |
+| ------------ | ------------------- | --------------------------------------------- |
+| `channel`    | `string`            | Unique identifier for the shared editor.      |
+| `language?`  | `string`            | Monaco language id. Defaults to `javascript`. |
+| `height?`    | `string \| number`  | Editor height. Defaults to `550`.             |
+| `className?` | `string`            | Optional wrapper class name.                  |
+| `theme?`     | `'light' \| 'dark'` | Optional theme.                               |

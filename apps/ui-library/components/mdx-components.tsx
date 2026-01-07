@@ -15,6 +15,7 @@ import { Callout } from './callout'
 import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
 import { DualRealtimeChat } from './dual-realtime-chat'
+import { DualRealtimeMonaco } from './dual-realtime-monaco'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
@@ -181,6 +182,7 @@ const components = {
   BlockItem,
   BlockPreview,
   DualRealtimeChat,
+  DualRealtimeMonaco,
 }
 
 interface MdxProps {

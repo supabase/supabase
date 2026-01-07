@@ -49,8 +49,9 @@
     "@react-router/fs-routes": "^7.4.0",
     "@supabase/postgrest-js": "catalog:",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
-    "@tanstack/react-query": "^5.83.0",
     "@supabase/vue-blocks": "workspace:*",
+    "@tanstack/react-query": "^5.83.0",
+    "@tiagoantunespt/y-supabase": "github:tiagoantunespt/y-supabase",
     "axios": "^1.12.0",
     "class-variance-authority": "*",
     "cmdk": "^1.0.0",
@@ -62,6 +63,7 @@
     "icons": "workspace:*",
     "jotai": "^2.8.0",
     "lucide-react": "*",
+    "monaco-editor": "^0.55.1",
     "next": "catalog:",
     "next-contentlayer2": "0.4.6",
     "next-themes": "^0.3.0",
@@ -84,6 +86,8 @@
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0",
     "vaul": "^0.9.6",
+    "y-monaco": "^0.1.6",
+    "yjs": "^13.6.28",
     "zod": "catalog:"
   },
   "devDependencies": {

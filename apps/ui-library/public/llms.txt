@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-11-20T11:14:14.146Z
+Last updated: 2026-01-07T11:37:18.300Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -29,6 +29,8 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time chat component for collaborative applications
 - [Realtime Cursor](https://supabase.com/ui/docs/nextjs/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
+- [Realtime Monaco](https://supabase.com/ui/docs/nextjs/realtime-monaco)
+    - Real-time Monaco editor for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/nextjs/social-auth)
     - Social authentication block for Next.js
 - [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
@@ -53,6 +55,8 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time chat component for collaborative applications
 - [Realtime Cursor](https://supabase.com/ui/docs/react-router/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
+- [Realtime Monaco](https://supabase.com/ui/docs/react-router/realtime-monaco)
+    - Real-time Monaco editor for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/react-router/social-auth)
     - Social authentication block for React Router
 - [Supabase Client Libraries](https://supabase.com/ui/docs/react/client)
@@ -69,6 +73,8 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time chat component for collaborative applications
 - [Realtime Cursor](https://supabase.com/ui/docs/react/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
+- [Realtime Monaco](https://supabase.com/ui/docs/react/realtime-monaco)
+    - Real-time Monaco editor for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/react/social-auth)
     - Social authentication block for React Single Page Applications
 - [Supabase Client Libraries](https://supabase.com/ui/docs/tanstack/client)
@@ -85,6 +91,8 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time chat component for collaborative applications
 - [Realtime Cursor](https://supabase.com/ui/docs/tanstack/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
+- [Realtime Monaco](https://supabase.com/ui/docs/tanstack/realtime-monaco)
+    - Real-time Monaco editor for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/tanstack/social-auth)
     - Social authentication block for Tanstack Start
 - [Supabase Client Libraries](https://supabase.com/ui/docs/vue/client)
