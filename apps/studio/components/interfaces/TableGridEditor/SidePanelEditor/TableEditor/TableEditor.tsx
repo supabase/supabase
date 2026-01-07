@@ -4,6 +4,7 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -346,6 +347,9 @@ export const TableEditor = ({
   if (!tableFields) return null
 
   const isApiAccessAndPoliciesSectionShown = isApiGrantTogglesEnabled || generatePoliciesEnabled
+  const isExposed =
+    !!apiAccessToggleHandler.data?.schemaExposed &&
+    checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data?.privileges)
 
   return (
     <SidePanel
@@ -574,6 +578,7 @@ export const TableEditor = ({
                 foreignKeyRelations={isNewRecord ? fkRelations : undefined}
                 isNewRecord={isNewRecord}
                 isDuplicating={isDuplicating}
+                isExposed={isExposed}
                 generatedPolicies={generatedPolicies}
                 onGeneratedPoliciesChange={setGeneratedPolicies}
                 onRLSUpdate={(value) => onUpdateField({ isRLSEnabled: value })}
