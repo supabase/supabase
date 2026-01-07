@@ -26,6 +26,7 @@ interface DestinationPanelProps {
     statusName?: string
   }
   onClose: () => void
+  onSuccessCreateReadReplica?: () => void
 }
 
 export const DestinationPanel = ({
@@ -33,6 +34,7 @@ export const DestinationPanel = ({
   type,
   existingDestination,
   onClose,
+  onSuccessCreateReadReplica,
 }: DestinationPanelProps) => {
   const unifiedReplication = useFlag('unifiedReplication')
 
@@ -69,7 +71,7 @@ export const DestinationPanel = ({
             <DialogSectionSeparator />
 
             {selectedType === 'Read Replica' ? (
-              <ReadReplicaForm onClose={onClose} />
+              <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
             ) : (
               <DestinationForm
                 visible={visible}
