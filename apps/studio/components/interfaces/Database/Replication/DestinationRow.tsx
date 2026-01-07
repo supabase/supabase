@@ -3,13 +3,15 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { Minus } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -146,20 +148,30 @@ export const DestinationRow = ({
       {isPipelineSuccess && (
         <TableRow>
           <TableCell>
-            {isPipelineLoading ? (
-              <ShimmeringLoader />
-            ) : pipeline?.id ? (
-              <Tooltip>
-                <TooltipTrigger>
-                  <span className="cursor-default">{destinationName}</span>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Pipeline ID: {pipeline.id}</TooltipContent>
-              </Tooltip>
+            {type === 'BigQuery' ? (
+              <BigQuery size={18} className="text-foreground-light" />
+            ) : type === 'Analytics Bucket' ? (
+              <AnalyticsBucket size={18} className="text-foreground-light" />
             ) : (
-              destinationName
+              <Database size={18} className="text-foreground-light" />
             )}
           </TableCell>
-          <TableCell>{isPipelineLoading ? <ShimmeringLoader /> : type}</TableCell>
+
+          <TableCell className="max-w-[180px]">
+            {isPipelineLoading ? (
+              <ShimmeringLoader />
+            ) : (
+              <div>
+                <p title={destinationName} className="truncate">
+                  {destinationName}
+                </p>
+                <p className="text-foreground-lighter">
+                  {type} (ID: {pipeline?.id})
+                </p>
+              </div>
+            )}
+          </TableCell>
+
           <TableCell>
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
@@ -175,6 +187,11 @@ export const DestinationRow = ({
               />
             )}
           </TableCell>
+
+          <TableCell>
+            <Minus size={18} className="text-foreground-lighter" />
+          </TableCell>
+
           <TableCell>
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
@@ -182,6 +199,7 @@ export const DestinationRow = ({
               pipeline.config.publication_name
             )}
           </TableCell>
+
           <TableCell>
             <div className="flex items-center justify-end gap-x-2">
               {hasTableErrors && (

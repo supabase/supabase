@@ -1,8 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { useParams } from 'common'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
@@ -20,16 +25,19 @@ import {
   cn,
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationModal } from './EnableReplicationModal'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -37,9 +45,30 @@ export const Destinations = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const isPaidPlan = organization?.plan.id !== 'free'
 
+  const unifiedReplication = useFlag('unifiedReplication')
+
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
+  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+
+  const {
+    data: databases = [],
+    error: databasesError,
+    isPending: isDatabasesLoading,
+    isError: isDatabasesError,
+    refetch: refetchDatabases,
+  } = useReadReplicasQuery({
+    projectRef,
+  })
+  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  const filteredReplicas =
+    filterString.length === 0
+      ? readReplicas
+      : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
+
+  const { data: statuses = [], isSuccess: isSuccessReplicasStatuses } =
+    useReadReplicasStatusesQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
 
   const {
     data: sourcesData,
@@ -62,6 +91,14 @@ export const Destinations = () => {
   } = useReplicationDestinationsQuery({
     projectRef,
   })
+  const destinations = destinationsData?.destinations ?? []
+  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+  const filteredDestinations =
+    filterString.length === 0
+      ? destinations ?? []
+      : (destinations ?? []).filter((destination) =>
+          destination.name.toLowerCase().includes(filterString.toLowerCase())
+        )
 
   const {
     data: pipelinesData,
@@ -72,13 +109,9 @@ export const Destinations = () => {
   } = useReplicationPipelinesQuery({
     projectRef,
   })
-  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
-  const filteredDestinations =
-    filterString.length === 0
-      ? destinationsData?.destinations ?? []
-      : (destinationsData?.destinations ?? []).filter((destination) =>
-          destination.name.toLowerCase().includes(filterString.toLowerCase())
-        )
+
+  const isLoading = isSourcesLoading || isDestinationsLoading || isDatabasesLoading
+  const hasErrorsFetchingData = isSourcesError || isDestinationsError || isDatabasesError
 
   useEffect(() => {
     if (
@@ -101,6 +134,33 @@ export const Destinations = () => {
     }
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
+  useEffect(() => {
+    if (!isSuccessReplicasStatuses) return
+
+    const pollReplicas = async () => {
+      const fixedStatues = [
+        REPLICA_STATUS.ACTIVE_HEALTHY,
+        REPLICA_STATUS.ACTIVE_UNHEALTHY,
+        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+      ]
+      const replicasInTransition = statuses.filter((db) => {
+        const { status } = db.replicaInitializationStatus || {}
+        return (
+          !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+        )
+      })
+      const hasTransientStatus = replicasInTransition.length > 0
+
+      // If any replica's status has changed, refetch databases
+      if (statuses.length !== databases.length) await refetchDatabases()
+
+      // If all replicas are active healthy, stop fetching statuses
+      if (!hasTransientStatus) setStatusRefetchInterval(false)
+    }
+
+    pollReplicas()
+  }, [databases.length, isSuccessReplicasStatuses, refetchDatabases, statuses])
+
   return (
     <>
       <div className="mb-4">
@@ -113,6 +173,16 @@ export const Destinations = () => {
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
+              actions={
+                filterString.length > 0 && (
+                  <Button
+                    type="text"
+                    icon={<X />}
+                    className="p-0 h-5 w-5"
+                    onClick={() => setFilterString('')}
+                  />
+                )
+              }
             />
           </div>
           <div className="flex items-center gap-x-2">
@@ -131,14 +201,14 @@ export const Destinations = () => {
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto">
-        {(isSourcesError || isDestinationsError) && (
+        {hasErrorsFetchingData && (
           <AlertError
-            error={sourcesError || destinationsError}
+            error={sourcesError || destinationsError || databasesError}
             subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
           />
         )}
 
-        {isSourcesLoading || isDestinationsLoading ? (
+        {isLoading ? (
           <GenericSkeletonLoader />
         ) : replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
@@ -164,14 +234,34 @@ export const Destinations = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead key="name">Name</TableHead>
-                    <TableHead key="type">Type</TableHead>
-                    <TableHead key="status">Status</TableHead>
+                    <TableHead key="type" className="w-[20px]" />
+                    <TableHead key="name" className="w-[250px]">
+                      Name
+                    </TableHead>
+                    <TableHead key="status" className="w-[150px]">
+                      Status
+                    </TableHead>
+                    <TableHead key="lag" className="w-[80px]">
+                      Lag
+                    </TableHead>
                     <TableHead key="publication">Publication</TableHead>
                     <TableHead key="actions" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {unifiedReplication &&
+                    filteredReplicas.map((replica) => {
+                      const status = statuses.find((x) => x.identifier === replica.identifier)
+                      return (
+                        <ReadReplicaRow
+                          key={replica.identifier}
+                          replica={replica}
+                          replicaStatus={status}
+                          onUpdateReplica={() => setStatusRefetchInterval(5000)}
+                        />
+                      )
+                    })}
+
                   {filteredDestinations.map((destination) => {
                     const pipeline = pipelinesData?.pipelines.find(
                       (p) => p.destination_id === destination.id
@@ -199,15 +289,27 @@ export const Destinations = () => {
                       />
                     )
                   })}
+
+                  {!isLoading &&
+                    filteredDestinations.length === 0 &&
+                    filteredReplicas.length === 0 &&
+                    hasDestinations && (
+                      <TableRow>
+                        <TableCell colSpan={5}>
+                          <p>No results found</p>
+                          <p className="text-foreground-light">
+                            Your search for "{filterString}" did not return any results
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
         ) : (
-          !isSourcesLoading &&
-          !isDestinationsLoading &&
-          !isSourcesError &&
-          !isDestinationsError && (
+          !isLoading &&
+          !hasErrorsFetchingData && (
             <div
               className={cn(
                 'w-full',
@@ -233,18 +335,10 @@ export const Destinations = () => {
         )}
       </div>
 
-      {!isSourcesLoading &&
-        !isDestinationsLoading &&
-        filteredDestinations.length === 0 &&
-        hasDestinations && (
-          <div className="text-center py-8 text-foreground-light">
-            <p>No destinations match "{filterString}"</p>
-          </div>
-        )}
-
       <DestinationPanel
         visible={showNewDestinationPanel}
         onClose={() => setShowNewDestinationPanel(false)}
+        onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)}
       />
     </>
   )
