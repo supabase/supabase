@@ -25,14 +25,14 @@ const LIGHT_STACKED_CHART_COLORS = [
 ]
 
 const LIGHT_STACKED_CHART_FILLS = [
-  '#9FE8C7', // #3ECF8E mixed with white
-  '#EDB885', // #DA760B mixed with white
-  '#4BA67A', // #097c4f mixed with white
-  '#F6D99F', // #EDC35E mixed with white
-  '#B2DCEC', // #65BCD9 mixed with white
-  '#80B1F4', // #0063E8 mixed with white
-  '#EDC9FC', // #DB8DF9 mixed with white
-  '#DB8BD3', // #B616A6 mixed with white
+  '#9FE8C7',
+  '#FFB885',
+  '#4BA67A',
+  '#F6D99F',
+  '#B2DCEC',
+  '#80B1F4',
+  '#EDC9FC',
+  '#DB8BD3',
 ]
 
 const DARK_STACKED_CHART_COLORS = [
@@ -47,14 +47,14 @@ const DARK_STACKED_CHART_COLORS = [
 ]
 
 const DARK_STACKED_CHART_FILLS = [
-  '#2A5C3F', // #3ECF8E mixed with black
-  '#1F3D2A', // #A3FFC2 mixed with black
-  '#5C3D0A', // #DA760B mixed with black
-  '#5C5230', // #EDD35E mixed with black
-  '#2A3D45', // #65BCD9 mixed with black
-  '#001F3D', // #0063E8 mixed with black
-  '#4A3D5C', // #DB8DF9 mixed with black
-  '#3D1F3A', // #B616A6 mixed with black
+  '#2A5C3F',
+  '#1F3D2A',
+  '#5C3D0A',
+  '#5C5230',
+  '#2A3D45',
+  '#001F3D',
+  '#4A3D5C',
+  '#3D1F3A',
 ]
 
 // Default to light mode colors, will be updated based on theme
