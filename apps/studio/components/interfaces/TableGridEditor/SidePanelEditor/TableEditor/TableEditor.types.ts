@@ -1,14 +1,15 @@
+import type { Prettify } from '@/lib/type-helpers'
 import type { Dictionary } from 'types'
 import type { ColumnField } from '../SidePanelEditor.types'
 
-export interface TableField {
+export type TableField = Prettify<{
   id: number
   name: string
   comment?: string | null
   columns: ColumnField[]
   isRLSEnabled: boolean
   isRealtimeEnabled: boolean
-}
+}>
 
 export interface ImportContent {
   file?: File
