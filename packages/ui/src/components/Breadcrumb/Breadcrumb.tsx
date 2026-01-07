@@ -10,6 +10,13 @@ interface Props {
 }
 
 /**
+ * A breadcrumb component for navigation.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode[]} [props.children] - The breadcrumb items.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @param {'small' | 'medium' | 'large'} [props.spacing='small'] - The spacing between items.
+ * @returns {React.ReactElement} The breadcrumb component.
  * @deprecated Use `import { Breadcrumb_shadcn_ } from "ui"` instead
  */
 const Breadcrumb = ({ className, style, children, spacing = 'small' }: Props) => {
@@ -46,6 +53,13 @@ interface ItemProps {
 }
 
 /**
+ * An item within the Breadcrumb component.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The content of the item.
+ * @param {boolean} [props.active] - Whether the item is active.
+ * @param {Function} [props.onClick] - The click handler for the item.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @returns {React.ReactElement} The breadcrumb item component.
  * @deprecated Use ./BreadcrumbItem_shadcn_ instead
  */
 export function Item({ children, active, onClick, style }: ItemProps) {

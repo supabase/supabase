@@ -14,6 +14,18 @@ interface CardProps {
   titleExtra?: React.ReactNode
 }
 
+/**
+ * A card component for displaying content in a structured layout.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} [props.children] - The content of the card.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {React.ReactNode} [props.cover] - An image or media to be displayed at the top of the card.
+ * @param {boolean} [props.hoverable] - If `true`, the card will have a hover effect.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @param {string} [props.title] - The title of the card.
+ * @param {React.ReactNode} [props.titleExtra] - Extra content to be displayed in the card's header, typically on the right side.
+ * @returns {React.ReactElement} The card component.
+ */
 function Card({ children, className, cover, hoverable, style, title, titleExtra }: CardProps) {
   let __styles = styleHandler('card')
 
@@ -42,6 +54,15 @@ interface MetaProps {
   className?: string
 }
 
+/**
+ * A metadata section for a Card component, typically used for displaying a title and description.
+ * @param {object} props - The component props.
+ * @param {string} [props.title] - The title of the metadata.
+ * @param {string} [props.description] - The description of the metadata.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @returns {React.ReactElement} The card metadata component.
+ */
 function Meta({ title, description, style, className }: MetaProps) {
   return (
     <div style={style} className={className}>
