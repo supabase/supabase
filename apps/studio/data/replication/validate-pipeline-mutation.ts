@@ -28,23 +28,19 @@ async function validatePipeline(
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
 
+  const batchConfig =
+    maxFillMs !== undefined || maxSize !== undefined
+      ? { max_fill_ms: maxFillMs, max_size: maxSize }
+      : undefined
+
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
       config: {
         publication_name: publicationName,
-        ...(maxTableSyncWorkers !== undefined
-          ? { max_table_sync_workers: maxTableSyncWorkers }
-          : {}),
-        ...(maxFillMs !== undefined || maxSize !== undefined
-          ? {
-              batch: {
-                ...(maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : {}),
-                ...(maxSize !== undefined ? { max_size: maxSize } : {}),
-              },
-            }
-          : {}),
+        max_table_sync_workers: maxTableSyncWorkers,
+        batch: batchConfig,
       },
     },
     signal,

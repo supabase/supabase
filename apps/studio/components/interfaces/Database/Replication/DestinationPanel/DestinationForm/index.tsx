@@ -175,9 +175,7 @@ export const DestinationForm = ({
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
       maxSize: pipelineData?.config?.batch?.max_size ?? undefined,
-      maxTableSyncWorkers:
-        (pipelineData?.config as { max_table_sync_workers?: number } | undefined)
-          ?.max_table_sync_workers ?? undefined,
+      maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
@@ -423,10 +421,8 @@ export const DestinationForm = ({
           destinationConfig,
           pipelineConfig: {
             publicationName: data.publicationName,
+            maxTableSyncWorkers: data.maxTableSyncWorkers,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
-            ...(data.maxTableSyncWorkers !== undefined
-              ? { maxTableSyncWorkers: data.maxTableSyncWorkers }
-              : {}),
           },
           sourceId,
         })
@@ -507,10 +503,8 @@ export const DestinationForm = ({
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
+            maxTableSyncWorkers: data.maxTableSyncWorkers,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
-            ...(data.maxTableSyncWorkers !== undefined
-              ? { maxTableSyncWorkers: data.maxTableSyncWorkers }
-              : {}),
           },
         })
         // Set request status only right before starting, then fire and close

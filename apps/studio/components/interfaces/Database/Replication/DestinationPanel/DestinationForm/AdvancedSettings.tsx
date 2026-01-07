@@ -48,9 +48,14 @@ export const AdvancedSettings = ({
               name="maxFillMs"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Batch wait time"
                   layout="horizontal"
-                  description="How long to wait for more changes before sending. Shorter times mean more real-time updates but higher overhead."
+                  label="Batch wait time"
+                  description={
+                    <>
+                      <p>Time to wait for additional changes before sending.</p>
+                      <p>Shorter times imply faster updates, but higher overhead.</p>
+                    </>
+                  }
                 >
                   <FormControl_Shadcn_>
                     <PrePostTab postTab="milliseconds">
@@ -74,7 +79,12 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Batch size"
                   layout="horizontal"
-                  description="How many rows to send in one batch. Larger batches can be faster but use more memory, and very large values can run out of memory."
+                  description={
+                    <>
+                      <p>Number of rows to send in a batch.</p>
+                      <p>Larger batches use more memory, with the risk of running out of memory.</p>
+                    </>
+                  }
                 >
                   <FormControl_Shadcn_>
                     <PrePostTab postTab="rows">
@@ -98,7 +108,12 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Table sync workers"
                   layout="horizontal"
-                  description="How many tables can copy in parallel during the initial sync. Each worker uses one replication slot, so when all are active it uses N+1 slots."
+                  description={
+                    <>
+                      <p>Number of tables to copy in parallel during the initial sync.</p>
+                      <p>Uses one replication slot per worker (N + 1 total when fully active).</p>
+                    </>
+                  }
                 >
                   <FormControl_Shadcn_>
                     <PrePostTab postTab="workers">
@@ -129,7 +144,15 @@ export const AdvancedSettings = ({
                       </div>
                     }
                     layout="horizontal"
-                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs. Leave empty for no staleness limit."
+                    description={
+                      <>
+                        <p>
+                          Maximum age of cached data before BigQuery reads from base tables at query
+                          time.
+                        </p>
+                        <p>Lower values return fresher results, but may increase query costs.</p>
+                      </>
+                    }
                   >
                     <FormControl_Shadcn_>
                       <PrePostTab postTab="minutes">
@@ -138,7 +161,7 @@ export const AdvancedSettings = ({
                           type="number"
                           value={field.value ?? ''}
                           onChange={handleNumberChange(field)}
-                          placeholder="Default: none"
+                          placeholder="Default: None (No staleness limit)"
                         />
                       </PrePostTab>
                     </FormControl_Shadcn_>
