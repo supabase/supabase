@@ -73,6 +73,22 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   showNewBadge?: boolean
 }
 
+interface CustomizedDotProps {
+  formattedGraphicalItems?: Array<{
+    props?: {
+      points?: Array<{ x: number; y: number }>
+      dataKey?: string
+    }
+    item?: {
+      props?: {
+        points?: Array<{ x: number; y: number }>
+        dataKey?: string
+      }
+    }
+    points?: Array<{ x: number; y: number }>
+  }>
+}
+
 export function ComposedChart({
   chartId,
   data,
@@ -122,7 +138,6 @@ export function ComposedChart({
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const [hiddenAttributes, setHiddenAttributes] = useState<Set<string>>(new Set())
   const isDarkMode = resolvedTheme?.includes('dark')
@@ -538,13 +553,13 @@ export function ComposedChart({
             }}
           />
           <Customized
-            component={(props: any) => {
+            component={(props: CustomizedDotProps) => {
               const { formattedGraphicalItems } = props
               if (!formattedGraphicalItems || focusDataIndex === null) return null
 
               return (
                 <g>
-                  {formattedGraphicalItems.map((item: any, index: number) => {
+                  {formattedGraphicalItems.map((item, index: number) => {
                     const points = item.props?.points || item.item?.props?.points || item.points
                     const dataKey = item.props?.dataKey || item.item?.props?.dataKey
 
@@ -597,7 +612,6 @@ export function ComposedChart({
             payload={[maxAttributeData, ...chartData]}
             attributes={attributes}
             showMaxValue={_showMaxValue}
-            onLabelHover={setHoveredLabel}
             onToggleAttribute={(attribute, options) => {
               setHiddenAttributes((prev) => {
                 if (options?.exclusive) {
