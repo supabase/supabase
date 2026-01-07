@@ -173,7 +173,11 @@ export const DestinationForm = ({
       // Common fields
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
-      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10000, // Default: 10 seconds
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
+      maxSize: pipelineData?.config?.batch?.max_size ?? undefined,
+      maxTableSyncWorkers:
+        (pipelineData?.config as { max_table_sync_workers?: number } | undefined)
+          ?.max_table_sync_workers ?? undefined,
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
@@ -301,6 +305,8 @@ export const DestinationForm = ({
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
+        maxSize: data.maxSize,
+        maxTableSyncWorkers: data.maxTableSyncWorkers,
       }),
     ])
 
@@ -398,9 +404,13 @@ export const DestinationForm = ({
           destinationConfig = { iceberg: icebergConfig }
         }
 
-        const batchConfig: BatchConfig | undefined = !!data.maxFillMs
-          ? { maxFillMs: data.maxFillMs }
-          : undefined
+        const batchConfig: BatchConfig | undefined =
+          data.maxFillMs !== undefined || data.maxSize !== undefined
+            ? {
+                ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
+                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
+              }
+            : undefined
         const hasBatchFields = batchConfig !== undefined
 
         if (!destinationConfig) throw new Error('Destination configuration is missing')
@@ -414,6 +424,9 @@ export const DestinationForm = ({
           pipelineConfig: {
             publicationName: data.publicationName,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
+            ...(data.maxTableSyncWorkers !== undefined
+              ? { maxTableSyncWorkers: data.maxTableSyncWorkers }
+              : {}),
           },
           sourceId,
         })
@@ -476,9 +489,13 @@ export const DestinationForm = ({
           }
           destinationConfig = { iceberg: icebergConfig }
         }
-        const batchConfig: BatchConfig | undefined = !!data.maxFillMs
-          ? { maxFillMs: data.maxFillMs }
-          : undefined
+        const batchConfig: BatchConfig | undefined =
+          data.maxFillMs !== undefined || data.maxSize !== undefined
+            ? {
+                ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
+                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
+              }
+            : undefined
         const hasBatchFields = batchConfig !== undefined
 
         if (!destinationConfig) throw new Error('Destination configuration is missing')
@@ -491,6 +508,9 @@ export const DestinationForm = ({
           pipelineConfig: {
             publicationName: data.publicationName,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
+            ...(data.maxTableSyncWorkers !== undefined
+              ? { maxTableSyncWorkers: data.maxTableSyncWorkers }
+              : {}),
           },
         })
         // Set request status only right before starting, then fire and close

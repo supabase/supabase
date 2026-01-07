@@ -5383,11 +5383,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -5411,11 +5413,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -8600,11 +8604,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -8660,11 +8666,13 @@ export interface components {
              */
             max_fill_ms?: number
             /**
-             * @description Maximum batch size
+             * @description Maximum size of the batch
              * @example 200
              */
             max_size?: number
           }
+          /** @description Maximum number of table sync workers */
+          max_table_sync_workers?: number
           /**
            * @description Publication name
            * @example pub_orders
@@ -10257,11 +10265,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -10285,11 +10295,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -10581,12 +10593,12 @@ export interface components {
         failure_type: 'critical' | 'warning'
         /**
          * @description Validation failure name
-         * @example BigQuery Dataset Not Found
+         * @example Validation Failed
          */
         name: string
         /**
          * @description Validation failure reason
-         * @example Dataset 'my_dataset' does not exist in project 'my_project'
+         * @example The configuration is invalid
          */
         reason: string
       }[]
@@ -10602,12 +10614,12 @@ export interface components {
         failure_type: 'critical' | 'warning'
         /**
          * @description Validation failure name
-         * @example Publication Not Found
+         * @example Validation Failed
          */
         name: string
         /**
          * @description Validation failure reason
-         * @example Publication 'my_publication' does not exist in the source database
+         * @example The configuration is invalid
          */
         reason: string
       }[]
@@ -10694,11 +10706,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders

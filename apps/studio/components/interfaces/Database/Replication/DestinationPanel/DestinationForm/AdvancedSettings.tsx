@@ -59,7 +59,55 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 10000 (10 seconds)"
+                        placeholder="Default: 10000"
+                      />
+                    </PrePostTab>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxSize"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Batch size"
+                  layout="horizontal"
+                  description="How many rows to send in one batch. Larger batches can be faster but use more memory, and very large values can run out of memory."
+                >
+                  <FormControl_Shadcn_>
+                    <PrePostTab postTab="rows">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 100000"
+                      />
+                    </PrePostTab>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxTableSyncWorkers"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Table sync workers"
+                  layout="horizontal"
+                  description="How many tables can copy in parallel during the initial sync. Each worker uses one replication slot, so when all are active it uses N+1 slots."
+                >
+                  <FormControl_Shadcn_>
+                    <PrePostTab postTab="workers">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 4"
                       />
                     </PrePostTab>
                   </FormControl_Shadcn_>
