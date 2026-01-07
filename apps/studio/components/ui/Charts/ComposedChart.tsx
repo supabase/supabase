@@ -493,31 +493,24 @@ export function ComposedChart({
             .filter((line) => {
               return line.isReferenceLine
             })
-            .map((line) => {
-              try {
-                return (
-                  <ReferenceLine
-                    key={line.attribute}
-                    y={line.value}
-                    strokeWidth={1}
-                    // {...line}
-                    color={isDarkMode ? line.color?.dark : line.color?.light}
-                    strokeDasharray={line.strokeDasharray ?? '3 3'}
-                    label={undefined}
-                  >
-                    <Label
-                      value={line.label}
-                      position="insideTopRight"
-                      fill={CHART_COLORS.REFERENCE_LINE_TEXT}
-                      className="text-xs"
-                      style={{ fill: CHART_COLORS.REFERENCE_LINE_TEXT }}
-                    />
-                  </ReferenceLine>
-                )
-              } catch (error) {
-                throw error
-              }
-            })}
+            .map((line) => (
+              <ReferenceLine
+                key={line.attribute}
+                y={line.value}
+                strokeWidth={1}
+                stroke={isDarkMode ? line.color?.dark : line.color?.light}
+                strokeDasharray={line.strokeDasharray ?? '3 3'}
+                label={undefined}
+              >
+                <Label
+                  value={line.label}
+                  position="insideTopRight"
+                  fill={CHART_COLORS.REFERENCE_LINE_TEXT}
+                  className="text-xs"
+                  style={{ fill: CHART_COLORS.REFERENCE_LINE_TEXT }}
+                />
+              </ReferenceLine>
+            ))}
 
           {/* Selection highlight */}
           {showHighlightActions && (
