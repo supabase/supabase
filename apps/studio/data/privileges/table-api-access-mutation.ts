@@ -11,6 +11,7 @@ import type { DeepReadonly } from '@/lib/type-helpers'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { UseCustomMutationOptions } from 'types'
 import type { ConnectionVars } from '../common.types'
+import { lintKeys } from '../lint/keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
@@ -90,7 +91,14 @@ export const useTableApiAccessPrivilegesMutation = ({
     mutationFn: (vars) => updateTableApiAccessPrivileges(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await invalidateTablePrivilegesQuery(queryClient, projectRef)
+      await Promise.all([
+        invalidateTablePrivilegesQuery(queryClient, projectRef),
+        // This affects the result of the RLS disabled lint, so we need to
+        // invalidate it
+        queryClient.invalidateQueries({
+          queryKey: lintKeys.lint(projectRef),
+        }),
+      ])
 
       await onSuccess?.(data, variables, context)
     },
