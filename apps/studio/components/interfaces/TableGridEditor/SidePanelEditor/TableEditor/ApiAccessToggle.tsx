@@ -9,6 +9,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react'
+import { usePreviousDistinct } from 'react-use'
 
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
@@ -30,7 +31,6 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePreviousDistinct } from 'react-use'
 import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -469,7 +469,7 @@ const SchemaExposureOptions = ({
         />
       )}
 
-      {!isPending && !isSchemaExposed && (
+      {!isPending && !isError && !isSchemaExposed && (
         <Admonition
           type="default"
           title={`The "${schemaName}" schema is not exposed via the Data API`}
