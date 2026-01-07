@@ -271,16 +271,15 @@ export function ComposedChart({
           )
           .map((att, index) => {
             const attribute = attributes.find((attr) => attr.attribute === att.name)
-            const isDark = resolvedTheme?.includes('dark')
             return {
               ...att,
               color: attribute?.color
-                ? isDark
+                ? isDarkMode
                   ? attribute.color.dark
                   : attribute.color.light
                 : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
               fill: attribute?.fill
-                ? isDark
+                ? isDarkMode
                   ? attribute.fill.dark
                   : attribute.fill.light
                 : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
