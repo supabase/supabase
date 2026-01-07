@@ -4633,6 +4633,10 @@ export interface components {
     }
     V1ServiceHealthResponse: {
       error?: string
+      /**
+       * @deprecated
+       * @description Deprecated. Use `status` instead.
+       */
       healthy: boolean
       info?:
         | {
@@ -4644,6 +4648,10 @@ export interface components {
         | {
             connected_cluster: number
             db_connected: boolean
+            /**
+             * @deprecated
+             * @description Deprecated. Use `status` instead.
+             */
             healthy: boolean
           }
         | {

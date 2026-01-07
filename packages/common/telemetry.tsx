@@ -426,7 +426,7 @@ export function useTelemetryIdentify(API_URL: string) {
         ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
-      posthogClient.identify(user.id)
+      posthogClient.identify(user.id, { gotrue_id: user.id })
     }
   }, [API_URL, user?.id])
 }
