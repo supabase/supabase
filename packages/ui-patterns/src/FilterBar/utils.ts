@@ -59,9 +59,7 @@ export function isFilterOptionObject(option: any): option is FilterOptionObject 
 }
 
 export function isFilterOperatorObject(operator: any): operator is FilterOperatorObject {
-  return (
-    typeof operator === 'object' && operator !== null && 'value' in operator && 'label' in operator
-  )
+  return typeof operator === 'object' && operator !== null && 'value' in operator && 'label' in operator
 }
 
 export function isAsyncOptionsFunction(
@@ -134,9 +132,7 @@ export function addFilterToGroup(
 ): FilterGroup {
   if (path.length === 0) {
     const firstOperator = property.operators?.[0] || '='
-    const operatorValue = isFilterOperatorObject(firstOperator)
-      ? firstOperator.value
-      : firstOperator
+    const operatorValue = isFilterOperatorObject(firstOperator) ? firstOperator.value : firstOperator
 
     return {
       ...group,
