@@ -462,7 +462,7 @@ export function ComposedChart({
             : visibleAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
-                  type="natural"
+                  type="bump"
                   dataKey={attribute.name}
                   stackId={
                     attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? `stack-${i}`
@@ -472,13 +472,6 @@ export function ComposedChart({
                   stroke={attribute.color}
                   radius={20}
                   animationDuration={375}
-                  // fillOpacity={
-                  //   hoveredLabel && hoveredLabel !== attribute.name
-                  //     ? 0.075
-                  //     : hoveredLabel === attribute.name
-                  //       ? 0.3
-                  //       : 0.25
-                  // }
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
@@ -489,7 +482,7 @@ export function ComposedChart({
           {maxAttribute && _showMaxValue && (
             <Line
               key={maxAttribute.attribute}
-              type="natural"
+              type="bump"
               dataKey={maxAttribute.attribute}
               stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
