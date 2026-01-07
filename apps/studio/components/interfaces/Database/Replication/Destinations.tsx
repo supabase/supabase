@@ -3,7 +3,6 @@ import { Plus, Search } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
@@ -14,20 +13,33 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
-import { Button, cn, Input } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  cn,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationModal } from './EnableReplicationModal'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 export const Destinations = () => {
+  const queryClient = useQueryClient()
+  const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isPaidPlan = organization?.plan.id !== 'free'
 
-  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
+  const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
-  const { ref: projectRef } = useParams()
+  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
 
   const {
     data: sourcesData,
@@ -38,7 +50,6 @@ export const Destinations = () => {
   } = useReplicationSourcesQuery({
     projectRef,
   })
-
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
   const replicationNotEnabled = isSourcesSuccess && !sourceId
 
@@ -61,9 +72,7 @@ export const Destinations = () => {
   } = useReplicationPipelinesQuery({
     projectRef,
   })
-
   const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
-
   const filteredDestinations =
     filterString.length === 0
       ? destinationsData?.destinations ?? []
@@ -71,9 +80,6 @@ export const Destinations = () => {
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  // Prefetch pipeline version info for all destinations on first load only
-  const queryClient = useQueryClient()
-  const prefetchedRef = useRef(false)
   useEffect(() => {
     if (
       projectRef &&
@@ -153,42 +159,50 @@ export const Destinations = () => {
             </div>
           </div>
         ) : hasDestinations ? (
-          <Table
-            head={[
-              <Table.th key="name">Name</Table.th>,
-              <Table.th key="type">Type</Table.th>,
-              <Table.th key="status">Status</Table.th>,
-              <Table.th key="publication">Publication</Table.th>,
-              <Table.th key="actions"></Table.th>,
-            ]}
-            body={filteredDestinations.map((destination) => {
-              const pipeline = pipelinesData?.pipelines.find(
-                (p) => p.destination_id === destination.id
-              )
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead key="name">Name</TableHead>
+                    <TableHead key="type">Type</TableHead>
+                    <TableHead key="status">Status</TableHead>
+                    <TableHead key="publication">Publication</TableHead>
+                    <TableHead key="actions" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredDestinations.map((destination) => {
+                    const pipeline = pipelinesData?.pipelines.find(
+                      (p) => p.destination_id === destination.id
+                    )
 
-              const type =
-                'big_query' in destination.config
-                  ? 'BigQuery'
-                  : 'iceberg' in destination.config
-                    ? 'Analytics Bucket'
-                    : undefined
+                    const type =
+                      'big_query' in destination.config
+                        ? 'BigQuery'
+                        : 'iceberg' in destination.config
+                          ? 'Analytics Bucket'
+                          : undefined
 
-              return (
-                <DestinationRow
-                  key={destination.id}
-                  sourceId={sourceId}
-                  destinationId={destination.id}
-                  destinationName={destination.name}
-                  type={type}
-                  pipeline={pipeline}
-                  error={pipelinesError}
-                  isLoading={isPipelinesLoading}
-                  isError={isPipelinesError}
-                  isSuccess={isPipelinesSuccess}
-                />
-              )
-            })}
-          />
+                    return (
+                      <DestinationRow
+                        key={destination.id}
+                        sourceId={sourceId}
+                        destinationId={destination.id}
+                        destinationName={destination.name}
+                        type={type}
+                        pipeline={pipeline}
+                        error={pipelinesError}
+                        isLoading={isPipelinesLoading}
+                        isError={isPipelinesError}
+                        isSuccess={isPipelinesSuccess}
+                      />
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         ) : (
           !isSourcesLoading &&
           !isDestinationsLoading &&

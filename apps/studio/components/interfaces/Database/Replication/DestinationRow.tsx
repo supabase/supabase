@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
@@ -16,7 +15,15 @@ import {
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import type { ResponseError } from 'types'
-import { Button, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
+import {
+  Button,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
+} from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
@@ -137,8 +144,8 @@ export const DestinationRow = ({
         <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       )}
       {isPipelineSuccess && (
-        <Table.tr>
-          <Table.td>
+        <TableRow>
+          <TableCell>
             {isPipelineLoading ? (
               <ShimmeringLoader />
             ) : pipeline?.id ? (
@@ -151,9 +158,9 @@ export const DestinationRow = ({
             ) : (
               destinationName
             )}
-          </Table.td>
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
-          <Table.td>
+          </TableCell>
+          <TableCell>{isPipelineLoading ? <ShimmeringLoader /> : type}</TableCell>
+          <TableCell>
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
             ) : (
@@ -167,15 +174,15 @@ export const DestinationRow = ({
                 pipelineId={pipeline?.id}
               />
             )}
-          </Table.td>
-          <Table.td>
+          </TableCell>
+          <TableCell>
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
             ) : (
               pipeline.config.publication_name
             )}
-          </Table.td>
-          <Table.td>
+          </TableCell>
+          <TableCell>
             <div className="flex items-center justify-end gap-x-2">
               {hasTableErrors && (
                 <Tooltip>
@@ -204,8 +211,8 @@ export const DestinationRow = ({
                 onUpdateClick={() => setShowUpdateVersionModal(true)}
               />
             </div>
-          </Table.td>
-        </Table.tr>
+          </TableCell>
+        </TableRow>
       )}
 
       <DeleteDestination
