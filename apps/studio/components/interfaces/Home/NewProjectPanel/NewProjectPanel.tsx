@@ -1,16 +1,19 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
+import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
-import APIKeys from './APIKeys'
-import GetStartedHero from './GetStartedHero'
+import { APIKeys } from './APIKeys'
+import { GetStartedHero } from './GetStartedHero'
 
-const NewProjectPanel = () => {
+export const NewProjectPanel = () => {
   const { ref } = useParams()
 
   const {
@@ -36,7 +39,7 @@ const NewProjectPanel = () => {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
               <div className="space-y-2">
-                <h2>Get started by building out your database</h2>
+                <h2>Build out your database</h2>
                 <p className="text-base text-foreground-light">
                   Start building your app by creating tables and inserting data. Our Table Editor
                   makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
@@ -51,11 +54,7 @@ const NewProjectPanel = () => {
                   <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink />}>
-                  <Link
-                    href="https://supabase.com/docs/guides/database"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <Link href={`${DOCS_URL}/guides/database`} target="_blank" rel="noreferrer">
                     About Database
                   </Link>
                 </Button>
@@ -100,11 +99,7 @@ const NewProjectPanel = () => {
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/auth"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/auth`} target="_blank" rel="noreferrer">
                           About Auth
                         </Link>
                       </Button>
@@ -136,11 +131,7 @@ const NewProjectPanel = () => {
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/storage"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/storage`} target="_blank" rel="noreferrer">
                           About Storage
                         </Link>
                       </Button>
@@ -173,7 +164,7 @@ const NewProjectPanel = () => {
                         asChild
                       >
                         <Link
-                          href="https://supabase.com/docs/guides/functions"
+                          href={`${DOCS_URL}/guides/functions`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -206,11 +197,7 @@ const NewProjectPanel = () => {
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/realtime"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/realtime`} target="_blank" rel="noreferrer">
                           About Realtime
                         </Link>
                       </Button>
@@ -226,32 +213,18 @@ const NewProjectPanel = () => {
       <div className="col-span-12 lg:col-span-4">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2>Connecting to your new project</h2>
-            <p className="text-base text-foreground-light lg:max-w-sm">
+            <h2>Connect to your project</h2>
+            <p className="text-base text-foreground-light text-balance">
               Interact with your database through the{' '}
-              <Link href="https://supabase.com/docs/reference" className="text-brand">
-                Supabase client libraries
-              </Link>{' '}
-              with your API keys.
-            </p>
-            <p className="text-base text-foreground-light lg:max-w-sm">
-              More information about your project's keys can be found in your project's API
-              settings.
+              <InlineLink href={`${DOCS_URL}/reference`}>Supabase client libraries</InlineLink> and
+              your API keys.
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default">
-              <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
+            <Button asChild type="default" icon={<Settings size={16} strokeWidth={1.5} />}>
+              <Link href={`/project/${ref}/settings/api`}>API settings</Link>
             </Button>
-            <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/api"
-                target="_blank"
-                rel="noreferrer"
-              >
-                About APIs
-              </Link>
-            </Button>
+            <DocsButton href={`${DOCS_URL}/guides/database/api`} />
           </div>
         </div>
       </div>
@@ -261,5 +234,3 @@ const NewProjectPanel = () => {
     </div>
   )
 }
-
-export default NewProjectPanel

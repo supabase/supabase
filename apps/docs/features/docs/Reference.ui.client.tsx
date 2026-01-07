@@ -3,6 +3,7 @@
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 import {
   cn,
@@ -44,7 +45,7 @@ export function ReferenceSectionWrapper({
         initialScrollHappened &&
         window.scrollY > 0 /* Don't update on first navigation to introduction */
       ) {
-        window.history.replaceState(null, '', link)
+        safeHistoryReplaceState(link)
       }
     },
   })

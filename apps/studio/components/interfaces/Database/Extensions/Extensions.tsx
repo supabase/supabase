@@ -4,23 +4,32 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import ExtensionRow from './ExtensionRow'
+import {
+  Card,
+  Input,
+  ShadowScrollArea,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ExtensionRow } from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
-const Extensions = () => {
+export const Extensions = () => {
   const { filter } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isLoading } = useDatabaseExtensionsQuery({
+  const { data, isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -41,8 +50,10 @@ const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)
@@ -51,17 +62,14 @@ const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="tiny"
-            placeholder="Search for an extension"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            className="w-52"
-            icon={<Search size={14} />}
-          />
-          <DocsButton href="https://supabase.com/docs/guides/database/extensions" />
-        </div>
+        <Input
+          size="tiny"
+          placeholder="Search for an extension"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          className="w-52"
+          icon={<Search />}
+        />
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
@@ -74,8 +82,8 @@ const Extensions = () => {
       {isLoading ? (
         <GenericSkeletonLoader />
       ) : (
-        <div className="w-full overflow-hidden overflow-x-auto">
-          <Card>
+        <Card>
+          <ShadowScrollArea stickyLastColumn>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -85,11 +93,16 @@ const Extensions = () => {
                   <TableHead key="description">Description</TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
-                  <TableHead
-                    key="enabled"
-                    className="w-20 bg-background-200 border-l sticky right-0"
-                  >
-                    Enabled
+                  {/* 
+                    [Joshen] All these classes are just to make the last column sticky 
+                    I reckon we can pull these out into the Table component where we can declare
+                    sticky columns via props, but we can do that if we start to have more tables
+                    in the dashboard with sticky columns
+                  */}
+                  <TableHead key="enabled" className="px-0">
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l">
+                      Enabled
+                    </div>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -110,11 +123,9 @@ const Extensions = () => {
                 )}
               </TableBody>
             </Table>
-          </Card>
-        </div>
+          </ShadowScrollArea>
+        </Card>
       )}
     </>
   )
 }
-
-export default Extensions

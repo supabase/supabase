@@ -1,46 +1,72 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { ProtectionAuthSettingsForm } from 'components/interfaces/Auth'
+import { useParams } from 'common'
+import { ProtectionAuthSettingsForm } from 'components/interfaces/Auth/ProtectionAuthSettingsForm/ProtectionAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const ProtectionPage: NextPageWithLayout = () => {
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const { ref } = useParams()
+  const showAttackProtection = useIsFeatureEnabled('authentication:attack_protection')
+
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+
+  if (!showAttackProtection) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+  }
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   }
 
   return (
-    <ScaffoldContainer>
-      {!isPermissionsLoaded ? (
-        <div className="mt-12">
-          <GenericSkeletonLoader />
-        </div>
-      ) : (
-        <ProtectionAuthSettingsForm />
-      )}
-    </ScaffoldContainer>
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Attack Protection</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure security settings to protect your project from attacks
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <ProtectionAuthSettingsForm />
+        )}
+      </PageContainer>
+    </>
   )
 }
 
 ProtectionPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="Attack Protection"
-        subtitle="Configure security settings to protect your project from attacks"
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

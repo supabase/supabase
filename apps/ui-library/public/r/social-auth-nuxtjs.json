@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "social-auth-nuxtjs",
+  "type": "registry:block",
+  "title": "Social Auth flow for Nuxt and Supabase",
+  "description": "Social Auth flow for Nuxt and Supabase",
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [
+    "button",
+    "card",
+    "input",
+    "label"
+  ],
+  "files": [
+    {
+      "path": "registry/default/social-auth/nuxtjs/app/components/login-form.vue",
+      "content": "<script setup lang=\"ts\">\nimport { ref } from \"vue\"\nimport { createClient } from \"@/lib/supabase/client\"\nimport { cn } from \"@/lib/utils\"\n\nimport { Button } from \"@/components/ui/button.vue\"\nimport {\n  Card,\n  CardContent,\n  CardDescription,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/card.vue\"\n\n// Reactive state\nconst error = ref<string | null>(null)\nconst isLoading = ref(false)\n\n// GitHub OAuth login handler\nconst handleSocialLogin = async (e: Event) => {\n  e.preventDefault()\n  const supabase = createClient()\n  isLoading.value = true\n  error.value = null\n\n  try {\n    const { error: supabaseError } = await supabase.auth.signInWithOAuth({\n      provider: \"github\",\n      options: {\n        redirectTo: `${window.location.origin}/api/routes/oauth?next=/protected`,\n      },\n    })\n\n    if (supabaseError) throw supabaseError\n  } catch (err: unknown) {\n    error.value = err instanceof Error ? err.message : \"An error occurred\"\n    isLoading.value = false\n  }\n}\n</script>\n\n<template>\n  <div :class=\"cn('flex flex-col gap-6')\">\n    <Card>\n      <CardHeader>\n        <CardTitle class=\"text-2xl\">Welcome!</CardTitle>\n        <CardDescription>Sign in to your account to continue</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <form @submit=\"handleSocialLogin\">\n          <div class=\"flex flex-col gap-6\">\n            <p v-if=\"error\" class=\"text-sm text-destructive-500\">{{ error }}</p>\n            <Button type=\"submit\" class=\"w-full\" :disabled=\"isLoading\">\n              {{ isLoading ? \"Logging in...\" : \"Continue with GitHub\" }}\n            </Button>\n          </div>\n        </form>\n      </CardContent>\n    </Card>\n  </div>\n</template>\n",
+      "type": "registry:file",
+      "target": "app/components/login-form.vue"
+    },
+    {
+      "path": "registry/default/social-auth/nuxtjs/app/components/logout-button.vue",
+      "content": "<script setup lang=\"ts\">\nimport { createClient } from \"@/lib/supabase/client\"\nimport { useRouter } from \"vue-router\"\nimport { Button } from \"@/components/ui/button.vue\"\n\nconst router = useRouter()\n\nconst logout = async () => {\n  const supabase = createClient()\n  await supabase.auth.signOut()\n  router.push(\"/auth/login\")\n}\n</script>\n\n<template>\n  <Button @click=\"logout\">Logout</Button>\n</template>\n",
+      "type": "registry:file",
+      "target": "app/components/logout-button.vue"
+    },
+    {
+      "path": "registry/default/social-auth/nuxtjs/app/pages/auth/login.vue",
+      "content": "<script setup lang=\"ts\">\nimport LoginForm from \"@/components/login-form.vue\"\n</script>\n\n<template>\n  <div class=\"flex min-h-screen w-full items-center justify-center p-6 md:p-10\">\n    <div class=\"w-full max-w-sm\">\n      <LoginForm />\n    </div>\n  </div>\n</template>",
+      "type": "registry:file",
+      "target": "app/pages/auth/login.vue"
+    },
+    {
+      "path": "registry/default/social-auth/nuxtjs/app/pages/auth/error.vue",
+      "content": "<script setup lang=\"ts\">\nimport { useRoute } from \"vue-router\"\nimport { computed } from \"vue\"\nimport { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\"\n\nconst route = useRoute()\nconst errorMessage = computed(() => route.query.error as string || null)\n</script>\n\n<template>\n  <div class=\"flex min-h-screen w-full items-center justify-center p-6 md:p-10\">\n    <div class=\"w-full max-w-sm\">\n      <div class=\"flex flex-col gap-6\">\n        <Card>\n          <CardHeader>\n            <CardTitle class=\"text-2xl\">Sorry, something went wrong.</CardTitle>\n          </CardHeader>\n          <CardContent>\n            <p v-if=\"errorMessage\" class=\"text-sm text-muted-foreground\">\n              Code error: {{ errorMessage }}\n            </p>\n            <p v-else class=\"text-sm text-muted-foreground\">\n              An unspecified error occurred.\n            </p>\n          </CardContent>\n        </Card>\n      </div>\n    </div>\n  </div>\n</template>",
+      "type": "registry:file",
+      "target": "app/pages/auth/error.vue"
+    },
+    {
+      "path": "registry/default/social-auth/nuxtjs/app/pages/protected/index.vue",
+      "content": "<script setup lang=\"ts\">\nimport { onMounted, ref } from \"vue\"\nimport { useRouter } from \"vue-router\"\nimport { createClient } from \"@/lib/supabase/client\"\nimport LogoutButton from \"@/components/logout-button.vue\"\n\nconst router = useRouter()\nconst supabase = createClient()\nconst email = ref<string | null>(null)\nconst loading = ref(true)\n\nonMounted(async () => {\n  const { data, error } = await supabase.auth.getUser()\n\n  if (error || !data?.user) {\n    router.replace(\"/auth/login\")\n    return\n  }\n\n  email.value = data.user.email\n  loading.value = false\n})\n</script>\n\n<template>\n  <div class=\"flex h-screen w-full items-center justify-center\">\n    <div v-if=\"loading\" class=\"text-muted-foreground\">Checking authentication...</div>\n\n    <div v-else class=\"flex items-center gap-2\">\n      <p>\n        Hello <span class=\"font-semibold\">{{ email }}</span>\n      </p>\n      <LogoutButton />\n    </div>\n  </div>\n</template>\n",
+      "type": "registry:file",
+      "target": "app/pages/protected/index.vue"
+    },
+    {
+      "path": "registry/default/social-auth/nuxtjs/server/middleware/auth.ts",
+      "content": "import { defineEventHandler, sendRedirect } from 'h3'\nimport { createSupabaseServerClient } from '@/registry/default/clients/nuxtjs/server/supabase/client'\n\nexport default defineEventHandler(async (event) => {\n  const supabase = createSupabaseServerClient(event)\n\n  // Get user claims\n  const { data } = await supabase.auth.getClaims()\n  const user = data?.claims\n\n  const pathname = event.node.req.url || '/'\n\n  // Redirect if no user and not already on login/auth route\n  if (\n    !user &&\n    !pathname.startsWith('/login') &&\n    !pathname.startsWith('/auth')\n  ) {\n    return sendRedirect(event, '/auth/login')\n  }\n\n  // Return event as-is (you could return any object if needed)\n  return { user }\n})\n",
+      "type": "registry:file",
+      "target": "server/middleware/auth.ts"
+    },
+    {
+      "path": "registry/default/social-auth/nuxtjs/server/routes/auth/oauth.ts",
+      "content": "import { createSupabaseServerClient } from '@/registry/default/clients/nuxtjs/server/supabase/client'\nimport { defineEventHandler, getQuery, sendRedirect, getRequestURL } from \"h3\"\n\nexport default defineEventHandler(async (event) => {\n  const url = getRequestURL(event) // URL object of the current request\n  const query = getQuery(event)\n\n  const code = query.code as string | undefined\n  let next = (query.next as string | undefined) ?? \"/\"\n\n  if (!next.startsWith(\"/\")) {\n    next = \"/\"\n  }\n\n  if (code) {\n    const supabase = createSupabaseServerClient(event)\n    const { error } = await supabase.auth.exchangeCodeForSession(code)\n\n    if (!error) {\n      // Determine origin\n      const forwardedHost = event.node.req.headers[\"x-forwarded-host\"] as string | undefined\n      const isLocalEnv = process.env.NODE_ENV === \"development\"\n      const origin = `${url.protocol}//${url.host}`\n\n      if (isLocalEnv) {\n        return sendRedirect(event, `${origin}${next}`)\n      } else if (forwardedHost) {\n        return sendRedirect(event, `https://${forwardedHost}${next}`)\n      } else {\n        return sendRedirect(event, `${origin}${next}`)\n      }\n    }\n  }\n\n  // fallback to error page\n  const origin = `${url.protocol}//${url.host}`\n  return sendRedirect(event, `${origin}/auth/error`)\n})\n",
+      "type": "registry:file",
+      "target": "server/routes/auth/oauth.ts"
+    }
+  ]
+}

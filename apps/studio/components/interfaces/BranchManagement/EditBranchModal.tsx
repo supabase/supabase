@@ -10,7 +10,6 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
@@ -38,6 +37,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -61,7 +61,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery({
@@ -69,12 +69,12 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isChecking } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated branch "${data.name}"`)
       onClose()
@@ -147,16 +147,16 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!branch?.id) return console.error('Branch ID is required')
+    if (!ref) return console.error('Branch ref is required')
 
     const payload: {
+      branchRef: string
       projectRef: string
-      id: string
       branchName: string
       gitBranch?: string
     } = {
+      branchRef: ref,
       projectRef,
-      id: branch.id,
       branchName: data.branchName,
     }
 
@@ -299,11 +299,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <Label>Sync with a GitHub branch</Label>
-                      {!gitlessBranching && (
-                        <Badge variant="warning" size="small">
-                          Required
-                        </Badge>
-                      )}
+                      {!gitlessBranching && <Badge variant="warning">Required</Badge>}
                     </div>
                     <p className="text-sm text-foreground-light">
                       {gitlessBranching

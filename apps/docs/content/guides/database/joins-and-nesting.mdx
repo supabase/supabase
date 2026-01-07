@@ -129,6 +129,7 @@ const sectionsWithInstruments: SectionsWithInstruments = data
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -136,6 +137,8 @@ final data = await supabase.from('orchestral_sections').select('id, name, instru
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -158,6 +161,8 @@ let orchestralSections: [OrchestralSection] = try await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -165,6 +170,8 @@ val data = supabase.from("orchestral_sections").select(Columns.raw("id, name, in
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -172,6 +179,7 @@ data = supabase.from_('orchestral_sections').select('id, name, instruments(id, n
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -245,6 +253,7 @@ const { data, error } = await supabase.from('teams').select(`
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -252,6 +261,8 @@ final data = await supabase.from('teams').select('id, team_name, users(id, name)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -284,6 +295,8 @@ let teams [Team] = try await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -291,6 +304,8 @@ val data = supabase.from("teams").select(Columns.raw("id, team_name, users(id, n
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -298,6 +313,7 @@ data = supabase.from_('teams').select('id, team_name, users(id, name)').execute(
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ````javascript
@@ -396,6 +412,7 @@ const { data, error } = await supabase.from('shifts').select(
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -415,6 +432,8 @@ end_scan:scans!scan_id_end (
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -466,6 +485,9 @@ let shifts: [Shift] = try await supabase
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -486,6 +508,8 @@ end_scan:scans!scan_id_end (
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -505,6 +529,7 @@ data = supabase.from_('shifts').select("""
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript

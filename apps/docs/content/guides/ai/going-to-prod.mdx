@@ -26,7 +26,7 @@ On the other hand, if you need to scale your application, you will need to [crea
 
 ## HNSW vs IVFFlat indexes
 
-`pgvector` supports two types of indexes: HNSW and IVFFlat. We recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](https://supabase.com/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
+`pgvector` supports two types of indexes: HNSW and IVFFlat. We recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
 
 <Image
   alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute add-on"
@@ -68,7 +68,7 @@ The values of lists and probes directly affect accuracy and queries per second (
 - Higher `probes` means that select queries will be slower, but you can achieve better accuracy.
 - `lists` and `probes` are not independent. Higher `lists` means that you will have to use higher `probes` to achieve the same accuracy.
 
-You can find more examples of how `lists` and `probes` constants affect accuracy and QPS in [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blogpost.
+You can find more examples of how `lists` and `probes` constants affect accuracy and QPS in [pgvector 0.4.0 performance](/blog/pgvector-performance) blogpost.
 
 <Image
   alt="multi database"
@@ -109,7 +109,7 @@ Don't forget to check out the general [Production Checklist](/docs/guides/platfo
 
 You can look at our [Choosing Compute Add-on](/docs/guides/ai/choosing-compute-addon) guide to get a basic understanding of how much compute you might need for your workload.
 
-Or take a look at our [pgvector 0.5.0 performance](https://supabase.com/blog/increase-performance-pgvector-hnsw) and [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blog posts to see what pgvector is capable of and how the above technique can be used to achieve the best results.
+Or take a look at our [pgvector 0.5.0 performance](/blog/increase-performance-pgvector-hnsw) and [pgvector 0.4.0 performance](/blog/pgvector-performance) blog posts to see what pgvector is capable of and how the above technique can be used to achieve the best results.
 
 <Image
   alt="multi database"

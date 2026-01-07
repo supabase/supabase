@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -31,7 +32,7 @@ export const AuthAlert = ({
             below. Developers using this provider should move over to the new provider. Please refer
             to our{' '}
             <a
-              href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
+              href={`${DOCS_URL}/guides/auth/social-login/auth-slack`}
               className="underline"
               target="_blank"
             >

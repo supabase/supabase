@@ -1,11 +1,11 @@
 import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
 import AlertError from 'components/ui/AlertError'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { sortBy } from 'lodash'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface PolicyRolesProps {
   selectedRoles: string[]
@@ -13,9 +13,15 @@ interface PolicyRolesProps {
 }
 type SystemRole = (typeof SYSTEM_ROLES)[number]
 
-const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
+export const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data, error, isLoading, isError, isSuccess } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -34,7 +40,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
   })
 
   return (
-    <div className="flex flex-col md:flew-row gap-4 md:gap-12">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
         <label className="text-foreground-light text-base" htmlFor="policy-name">
           Target roles
@@ -57,5 +63,3 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
     </div>
   )
 }
-
-export default PolicyRoles

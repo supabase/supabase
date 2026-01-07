@@ -52,7 +52,8 @@ export const Index: Record<string, any> = [`
     let { children } = iconNodes[iconName]
     children = children.map(({ name, attributes }) => [name, attributes])
 
-    const getSvg = () => readSvg(`${iconName}.svg`, iconsDir)
+    const svgContent = readSvg(`${iconName}.svg`, iconsDir)
+    const getSvg = () => svgContent
     // const { deprecated = false } = iconMetaData[iconName]
     const deprecated = false
 

@@ -11,6 +11,10 @@ export interface NavMenuSection {
   name: string
   url?: `/${string}` | `https://${string}`
   items: Partial<NavMenuSection>[]
+  icon?: string
+  hasLightIcon?: boolean
+  isDarkMode?: boolean
+  enabled?: boolean
 }
 
 type MenuItem = {
@@ -20,6 +24,7 @@ type MenuItem = {
   level?: string
   hasLightIcon?: boolean
   community?: boolean
+  enabled?: boolean
 }
 
 export type DropdownMenuItem = MenuItem & {
@@ -33,4 +38,5 @@ export type NavMenuConstant = Readonly<{
   icon: string
   url?: `/${string}`
   items: ReadonlyArray<Partial<NavMenuSection>>
+  enabled?: boolean
 }>

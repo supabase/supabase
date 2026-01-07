@@ -1,33 +1,35 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, useMemo } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
+import { CommandMenuTriggerInput } from 'ui-patterns'
 import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown'
+import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -52,28 +54,26 @@ interface LayoutHeaderProps {
   breadcrumbs?: any[]
   headerTitle?: string
   showProductMenu?: boolean
+  backToDashboardURL?: string
 }
 
-const LayoutHeader = ({
+export const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
   showProductMenu,
+  backToDashboardURL,
 }: LayoutHeaderProps) => {
   const { ref: projectRef, slug } = useParams()
+  const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const [showEditorPanel, setShowEditorPanel] = useState(false)
-  useHotKey(
-    () => {
-      if (projectRef) setShowEditorPanel(!showEditorPanel)
-    },
-    'e',
-    [showEditorPanel, projectRef]
-  )
+  const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
+
+  const isAccountPage = router.pathname.startsWith('/account')
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -95,7 +95,17 @@ const LayoutHeader = ({
   return (
     <>
       <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
-        {showProductMenu && (
+        {backToDashboardURL && isAccountPage && (
+          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+            <Link
+              href={backToDashboardURL}
+              className="flex items-center justify-center border-none !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
+            >
+              <ChevronLeft strokeWidth={1.5} size={16} />
+            </Link>
+          </div>
+        )}
+        {(showProductMenu || isAccountPage) && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <button
               title="Menu dropdown button"
@@ -141,9 +151,7 @@ const LayoutHeader = ({
                     {exceedingLimits && (
                       <div className="ml-2">
                         <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                          <Badge variant="destructive" className="whitespace-nowrap">
-                            Exceeding usage limits
-                          </Badge>
+                          <Badge variant="destructive">Exceeding usage limits</Badge>
                         </Link>
                       </div>
                     )}
@@ -202,13 +210,24 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    showShortcut={commandMenuEnabled}
+                    placeholder="Search..."
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      '[&_.command-shortcut>div]:border-none',
+                      '[&_.command-shortcut>div]:pr-2',
+                      '[&_.command-shortcut>div]:bg-transparent',
+                      '[&_.command-shortcut>div]:text-foreground-lighter'
+                    )}
+                  />
                   <HelpPopover />
-                  <NotificationsPopoverV2 />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -219,11 +238,21 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                        [&_.command-shortcut>div]:border-none
+                        [&_.command-shortcut>div]:pr-2
+                        [&_.command-shortcut>div]:bg-transparent
+                        [&_.command-shortcut>div]:text-foreground-lighter
+                      "
+                  />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -235,9 +264,6 @@ const LayoutHeader = ({
           </div>
         </div>
       </header>
-      <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
     </>
   )
 }
-
-export default LayoutHeader

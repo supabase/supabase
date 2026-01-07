@@ -1,9 +1,8 @@
-import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabaseQueuePurgeMutation } from 'data/database-queues/database-queues-purge-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface PurgeQueueProps {
   queueName: string
@@ -11,14 +10,12 @@ interface PurgeQueueProps {
   onClose: () => void
 }
 
-const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
-  const router = useRouter()
+export const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: purgeDatabaseQueue, isLoading } = useDatabaseQueuePurgeMutation({
+  const { mutate: purgeDatabaseQueue, isPending } = useDatabaseQueuePurgeMutation({
     onSuccess: () => {
       toast.success(`Successfully purged queue ${queueName}`)
-      router.push(`/project/${project?.ref}/integrations/queues`)
       onClose()
     },
   })
@@ -44,7 +41,7 @@ const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
       onCancel={() => onClose()}
       onConfirm={handlePurge}
       title="Purge this queue"
-      loading={isLoading}
+      loading={isPending}
       confirmLabel={`Purge queue ${queueName}`}
       confirmPlaceholder="Type in name of queue"
       confirmString={queueName ?? 'Unknown'}
@@ -61,5 +58,3 @@ const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
     />
   )
 }
-
-export default PurgeQueue

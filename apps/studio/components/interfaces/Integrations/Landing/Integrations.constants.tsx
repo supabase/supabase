@@ -1,11 +1,11 @@
-import { Clock5, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import { Clock5, Layers, Timer, Vault, Webhook, Receipt } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -51,7 +51,7 @@ const authorSupabase = {
   websiteUrl: 'https://supabase.com',
 }
 
-const supabaseIntegrations: IntegrationDefinition[] = [
+const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
   {
     id: 'queues',
     type: 'postgres_extension' as const,
@@ -87,7 +87,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+        return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
           loading: Loading,
         })
       }
@@ -121,7 +121,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     icon: ({ className, ...props } = {}) => (
       <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
-    description: 'Schedule recurring Jobs in Postgres.',
+    description: 'Schedule recurring Jobs in Postgres',
     docsUrl: 'https://github.com/citusdata/pg_cron',
     author: {
       name: 'Citus Data',
@@ -143,12 +143,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(
-          () => import('../CronJobs/PreviousRunsTab').then((mod) => mod.PreviousRunsTab),
-          {
-            loading: Loading,
-          }
-        )
+        return dynamic(() => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage), {
+          loading: Loading,
+        })
       }
       switch (pageId) {
         case 'overview':
@@ -175,12 +172,12 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     requiredExtensions: ['supabase_vault'],
     missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
-    status: 'alpha',
+    status: 'beta',
     icon: ({ className, ...props } = {}) => (
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     navigation: [
       {
@@ -224,7 +221,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     requiredExtensions: [],
     navigation: [
@@ -278,7 +275,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       />
     ),
     description: 'Run GraphQL queries through our interactive in-browser IDE',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     navigation: [
       {
@@ -318,7 +315,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
   },
 ] as const
 
-const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
+const WRAPPER_INTEGRATIONS: IntegrationDefinition[] = WRAPPERS.map((w) => {
   return {
     id: w.name,
     type: 'wrapper' as const,
@@ -369,7 +366,66 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
   }
 })
 
+const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
+  {
+    id: 'stripe_sync_engine',
+    type: 'custom' as const,
+    requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
+    missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
+    name: `Stripe Sync Engine`,
+    status: 'alpha',
+    icon: ({ className, ...props } = {}) => (
+      <Image
+        fill
+        src={`${BASE_PATH}/img/icons/stripe-icon.svg`}
+        alt={'Stripe Logo'}
+        className={cn('p-2', className)}
+        {...props}
+      />
+    ),
+    description:
+      'Continuously sync your payments, customer, and other data from Stripe to your Postgres database',
+    docsUrl: 'https://github.com/stripe-experiments/sync-engine/',
+    author: {
+      name: 'Stripe',
+      websiteUrl: 'https://www.stripe.com',
+    },
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+      {
+        route: 'settings',
+        label: 'Settings',
+      },
+    ],
+    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import(
+                'components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview'
+              ).then((mod) => mod.StripeSyncInstallationPage),
+            { loading: Loading }
+          )
+        case 'settings':
+          return dynamic(
+            () =>
+              import(
+                'components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage'
+              ).then((mod) => mod.StripeSyncSettingsPage),
+            { loading: Loading }
+          )
+      }
+      return null
+    },
+  },
+]
+
 export const INTEGRATIONS: IntegrationDefinition[] = [
-  ...wrapperIntegrations,
-  ...supabaseIntegrations,
+  ...WRAPPER_INTEGRATIONS,
+  ...SUPABASE_INTEGRATIONS,
+  ...TEMPLATE_INTEGRATIONS,
 ]

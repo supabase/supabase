@@ -1,31 +1,26 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
-import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod/v4'
+import { safeValidateUIMessages } from 'ai'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-
-import {
-  CHAT_PROMPT,
-  EDGE_FUNCTION_PROMPT,
-  GENERAL_PROMPT,
-  PG_BEST_PRACTICES,
-  RLS_PROMPT,
-  SECURITY_PROMPT,
-} from 'lib/ai/prompts'
+import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const maxDuration = 120
 
 export const config = {
-  api: { bodyParser: true },
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -36,7 +31,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handlePost(req, res)
     default:
       res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+      res.status(405).json({
+        data: null,
+        error: { message: `Method ${method} Not Allowed` },
+      })
   }
 }
 
@@ -53,6 +51,7 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
+  model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -70,27 +69,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
+  const {
+    messages: rawMessages,
+    projectRef,
+    connectionString,
+    orgSlug,
+    chatName,
+    model: requestedModel,
+  } = data
 
-  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
-  // Results property is used to cache results client-side after queries are run
-  // Tool results will still be included in history sent to model
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
-      delete cleanedMsg.results
-      return cleanedMsg
-    }
-    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
-    // this happens when a user stops the assistant response while the tool is being called
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.filter((part: any) => {
-        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
-      })
-      return { ...msg, parts: cleanedParts }
-    }
-    return msg
-  })
+  const messagesValidation = await safeValidateUIMessages({ messages: rawMessages })
+  if (!messagesValidation.success) {
+    return res
+      .status(400)
+      .json({ error: 'Invalid request body', message: messagesValidation.error.message })
+  }
+  const messages = messagesValidation.data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
@@ -111,80 +105,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
       isLimited = orgAILimited
     } catch (error) {
-      return res
-        .status(400)
-        .json({ error: 'There was an error fetching your organization details' })
+      return res.status(400).json({
+        error: 'There was an error fetching your organization details',
+      })
     }
   }
 
-  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+  const {
+    model,
+    error: modelError,
+    promptProviderOptions,
+    providerOptions,
+  } = await getModel({
+    provider: 'openai',
+    model: requestedModel ?? 'gpt-5',
+    routingKey: projectRef,
+    isLimited,
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
   }
 
   try {
-    // Get a list of all schemas to add to context
-    const pgMetaSchemasList = pgMeta.schemas.list()
-
-    const { result: schemas } =
-      aiOptInLevel !== 'disabled'
-        ? await executeSql(
-            {
-              projectRef,
-              connectionString,
-              sql: pgMetaSchemasList.sql,
-            },
-            undefined,
-            {
-              'Content-Type': 'application/json',
-              ...(authorization && { Authorization: authorization }),
-            },
-            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
-          )
-        : { result: [] }
-
-    const schemasString =
-      schemas?.length > 0
-        ? `The available database schema names are: ${JSON.stringify(schemas)}`
-        : "You don't have access to any schemas."
-
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
-    const system = source`
-      ${GENERAL_PROMPT}
-      ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${SECURITY_PROMPT}
-    `
-
-    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
-    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-    const coreMessages: ModelMessage[] = [
-      {
-        role: 'system',
-        content: system,
-        providerOptions: {
-          bedrock: {
-            // Always cache the system prompt (must not contain dynamic content)
-            cachePoint: { type: 'default' },
-          },
-        },
-      },
-      {
-        role: 'assistant',
-        // Add any dynamic context here
-        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
-      },
-      ...convertToModelMessages(messages),
-    ]
-
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
 
-    // Get tools
     const tools = await getTools({
       projectRef,
       connectionString,
@@ -193,15 +140,45 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
+    // Get a list of all schemas to add to context
+    const getSchemas = async (): Promise<string> => {
+      const pgMetaSchemasList = pgMeta.schemas.list()
+      type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
+
+      const { result: schemas } = await executeSql<Schemas>(
+        {
+          projectRef,
+          connectionString,
+          sql: pgMetaSchemasList.sql,
+        },
+        undefined,
+        {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+        IS_PLATFORM ? undefined : executeQuery
+      )
+
+      return schemas?.length > 0
+        ? `The available database schema names are: ${JSON.stringify(schemas)}`
+        : "You don't have access to any schemas."
+    }
+
+    const result = await generateAssistantResponse({
+      messages,
       model,
-      stopWhen: stepCountIs(5),
-      messages: coreMessages,
       tools,
+      aiOptInLevel,
+      getSchemas: aiOptInLevel !== 'disabled' ? getSchemas : undefined,
+      projectRef,
+      chatName,
+      promptProviderOptions,
+      providerOptions,
       abortSignal: abortController.signal,
     })
 
     result.pipeUIMessageStreamToResponse(res, {
+      sendReasoning: true,
       onError: (error) => {
         if (error == null) {
           return 'unknown error'

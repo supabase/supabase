@@ -2,41 +2,41 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 
-const MIDDLEWARE_OUTAGE_BANNER_KEY = LOCAL_STORAGE_KEYS.MIDDLEWARE_OUTAGE_BANNER
+const MAINTENANCE_WINDOW_BANNER_KEY = LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER
 
 // [Joshen] This file is meant to be dynamic - update this as and when we need to use the NoticeBanner
 
 type AppBannerContextType = {
-  middlewareOutageBannerAcknowledged: boolean
-  onUpdateAcknowledged: (key: typeof MIDDLEWARE_OUTAGE_BANNER_KEY) => void
+  maintenanceWindowBannerAcknowledged: boolean
+  onUpdateAcknowledged: (key: typeof MAINTENANCE_WINDOW_BANNER_KEY) => void
 }
 
 const AppBannerContext = createContext<AppBannerContextType>({
-  middlewareOutageBannerAcknowledged: false,
+  maintenanceWindowBannerAcknowledged: false,
   onUpdateAcknowledged: noop,
 })
 
 export const useAppBannerContext = () => useContext(AppBannerContext)
 
 export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [middlewareOutageBannerAcknowledged, setmiddlewareOutageBannerAcknowledged] =
+  const [maintenanceWindowBannerAcknowledged, setMaintenanceWindowBannerAcknowledged] =
     useState<boolean>(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const acknowledged = localStorage.getItem(MIDDLEWARE_OUTAGE_BANNER_KEY) === 'true'
-      setmiddlewareOutageBannerAcknowledged(acknowledged)
+      const maintenanceAcknowledged = localStorage.getItem(MAINTENANCE_WINDOW_BANNER_KEY) === 'true'
+      setMaintenanceWindowBannerAcknowledged(maintenanceAcknowledged)
     }
   }, [])
 
   const value = {
-    middlewareOutageBannerAcknowledged,
-    onUpdateAcknowledged: (key: typeof MIDDLEWARE_OUTAGE_BANNER_KEY) => {
-      if (key === MIDDLEWARE_OUTAGE_BANNER_KEY) {
+    maintenanceWindowBannerAcknowledged,
+    onUpdateAcknowledged: (key: typeof MAINTENANCE_WINDOW_BANNER_KEY) => {
+      if (key === MAINTENANCE_WINDOW_BANNER_KEY) {
         if (typeof window !== 'undefined') {
-          window.localStorage.setItem(MIDDLEWARE_OUTAGE_BANNER_KEY, 'true')
+          window.localStorage.setItem(MAINTENANCE_WINDOW_BANNER_KEY, 'true')
         }
-        setmiddlewareOutageBannerAcknowledged(true)
+        setMaintenanceWindowBannerAcknowledged(true)
       }
     },
   }
@@ -45,6 +45,6 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
 }
 
 export const useIsNoticeBannerShown = () => {
-  const { middlewareOutageBannerAcknowledged } = useAppBannerContext()
-  return middlewareOutageBannerAcknowledged
+  const { maintenanceWindowBannerAcknowledged } = useAppBannerContext()
+  return maintenanceWindowBannerAcknowledged
 }

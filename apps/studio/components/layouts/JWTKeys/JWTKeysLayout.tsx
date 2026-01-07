@@ -9,14 +9,14 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
 
   const navigationItems = [
     {
-      label: 'Legacy JWT Secret',
+      label: 'JWT Signing Keys',
       href: `/project/${projectRef}/settings/jwt`,
-      id: 'legacy-jwt-keys',
+      id: 'signing-keys',
     },
     {
-      label: 'JWT Signing Keys',
-      href: `/project/${projectRef}/settings/jwt/signing-keys`,
-      id: 'signing-keys',
+      label: 'Legacy JWT Secret',
+      href: `/project/${projectRef}/settings/jwt/legacy`,
+      id: 'legacy-jwt-keys',
     },
   ]
 

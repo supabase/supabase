@@ -5,21 +5,63 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 29 Apr 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 17 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/exprealty</guid>
+  <title>How eXp Realty Unlocked Enterprise Innovation and Cut SaaS Costs with Supabase</title>
+  <link>https://supabase.com/customers/exprealty</link>
+  <description>eXp Realty empowered 2,000+ non-technical employees to build production software using AI coding tools with Supabase, replacing millions in SaaS contracts with bespoke solutions.</description>
+  <pubDate>Wed, 17 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/govsignals</guid>
+  <title>GovSignals builds the AI platform for Government Contractors on Supabase</title>
+  <link>https://supabase.com/customers/govsignals</link>
+  <description>GovSignals builds AI for government contractors, helping them discover federal opportunities, automate RFP responses, and collaborate on proposals within secure, compliant environments powered by Supabase.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/koodos</guid>
+  <title>Koodos scales its social discovery app Shelf on Supabase</title>
+  <link>https://supabase.com/customers/koodos</link>
+  <description>Koodos built its app Shelf from day one on Supabase, growing to support millions of users and billions of data points without dedicated database staff.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/phoenix-energy</guid>
+  <title>Phoenix Energy completes critical infrastructure migration in six months with Supabase</title>
+  <link>https://supabase.com/customers/phoenix-energy</link>
+  <description>Phoenix Energy rebuilt its infrastructure on Supabase, completing a full-stack migration from MongoDB ahead of deadline with zero downtime.</description>
+  <pubDate>Thu, 13 Nov 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/rally</guid>
+  <title>Rally builds a pan-European fleet payments platform on Supabase</title>
+  <link>https://supabase.com/customers/rally</link>
+  <description>Rally went from first line of code to fully licensed fintech in three months, processing live fleet payments across Europe.</description>
+  <pubDate>Tue, 21 Oct 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/soshi</guid>
+  <title>From Hackathon to Funded Startup: How Soshi Built an AI Social Media Manager on Supabase</title>
+  <link>https://supabase.com/customers/soshi</link>
+  <description>Soshi built the world&apos;s first AI-powered social media marketing employee on Supabase, going from hackathon project to funded startup in months.</description>
+  <pubDate>Sun, 17 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/kayhanspace</guid>
   <title>Kayhan Space saw 8x improvement in developer speed when moving to Supabase</title>
   <link>https://supabase.com/customers/kayhanspace</link>
   <description>The Kayhan Space team migrated to Supabase from Amazon RDS and Auth0 to simplify infrastructure and unlock developer velocity.</description>
-  <pubDate>Tue, 20 May 2025 00:00:00 -0700</pubDate>
+  <pubDate>Wed, 21 May 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/udio</guid>
   <title>Udio hits the right notes with Supabase</title>
   <link>https://supabase.com/customers/udio</link>
   <description>Udio built a scalable, AI-driven music platform on a Supabase backend from day one.</description>
-  <pubDate>Tue, 20 May 2025 00:00:00 -0700</pubDate>
+  <pubDate>Wed, 21 May 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/euka</guid>
@@ -69,6 +111,13 @@
   <link>https://supabase.com/customers/resend</link>
   <description>Scaling seamlessly to 5,000+ paying customers &amp; millions of emails sent daily with Supabase</description>
   <pubDate>Fri, 21 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/juniver</guid>
+  <title>Juniver built a self-serve B2B platform with Supabase to scale eating disorder recovery</title>
+  <link>https://supabase.com/customers/juniver</link>
+  <description>Juniver switched from Firebase to Supabase and saw immediate improvements in developer experience and performance.</description>
+  <pubDate>Wed, 15 Jan 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/e2b</guid>
@@ -162,10 +211,10 @@
   <pubDate>Wed, 17 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/mendableai</guid>
-  <title>Mendable switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
-  <link>https://supabase.com/customers/mendableai</link>
-  <description>How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
+  <guid>https://supabase.com/customers/firecrawl</guid>
+  <title>Firecrawl switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
+  <link>https://supabase.com/customers/firecrawl</link>
+  <description>How Firecrawl boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
   <pubDate>Fri, 05 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>

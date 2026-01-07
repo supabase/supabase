@@ -18,6 +18,8 @@ function processJsonFile(filePath: string) {
         "import { Link } from '@/registry/default/components/ui/link'",
         "import Link from 'next/link'"
       )
+      // Replace the file origin path to exclude the monorepo structure
+      .replaceAll('node_modules/@supabase/vue-blocks/', '')
 
     // Write back to file
     fs.writeFileSync(filePath, stringified)

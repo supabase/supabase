@@ -1,11 +1,12 @@
+import * as Sentry from '@sentry/nextjs'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { isEqual } from 'lodash'
+import { useState } from 'react'
+
+import { useParams } from 'common'
 import { get } from 'data/fetchers'
 import { generateRegexpWhere } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
-import { useQueries, useQueryClient } from '@tanstack/react-query'
-import * as Sentry from '@sentry/nextjs'
-import { useState } from 'react'
-import { useParams } from 'common'
-import { isEqual } from 'lodash'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
@@ -219,8 +220,15 @@ const fetchLogs = async ({
 
 const DEFAULT_KEYS = ['shared-api-report']
 
+export type SharedAPIReportFilterBy =
+  | 'auth'
+  | 'realtime'
+  | 'storage'
+  | 'graphql'
+  | 'functions'
+  | 'postgrest'
 type SharedAPIReportParams = {
-  filterBy: 'auth' | 'realtime' | 'storage' | 'graphql' | 'functions' | 'postgrest'
+  filterBy: SharedAPIReportFilterBy
   start: string
   end: string
   projectRef: string
@@ -263,7 +271,16 @@ export const useSharedAPIReport = ({
 
   const queries = useQueries({
     queries: Object.entries(SHARED_API_REPORT_SQL).map(([key, value]) => ({
-      queryKey: [...DEFAULT_KEYS, key, filterByMapSource[filterBy], filters, start, end, ref],
+      queryKey: [
+        ...DEFAULT_KEYS,
+        filterBy,
+        key,
+        filterByMapSource[filterBy],
+        filters,
+        start,
+        end,
+        ref,
+      ],
       enabled: enabled && !!ref && !!filterBy,
       queryFn: () =>
         fetchLogs({
@@ -287,7 +304,7 @@ export const useSharedAPIReport = ({
 
   const error = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].error as string
+      acc[key] = queries[i].error as unknown as string
       return acc
     },
     {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: string }
@@ -324,6 +341,22 @@ export const useSharedAPIReport = ({
 
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
+  const SQLMap: Record<SharedAPIReportKey, string> = {
+    totalRequests: SHARED_API_REPORT_SQL.totalRequests.sql(allFilters, filterByMapSource[filterBy]),
+    topRoutes: SHARED_API_REPORT_SQL.topRoutes.sql(allFilters, filterByMapSource[filterBy]),
+    errorCounts: SHARED_API_REPORT_SQL.errorCounts.sql(allFilters, filterByMapSource[filterBy]),
+    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.sql(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.sql(allFilters, filterByMapSource[filterBy]),
+    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.sql(allFilters, filterByMapSource[filterBy]),
+    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.sql(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+  }
+
   return {
     data,
     error,
@@ -334,5 +367,9 @@ export const useSharedAPIReport = ({
     filters,
     addFilter,
     removeFilters,
+    /**
+     * The SQL queries used to fetch each metric
+     */
+    sql: SQLMap,
   }
 }

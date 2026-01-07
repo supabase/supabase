@@ -9,7 +9,7 @@ import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/Com
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
 import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
@@ -76,7 +76,7 @@ export function useSnippetCommands() {
     [
       {
         id: 'run-snippet',
-        name: 'Run snippet',
+        name: 'Run snippet...',
         icon: () => <Code />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },
@@ -93,7 +93,7 @@ function RunSnippetPage() {
   const { ref } = useParams()
   const {
     data: snippetPages,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useSqlSnippetsQuery({
@@ -103,10 +103,14 @@ function RunSnippetPage() {
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
   const { profile } = useProfile()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   useSetCommandMenuSize('xlarge')
 
@@ -283,7 +287,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
     [
       {
         id: 'query-table',
-        name: 'Query a table',
+        name: 'Query a table...',
         icon: () => <Table2 />,
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
@@ -298,7 +302,7 @@ function TableSelector() {
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useTablesQuery({

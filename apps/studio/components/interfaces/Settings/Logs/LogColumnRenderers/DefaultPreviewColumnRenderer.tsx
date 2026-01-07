@@ -14,6 +14,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'default-preview-first-column',
     key: 'default-preview-first-column',
+    renderHeaderCell: () => null,
     renderCell: defaultRenderCell,
   },
 ]

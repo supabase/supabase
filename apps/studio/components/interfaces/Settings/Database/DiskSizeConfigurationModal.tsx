@@ -7,10 +7,12 @@ import { toast } from 'sonner'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,7 +24,7 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean
@@ -37,10 +39,10 @@ const DiskSizeConfigurationModal = ({
 }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { lastDatabaseResizeAt } = project ?? {}
 
-  const { data: projectSubscriptionData, isLoading: isLoadingSubscription } =
+  const { data: projectSubscriptionData, isPending: isLoadingSubscription } =
     useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 
   const isLoading = isLoadingProject || isLoadingSubscription
@@ -55,7 +57,7 @@ const DiskSizeConfigurationModal = ({
           timeTillNextAvailableDatabaseResize % 60
         } minute(s)`
 
-  const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
+  const { mutate: updateProjectUsage, isPending: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
       onSuccess: (res, variables) => {
         toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
@@ -117,11 +119,15 @@ const DiskSizeConfigurationModal = ({
                     need more than this, contact us via support for help.
                   </p>
                   <Button asChild type="default" className="mt-3">
-                    <Link
-                      href={`/support/new?projectRef=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
+                    <SupportLink
+                      queryParams={{
+                        projectRef,
+                        category: SupportCategories.PERFORMANCE_ISSUES,
+                        subject: 'Increase disk size beyond 200GB',
+                      }}
                     >
                       Contact support
-                    </Link>
+                    </SupportLink>
                   </Button>
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
@@ -144,7 +150,7 @@ const DiskSizeConfigurationModal = ({
                             )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
                       </div>
                       <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                        <Link href="https://supabase.com/docs/guides/platform/database-size#disk-management">
+                        <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
                           Read more about disk management
                         </Link>
                       </Button>

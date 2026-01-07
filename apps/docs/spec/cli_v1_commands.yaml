@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.34.3
+  version: 2.62.10
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -70,11 +70,15 @@ flags:
       - id: yaml
         name: yaml
         type: '[ env | pretty | json | toml | yaml ]'
+  - id: profile
+    name: --profile <string>
+    description: use a specific profile for connecting to Supabase API
+    default_value: supabase
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: "yes"
+  - id: 'yes'
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -345,6 +349,35 @@ commands:
   - id: supabase-storage-cp
     title: supabase storage cp
     summary: Copy objects from src to dst path
+    description: |
+      Relies on standard uploads to move files between local and remote storage. [Not suitable for moving files over 6MB in size](https://supabase.com/docs/guides/storage/uploads/standard-uploads?queryGroups=language&language=js#uploading).
+    examples:
+      - id: upload-file-to-bucket
+        name: Upload file to bucket
+        code: supabase storage cp -r path/to/file ss:///bucket_name --experimental
+        response: |
+          Uploading: /path/to/file/example.txt => /bucket_name/example.txt
+      - id: Upload-file-to-folder
+        name: Upload file to folder
+        code: supabase storage cp -r path/to/local/file ss:///bucket_name/path/to/folder --experimental
+        response: |
+          Uploading: /path/to/file/example.txt => /bucket_name/path/to/folder/example.txt
+      - id: upload-entire-folder-to-bucket
+        name: Upload folder to bucket
+        code: supabase storage cp -r path/to/local/folder ss:///bucket_name --experimental
+        response: |
+          Uploading: /path/to/folder/example1.txt => /bucket_name/folder/example1.txt
+          Uploading: /path/to/folder/example2.txt => /bucket_name/folder/example2.txt
+          Uploading: /path/to/folder/example3.txt => /bucket_name/folder/example3.txt
+          ...
+      - id: download-entire-bucket
+        name: Download bucket
+        code: supabase storage cp -r ss://bucket_name path/to/local/folder --experimental
+        response: |
+          Downloading: bucket_name/example1.txt => path/to/local/folder/bucket_name/example1.txt
+          Downloading: bucket_name/example2.txt => path/to/local/folder/bucket_name/example2.txt
+          Downloading: bucket_name/example3.txt => path/to/local/folder/bucket_name/example3.txt
+          ...
     tags: []
     links: []
     usage: supabase storage cp <src> <dst> [flags]
@@ -601,6 +634,24 @@ commands:
         description: |
           URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
         default_value: ''
+      - id: name-id-format
+        name: --name-id-format <string>
+        description: |
+          URI reference representing the classification of string-based identifier information.
+        default_value: ''
+        accepted_values:
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            type: string
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            type: string
       - id: remove-domains
         name: --remove-domains <strings>
         description: |
@@ -763,6 +814,24 @@ commands:
         description: |
           URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
         default_value: ''
+      - id: name-id-format
+        name: --name-id-format <string>
+        description: |
+          URI reference representing the classification of string-based identifier information.
+        default_value: ''
+        accepted_values:
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            type: string
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            type: string
       - id: skip-url-validation
         name: --skip-url-validation
         description: |
@@ -1277,6 +1346,10 @@ commands:
     usage: supabase network-restrictions update [flags]
     subcommands: []
     flags:
+      - id: append
+        name: --append
+        description: Append to existing restrictions instead of replacing them.
+        default_value: 'false'
       - id: bypass-cidr-checks
         name: --bypass-cidr-checks
         description: Bypass some of the CIDR validation checks.
@@ -1768,6 +1841,10 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: skip-pooler
+        name: --skip-pooler
+        description: Use direct connection instead of pooler.
+        default_value: 'false'
   - id: supabase-inspect
     title: supabase inspect
     summary: Tools to inspect your Supabase project
@@ -1820,6 +1897,7 @@ commands:
       - supabase-inspect-db-replication-slots
       - supabase-inspect-db-role-stats
       - supabase-inspect-db-table-stats
+      - supabase-inspect-db-traffic-profile
       - supabase-inspect-db-vacuum-stats
     flags: []
   - id: supabase-inspect-db-vacuum-stats
@@ -1846,6 +1924,52 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db vacuum-stats
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Inspect the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Inspect the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Inspect the local database.
+        default_value: 'false'
+  - id: supabase-inspect-db-traffic-profile
+    title: supabase inspect db traffic-profile
+    summary: |
+      Show read/write activity ratio for tables based on block I/O operations
+    description: |2+
+
+      This command analyzes table I/O patterns to show read/write activity ratios based on block-level operations. It combines data from PostgreSQL's `pg_stat_user_tables` (for tuple operations) and `pg_statio_user_tables` (for block I/O) to categorize each table's workload profile.
+
+
+      The command classifies tables into categories:
+      - **Read-Heavy** - Read operations are more than 5x write operations (e.g., 1:10, 1:50)
+      - **Write-Heavy** - Write operations are more than 20% of read operations (e.g., 1:2, 1:4, 2:1, 10:1)
+      - **Balanced** - Mixed workload where writes are between 20% and 500% of reads
+      - **Read-Only** - Only read operations detected
+      - **Write-Only** - Only write operations detected
+
+      ```
+      SCHEMA │ TABLE        │ BLOCKS READ │ WRITE TUPLES │ BLOCKS WRITE │ ACTIVITY RATIO
+      ───────┼──────────────┼─────────────┼──────────────┼──────────────┼────────────────────
+      public │ user_events  │     450,234 │     9,004,680│       23,450 │ 20:1 (Write-Heavy)
+      public │ users        │      89,203 │        12,451│        1,203 │ 7.2:1 (Read-Heavy)
+      public │ sessions     │      15,402 │        14,823│        2,341 │ ≈1:1 (Balanced)
+      public │ cache_data   │     123,456 │             0│            0 │ Read-Only
+      auth   │ audit_logs   │           0 │        98,234│       12,341 │ Write-Only
+      ```
+
+      **Note:** This command only displays tables that have had both read and write activity. Tables with no I/O operations are not shown. The classification ratio threshold (default: 5:1) determines when a table is considered "heavy" in one direction versus balanced.
+
+    tags: []
+    links: []
+    usage: supabase inspect db traffic-profile
     subcommands: []
     flags:
       - id: db-url
@@ -2249,7 +2373,7 @@ commands:
       - local-dev
     links: []
     subcommands:
-      - supabase-gen-keys
+      - supabase-gen-bearer-jwt
       - supabase-gen-signing-key
       - supabase-gen-types
     flags: []
@@ -2289,13 +2413,16 @@ commands:
         default_value: 'false'
       - id: postgrest-v9-compat
         name: --postgrest-v9-compat
-        description: |
-          Generate types compatible with PostgREST v9 and below. Only use together with --db-url.
+        description: Generate types compatible with PostgREST v9 and below.
         default_value: 'false'
       - id: project-id
         name: --project-id <string>
         description: Generate types from a project ID.
         default_value: ''
+      - id: query-timeout
+        name: --query-timeout <duration>
+        description: Maximum timeout allowed for the database query.
+        default_value: 15s
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
@@ -2340,27 +2467,35 @@ commands:
         name: --append
         description: Append new key to existing keys file instead of overwriting.
         default_value: 'false'
-  - id: supabase-gen-keys
-    title: supabase gen keys
-    summary: Generate keys for preview branch
+  - id: supabase-gen-bearer-jwt
+    title: supabase gen bearer-jwt
+    summary: Generate a Bearer Auth JWT for accessing Data API
     tags: []
     links: []
-    usage: supabase gen keys [flags]
+    usage: supabase gen bearer-jwt [flags]
     subcommands: []
     flags:
-      - id: override-name
-        name: --override-name <strings>
-        description: Override specific variable names.
-        default_value: '[]'
-      - id: project-ref
-        name: --project-ref <string>
-        description: Project ref of the Supabase project.
+      - id: exp
+        name: --exp <time>
+        description: Expiry timestamp for this token.
         default_value: ''
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
+      - id: payload
+        name: --payload <string>
+        description: Custom claims in JSON format.
+        default_value: '{}'
+      - id: role
+        name: --role <string>
+        description: Postgres role to use.
         required: true
-        default_value: 'false'
+        default_value: ''
+      - id: sub
+        name: --sub <string>
+        description: User ID to impersonate.
+        default_value: anonymous
+      - id: valid-for
+        name: --valid-for <duration>
+        description: Validity duration for this token.
+        default_value: 30m0s
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions
@@ -2493,14 +2628,14 @@ commands:
     usage: supabase functions download <Function name> [flags]
     subcommands: []
     flags:
-      - id: legacy-bundle
-        name: --legacy-bundle
-        description: Use legacy bundling mechanism.
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: use-api
+        name: --use-api
+        description: Unbundle functions server-side without using Docker.
+        default_value: 'false'
   - id: supabase-functions-deploy
     title: supabase functions deploy
     summary: Deploy a Function to Supabase
@@ -2533,12 +2668,8 @@ commands:
         default_value: 'false'
       - id: use-api
         name: --use-api
-        description: Use Management API to bundle functions.
+        description: Bundle functions server-side without using Docker.
         default_value: 'false'
-      - id: use-docker
-        name: --use-docker
-        description: Use Docker to bundle functions.
-        default_value: 'true'
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -3099,7 +3230,7 @@ commands:
         default_value: '[]'
       - id: use-copy
         name: --use-copy
-        description: Uses copy statements in place of inserts.
+        description: Use copy statements in place of inserts.
         default_value: 'false'
   - id: supabase-db-diff
     title: supabase db diff
@@ -3376,6 +3507,10 @@ commands:
         name: --name <string>
         description: Rename the preview branch.
         default_value: ''
+      - id: notify-url
+        name: --notify-url <string>
+        description: URL to notify when branch is active healthy.
+        default_value: ''
       - id: persistent
         name: --persistent
         description: Switch between ephemeral and persistent branch.
@@ -3476,6 +3611,10 @@ commands:
     usage: supabase branches create [name] [flags]
     subcommands: []
     flags:
+      - id: notify-url
+        name: --notify-url <string>
+        description: URL to notify when branch is active healthy.
+        default_value: ''
       - id: persistent
         name: --persistent
         description: Whether to create a persistent branch.

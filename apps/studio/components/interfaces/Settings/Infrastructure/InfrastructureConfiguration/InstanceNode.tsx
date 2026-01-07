@@ -14,7 +14,9 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -44,7 +46,7 @@ interface NodeData {
   id: string
   provider: string
   region: Region
-  computeSize: string
+  computeSize?: string
   status: string
   inserted_at: string
 }
@@ -94,7 +96,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
-                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+                <Link href={`/project/${ref}/settings/api?source=load-balancer`}>View API URL</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -108,6 +110,12 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
 export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -132,16 +140,20 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{provider}</span>
-                <span className="text-sm text-foreground-light">•</span>
-                <span className="text-sm text-foreground-light">{computeSize}</span>
+                <span className="text-sm text-foreground-light">{providerLabel}</span>
+                {projectHomepageShowInstanceSize && (
+                  <>
+                    <span className="text-sm text-foreground-light">•</span>
+                    <span className="text-sm text-foreground-light">{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
           <img
             alt="region icon"
             className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
         {numReplicas > 0 && (
@@ -182,10 +194,11 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   } = data
   const { ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
-    PermissionAction.CREATE,
-    'projects'
-  )
+  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
@@ -220,6 +233,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         REPLICA_STATUS.INIT_READ_REPLICA,
       ] as string[]
     ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
+
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -278,9 +294,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESIZING ? (
                 <Badge>Resizing</Badge>
-              ) : initStatus === ReplicaInitializationStatus.Completed &&
-                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge variant="brand">Healthy</Badge>
+              ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+                <Badge variant="success">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}
@@ -288,8 +303,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{provider}</span>
-                {!!computeSize && (
+                <span>{providerLabel}</span>
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span>•</span>
                     <span>{computeSize}</span>
@@ -359,7 +374,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               className="gap-x-2"
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
-              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
+              <Link href={`/project/${ref}/observability/database?db=${id}&chart=replication-lag`}>
                 View replication lag
               </Link>
             </DropdownMenuItem>
@@ -407,7 +422,7 @@ export const RegionNode = ({ data }: any) => {
         <img
           alt="region icon"
           className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>
       </div>

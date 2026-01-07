@@ -161,7 +161,7 @@ function Feedback({ className }: { className?: string }) {
               '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
               'motion-reduce:[transition-duration:150ms,1ms,300ms]',
               '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
-              !isNo && 'hover:text-warning-600 hover:border-warning-500',
+              !isNo && 'hover:text-warning hover:border-warning-500',
               isNo && `bg-warning text-warning-200 !border-warning disabled:opacity-100`,
               !showNo && 'opacity-0 invisible'
             )}

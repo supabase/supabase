@@ -1,66 +1,56 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { FilterProperty, FilterGroup as FilterGroupType } from './types'
-import { ActiveInput } from './FilterBar'
-import { FilterCondition } from './FilterCondition'
-import { Input_Shadcn_ } from 'ui'
+'use client'
 
-type FilterGroupProps = {
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  cn,
+  Input_Shadcn_,
+  Popover_Shadcn_,
+  PopoverAnchor_Shadcn_,
+  PopoverContent_Shadcn_,
+} from 'ui'
+import { DefaultCommandList } from './DefaultCommandList'
+import { useFilterBar } from './FilterBarContext'
+import { FilterCondition } from './FilterCondition'
+import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import { buildPropertyItems } from './menuItems'
+import { FilterGroup as FilterGroupType } from './types'
+import { pathsEqual } from './utils'
+
+export type FilterGroupProps = {
   group: FilterGroupType
   path: number[]
-  isLoading?: boolean
-  filterProperties: FilterProperty[]
-  // Active state
-  activeInput: ActiveInput
-  onOperatorChange: (path: number[], value: string) => void
-  onValueChange: (path: number[], value: string) => void
-  onOperatorFocus: (path: number[]) => void
-  onValueFocus: (path: number[]) => void
-  onBlur: () => void
-  onLabelClick: (path: number[]) => void
-  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
-  // Group specific props
-  onGroupFreeformChange: (path: number[], value: string) => void
-  onGroupFreeformFocus: (path: number[]) => void
-  groupFreeformValue: string
-  isGroupFreeformActive: boolean
-  // Logical operator props
-  onLogicalOperatorChange?: (path: number[]) => void
 }
 
-export function FilterGroup({
-  group,
-  path,
-  isLoading,
-  activeInput,
-  filterProperties,
-  onOperatorChange,
-  onValueChange,
-  onOperatorFocus,
-  onValueFocus,
-  onBlur,
-  onLabelClick,
-  onKeyDown,
-  onGroupFreeformChange,
-  onGroupFreeformFocus,
-  groupFreeformValue,
-  isGroupFreeformActive,
-  onLogicalOperatorChange,
-}: FilterGroupProps) {
+export function FilterGroup({ group, path }: FilterGroupProps) {
+  const {
+    filterProperties,
+    activeInput,
+    freeformText,
+    isLoading,
+    supportsOperators,
+    actions,
+    variant,
+    handleInputBlur,
+    handleGroupFreeformFocus,
+    handleGroupFreeformChange,
+    handleLogicalOperatorChange,
+    handleKeyDown,
+    handleSelectMenuItem,
+  } = useFilterBar()
+
   const [localFreeformValue, setLocalFreeformValue] = useState('')
   const freeformInputRef = useRef<HTMLInputElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const [isHoveringOperator, setIsHoveringOperator] = useState(false)
-  const isActive =
-    isGroupFreeformActive &&
-    activeInput?.type === 'group' &&
-    path.length === activeInput.path.length &&
-    path.every((v, i) => v === activeInput.path[i])
+
+  const isActive = activeInput?.type === 'group' && pathsEqual(path, activeInput.path)
 
   // Reset local value when group freeform value is cleared
   useEffect(() => {
-    if (groupFreeformValue === '') {
+    if (freeformText === '') {
       setLocalFreeformValue('')
     }
-  }, [groupFreeformValue])
+  }, [freeformText])
 
   useEffect(() => {
     if (isActive && freeformInputRef.current) {
@@ -68,56 +58,82 @@ export function FilterGroup({
     }
   }, [isActive])
 
+  const handleFreeformBlur = useDeferredBlur(
+    wrapperRef as React.RefObject<HTMLElement>,
+    handleInputBlur
+  )
+
   const handleFreeformChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalFreeformValue(e.target.value)
-    onGroupFreeformChange(path, e.target.value)
+    handleGroupFreeformChange(path, e.target.value)
   }
 
   const handleLogicalOperatorClick = () => {
-    onLogicalOperatorChange?.(path)
-  }
-
-  const handleLogicalOperatorMouseEnter = () => {
-    setIsHoveringOperator(true)
-  }
-
-  const handleLogicalOperatorMouseLeave = () => {
-    setIsHoveringOperator(false)
+    handleLogicalOperatorChange(path)
   }
 
   const isConditionActive = (conditionPath: number[]) => {
     if (!activeInput) return false
-    return (
-      activeInput.type === 'value' &&
-      conditionPath.length === activeInput.path.length &&
-      conditionPath.every((v, i) => v === activeInput.path[i])
-    )
+    return activeInput.type === 'value' && pathsEqual(conditionPath, activeInput.path)
   }
 
   const isOperatorActive = (conditionPath: number[]) => {
     if (!activeInput) return false
-    return (
-      activeInput.type === 'operator' &&
-      conditionPath.length === activeInput.path.length &&
-      conditionPath.every((v, i) => v === activeInput.path[i])
-    )
+    return activeInput.type === 'operator' && pathsEqual(conditionPath, activeInput.path)
   }
+
+  const items = useMemo(
+    () =>
+      buildPropertyItems({
+        filterProperties,
+        inputValue: (isActive ? freeformText : localFreeformValue) || '',
+        actions,
+        supportsOperators,
+      }),
+    [filterProperties, isActive, freeformText, localFreeformValue, actions, supportsOperators]
+  )
+
+  // Only the root group should expand to fill available space
+  const isRootGroup = path.length === 0
+
+  const {
+    highlightedIndex,
+    handleKeyDown: handleFreeformKeyDown,
+    reset: resetFreeformHighlight,
+  } = useHighlightNavigation(
+    items.length,
+    (index) => {
+      if (items[index]) handleSelectMenuItem(items[index])
+    },
+    handleKeyDown
+  )
+
+  useEffect(() => {
+    if (!isActive) resetFreeformHighlight()
+  }, [isActive, resetFreeformHighlight])
 
   return (
     <div
-      className={`flex items-center gap-1 rounded ${
+      ref={wrapperRef}
+      className={`flex items-stretch gap-0 shrink-0 ${
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
           : ''
-      }`}
+      } ${isRootGroup ? 'flex-1 min-w-0' : ''} ${variant === 'pill' ? 'py-2' : ''}`}
     >
-      <div className="flex items-center gap-1">
+      <div
+        className={cn(
+          'flex items-stretch',
+          isRootGroup ? 'flex-1 min-w-0' : '',
+          variant === 'pill' ? 'gap-1' : 'gap-0'
+        )}
+      >
         {group.conditions.map((condition, index) => {
           const currentPath = [...path, index]
 
           return (
             <React.Fragment key={index}>
-              {index > 0 && (
+              {index > 0 && supportsOperators && (
                 <span
                   className={`text-xs font-medium cursor-pointer ${
                     isHoveringOperator
@@ -125,74 +141,84 @@ export function FilterGroup({
                       : 'text-foreground-muted'
                   }`}
                   onClick={handleLogicalOperatorClick}
-                  onMouseEnter={handleLogicalOperatorMouseEnter}
-                  onMouseLeave={handleLogicalOperatorMouseLeave}
+                  onMouseEnter={() => setIsHoveringOperator(true)}
+                  onMouseLeave={() => setIsHoveringOperator(false)}
                 >
                   {group.logicalOperator}
                 </span>
               )}
-              {/* Render condition or nested group */}
               {'logicalOperator' in condition ? (
-                <FilterGroup
-                  filterProperties={filterProperties}
-                  group={condition}
-                  path={currentPath}
-                  isLoading={isLoading}
-                  activeInput={activeInput}
-                  onOperatorChange={onOperatorChange}
-                  onValueChange={onValueChange}
-                  onOperatorFocus={onOperatorFocus}
-                  onValueFocus={onValueFocus}
-                  onBlur={onBlur}
-                  onLabelClick={onLabelClick}
-                  onKeyDown={onKeyDown}
-                  onGroupFreeformChange={onGroupFreeformChange}
-                  onGroupFreeformFocus={onGroupFreeformFocus}
-                  groupFreeformValue={groupFreeformValue}
-                  isGroupFreeformActive={isGroupFreeformActive}
-                  onLogicalOperatorChange={onLogicalOperatorChange}
-                />
+                <FilterGroup group={condition} path={currentPath} />
               ) : (
                 <FilterCondition
-                  id={`filter-${currentPath.join('-')}`}
                   condition={condition}
+                  path={currentPath}
                   isActive={isConditionActive(currentPath)}
                   isOperatorActive={isOperatorActive(currentPath)}
-                  isLoading={isLoading}
-                  onOperatorChange={(value) => onOperatorChange(currentPath, value)}
-                  filterProperties={filterProperties}
-                  onValueChange={(value) => onValueChange(currentPath, value)}
-                  onOperatorFocus={() => onOperatorFocus(currentPath)}
-                  onValueFocus={() => onValueFocus(currentPath)}
-                  onBlur={onBlur}
-                  onLabelClick={() => onLabelClick(currentPath)}
-                  onKeyDown={onKeyDown}
                 />
               )}
             </React.Fragment>
           )
         })}
-        {/* Add freeform input at the end */}
-        <Input_Shadcn_
-          ref={freeformInputRef}
-          value={isActive ? groupFreeformValue : localFreeformValue}
-          onChange={handleFreeformChange}
-          onFocus={() => onGroupFreeformFocus(path)}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
-          placeholder={
-            path.length === 0 && group.conditions.length === 0 ? 'Search or filter...' : '+'
-          }
-          disabled={isLoading}
-          style={{
-            width: `${Math.max(
-              (isActive ? groupFreeformValue : localFreeformValue).length || 1,
-              path.length === 0 && group.conditions.length === 0 ? 18 : 1
-            )}ch`,
-            minWidth: path.length === 0 && group.conditions.length === 0 ? '18ch' : '1ch',
-          }}
-        />
+        <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
+          <PopoverAnchor_Shadcn_ asChild>
+            {isRootGroup ? (
+              <Input_Shadcn_
+                ref={freeformInputRef}
+                type="text"
+                value={isActive ? freeformText : localFreeformValue}
+                onChange={handleFreeformChange}
+                onFocus={() => handleGroupFreeformFocus(path)}
+                onBlur={handleFreeformBlur}
+                onKeyDown={handleFreeformKeyDown}
+                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
+                placeholder={
+                  group.conditions.length === 0 ? 'Search or filter...' : '+ Search or filter...'
+                }
+                disabled={isLoading}
+              />
+            ) : (
+              <div className="relative inline-block">
+                <Input_Shadcn_
+                  ref={freeformInputRef}
+                  type="text"
+                  value={isActive ? freeformText : localFreeformValue}
+                  onChange={handleFreeformChange}
+                  onFocus={() => handleGroupFreeformFocus(path)}
+                  onBlur={handleFreeformBlur}
+                  onKeyDown={handleFreeformKeyDown}
+                  className="h-full border-none bg-transparent py-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
+                  placeholder="+ Add filter"
+                  disabled={isLoading}
+                />
+                <span className="invisible whitespace-pre text-xs block">
+                  {(isActive ? freeformText : localFreeformValue) || '+'}
+                </span>
+              </div>
+            )}
+          </PopoverAnchor_Shadcn_>
+          <PopoverContent_Shadcn_
+            className="min-w-[220px] p-0"
+            align="start"
+            side="bottom"
+            portal
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={(e) => {
+              const target = e.target as Node
+              if (wrapperRef.current && !wrapperRef.current.contains(target)) {
+                handleInputBlur()
+              }
+            }}
+          >
+            <DefaultCommandList
+              items={items}
+              highlightedIndex={highlightedIndex}
+              onSelect={handleSelectMenuItem}
+              includeIcon
+            />
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
       </div>
     </div>
   )
