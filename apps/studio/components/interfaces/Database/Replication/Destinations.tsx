@@ -57,11 +57,13 @@ export const Destinations = () => {
     error: databasesError,
     isPending: isDatabasesLoading,
     isError: isDatabasesError,
+    isSuccess: isDatabasesSuccess,
     refetch: refetchDatabases,
   } = useReadReplicasQuery({
     projectRef,
   })
   const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
       ? readReplicas
@@ -152,10 +154,14 @@ export const Destinations = () => {
       const hasTransientStatus = replicasInTransition.length > 0
 
       // If any replica's status has changed, refetch databases
-      if (statuses.length !== databases.length) await refetchDatabases()
+      if (statuses.length !== databases.length) {
+        await refetchDatabases()
+      }
 
       // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus) setStatusRefetchInterval(false)
+      if (!hasTransientStatus && statuses.length === databases.length) {
+        setStatusRefetchInterval(false)
+      }
     }
 
     pollReplicas()
@@ -228,7 +234,7 @@ export const Destinations = () => {
               <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
             </div>
           </div>
-        ) : hasDestinations ? (
+        ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
           <Card>
             <CardContent className="p-0">
               <Table>

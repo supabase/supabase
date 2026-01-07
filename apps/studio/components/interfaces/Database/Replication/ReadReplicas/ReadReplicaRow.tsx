@@ -35,8 +35,10 @@ interface ReadReplicaRow {
 
 export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: ReadReplicaRow) => {
   const { ref } = useParams()
-  const { identifier, region } = replica
-  const { status, replicaInitializationStatus } = replicaStatus || { status: 'UNKNOWN' }
+  const { identifier, region, status: baseStatus } = replica
+
+  const status = replicaStatus?.status ?? baseStatus
+  const replicaInitializationStatus = replicaStatus?.replicaInitializationStatus
   const formattedId = formatDatabaseID(identifier ?? '')
 
   const {
@@ -134,10 +136,10 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
         </TableCell>
 
         <TableCell>
-          {isLoadingLag ? (
-            <ShimmeringLoader />
-          ) : isErrorLag ? (
+          {isErrorLag || status !== REPLICA_STATUS.ACTIVE_HEALTHY ? (
             <Minus size={18} className="text-foreground-lighter" />
+          ) : isLoadingLag ? (
+            <ShimmeringLoader />
           ) : (
             <p>{lagDuration}s</p>
           )}
