@@ -21,6 +21,9 @@ import {
 
 const AVAILABLE_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-central-1', 'ap-southeast-2']
 
+const getRegionNameFromCode = (code: string) =>
+  Object.values(AWS_REGIONS).find((x) => x.code === code)?.displayName
+
 const StorageVectorsPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -28,9 +31,6 @@ const StorageVectorsPage: NextPageWithLayout = () => {
 
   // [Joshen] We're actively looking into lifting this restriction so can remove once done
   const isAvailableInProjectRegion = AVAILABLE_REGIONS.includes(project?.region ?? '')
-  const projectRegion = Object.values(AWS_REGIONS).find(
-    (x) => x.code === project?.region
-  )?.displayName
 
   if (!isAvailableInProjectRegion) {
     return (
@@ -51,17 +51,12 @@ const StorageVectorsPage: NextPageWithLayout = () => {
                     <TooltipTrigger className={InlineLinkClassName}>some regions</TooltipTrigger>
                     <TooltipContent side="bottom">
                       <ul>
-                        {AVAILABLE_REGIONS.map((x) => {
-                          const region = Object.values(AWS_REGIONS).find(
-                            (y) => y.code === x
-                          )?.displayName
-                          return (
-                            <li key={x}>
-                              <span>{region}</span>
-                              <span className="text-foreground-lighter ml-2">{x}</span>
-                            </li>
-                          )
-                        })}
+                        {AVAILABLE_REGIONS.map((x) => (
+                          <li key={x}>
+                            <span>{getRegionNameFromCode(x)}</span>
+                            <span className="text-foreground-lighter ml-2">{x}</span>
+                          </li>
+                        ))}
                       </ul>
                     </TooltipContent>
                   </Tooltip>{' '}
