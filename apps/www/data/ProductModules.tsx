@@ -53,6 +53,19 @@ const ProductModules: ProductType = {
     label: '',
     url: '/modules/sandbox',
   },
+  [PRODUCT_MODULES_SHORTNAMES.WORKFLOWS]: {
+    name: PRODUCT_MODULES_NAMES.WORKFLOWS,
+    icon: PRODUCT_MODULES.workflows.icon[24],
+    description: (
+      <>
+        Build durable, multi-step workflows with <strong>automatic retries</strong> and Postgres as
+        the execution engine.
+      </>
+    ),
+    description_short: 'Durable workflows powered by pgflow',
+    label: '',
+    url: '/modules/workflows',
+  },
 }
 
 export default ProductModules
