@@ -38,14 +38,15 @@ Based on [Vercel + Sitecore](https://vercel.com/partners/sitecore) and [Vercel +
 
 ### Partner-Specific Components
 
-Create these in `apps/www/components/Partners/Featured/`:
+These already exist in `apps/www/components/Partners/Featured/`:
 
-```tsx
-// PartnerHero.tsx - Hero with dual logos
-// PartnerBenefits.tsx - Key benefits grid
-// PartnerFeatures.tsx - Integration features
-// PartnerCustomers.tsx - Customer logos/quotes
-```
+- `PartnerHero` - Hero with dual logos (Supabase icon + Partner icon, NOT wordmarks)
+- `PartnerBenefits` - Key benefits grid with stats
+- `PartnerTrustIndicators` - Security/compliance badges with icons
+- `PartnerTestimonial` - Customer or partner quotes
+- `PartnerFeatures` - Feature description cards
+- `PartnerStats` - Customer success metrics
+- `PartnerResource` - Related resource link
 
 ## Page Template
 
@@ -65,12 +66,12 @@ import {
   PartnerResource,
 } from '~/components/Partners/Featured'
 
-import pageData from '~/data/partners/featured/[partner-name]'
+import { getPageData } from '~/data/partners/featured/[partner-name]'
 
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 function PartnerPage() {
-  const data = pageData()
+  const data = getPageData()
 
   return (
     <>
@@ -144,14 +145,15 @@ export default PartnerPage
 ```tsx
 // apps/www/data/partners/featured/[partner-name].tsx
 
-export default () => ({
+export const getPageData = () => ({
   metaTitle: 'Supabase + [Partner] | Partnership',
   metaDescription: 'Description of the partnership and its benefits',
   metaImage: '/images/partners/featured/[partner-name]/og.png',
-  
+
   partnerName: '[Partner Name]',
   partnerLogo: '/images/partners/featured/[partner-name]/logo.svg',
-  
+  partnerLogoDark: '/images/partners/featured/[partner-name]/logo.svg', // same as light if no dark variant
+
   heroSection: {
     headline: <>Supabase + [Partner]</>,
     subheadline: 'Main value proposition of the partnership in one or two sentences.',
@@ -166,8 +168,8 @@ export default () => ({
       },
     ],
   },
-  
-  // Key benefits with stats - aim for 3
+
+  // Key benefits - use stat for numbers, icon for concepts (import from lucide-react)
   benefits: [
     {
       stat: '2x',
@@ -175,16 +177,17 @@ export default () => ({
       description: 'Description of this benefit and how it helps customers.',
     },
     {
-      stat: '7x',
-      title: 'Time to Market',
-      description: 'Ship faster with the combined power of both platforms.',
+      stat: '99.9%',
+      title: 'Uptime SLA',
+      description: 'Enterprise-grade reliability backed by infrastructure.',
     },
     {
+      icon: <Check className="w-8 h-8" />, // import { Check } from 'lucide-react'
       title: 'Zero Configuration',
       description: 'Deploy in minutes without managing infrastructure.',
     },
   ],
-  
+
   // Trust indicators - security, compliance, SLAs
   trustIndicators: {
     title: 'Enterprise-grade security',
@@ -206,7 +209,7 @@ export default () => ({
       },
     ],
   },
-  
+
   // Customer testimonial
   testimonial: {
     quote: 'Quote from a customer using both products together...',
@@ -215,30 +218,33 @@ export default () => ({
     company: 'Acme Corp',
     companyLogo: '/images/customers/acme.svg',
   },
-  
+
   // Partner testimonial (optional)
   partnerTestimonial: {
     quote: 'Quote from the partner company about the integration...',
     author: 'John Smith',
     role: 'VP of Partnerships, [Partner]',
   },
-  
+
   // Feature sections - aim for 3
   features: [
     {
       title: 'Superior Performance',
-      description: 'Build and deploy high-performance applications with the combined power of Supabase and [Partner]. Eliminate infrastructure complexities and leverage scalable infrastructure.',
+      description:
+        'Build and deploy high-performance applications with the combined power of Supabase and [Partner]. Eliminate infrastructure complexities and leverage scalable infrastructure.',
     },
     {
       title: 'Seamless Integration',
-      description: 'From selecting tools to building infrastructure, the integration simplifies your path with first-class support for [Partner] features.',
+      description:
+        'From selecting tools to building infrastructure, the integration simplifies your path with first-class support for [Partner] features.',
     },
     {
       title: 'Build What Users Want',
-      description: 'Increased flexibility in development with a fully composable architecture lets you build how you want with best-of-breed tools.',
+      description:
+        'Increased flexibility in development with a fully composable architecture lets you build how you want with best-of-breed tools.',
     },
   ],
-  
+
   // Customer success stats with logos - aim for 4
   customerStats: [
     {
@@ -266,7 +272,7 @@ export default () => ({
       companyLogo: '/images/customers/company-d.svg',
     },
   ],
-  
+
   // Related resource/guide (optional)
   relatedResource: {
     title: 'Read the Integration Guide',
@@ -277,41 +283,39 @@ export default () => ({
 })
 ```
 
-## Styling Guidelines
+## Required Assets (complete BEFORE creating page files)
 
-### Colors
-- Use brand colors for stats and highlights
-- `text-foreground` for headings
-- `text-foreground-lighter` for body text
-- `bg-alternative` for alternating section backgrounds
+### Partner Logo - MUST be resolved first (SVG ONLY)
 
-### Dual Logo Treatment
-```tsx
-<div className="flex items-center gap-4">
-  <div className="w-12 h-12 flex items-center justify-center">
-    <Image src="/images/supabase-logo-icon.svg" alt="Supabase" width={48} height={48} />
-  </div>
-  <span className="text-3xl text-foreground-muted font-light">+</span>
-  <div className="w-12 h-12 flex items-center justify-center">
-    <Image src={partnerLogo} alt={partnerName} width={48} height={48} />
-  </div>
-</div>
-```
+1. Search for existing logo in codebase: `apps/www/public/images/` (logos/, company/, publicity/)
+2. If found, copy to `apps/www/public/images/partners/featured/[partner-name]/`
+3. If not found in codebase, try these sources (SVG format required):
 
-### Stats Display
-```tsx
-<div className="flex flex-col">
-  <span className="text-4xl md:text-5xl font-bold text-brand">{stat}</span>
-  <span className="text-lg text-foreground-lighter">{description}</span>
-</div>
-```
+   **Option A: svglogos.dev**
 
-## Required Assets
+   - Navigate to `https://svglogos.dev/#search=[partner-name]`
+   - Use `browser_network_requests` to find the CDN URL (do NOT click download buttons)
+   - Look for requests to `https://cdn.svglogos.dev/logos/[name].svg` or `https://cdn.svglogos.dev/logos/[name]-icon.svg`
+   - Prefer icon version (`-icon.svg`) over wordmark if both are available
+   - Download using curl with the exact CDN URL
 
-1. **Partner logo** - SVG preferred, dark/light variants if needed
-2. **OG Image** - `og.png` (1200x630)
-3. **Feature images** - Screenshots or diagrams of integration
-4. **Customer logos** - If including customer success stories
+   **Option B: Wikipedia**
+
+   - Search Wikipedia for the company
+   - Find the company logo in the infobox
+   - Ensure it's an SVG file (check the file extension)
+   - Download the SVG version from Wikimedia Commons
+
+4. Save to: `apps/www/public/images/partners/featured/[partner-name]/logo.svg`
+5. Verify the downloaded file is valid SVG (not an error page or HTML)
+6. Only proceed to create page files AFTER logo is verified and in place
+7. Reference the actual logo path in the data file - no TODOs or empty strings
+8. NEVER create your own SVG logo - always use an official source
+
+### Other Assets
+
+- **OG Image** - `og.png` (1200x630) - optional, can use default
+- **Feature images** - Screenshots or diagrams of integration (optional)
 
 ## Checklist
 
@@ -333,11 +337,12 @@ export default () => ({
 ## Component Patterns from Existing Pages
 
 ### ImageParagraphSection
+
 Good for feature sections with image + text side by side:
+
 ```tsx
 import ImageParagraphSection from '~/components/Sections/ImageParagraphSection'
-
-<ImageParagraphSection
+;<ImageParagraphSection
   heading={<>Feature Title</>}
   subheading="Feature description"
   image={<Image src="..." />}
@@ -346,11 +351,12 @@ import ImageParagraphSection from '~/components/Sections/ImageParagraphSection'
 ```
 
 ### HighlightCards
+
 Good for benefit grids:
+
 ```tsx
 import HighlightCards from '~/components/Sections/HighlightCards'
-
-<HighlightCards
+;<HighlightCards
   highlights={[
     { title: 'Benefit 1', paragraph: 'Description', svg: <Icon /> },
     // ...
@@ -359,15 +365,15 @@ import HighlightCards from '~/components/Sections/HighlightCards'
 ```
 
 ### SingleQuote
+
 Good for customer testimonials:
+
 ```tsx
 import SingleQuote from '~/components/Sections/SingleQuote'
-
-<SingleQuote
+;<SingleQuote
   quote="Customer testimonial..."
   author="Name"
   role="Title, Company"
   logo="/images/customers/company.svg"
 />
 ```
-
