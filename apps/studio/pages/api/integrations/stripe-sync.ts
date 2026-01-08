@@ -1,8 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { install, uninstall } from 'stripe-experiment-sync/supabase'
-import { VERSION } from 'stripe-experiment-sync'
 import { waitUntil } from '@vercel/functions'
+import { start } from 'workflow/api'
+import { VERSION } from 'stripe-experiment-sync'
+import { uninstall } from 'stripe-experiment-sync/supabase'
+
+import { installStripeSyncWorkflow } from '@/workflows/stripe-sync-install'
 
 const ENABLE_FLAG_KEY = 'enableStripeSyncEngineIntegration'
 
@@ -121,21 +124,25 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       error: { message: `Failed to validate Stripe API key: ${error.message}` },
     })
   }
-  waitUntil(
-    install({
+  const workflowRun = await start(installStripeSyncWorkflow, [
+    {
       supabaseAccessToken: supabaseToken,
       supabaseProjectRef: projectRef,
-      stripeKey: stripeSecretKey,
+      stripeSecretKey,
+      packageVersion: VERSION,
+      workerIntervalSeconds: 60,
       baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
       supabaseManagementUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
-      packageVersion: VERSION,
-    }).catch((error) => {
-      console.error('Stripe Sync Engine installation failed.', error)
-      throw error
-    })
-  )
+    },
+  ])
 
-  return res
-    .status(200)
-    .json({ data: { message: 'Stripe Sync setup initiated', version: VERSION }, error: null })
+  const runId =
+    (workflowRun as { runId?: string; id?: string } | null)?.runId ??
+    (workflowRun as { id?: string } | null)?.id ??
+    null
+
+  return res.status(200).json({
+    data: { message: 'Stripe Sync setup workflow started', version: VERSION, runId },
+    error: null,
+  })
 }

@@ -76,6 +76,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "@vercel/functions": "^2.1.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "@workflow/builders": "4.0.1-beta.30",
     "@zip.js/zip.js": "^2.7.29",
     "ai": "5.0.52",
     "ai-commands": "workspace:*",
@@ -113,6 +114,7 @@
     "papaparse": "^5.3.1",
     "path-to-regexp": "^8.0.0",
     "pg-minify": "^1.6.3",
+    "postgres": "^3.4.7",
     "randombytes": "^2.1.0",
     "react": "catalog:",
     "react-beautiful-dnd": "^13.1.0",
@@ -147,6 +149,7 @@
     "use-stick-to-bottom": "^1.1.1",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
+    "workflow": "4.0.1-beta.35",
     "yup": "^1.4.0",
     "zod": "catalog:",
     "zxcvbn": "^4.4.2"

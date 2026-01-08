@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2021",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -18,13 +22,29 @@
     "downlevelIteration": true,
     "incremental": true,
     "paths": {
-      "@/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@/*": [
+        "./*"
+      ],
+      "@ui/*": [
+        "./../../packages/ui/src/*"
+      ], // handle ui package paths
+      "workflow-generated/flow": [
+        "./.well-known/workflow/v1/flow/route.js"
+      ],
+      "workflow-generated/step": [
+        "./.well-known/workflow/v1/step/route.js"
+      ],
+      "workflow-generated/webhook": [
+        "./.well-known/workflow/v1/webhook/[token]/route.js"
+      ]
     },
     "useDefineForClassFields": true,
     "plugins": [
       {
         "name": "next"
+      },
+      {
+        "name": "workflow"
       }
     ],
     "noErrorTruncation": true
@@ -38,5 +58,8 @@
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "public/deno/*.ts"]
+  "exclude": [
+    "node_modules",
+    "public/deno/*.ts"
+  ]
 }
