@@ -2622,15 +2622,15 @@ export interface DashboardErrorCreatedEvent {
 }
 
 /**
- * User successfully installed an integration via the integrations marketplace in the dashboard.
+ * User successfully completed installing an integration via the integrations marketplace in the dashboard.
  * Note: This excludes Wrappers and Postgres Extensions.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationInstalledEvent {
-  action: 'integration_installed'
+export interface IntegrationInstallCompletedEvent {
+  action: 'integration_install_completed'
   properties: {
     /**
      * The name of the integration installed
@@ -2641,14 +2641,14 @@ export interface IntegrationInstalledEvent {
 }
 
 /**
- * User started installing an integration via the integrations marketplace.
+ * User submitted an integration install via the integrations marketplace.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationInstallStartedEvent {
-  action: 'integration_install_started'
+export interface IntegrationInstallSubmittedEvent {
+  action: 'integration_install_submitted'
   properties: {
     /**
      * The name of the integration being installed
@@ -2659,14 +2659,14 @@ export interface IntegrationInstallStartedEvent {
 }
 
 /**
- * User started uninstalling an integration via the integrations marketplace.
+ * User submitted an integration uninstall via the integrations marketplace.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationUninstallStartedEvent {
-  action: 'integration_uninstall_started'
+export interface IntegrationUninstallSubmittedEvent {
+  action: 'integration_uninstall_submitted'
   properties: {
     /**
      * The name of the integration being uninstalled
@@ -2695,15 +2695,15 @@ export interface IntegrationInstallFailedEvent {
 }
 
 /**
- * User uninstalled an integration via the integrations marketplace in the dashboard.
+ * User successfully completed uninstalling an integration via the integrations marketplace in the dashboard.
  * Note: This excludes Wrappers and Postgres Extensions.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationUninstalledEvent {
-  action: 'integration_uninstalled'
+export interface IntegrationUninstallCompletedEvent {
+  action: 'integration_uninstall_completed'
   properties: {
     /**
      * The name of the integration installed
@@ -2871,9 +2871,9 @@ export type TelemetryEvent =
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
-  | IntegrationInstalledEvent
-  | IntegrationInstallStartedEvent
-  | IntegrationUninstallStartedEvent
+  | IntegrationInstallCompletedEvent
+  | IntegrationInstallSubmittedEvent
+  | IntegrationUninstallSubmittedEvent
   | IntegrationInstallFailedEvent
-  | IntegrationUninstalledEvent
+  | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
