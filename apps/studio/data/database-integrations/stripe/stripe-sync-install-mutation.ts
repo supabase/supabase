@@ -63,7 +63,7 @@ export const useStripeSyncInstallMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      track('integration_install_started', {
+      track('integration_install_submitted', {
         integrationName: 'stripe_sync_engine',
       })
 

@@ -25,6 +25,7 @@ interface RLSManagementProps {
   foreignKeyRelations?: ForeignKey[] // For new tables
   isNewRecord: boolean
   isDuplicating: boolean
+  isExposed?: boolean
   generatedPolicies?: GeneratedPolicy[]
   onRLSUpdate?: (isEnabled: boolean) => void
   onGeneratedPoliciesChange?: (policies: GeneratedPolicy[]) => void
@@ -36,6 +37,7 @@ export const RLSManagement = ({
   foreignKeyRelations = [],
   isNewRecord,
   isDuplicating,
+  isExposed,
   generatedPolicies = [],
   onRLSUpdate,
   onGeneratedPoliciesChange,
@@ -162,7 +164,10 @@ export const RLSManagement = ({
       <Admonition
         // [Joshen] Using CSS to determine visibility here as the onSuccess within ToggleRLSButton doesn't get triggered
         // if we dynamically render this component, since this admonition gets unmounted from the DOM once RLS is updated
-        className={cn('mb-0', !isNewRecord && !isRLSEnabled ? 'block' : 'hidden')}
+        className={cn(
+          'mb-0',
+          !isNewRecord && !isRLSEnabled && isExposed !== false ? 'block' : 'hidden'
+        )}
         type="warning"
         title="Row Level Security is currently disabled"
         description="Your table is currently accessible by anyone on the internet. We recommend enabling RLS to restrict access."
