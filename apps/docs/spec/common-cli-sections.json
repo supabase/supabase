@@ -208,6 +208,12 @@
         "title": "Apply pending migration files",
         "slug": "supabase-migration-up",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-down",
+        "title": "Rollback applied migration files",
+        "slug": "supabase-migration-down",
+        "type": "cli-command"
       }
     ]
   },
