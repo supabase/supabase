@@ -92,7 +92,7 @@ export const ReadReplicaDetails = () => {
       <Chart className="mt-6" isLoading={isLoadingLag || isFetchingInfraMonitoring}>
         <ChartCard className="rounded-none border-x-0">
           <ChartHeader className="px-10">
-            <ChartMetric label="Replication lag" value={`${lagDuration}s`} />
+            <ChartMetric label="Replication lag" value={!!lagDuration ? `${lagDuration}s` : '-'} />
           </ChartHeader>
           <ChartContent
             isEmpty={chartData.length === 0}

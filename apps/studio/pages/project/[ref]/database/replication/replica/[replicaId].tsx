@@ -145,7 +145,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
       primaryActions={[
         <Button asChild key="logs" type="default">
           <Link
-            href={`/project/${ref}/logs/postgres-logs?${!!identifier ? `?db=${identifier}` : ''}`}
+            href={`/project/${ref}/logs/postgres-logs${!!identifier ? `?db=${identifier}` : ''}`}
           >
             View logs
           </Link>
