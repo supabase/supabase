@@ -54,14 +54,21 @@ jobs:
           echo "Generating new typespec snapshot for review..."
           npx vitest run --update ./features/docs/Reference.typeSpec.test.ts
 
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf
+        with:
+          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'docs: update js client libraries (${{ github.event.inputs.version }})'
-          title: 'docs: update js client libraries (${{ github.event.inputs.version }})'
+          token: ${{ steps.app-token.outputs.token }}
+          commit-message: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
+          title: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           body: |
-            Updates JS client libraries documentation following stable release. 
+            Updates JS sdk documentation following stable release. 
             Ran `make` in apps/docs/spec to regenerate tsdoc files.
 
             **Details:**
@@ -69,6 +76,6 @@ jobs:
             - **Source:** `${{ github.event.inputs.source }}`
             - **Changes:** Regenerated tsdoc files from latest spec files
 
-            🤖 Auto-generated from supabase-js-libs stable release.
-          branch: 'gha/update-js-libs-docs-${{ github.run_number }}'
+            🤖 Auto-generated from @supabase/supabase-js stable release.
+          branch: 'gha/update-js-sdk-docs-${{ github.run_number }}'
           base: 'master'
