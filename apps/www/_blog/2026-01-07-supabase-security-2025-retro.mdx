@@ -266,19 +266,46 @@ Community developers have built security tooling for Supabase:
 
 Several security improvements are planned for this year:
 
-**Alternative authorization patterns**: We're exploring integrations with authorization systems like OpenFGA and Zanzibar for developers who need fine-grained permissions beyond RLS.
+#### Grant toggles for exposed schemas
 
-**GitHub push protection**: Our leaked key detection currently uses GitHub's secret scanning API for post-commit detection. We're working with GitHub to add push protection, which will block commits containing secret keys before they reach the repository.
+A new UI control will allow you to toggle API access for individual tables directly from the dashboard. Instead of manually managing Postgres grants, you'll be able to enable or disable table access with a single click. This makes it easier to control exactly which tables are accessible via the Data API without needing to write SQL grant statements. This feature is currently in staging and undergoing extensive testing before production release.
 
-**GraphQL disabled by default**: pg_graphql will be disabled by default on new projects. You can still enable it manually if needed, but it won't be exposed automatically to reduce the attack surface.
+<Img
+  alt="Grant toggles for controlling table access"
+  src="/images/blog/2026/security-retro/grant-toggles.png"
+  captionAlign="bottom"
+  zoomable={true}
+/>
 
-**Expanded Security Advisor lints**: New security checks will be added to Splinter to detect more misconfigurations. This includes detecting weak password policies, excessive function privileges, and insecure extension configurations.
+#### Alternative authorization patterns
 
-**Hardened project configurations**: New project configuration options will allow developers to choose extremely hardened security environments. This includes strict defaults for all security settings and mandatory security policies. Bring Your Own Cloud will be available to more customers beyond Supabase for Platforms.
+We're exploring integrations with authorization systems like OpenFGA and Zanzibar for developers who need fine-grained permissions beyond RLS.
 
-**Security-focused test harness**: A dedicated test harness for security will help developers validate RLS policies, test authorization logic, and ensure security configurations are correct before deploying to production.
+#### GitHub push protection
 
-**Assistant everywhere**: The dashboard Assistant will be available in more locations. You'll be able to fix security issues directly from GitHub, Slack, and email recommendations, rather than needing to go to the dashboard. The Assistant will be integrated into your existing workflows.
+Our leaked key detection currently uses GitHub's secret scanning API for post-commit detection. We're working with GitHub to add push protection, which will block commits containing secret keys before they reach the repository.
 
-**Enhanced security alerts**: Security alerts and recommendations will be enhanced with more detailed explanations of impact, step-by-step remediation guidance, and inline code examples to help developers resolve issues faster.
+#### GraphQL disabled by default
+
+pg_graphql will be disabled by default on new projects. You can still enable it manually if needed, but it won't be exposed automatically to reduce the attack surface.
+
+#### Expanded Security Advisor lints
+
+New security checks will be added to Splinter to detect more misconfigurations. This includes detecting weak password policies, excessive function privileges, and insecure extension configurations.
+
+#### Hardened project configurations
+
+New project configuration options will allow developers to choose extremely hardened security environments. This includes strict defaults for all security settings and mandatory security policies. Bring Your Own Cloud will be available to more customers beyond Supabase for Platforms.
+
+#### Security-focused test harness
+
+A dedicated test harness for security will help developers validate RLS policies, test authorization logic, and ensure security configurations are correct before deploying to production.
+
+#### Assistant everywhere
+
+The dashboard Assistant will be available in more locations. You'll be able to fix security issues directly from GitHub, Slack, and email recommendations, rather than needing to go to the dashboard. The Assistant will be integrated into your existing workflows.
+
+#### Enhanced security alerts
+
+Security alerts and recommendations will be enhanced with more detailed explanations of impact, step-by-step remediation guidance, and inline code examples to help developers resolve issues faster.
 
