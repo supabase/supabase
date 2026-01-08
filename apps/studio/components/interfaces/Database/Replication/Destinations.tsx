@@ -10,7 +10,6 @@ import {
 import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
 import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
@@ -35,7 +34,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
-import { EnableReplicationModal } from './EnableReplicationModal'
+import { EnableReplicationCallout } from './EnableReplicationCallout'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 
@@ -216,24 +215,8 @@ export const Destinations = () => {
 
         {isLoading ? (
           <GenericSkeletonLoader />
-        ) : replicationNotEnabled ? (
-          <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
-            <div className="flex flex-col gap-y-1">
-              <h3>Replicate data to external destinations in real-time</h3>
-              <p className="text-sm text-foreground-light">
-                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating
-                your database changes to data warehouses and analytics platforms
-              </p>
-            </div>
-            <div className="flex gap-x-2">
-              {isPaidPlan ? (
-                <EnableReplicationModal />
-              ) : (
-                <UpgradePlanButton source="replication" featureProposition="use replication" />
-              )}
-              <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
-            </div>
-          </div>
+        ) : !unifiedReplication && replicationNotEnabled ? (
+          <EnableReplicationCallout />
         ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
           <Card>
             <CardContent className="p-0">
