@@ -12,6 +12,7 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
@@ -27,8 +28,8 @@ export const SOC2 = () => {
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-
-  const currentPlan = organization?.plan
+  const { hasAccess: hasAccessToSoc2Report, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.soc2_report')
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -37,9 +38,21 @@ export const SOC2 = () => {
       const soc2Link = await getDocument({ orgSlug, docType: 'soc2-type-2-report' })
       if (soc2Link?.fileUrl) window.open(soc2Link.fileUrl, '_blank')
       setIsOpen(false)
-    } catch (error: any) {
-      toast.error(`Failed to download SOC2 report: ${error.message}`)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error(`Failed to download SOC2 report: ${message}`)
     }
+  }
+
+  const handleDownloadClick = () => {
+    if (!slug) return
+
+    sendEvent({
+      action: 'document_view_button_clicked',
+      properties: { documentName: 'SOC2' },
+      groups: { organization: slug },
+    })
+    setIsOpen(true)
   }
 
   return (
@@ -53,34 +66,28 @@ export const SOC2 = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {isLoadingPermissions ? (
+        {isLoadingPermissions || isLoadingEntitlement ? (
           <div className="flex items-center justify-center h-full">
             <ShimmeringLoader className="w-24" />
           </div>
         ) : !canReadSubscriptions ? (
           <NoPermission resourceText="access our SOC2 Type 2 report" />
+        ) : !hasAccessToSoc2Report ? (
+          <div className="flex items-center justify-center h-full">
+            <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
+              <Button type="default">Upgrade to Team</Button>
+            </Link>
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full">
-            {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
-                <Button type="default">Upgrade to Team</Button>
-              </Link>
-            ) : (
-              <Button
-                type="default"
-                icon={<Download />}
-                onClick={() => {
-                  sendEvent({
-                    action: 'document_view_button_clicked',
-                    properties: { documentName: 'SOC2' },
-                    groups: { organization: organization?.slug ?? 'Unknown' },
-                  })
-                  setIsOpen(true)
-                }}
-              >
-                Download SOC2 Type 2 Report
-              </Button>
-            )}
+            <Button
+              type="default"
+              icon={<Download />}
+              onClick={handleDownloadClick}
+              disabled={!slug}
+            >
+              Download SOC2 Type 2 Report
+            </Button>
           </div>
         )}
         <ConfirmationModal
