@@ -7,7 +7,6 @@ import { Card, copyToClipboard, Table, TableBody, TableCell, TableRow } from 'ui
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -77,9 +76,6 @@ export const OAuthEndpointsTable = () => {
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>OAuth Endpoints</PageSectionTitle>
-          <PageSectionDescription>
-            Standard OAuth 2.1 and OIDC endpoints for your OAuth server.
-          </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
