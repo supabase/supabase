@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
@@ -5,23 +6,22 @@ import { useParams } from 'common'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  Bucket,
-  EdgeFunction,
-  EdgeFunctions,
-  Entities,
-  Entity,
-  Introduction,
-  RPC,
-  Realtime,
-  Storage,
-  StoredProcedures,
-  UserManagement,
-} from './Content'
-import FirstLevelNav from './FirstLevelNav'
+import { Bucket } from './Content/Bucket'
+import { EdgeFunction } from './Content/EdgeFunction'
+import { EdgeFunctions } from './Content/EdgeFunctions'
+import { Entities } from './Content/Entities'
+import { Entity } from './Content/Entity'
+import { Introduction } from './Content/Introduction'
+import { Realtime } from './Content/Realtime'
+import { RPC } from './Content/RPC'
+import { Storage } from './Content/Storage'
+import { StoredProcedures } from './Content/StoredProcedures'
+import { UserManagement } from './Content/UserManagement'
+import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
-import SecondLevelNav from './SecondLevelNav'
+import { SecondLevelNav } from './SecondLevelNav'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature
@@ -34,7 +34,7 @@ import SecondLevelNav from './SecondLevelNav'
  * - GraphiQL needs a better home, cannot be placed under Database as its "API"
  */
 
-const ProjectAPIDocs = () => {
+export const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const isIntroduction =
@@ -45,9 +45,10 @@ const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: ref },
-    { enabled: snap.showProjectApiDocs }
+    { enabled: snap.showProjectApiDocs && canReadAPIKeys }
   )
   const { data: settings } = useProjectSettingsV2Query(
     { projectRef: ref },
@@ -154,5 +155,3 @@ const ProjectAPIDocs = () => {
     </SidePanel>
   )
 }
-
-export default ProjectAPIDocs

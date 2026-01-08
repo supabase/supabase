@@ -96,7 +96,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
-                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+                <Link href={`/project/${ref}/settings/api?source=load-balancer`}>View API URL</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -294,9 +294,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESIZING ? (
                 <Badge>Resizing</Badge>
-              ) : initStatus === ReplicaInitializationStatus.Completed &&
-                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge variant="brand">Healthy</Badge>
+              ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+                <Badge variant="success">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}
@@ -375,7 +374,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               className="gap-x-2"
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
-              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
+              <Link href={`/project/${ref}/observability/database?db=${id}&chart=replication-lag`}>
                 View replication lag
               </Link>
             </DropdownMenuItem>
@@ -387,9 +386,6 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             >
               Restart replica
             </DropdownMenuItem>
-            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
-                Resize replica
-              </DropdownMenuItem> */}
             <DropdownMenuItemTooltip
               className="gap-x-2 !pointer-events-auto"
               disabled={!canManageReplicas}

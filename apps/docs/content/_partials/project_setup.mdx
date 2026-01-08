@@ -55,4 +55,5 @@ supabase migration new user_management_starter
 </TabPanel>
 </Tabs>
 
-<$Partial path="api_settings.mdx" />
+<$Partial path="api_settings.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }}
+/>

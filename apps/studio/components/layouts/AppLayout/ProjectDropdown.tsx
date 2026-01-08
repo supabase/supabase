@@ -6,13 +6,13 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   const queryArray = Object.entries(routerQueries)
@@ -35,24 +35,21 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
 export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { data, isLoading: isLoadingProjects } = useProjectsQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const isBranch = project?.parentRef !== project?.ref
+  const { data: parentProject, isPending: isLoadingParentProject } = useProjectDetailQuery(
+    { ref: project?.parent_project_ref },
+    { enabled: isBranch }
+  )
+  const selectedProject = parentProject ?? project
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const isBranch = project?.parentRef !== project?.ref
-
-  const projects = (data?.projects ?? [])
-    .filter((x) => x.organization_id === selectedOrganization?.id)
-    .sort((a, b) => a.name.localeCompare(b.name))
-  const selectedProject = isBranch
-    ? projects?.find((p) => p.ref === project?.parentRef)
-    : projects?.find((p) => p.ref === ref)
-
   const [open, setOpen] = useState(false)
 
-  if (isLoadingProjects || !selectedProject) {
+  if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 

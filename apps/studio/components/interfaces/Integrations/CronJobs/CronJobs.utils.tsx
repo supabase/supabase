@@ -1,12 +1,10 @@
-import parser from 'cron-parser'
 import { toString as CronToString } from 'cronstrue'
-import dayjs from 'dayjs'
 import { Column } from 'react-data-grid'
 
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { cn } from 'ui'
-import { CronJobType } from './CreateCronJobSheet'
-import { CRON_TABLE_COLUMNS, HTTPHeader } from './CronJobs.constants'
+import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
+import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 import { CronJobTableCell } from './CronJobTableCell'
 
 export function buildCronQuery(name: string, schedule: string, command: string) {
@@ -186,12 +184,6 @@ export function formatDate(dateString: string): string {
   return date.toLocaleString(undefined, options)
 }
 
-export const cronPattern =
-  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
-
-// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
-export const secondsPattern = /^\d+\s+seconds*$/
-
 export function isSecondsFormat(schedule: string): boolean {
   return secondsPattern.test(schedule.trim().toLocaleLowerCase())
 }
@@ -227,44 +219,6 @@ export const formatScheduleString = (value: string) => {
     }
   } catch (error) {
     return ''
-  }
-}
-
-export const convertCronToString = (schedule: string) => {
-  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
-  try {
-    return CronToString(schedule)
-  } catch (error) {
-    return schedule
-  }
-}
-
-export const getNextRun = (schedule: string, lastRun?: string) => {
-  // cron-parser can only deal with the traditional cron syntax but technically users can also
-  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
-  // (can't guarantee as scope is quite big)
-  if (schedule.includes('*')) {
-    try {
-      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
-      return interval.next().getTime()
-    } catch (error) {
-      return undefined
-    }
-  } else {
-    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n second" or "n seconds"
-    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
-    const [value, unit] = schedule.toLocaleLowerCase().split(' ')
-    if (
-      ['second', 'seconds'].includes(unit) &&
-      !Number.isNaN(Number(value)) &&
-      lastRun !== undefined
-    ) {
-      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
-      return parsedLastRun.valueOf()
-    } else {
-      return undefined
-    }
   }
 }
 

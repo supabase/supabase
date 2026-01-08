@@ -19,7 +19,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
+import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -39,6 +39,7 @@ import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
+  chartId?: string
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
@@ -61,13 +62,17 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
   sql?: string
   highlightActions?: ChartHighlightAction[]
+  showNewBadge?: boolean
 }
 
 export function ComposedChart({
+  chartId,
   data,
   attributes,
   yAxisKey,
@@ -99,10 +104,14 @@ export function ComposedChart({
   updateDateRange,
   hideYAxis,
   hideHighlightedValue,
+  hideHighlightedLabel = false,
+  hideHighlightArea = false,
   syncId,
   docsUrl,
   sql,
   highlightActions,
+  titleTooltip,
+  showNewBadge,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -214,7 +223,12 @@ export function ComposedChart({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      const formatted = formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
     }
 
     return numberFormatter(value, valuePrecision)
@@ -281,7 +295,9 @@ export function ComposedChart({
     att.name.toLowerCase().includes('pg_database_size')
   )
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+  const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+  const shouldFormatBytes =
+    isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -296,12 +312,14 @@ export function ComposedChart({
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
+        hideTotalPlaceholder={highlightedValue === undefined}
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}
         format={format}
+        titleTooltip={titleTooltip}
       />
     )
   }
@@ -311,7 +329,11 @@ export function ComposedChart({
       <ChartHeader
         hideHighlightedValue={hideHighlightedValue}
         title={title}
+        showNewBadge={showNewBadge}
         format={format}
+        hideHighlightedLabel={hideHighlightedLabel}
+        hideHighlightArea={hideHighlightArea}
+        titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
@@ -339,30 +361,34 @@ export function ComposedChart({
           data={data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={(e: any) => {
+          onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {
+            if (!activeTooltipIndex) return
+
             setIsActiveHoveredChart(true)
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
-              setActivePayload(e.activePayload)
+            if (activeTooltipIndex !== focusDataIndex) {
+              setFocusDataIndex(activeTooltipIndex)
+              setActivePayload(activePayload ?? [])
             }
 
-            setHover(e.activeTooltipIndex)
+            setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
+            if (!activeTooltipIndex) return
+
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)
@@ -498,6 +524,7 @@ export function ComposedChart({
           chartHighlight={chartHighlight}
           updateDateRange={updateDateRange}
           actions={highlightActions}
+          chartId={chartId}
         />
       </Container>
       {data && (
@@ -514,34 +541,36 @@ export function ComposedChart({
         </div>
       )}
       {showLegend && (
-        <CustomLabel
-          payload={[maxAttributeData, ...chartData]}
-          attributes={attributes}
-          showMaxValue={_showMaxValue}
-          onLabelHover={setHoveredLabel}
-          onToggleAttribute={(attribute, options) => {
-            setHiddenAttributes((prev) => {
-              if (options?.exclusive) {
-                const next = new Set<string>()
-                // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
-                const allNames = chartData.map((c) => c.name)
-                const allHiddenExcept = allNames.filter((n) => n !== attribute)
-                const isAlreadyExclusive =
-                  allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
-                return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
-              }
+        <div className="relative z-0">
+          <CustomLabel
+            payload={[maxAttributeData, ...chartData]}
+            attributes={attributes}
+            showMaxValue={_showMaxValue}
+            onLabelHover={setHoveredLabel}
+            onToggleAttribute={(attribute, options) => {
+              setHiddenAttributes((prev) => {
+                if (options?.exclusive) {
+                  const next = new Set<string>()
+                  // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
+                  const allNames = chartData.map((c) => c.name)
+                  const allHiddenExcept = allNames.filter((n) => n !== attribute)
+                  const isAlreadyExclusive =
+                    allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
+                  return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
+                }
 
-              const next = new Set(prev)
-              if (next.has(attribute)) {
-                next.delete(attribute)
-              } else {
-                next.add(attribute)
-              }
-              return next
-            })
-          }}
-          hiddenAttributes={hiddenAttributes}
-        />
+                const next = new Set(prev)
+                if (next.has(attribute)) {
+                  next.delete(attribute)
+                } else {
+                  next.add(attribute)
+                }
+                return next
+              })
+            }}
+            hiddenAttributes={hiddenAttributes}
+          />
+        </div>
       )}
     </div>
   )

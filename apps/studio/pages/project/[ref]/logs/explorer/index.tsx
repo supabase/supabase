@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,16 +9,15 @@ import { toast } from 'sonner'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 import {
+  EXPLORER_DATEPICKER_HELPERS,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   TEMPLATES,
+  getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { LogData, LogTemplate, LogsWarning } from 'components/interfaces/Settings/Logs/Logs.types'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
-  DatePickerToFrom,
-  LogTemplate,
-  LogsWarning,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import {
-  maybeShowUpgradePrompt,
+  maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
@@ -37,12 +36,16 @@ import {
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import {
+  buildLogQueryParams,
+  resolveLogDateRange,
+} from 'components/interfaces/Settings/Logs/logsDateRange'
 import {
   Button,
   Form,
@@ -66,7 +69,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const { ref, q, queryId } = useParams()
   const projectRef = ref as string
-  const { data: organization } = useSelectedOrganizationQuery()
   const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
   const allTemplates = useMemo(() => {
@@ -77,6 +79,22 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
   const [editorId] = useState<string>(uuidv4())
   const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
+  const initialDatePickerValue = useMemo<DatePickerValue>(() => {
+    if (timestampStart && timestampEnd) {
+      return { from: timestampStart, to: timestampEnd, isHelper: false }
+    }
+    if (timestampStart) {
+      return { from: timestampStart, to: timestampEnd || '', isHelper: false }
+    }
+    return {
+      from: defaultHelper.calcFrom(),
+      to: defaultHelper.calcTo(),
+      isHelper: true,
+      text: defaultHelper.text,
+    }
+  }, [timestampStart, timestampEnd, defaultHelper])
+  const [datePickerValue, setDatePickerValue] = useState<DatePickerValue>(initialDatePickerValue)
 
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
   const PLACEHOLDER_QUERY = IS_PLATFORM
@@ -86,30 +104,43 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const [selectedLog, setSelectedLog] = useState<any>(null)
+  const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
 
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
   const { data: content } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
   })
   const query = content?.content.find((x) => x.id === queryId)
+
+  const resolvedRange = useMemo(() => {
+    if (datePickerValue.isHelper) {
+      return resolveLogDateRange(datePickerValue)
+    }
+    if (timestampStart && timestampEnd) {
+      return { from: timestampStart, to: timestampEnd }
+    }
+    return resolveLogDateRange(datePickerValue)
+  }, [timestampStart, timestampEnd, datePickerValue])
+
   const {
     params,
     logData,
     error,
     isLoading: logsLoading,
-    changeQuery,
-    runQuery,
+    setParams,
   } = useLogsQuery(
     projectRef,
     {
-      iso_timestamp_start: timestampStart,
-      iso_timestamp_end: timestampEnd,
+      iso_timestamp_start: resolvedRange.from,
+      iso_timestamp_end: resolvedRange.to,
     },
     true
   )
@@ -117,7 +148,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const { mutate: upsertContent, isLoading: isUpsertingContent } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
       const error = e as { message: string }
       console.error(error)
@@ -141,7 +172,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      favorite: false,
       sql: '',
       content_id: '',
     }
@@ -172,12 +202,27 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
+    const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
-    changeQuery(query)
-    runQuery()
+    setParams((prev) => ({
+      ...prev,
+      sql: resolvedParams.sql,
+      iso_timestamp_start: resolvedParams.from,
+      iso_timestamp_end: resolvedParams.to,
+    }))
+    if (!datePickerValue.isHelper) {
+      setTimeRange(resolvedParams.from, resolvedParams.to)
+    } else {
+      setTimeRange('', '')
+    }
+    const queryParams: Record<string, string | string[] | undefined> = { ...router.query, q: query }
+    if (datePickerValue.isHelper) {
+      delete queryParams.its
+      delete queryParams.ite
+    }
     router.push({
       pathname: router.pathname,
-      query: { ...router.query, q: query },
+      query: queryParams,
     })
     addRecentLogSqlSnippet({ sql: query })
   }
@@ -205,7 +250,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
   }
 
-  const handleCreateQuery = async (values: any, { setSubmitting }: any) => {
+  type SaveQueryFormValues = { name: string; description?: string }
+
+  const handleCreateQuery = async (
+    values: SaveQueryFormValues,
+    { setSubmitting }: { setSubmitting: (value: boolean) => void }
+  ) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!profile) return console.error('Profile is required')
     setSubmitting(true)
@@ -252,14 +302,29 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
+  const handleDateChange = (value: DatePickerValue) => {
+    setDatePickerValue(value)
+    const resolvedRange = resolveLogDateRange(value)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      resolvedRange.from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
-      setShowUpgradePrompt(!showUpgradePrompt)
-    } else {
-      setTimeRange(from || '', to || '')
+      setShowUpgradePrompt(true)
+      return
     }
+
+    if (value.isHelper) {
+      setTimeRange('', '')
+    } else {
+      setTimeRange(resolvedRange.from || '', resolvedRange.to || '')
+    }
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: resolvedRange.from,
+      iso_timestamp_end: resolvedRange.to,
+    }))
   }
 
   useEffect(() => {
@@ -267,6 +332,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setEditorValue(q)
     }
   }, [q])
+
+  useEffect(() => {
+    // prevents overwriting when the user selects a helper.
+    // without this, if the user selects "last 3 days" it would overwrite it with "last hour"
+    // its the simplest solution I could come up with - jordi
+    if (!initialDatePickerValue.isHelper) {
+      setDatePickerValue(initialDatePickerValue)
+    }
+  }, [initialDatePickerValue])
 
   useEffect(() => {
     let newWarnings = []
@@ -288,12 +362,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
-        setShowUpgradePrompt(!showUpgradePrompt)
+        setShowUpgradePrompt(true)
       }
     }
-  }, [timestampStart, organization])
+  }, [timestampStart, entitledToAuditLogDays, setShowUpgradePrompt])
 
   return (
     <div className="w-full h-full mx-auto">
@@ -304,8 +381,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       >
         <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
-            defaultFrom={timestampStart || ''}
-            defaultTo={timestampEnd || ''}
+            value={datePickerValue}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             templates={allTemplates.filter((template) => template.mode === 'custom')}
@@ -335,7 +411,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               error={error}
               projectRef={projectRef}
               onSelectedLogChange={setSelectedLog}
-              selectedLog={selectedLog}
+              selectedLog={selectedLog || undefined}
             />
 
             <div className="flex flex-row justify-end mt-2">
@@ -355,7 +431,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <Form
           initialValues={{
             name: '',
-            desdcription: '',
+            description: '',
           }}
           onSubmit={handleCreateQuery}
         >

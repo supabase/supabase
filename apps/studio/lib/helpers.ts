@@ -1,7 +1,11 @@
-export { default as passwordStrength } from './password-strength'
-export { default as uuidv4 } from './uuid'
 import { UIEvent } from 'react'
+import { v4 as _uuidV4 } from 'uuid'
+
 import type { TablesData } from '../data/tables/tables-query'
+
+export const uuidv4 = () => {
+  return _uuidV4()
+}
 
 export const isAtBottom = ({ currentTarget }: UIEvent<HTMLElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
@@ -348,3 +352,18 @@ export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
     }, timeoutMs)
   }
 }
+
+export const createWrappedSymbol = (name: string, display: string): Symbol => {
+  const sym = Symbol(name)
+  const wrapper = Object(sym)
+
+  wrapper.toString = () => display
+
+  Object.freeze(wrapper)
+  return wrapper
+}
+
+// Intentional for generic use; does not affect type safety since this branch is
+// unreachable.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function neverGuard(_: never): any {}

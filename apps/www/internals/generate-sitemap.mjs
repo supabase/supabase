@@ -220,9 +220,7 @@ async function generate() {
   /**
    * write sitemaps
    */
-  // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap.xml', sitemapRouter)
-  // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap_www.xml', formatted)
 }
 

@@ -3,9 +3,9 @@ import { apiAuthenticate } from './apiAuthenticate'
 
 const mocks = vi.hoisted(() => {
   return {
-    getAuthUser: vi.fn().mockResolvedValue({
-      user: {
-        id: 'test-gotrue-id',
+    getUserClaims: vi.fn().mockResolvedValue({
+      claims: {
+        sub: 'test-gotrue-id',
         email: 'test@example.com',
       },
       error: null,
@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => {
 })
 
 vi.mock('lib/gotrue', () => ({
-  getAuthUser: mocks.getAuthUser,
+  getUserClaims: mocks.getUserClaims,
 }))
 
 describe('apiAuthenticate', () => {
@@ -29,9 +29,9 @@ describe('apiAuthenticate', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getAuthUser.mockResolvedValue({
-      user: {
-        id: 'test-gotrue-id',
+    mocks.getUserClaims.mockResolvedValue({
+      claims: {
+        sub: 'test-gotrue-id',
         email: 'test@example.com',
       },
       error: null,
@@ -45,8 +45,8 @@ describe('apiAuthenticate', () => {
   })
 
   it('should return error when auth user fetch fails', async () => {
-    mocks.getAuthUser.mockResolvedValue({
-      user: null,
+    mocks.getUserClaims.mockResolvedValue({
+      claims: null,
       error: new Error('Auth failed'),
     })
 
@@ -55,8 +55,8 @@ describe('apiAuthenticate', () => {
   })
 
   it('should return error when user does not exist', async () => {
-    mocks.getAuthUser.mockResolvedValue({
-      user: null,
+    mocks.getUserClaims.mockResolvedValue({
+      claims: null,
       error: null,
     })
 

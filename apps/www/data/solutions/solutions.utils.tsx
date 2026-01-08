@@ -66,7 +66,7 @@ export interface Feature {
 export interface FeaturesSection {
   id: string
   label?: string
-  heading: JSX.Element
+  heading: string | JSX.Element
   subheading?: string
   features: Feature[]
   // {
@@ -101,6 +101,11 @@ export interface FrameworkLinkProps {
   name: string
   icon: string | React.ReactNode
   docs: string
+}
+
+export interface PostGridProps {
+  header: React.ReactNode
+  subheader: React.ReactNode
 }
 
 export const FrameworkLink = ({ framework }: { framework: FrameworkLinkProps }) => {

@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
@@ -7,16 +7,7 @@ import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/S
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
-import {
-  Auth,
-  Database,
-  EdgeFunctions,
-  Realtime,
-  Reports,
-  SqlEditor,
-  Storage,
-  TableEditor,
-} from 'icons'
+import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
@@ -35,9 +26,7 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
       key: 'sql',
       label: 'SQL Editor',
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: !IS_PLATFORM
-        ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
@@ -51,7 +40,6 @@ export const generateProductRoutes = (
     storage?: boolean
     realtime?: boolean
     authOverviewPage?: boolean
-    isStorageV2?: boolean
   }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -63,7 +51,6 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
-  const isStorageV2 = features?.isStorageV2 ?? false
 
   const databaseMenu = generateDatabaseMenu(project)
   const authMenu = generateAuthMenu(ref as string)
@@ -105,11 +92,7 @@ export const generateProductRoutes = (
             key: 'storage',
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link:
-              ref &&
-              (isProjectBuilding
-                ? buildingUrl
-                : `/project/${ref}/storage/${isStorageV2 ? 'files' : 'buckets'}`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
           },
         ]
       : []),
@@ -158,10 +141,10 @@ export const generateOtherRoutes = (
     ...(IS_PLATFORM && reportsEnabled
       ? [
           {
-            key: 'reports',
-            label: 'Reports',
-            icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
+            key: 'observability',
+            label: 'Observability',
+            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
           },
         ]
       : []),
@@ -195,16 +178,14 @@ export const generateOtherRoutes = (
 export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
   const settingsMenu = generateSettingsMenu(ref as string)
   return [
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'settings',
-            label: 'Project Settings',
-            icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && `/project/${ref}/settings/general`,
-            items: settingsMenu,
-          },
-        ]
-      : []),
+    {
+      key: 'settings',
+      label: 'Project Settings',
+      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link:
+        ref &&
+        (IS_PLATFORM ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
+      items: settingsMenu,
+    },
   ]
 }

@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
@@ -20,7 +21,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
@@ -30,14 +30,18 @@ export const ToggleLegacyApiKeysPanel = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
-  const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
-    useLegacyAPIKeysStatusQuery({ projectRef })
-
-  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery({ projectRef })
-
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_WRITE,
     '*'
+  )
+
+  const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
+
+  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
   )
 
   const { data: authorizedApps = [], isSuccess: isAuthorizedAppsSuccess } = useAuthorizedAppsQuery({
@@ -109,14 +113,14 @@ export const ToggleLegacyApiKeysPanel = () => {
             <AlertDialogTitle>Apps using Supabase may break</AlertDialogTitle>
             <AlertDialogDescription>
               Your project uses apps that integrate with Supabase. Disabling the legacy API keys is
-              a brand new feature and the apps you're using may not have added support for this yet.
+              a brand new feature and the apps you’re using may not have added support for this yet.
               It can cause them to stop functioning. Check before continuing.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => setIsConfirmOpen(true)}>
-              Proceed to disable API keys
+            <AlertDialogAction variant="danger" onClick={() => setIsConfirmOpen(true)}>
+              Disable API keys
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -137,7 +141,7 @@ const ToggleApiKeysModal = ({
   const { ref: projectRef } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
-  const { mutate: toggleLegacyAPIKey, isLoading: isTogglingLegacyAPIKey } =
+  const { mutate: toggleLegacyAPIKey, isPending: isTogglingLegacyAPIKey } =
     useToggleLegacyAPIKeysMutation()
 
   const onToggleLegacyAPIKeysEnabled = () => {

@@ -87,7 +87,7 @@ export const InviteMemberButton = () => {
       )
     )
 
-  const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
+  const { mutate: inviteMember, isPending: isInviting } = useOrganizationCreateInvitationMutation()
 
   const FormSchema = z.object({
     email: z.string().email('Must be a valid email address').min(1, 'Email is required'),
@@ -256,6 +256,7 @@ export const InviteMemberButton = () => {
                     >
                       <FormControl_Shadcn_>
                         <OrganizationProjectSelector
+                          fetchOnMount
                           sameWidthAsTrigger
                           checkPosition="left"
                           selectedRef={projectRef}
@@ -310,7 +311,11 @@ export const InviteMemberButton = () => {
                         </Link>
                       </Button>
                       {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                        <UpgradePlanButton source="inviteMemberSSO" plan="Team" />
+                        <UpgradePlanButton
+                          plan="Team"
+                          source="inviteMemberSSO"
+                          featureProposition="enable Single Sign-on (SSO)"
+                        />
                       )}
                     </div>
                   </div>

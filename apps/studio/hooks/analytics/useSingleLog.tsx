@@ -41,12 +41,12 @@ function useSingleLog({
   const {
     data,
     error: rcError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', projectRef, 'single-log', id, queryType],
-    async ({ signal }) => {
+  } = useQuery({
+    queryKey: ['projects', projectRef, 'single-log', id, queryType],
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -60,13 +60,11 @@ function useSingleLog({
 
       return data as unknown as Logs
     },
-    {
-      enabled,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-    }
-  )
+    enabled,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  })
 
   let error: null | string | object = rcError ? (rcError as any).message : null
   const result = data?.result ? data.result[0] : undefined
@@ -75,7 +73,7 @@ function useSingleLog({
     data: !!result
       ? { ...result, metadata: logsMetadata ? result?.metadata : undefined }
       : undefined,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (enabled && isPending) || isRefetching,
     error,
     refresh: () => refetch(),
   }

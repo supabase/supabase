@@ -17,7 +17,9 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create a Nuxt app">
 
-    Create a Nuxt app using the `npx nuxi` command.
+    - Create a Nuxt app using the `npx nuxi` command.
+
+    <$Partial path="uiLibCta.mdx" />
 
     </StepHikeCompact.Details>
 
@@ -56,7 +58,8 @@ hideToc: true
     Create a `.env` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishableKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
@@ -81,6 +84,7 @@ hideToc: true
         ```
 
       </$CodeTabs>
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "nuxt", "tab": "frameworks" }} />
 
     </StepHikeCompact.Code>
 
