@@ -208,6 +208,12 @@
         "title": "Apply pending migration files",
         "slug": "supabase-migration-up",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-down",
+        "title": "Reset migrations to a prior version",
+        "slug": "supabase-migration-down",
+        "type": "cli-command"
       }
     ]
   },
