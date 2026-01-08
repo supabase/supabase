@@ -119,9 +119,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -148,9 +146,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }
 ```
 
@@ -209,7 +205,9 @@ export default function RealtimePosts({ serverPosts }) {
 
     async function setupRealtime() {
       // Pass auth token to realtime for RLS to work
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (session?.access_token) {
         await supabase.realtime.setAuth(session.access_token)
       }
@@ -235,9 +233,7 @@ export default function RealtimePosts({ serverPosts }) {
             table: 'posts',
           },
           (payload) => {
-            setPosts((current) =>
-              current.filter((post) => post.id !== payload.old.id)
-            )
+            setPosts((current) => current.filter((post) => post.id !== payload.old.id))
           }
         )
         .subscribe()
@@ -278,11 +274,7 @@ import { notFound } from 'next/navigation'
 export default async function PostPage({ params }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: post } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const { data: post } = await supabase.from('posts').select('*').eq('id', id).single()
 
   if (!post) notFound()
 
@@ -353,13 +345,9 @@ export default function RealtimeRefresh({ children }) {
   useEffect(() => {
     const channel = supabase
       .channel('db-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'posts' },
-        () => {
-          router.refresh()
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+        router.refresh()
+      })
       .subscribe()
 
     return () => {
@@ -390,7 +378,9 @@ Supabase automatically handles cleanup 30 seconds after disconnect, but removing
 For RLS policies to work with Realtime subscriptions, you must pass the auth token before subscribing:
 
 ```ts
-const { data: { session } } = await supabase.auth.getSession()
+const {
+  data: { session },
+} = await supabase.auth.getSession()
 if (session?.access_token) {
   await supabase.realtime.setAuth(session.access_token)
 }
