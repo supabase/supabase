@@ -188,26 +188,10 @@ AWS PrivateLink connects your VPC directly to Supabase infrastructure without tr
 All Supabase databases run fail2ban to automatically block IPs after failed login attempts. You can also [configure IP allowlists](https://supabase.com/docs/guides/platform/network-restrictions) to restrict database access to specific trusted addresses.
 
 ## OpenAPI spec restricted with publishable keys
-{/* 
-<Img
-  alt="OpenAPI spec access control"
-  src="/images/blog/2026/security-retro/openapi-access.png"
-  captionAlign="bottom"
-  zoomable={true}
-/> 
-*/}
 
 The OpenAPI spec is no longer publicly visible when using the new `publishable` keys. Previously, anyone with an anon key could view your complete API schema, including all tables and columns. With publishable keys, the OpenAPI spec requires elevated permissions. This prevents unauthorized schema enumeration and reduces information disclosure.
 
 ## Continuous Researcher Engagement: HackerOne VDP
-{/* 
-<Img
-  alt="HackerOne vulnerability disclosure program stats"
-  src="/images/blog/2026/security-retro/hackerone.png"
-  captionAlign="bottom"
-  zoomable={true}
-/> 
-*/}
 
 Supabase runs continuous security testing using external researchers in both red team and purple team engagements. Red team testing is adversarial and unannounced. Purple team testing is collaborative and focuses on validating controls and isolation boundaries.
 
