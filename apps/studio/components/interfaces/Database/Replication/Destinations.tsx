@@ -15,7 +15,6 @@ import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
@@ -41,9 +40,6 @@ import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
-
   const unifiedReplication = useFlag('unifiedReplication')
 
   const prefetchedRef = useRef(false)

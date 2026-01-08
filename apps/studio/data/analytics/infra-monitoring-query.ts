@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
+import { UseCustomQueryOptions } from 'types'
 import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 export type InfraMonitoringAttribute =
   | 'max_cpu_usage'
@@ -23,6 +23,7 @@ export type InfraMonitoringAttribute =
   | 'realtime_payload_size'
   | 'realtime_sum_connections_connected'
   | 'realtime_replication_connection_lag'
+  | 'physical_replication_lag_physical_replica_lag_seconds'
 
 export type InfraMonitoringSeriesMetadata = {
   yAxisLimit: number

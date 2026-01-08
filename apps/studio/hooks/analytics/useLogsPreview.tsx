@@ -79,6 +79,7 @@ function useLogsPreview({
     }),
     [JSON.stringify(urlFilters), JSON.stringify(filterOverride), search]
   )
+  console.log({ mergedFilters })
 
   const params: LogsEndpointParams = useMemo(() => {
     const currentSql = genDefaultQuery(table, mergedFilters, limit)

@@ -74,7 +74,6 @@ const DatabaseUsage = () => {
     updateDateRange,
     datePickerValue,
     datePickerHelpers,
-    isOrgPlanLoading,
     orgPlan,
     showUpgradePrompt,
     setShowUpgradePrompt,
