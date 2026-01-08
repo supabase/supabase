@@ -112,7 +112,7 @@ export const getFileExtension = (fileName: string): string => {
  */
 export const isAllowedExtension = (fileName: string): boolean => {
   const extension = getFileExtension(fileName)
-  return ZIP_EXTRACTION_CONFIG.ALLOWED_EXTENSIONS.includes(extension)
+  return (ZIP_EXTRACTION_CONFIG.ALLOWED_EXTENSIONS as readonly string[]).includes(extension)
 }
 
 /**
@@ -120,7 +120,7 @@ export const isAllowedExtension = (fileName: string): boolean => {
  */
 export const isAllowedBinaryFile = (fileName: string): boolean => {
   const extension = getFileExtension(fileName)
-  return ZIP_EXTRACTION_CONFIG.ALLOWED_BINARY_EXTENSIONS.includes(extension)
+  return (ZIP_EXTRACTION_CONFIG.ALLOWED_BINARY_EXTENSIONS as readonly string[]).includes(extension)
 }
 
 /**
