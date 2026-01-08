@@ -10,13 +10,13 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import UpcomingInvoice from './UpcomingInvoice'
 
 const BillingBreakdown = () => {
@@ -32,7 +32,7 @@ const BillingBreakdown = () => {
   const {
     data: subscription,
     error: subscriptionError,
-    isLoading: isLoadingSubscription,
+    isPending: isLoadingSubscription,
     isError: isErrorSubscription,
   } = useOrgSubscriptionQuery({ orgSlug }, { enabled: canReadSubscriptions })
 
@@ -71,22 +71,24 @@ const BillingBreakdown = () => {
           <p className="prose text-sm">
             {selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? (
               <>
-                You'll receive two invoices from AWS Marketplace: one on the 3rd of{' '}
-                {billingCycleEnd.format('MMMM')} for your usage in{' '}
-                {billingCycleStart.format('MMMM')} and one on {billingCycleEnd.format('MMMM DD')}{' '}
-                for the fixed subscription fee.
+                <p>
+                  AWS Marketplace sends two invoices each month: one for your fixed subscription
+                  fee, billed on the day you subscribed, and one for your usage charges from the
+                  previous month, billed by the 3rd.
+                </p>
+
+                <p>
+                  For a more detailed breakdown, visit the{' '}
+                  <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+                </p>
               </>
             ) : (
               <>
                 Your upcoming invoice (excluding credits) will continue to update until the end of
-                your billing cycle on {billingCycleEnd.format('MMMM DD')}.
+                your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
+                breakdown, visit the <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
               </>
             )}
-            <>
-              {' '}
-              For a more detailed breakdown, visit the{' '}
-              <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
-            </>
           </p>
           <br />
           <p className="text-sm text-foreground-light mt-4">

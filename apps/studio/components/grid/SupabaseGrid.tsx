@@ -4,7 +4,8 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
@@ -16,12 +17,15 @@ import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
-import { RowContextMenu } from './components/menu'
+import { HeaderNew } from './components/header/HeaderNew'
+import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -42,12 +46,26 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const { filters, onApplyFilters } = useTableFilter()
+  const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
+
+  const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
+  const msSqlWarning = isMsSqlForeignTable(snap.originalTable)
+    ? validateMsSqlSorting({ filters, sorts, table: snap.originalTable })
+    : { warning: null }
+  const tableQueriesEnabled = msSqlWarning.warning === null
+
+  const {
+    data,
+    error,
+    isSuccess,
+    isError,
+    isPending: isLoading,
+    isRefetching,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -59,18 +77,12 @@ export const SupabaseGrid = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
-      retryDelay: (retryAttempt, error: any) => {
+      placeholderData: keepPreviousData,
+      enabled: tableQueriesEnabled,
+      retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')
-        const tooManyRequestsError = error.message?.includes('Too Many Requests')
-        const vaultError = error.message?.includes('query vault failed')
-
         if (doesNotExistError) onApplySorts([])
-
-        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
-          return Infinity
-        }
-        return 5000
+        return false
       },
     }
   )
@@ -81,10 +93,18 @@ export const SupabaseGrid = ({
 
   const rows = data?.rows ?? EMPTY_ARR
 
+  const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
+
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} isRefetching={isRefetching} />
+        <HeaderComponent
+          customHeader={customHeader}
+          isRefetching={isRefetching}
+          tableQueriesEnabled={tableQueriesEnabled}
+        />
+
+        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
         {children || (
           <>
@@ -93,13 +113,12 @@ export const SupabaseGrid = ({
               {...gridProps}
               rows={rows}
               error={error}
+              isDisabled={!tableQueriesEnabled}
               isLoading={isLoading}
               isSuccess={isSuccess}
               isError={isError}
-              filters={filters}
-              onApplyFilters={onApplyFilters}
             />
-            <Footer />
+            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}

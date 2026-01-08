@@ -1,17 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
+import { Lightbulb, Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
+import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
+import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Entity,
@@ -21,12 +24,13 @@ import {
   isView as isTableLikeView,
 } from 'data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -39,9 +43,8 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
@@ -52,7 +55,7 @@ export interface GridHeaderActionsProps {
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -62,6 +65,10 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
 
+  // Use table-specific index advisor context
+  const { isAvailable: isIndexAdvisorAvailable, isEnabled: isIndexAdvisorEnabled } =
+    useTableIndexAdvisor()
+
   const isTable = isTableLike(table)
   const isForeignTable = isTableLikeForeignTable(table)
   const isView = isTableLikeView(table)
@@ -70,7 +77,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
-  const { mutate: updateTable } = useTableUpdateMutation({
+  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
     },
@@ -103,17 +110,44 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     (publication) => publication.name === 'supabase_realtime'
   )
   const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
+  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
 
-  const { mutate: updatePublications, isLoading: isTogglingRealtime } =
+  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
+    projectInsertedAt: project?.inserted_at,
+    isTable,
+    isRealtimeEnabled,
+  })
+
+  const { mutate: updatePublications, isPending: isTogglingRealtime } =
     useDatabasePublicationUpdateMutation({
       onSuccess: () => {
         setShowEnableRealtime(false)
+
+        track(isRealtimeEnabled ? 'table_realtime_disabled' : 'table_realtime_enabled', {
+          method: 'ui',
+          schema_name: table.schema,
+          table_name: table.name,
+        })
       },
       onError: (error) => {
         toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
       },
     })
+
+  const { data: triggersData } = useDatabaseTriggersQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isTable,
+    }
+  )
+  const tableTriggers = (triggersData ?? []).filter(
+    (trigger) => trigger.schema === table.schema && trigger.table === table.name
+  )
+
+  const tableTriggersCount = tableTriggers.length
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -126,6 +160,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isReadOnly = !isLoadingPermissions && !canSqlWriteTables && !canSqlWriteColumns
   // This will change when we allow autogenerated API docs for schemas other than `public`
   const doesHaveAutoGeneratedAPIDocs = table.schema === 'public'
+
+  const { hasLint: tableHasLints } = getEntityLintDetails(
+    table.name,
+    'rls_disabled_in_public',
+    ['ERROR'],
+    lints,
+    table.schema
+  )
 
   const { hasLint: viewHasLints, matchingLint: matchingViewLint } = getEntityLintDetails(
     table.name,
@@ -144,31 +186,21 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       table.schema
     )
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   const toggleRealtime = async () => {
-    if (!project) return console.error('Project is required')
-    if (!realtimePublication) return console.error('Unable to find realtime publication')
+    if (!project || !realtimePublication) return
 
-    const exists = realtimeEnabledTables.some((x: any) => x.id == table.id)
+    const exists = realtimeEnabledTables.some((x) => x.id === table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
-          realtimeEnabledTables.map((t: any) => `${t.schema}.${t.name}`)
+          realtimeEnabledTables.map((t) => `${t.schema}.${t.name}`)
         )
-      : realtimeEnabledTables
-          .filter((x: any) => x.id != table.id)
-          .map((x: any) => `${x.schema}.${x.name}`)
+      : realtimeEnabledTables.filter((x) => x.id !== table.id).map((x) => `${x.schema}.${x.name}`)
 
-    sendEvent({
-      action: 'realtime_toggle_table_clicked',
-      properties: {
-        newState: exists ? 'disabled' : 'enabled',
-        origin: 'tableGridHeader',
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('realtime_toggle_table_clicked', {
+      newState: exists ? 'disabled' : 'enabled',
+      origin: 'tableGridHeader',
     })
 
     updatePublications({
@@ -195,6 +227,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       name: table.name,
       schema: table.schema,
       payload: payload,
+    })
+
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: table.schema,
+      table_name: table.name,
     })
   }
 
@@ -234,7 +272,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   >
                     <Link
                       passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
                     >
                       Add RLS policy
                     </Link>
@@ -264,17 +302,17 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   >
                     <Link
                       passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
                     >
                       RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>
                 )}
               </>
-            ) : (
+            ) : tableHasLints ? (
               <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger_Shadcn_ asChild>
-                  <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
+                  <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>
@@ -308,8 +346,84 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </div>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
-            )
+            ) : null
           ) : null}
+
+          {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
+            <Popover_Shadcn_ modal={false}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="default" icon={<Lightbulb strokeWidth={1.5} />}>
+                  Index Advisor
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ portal className="w-80 text-sm" align="end">
+                <h4 className="flex items-center gap-2">
+                  <Lightbulb size={16} /> Index Advisor
+                </h4>
+                <div className="grid gap-2 mt-4 text-foreground-light text-xs">
+                  <p>
+                    Index Advisor recommends indexes to improve query performance on this table.
+                  </p>
+                  <p>
+                    Enable Index Advisor to get recommendations based on your actual query patterns.
+                  </p>
+                  <div className="mt-2">
+                    <EnableIndexAdvisorButton />
+                  </div>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          )}
+
+          {isTable && activeRealtimeVariant === RealtimeButtonVariant.TRIGGERS ? (
+            <Button
+              asChild
+              type={'default'}
+              size="tiny"
+              icon={
+                <div
+                  className={cn(
+                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
+                  )}
+                >
+                  <span className="text-[11px] text-foreground font-mono text-center">
+                    {tableTriggersCount}
+                  </span>
+                </div>
+              }
+            >
+              <Link href={manageTriggersHref}>
+                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
+              </Link>
+            </Button>
+          ) : (
+            activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON &&
+            realtimeEnabled && (
+              <ButtonTooltip
+                type="default"
+                size="tiny"
+                icon={
+                  <MousePointer2
+                    strokeWidth={1.5}
+                    className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
+                  />
+                }
+                onClick={() => setShowEnableRealtime(true)}
+                className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: isRealtimeEnabled
+                      ? 'Click to disable realtime for this table'
+                      : 'Click to enable realtime for this table',
+                  },
+                }}
+              >
+                {!isRealtimeEnabled && 'Enable Realtime'}
+              </ButtonTooltip>
+            )
+          )}
 
           {isView && viewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
@@ -432,7 +546,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
+                        href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
                       >
                         Learn more
                       </Link>
@@ -445,32 +559,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
-          {isTable && realtimeEnabled && (
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={
-                <MousePointer2
-                  strokeWidth={1.5}
-                  className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-                />
-              }
-              onClick={() => setShowEnableRealtime(true)}
-              className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: isRealtimeEnabled
-                    ? 'Click to disable realtime for this table'
-                    : 'Click to enable realtime for this table',
-                },
-              }}
-            >
-              {!isRealtimeEnabled && 'Enable Realtime'}
-            </ButtonTooltip>
+          {doesHaveAutoGeneratedAPIDocs && (
+            <APIDocsButton section={['entities', table.name]} source="table_editor" />
           )}
-
-          {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
 
           <RefreshButton tableId={table.id} isRefetching={isRefetching} />
         </div>
@@ -508,15 +599,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       />
 
       {isTable && (
-        <ConfirmModal
-          danger={table.rls_enabled}
+        <ConfirmationModal
           visible={rlsConfirmModalOpen}
-          title="Confirm to enable Row Level Security"
-          description="Are you sure you want to enable Row Level Security for this table?"
-          buttonLabel="Enable RLS"
-          buttonLoadingLabel="Updating"
-          onSelectCancel={closeConfirmModal}
-          onSelectConfirm={onToggleRLS}
+          variant={table.rls_enabled ? 'destructive' : 'default'}
+          title={`${table.rls_enabled ? 'Disable' : 'Enable'} Row Level Security`}
+          description={`Are you sure you want to ${
+            table.rls_enabled ? 'disable' : 'enable'
+          } Row Level Security for this table?`}
+          confirmLabel={`${table.rls_enabled ? 'Disable' : 'Enable'} RLS`}
+          confirmLabelLoading={`${table.rls_enabled ? 'Disabling' : 'Enabling'} RLS`}
+          loading={isUpdatingTable}
+          onCancel={closeConfirmModal}
+          onConfirm={onToggleRLS}
         />
       )}
     </div>

@@ -1,4 +1,5 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -7,22 +8,24 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
+  Button,
   Input,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import {
@@ -36,12 +39,15 @@ const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const authEnabled = useIsFeatureEnabled('project_auth:all')
+  const unifiedReplication = useFlag('unifiedReplication')
+
+  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
+    useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
 
   const {
     data,
     error,
-    isLoading: isLoadingUpgradeEligibility,
+    isPending: isLoadingUpgradeEligibility,
     isError: isErrorUpgradeEligibility,
     isSuccess: isSuccessUpgradeEligibility,
   } = useProjectUpgradeEligibilityQuery({
@@ -51,7 +57,7 @@ const InfrastructureInfo = () => {
   const {
     data: serviceVersions,
     error: serviceVersionsError,
-    isLoading: isLoadingServiceVersions,
+    isPending: isLoadingServiceVersions,
     isError: isErrorServiceVersions,
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })
@@ -82,19 +88,38 @@ const InfrastructureInfo = () => {
   return (
     <>
       <ScaffoldDivider />
-      {project?.cloud_provider !== 'FLY' && (
-        <>
-          <InstanceConfiguration />
-          <ScaffoldDivider />
-        </>
-      )}
+      {project?.cloud_provider !== 'FLY' &&
+        (unifiedReplication ? (
+          <ScaffoldContainer>
+            <ScaffoldSection isFullWidth>
+              <NoticeBar
+                visible={true}
+                type="default"
+                title="Management of read replicas has moved"
+                description="Read replicas is now managed under Replication in the Database section."
+                actions={
+                  <Button type="default" asChild>
+                    <Link href={`/project/${ref}/database/replication`} className="!no-underline">
+                      Go to Replication
+                    </Link>
+                  </Button>
+                }
+              />
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        ) : (
+          <>
+            <InstanceConfiguration />
+            <ScaffoldDivider />
+          </>
+        ))}
 
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             <h4 className="text-base capitalize m-0">Service Versions</h4>
             <p className="text-foreground-light text-sm pr-8 mt-1">
-              Information on your provisioned instance.
+              Service versions and upgrade eligibility for your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
@@ -109,6 +134,7 @@ const InfrastructureInfo = () => {
               </Alert_Shadcn_>
             ) : (
               <>
+                {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
                 {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
                 {isErrorUpgradeEligibility && (
                   <AlertError error={error} subject="Failed to retrieve Postgres version" />
@@ -147,7 +173,7 @@ const InfrastructureInfo = () => {
                             isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="warning" className="mr-1 capitalize">
+                                  <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
@@ -172,7 +198,7 @@ const InfrastructureInfo = () => {
                             isOnLatestVersion && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="brand" className="mr-1">
+                                  <Badge variant="success" className="mr-1">
                                     Latest
                                   </Badge>
                                 </TooltipTrigger>
@@ -187,7 +213,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data.eligible ? (
+                    {showDatabaseUpgrades && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -195,7 +221,7 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {!data.eligible ? (
+                    {showDatabaseUpgrades && !data.eligible ? (
                       hasObjectsToBeDropped ? (
                         <ObjectsToBeDroppedWarning
                           objectsToBeDropped={data.objects_to_be_dropped}

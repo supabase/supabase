@@ -1,11 +1,11 @@
-import { BASE_PATH } from 'lib/constants'
-import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import type { ServerOption, WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',
   FIREBASE: 'firebase_fdw_handler',
   S3: 's3_fdw_handler',
+  S3_VECTORS: 's3_vectors_fdw_handler',
   CLICK_HOUSE: 'click_house_fdw_handler',
   BIG_QUERY: 'big_query_fdw_handler',
   AIRTABLE: 'airtable_fdw_handler',
@@ -27,7 +27,7 @@ export const WRAPPER_HANDLERS = {
   ORB: 'wasm_fdw_handler',
 }
 
-const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
+export const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
   name: 'supabase_target_schema',
   label: 'Target Schema',
   required: false,
@@ -46,7 +46,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Payment processing and subscription management',
     extensionName: 'StripeFdw',
     label: 'Stripe',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/stripe',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/stripe`,
     server: {
       options: [
         {
@@ -1213,7 +1213,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Backend-as-a-Service with real-time database',
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/firebase',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/firebase`,
     server: {
       options: [
         {
@@ -1340,7 +1340,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Cloud object storage service',
     extensionName: 'S3Fdw',
     label: 'S3',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/s3',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3`,
     server: {
       options: [
         {
@@ -1417,6 +1417,54 @@ export const WRAPPERS: WrapperMeta[] = [
     ],
   },
   {
+    name: 's3_vectors_wrapper',
+    handlerName: WRAPPER_HANDLERS.S3_VECTORS,
+    validatorName: 's3_vectors_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/s3-icon.svg`,
+    description: 'Cloud storage service for high-dimensional vectors',
+    extensionName: 'S3VectorsFdw',
+    label: 'S3 Vectors',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`,
+    minimumExtensionVersion: '0.5.6',
+    server: {
+      options: [
+        {
+          name: 'vault_access_key_id',
+          label: 'Access Key ID',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'vault_secret_access_key',
+          label: 'Access Key Secret',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'aws_region',
+          label: 'AWS Region',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'us-east-1',
+        },
+        {
+          name: 'endpoint_url',
+          label: 'Endpoint URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '',
+        },
+        SUPABASE_TARGET_SCHEMA_OPTION,
+      ],
+    },
+    canTargetSchema: true,
+    tables: [],
+  },
+  {
     name: 'clickhouse_wrapper',
     handlerName: WRAPPER_HANDLERS.CLICK_HOUSE,
     validatorName: 'click_house_fdw_validator',
@@ -1424,7 +1472,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Column-oriented analytics database',
     extensionName: 'ClickHouseFdw',
     label: 'ClickHouse',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/clickhouse',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/clickhouse`,
     server: {
       options: [
         {
@@ -1469,7 +1517,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Serverless data warehouse and analytics',
     extensionName: 'BigQueryFdw',
     label: 'BigQuery',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/bigquery',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/bigquery`,
     server: {
       options: [
         {
@@ -1544,7 +1592,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'No-code database and spreadsheet platform',
     extensionName: 'airtableFdw',
     label: 'Airtable',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/airtable',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/airtable`,
     server: {
       options: [
         {
@@ -1587,7 +1635,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Log management and analytics service',
     extensionName: 'logflareFdw',
     label: 'Logflare',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/logflare',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/logflare`,
     server: {
       options: [
         {
@@ -1623,7 +1671,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Identity and access management platform',
     extensionName: 'Auth0Fdw',
     label: 'Auth0',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/auth0',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/auth0`,
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1754,7 +1802,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'AWS user authentication and authorization',
     extensionName: 'CognitoFdw',
     label: 'Cognito',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cognito',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/cognito`,
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1849,7 +1897,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Microsoft SQL Server database',
     extensionName: 'mssqlFdw',
     label: 'Microsoft SQL Server',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/mssql',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/mssql`,
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1886,7 +1934,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'In-memory data structure store',
     extensionName: 'redisFdw',
     label: 'Redis',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/redis',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/redis`,
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1901,60 +1949,231 @@ export const WRAPPERS: WrapperMeta[] = [
     },
     tables: [
       {
-        label: 'Redis Table',
-        description: 'Map to an Redis Table',
+        label: 'List',
+        description: 'Redis list data structure',
+        availableColumns: [
+          {
+            name: 'element',
+            type: 'text',
+          },
+        ],
         options: [
           {
             name: 'src_type',
-            label: 'Source Type',
-            editable: true,
-            required: true,
-            type: 'select',
             defaultValue: 'list',
-            options: [
-              {
-                label: 'list',
-                value: 'list',
-              },
-              {
-                label: 'set',
-                value: 'set',
-              },
-              {
-                label: 'hash',
-                value: 'hash',
-              },
-              {
-                label: 'zset',
-                value: 'zset',
-              },
-              {
-                label: 'stream',
-                value: 'stream',
-              },
-              {
-                label: 'multi_list',
-                value: 'multi_list',
-              },
-              {
-                label: 'multi_set',
-                value: 'multi_set',
-              },
-              {
-                label: 'multi_hash',
-                value: 'multi_hash',
-              },
-              {
-                label: 'multi_zset',
-                value: 'multi_zset',
-              },
-            ],
+            editable: false,
+            required: true,
+            type: 'text',
           },
           {
             name: 'src_key',
             label: 'Source Key',
             editable: true,
-            required: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Set',
+        description: 'Redis set data structure',
+        availableColumns: [
+          {
+            name: 'element',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'set',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Sorted Set (zset)',
+        description: 'Redis sorted set data structure',
+        availableColumns: [
+          {
+            name: 'element',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'zset',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Hash',
+        description: 'Redis hash data structure',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'value',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'hash',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Stream',
+        description: 'Redis stream data structure',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'stream',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi List',
+        description: 'Query multiple Redis lists',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_list',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi Set',
+        description: 'Query multiple Redis sets',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_set',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi Hash',
+        description: 'Query multiple Redis hashes',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_hash',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Multi Sorted Set (multi_zset)',
+        description: 'Query multiple Redis sorted sets',
+        availableColumns: [
+          {
+            name: 'key',
+            type: 'text',
+          },
+          {
+            name: 'items',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'src_type',
+            defaultValue: 'multi_zset',
+            editable: false,
+            required: true,
             type: 'text',
           },
         ],
@@ -1969,7 +2188,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Subscription billing and payments platform',
     extensionName: 'paddleFdw',
     label: 'Paddle',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/paddle',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/paddle`,
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2070,7 +2289,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Cloud data warehouse platform',
     extensionName: 'snowflakeFdw',
     label: 'Snowflake',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/snowflake',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/snowflake`,
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2173,9 +2392,9 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Iceberg is a data warehouse',
     extensionName: 'icebergFdw',
     label: 'Iceberg',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/iceberg',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/iceberg`,
     minimumExtensionVersion: '0.5.3',
-    createComponent: CreateIcebergWrapperSheet,
+    customComponent: true,
     server: {
       // The fields are intentionally not required. The required flag is enforced in the create iceberg wrapper sheet.
       // In the edit wrapper sheet, all fields are shown and not required.
@@ -2259,7 +2478,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/cal-com-icon.svg`,
     extensionName: 'calFdw',
     label: 'Cal.com',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cal',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/cal`,
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2466,7 +2685,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/calendly-icon.svg`,
     extensionName: 'calendlyFdw',
     label: 'Calendly',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/calendly',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/calendly`,
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2703,7 +2922,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/clerk-icon.svg`,
     extensionName: 'clerkFdw',
     label: 'Clerk',
-    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/clerk',
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/clerk`,
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [

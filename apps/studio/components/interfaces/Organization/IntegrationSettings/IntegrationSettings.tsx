@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
-import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
+import { VercelSection } from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -43,7 +43,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const IntegrationSettings = () => {
+export const IntegrationSettings = () => {
   const router = useRouter()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -193,5 +193,3 @@ The GitHub app will watch for changes in your repository such as file changes, b
     </>
   )
 }
-
-export default IntegrationSettings

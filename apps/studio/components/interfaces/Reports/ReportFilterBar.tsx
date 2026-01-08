@@ -1,10 +1,11 @@
-import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
+import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
 import { BASE_PATH } from 'lib/constants'
@@ -22,7 +23,6 @@ import {
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -46,8 +46,7 @@ const PRODUCT_FILTERS = [
     key: 'rest',
     filterKey: 'request.path',
     filterValue: '/rest',
-    label: 'REST',
-    description: 'Requests made to PostgREST',
+    label: 'Data API (PostgREST)',
     icon: Database,
   },
   {
@@ -55,7 +54,6 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/auth',
     label: 'Auth',
-    description: 'Auth and authorization requests',
     icon: Auth,
   },
   {
@@ -63,7 +61,6 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/storage',
     label: 'Storage',
-    description: 'Storage asset requests',
     icon: Storage,
   },
   {
@@ -71,15 +68,13 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/realtime',
     label: 'Realtime',
-    description: 'Realtime connection requests',
     icon: Realtime,
   },
   {
     key: 'graphql',
     filterKey: 'request.path',
     filterValue: '/graphql',
-    label: 'GraphQL',
-    description: 'Requests made to pg_graphql',
+    label: 'GraphQL (pg_graphql)',
     icon: null,
   },
 ]
@@ -175,6 +170,13 @@ const ReportFilterBar = ({
 
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>(getInitialDatePickerValue())
 
+  // Sync selectedRange when initialDatePickerValue changes
+  useEffect(() => {
+    if (initialDatePickerValue) {
+      setSelectedRange(initialDatePickerValue)
+    }
+  }, [initialDatePickerValue])
+
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
@@ -210,7 +212,8 @@ const ReportFilterBar = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start">
               <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
-                <p>All Requests</p>
+                <Network size={14} strokeWidth={1.5} className="mr-2" />
+                All Requests
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {PRODUCT_FILTERS.map((productFilter) => {
@@ -226,13 +229,13 @@ const ReportFilterBar = ({
                     {productFilter.key === 'graphql' ? (
                       <SVG
                         src={`${BASE_PATH}/img/graphql.svg`}
-                        className="w-[20px] h-[20px] mr-2"
+                        className="w-[14px] h-[14px] mr-2"
                         preProcessor={(code) =>
                           code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                         }
                       />
                     ) : Icon !== null ? (
-                      <Icon size={20} strokeWidth={1.5} className="mr-2" />
+                      <Icon size={14} strokeWidth={1.5} className="mr-2" />
                     ) : null}
                     <div className="flex flex-col">
                       <p
@@ -242,9 +245,6 @@ const ReportFilterBar = ({
                         )}
                       >
                         {productFilter.label}
-                      </p>
-                      <p className=" text-left text-foreground-light inline-block w-[180px]">
-                        {productFilter.description}
                       </p>
                     </div>
                   </DropdownMenuItem>

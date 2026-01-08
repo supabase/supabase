@@ -3,17 +3,17 @@ import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 
-const TOTPFactors = () => {
+export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
-  const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
 
   return (
     <>
@@ -88,5 +88,3 @@ const TOTPFactors = () => {
     </>
   )
 }
-
-export default TOTPFactors

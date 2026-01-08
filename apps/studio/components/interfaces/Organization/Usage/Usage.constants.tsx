@@ -2,6 +2,7 @@ import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billi
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
+import { DOCS_URL } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 
 export const COLOR_MAP = {
@@ -61,7 +62,7 @@ export interface CategoryAttribute {
   additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
 }
 
-export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute'
+export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute' | 'logs'
 
 export interface CategoryMeta {
   key: CategoryMetaKey
@@ -79,7 +80,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       key: PricingMetric.EGRESS,
       attributes: [
         { key: EgressType.AUTH, name: 'Auth Egress', color: 'yellow' },
-        { key: EgressType.DATABASE, name: 'Database Egress', color: 'green' },
+        { key: EgressType.REST, name: 'PostgREST Egress', color: 'green' },
         { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
         { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
         { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
@@ -89,22 +90,17 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       name: 'Egress',
       unit: 'bytes',
       description:
-        subscription?.cached_egress_enabled === true
-          ? 'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.'
-          : 'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.',
+        'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.',
       chartDescription:
-        'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every 24 hours.',
+        'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
       links: [
         {
           name: 'Documentation',
-          url: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
         },
       ],
     },
-  ]
-
-  if (subscription?.cached_egress_enabled) {
-    egressAttributes.push({
+    {
       anchor: 'cachedEgress',
       key: PricingMetric.CACHED_EGRESS,
       attributes: [{ key: PricingMetric.CACHED_EGRESS.toLowerCase(), color: 'white' }],
@@ -112,15 +108,125 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       unit: 'bytes',
       description:
         'Contains any outgoing traffic that is served from a cache hit. Includes API, Storage and Edge Functions.\nBilling is based on the total sum of cached egress in GB throughout your billing period.',
-      chartDescription: 'The data refreshes every 24 hours.',
+      chartDescription: 'The data refreshes every hour.',
       links: [
         {
           name: 'Documentation',
-          url: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
         },
       ],
+    },
+  ]
+
+  const databaseAndStorageSizeAttributes: CategoryAttribute[] = []
+  if (subscription?.plan.id === 'free') {
+    databaseAndStorageSizeAttributes.push({
+      anchor: 'dbSize',
+      key: PricingMetric.DATABASE_SIZE,
+      attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
+      name: 'Database size',
+      chartPrefix: 'Average',
+      unit: 'bytes',
+      description:
+        'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.',
+      links: [
+        {
+          name: 'Documentation',
+          url: `${DOCS_URL}/guides/platform/database-size`,
+        },
+      ],
+      chartDescription: 'The data refreshes every hour.',
+      additionalInfo: (usage?: OrgUsageResponse) => {
+        const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
+        const usageRatio =
+          typeof usageMeta !== 'number'
+            ? (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
+            : 0
+        const hasLimit = usageMeta && (usageMeta?.pricing_free_units ?? 0) > 0
+
+        const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
+        const isExceededLimit = hasLimit && usageRatio >= 1
+        const isCapped = usageMeta?.capped
+
+        const onFreePlan = subscription?.plan?.name === 'Free'
+
+        return (
+          <div>
+            {(isApproachingLimit || isExceededLimit) && isCapped && (
+              <Admonition
+                type={isExceededLimit ? 'danger' : 'warning'}
+                title={
+                  isExceededLimit ? 'Exceeding database size limit' : 'Nearing database size limit'
+                }
+              >
+                <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
+                  <div>
+                    When you reach your database size limit, your project can go into read-only
+                    mode.{' '}
+                    {onFreePlan
+                      ? 'Please upgrade your Plan.'
+                      : "Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota."}
+                  </div>
+                </div>
+              </Admonition>
+            )}
+          </div>
+        )
+      },
+    })
+  } else if (subscription?.plan.id !== 'platform') {
+    databaseAndStorageSizeAttributes.push({
+      anchor: 'diskSize',
+      key: 'diskSize',
+      attributes: [],
+      name: 'Disk size',
+      chartPrefix: 'Average',
+      unit: 'bytes',
+      description:
+        "Each Supabase project comes with a dedicated disk. Each project gets 8 GB of disk for free. Billing is based on the provisioned disk size. Disk automatically scales up when you get close to it's size.\nEach hour your project is using more than 8 GB of GP3 disk, it incurs the overages in GB-Hrs, i.e. a 16 GB disk incurs 8 GB-Hrs every hour. Extra disk size costs $0.125/GB/month ($0.000171/GB-Hr).",
+      links: [
+        {
+          name: 'Documentation',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
+        },
+        {
+          name: 'Disk Management',
+          url: `${DOCS_URL}/guides/platform/database-size#disk-management`,
+        },
+      ],
+      chartDescription: '',
+    })
+  } else if (subscription?.plan.id === 'platform') {
+    databaseAndStorageSizeAttributes.push({
+      anchor: 'databaseSize',
+      key: PricingMetric.DATABASE_SIZE,
+      attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
+      name: 'Database Size',
+      chartPrefix: 'Cumulative',
+      unit: 'bytes',
+      description:
+        'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+      chartDescription: 'The data refreshes every hour.',
     })
   }
+
+  databaseAndStorageSizeAttributes.push({
+    anchor: 'storageSize',
+    key: PricingMetric.STORAGE_SIZE,
+    attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
+    name: 'Storage Size',
+    chartPrefix: 'Average',
+    unit: 'bytes',
+    description:
+      'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+    chartDescription: 'The data refreshes every hour.',
+    links: [
+      {
+        name: 'Storage',
+        url: `${DOCS_URL}/guides/storage`,
+      },
+    ],
+  })
 
   return [
     {
@@ -133,105 +239,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       key: 'sizeCount',
       name: 'Database & Storage Size',
       description: 'Amount of resources your project is consuming',
-      attributes: [
-        subscription?.plan.id === 'free'
-          ? {
-              anchor: 'dbSize',
-              key: PricingMetric.DATABASE_SIZE,
-              attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
-              name: 'Database size',
-              chartPrefix: 'Average',
-              unit: 'bytes',
-              description:
-                'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.',
-              links: [
-                {
-                  name: 'Documentation',
-                  url: 'https://supabase.com/docs/guides/platform/database-size',
-                },
-              ],
-              chartDescription: 'The data refreshes every 24 hours.',
-              additionalInfo: (usage?: OrgUsageResponse) => {
-                const usageMeta = usage?.usages.find(
-                  (x) => x.metric === PricingMetric.DATABASE_SIZE
-                )
-                const usageRatio =
-                  typeof usageMeta !== 'number'
-                    ? (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
-                    : 0
-                const hasLimit = usageMeta && (usageMeta?.pricing_free_units ?? 0) > 0
-
-                const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
-                const isExceededLimit = hasLimit && usageRatio >= 1
-                const isCapped = usageMeta?.capped
-
-                const onFreePlan = subscription?.plan?.name === 'Free'
-
-                return (
-                  <div>
-                    {(isApproachingLimit || isExceededLimit) && isCapped && (
-                      <Admonition
-                        type={isExceededLimit ? 'danger' : 'warning'}
-                        title={
-                          isExceededLimit
-                            ? 'Exceeding database size limit'
-                            : 'Nearing database size limit'
-                        }
-                      >
-                        <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
-                          <div>
-                            When you reach your database size limit, your project can go into
-                            read-only mode.{' '}
-                            {onFreePlan
-                              ? 'Please upgrade your Plan.'
-                              : "Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota."}
-                          </div>
-                        </div>
-                      </Admonition>
-                    )}
-                  </div>
-                )
-              },
-            }
-          : {
-              anchor: 'diskSize',
-              key: 'diskSize',
-              attributes: [],
-              name: 'Disk size',
-              chartPrefix: 'Average',
-              unit: 'bytes',
-              description:
-                "Each Supabase project comes with a dedicated disk. Each project gets 8 GB of disk for free. Billing is based on the provisioned disk size. Disk automatically scales up when you get close to it's size.\nEach hour your project is using more than 8 GB of GP3 disk, it incurs the overages in GB-Hrs, i.e. a 16 GB disk incurs 8 GB-Hrs every hour. Extra disk size costs $0.125/GB/month ($0.000171/GB-Hr).",
-              links: [
-                {
-                  name: 'Documentation',
-                  url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
-                },
-                {
-                  name: 'Disk Management',
-                  url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
-                },
-              ],
-              chartDescription: '',
-            },
-        {
-          anchor: 'storageSize',
-          key: PricingMetric.STORAGE_SIZE,
-          attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
-          name: 'Storage Size',
-          chartPrefix: 'Average',
-          unit: 'bytes',
-          description:
-            'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
-          chartDescription: 'The data refreshes every 24 hours.',
-          links: [
-            {
-              name: 'Storage',
-              url: 'https://supabase.com/docs/guides/storage',
-            },
-          ],
-        },
-      ],
+      attributes: databaseAndStorageSizeAttributes,
     },
     {
       key: 'activity',
@@ -253,7 +261,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Auth',
-              url: 'https://supabase.com/docs/guides/auth',
+              url: `${DOCS_URL}/guides/auth`,
             },
           ],
         },
@@ -274,7 +282,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'SSO with SAML 2.0',
-              url: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+              url: `${DOCS_URL}/guides/auth/sso/auth-sso-saml`,
             },
           ],
         },
@@ -295,7 +303,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Documentation',
-              url: 'https://supabase.com/docs/guides/storage/image-transformations',
+              url: `${DOCS_URL}/guides/storage/image-transformations`,
             },
           ],
         },
@@ -307,11 +315,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'absolute',
           description:
             'Every serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Edge Functions',
-              url: 'https://supabase.com/docs/guides/functions',
+              url: `${DOCS_URL}/guides/functions`,
             },
           ],
         },
@@ -323,11 +331,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'absolute',
           description:
             "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Realtime Quotas',
-              url: 'https://supabase.com/docs/guides/realtime/quotas',
+              url: `${DOCS_URL}/guides/realtime/quotas`,
             },
           ],
         },
@@ -342,13 +350,54 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'absolute',
           description:
             'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Realtime Quotas',
-              url: 'https://supabase.com/docs/guides/realtime/quotas',
+              url: `${DOCS_URL}/guides/realtime/quotas`,
             },
           ],
+        },
+      ],
+    },
+
+    {
+      key: 'logs',
+      name: 'Logs',
+      description: 'Usage statistics related to your logs',
+      attributes: [
+        {
+          anchor: 'logIngestion',
+          key: PricingMetric.LOG_INGESTION,
+          attributes: [{ key: PricingMetric.LOG_INGESTION.toLowerCase(), color: 'white' }],
+          name: 'Log Ingestion',
+          unit: 'absolute',
+          description:
+            'Total amount of logs ingested across all projects.\nBilling is based on the total amount of logs ingested in Gigabyte.',
+          chartDescription: 'The data refreshes every hour.',
+          links: [],
+        },
+        {
+          anchor: 'logQuery',
+          key: PricingMetric.LOG_QUERYING,
+          attributes: [{ key: PricingMetric.LOG_QUERYING.toLowerCase(), color: 'white' }],
+          name: 'Log Query',
+          unit: 'absolute',
+          description:
+            'Total amount of logs queried across all projects.\nBilling is based on the total amount of logs queried in Gigabyte.',
+          chartDescription: 'The data refreshes every hour.',
+          links: [],
+        },
+        {
+          anchor: 'logStorage',
+          key: PricingMetric.LOG_STORAGE,
+          attributes: [{ key: PricingMetric.LOG_STORAGE.toLowerCase(), color: 'white' }],
+          name: 'Log Storage',
+          unit: 'absolute',
+          description:
+            'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
+          chartDescription: 'The data refreshes every hour.',
+          links: [],
         },
       ],
     },

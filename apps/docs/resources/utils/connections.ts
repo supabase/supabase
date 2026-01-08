@@ -12,7 +12,7 @@ import { Result } from '~/features/helpers.fn'
 import { nanoId } from '~/features/helpers.misc'
 
 /**
- * Extracts the name from a a GraphQLOutputType.
+ * Extracts the name from a GraphQLOutputType.
  */
 function extractNodeTypeName(
   /**

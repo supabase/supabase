@@ -20,6 +20,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -29,11 +30,12 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'pooling-configuration-form'
@@ -60,7 +62,7 @@ export const ConnectionPooling = () => {
   const {
     data: pgbouncerConfig,
     error: pgbouncerConfigError,
-    isLoading: isLoadingPgbouncerConfig,
+    isPending: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
   } = usePgbouncerConfigQuery({ projectRef })
@@ -75,7 +77,7 @@ export const ConnectionPooling = () => {
   })
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
 
-  const { mutate: updatePoolerConfig, isLoading: isUpdatingPoolerConfig } =
+  const { mutate: updatePoolerConfig, isPending: isUpdatingPoolerConfig } =
     usePgbouncerConfigurationUpdateMutation()
 
   const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
@@ -139,7 +141,7 @@ export const ConnectionPooling = () => {
   return (
     <section id="connection-pooler">
       <Panel
-        className="!mb-0"
+        noMargin
         title={
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -150,7 +152,9 @@ export const ConnectionPooling = () => {
                 <Badge>Shared/Dedicated Pooler</Badge>
               )}
             </div>
-            <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
+            <DocsButton
+              href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
+            />
           </div>
         }
         footer={
@@ -214,7 +218,7 @@ export const ConnectionPooling = () => {
             <Form_Shadcn_ {...form}>
               <form
                 id={formId}
-                className="flex flex-col gap-y-6 w-full"
+                className="flex flex-col gap-y-4 w-full"
                 onSubmit={form.handleSubmit(onSubmit)}
               >
                 <FormField_Shadcn_
@@ -222,7 +226,7 @@ export const ConnectionPooling = () => {
                   name="default_pool_size"
                   render={({ field }) => (
                     <FormItemLayout
-                      layout="horizontal"
+                      layout="flex-row-reverse"
                       label="Pool Size"
                       description={
                         <p>
@@ -231,18 +235,21 @@ export const ConnectionPooling = () => {
                           based on your compute size of {computeSize}.
                         </p>
                       }
+                      className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          {...field}
-                          type="number"
-                          className="w-full"
-                          value={field.value || ''}
-                          placeholder={defaultPoolSize.toString()}
-                          {...form.register('default_pool_size', {
-                            setValueAs: setValueAsNullableNumber,
-                          })}
-                        />
+                        <PrePostTab postTab="connections" className="uppercase">
+                          <Input_Shadcn_
+                            {...field}
+                            type="number"
+                            className="w-full"
+                            value={field.value || ''}
+                            placeholder={defaultPoolSize.toString()}
+                            {...form.register('default_pool_size', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
+                          />
+                        </PrePostTab>
                       </FormControl_Shadcn_>
                       {!!maxConnData &&
                         (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
@@ -261,13 +268,16 @@ export const ConnectionPooling = () => {
                   )}
                 />
 
+                <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
                 <FormField_Shadcn_
                   control={form.control}
                   name="max_client_conn"
                   render={({ field }) => (
                     <FormItemLayout
-                      layout="horizontal"
+                      layout="flex-row-reverse"
                       label="Max Client Connections"
+                      className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                       description={
                         <>
                           <p>
@@ -277,7 +287,9 @@ export const ConnectionPooling = () => {
                           </p>
                           <p className="mt-2">
                             Please refer to our{' '}
-                            <InlineLink href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size">
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/database/connection-management#configuring-supavisors-pool-size`}
+                            >
                               documentation
                             </InlineLink>{' '}
                             to find out more.
@@ -286,17 +298,19 @@ export const ConnectionPooling = () => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          {...field}
-                          type="number"
-                          className="w-full"
-                          value={pgbouncerConfig?.max_client_conn || ''}
-                          disabled={true}
-                          placeholder={defaultMaxClientConn.toString()}
-                          {...form.register('max_client_conn', {
-                            setValueAs: setValueAsNullableNumber,
-                          })}
-                        />
+                        <PrePostTab postTab="clients" className="uppercase">
+                          <Input_Shadcn_
+                            {...field}
+                            type="number"
+                            className="w-full"
+                            value={pgbouncerConfig?.max_client_conn || ''}
+                            disabled={true}
+                            placeholder={defaultMaxClientConn.toString()}
+                            {...form.register('max_client_conn', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
+                          />
+                        </PrePostTab>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
