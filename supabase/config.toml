@@ -12,7 +12,7 @@ port = 54321
 # endpoints. public and storage are always included.
 schemas = ["public", "content", "storage", "graphql_public"]
 # Extra schemas to add to the search_path of every request. public is always included.
-extra_search_path = ["public", "extensions"]
+extra_search_path = ["public", "extensions", "topology"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
