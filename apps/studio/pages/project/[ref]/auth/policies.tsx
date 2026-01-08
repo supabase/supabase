@@ -31,10 +31,11 @@ import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
+import { AiIconAnimation, Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -106,6 +107,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
     setValue: setEditorPanelValue,
@@ -227,6 +229,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
+  const handleSecurityReview = useCallback(() => {
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      name: 'Security review',
+      initialMessage: `Please perform a security review of all tables and policies in the "${schema}" schema.`,
+    })
+  }, [aiSnap, openSidebar, schema])
+
   useEffect(() => {
     if (!isTriggerPermissionsLoaded) return
 
@@ -270,6 +280,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+            <Button
+              type="default"
+              icon={<AiIconAnimation size={16} />}
+              onClick={handleSecurityReview}
+            >
+              Review
+            </Button>
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>

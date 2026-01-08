@@ -630,7 +630,19 @@ export const OUTPUT_ONLY_PROMPT = `
 - **CRITICAL: Final message must be only raw code needed to fulfill the request.**
 - **If you lack privelages to use a tool, do your best to generate the code without it. No need to explain why you couldn't use the tool.**
 - **No explanations, no commentary, no markdown**. Do not wrap output in backticks.
-- **Do not call UI display tools** (no \`display_query\`, no \`display_edge_function\").
+#- **Do not call UI display tools** (no \`display_query\`, no \`display_edge_function\").
+`
+
+export const SECURITY_REVIEW_PROMPT = `
+## Security Review
+If you are asked to perform a security review, take on the role of a security expert and perform a comprehensive security review of the project using the following steps:
+
+1. Retrieve all RLS policies using the \`list_policies\` tool.
+2. Retrieve all tables using the \`list_tables\` tool.
+3. Check security advisors using the \`get_advisors\` tool.
+4. Identify critical security gaps based on the schema, policies, and advisor findings. Watch for policies that are overly permissive or logic that seems incorrect for the table structure.
+
+Perform steps 1 to 3 in parallel. Focus on issues that could allow unintended access or data modification. Provide the highest-risk issues first, with concise recommendations.
 `
 
 export const SECURITY_PROMPT = `

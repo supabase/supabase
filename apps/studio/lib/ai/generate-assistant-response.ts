@@ -16,11 +16,12 @@ import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
   GENERAL_PROMPT,
-  PG_BEST_PRACTICES,
-  RLS_PROMPT,
-  REALTIME_PROMPT,
-  SECURITY_PROMPT,
   LIMITATIONS_PROMPT,
+  PG_BEST_PRACTICES,
+  REALTIME_PROMPT,
+  RLS_PROMPT,
+  SECURITY_PROMPT,
+  SECURITY_REVIEW_PROMPT,
 } from 'lib/ai/prompts'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 
@@ -86,6 +87,7 @@ export async function generateAssistantResponse({
     ${CHAT_PROMPT}
     ${PG_BEST_PRACTICES}
     ${RLS_PROMPT}
+    ${SECURITY_REVIEW_PROMPT}
     ${EDGE_FUNCTION_PROMPT}
     ${REALTIME_PROMPT}
     ${SECURITY_PROMPT}
