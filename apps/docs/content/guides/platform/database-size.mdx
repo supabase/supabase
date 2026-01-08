@@ -90,7 +90,7 @@ Disk size expands automatically when the database reaches 90% of the allocated d
 
 <Admonition type="note">
 
-The automatic resize operation will add an additional 50% capped to a maximum of 200 GB. If 50% of your current usage is more than 200 GB then only 200 GB will be added to your disk (for example a size of 1500 GB will resize to 1700 GB).
+For databases under 1TB the automatic resize operation will add an additional 50% capped to a maximum of 200 GB. For databases over 1TB in disk, the automatic resize operation will be capped at 20% of the current database size instead. Note: Additional charges may be incurred for increased disk resizing. 
 
 </Admonition>
 
