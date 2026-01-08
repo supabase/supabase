@@ -224,7 +224,7 @@ const MergePage: NextPageWithLayout = () => {
 
         // Track successful merge
         sendEvent({
-          action: 'branch_merge_succeeded',
+          action: 'branch_merge_completed',
           properties: {
             branchType: currentBranch?.persistent ? 'persistent' : 'preview',
           },
