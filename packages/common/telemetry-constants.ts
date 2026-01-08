@@ -167,7 +167,7 @@ export interface CronJobUpdatedEvent {
 }
 
 /**
- * Cron job removed.
+ * Cron job removed. Previously: cron_job_deleted
  *
  * @group Events
  * @source studio
@@ -1541,7 +1541,7 @@ export interface BranchMergeSubmittedEvent {
 }
 
 /**
- * Triggered when a branch merge completes successfully.
+ * Triggered when a branch merge completes successfully. Previously: branch_merge_succeeded
  *
  * @group Events
  * @source studio
@@ -2623,7 +2623,7 @@ export interface DashboardErrorCreatedEvent {
 
 /**
  * User successfully completed installing an integration via the integrations marketplace in the dashboard.
- * Note: This excludes Wrappers and Postgres Extensions.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_installed
  *
  * @group Events
  * @source studio
@@ -2641,7 +2641,7 @@ export interface IntegrationInstallCompletedEvent {
 }
 
 /**
- * User submitted an integration install via the integrations marketplace.
+ * User submitted an integration install via the integrations marketplace. Previously: integration_install_started
  *
  * @group Events
  * @source studio
@@ -2659,7 +2659,7 @@ export interface IntegrationInstallSubmittedEvent {
 }
 
 /**
- * User submitted an integration uninstall via the integrations marketplace.
+ * User submitted an integration uninstall via the integrations marketplace. Previously: integration_uninstall_started
  *
  * @group Events
  * @source studio
@@ -2696,7 +2696,7 @@ export interface IntegrationInstallFailedEvent {
 
 /**
  * User successfully completed uninstalling an integration via the integrations marketplace in the dashboard.
- * Note: This excludes Wrappers and Postgres Extensions.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_uninstalled
  *
  * @group Events
  * @source studio
