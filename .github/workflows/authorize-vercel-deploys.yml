@@ -44,3 +44,5 @@ jobs:
           pnpm run authorize-vercel-deploys
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          # The SHA of the commit that triggered the validate-pr workflow
+          HEAD_COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
