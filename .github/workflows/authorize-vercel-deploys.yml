@@ -3,7 +3,7 @@ name: Authorize Vercel Deploys
 on:
   # only run this workflow when the validate-pr workflow completes (successfully or not)
   workflow_run:
-    workflows: ['validate-pr']
+    workflows: ['Validate pull request']
     types: [completed]
 
 # Cancel old builds on new commit for same workflow + branch/PR.
