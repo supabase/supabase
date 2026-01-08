@@ -89,8 +89,8 @@ export const EnableReplicationCallout = ({
   type?: string
   className?: string
 }) => {
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
+  const { data: organization, isSuccess } = useSelectedOrganizationQuery()
+  const isPaidPlan = isSuccess && organization?.plan.id !== 'free'
 
   return (
     <div className={cn('border rounded-md p-4 md:p-12 flex flex-col gap-y-4', className)}>

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useFlag, useParams } from 'common'
 import {
   cn,
@@ -41,9 +40,6 @@ export const DestinationPanel = ({
   onSuccessCreateReadReplica,
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
-
   const unifiedReplication = useFlag('unifiedReplication')
 
   const [selectedType, setSelectedType] = useState<DestinationType>(
