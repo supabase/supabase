@@ -190,7 +190,7 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            {(unifiedReplication || (!unifiedReplication && !!sourceId)) && (
+            {(unifiedReplication || !!sourceId) && (
               <Button
                 type="default"
                 icon={<Plus />}
