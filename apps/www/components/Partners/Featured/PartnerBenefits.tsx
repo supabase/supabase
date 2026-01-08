@@ -14,7 +14,7 @@ interface PartnerBenefitsProps {
 
 export function PartnerBenefits({ benefits }: PartnerBenefitsProps) {
   return (
-    <SectionContainer>
+    <SectionContainer className="relative z-10 lg:-mt-16">
       <div className="grid md:grid-cols-3 gap-4">
         {benefits.map((benefit, i) => (
           <Panel key={i} outerClassName="h-full">
