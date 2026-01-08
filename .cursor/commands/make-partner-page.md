@@ -1,5 +1,7 @@
 # Create Featured Partner Page for www
 
+remember - Once this task is complete, navigate the browser to the new page.
+
 ## Overview
 
 Featured partner pages are dedicated landing pages showcasing strategic partnerships with other companies. These pages highlight the combined value proposition, integration benefits, and co-marketing opportunities.
@@ -287,22 +289,29 @@ export const getPageData = () => ({
 
 ### Partner Logo - MUST be resolved first (SVG ONLY)
 
+**CRITICAL: Search for the PRODUCT name, not the parent company.**
+
+- For "Claude Code" → search "claude", NOT "anthropic"
+- For "GitHub Copilot" → search "github-copilot" or "copilot", NOT "github" or "microsoft"
+- For "AWS Lambda" → search "aws-lambda", NOT "aws" or "amazon"
+
 1. Search for existing logo in codebase: `apps/www/public/images/` (logos/, company/, publicity/)
 2. If found, copy to `apps/www/public/images/partners/featured/[partner-name]/`
 3. If not found in codebase, try these sources (SVG format required):
 
    **Option A: svglogos.dev**
 
-   - Navigate to `https://svglogos.dev/#search=[partner-name]`
+   - Navigate to `https://svglogos.dev/#search=[product-name]` (use the PRODUCT name, not parent company)
    - Use `browser_network_requests` to find the CDN URL (do NOT click download buttons)
    - Look for requests to `https://cdn.svglogos.dev/logos/[name].svg` or `https://cdn.svglogos.dev/logos/[name]-icon.svg`
    - Prefer icon version (`-icon.svg`) over wordmark if both are available
+   - If no product-specific logo exists, THEN fall back to the parent company logo
    - Download using curl with the exact CDN URL
 
    **Option B: Wikipedia**
 
-   - Search Wikipedia for the company
-   - Find the company logo in the infobox
+   - Search Wikipedia for the product/service specifically
+   - Find the logo in the infobox
    - Ensure it's an SVG file (check the file extension)
    - Download the SVG version from Wikimedia Commons
 
