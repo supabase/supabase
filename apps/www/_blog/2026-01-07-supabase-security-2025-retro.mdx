@@ -8,8 +8,8 @@ tags:
 date: '2026-01-07'
 toc_depth: 3
 author: paul_copplestone,bil_harmer
-image: 2025-12-19-stripe-sync-engine-integration/og.png
-thumb: 2025-12-19-stripe-sync-engine-integration/thumb.png
+image: 2026/security-retro/og.png
+thumb: 2026/security-retro/thumb.png
 ---
 
 This post covers security changes made to the Supabase platform in 2025 and what to expect in 2026. Some changes may be breaking.
@@ -100,12 +100,12 @@ For tables created via the dashboard, RLS is enabled by default. Tables are prot
 
 <Img
   alt="Event trigger configuration for automatic RLS"
-  src="/images/blog/2026/security-retro/event-triggers.png"
+  src="/images/blog/2026/security-retro/auto-enable-rls.png"
   captionAlign="bottom"
   zoomable={true}
 />
 
-If you create tables using external tools or migrations that don't enable RLS, you can use Postgres [Event Triggers to enforce RLS](/docs/guides/database/postgres/event-triggers#example-trigger-function---auto-enable-row-level-security) automatically. We added Event Triggers to the platform in 2025 and documented how to set up automatic RLS enforcement for any table creation method.
+If you create tables using external tools or migrations that don't enable RLS, you can use Postgres Event Triggers to enforce RLS automatically. We added Event Triggers to the platform in 2025, [documented](/docs/guides/database/postgres/event-triggers#example-trigger-function---auto-enable-row-level-security) how to set up automatic RLS enforcement for any table creation method, and added a one-click setup in the dashboard.
 
 ## Clear labels when tables are exposed
 
