@@ -533,7 +533,7 @@ export const pricing: Pricing = {
         key: 'realtime.maxMessageSize',
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
+          free: '256 KB',
           pro: '3 MB',
           team: '3 MB',
           enterprise: 'Custom',
