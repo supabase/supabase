@@ -18,7 +18,6 @@ Postgres Row Level Security (RLS) is powerful but can be complex for developers 
 
 We'll cover what shipped in 2025 and outline planned improvements for 2026.
 
-
 ## Disabling the Data API when creating a project
 
 <Img
@@ -118,7 +117,6 @@ If you create tables using external tools or migrations that don't enable RLS, y
 
 The Table Editor now shows a clear warning label for any table that has RLS disabled. This makes it immediately obvious which tables are exposed via the API without row-level security policies.
 
-
 ## Security alerts for tables without RLS
 
 <Img
@@ -176,20 +174,7 @@ Column-level security works independently from RLS. You can use both together: R
   zoomable={true}
 />
 
-Custom claims let you add metadata to JWTs for role-based access control (RBAC). Instead of writing RLS policies for each table, you can embed role information in the authentication token and check it in your policies. This works well if you're migrating from traditional RBAC systems or prefer centralized role management. 
-
-
-
-## Custom security extensions for Postgres
-
-<Img
-  alt="Custom security extensions catalog"
-  src="/images/blog/2026/security-retro/extensions.png"
-  captionAlign="bottom"
-  zoomable={true}
-/>
-
-Postgres extensions can implement custom authorization patterns. Community developers have built extensions for alternative security models, including an RBAC extension that simplifies role management. These extensions are available in the Supabase extensions catalog. We're planning improved extension documentation and tighter dashboard integration in 2026.
+Custom claims let you add metadata to JWTs for role-based access control (RBAC). Instead of writing RLS policies for each table, you can embed role information in the authentication token and check it in your policies. This works well if you're migrating from traditional RBAC systems or prefer centralized role management.
 
 ## VPC / Private Link on AWS
 
@@ -211,8 +196,7 @@ AWS PrivateLink connects your VPC directly to Supabase infrastructure without tr
   zoomable={true}
 />
 
-All Supabase databases run fail2ban to automatically block IPs after failed login attempts. You can also configure IP allowlists to restrict database access to specific trusted addresses. 
-
+All Supabase databases run fail2ban to automatically block IPs after failed login attempts. You can also configure IP allowlists to restrict database access to specific trusted addresses.
 
 ## Continuous Researcher Engagement: HackerOne VDP
 
@@ -228,6 +212,7 @@ Supabase runs continuous security testing using external researchers in both red
 In addition to scheduled testing, we operate an active vulnerability disclosure program on HackerOne. Since launch, we have resolved 139 reports from 96 researchers. In the last 90 days, we received 42 reports. The most recent resolution was 13 days ago. This program runs continuously.
 
 Response targets
+
 - First response: 2 business days (median 8 hours)
 - Triage: 5 business days (median 10 hours)
 - Resolution: severity-dependent (median 2 days)
@@ -248,20 +233,6 @@ Validated issues are not only patched. They feed into platform hardening, detect
 
 This program complements scheduled testing by providing continuous external validation of the platform security boundaries. Supabase secures the platform. Application-level security remains the responsibility of each customer.
 
-## Ecosystem developments
-
-<Img
-  alt="Community security tools"
-  src="/images/blog/2026/security-retro/ecosystem-tools.png"
-  captionAlign="bottom"
-  zoomable={true}
-/>
-
-Community developers have built security tooling for Supabase:
-
-* [SupaShield](https://github.com/Rodrigotari1/supashield) - A security scanning tool that analyzes your Supabase project for common misconfigurations and exposed tables
-* [RLS Policy Testing Framework](https://x.com/xyborg/status/2008109697006531054?s=46) - Tools for testing RLS policies before deploying to production
-
 ## What's next for 2026
 
 Several security improvements are planned for this year:
@@ -279,7 +250,7 @@ A new UI control will allow you to toggle API access for individual tables direc
 
 #### Alternative authorization patterns
 
-We're exploring integrations with authorization systems like OpenFGA and Zanzibar for developers who need fine-grained permissions beyond RLS.
+We're exploring integrations with authorization systems like OpenFGA and Zanzibar for developers who need fine-grained permissions beyond RLS. Like everything else in Supabase, we're taking a Postgres-native approach. Community developers have already built Postgres extensions for alternative security models, like [supabase_rbac](https://database.dev/pointsource/supabase_rbac), which simplifies role-based access control. We're planning improved extension documentation and tighter dashboard integration to make these patterns more accessible.
 
 #### GitHub push protection
 
@@ -308,4 +279,3 @@ The dashboard Assistant will be available in more locations. You'll be able to f
 #### Enhanced security alerts
 
 Security alerts and recommendations will be enhanced with more detailed explanations of impact, step-by-step remediation guidance, and inline code examples to help developers resolve issues faster.
-
