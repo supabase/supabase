@@ -15,7 +15,14 @@ import {
   TreeView,
   TreeViewItem,
 } from 'ui'
-import { getLanguageFromFileName, isBinaryFile } from './FileExplorerAndEditor.utils'
+import {
+  extractZipFile,
+  formatBytes,
+  getLanguageFromFileName,
+  isBinaryFile,
+  isZipFile,
+  ZIP_EXTRACTION_CONFIG,
+} from './FileExplorerAndEditor.utils'
 
 interface FileData {
   id: number
@@ -45,6 +52,11 @@ export const FileExplorerAndEditor = ({
 }: FileExplorerAndEditorProps) => {
   const selectedFile = files.find((f) => f.selected) ?? files[0]
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isExtractingZip, setIsExtractingZip] = useState(false)
+  const [extractionProgress, setExtractionProgress] = useState<{
+    current: number
+    total: number
+  } | null>(null)
 
   const [treeData, setTreeData] = useState({
     name: '',
@@ -83,8 +95,22 @@ export const FileExplorerAndEditor = ({
     const newFiles: FileData[] = []
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
 
+    // Separate zip files from regular files
+    const zipFiles: File[] = []
+    const regularFiles: File[] = []
+
     for (let i = 0; i < droppedFiles.length; i++) {
       const file = droppedFiles[i]
+      if (isZipFile(file.name)) {
+        zipFiles.push(file)
+      } else {
+        regularFiles.push(file)
+      }
+    }
+
+    // Process regular files first
+    for (let i = 0; i < regularFiles.length; i++) {
+      const file = regularFiles[i]
       const newId = Math.max(0, ...files.map((f) => f.id), ...newFiles.map((f) => f.id)) + 1
 
       try {
@@ -102,15 +128,111 @@ export const FileExplorerAndEditor = ({
           id: newId,
           name: file.name,
           content,
-          selected: i === droppedFiles.length - 1, // Select the last dropped file
+          selected: false, // Will select last file at the end
         })
       } catch (error) {
         console.error(`Failed to read file ${file.name}:`, error)
+        toast.error(`Failed to read file: ${file.name}`)
       }
     }
 
+    // Process zip files
+    for (const zipFile of zipFiles) {
+      try {
+        setIsExtractingZip(true)
+        setExtractionProgress({ current: 0, total: 0 })
+
+        const extractedFiles = await extractZipFile(zipFile, (current, total) => {
+          setExtractionProgress({ current, total })
+        })
+
+        let extractedCount = 0
+        let replacedCount = 0
+
+        for (const extractedFile of extractedFiles) {
+          // Check if file with same name already exists
+          const existingFileIndex = updatedFiles.findIndex((f) => f.name === extractedFile.name)
+          const newFileIndex = newFiles.findIndex((f) => f.name === extractedFile.name)
+
+          if (existingFileIndex !== -1) {
+            // Replace existing file in the original files array
+            updatedFiles[existingFileIndex] = {
+              ...updatedFiles[existingFileIndex],
+              content: extractedFile.content,
+              selected: false,
+            }
+            replacedCount++
+          } else if (newFileIndex !== -1) {
+            // Replace file in the newFiles array (from earlier in this operation)
+            newFiles[newFileIndex] = {
+              ...newFiles[newFileIndex],
+              content: extractedFile.content,
+              selected: false,
+            }
+            replacedCount++
+          } else {
+            // Add as new file
+            const newId =
+              Math.max(
+                0,
+                ...files.map((f) => f.id),
+                ...updatedFiles.map((f) => f.id),
+                ...newFiles.map((f) => f.id)
+              ) + 1
+            newFiles.push({
+              id: newId,
+              name: extractedFile.name,
+              content: extractedFile.content,
+              selected: false,
+            })
+            extractedCount++
+          }
+        }
+
+        setIsExtractingZip(false)
+        setExtractionProgress(null)
+
+        // Show success message
+        const messages: string[] = []
+        if (extractedCount > 0) {
+          messages.push(`Added ${extractedCount} new file${extractedCount > 1 ? 's' : ''}`)
+        }
+        if (replacedCount > 0) {
+          messages.push(`Replaced ${replacedCount} existing file${replacedCount > 1 ? 's' : ''}`)
+        }
+
+        toast.success(
+          <div className="flex flex-col gap-y-1">
+            <p className="text-foreground">Successfully extracted {zipFile.name}</p>
+            <p className="text-foreground-light">{messages.join(' • ')}</p>
+          </div>,
+          { duration: 5000 }
+        )
+      } catch (error) {
+        console.error(`Failed to extract zip file ${zipFile.name}:`, error)
+        setIsExtractingZip(false)
+        setExtractionProgress(null)
+
+        toast.error(
+          <div className="flex flex-col gap-y-1">
+            <p className="text-foreground">Failed to extract {zipFile.name}</p>
+            <p className="text-foreground-light">
+              {error instanceof Error ? error.message : 'Unknown error occurred'}
+            </p>
+          </div>,
+          { duration: 8000 }
+        )
+      }
+    }
+
+    // Select the last added/modified file
     if (newFiles.length > 0) {
+      newFiles[newFiles.length - 1].selected = true
       onFilesChange([...updatedFiles, ...newFiles])
+    } else if (updatedFiles.length > 0 && updatedFiles !== files) {
+      // If we only replaced files, select the first one
+      updatedFiles[0].selected = true
+      onFilesChange(updatedFiles)
     }
   }
 
@@ -245,7 +367,7 @@ export const FileExplorerAndEditor = ({
       onDrop={handleDrop}
     >
       <AnimatePresence>
-        {isDragOver && (
+        {(isDragOver || isExtractingZip) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -254,7 +376,16 @@ export const FileExplorerAndEditor = ({
             className="absolute inset-0 bg bg-opacity-30 z-10 flex items-center justify-center"
           >
             <div className="w-96 py-20 bg bg-opacity-60 border-2 border-dashed border-muted flex items-center justify-center">
-              <div className="text-base">Drop files here to add them</div>
+              {isExtractingZip && extractionProgress ? (
+                <div className="text-center space-y-2">
+                  <div className="text-base">Extracting zip file...</div>
+                  <div className="text-sm text-foreground-light">
+                    Processing file {extractionProgress.current} of {extractionProgress.total}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-base">Drop files here to add them</div>
+              )}
             </div>
           </motion.div>
         )}
