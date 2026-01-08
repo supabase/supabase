@@ -120,7 +120,11 @@ export const UsersSearch = ({
         placeholder={getSearchPlaceholder(specificFilterColumn)}
         value={search}
         onChange={(e) => {
-          const value = e.target.value.replace(/\s+/g, '').toLowerCase()
+          let value = e.target.value.toLowerCase()
+          // Remove spaces for all filters except 'name'
+          if (specificFilterColumn !== 'name') {
+            value = value.replace(/\s+/g, '')
+          }
           setSearch(value)
         }}
         onKeyDown={(e) => {
