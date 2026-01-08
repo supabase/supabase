@@ -111,6 +111,7 @@ Create a hook to read and write information to this table. For example:
 create function public.hook_mfa_verification_attempt(event jsonb)
   returns jsonb
   language plpgsql
+  security definer
 as $$
   declare
     last_failed_at timestamp;
