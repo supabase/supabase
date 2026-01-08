@@ -25,6 +25,7 @@ const jobInfoSchema = z.object({
     headInfo: z.object({
       sha: z.string().min(1, 'SHA is required'),
     }),
+    id: z.string().min(1, 'ID is required'),
     org: z.literal('supabase'),
     prId: z.number().int().positive('PR ID must be a positive integer'),
     repo: z.literal('supabase'),
