@@ -14,7 +14,7 @@ export function PartnerResource({ title, description, href, linkText }: PartnerR
     <SectionContainer>
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-xl bg-surface-100 border">
         <div>
-          <h3 className="text-xl font-medium">{title}</h3>
+          <h3 className="text-xl">{title}</h3>
           <p className="text-foreground-lighter mt-1">{description}</p>
         </div>
         <Button asChild type="default">

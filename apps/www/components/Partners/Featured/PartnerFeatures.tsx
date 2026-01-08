@@ -22,7 +22,7 @@ export function PartnerFeatures({ features, columns = 3 }: PartnerFeaturesProps)
       >
         {features.map((feature, i) => (
           <div key={i} className="flex flex-col gap-4">
-            <h3 className="text-xl font-medium">{feature.title}</h3>
+            <h3 className="text-xl">{feature.title}</h3>
             <p className="text-foreground-lighter">{feature.description}</p>
           </div>
         ))}

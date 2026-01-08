@@ -29,7 +29,7 @@ export function PartnerTestimonial({
             "{quote}"
           </blockquote>
           <div className="mt-4 pl-6">
-            <span className="font-medium">{author}</span>
+            <span>{author}</span>
             <span className="text-foreground-lighter text-sm ml-2">{role}</span>
           </div>
         </div>
@@ -44,7 +44,7 @@ export function PartnerTestimonial({
           "{quote}"
         </blockquote>
         <div className="flex flex-col items-center gap-2">
-          <span className="font-medium">{author}</span>
+          <span>{author}</span>
           <span className="text-foreground-lighter text-sm">{role}</span>
           {companyLogo && (
             <Image
