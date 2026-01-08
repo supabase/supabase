@@ -1,5 +1,7 @@
 name: Authorize Vercel Deploys
 
+# This workflow is triggered by the validate-pr workflow. When it's triggered, it will run the
+# authorize-vercel-deploys.yml in master branch. If you want to change it, you'll have to merge it into master.
 on:
   # only run this workflow when the validate-pr workflow completes (successfully or not)
   workflow_run:
