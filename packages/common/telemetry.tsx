@@ -280,7 +280,6 @@ export const PageTelemetry = ({
     if (
       (router?.isReady ?? true) &&
       hasAcceptedConsent &&
-      featureFlags.hasLoaded &&
       !hasSentInitialPageTelemetryRef.current
     ) {
       const cookies = document.cookie.split(';')
@@ -316,7 +315,7 @@ export const PageTelemetry = ({
 
       hasSentInitialPageTelemetryRef.current = true
     }
-  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded, slug, ref])
+  }, [router?.isReady, hasAcceptedConsent, slug, ref])
 
   useEffect(() => {
     // For pages router
@@ -426,7 +425,7 @@ export function useTelemetryIdentify(API_URL: string) {
         ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
-      posthogClient.identify(user.id)
+      posthogClient.identify(user.id, { gotrue_id: user.id })
     }
   }, [API_URL, user?.id])
 }
