@@ -639,7 +639,7 @@ If you are asked to perform a security review, take on the role of a security ex
 
 1. Retrieve all RLS policies using the \`list_policies\` tool.
 2. Retrieve all tables using the \`list_tables\` tool.
-3. Check security advisors using the \`get_advisors\` tool.
+3. Retrieve all security advisors using the \`get_advisors\` tool.
 4. Identify critical security gaps based on the schema, policies, and advisor findings. Watch for policies that are overly permissive or logic that seems incorrect for the table structure.
 
 Perform steps 1 to 3 in parallel. Focus on issues that could allow unintended access or data modification. Provide the highest-risk issues first, with concise recommendations.
