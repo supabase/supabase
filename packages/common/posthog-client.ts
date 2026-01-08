@@ -8,6 +8,7 @@ const MAX_PENDING_EVENTS = 20
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
+  uiHost?: string
 }
 
 class PostHogClient {
@@ -22,10 +23,15 @@ class PostHogClient {
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
 
   constructor(config: PostHogClientConfig = {}) {
+    const apiHost =
+      config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green'
+    const uiHost =
+      config.uiHost || process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com'
+
     this.config = {
       apiKey: config.apiKey || process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      apiHost:
-        config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green',
+      apiHost,
+      uiHost,
     }
   }
 
@@ -39,6 +45,7 @@ class PostHogClient {
 
     const config: Partial<PostHogConfig> = {
       api_host: this.config.apiHost,
+      ui_host: this.config.uiHost,
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves

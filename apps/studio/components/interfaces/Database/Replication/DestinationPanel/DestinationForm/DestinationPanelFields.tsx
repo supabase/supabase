@@ -32,16 +32,15 @@ import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (
-    <div className="flex flex-col gap-y-6">
-      <p className="text-sm font-medium text-foreground px-5 pt-5">BigQuery settings</p>
-      <div className="flex flex-col gap-y-4 pb-5">
+    <div className="flex flex-col gap-y-6 p-5">
+      <p className="text-sm font-medium text-foreground">BigQuery settings</p>
+      <div className="flex flex-col gap-y-4">
         <FormField_Shadcn_
           control={form.control}
           name="projectId"
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              className="px-5"
               label="Project ID"
               description="The Google Cloud project ID where data will be sent"
             >
@@ -59,7 +58,6 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             <FormItemLayout
               label="Dataset ID"
               layout="horizontal"
-              className="px-5"
               description="The BigQuery dataset where replicated tables will be created"
             >
               <FormControl_Shadcn_>
@@ -75,7 +73,6 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              className="px-5"
               label="Service Account Key"
               description="Service account credentials JSON for authenticating with BigQuery"
             >
@@ -158,10 +155,10 @@ export const AnalyticsBucketFields = ({
   )
 
   return (
-    <div className="flex flex-col gap-y-6">
-      <p className="text-sm font-medium text-foreground px-5 pt-5">Analytics Bucket settings</p>
+    <div className="flex flex-col gap-y-6 p-5">
+      <p className="text-sm font-medium text-foreground">Analytics Bucket settings</p>
 
-      <div className="flex flex-col gap-y-4 pb-5">
+      <div className="flex flex-col gap-y-4">
         <FormField_Shadcn_
           control={form.control}
           name="warehouseName"
@@ -169,7 +166,6 @@ export const AnalyticsBucketFields = ({
             <FormItemLayout
               label="Bucket"
               layout="horizontal"
-              className="px-5"
               description="The Analytics Bucket where data will be stored"
             >
               {isLoadingBuckets ? (
@@ -243,7 +239,6 @@ export const AnalyticsBucketFields = ({
             <FormItemLayout
               label="Namespace"
               layout="horizontal"
-              className="px-5"
               description="The namespace within the bucket where tables will be organized"
             >
               {isLoadingNamespaces && canSelectNamespace ? (
@@ -317,7 +312,6 @@ export const AnalyticsBucketFields = ({
               <FormItemLayout
                 label="New Namespace Name"
                 layout="horizontal"
-                className="px-5"
                 description="A unique name for the new namespace"
               >
                 <FormControl_Shadcn_>
@@ -335,7 +329,6 @@ export const AnalyticsBucketFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Catalog Token"
-              className="px-5"
               description={
                 <>
                   Automatically retrieved from your project's{' '}
@@ -401,7 +394,6 @@ export const AnalyticsBucketFields = ({
                   )}
                 </div>
               }
-              className="px-5"
             >
               {isLoadingKeys ? (
                 <Button
@@ -462,7 +454,7 @@ export const AnalyticsBucketFields = ({
               <FormItemLayout
                 layout="horizontal"
                 label="S3 Secret Access Key"
-                className="relative px-5"
+                className="relative"
                 description="The secret key corresponding to your selected access key ID"
               >
                 <FormControl_Shadcn_>

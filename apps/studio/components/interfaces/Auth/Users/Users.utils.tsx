@@ -82,6 +82,7 @@ const providers = {
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
     { twitter: 'twitter-icon' },
+    { x: 'x-icon-light' },
     { slack_oidc: 'slack-icon' },
     { slack: 'slack-icon' },
     { spotify: 'spotify-icon' },
@@ -373,7 +374,9 @@ export const formatUserColumns = ({
                           width={16}
                           src={icon}
                           alt={`${provider} auth icon`}
-                          className={cn(provider === 'github' && 'dark:invert')}
+                          className={cn(
+                            (provider === 'github' || provider === 'x') && 'dark:invert'
+                          )}
                         />
                       </div>
                     )

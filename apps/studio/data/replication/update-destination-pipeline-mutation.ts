@@ -17,6 +17,7 @@ export type UpdateDestinationPipelineParams = {
   pipelineConfig: {
     publicationName: string
     batch?: BatchConfig
+    maxTableSyncWorkers?: number
   }
 }
 
@@ -27,7 +28,7 @@ async function updateDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: { publicationName, batch },
+    pipelineConfig: { publicationName, batch, maxTableSyncWorkers },
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
@@ -84,7 +85,17 @@ async function updateDestinationPipeline(
         destination_name: destinationName,
         pipeline_config: {
           publication_name: publicationName,
-          ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
+          ...(maxTableSyncWorkers !== undefined
+            ? { max_table_sync_workers: maxTableSyncWorkers }
+            : {}),
+          ...(batch
+            ? {
+                batch: {
+                  ...(batch.maxFillMs !== undefined ? { max_fill_ms: batch.maxFillMs } : {}),
+                  ...(batch.maxSize !== undefined ? { max_size: batch.maxSize } : {}),
+                },
+              }
+            : {}),
         },
       },
       signal,
