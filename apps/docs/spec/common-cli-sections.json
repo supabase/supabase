@@ -211,7 +211,7 @@
       },
       {
         "id": "supabase-migration-down",
-        "title": "Rollback applied migration files",
+        "title": "Reset migrations to a prior version",
         "slug": "supabase-migration-down",
         "type": "cli-command"
       }
