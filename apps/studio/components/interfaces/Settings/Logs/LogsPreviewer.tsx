@@ -210,6 +210,7 @@ export const LogsPreviewer = ({
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
       setSearch(query || '')
+      setFilters({ ...filters, search_query: query || '' })
       setSelectedLogId(null)
     } else if (event === 'event-chart-bar-click') {
       setTimeRange(from || '', to || '')
@@ -224,6 +225,11 @@ export const LogsPreviewer = ({
         setTimeRange(from || '', to || '')
       }
     }
+  }
+
+  const handleSearchChange = (newSearch: string) => {
+    setSearch(newSearch)
+    setFilters({ ...filters, search_query: newSearch })
   }
 
   // Show the prompt on page load based on query params
@@ -345,6 +351,8 @@ export const LogsPreviewer = ({
             selectedLog={selectedLog}
             isSelectedLogLoading={isSelectedLogLoading}
             selectedLogError={selectedLogError ?? undefined}
+            currentSearch={filters.search_query?.toString() || ''}
+            onSearchChange={handleSearchChange}
           />
         </LoadingOpacity>
       </div>
