@@ -138,7 +138,6 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
 
 export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: number = 100) => {
   const where = genWhereStatement(table, filters)
-  console.log({ where })
   const joins = genCrossJoinUnnests(table)
   const orderBy = 'order by timestamp desc'
 
