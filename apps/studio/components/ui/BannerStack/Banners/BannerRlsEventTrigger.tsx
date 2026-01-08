@@ -1,11 +1,10 @@
 import { ShieldCheck } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-import { EMPTY_ARR } from '@/lib/void'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { DEFAULT_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseEventTriggerCreateMutation } from 'data/database-event-triggers/database-event-trigger-create-mutation'
 import { useDatabaseEventTriggersQuery } from 'data/database-event-triggers/database-event-triggers-query'
@@ -35,7 +34,7 @@ export const BannerRlsEventTrigger = () => {
     'triggers'
   )
 
-  const { data: eventTriggers = EMPTY_ARR, isLoading: isLoadingEventTriggers } =
+  const { data: eventTriggers = [], isLoading: isLoadingEventTriggers } =
     useDatabaseEventTriggersQuery({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -66,7 +65,7 @@ export const BannerRlsEventTrigger = () => {
     createEventTrigger({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: DEFAULT_EVENT_TRIGGER_SQL,
+      sql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
     })
   }
 

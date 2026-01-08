@@ -472,13 +472,11 @@ const EntityTooltipTrigger = ({
     )
   }
 
-  // Show warning for tables with RLS enabled but no policies
-  if (
-    isDataApiExposedBadgeEnabled &&
+  const isRlsEnabledNoPolicies =
     entity.type === ENTITY_TYPE.TABLE &&
-    apiAccessData?.hasApiAccess &&
+    apiAccessData?.apiAccessType === 'access' &&
     tableHasRlsEnabledNoPolicyLint
-  ) {
+  if (isDataApiExposedBadgeEnabled && isRlsEnabledNoPolicies) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
@@ -492,8 +490,9 @@ const EntityTooltipTrigger = ({
     )
   }
 
-  // Show globe icon for tables with API access, RLS enabled and policies
-  if (isDataApiExposedBadgeEnabled && apiAccessData?.hasApiAccess) {
+  const isApiExposedWithRlsAndPolicies =
+    apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isApiExposedWithRlsAndPolicies) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">

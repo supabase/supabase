@@ -1483,6 +1483,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Generating Python Types',
+      url: '/guides/api/rest/generating-python-types',
+      items: [],
+    },
+    {
       name: 'Tools',
       url: '/guides/api',
       items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
-import { useFlag } from 'common'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useFlag, useParams } from 'common'
 import {
   cn,
   DialogSectionSeparator,
@@ -8,8 +9,10 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
+  SheetSection,
   SheetTitle,
 } from 'ui'
+import { EnableReplicationCallout } from '../EnableReplicationCallout'
 import { DestinationForm } from './DestinationForm'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
@@ -26,6 +29,7 @@ interface DestinationPanelProps {
     statusName?: string
   }
   onClose: () => void
+  onSuccessCreateReadReplica?: () => void
 }
 
 export const DestinationPanel = ({
@@ -33,7 +37,9 @@ export const DestinationPanel = ({
   type,
   existingDestination,
   onClose,
+  onSuccessCreateReadReplica,
 }: DestinationPanelProps) => {
+  const { ref: projectRef } = useParams()
   const unifiedReplication = useFlag('unifiedReplication')
 
   const [selectedType, setSelectedType] = useState<DestinationType>(
@@ -41,6 +47,12 @@ export const DestinationPanel = ({
   )
 
   const editMode = !!existingDestination
+
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const replicationNotEnabled = isSourcesSuccess && !sourceId
 
   return (
     <>
@@ -69,7 +81,11 @@ export const DestinationPanel = ({
             <DialogSectionSeparator />
 
             {selectedType === 'Read Replica' ? (
-              <ReadReplicaForm onClose={onClose} />
+              <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
+            ) : unifiedReplication && replicationNotEnabled ? (
+              <SheetSection>
+                <EnableReplicationCallout className="!p-6" type={selectedType} />
+              </SheetSection>
             ) : (
               <DestinationForm
                 visible={visible}

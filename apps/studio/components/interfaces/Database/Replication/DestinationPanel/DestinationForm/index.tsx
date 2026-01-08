@@ -649,7 +649,7 @@ export const DestinationForm = ({
               <p className="text-foreground-light text-sm">
                 {isValidating
                   ? 'Validating destination configuration...'
-                  : 'Creating destination...'}
+                  : `${editMode ? 'Updating' : 'Creating'} destination...`}
               </p>
             </motion.div>
           ) : (
