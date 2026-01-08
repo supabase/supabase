@@ -43,7 +43,7 @@ To update your self-hosted Supabase instance:
 
 1. Review [CHANGELOG.md](./CHANGELOG.md) for breaking changes
 2. Check [versions.md](./versions.md) for new image versions
-3. Update `docker-compose.yml` if there are configuration changes
+3. Update `compose.yaml` if there are configuration changes
 4. Pull the latest images: `docker compose pull`
 5. Stop services: `docker compose down`
 6. Start services with new configuration: `docker compose up -d`

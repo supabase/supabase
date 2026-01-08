@@ -55,7 +55,7 @@ The [example docker-compose](https://github.com/supabase/supabase/tree/master/do
 ```bash
 # clone the supabase/supabase repo, and run the following
 cd docker
-docker compose -f docker-compose.yml up
+docker compose -f compose.yaml up
 ```
 
 ### Configuration and Requirements
@@ -122,15 +122,15 @@ Using the example [self-hosting stack based on docker-compose](https://github.co
 - `GOOGLE_PROJECT_NUMBER`
 
 2. Place your Service Account key in your present working directory with the filename `gcloud.json`.
-3. On `docker-compose.yml`, uncomment the block section below the commentary `# Uncomment to use Big Query backend for analytics`
-4. On `docker-compose.yml`, comment the block section below the commentary `# Comment variables to use Big Query backend for analytics`
+3. On `compose.yaml`, uncomment the block section below the commentary `# Uncomment to use Big Query backend for analytics`
+4. On `compose.yaml`, comment the block section below the commentary `# Comment variables to use Big Query backend for analytics`
 
 Thereafter, you can start the example stack using the following command:
 
 ```bash
 # assuming you clone the supabase/supabase repo.
 cd docker
-docker compose -f docker-compose.yml
+docker compose -f compose.yaml
 ```
 
 #### BigQuery Datset Storage Location
