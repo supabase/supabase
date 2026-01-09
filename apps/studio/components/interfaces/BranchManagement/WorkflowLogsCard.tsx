@@ -1,19 +1,20 @@
+import { WorkflowRun } from '@/data/workflow-runs/workflow-run-query'
 import { motion } from 'framer-motion'
 import { CircleDotDashed, GitMerge, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
-interface WorkflowRun {
-  id: string
-  status: string
-  branch_id?: string
-  check_run_id?: number | null
-  created_at?: string
-  updated_at?: string
-  workdir?: string | null
-  git_config?: unknown
-}
+// interface WorkflowRun {
+//   id: string
+//   status: string
+//   branch_id?: string
+//   check_run_id?: number | null
+//   created_at?: string
+//   updated_at?: string
+//   workdir?: string | null
+//   git_config?: unknown
+// }
 
 interface WorkflowLogsCardProps {
   workflowRun: WorkflowRun | null | undefined
@@ -46,13 +47,11 @@ const WorkflowLogsCard = ({
     }
   }, [logs])
 
-  const showSuccessIcon = workflowRun?.status === 'FUNCTIONS_DEPLOYED'
-  const isFailed =
-    workflowRun?.status && ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowRun.status)
-  const isPolling =
-    workflowRun?.status !== 'FUNCTIONS_DEPLOYED' &&
-    (!workflowRun?.status ||
-      !['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowRun.status))
+  const showSuccessIcon = workflowRun?.run_steps.every((x) => x.status === 'EXITED')
+  const isFailed = workflowRun?.run_steps.every((x) => x.status === 'DEAD')
+  const isPolling = workflowRun?.run_steps.every(
+    (x) => !['EXITED', 'PAUSED', 'DEAD'].includes(x.status)
+  )
 
   const displayTitle =
     overrideTitle ||
