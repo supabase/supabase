@@ -716,7 +716,7 @@ function createStorageExplorerState({
           })
         }
 
-        if (state.openedFolders[columnIndex].name === folder.name) {
+        if (state.openedFolders[columnIndex]?.name === folder.name) {
           state.setSelectedFilePreview(undefined)
           state.popOpenedFoldersAtIndex(columnIndex - 1)
         }

@@ -40,14 +40,14 @@ export const FileExplorerRowEditing = ({
         newName: name,
         columnIndex,
         onError: () => {
-          if (event.type === 'blur') {
+          if (event?.type === 'blur') {
             updateRowStatus({
               name: itemWithColumnIndex.name,
               status: STORAGE_ROW_STATUS.READY,
               columnIndex,
             })
           } else {
-            inputRef.current.select()
+            inputRef.current?.select()
           }
         },
       })
@@ -56,10 +56,10 @@ export const FileExplorerRowEditing = ({
         folderName: name,
         columnIndex,
         onError: () => {
-          if (event.type === 'blur') {
+          if (event?.type === 'blur') {
             addNewFolder({ folderName: '', columnIndex })
           } else {
-            inputRef.current.select()
+            inputRef.current?.select()
           }
         },
       })
