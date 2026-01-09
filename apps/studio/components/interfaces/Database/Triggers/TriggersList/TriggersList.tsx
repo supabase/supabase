@@ -1,7 +1,7 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, Search } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -25,13 +25,26 @@ import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, Input, Table, TableBody, TableHead, TableHeadSort, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DocsButton } from 'components/ui/DocsButton'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
+
+const TRIGGERS_SORT_VALUES = [
+  'name:asc',
+  'name:desc',
+  'table:asc',
+  'table:desc',
+  'function:asc',
+  'function:desc',
+] as const
+
+type TriggersSort = (typeof TRIGGERS_SORT_VALUES)[number]
+type TriggersSortColumn = TriggersSort extends `${infer Column}:${string}` ? Column : unknown
+type TriggersSortOrder = TriggersSort extends `${string}:${infer Order}` ? Order : unknown
 
 export const TriggersList = () => {
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
@@ -44,6 +57,11 @@ export const TriggersList = () => {
   const [filterString, setFilterString] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
+
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral<TriggersSort>(TRIGGERS_SORT_VALUES).withDefault('name:asc')
   )
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -167,6 +185,22 @@ execute function function_name();`)
     setTriggerToDelete(trigger.id.toString())
   }
 
+  const handleSortChange = (column: TriggersSortColumn) => {
+    const [currentCol, currentOrder] = sort.split(':') as [TriggersSortColumn, TriggersSortOrder]
+    if (currentCol === column) {
+      // Cycle through: asc -> desc -> no sort (default)
+      if (currentOrder === 'asc') {
+        setSort(`${column}:desc` as TriggersSort)
+      } else {
+        // Reset to default sort (name:asc)
+        setSort('name:asc')
+      }
+    } else {
+      // New column, start with asc
+      setSort(`${column}:asc` as TriggersSort)
+    }
+  }
+
   if (isPending) {
     return <GenericSkeletonLoader />
   }
@@ -235,9 +269,33 @@ execute function function_name();`)
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead key="name">Name</TableHead>
-                    <TableHead key="table">Table</TableHead>
-                    <TableHead key="function">Function</TableHead>
+                    <TableHead>
+                      <TableHeadSort
+                        column="name"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Name
+                      </TableHeadSort>
+                    </TableHead>
+                    <TableHead>
+                      <TableHeadSort
+                        column="table"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Table
+                      </TableHeadSort>
+                    </TableHead>
+                    <TableHead>
+                      <TableHeadSort
+                        column="function"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Function
+                      </TableHeadSort>
+                    </TableHead>
                     <TableHead key="events">Events</TableHead>
                     <TableHead key="orientation">Orientation</TableHead>
                     <TableHead key="enabled" className="w-20">
@@ -250,6 +308,7 @@ execute function function_name();`)
                   <TriggerList
                     schema={selectedSchema}
                     filterString={filterString}
+                    sort={sort}
                     isLocked={isSchemaLocked}
                     editTrigger={editTrigger}
                     duplicateTrigger={duplicateTrigger}

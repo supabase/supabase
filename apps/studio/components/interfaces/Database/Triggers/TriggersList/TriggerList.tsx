@@ -1,6 +1,7 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, sortBy } from 'lodash'
+import { includes } from 'lodash'
+import { useMemo } from 'react'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 
@@ -25,9 +26,13 @@ import {
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
+type TriggersSortColumn = 'name' | 'table' | 'function'
+type TriggersSortOrder = 'asc' | 'desc'
+
 interface TriggerListProps {
   schema: string
   filterString: string
+  sort: string
   isLocked: boolean
   editTrigger: (trigger: PostgresTrigger) => void
   duplicateTrigger: (trigger: PostgresTrigger) => void
@@ -37,6 +42,7 @@ interface TriggerListProps {
 export const TriggerList = ({
   schema,
   filterString,
+  sort,
   isLocked,
   editTrigger,
   duplicateTrigger,
@@ -56,15 +62,33 @@ export const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter(
-    (x) =>
-      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
-      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
-  )
-  const _triggers = sortBy(
-    filteredTriggers.filter((x) => x.schema == schema),
-    (trigger) => trigger.name.toLocaleLowerCase()
-  )
+
+  const _triggers = useMemo(() => {
+    const filtered = (triggers ?? []).filter(
+      (x) =>
+        x.schema === schema &&
+        (includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
+          (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase())))
+    )
+
+    const [sortCol, sortOrder] = sort.split(':') as [TriggersSortColumn, TriggersSortOrder]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return filtered.sort((a, b) => {
+      if (sortCol === 'name') {
+        return a.name.localeCompare(b.name) * orderMultiplier
+      }
+      if (sortCol === 'table') {
+        return a.table.localeCompare(b.table) * orderMultiplier
+      }
+      if (sortCol === 'function') {
+        const aFunction = a.function_name || ''
+        const bFunction = b.function_name || ''
+        return aFunction.localeCompare(bFunction) * orderMultiplier
+      }
+      return 0
+    })
+  }, [triggers, schema, filterString, sort])
 
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
