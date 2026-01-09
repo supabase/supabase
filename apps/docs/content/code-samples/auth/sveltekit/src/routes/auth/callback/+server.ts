@@ -8,10 +8,10 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            return redirect(303, `/${next.slice(1)}`)
+            redirect(303, `/${next.slice(1)}`)
         }
     }
 
     // return the user to an error page with instructions
-    return redirect(303, '/auth/auth-code-error')
+    redirect(303, '/auth/auth-code-error')
 }
