@@ -42,7 +42,6 @@ export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
 
   const unifiedReplication = useFlag('unifiedReplication')
 
@@ -191,7 +190,7 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            {!!sourceId && (
+            {(unifiedReplication || !!sourceId) && (
               <Button
                 type="default"
                 icon={<Plus />}
