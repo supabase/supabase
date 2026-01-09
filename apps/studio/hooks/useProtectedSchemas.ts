@@ -64,7 +64,7 @@ const useFdwSchemasQuery = () => {
 
     const fdwSchemas = icebergFDWs.map((fdw) => {
       const schemaOption =
-        convertKVStringArrayToJson(fdw.server_options)['supabase_target_schema'] ?? ''
+        convertKVStringArrayToJson(fdw.server_options ?? [])['supabase_target_schema'] ?? ''
 
       const schemas = uniq(schemaOption.split(',').filter(Boolean))
 

@@ -21,7 +21,7 @@ import {
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import DeleteWrapperModal from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'
-import { formatWrapperTables } from './Wrappers.utils'
+import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
 
 interface WrapperRowProps {
   wrapper: FDW
@@ -55,9 +55,7 @@ export const WrapperRow = ({
     return <p className="text-foreground-lighter text-sm">A wrapper with this ID does not exist</p>
   }
 
-  const serverOptions = Object.fromEntries(
-    wrapper.server_options.map((option) => option.split('='))
-  )
+  const serverOptions = convertKVStringArrayToJson(wrapper.server_options ?? [])
   const [encryptedMetadata, visibleMetadata] = partition(
     integration?.meta?.server.options.filter((option) => !option.hidden),
     'secureEntry'
