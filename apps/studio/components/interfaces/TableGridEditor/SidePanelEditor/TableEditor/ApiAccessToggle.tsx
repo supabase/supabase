@@ -319,9 +319,10 @@ export const ApiAccessToggle = ({
             <p className="text-sm text-foreground flex items-center gap-1.5">
               Data API Access
               <InfoTooltip side="top" className="max-w-80">
-                This controls which operations the <code className="text-xs">anon</code> and{' '}
-                <code className="text-xs">authenticated</code> roles can perform on this table via
-                the Data API. Unselected privileges are revoked from these roles.
+                This controls which operations the <code className="text-code-inline">anon</code>{' '}
+                and <code className="text-code-inline whitespace-nowrap">authenticated</code> roles
+                can perform on this table via the Data API. Unselected privileges are revoked from
+                these roles.
               </InfoTooltip>
             </p>
             <p className="text-sm text-foreground-lighter">
