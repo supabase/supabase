@@ -5,6 +5,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -42,6 +43,10 @@ export const OAuthEndpointsTable = () => {
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>OAuth Endpoints</PageSectionTitle>
+          <PageSectionDescription>
+            Share these endpoints with third-party applications that need to integrate with your
+            OAuth 2.1 server.
+          </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
