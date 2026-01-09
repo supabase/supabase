@@ -204,15 +204,7 @@ export const OAuthServerSettingsForm = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Enable the Supabase OAuth Server"
-                        description={
-                          <>
-                            Enable OAuth server functionality for your project to create and manage
-                            OAuth applications.{' '}
-                            <InlineLink href={`${DOCS_URL}/guides/auth/oauth-server`}>
-                              Learn more
-                            </InlineLink>
-                          </>
-                        }
+                        description="Enable OAuth server functionality for your project to create and manage OAuth applications."
                       >
                         <FormControl_Shadcn_>
                           <Switch
