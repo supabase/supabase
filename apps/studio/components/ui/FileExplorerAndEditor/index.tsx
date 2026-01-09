@@ -92,6 +92,7 @@ export const FileExplorerAndEditor = ({
   const addDroppedFiles = async (droppedFiles: FileList) => {
     const newFiles: FileData[] = []
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
+    let hasReplacedFiles = false // Track if any existing files were replaced
 
     // Separate zip files from regular files
     const zipFiles: File[] = []
@@ -160,6 +161,7 @@ export const FileExplorerAndEditor = ({
               selected: false,
             }
             replacedCount++
+            hasReplacedFiles = true
           } else if (newFileIndex !== -1) {
             // Replace file in the newFiles array (from earlier in this operation)
             newFiles[newFileIndex] = {
@@ -227,7 +229,7 @@ export const FileExplorerAndEditor = ({
     if (newFiles.length > 0) {
       newFiles[newFiles.length - 1].selected = true
       onFilesChange([...updatedFiles, ...newFiles])
-    } else if (updatedFiles.length > 0 && updatedFiles !== files) {
+    } else if (hasReplacedFiles) {
       // If we only replaced files, select the first one
       updatedFiles[0].selected = true
       onFilesChange(updatedFiles)
