@@ -7,48 +7,6 @@ export const ZIP_EXTRACTION_CONFIG = {
 
   // Maximum individual file size: 10MB
   MAX_INDIVIDUAL_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-
-  // Allowed file extensions for extraction (edge function context)
-  ALLOWED_EXTENSIONS: [
-    'ts',
-    'tsx',
-    'js',
-    'jsx',
-    'mjs',
-    'cjs',
-    'json',
-    'jsonc',
-    'md',
-    'txt',
-    'css',
-    'scss',
-    'sass',
-    'less',
-    'html',
-    'htm',
-    'yaml',
-    'yml',
-    'toml',
-    'sh',
-    'env',
-    'gitignore',
-    'graphql',
-    'gql',
-  ],
-
-  // Binary extensions that should be preserved (not skipped)
-  ALLOWED_BINARY_EXTENSIONS: [
-    'wasm', // WebAssembly modules
-    'pdf', // Documents
-    'jpg',
-    'jpeg',
-    'png',
-    'gif',
-    'svg',
-    'bmp',
-    'ico',
-    'webp', // Images
-  ],
 } as const
 
 export const isBinaryFile = (fileName: string): boolean => {
@@ -110,30 +68,6 @@ export const isZipFile = (fileName: string): boolean => {
 }
 
 /**
- * Get file extension from a filename
- */
-export const getFileExtension = (fileName: string): string => {
-  const parts = fileName.split('.')
-  return parts.length > 1 ? parts.pop()!.toLowerCase() : ''
-}
-
-/**
- * Check if a file extension is allowed for extraction
- */
-export const isAllowedExtension = (fileName: string): boolean => {
-  const extension = getFileExtension(fileName)
-  return (ZIP_EXTRACTION_CONFIG.ALLOWED_EXTENSIONS as readonly string[]).includes(extension)
-}
-
-/**
- * Check if a file is binary but allowed (like .wasm)
- */
-export const isAllowedBinaryFile = (fileName: string): boolean => {
-  const extension = getFileExtension(fileName)
-  return (ZIP_EXTRACTION_CONFIG.ALLOWED_BINARY_EXTENSIONS as readonly string[]).includes(extension)
-}
-
-/**
  * Format bytes to human readable string
  */
 export const formatBytes = (bytes: number): string => {
@@ -158,7 +92,6 @@ export const extractZipFile = async (
   const extractedFiles: { name: string; content: string; size: number }[] = []
   const skippedFiles: string[] = []
   const oversizedFiles: string[] = []
-  const rejectedExtensions: string[] = []
 
   let totalExtractedSize = 0
 
@@ -182,12 +115,6 @@ export const extractZipFile = async (
       continue
     }
 
-    // Check file extension
-    if (!isAllowedExtension(fileName) && !isAllowedBinaryFile(fileName)) {
-      rejectedExtensions.push(fileName)
-      continue
-    }
-
     // Check individual file size
     const uncompressedSize = entry.uncompressedSize
     if (uncompressedSize > ZIP_EXTRACTION_CONFIG.MAX_INDIVIDUAL_FILE_SIZE) {
@@ -206,8 +133,8 @@ export const extractZipFile = async (
 
     // Extract file content
     let content: string
-    if (isBinaryFile(fileName) && isAllowedBinaryFile(fileName)) {
-      // For allowed binary files (like .wasm), read as blob and convert to binary string
+    if (isBinaryFile(fileName)) {
+      // For binary files, read as blob and convert to binary string
       const blob = await entry.getData!(new BlobWriter())
       const arrayBuffer = await blob.arrayBuffer()
       const bytes = new Uint8Array(arrayBuffer)
@@ -233,9 +160,6 @@ export const extractZipFile = async (
     const reasons: string[] = []
     if (skippedFiles.length > 0) {
       reasons.push(`${skippedFiles.length} hidden/system files`)
-    }
-    if (rejectedExtensions.length > 0) {
-      reasons.push(`${rejectedExtensions.length} unsupported file types`)
     }
     if (oversizedFiles.length > 0) {
       reasons.push(`${oversizedFiles.length} oversized files`)

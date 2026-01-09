@@ -17,11 +17,9 @@ import {
 } from 'ui'
 import {
   extractZipFile,
-  formatBytes,
   getLanguageFromFileName,
   isBinaryFile,
   isZipFile,
-  ZIP_EXTRACTION_CONFIG,
 } from './FileExplorerAndEditor.utils'
 
 interface FileData {
