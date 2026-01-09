@@ -36,7 +36,7 @@ export const CreateNewAPIKeysButton = () => {
 
       setCreateKeysDialogOpen(false)
       toast.success('Successfully created a new set of API keys!')
-    } catch (error) {
+    } catch (error:unknown) {
       console.error('Failed to create API keys:', error)
     } finally {
       setIsCreatingKeys(false)
