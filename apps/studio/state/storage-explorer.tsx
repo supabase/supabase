@@ -1667,7 +1667,7 @@ function createStorageExplorerState({
     // ======== UI Helper functions ========
 
     selectRangeItems: (columnIndex: number, toItemIndex: number) => {
-      const columnItems = state.columns[columnIndex].items
+      const columnItems = state.columns[columnIndex]?.items
       const toItem = columnItems[toItemIndex]
       const selectedItemIds = state.selectedItems.map((item) => item.id)
       const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
@@ -1711,7 +1711,7 @@ function createStorageExplorerState({
     }) => {
       const columnIndex_ = columnIndex !== undefined ? columnIndex : state.getLatestColumnIndex()
       const currentColumn = state.columns[columnIndex_]
-      const currentColumnItems = currentColumn.items.filter(
+      const currentColumnItems = currentColumn?.items?.filter(
         (item) => item.status !== STORAGE_ROW_STATUS.EDITING
       )
       // [Joshen] JFYI storage does support folders of the same name with different casing
