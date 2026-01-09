@@ -200,8 +200,8 @@ const BlogPostRenderer = ({
                     <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (
-                    <div className="hidden lg:flex justify-between">
-                      <div className="flex-1 flex flex-col gap-3 pt-2 md:flex-row md:gap-0 lg:gap-3">
+                    <div className="flex justify-between">
+                      <div className="flex-1 flex flex-wrap gap-3 pt-2 md:gap-0 lg:gap-3">
                         {authors.map((author, i: number) => {
                           // Handle both static and CMS author image formats
                           const authorImageUrl =
@@ -209,13 +209,14 @@ const BlogPostRenderer = ({
                               ? author.author_image_url
                               : (author.author_image_url as { url: string })?.url || ''
 
+                          const authorId =
+                            (author as any).author_id ||
+                            (author as any).username ||
+                            author.author.toLowerCase().replace(/\s+/g, '_')
+
                           return (
                             <div className="mr-4 w-max" key={`author-${i}-${author.author}`}>
-                              <Link
-                                href={author.author_url}
-                                target="_blank"
-                                className="cursor-pointer"
-                              >
+                              <Link href={`/blog/authors/${authorId}`} className="cursor-pointer">
                                 <div className="flex items-center gap-3">
                                   {authorImageUrl && (
                                     <div className="w-10">
