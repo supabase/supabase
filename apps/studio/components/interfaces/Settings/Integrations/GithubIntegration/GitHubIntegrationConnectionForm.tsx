@@ -467,12 +467,7 @@ const GitHubIntegrationConnectionForm = ({
                           </Button>
                         </FormControl_Shadcn_>
                       </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_
-                        portal
-                        className="p-0 w-80"
-                        side="bottom"
-                        align="start"
-                      >
+                      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
                           <CommandList_Shadcn_ className="!max-h-[200px]">

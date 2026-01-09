@@ -1,26 +1,26 @@
-import { ChevronDown, Filter as FilterIcon, Plus, X } from 'lucide-react'
-import { KeyboardEvent, useCallback, useState, useMemo, useEffect } from 'react'
 import { isEqual } from 'lodash'
+import { ChevronDown, Filter as FilterIcon, Plus, X } from 'lucide-react'
+import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import {
   Button,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  Input,
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Command_Shadcn_,
+  Input,
+  PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   cn,
 } from 'ui'
-import type { ReportFilter, ReportFilterProperty } from './Reports.types'
 import { sizes } from 'ui/src/lib/commonCva'
 import defaultTheme from 'ui/src/lib/theme/defaultTheme'
+import type { ReportFilter, ReportFilterProperty } from './Reports.types'
 
 const FilterableInput = ({
   value,
@@ -125,7 +125,6 @@ export interface ReportFilterPopoverProps {
   filters: ReportFilter[]
   filterProperties: ReportFilterProperty[]
   onFiltersChange: (filters: ReportFilter[]) => void
-  portal?: boolean
   disabled?: boolean
 }
 
@@ -265,7 +264,6 @@ export const ReportFilterPopover = ({
   filters,
   filterProperties,
   onFiltersChange,
-  portal = true,
   disabled = false,
 }: ReportFilterPopoverProps) => {
   const [open, setOpen] = useState(false)
@@ -343,7 +341,7 @@ export const ReportFilterPopover = ({
           {displayButtonText}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[500px]" side="bottom" align="start" portal={portal}>
+      <PopoverContent_Shadcn_ className="p-0 w-[500px]" side="bottom" align="start">
         <div className="space-y-2 py-2">
           <div>
             {localFilters.map((filter, index) => (

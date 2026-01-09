@@ -2,18 +2,19 @@ import { ChevronDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { CommandGroup } from '@ui/components/shadcn/ui/command'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import {
   Button,
   cn,
   Command_Shadcn_ as Command,
+  CommandEmpty_Shadcn_ as CommandEmpty,
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_ as CommandList,
 } from 'ui'
-import { CommandList_Shadcn_ as CommandList, CommandEmpty_Shadcn_ as CommandEmpty } from 'ui'
 import { z } from 'zod'
-import { CommandGroup } from '@ui/components/shadcn/ui/command'
 
 export interface ReportSelectOption {
   label: React.ReactNode
@@ -88,7 +89,7 @@ export const ReportsSelectFilter = ({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="p-0 w-72" portal={true}>
+      <PopoverContent align="start" className="p-0 w-72">
         <Command>
           {showSearch && <CommandInput placeholder="Search..." />}
           <CommandList>

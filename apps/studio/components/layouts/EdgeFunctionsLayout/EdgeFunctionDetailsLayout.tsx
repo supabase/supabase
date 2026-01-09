@@ -266,7 +266,7 @@ const EdgeFunctionDetailsLayout = ({
                       Download
                     </Button>
                   </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" portal className="p-0">
+                  <PopoverContent_Shadcn_ align="end" className="p-0">
                     <div className="p-3 flex flex-col gap-y-2">
                       <p className="text-xs text-foreground-light">Download via CLI</p>
                       <Input

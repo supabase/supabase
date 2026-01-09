@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { Label } from '@ui/components/shadcn/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { Button, cn } from 'ui'
 import type { FilterSet, Filters } from './Logs.types'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { Label } from '@ui/components/shadcn/ui/label'
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 
 interface LogsFilterPopoverProps {
   options: FilterSet
@@ -69,7 +69,7 @@ const LogsFilterPopover = ({
           <span>{options.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="p-0 w-60" portal={true}>
+      <PopoverContent align={align} className="p-0 w-60">
         <form
           onSubmit={(e) => {
             e.preventDefault()

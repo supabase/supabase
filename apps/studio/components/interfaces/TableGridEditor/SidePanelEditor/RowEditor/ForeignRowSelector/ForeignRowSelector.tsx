@@ -216,17 +216,9 @@ export const ForeignRowSelector = ({
                 <div className="flex items-center justify-between my-2 mx-3">
                   <div className="flex items-center">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
-                    <FilterPopoverPrimitive
-                      portal={false}
-                      filters={filters}
-                      onApplyFilters={onApplyFilters}
-                    />
+                    <FilterPopoverPrimitive filters={filters} onApplyFilters={onApplyFilters} />
                     <DndProvider backend={HTML5Backend} context={window}>
-                      <SortPopoverPrimitive
-                        portal={false}
-                        sorts={sorts}
-                        onApplySorts={onApplySorts}
-                      />
+                      <SortPopoverPrimitive sorts={sorts} onApplySorts={onApplySorts} />
                     </DndProvider>
                   </div>
 

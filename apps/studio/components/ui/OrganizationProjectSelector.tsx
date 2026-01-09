@@ -148,7 +148,6 @@ export const OrganizationProjectSelector = ({
         )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
-        portal
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
         side="bottom"

@@ -168,7 +168,6 @@ export const TableEditorMenu = () => {
               setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
-            portal={!isMobile}
           />
 
           <div className="grid gap-3 mx-4">
