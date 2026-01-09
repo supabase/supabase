@@ -1,9 +1,7 @@
-import { Check, Copy } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { IS_PLATFORM } from 'lib/constants'
-import { Card, copyToClipboard, Table, TableBody, TableCell, TableRow } from 'ui'
+import { Card, CardContent } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
   PageSectionContent,
@@ -11,43 +9,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
-
-interface CopyableCellProps {
-  value: string
-}
-
-const CopyableCell = ({ value }: CopyableCellProps) => {
-  const [isCopied, setIsCopied] = useState(false)
-
-  const handleCopy = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsCopied(true)
-    copyToClipboard(value)
-    setTimeout(() => setIsCopied(false), 3000)
-  }
-
-  return (
-    <div
-      className="group relative flex gap-2 items-center truncate cursor-pointer"
-      onClick={handleCopy}
-    >
-      <span className="text-sm font-mono truncate">{value}</span>
-      <button
-        type="button"
-        className="text-foreground-lighter hover:text-foreground transition opacity-0 group-hover:opacity-100 flex-shrink-0"
-        onClick={handleCopy}
-      >
-        {isCopied ? <Check size={14} strokeWidth={1.5} /> : <Copy size={14} strokeWidth={1.5} />}
-      </button>
-    </div>
-  )
-}
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const OAuthEndpointsTable = () => {
   const { ref: projectRef } = useParams()
-
   const baseUrl = IS_PLATFORM ? `https://${projectRef}.supabase.co` : 'http://localhost:54321'
-
   const endpoints = [
     {
       name: 'Authorization endpoint',
@@ -80,23 +46,18 @@ export const OAuthEndpointsTable = () => {
       </PageSectionMeta>
       <PageSectionContent>
         <Card>
-          <Table>
-            <TableBody>
-              {endpoints.map((endpoint) => {
-                const url = `${baseUrl}${endpoint.path}`
-                return (
-                  <TableRow key={endpoint.name}>
-                    <TableCell className="text-sm text-foreground-lighter whitespace-nowrap">
-                      {endpoint.name}
-                    </TableCell>
-                    <TableCell>
-                      <CopyableCell value={url} />
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+          <CardContent className="flex flex-col gap-4 pt-0 divide-y">
+            {endpoints.map((endpoint) => (
+              <FormItemLayout
+                layout="horizontal"
+                isReactForm={false}
+                label={endpoint.name}
+                className="mt-4"
+              >
+                <Input readOnly copy value={`${baseUrl}${endpoint.path}`} />
+              </FormItemLayout>
+            ))}
+          </CardContent>
         </Card>
       </PageSectionContent>
     </PageSection>
