@@ -63,6 +63,22 @@ All projects have a custom domain activated throughout the entire billing cycle.
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="55" />** |
 
+### Add-on disabled after a day
+
+Project add-ons are billed in-arrears based on how many hours you used it.
+If you remove the custom domain add-on, you are no longer billed from the time of removal onwards.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| Custom Domain Hours Project 1 | 24    | <Price price="0.33" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="35.33" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="25.33" />** |
+
 ## Optimize usage
 
 - Regularly check your projects and remove custom domains that are no longer needed

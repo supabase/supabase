@@ -40,7 +40,7 @@ The project has PITR with a recovery retention period of 7 days activated throug
 | ----------------------------- | ----- | ------------------------- |
 | Pro Plan                      | -     | <Price price="25" />      |
 | Compute Hours Small Project 1 | 744   | <Price price="15" />      |
-| PITR Hours                    | 744   | <Price price="100" />     |
+| 7-day PITR Hours Project 1    | 744   | <Price price="100" />     |
 | **Subtotal**                  |       | **<Price price="140" />** |
 | Compute Credits               |       | -<Price price="10" />     |
 | **Total**                     |       | **<Price price="130" />** |
@@ -54,14 +54,30 @@ All projects have PITR with a recovery retention period of 14 days activated thr
 | Pro Plan                      | -     | <Price price="25" />      |
 |                               |       |                           |
 | Compute Hours Small Project 1 | 744   | <Price price="15" />      |
-| PITR Hours Project 1          | 744   | <Price price="200" />     |
+| 14-day PITR Hours Project 1   | 744   | <Price price="200" />     |
 |                               |       |                           |
 | Compute Hours Small Project 2 | 744   | <Price price="15" />      |
-| PITR Hours Project 2          | 744   | <Price price="200" />     |
+| 14-day PITR Hours Project 2   | 744   | <Price price="200" />     |
 |                               |       |                           |
 | **Subtotal**                  |       | **<Price price="455" />** |
 | Compute Credits               |       | -<Price price="10" />     |
 | **Total**                     |       | **<Price price="445" />** |
+
+### Add-on disabled after a day
+
+Project add-ons are billed in-arrears based on how many hours you used it.
+If you remove the PITR add-on, you are no longer billed from the time of removal onwards.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| 7-day PITR Hours Project 1    | 24    | <Price price="3.23" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="38.23" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="28.23" />** |
 
 ## Optimize usage
 
