@@ -2,8 +2,7 @@ import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -59,7 +58,7 @@ export const VectorBucketDetails = () => {
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [selectedTableIdToDelete, setSelectedTableIdToDelete] = useQueryState(
+  const [_, setSelectedTableIdToDelete] = useQueryState(
     'deleteTable',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -83,9 +82,6 @@ export const VectorBucketDetails = () => {
     vectorBucketName: bucket?.vectorBucketName,
   })
   const allIndexes = data?.indexes ?? []
-  const selectedTableToDelete = allIndexes.find(
-    (index) => index.indexName === selectedTableIdToDelete
-  )
 
   const filteredList =
     filterString.length === 0
@@ -114,13 +110,6 @@ export const VectorBucketDetails = () => {
         ? 'added'
         : 'missing'
       : extensionState
-
-  useEffect(() => {
-    if (!!selectedTableIdToDelete && isSuccessIndexes && !selectedTableToDelete) {
-      toast(`Table ${selectedTableIdToDelete} cannot be found in your bucket`)
-      setSelectedTableIdToDelete(null)
-    }
-  }, [isSuccessIndexes, selectedTableIdToDelete, selectedTableToDelete, setSelectedTableIdToDelete])
 
   return (
     <>
@@ -332,11 +321,7 @@ export const VectorBucketDetails = () => {
         </ScaffoldContainer>
       )}
 
-      <DeleteVectorTableModal
-        visible={!!selectedTableToDelete}
-        table={selectedTableToDelete}
-        onClose={() => setSelectedTableIdToDelete(null)}
-      />
+      <DeleteVectorTableModal />
 
       <DeleteVectorBucketModal
         visible={showDeleteModal}
