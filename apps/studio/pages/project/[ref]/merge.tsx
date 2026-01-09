@@ -393,7 +393,7 @@ const MergePage: NextPageWithLayout = () => {
                 : isWorkflowRunning
                   ? 'Workflow is currently running'
                   : Boolean(mainBranch?.git_branch)
-                    ? 'Base branch is tracked in git'
+                    ? 'Deploy to production from GitHub is enabled'
                     : 'Unable to merge at this time',
             },
           }}
