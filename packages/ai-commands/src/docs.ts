@@ -24,7 +24,10 @@ export async function clippy(
   // TODO: better sanitization
   const contextMessages = messages.map(({ role, content }) => {
     if (!['user', 'assistant'].includes(role)) {
-      throw new Error(`Invalid message role '${role}'`)
+      throw new UserError('Invalid message role', {
+    role,
+    allowed_roles: ['user', 'assistant'],
+  })
     }
 
     return {
@@ -36,7 +39,9 @@ export async function clippy(
   const [userMessage] = contextMessages.filter(({ role }) => role === 'user').slice(-1)
 
   if (!userMessage) {
-    throw new Error("No message with role 'user'")
+     throw new UserError('No user message found', {
+    required_role: 'user',
+  })
   }
 
   // Moderate the content to comply with OpenAI T&C
