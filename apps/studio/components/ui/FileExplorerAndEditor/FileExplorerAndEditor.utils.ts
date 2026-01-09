@@ -34,11 +34,21 @@ export const ZIP_EXTRACTION_CONFIG = {
     'gitignore',
     'graphql',
     'gql',
-    'wasm', // Binary but needed for edge functions
   ],
 
   // Binary extensions that should be preserved (not skipped)
-  ALLOWED_BINARY_EXTENSIONS: ['wasm'],
+  ALLOWED_BINARY_EXTENSIONS: [
+    'wasm', // WebAssembly modules
+    'pdf', // Documents
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'svg',
+    'bmp',
+    'ico',
+    'webp', // Images
+  ],
 } as const
 
 export const isBinaryFile = (fileName: string): boolean => {
