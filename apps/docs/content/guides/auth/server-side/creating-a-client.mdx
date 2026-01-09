@@ -312,6 +312,24 @@ You're done! To recap, you've successfully:
 
 You can now use any Supabase features from your client or server code!
 
+### OAuth Login
+
+To implement OAuth login (e.g., Google, GitHub), create a form action that initiates the OAuth flow and redirects to the provider:
+
+<$CodeTabs>
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/+page.server.ts"
+meta="name=src/routes/auth/+page.server.ts"
+language="typescript"
+/>
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/callback/+server.ts"
+meta="name=src/routes/auth/callback/+server.ts"
+language="typescript"
+/>
+</$CodeTabs>
+
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
