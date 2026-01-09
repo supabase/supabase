@@ -279,6 +279,15 @@
     "product_url": "/project/{ref}/database/hooks"
   },
   {
+    "name": "pg_partman",
+    "comment": "Automated partition management",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_partman",
+    "github_url": "https://github.com/pgpartman/pg_partman",
+    "product": null,
+    "product_url": null
+  },
+  {
     "name": "pg_prewarm",
     "comment": "prewarm relation data",
     "tags": ["Admin", "Utility"],
