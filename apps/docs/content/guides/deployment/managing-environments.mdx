@@ -380,7 +380,7 @@ grant all on all sequences in schema graphql to postgres, anon, authenticated, s
 
 ### Permission denied on `db push`
 
-If you create a table using a custom database role, the default `postgres` user may lack permission to modify it. This can cause `42501` privilege errors during migrations. To resolve this, grant the postgres user ownership of the custom role.
+If you create a table using a custom database role, the default `postgres` user may lack permission to modify it. This can cause `42501` privilege errors during migrations. To resolve this, grant the 'postgres` user ownership of the custom role.
 
 ```sql
 grant "custom_role" to "postgres";
