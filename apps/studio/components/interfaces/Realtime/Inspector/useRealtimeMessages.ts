@@ -115,7 +115,7 @@ export const useRealtimeMessages = (
       realtimeClient.disconnect()
       setClient(undefined)
     }
-  }, [enabled, bearer, host, logLevel, token])
+  }, [enabled, bearer, realtimeUrl, host, logLevel, token])
 
   useEffect(() => {
     if (!client) {
