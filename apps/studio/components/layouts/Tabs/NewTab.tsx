@@ -104,7 +104,7 @@ export function NewTab() {
 
   const shouldTrackExposure =
     editor !== 'sql' &&
-    profile?.id &&
+    !!profile?.id &&
     tableQuickstartVariant !== false &&
     tableQuickstartVariant !== undefined
 
