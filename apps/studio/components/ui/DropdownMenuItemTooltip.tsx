@@ -17,6 +17,7 @@ export const DropdownMenuItemTooltip = forwardRef<
         <DropdownMenuItem
           ref={ref}
           {...props}
+          aria-label={props.tooltip?.content?.text}
           className={cn(props.className, '!pointer-events-auto')}
           onClick={(e) => {
             if (!props.disabled && props.onClick) props.onClick(e)
@@ -25,6 +26,7 @@ export const DropdownMenuItemTooltip = forwardRef<
           {props.children}
         </DropdownMenuItem>
       </TooltipTrigger>
+
       {props.disabled && props.tooltip.content.text !== undefined && (
         <TooltipContent {...props.tooltip.content}>{props.tooltip.content.text}</TooltipContent>
       )}
