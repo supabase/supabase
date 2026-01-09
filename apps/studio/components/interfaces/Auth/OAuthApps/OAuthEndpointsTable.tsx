@@ -54,6 +54,7 @@ export const OAuthEndpointsTable = () => {
           <CardContent className="flex flex-col gap-4 pt-0 divide-y">
             {endpoints.map((endpoint) => (
               <FormItemLayout
+                key={endpoint.name}
                 layout="horizontal"
                 isReactForm={false}
                 label={endpoint.name}
