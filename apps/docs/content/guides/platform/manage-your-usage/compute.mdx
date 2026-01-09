@@ -104,6 +104,22 @@ The project's Compute size changes throughout the billing cycle.
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="29" />** |
 
+### Projects not running for full month
+
+Besides one Project that is running for the entire month, multiple projects were launched and deleted within a few days.
+We only bill for the hours while the project was running and billing stops once a project is deleted.
+Compute is always billed in arrears when your billing cycle resets.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| Compute Hours Micro Project 2 | 20    | <Price price="0.27" />      |
+| Compute Hours Micro Project 3 | 70    | <Price price="0.94" />      |
+| **Subtotal**                  |       | **<Price price="36.21" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="26.21" />** |
+
 ## View usage
 
 You can view Compute usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.

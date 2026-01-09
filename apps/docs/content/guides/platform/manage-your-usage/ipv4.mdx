@@ -93,6 +93,22 @@ The project has two Read Replicas and the IPv4 add-on enabled throughout the ent
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="72" />** |
 
+### Add-on disabled after a day
+
+Project add-ons are billed in-arrears based on how many hours you used it.
+If you remove the IPv4 add-on, you are no longer billed from the time of removal onwards.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| IPv4 Hours Project 1          | 24    | <Price price="0.13" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="35.13" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="25.13" />** |
+
 ## Optimize usage
 
 To see whether your database actually needs a dedicated IPv4 address, refer to [When you need the IPv4 add-on](/docs/guides/platform/ipv4-address#when-you-need-the-ipv4-add-on).

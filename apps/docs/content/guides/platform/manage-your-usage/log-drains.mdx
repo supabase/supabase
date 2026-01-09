@@ -77,6 +77,25 @@ The project has two log drains configured throughout the entire billing cycle wi
 | Compute Credits               |                    | -<Price price="10" />        |
 | **Total**                     |                    | **<Price price="720.14" />** |
 
+### Add-on disabled after a day
+
+Project add-ons are billed in-arrears based on how many hours you used it.
+If you remove the log drain add-on, you are no longer billed from the time of removal onwards.
+
+| Line Item                     | Hours    | Costs                       |
+| ----------------------------- | -------- | --------------------------- |
+| Pro Plan                      | -        | <Price price="25" />        |
+|                               |          |                             |
+| Compute Hours Micro Project 1 | 744      | <Price price="10" />        |
+|                               |          |                             |
+| Log Drain Hours Drain 1       | 24       | <Price price="1.97" />      |
+| Log Drain Events Drain 1      | 0 events | <Price price="0" />         |
+| Egress Drain 1                | 0 GB     | <Price price="0" />         |
+|                               |          |                             |
+| **Subtotal**                  |          | **<Price price="36.97" />** |
+| Compute Credits               |          | -<Price price="10" />       |
+| **Total**                     |          | **<Price price="26.97" />** |
+
 ## View usage
 
 You can view Log Drain Events usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
