@@ -55,10 +55,12 @@ const PricingComputeSection = () => {
       </div>
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
+        hello?
         <div
-          className="relative w-full overflow-hidden transition-all !ease-[.76,0,.23,1] duration-300"
+          className="relative w-full overflow-hidden transition-all !ease-[cubic-bezier(.76,0,.23,1)] duration-300"
           style={{ height: showTable ? `${height}px` : '200px' }}
         >
+          to you
           <div
             className={cn(
               'absolute inset-0 top-auto w-full h-40 bg-gradient-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
