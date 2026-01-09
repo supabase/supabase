@@ -1,6 +1,6 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
@@ -23,6 +23,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
+  TableHeadSort,
   TableHeader,
   TableRow,
 } from 'ui'
@@ -32,11 +33,26 @@ import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 
+const ENUMERATED_TYPES_SORT_VALUES = ['name:asc', 'name:desc'] as const
+
+type EnumeratedTypesSort = (typeof ENUMERATED_TYPES_SORT_VALUES)[number]
+type EnumeratedTypesSortColumn = EnumeratedTypesSort extends `${infer Column}:${string}`
+  ? Column
+  : unknown
+type EnumeratedTypesSortOrder = EnumeratedTypesSort extends `${string}:${infer Order}`
+  ? Order
+  : unknown
+
 export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const deletingTypeIdRef = useRef<string | null>(null)
+
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EnumeratedTypesSort>(ENUMERATED_TYPES_SORT_VALUES).withDefault('name:asc')
+  )
 
   const {
     data,
@@ -70,12 +86,47 @@ export const EnumeratedTypes = () => {
   })
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
-  const filteredEnumeratedTypes =
-    search.length > 0
-      ? enumeratedTypes.filter(
-          (x) => x.schema === selectedSchema && x.name.toLowerCase().includes(search.toLowerCase())
-        )
-      : enumeratedTypes.filter((x) => x.schema === selectedSchema)
+
+  const handleSortChange = (column: EnumeratedTypesSortColumn) => {
+    const [currentCol, currentOrder] = sort.split(':') as [
+      EnumeratedTypesSortColumn,
+      EnumeratedTypesSortOrder,
+    ]
+    if (currentCol === column) {
+      // Cycle through: asc -> desc -> no sort (default)
+      if (currentOrder === 'asc') {
+        setSort(`${column}:desc` as EnumeratedTypesSort)
+      } else {
+        // Reset to default sort (name:asc)
+        setSort('name:asc')
+      }
+    } else {
+      setSort(`${column}:asc` as EnumeratedTypesSort)
+    }
+  }
+
+  const filteredEnumeratedTypes = useMemo(() => {
+    const filtered =
+      search.length > 0
+        ? enumeratedTypes.filter(
+            (x) =>
+              x.schema === selectedSchema && x.name.toLowerCase().includes(search.toLowerCase())
+          )
+        : enumeratedTypes.filter((x) => x.schema === selectedSchema)
+
+    const [sortCol, sortOrder] = sort.split(':') as [
+      EnumeratedTypesSortColumn,
+      EnumeratedTypesSortOrder,
+    ]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return filtered.sort((a, b) => {
+      if (sortCol === 'name') {
+        return a.name.localeCompare(b.name) * orderMultiplier
+      }
+      return 0
+    })
+  }, [enumeratedTypes, selectedSchema, search, sort])
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
@@ -130,7 +181,11 @@ export const EnumeratedTypes = () => {
             <TableHeader>
               <TableRow>
                 <TableHead key="schema">Schema</TableHead>
-                <TableHead key="name">Name</TableHead>
+                <TableHead>
+                  <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
+                    Name
+                  </TableHeadSort>
+                </TableHead>
                 <TableHead key="values">Values</TableHead>
                 <TableHead key="actions" />
               </TableRow>
