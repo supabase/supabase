@@ -1,5 +1,7 @@
 import { PropsWithChildren } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
+import { HideTabsButton } from '../Tabs/HideTabsButton'
 
 interface ProductMenuBarProps {
   title: string
@@ -7,6 +9,8 @@ interface ProductMenuBarProps {
 }
 
 const ProductMenuBar = ({ title, children, className }: PropsWithChildren<ProductMenuBarProps>) => {
+  const { showTabs } = useAppStateSnapshot()
+  const tabProducts = ['Table Editor', 'SQL Editor'].includes(title)
   return (
     <div
       /**
@@ -19,10 +23,15 @@ const ProductMenuBar = ({ title, children, className }: PropsWithChildren<Produc
       )}
     >
       <div
-        className="border-default flex max-h-12 items-center border-b px-6"
+        className={cn(
+          'border-default flex max-h-12 items-center border-b px-6',
+          tabProducts && 'justify-between'
+        )}
         style={{ minHeight: '3rem' }}
       >
         <h4 className="text-lg">{title}</h4>
+
+        {tabProducts && <HideTabsButton hideTabs={showTabs} />}
       </div>
       <div className={cn('flex-grow overflow-y-auto', className)}>{children}</div>
     </div>

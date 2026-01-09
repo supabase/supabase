@@ -28,11 +28,13 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
+import { useAppStateSnapshot } from 'state/app-state'
 
 export const EditorTabs = () => {
   const { ref, id } = useParams()
   const router = useRouter()
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
+  const { showTabs } = useAppStateSnapshot()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -135,7 +137,10 @@ export const EditorTabs = () => {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <Tabs_Shadcn_
-        className="w-full flex"
+        className={cn(
+          'w-full flex',
+          `${!showTabs && 'hidden'}`
+        )}
         value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
         onValueChange={handleTabChange}
       >
