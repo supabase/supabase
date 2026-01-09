@@ -1,0 +1,23 @@
+{
+  "name": "oauth-consent-nextjs",
+  "type": "registry:block",
+  "title": "OAuth Consent Page for Next.js and Supabase",
+  "description": "OAuth 2.1 consent page for MCP server authorization with Supabase Auth",
+  "registryDependencies": ["button", "card"],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/oauth-consent-nextjs/app/oauth/consent/page.tsx",
+      "type": "registry:page",
+      "target": "app/oauth/consent/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/oauth-consent-nextjs/components/consent-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/oauth-consent-nextjs/components/scope-list.tsx",
+      "type": "registry:component"
+    }
+  ]
+}

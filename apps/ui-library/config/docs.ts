@@ -75,6 +75,14 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Social Auth',
     },
     {
+      title: 'OAuth Consent Page',
+      supportedFrameworks: ['nextjs'],
+      href: '/docs/nextjs/oauth-consent',
+      items: [],
+      new: true,
+      commandItemLabel: 'OAuth Consent Page',
+    },
+    {
       title: 'Dropzone',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/dropzone',
