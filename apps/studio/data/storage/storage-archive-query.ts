@@ -1,7 +1,7 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type StorageArchiveVariables = { projectRef?: string }
@@ -27,7 +27,10 @@ export type StorageArchiveData = Awaited<ReturnType<typeof fetchStorageArchive>>
 
 export const useStorageArchiveQuery = <TData = StorageArchiveData>(
   { projectRef }: StorageArchiveVariables,
-  { enabled = true, ...options }: UseQueryOptions<StorageArchiveData, ResponseError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<StorageArchiveData, ResponseError, TData> = {}
 ) =>
   useQuery<StorageArchiveData, ResponseError, TData>({
     queryKey: storageKeys.archive(projectRef),

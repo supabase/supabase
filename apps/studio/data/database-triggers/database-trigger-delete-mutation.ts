@@ -1,8 +1,8 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerDeleteVariables = {
@@ -40,7 +40,11 @@ export const useDatabaseTriggerDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>,
+  UseCustomMutationOptions<
+    DatabaseTriggerDeleteData,
+    ResponseError,
+    DatabaseTriggerDeleteVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

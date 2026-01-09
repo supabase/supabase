@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -34,7 +34,7 @@ export const PublicationsTables = () => {
 
   const {
     data: tablesData = [],
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -69,15 +69,15 @@ export const PublicationsTables = () => {
                 placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size={12} />}
-                className="w-48 pl-8"
+                icon={<Search />}
+                className="w-48"
               />
             </div>
           </div>
           {!isLoadingPermissions && !canUpdatePublications && (
             <Admonition
               type="note"
-              className="w-[500px] m-0"
+              className="w-[500px]"
               title="You need additional permissions to update database replications"
             />
           )}
@@ -94,7 +94,7 @@ export const PublicationsTables = () => {
 
       {isSuccess &&
         (tables.length === 0 ? (
-          <NoSearchResults />
+          <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
         ) : (
           <Card>
             <Table>
@@ -102,7 +102,7 @@ export const PublicationsTables = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Schema</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead className="hidden lg:table-cell">Description</TableHead>
                   {/* 
                       We've disabled All tables toggle for publications. 
                       See https://github.com/supabase/supabase/pull/7233. 

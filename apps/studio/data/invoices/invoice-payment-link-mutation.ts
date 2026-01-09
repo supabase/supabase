@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invoicesKeys } from './keys'
 
 export type InvoicePaymentLinkGetVariables = {
@@ -39,7 +39,11 @@ export const useInvoicePaymentLinkGetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>,
+  UseCustomMutationOptions<
+    InvoicePaymentLinkGetData,
+    ResponseError,
+    InvoicePaymentLinkGetVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

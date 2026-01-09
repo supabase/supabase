@@ -94,7 +94,7 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
     },
@@ -189,7 +189,7 @@ const MergePage: NextPageWithLayout = () => {
     })
   }, [router])
 
-  const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
+  const { mutate: pushBranch, isPending: isPushing } = useBranchPushMutation({
     onSuccess: (data) => {
       toast.success('Branch update initiated!')
       if (data?.workflow_run_id) {
@@ -215,7 +215,7 @@ const MergePage: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
+  const { mutate: mergeBranch, isPending: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
       if (data.workflowRunId) {
@@ -224,7 +224,7 @@ const MergePage: NextPageWithLayout = () => {
 
         // Track successful merge
         sendEvent({
-          action: 'branch_merge_succeeded',
+          action: 'branch_merge_completed',
           properties: {
             branchType: currentBranch?.persistent ? 'persistent' : 'preview',
           },
@@ -256,7 +256,7 @@ const MergePage: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
@@ -313,20 +313,6 @@ const MergePage: NextPageWithLayout = () => {
     })
   }
 
-  const handleReadyForReview = () => {
-    if (!ref || !parentProjectRef) return
-    updateBranch(
-      {
-        branchRef: ref,
-        projectRef: parentProjectRef,
-        requestReview: true,
-      },
-      {
-        onSuccess: () => toast.success('Successfully marked as ready for review'),
-      }
-    )
-  }
-
   const breadcrumbs = useMemo(
     () => [
       {
@@ -334,7 +320,7 @@ const MergePage: NextPageWithLayout = () => {
         href: `/project/${project?.ref}/branches/merge-requests`,
       },
     ],
-    [parentProjectRef]
+    [project?.ref]
   )
 
   const currentTab = (router.query.tab as string) || 'database'
@@ -383,7 +369,11 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const isMergeDisabled =
-    !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
+    !combinedHasChanges ||
+    isCombinedDiffLoading ||
+    isBranchOutOfDateOverall ||
+    isWorkflowRunning ||
+    Boolean(mainBranch?.git_branch)
 
   const primaryActions = (
     <div className="flex items-end gap-2">
@@ -402,7 +392,9 @@ const MergePage: NextPageWithLayout = () => {
                 ? 'No changes to merge'
                 : isWorkflowRunning
                   ? 'Workflow is currently running'
-                  : 'Unable to merge at this time',
+                  : Boolean(mainBranch?.git_branch)
+                    ? 'Deploy to production from GitHub is enabled'
+                    : 'Unable to merge at this time',
             },
           }}
           type="primary"
@@ -418,7 +410,6 @@ const MergePage: NextPageWithLayout = () => {
           type="primary"
           loading={isMerging || isSubmitting}
           onClick={() => setShowConfirmDialog(true)}
-          disabled={isBranchOutOfDateOverall}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
           Merge branch

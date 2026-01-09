@@ -1,42 +1,14 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
-export type EdgeFunctionBodyVariables = {
+type EdgeFunctionBodyVariables = {
   projectRef?: string
   slug?: string
-}
-
-export type EdgeFunctionFile = {
-  name: string
-  content: string
-}
-
-export type EdgeFunctionBodyResponse = {
-  files: EdgeFunctionFile[]
-}
-
-async function streamToString(stream: ReadableStream<Uint8Array>) {
-  const reader = stream.getReader()
-  const decoder = new TextDecoder()
-  let result = ''
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      result += decoder.decode(value, { stream: true })
-    }
-    // Final decode to handle any remaining bytes
-    result += decoder.decode()
-    return result
-  } catch (error) {
-    console.error('Error reading stream:', error)
-    throw error
-  }
 }
 
 export async function getEdgeFunctionBody(
@@ -61,16 +33,29 @@ export async function getEdgeFunctionBody(
 
   if (!data || !boundary) return { files: [] }
 
-  for await (let part of parseMultipartStream(data, { boundary })) {
+  let metadata: {
+    deno2_entrypoint_path?: string | null
+  } = {}
+
+  for await (let part of parseMultipartStream(data, {
+    boundary,
+    maxFileSize: 20 * 1024 * 1024,
+  })) {
     if (part.isFile) {
       files.push({
         name: part.filename,
         content: part.text,
       })
+    } else {
+      // treat it as metadata
+      metadata = JSON.parse(part.text)
     }
   }
 
-  return { files: files as EdgeFunctionFile[] }
+  return {
+    metadata,
+    files: files as Omit<EdgeFunctionFile, 'id' | 'selected'>[],
+  }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>
@@ -81,7 +66,7 @@ export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
+  }: UseCustomQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
 ) =>
   useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>({
     queryKey: edgeFunctionsKeys.body(projectRef, slug),

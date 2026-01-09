@@ -69,7 +69,7 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
   }, [form])
 
   const hasAppliedOrgProjectRef = useRef(false)
-  const { data: organizations, isLoading: organizationsLoading } = useOrganizationsQuery()
+  const { data: organizations, isPending: organizationsLoading } = useOrganizationsQuery()
 
   // Organization slug and project ref need to be validated after loading from
   // URL params

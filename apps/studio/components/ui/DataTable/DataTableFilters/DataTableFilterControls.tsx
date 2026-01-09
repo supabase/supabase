@@ -70,12 +70,7 @@ export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterCo
                       return <DataTableFilterInput {...field} />
                     }
                     case 'timerange': {
-                      return (
-                        <DataTableFilterTimerange
-                          dateRangeDisabled={dateRangeDisabled}
-                          {...field}
-                        />
-                      )
+                      return <DataTableFilterTimerange {...field} />
                     }
                   }
                 })()}

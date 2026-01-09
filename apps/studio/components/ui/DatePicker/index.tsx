@@ -1,12 +1,12 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ArrowRight, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
-import { ReactNode, useEffect, useState } from 'react'
-import ReactDatePicker from 'react-datepicker'
+import { ArrowRight, Calendar } from 'lucide-react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
+  Calendar as CalendarPicker,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -39,6 +39,22 @@ const END_DATE_DEFAULT = new Date()
 const START_TIME_DEFAULT = { HH: '00', mm: '00', ss: '00' }
 const END_TIME_DEFAULT = { HH: '23', mm: '59', ss: '59' }
 
+const calculateDisabledDays = (minDate?: Date, maxDate?: Date) => {
+  const rules: Array<{ before: Date } | { after: Date }> = []
+
+  if (minDate) {
+    rules.push({ before: dayjs(minDate).startOf('day').toDate() })
+  }
+
+  if (maxDate) {
+    rules.push({ after: dayjs(maxDate).endOf('day').toDate() })
+  }
+
+  if (rules.length === 0) return undefined
+  if (rules.length === 1) return rules[0]
+  return rules
+}
+
 export function DatePicker({
   to,
   from,
@@ -63,6 +79,55 @@ export function DatePicker({
   const [endDate, setEndDate] = useState<Date | null>(END_DATE_DEFAULT)
   const [startTime, setStartTime] = useState<any>(START_TIME_DEFAULT)
   const [endTime, setEndTime] = useState<any>(END_TIME_DEFAULT)
+
+  const disabledDays = useMemo(() => calculateDisabledDays(minDate, maxDate), [minDate, maxDate])
+
+  const clampDateToRange = useCallback(
+    (date: Date | null) => {
+      if (!date) return date
+
+      let nextDate = date
+
+      if (minDate && dayjs(nextDate).isBefore(minDate, 'day')) {
+        nextDate = dayjs(minDate).toDate()
+      }
+
+      if (maxDate && dayjs(nextDate).isAfter(maxDate, 'day')) {
+        nextDate = dayjs(maxDate).toDate()
+      }
+
+      return nextDate
+    },
+    [minDate, maxDate]
+  )
+
+  useEffect(() => {
+    if (!minDate && !maxDate) return
+
+    setStartDate((prev) => {
+      if (!prev) return prev
+      const clamped = clampDateToRange(prev)
+      return dayjs(clamped).isSame(prev) ? prev : clamped
+    })
+
+    setEndDate((prev) => {
+      if (!prev) return prev
+      const clamped = clampDateToRange(prev)
+      return dayjs(clamped).isSame(prev) ? prev : clamped
+    })
+
+    setAppliedStartDate((prev) => {
+      if (!prev) return prev
+      const clamped = clampDateToRange(prev)
+      return dayjs(clamped).isSame(prev) ? prev : clamped
+    })
+
+    setAppliedEndDate((prev) => {
+      if (!prev) return prev
+      const clamped = clampDateToRange(prev)
+      return dayjs(clamped).isSame(prev) ? prev : clamped
+    })
+  }, [minDate, maxDate, clampDateToRange])
 
   useEffect(() => {
     if (!from) {
@@ -145,7 +210,7 @@ export function DatePicker({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+    <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           title={triggerButtonTitle}
@@ -218,57 +283,25 @@ export function DatePicker({
             </>
           )}
           <div className="p-2">
-            <ReactDatePicker
-              inline
-              selectsRange={selectsRange}
-              selected={startDate}
-              onChange={(dates) => {
-                handleDatePickerChange(dates)
-              }}
-              dateFormat="MMMM d, yyyy h:mm aa"
-              startDate={startDate}
-              endDate={endDate}
-              minDate={minDate}
-              maxDate={maxDate}
-              dayClassName={() => 'cursor-pointer'}
-              renderCustomHeader={({
-                date,
-                decreaseMonth,
-                increaseMonth,
-                prevMonthButtonDisabled,
-                nextMonthButtonDisabled,
-              }) => (
-                <div className="flex items-center justify-between">
-                  <div className="flex w-full items-center justify-between">
-                    <button
-                      onClick={decreaseMonth}
-                      disabled={prevMonthButtonDisabled}
-                      type="button"
-                      className={`
-                        ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none p-2
-                    `}
-                    >
-                      <ChevronLeft size={16} strokeWidth={2} />
-                    </button>
-                    <span className="text-sm text-foreground-light">
-                      {format(date, 'MMMM yyyy')}
-                    </span>
-                    <button
-                      onClick={increaseMonth}
-                      disabled={nextMonthButtonDisabled}
-                      type="button"
-                      className={`
-                        ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light p-2 hover:text-foreground focus:outline-none
-                    `}
-                    >
-                      <ChevronRight size={16} strokeWidth={2} />
-                    </button>
-                  </div>
-                </div>
-              )}
-            />
+            {selectsRange ? (
+              <CalendarPicker
+                mode="range"
+                disabled={disabledDays}
+                selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+                onSelect={(range) => {
+                  handleDatePickerChange([range?.from ?? null, range?.to ?? null])
+                }}
+              />
+            ) : (
+              <CalendarPicker
+                mode="single"
+                disabled={disabledDays}
+                selected={endDate ?? undefined}
+                onSelect={(date) => {
+                  handleDatePickerChange(date ?? null)
+                }}
+              />
+            )}
           </div>
           {renderFooter({
             from: startDate?.toISOString() || null,

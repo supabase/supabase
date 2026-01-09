@@ -1,4 +1,5 @@
 import { Children } from 'react'
+import { cn } from 'ui'
 
 export const FormSection = ({
   children,
@@ -15,7 +16,7 @@ export const FormSection = ({
   className?: string
 }) => {
   const classes = [
-    'grid grid-cols-12 gap-6 px-4 md:px-8 py-4 md:py-8',
+    'grid grid-cols-12 gap-6 px-[var(--card-padding-x)] py-4 md:py-8',
     `${disabled ? ' opacity-30' : ' opacity-100'}`,
     `${className}`,
   ]
@@ -39,7 +40,7 @@ export const FormSectionLabel = ({
 }) => {
   if (description !== undefined) {
     return (
-      <div className={`flex flex-col space-y-2 col-span-12 lg:col-span-5 ${className}`}>
+      <div className={cn('flex flex-col space-y-2 col-span-12 lg:col-span-5', className)}>
         <label className="text-foreground text-sm">{children}</label>
         {description}
       </div>

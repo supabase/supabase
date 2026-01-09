@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeCreateVariables = {
@@ -40,7 +40,7 @@ export const useEnumeratedTypeCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EnumeratedTypeCreateData, ResponseError, EnumeratedTypeCreateVariables>,
+  UseCustomMutationOptions<EnumeratedTypeCreateData, ResponseError, EnumeratedTypeCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

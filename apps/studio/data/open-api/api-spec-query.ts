@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { openApiKeys } from './keys'
 
 export type OpenAPISpecVariables = {
@@ -56,7 +56,10 @@ export type OpenAPISpecError = ResponseError
 
 export const useOpenAPISpecQuery = <TData = OpenAPISpecData>(
   { projectRef }: OpenAPISpecVariables,
-  { enabled = true, ...options }: UseQueryOptions<OpenAPISpecData, OpenAPISpecError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<OpenAPISpecData, OpenAPISpecError, TData> = {}
 ) =>
   useQuery<OpenAPISpecData, OpenAPISpecError, TData>({
     queryKey: openApiKeys.apiSpec(projectRef),

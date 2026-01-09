@@ -1,14 +1,14 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 
 import type { components } from 'data/api'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
 export type NotificationVariables = {
-  page: number
+  page: number | undefined
   limit?: number
   status?: 'new' | 'seen' | 'archived'
   filters: {
@@ -64,15 +64,22 @@ export type NotificationsError = ResponseError
 export const useNotificationsV2Query = <TData = NotificationsData>(
   { status, filters, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
   {
-    enabled = true,
+    enabled,
     ...options
-  }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    NotificationsData,
+    NotificationsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number | undefined
+  > = {}
 ) => {
-  return useInfiniteQuery<NotificationsData, NotificationsError, TData>({
+  return useInfiniteQuery({
     queryKey: notificationKeys.listV2({ status, filters, limit }),
     queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
     enabled: enabled,
+    initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length
       if ((lastPage ?? []).length < limit) return undefined

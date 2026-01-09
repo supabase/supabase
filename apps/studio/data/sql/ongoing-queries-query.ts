@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { sqlKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type OngoingQuery = {
   pid: number
@@ -43,7 +44,7 @@ export const useOngoingQueriesQuery = <TData = OngoingQueriesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
+  }: UseCustomQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
 ) =>
   useQuery<OngoingQueriesData, OngoingQueriesError, TData>({
     queryKey: sqlKeys.ongoingQueries(projectRef),

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { IntegrationConnectionsCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
 
@@ -35,7 +35,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     IntegrationVercelConnectionsCreateData,
     ResponseError,
     IntegrationConnectionsCreateVariables

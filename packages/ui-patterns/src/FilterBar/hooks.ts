@@ -13,48 +13,22 @@ export type ActiveInput =
 export function useFilterBarState() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedCommandIndex, setSelectedCommandIndex] = useState(0)
   const [isCommandMenuVisible, setIsCommandMenuVisible] = useState(false)
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [activeInput, setActiveInput] = useState<ActiveInput>(null)
   const newPathRef = useRef<number[]>([])
-  const [dialogContent, setDialogContent] = useState<React.ReactElement | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [pendingPath, setPendingPath] = useState<number[] | null>(null)
-
-  const resetState = useCallback(() => {
-    setError(null)
-    setSelectedCommandIndex(0)
-    setIsCommandMenuVisible(false)
-    setActiveInput(null)
-    setDialogContent(null)
-    setIsDialogOpen(false)
-    setPendingPath(null)
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current)
-    }
-  }, [])
 
   return {
     isLoading,
     setIsLoading,
     error,
     setError,
-    selectedCommandIndex,
-    setSelectedCommandIndex,
     isCommandMenuVisible,
     setIsCommandMenuVisible,
     hideTimeoutRef,
     activeInput,
     setActiveInput,
     newPathRef,
-    dialogContent,
-    setDialogContent,
-    isDialogOpen,
-    setIsDialogOpen,
-    pendingPath,
-    setPendingPath,
-    resetState,
   }
 }
 
@@ -125,10 +99,9 @@ export function useOptionsCache() {
   }
 }
 
-// Shared utilities
 export function useDeferredBlur(wrapperRef: React.RefObject<HTMLElement>, onBlur: () => void) {
   return useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
+    (_e: React.FocusEvent<HTMLInputElement>) => {
       setTimeout(() => {
         const active = document.activeElement as HTMLElement | null
         if (active && wrapperRef.current && wrapperRef.current.contains(active)) {

@@ -1,14 +1,17 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
+import type { Snippet } from './sql-folders-query'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
+  id: string
   content: Partial<Content['content']>
+  favorite?: boolean
 }
 
 export type UpsertContentVariables = {
@@ -28,7 +31,7 @@ export async function upsertContent(
   })
   if (error) handleError(error)
 
-  return data
+  return data as Snippet | null
 }
 
 export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
@@ -39,7 +42,7 @@ export const useContentUpsertMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
+  UseCustomMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean

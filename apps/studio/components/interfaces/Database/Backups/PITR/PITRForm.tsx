@@ -1,12 +1,11 @@
-import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react'
+import { HelpCircle } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import DatePicker from 'react-datepicker'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import InformationBox from 'components/ui/InformationBox'
+import { Calendar, cn } from 'ui'
 import { Timezone } from './PITR.types'
 import {
   constrainDateToRange,
@@ -41,6 +40,8 @@ export function PITRForm({
   const latestAvailableBackup = dayjs
     .unix(latestAvailableBackupUnix ?? 0)
     .tz(selectedTimezone.utc[0])
+  const earliestAvailableBackupAsDate = earliestAvailableBackup.toDate()
+  const latestAvailableBackupAsDate = latestAvailableBackup.toDate()
 
   const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
 
@@ -125,51 +126,25 @@ export function PITRForm({
       >
         <div className="flex justify-between px-4 md:px-10 py-6 space-x-10">
           <div className="w-1/3 space-y-2">
-            <DatePicker
-              inline
+            <Calendar
+              mode="single"
+              required={true}
               selected={selectedDateRaw}
-              onChange={onUpdateDate}
-              dayClassName={() => 'cursor-pointer'}
-              minDate={earliestAvailableBackup.toDate()}
-              maxDate={latestAvailableBackup.toDate()}
-              highlightDates={availableDates.map((date) => date.toDate())}
-              renderCustomHeader={({
-                date,
-                decreaseMonth,
-                increaseMonth,
-                prevMonthButtonDisabled,
-                nextMonthButtonDisabled,
-              }) => (
-                <div className="flex items-center justify-between px-2 py-2">
-                  <div className="flex w-full items-center justify-between">
-                    <button
-                      onClick={decreaseMonth}
-                      disabled={prevMonthButtonDisabled}
-                      type="button"
-                      className={`
-                            ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-foreground-light hover:text-foreground focus:outline-none
-                        `}
-                    >
-                      <ChevronLeft size={16} strokeWidth={2} />
-                    </button>
-                    <span className="text-foreground-light text-sm">
-                      {format(date, 'MMMM yyyy')}
-                    </span>
-                    <button
-                      onClick={increaseMonth}
-                      disabled={nextMonthButtonDisabled}
-                      type="button"
-                      className={`
-                            ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-foreground-light hover:text-foreground focus:outline-none
-                        `}
-                    >
-                      <ChevronRight size={16} strokeWidth={2} />
-                    </button>
-                  </div>
-                </div>
-              )}
+              onSelect={onUpdateDate}
+              defaultMonth={latestAvailableBackupAsDate}
+              startMonth={earliestAvailableBackupAsDate}
+              endMonth={latestAvailableBackupAsDate}
+              disabled={[
+                { before: earliestAvailableBackupAsDate },
+                { after: latestAvailableBackupAsDate },
+              ]}
+              classNames={{
+                day: cn(
+                  '[&:not(:has(:disabled))]:border [&:not(:has(:disabled))]:border-stronger [&:not(:last-child)]:border-r-0 [&:not(:has(:disabled))]:bg-overlay-hover',
+                  'rounded-none'
+                ),
+                selected: '!bg-brand-500',
+              }}
             />
             {availableDates.length > 1 && (
               <div className="flex items-center space-x-2">

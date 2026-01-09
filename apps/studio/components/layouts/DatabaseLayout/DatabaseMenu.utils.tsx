@@ -10,8 +10,8 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
-    enablePgReplicate: boolean
     showPgReplicate: boolean
+    enablePgReplicate: boolean
     showRoles: boolean
     showWrappers: boolean
   }
@@ -21,8 +21,8 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists,
     pitrEnabled,
     columnLevelPrivileges,
-    enablePgReplicate,
     showPgReplicate,
+    enablePgReplicate,
     showRoles,
     showWrappers,
   } = flags || {}
@@ -47,7 +47,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Triggers',
           key: 'triggers',
-          url: `/project/${ref}/database/triggers`,
+          url: `/project/${ref}/database/triggers/data`,
           items: [],
         },
         {
@@ -75,17 +75,6 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
-        ...(showPgReplicate
-          ? [
-              {
-                name: 'Replication',
-                key: 'replication',
-                url: `/project/${ref}/database/replication`,
-                label: !enablePgReplicate ? 'Coming soon' : undefined,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
     {
@@ -101,7 +90,6 @@ export const generateDatabaseMenu = (
                 key: 'column-privileges',
                 url: `/project/${ref}/database/column-privileges`,
                 items: [],
-                label: 'ALPHA',
               },
             ]
           : []),
@@ -118,6 +106,17 @@ export const generateDatabaseMenu = (
     {
       title: 'Platform',
       items: [
+        ...(showPgReplicate
+          ? [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                label: enablePgReplicate ? 'New' : undefined,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM
           ? [
               {
@@ -180,7 +179,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/reports/query-performance`,
+          url: `/project/${ref}/observability/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },

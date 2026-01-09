@@ -8,6 +8,7 @@ import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -27,11 +28,7 @@ import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagement.types'
-import {
-  calculateComputeSizePrice,
-  getAvailableComputeOptions,
-  showMicroUpgrade,
-} from '../DiskManagement.utils'
+import { calculateComputeSizePrice, getAvailableComputeOptions } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
@@ -55,7 +52,10 @@ type ComputeSizeFieldProps = {
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
+
+  const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
+    useCheckEntitlements('instances.compute_update_available_sizes')
 
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
@@ -63,11 +63,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const {
     data: addons,
-    isLoading: isAddonsLoading,
+    isPending: isAddonsLoading,
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
-  const isLoading = isProjectLoading || isAddonsLoading
+  const isLoading = isProjectLoading || isAddonsLoading || isEntitlementLoading
 
   const { control, formState, setValue, trigger } = form
 
@@ -92,10 +92,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     plan: org?.plan.id ?? 'free',
   })
 
-  const showUpgradeBadge = showMicroUpgrade(
-    org?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano'
-  )
+  const projectComputeSize = project?.infra_compute_size ?? 'nano'
+  const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
 
   return (
     <FormField_Shadcn_

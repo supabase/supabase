@@ -1,19 +1,12 @@
-import saveAs from 'file-saver'
-import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
-import Papa from 'papaparse'
+import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM, useParams } from 'common'
-import {
-  MAX_EXPORT_ROW_COUNT,
-  MAX_EXPORT_ROW_COUNT_MESSAGE,
-} from 'components/grid/components/header/Header'
-import { LOAD_TAB_FROM_CACHE_PARAM, parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import {
-  formatTableRowsToSQL,
-  getEntityLintDetails,
-} from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { useFlag, useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
+import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getTableDefinition } from 'data/database/table-definition-query'
@@ -21,13 +14,15 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { getTableEditor } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/table-api-access-query'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
-import type { CSSProperties } from 'react'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
@@ -48,6 +43,7 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
+import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 
 export interface EntityListItemProps {
   id: number | string
@@ -57,6 +53,7 @@ export interface EntityListItemProps {
   isActive?: boolean
   style?: CSSProperties
   onExportCLI: () => void
+  apiAccessMap?: TableApiAccessMap
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -64,7 +61,7 @@ function isTableLikeEntityListItem(entity: { type?: string }) {
   return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
-const EntityListItem = ({
+export const EntityListItem = ({
   id,
   projectRef,
   item: entity,
@@ -72,6 +69,7 @@ const EntityListItem = ({
   isActive: _isActive,
   style,
   onExportCLI,
+  apiAccessMap,
 }: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -85,14 +83,39 @@ const EntityListItem = ({
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
+  const { filters } = useTableFilter()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const { data: countData } = useTableRowsCountQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+      tableId: entity.id,
+      filters,
+      enforceExactCount: false,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    },
+    {
+      enabled: isTableLikeEntityListItem(entity) && isActive,
+    }
+  )
+  const rowCount = countData?.count
+
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 
-  const tableHasLints: boolean = getEntityLintDetails(
+  const tableHasRlsDisabledLint: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const tableHasRlsEnabledNoPolicyLint: boolean = getEntityLintDetails(
+    entity.name,
+    'rls_enabled_no_policy',
+    ['ERROR', 'WARN', 'INFO'],
     lints,
     selectedSchema
   ).hasLint
@@ -121,133 +144,48 @@ const EntityListItem = ({
     selectedSchema
   ).hasLint
 
+  const apiAccessData = apiAccessMap?.[entity.name]
+
   const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
+    const text =
+      Object.entries(ENTITY_TYPE)
+        .find(([, value]) => value === entityType)?.[0]
+        ?.toLowerCase()
+        ?.split('_')
+        ?.join(' ') || ''
+    // Return sentence case (capitalize first letter only)
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
-  const exportTableAsCSV = async () => {
-    if (IS_PLATFORM && !project?.connectionString) {
-      return console.error('Connection string is required')
-    }
-    const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
+  const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv({
+    enabled: true,
+    projectRef,
+    connectionString: project?.connectionString ?? null,
+    entity,
+    type: 'fetch_all',
+    totalRows: rowCount,
+  })
 
-    try {
-      const table = await getTableEditor({
-        id: entity.id,
-        projectRef,
-        connectionString: project?.connectionString,
-      })
-      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
-        return toast.error(
-          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
-          { id: toastId }
-        )
-      }
-
-      const supaTable = table && parseSupaTable(table)
-
-      if (!supaTable) {
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-      }
-
-      const rows = await fetchAllTableRows({
-        projectRef,
-        connectionString: project?.connectionString,
-        table: supaTable,
-      })
-      const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
-        })
-        return formattedRow
-      })
-
-      if (formattedRows.length > 0) {
-        const csv = Papa.unparse(formattedRows, {
-          columns: supaTable.columns.map((column) => column.name),
-        })
-        const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-        saveAs(csvData, `${entity!.name}_rows.csv`)
-      }
-
-      toast.success(`Successfully exported ${entity.name} as CSV`, { id: toastId })
-    } catch (error: any) {
-      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
-    }
-  }
-
-  const exportTableAsSQL = async () => {
-    if (IS_PLATFORM && !project?.connectionString) {
-      return console.error('Connection string is required')
-    }
-    const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
-
-    try {
-      const table = await getTableEditor({
-        id: entity.id,
-        projectRef,
-        connectionString: project?.connectionString,
-      })
-
-      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
-        return toast.error(
-          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
-          { id: toastId }
-        )
-      }
-
-      const supaTable = table && parseSupaTable(table)
-
-      if (!supaTable) {
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-      }
-
-      const rows = await fetchAllTableRows({
-        projectRef,
-        connectionString: project?.connectionString,
-        table: supaTable,
-      })
-
-      const formattedRows = rows.map((row) => {
-        const formattedRow = { ...row }
-        Object.keys(row).forEach((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null) {
-            formattedRow[column] = JSON.stringify(row[column])
-          }
-        })
-        return formattedRow
-      })
-
-      if (formattedRows.length > 0) {
-        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
-        const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
-        saveAs(sqlData, `${entity!.name}_rows.sql`)
-      }
-
-      toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
-    } catch (error: any) {
-      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
-    }
-  }
+  const { exportSql, confirmationModal: exportSqlConfirmationModal } = useExportAllRowsAsSql({
+    enabled: true,
+    projectRef,
+    connectionString: project?.connectionString ?? null,
+    entity,
+    type: 'fetch_all',
+    totalRows: rowCount,
+  })
 
   return (
     <EditorTablePageLink
       title={entity.name}
       style={style}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+      href={buildTableEditorUrl({ projectRef, tableId: entity.id, schema: entity.schema })}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(
         TreeViewItemVariant({
           isSelected: isActive && !isPreview,
-          isOpened: isOpened && !isPreview,
           isPreview,
         }),
         'pl-4 pr-1'
@@ -280,15 +218,15 @@ const EntityListItem = ({
           >
             {entity.name}
           </span>
-          <div>
-            <EntityTooltipTrigger
-              entity={entity}
-              tableHasLints={tableHasLints}
-              viewHasLints={viewHasLints}
-              materializedViewHasLints={materializedViewHasLints}
-              foreignTableHasLints={foreignTableHasLints}
-            />
-          </div>
+          <EntityTooltipTrigger
+            entity={entity}
+            tableHasRlsDisabledLint={tableHasRlsDisabledLint}
+            tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
+            viewHasLints={viewHasLints}
+            materializedViewHasLints={materializedViewHasLints}
+            foreignTableHasLints={foreignTableHasLints}
+            apiAccessData={apiAccessData}
+          />
         </div>
 
         {canEdit && (
@@ -397,7 +335,7 @@ const EntityListItem = ({
                         className="space-x-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          exportTableAsCSV()
+                          exportCsv()
                         }}
                       >
                         <span>Export table as CSV</span>
@@ -407,7 +345,7 @@ const EntityListItem = ({
                         className="gap-x-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          exportTableAsSQL()
+                          exportSql()
                         }}
                       >
                         <span>Export table as SQL</span>
@@ -443,24 +381,31 @@ const EntityListItem = ({
           </DropdownMenu>
         )}
       </>
+      {exportCsvConfirmationModal}
+      {exportSqlConfirmationModal}
     </EditorTablePageLink>
   )
 }
 
 const EntityTooltipTrigger = ({
   entity,
-  tableHasLints,
+  tableHasRlsDisabledLint,
+  tableHasRlsEnabledNoPolicyLint,
   viewHasLints,
   materializedViewHasLints,
   foreignTableHasLints,
+  apiAccessData,
 }: {
   entity: Entity
-  tableHasLints: boolean
+  tableHasRlsDisabledLint: boolean
+  tableHasRlsEnabledNoPolicyLint: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
+  apiAccessData?: TableApiAccessData
 }) => {
   const { ref } = useParams()
+  const isDataApiExposedBadgeEnabled = useFlag('dataApiExposedBadge')
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
@@ -474,10 +419,11 @@ const EntityTooltipTrigger = ({
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
-      if (tableHasLints) {
+      if (tableHasRlsDisabledLint) {
         tooltipContent = (
           <>
-            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+            This table can be accessed by anyone via the Data API as RLS is disabled. {learnMoreCTA}
+            .
           </>
         )
       }
@@ -519,14 +465,43 @@ const EntityTooltipTrigger = ({
         <TooltipTrigger className="min-w-4">
           <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-52 text-center">
+        <TooltipContent side="right" className="max-w-52">
           {tooltipContent}
         </TooltipContent>
       </Tooltip>
     )
   }
 
+  const isRlsEnabledNoPolicies =
+    entity.type === ENTITY_TYPE.TABLE &&
+    apiAccessData?.apiAccessType === 'access' &&
+    tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isRlsEnabledNoPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-52">
+          This table can be accessed via the Data API but no RLS policies exist so no data will be
+          returned
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  const isApiExposedWithRlsAndPolicies =
+    apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isApiExposedWithRlsAndPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
+      </Tooltip>
+    )
+  }
+
   return null
 }
-
-export default EntityListItem

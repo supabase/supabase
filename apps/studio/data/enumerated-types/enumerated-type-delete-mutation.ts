@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeDeleteVariables = {
@@ -30,7 +30,7 @@ export const useEnumeratedTypeDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EnumeratedTypeDeleteData, ResponseError, EnumeratedTypeDeleteVariables>,
+  UseCustomMutationOptions<EnumeratedTypeDeleteData, ResponseError, EnumeratedTypeDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

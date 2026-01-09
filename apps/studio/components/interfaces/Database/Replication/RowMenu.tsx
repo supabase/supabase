@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
+import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
@@ -20,9 +21,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
-  PIPELINE_ACTIONABLE_STATES,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,
@@ -58,6 +58,7 @@ export const RowMenu = ({
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
   const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
@@ -117,7 +118,7 @@ export const RowMenu = ({
 
     try {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
+      await restartPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
@@ -180,7 +181,7 @@ export const RowMenu = ({
             <p>Edit destination</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
-            <Trash stroke="red" size={14} />
+            <Trash size={14} />
             <p>Delete destination</p>
           </DropdownMenuItem>
         </DropdownMenuContent>

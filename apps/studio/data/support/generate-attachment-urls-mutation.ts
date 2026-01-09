@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type GenerateAttachmentURLsResponse = {
   title: string
@@ -52,7 +52,11 @@ export const useGenerateAttachmentURLsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<GenerateAttachmentURLsData, ResponseError, GenerateAttachmentURLsVariables>,
+  UseCustomMutationOptions<
+    GenerateAttachmentURLsData,
+    ResponseError,
+    GenerateAttachmentURLsVariables
+  >,
   'mutationFn'
 > = {}) => {
   return useMutation<GenerateAttachmentURLsData, ResponseError, GenerateAttachmentURLsVariables>({

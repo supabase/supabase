@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchVariables = {
@@ -27,7 +27,7 @@ export type BranchError = ResponseError
 
 export const useBranchQuery = <TData = BranchData>(
   { projectRef, branchRef }: BranchVariables,
-  { enabled = true, ...options }: UseQueryOptions<BranchData, BranchError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<BranchData, BranchError, TData> = {}
 ) =>
   useQuery<BranchData, BranchError, TData>({
     queryKey: branchKeys.detail(projectRef, branchRef),

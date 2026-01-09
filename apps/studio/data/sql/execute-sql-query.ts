@@ -1,4 +1,4 @@
-import { QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryKey, useQuery } from '@tanstack/react-query'
 
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
@@ -8,7 +8,7 @@ import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { sqlKeys } from './keys'
 
 export type ExecuteSqlVariables = {
@@ -23,6 +23,11 @@ export type ExecuteSqlVariables = {
   contextualInvalidation?: boolean
 }
 
+/**
+ * Executes a SQL query against the user's instance.
+ *
+ * @throws {Error}
+ */
 export async function executeSql<T = any>(
   {
     projectRef,
@@ -157,7 +162,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     handleError,
     isRoleImpersonationEnabled,
   }: ExecuteSqlVariables,
-  { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY

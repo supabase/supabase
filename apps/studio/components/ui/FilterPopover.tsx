@@ -2,6 +2,7 @@ import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { noop } from 'lodash'
 import { X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+
 import {
   Button,
   Checkbox_Shadcn_,
@@ -13,7 +14,7 @@ import {
   ScrollArea,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface FilterPopoverProps<T> {
   title?: string
@@ -30,6 +31,7 @@ interface FilterPopoverProps<T> {
   maxHeightClass?: string
   clearButtonText?: string
   className?: string
+  isMinimized?: boolean
   onSaveFilters: (options: string[]) => void
 
   // [Joshen] These props are to support async data with infinite loading if applicable
@@ -60,6 +62,7 @@ export const FilterPopover = <T extends Record<string, any>>({
   className,
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
+  isMinimized = false,
   onSaveFilters,
 
   search,
@@ -127,14 +130,20 @@ export const FilterPopover = <T extends Record<string, any>>({
         >
           <div>
             <span>{name}</span>
-            {activeOptions.length > 0 && <span className="mr-1">:</span>}
-            {activeOptions.length >= 3 ? (
-              <span>
-                {formattedOptions[0]} and {activeOptions.length - 1} others
-              </span>
-            ) : activeOptions.length > 0 ? (
-              <span>{formattedOptions.join(', ')}</span>
-            ) : null}
+            {activeOptions.length > 0 && (
+              <>
+                <span className="mr-1">:</span>
+                {isMinimized ? (
+                  <span>{activeOptions.length}</span>
+                ) : activeOptions.length >= 3 ? (
+                  <span>
+                    {formattedOptions[0]} and {activeOptions.length - 1} others
+                  </span>
+                ) : (
+                  <span>{formattedOptions.join(', ')}</span>
+                )}
+              </>
+            )}
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>

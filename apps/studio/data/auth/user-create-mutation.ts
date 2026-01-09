@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { authKeys } from './keys'
 
 export type UserCreateVariables = {
@@ -34,7 +34,7 @@ export const useUserCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UserCreateData, ResponseError, UserCreateVariables>,
+  UseCustomMutationOptions<UserCreateData, ResponseError, UserCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -46,6 +46,7 @@ export const useUserCreateMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: authKeys.usersCount(projectRef) }),
       ])
 
       await onSuccess?.(data, variables, context)

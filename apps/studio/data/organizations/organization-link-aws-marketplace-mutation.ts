@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { ResponseError, UseCustomMutationOptions } from '../../types'
 import { handleError, put } from '../fetchers'
-import type { ResponseError } from '../../types'
 
 export type OrganizationLinkAwsMarketplaceVariables = {
   buyerId: string
@@ -29,7 +29,11 @@ export const useOrganizationLinkAwsMarketplaceMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>,
+  UseCustomMutationOptions<
+    LinkOrganizationData,
+    ResponseError,
+    OrganizationLinkAwsMarketplaceVariables
+  >,
   'mutationFn'
 > = {}) => {
   return useMutation<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>({

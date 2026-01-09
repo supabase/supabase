@@ -578,7 +578,7 @@ This feature is particularly useful for teams looking to enhance their security 
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -1927,7 +1927,7 @@ Absolutely. The SQL Editor includes syntax highlighting to improve code readabil
 
 ### Is the editor accessible via the Supabase CLI?
 
-While the editor is primarily a web-based tool within Supabase Studio, you can execute SQL queries using the [Supabase CLI](/features/cli) by utilizing the supabase db query command. This allows for integration into scripts and automation workflows.
+Yes, the editor is available locally through [Supabase CLI](/features/cli).
 `,
     icon: FileCode2,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
@@ -2399,7 +2399,7 @@ Yes. You can pull your production schema into declarative files by running \`sup
 
 The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
 
-For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/database/declarative-schemas).
+For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],

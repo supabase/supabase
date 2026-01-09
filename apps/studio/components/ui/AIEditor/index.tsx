@@ -1,12 +1,14 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
-import { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from 'data/fetchers'
 import { detectOS } from 'lib/helpers'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -28,6 +30,7 @@ interface AIEditorProps {
   onChange?: (value: string) => void
   onClose?: () => void
   closeShortcutEnabled?: boolean
+  openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
 }
 
@@ -35,7 +38,7 @@ interface AIEditorProps {
 // Can we try to de-dupe accordingly? Perhaps the SQL Editor could use this AIEditor
 // We have a tendency to create multiple versions of the monaco editor like RLSCodeEditor
 // so hoping to prevent that from snowballing
-const AIEditor = ({
+export const AIEditor = ({
   language = 'javascript',
   value,
   defaultValue = '',
@@ -49,9 +52,11 @@ const AIEditor = ({
   onChange,
   onClose,
   closeShortcutEnabled = true,
+  openAIAssistantShortcutEnabled = true,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
+  const { toggleSidebar } = useSidebarManagerSnapshot()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -195,18 +200,24 @@ const AIEditor = ({
       diagnosticCodesToIgnore: [2792],
     })
 
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
-      .then((response) => response.text())
-      .then((code) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
-      })
-
-    // Add edge runtime types to the TS language service
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
-      .then((response) => response.text())
-      .then((code) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
-      })
+    if (language === 'javascript' || language === 'typescript') {
+      // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
+      // Monaco editor.
+      import('public/deno/edge-runtime.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno edge-runtime typings:', error)
+        })
+      import('public/deno/lib.deno.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno lib typings:', error)
+        })
+    }
 
     if (!!executeQueryRef.current) {
       editor.addAction({
@@ -220,6 +231,18 @@ const AIEditor = ({
     }
 
     refreshCloseAction()
+
+    // Add AI Assistant toggle keybinding (Cmd+I)
+    if (openAIAssistantShortcutEnabled) {
+      editor.addAction({
+        id: 'toggle-ai-assistant',
+        label: 'Toggle AI Assistant',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+        run: () => {
+          toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        },
+      })
+    }
 
     editor.addAction({
       id: 'generate-ai',
@@ -441,5 +464,3 @@ const AIEditor = ({
     </div>
   )
 }
-
-export default AIEditor

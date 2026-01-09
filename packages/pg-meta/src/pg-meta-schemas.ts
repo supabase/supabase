@@ -7,6 +7,7 @@ const pgSchemaZod = z.object({
   id: z.number(),
   name: z.string(),
   owner: z.string(),
+  comment: z.string().nullable(),
 })
 const pgSchemaArrayZod = z.array(pgSchemaZod)
 const pgSchemaOptionalZod = z.optional(pgSchemaZod)

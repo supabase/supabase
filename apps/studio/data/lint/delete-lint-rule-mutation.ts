@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { lintKeys } from './keys'
 
 export type LintRuleDeleteVariables = {
@@ -26,7 +26,7 @@ export const useLintRuleDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LintRuleDeleteData, ResponseError, LintRuleDeleteVariables>,
+  UseCustomMutationOptions<LintRuleDeleteData, ResponseError, LintRuleDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

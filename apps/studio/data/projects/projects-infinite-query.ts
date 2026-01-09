@@ -1,9 +1,9 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 const DEFAULT_LIMIT = 100
@@ -15,8 +15,8 @@ interface GetProjectsInfiniteVariables {
   page?: number
 }
 
-export type ProjectInfoInfinite =
-  components['schemas']['ListProjectsPaginatedResponse']['projects'][number]
+export type ProjectInfiniteResponse = components['schemas']['ListProjectsPaginatedResponse']
+export type ProjectInfoInfinite = ProjectInfiniteResponse['projects'][number]
 
 async function getProjects(
   {
@@ -50,15 +50,22 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    ProjectsInfiniteData,
+    ProjectsInfiniteError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number
+  > = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>({
+  return useInfiniteQuery({
     queryKey: projectKeys.infiniteList({ limit, sort, search }),
     queryFn: ({ signal, pageParam }) =>
       getProjects({ limit, page: pageParam, sort, search }, signal),
     enabled: enabled && profile !== undefined,
     staleTime: 30 * 60 * 1000, // 30 minutes
+    initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length
       const currentTotalCount = page * limit

@@ -24,8 +24,8 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -40,6 +40,7 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -57,7 +58,7 @@ export const Addons = () => {
   ])
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: selectedProject, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({
     ref: selectedProject?.parent_project_ref,
   })
@@ -82,19 +83,26 @@ export const Addons = () => {
   // I tried setting the interval to 1m but no data was returned, may need to experiment
   const startDate = useMemo(() => dayjs().subtract(15, 'minutes').millisecond(0).toISOString(), [])
   const endDate = useMemo(() => dayjs().millisecond(0).toISOString(), [])
-  const { data: ioBudgetData } = useInfraMonitoringQuery({
+  const { data: ioBudgetData } = useInfraMonitoringAttributesQuery({
     projectRef,
-    attribute: 'disk_io_budget',
+    attributes: ['disk_io_budget'],
     interval: '5m',
     startDate,
     endDate,
   })
-  const [mostRecentRemainingIOBudget] = (ioBudgetData?.data ?? []).slice(-1)
+  const mostRecentRemainingIOBudget = useMemo(() => {
+    if (!ioBudgetData) return undefined
+    const mapped = mapResponseToAnalyticsData(ioBudgetData, ['disk_io_budget'])
+    const data = mapped['disk_io_budget']?.data
+    if (!data?.length) return undefined
+    const lastPoint = data[data.length - 1]
+    return { disk_io_budget: lastPoint?.disk_io_budget }
+  }, [ioBudgetData])
 
   const {
     data: addons,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })
@@ -232,10 +240,7 @@ export const Addons = () => {
                       <ShimmeringLoader className="w-32" />
                     ) : (
                       <div className="flex py-3">
-                        <ComputeBadge
-                          infraComputeSize={selectedProject?.infra_compute_size}
-                          size={'large'}
-                        />
+                        <ComputeBadge infraComputeSize={selectedProject?.infra_compute_size} />
                       </div>
                     )}
 

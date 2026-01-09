@@ -34,11 +34,10 @@ import {
   FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Separator,
+  PrePostTab,
   Skeleton,
   Switch,
   WarningIcon,
-  cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -87,7 +86,7 @@ export const PostgrestConfig = () => {
   const {
     data: config,
     isError,
-    isLoading: isLoadingConfig,
+    isPending: isLoadingConfig,
   } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -95,7 +94,7 @@ export const PostgrestConfig = () => {
   })
   const {
     data: allSchemas = [],
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -104,7 +103,7 @@ export const PostgrestConfig = () => {
 
   const isLoading = isLoadingConfig || isLoadingSchemas
 
-  const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
+  const { mutate: updatePostgrestConfig, isPending: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully saved settings')
@@ -112,7 +111,17 @@ export const PostgrestConfig = () => {
     })
 
   const formId = 'project-postgres-config'
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
+  const hiddenSchema = [
+    'auth',
+    'pgbouncer',
+    'hooks',
+    'extensions',
+    'vault',
+    'storage',
+    'realtime',
+    'pgsodium',
+    'pgsodium_masks',
+  ]
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
@@ -191,23 +200,26 @@ export const PostgrestConfig = () => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className={cn(!isLoading ? 'p-0' : '')}>
-        <Form_Shadcn_ {...form}>
-          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            {isLoading ? (
+      <Form_Shadcn_ {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          {isLoading ? (
+            <CardContent>
               <GenericSkeletonLoader />
-            ) : isError ? (
+            </CardContent>
+          ) : isError ? (
+            <CardContent>
               <Admonition type="destructive" title="Failed to retrieve API settings" />
-            ) : (
-              <>
+            </CardContent>
+          ) : (
+            <>
+              <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
                   name="enableDataApi"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
+                    <FormItem_Shadcn_ className="space-y-4">
                       <FormItemLayout
-                        className="w-full px-8 py-8"
-                        layout="flex"
+                        layout="flex-row-reverse"
                         label="Enable Data API"
                         description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured below."
                       >
@@ -231,45 +243,38 @@ export const PostgrestConfig = () => {
                       </FormItemLayout>
 
                       {!field.value && (
-                        <>
-                          <Separator />
-                          <Alert_Shadcn_
-                            variant="warning"
-                            className="mb-0 border-none rounded-none"
-                          >
-                            <WarningIcon className="!left-[2rem]" />
-                            <AlertTitle_Shadcn_ className="!pl-[3.5rem] !left-[6rem]">
-                              No schemas can be queried
-                            </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_ className="!pl-[3.5rem]">
-                              <p>
-                                With this setting disabled, you will not be able to query any
-                                schemas via the Data API.
-                              </p>
-                              <p>
-                                You will see errors from the Postgrest endpoint
-                                <code className="text-xs">/rest/v1/</code>.
-                              </p>
-                            </AlertDescription_Shadcn_>
-                          </Alert_Shadcn_>
-                        </>
+                        <Alert_Shadcn_ variant="warning">
+                          <WarningIcon />
+                          <AlertTitle_Shadcn_>No schemas can be queried</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            <p>
+                              With this setting disabled, you will not be able to query any schemas
+                              via the Data API.
+                            </p>
+                            <p>
+                              You will see errors from the Postgrest endpoint
+                              <code className="text-code-inline">/rest/v1/</code>.
+                            </p>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
                       )}
                     </FormItem_Shadcn_>
                   )}
                 />
-                <Collapsible_Shadcn_ open={form.getValues('enableDataApi')}>
-                  <CollapsibleContent_Shadcn_ className="border-t divide-y transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+              </CardContent>
+              <Collapsible_Shadcn_ open={form.getValues('enableDataApi')}>
+                <CollapsibleContent_Shadcn_ className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                  <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
                       name="dbSchema"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="w-full">
+                        <FormItem_Shadcn_>
                           <FormItemLayout
                             label="Exposed schemas"
                             description="The schemas to expose in your API. Tables, views and stored procedures in
                           these schemas will get API endpoints."
-                            layout="horizontal"
-                            className="px-8 py-8"
+                            layout="flex-row-reverse"
                           >
                             {isLoadingSchemas ? (
                               <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
@@ -284,7 +289,7 @@ export const PostgrestConfig = () => {
                               >
                                 <MultiSelectorTrigger
                                   mode="inline-combobox"
-                                  label="Select schemas for Data API..."
+                                  label="Select schemas..."
                                   badgeLimit="wrap"
                                   showIcon={false}
                                   deletableBadge
@@ -316,14 +321,15 @@ export const PostgrestConfig = () => {
                                   <>
                                     <p className="prose text-sm">
                                       You will not be able to query tables and views in the{' '}
-                                      <code className="text-xs">public</code> schema via supabase-js
-                                      or HTTP clients.
+                                      <code className="text-code-inline">public</code> schema via
+                                      supabase-js or HTTP clients.
                                     </p>
                                     {isGraphqlExtensionEnabled && (
                                       <>
                                         <p className="prose text-sm mt-2">
-                                          Tables in the <code className="text-xs">public</code>{' '}
-                                          schema are still exposed over our GraphQL endpoints.
+                                          Tables in the{' '}
+                                          <code className="text-code-inline">public</code> schema
+                                          are still exposed over our GraphQL endpoints.
                                         </p>
                                         <Button asChild type="default" className="mt-2">
                                           <Link href={`/project/${projectRef}/database/extensions`}>
@@ -340,15 +346,15 @@ export const PostgrestConfig = () => {
                         </FormItem_Shadcn_>
                       )}
                     />
-
+                  </CardContent>
+                  <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
                       name="dbExtraSearchPath"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="w-full">
+                        <FormItem_Shadcn_>
                           <FormItemLayout
-                            className="w-full px-8 py-8"
-                            layout="horizontal"
+                            layout="flex-row-reverse"
                             label="Extra search path"
                             description="Extra schemas to add to the search path of every request."
                           >
@@ -365,7 +371,7 @@ export const PostgrestConfig = () => {
                               >
                                 <MultiSelectorTrigger
                                   mode="inline-combobox"
-                                  label="Select schemas to add to search path..."
+                                  label="Select schemas..."
                                   badgeLimit="wrap"
                                   showIcon={false}
                                   deletableBadge
@@ -391,72 +397,74 @@ export const PostgrestConfig = () => {
                         </FormItem_Shadcn_>
                       )}
                     />
-
+                  </CardContent>
+                  <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
                       name="maxRows"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="w-full">
+                        <FormItem_Shadcn_>
                           <FormItemLayout
-                            className="w-full px-8 py-8"
-                            layout="horizontal"
+                            layout="flex-row-reverse"
                             label="Max rows"
                             description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
                           >
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                size="small"
-                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                                {...field}
-                                type="number"
-                                {...form.register('maxRows', {
-                                  valueAsNumber: true, // Ensure the value is handled as a number
-                                })}
-                              />
+                              <PrePostTab postTab="rows">
+                                <Input_Shadcn_
+                                  size="small"
+                                  disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                  {...field}
+                                  type="number"
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                />
+                              </PrePostTab>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
                       )}
                     />
-
+                  </CardContent>
+                  <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
                       name="dbPool"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="w-full">
+                        <FormItem_Shadcn_>
                           <FormItemLayout
-                            className="w-full px-8 py-8"
-                            layout="horizontal"
+                            layout="flex-row-reverse"
                             label="Pool size"
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
                           >
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                size="small"
-                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                                {...field}
-                                type="number"
-                                placeholder="Configured automatically based on compute size"
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.value === '' ? null : Number(e.target.value)
-                                  )
-                                }
-                                value={field.value === null ? '' : field.value}
-                              />
+                              <PrePostTab postTab="connections">
+                                <Input_Shadcn_
+                                  size="small"
+                                  disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                  {...field}
+                                  type="number"
+                                  placeholder="Configured automatically"
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      e.target.value === '' ? null : Number(e.target.value)
+                                    )
+                                  }
+                                  value={field.value === null ? '' : field.value}
+                                />
+                              </PrePostTab>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
                       )}
                     />
-                  </CollapsibleContent_Shadcn_>
-                </Collapsible_Shadcn_>
-              </>
-            )}
-          </form>
-        </Form_Shadcn_>
-      </CardContent>
-      <CardFooter>
+                  </CardContent>
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
+            </>
+          )}
+        </form>
+      </Form_Shadcn_>
+      <CardFooter className="border-t">
         <FormActions
           form={formId}
           isSubmitting={isUpdating}

@@ -1,32 +1,33 @@
-import { Button, Card, cn } from 'ui'
-import Link from 'next/link'
-import { AnimatedLogos } from './AnimatedLogos'
-import Image from 'next/image'
-import { BASE_PATH } from 'lib/constants'
+import { IS_PLATFORM } from 'common'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { Button, Card, cn } from 'ui'
+import { AnimatedLogos } from './AnimatedLogos'
+import { VoteLink } from './VoteLink'
 
 export const LogDrainsEmpty = () => {
   const items = [
     {
       step: 1,
-      title: 'Log drain pricing',
+      title: 'Pricing',
       description:
         'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $60 per month.',
       label: 'See our pricing',
-      link: 'https://supabase.com/docs/guides/platform/manage-your-usage/log-drains',
+      link: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
     },
     {
       step: 2,
       title: 'Connect to your drain',
       description:
-        'We offer support for multiple destinations including HTTPS, Datadog, Loki and Sentry.',
+        'We offer support for multiple destinations including Datadog, Loki, Sentry or a custom endpoint.',
       label: 'Read our documentation',
-      link: 'https://supabase.com/docs/guides/telemetry/log-drains',
+      link: `${DOCS_URL}/guides/telemetry/log-drains`,
     },
-  ]
+  ].filter((item) => IS_PLATFORM || item.title !== 'Pricing')
 
   return (
-    <div className="flex grow h-full pt-16">
+    <div className="flex grow h-full">
       <div className="flex grow items-center justify-center p-12 @container">
         <div className="w-full max-w-4xl flex flex-col items-center gap-0">
           <div className="text-center mb-12">
@@ -35,17 +36,22 @@ export const LogDrainsEmpty = () => {
             <p className="text-foreground-light mb-6">
               Upgrade to a Team or Enterprise Plan to send your logs to your preferred platform
             </p>
-            <UpgradePlanButton type="primary" plan="Team" source="log-drains-empty-state">
-              Upgrade plan
-            </UpgradePlanButton>
+            <UpgradePlanButton
+              plan="Team"
+              source="log-drains-empty-state"
+              featureProposition="use Log Drains"
+            />
           </div>
-          <Card className="grid grid-cols-1 @xl:grid-cols-2 bg divide-x mb-8">
+          <Card
+            className={cn('grid grid-cols-1 bg divide-x mb-8', IS_PLATFORM && '@xl:grid-cols-2')}
+          >
             {items.map((item, i) => (
               <div className="flex flex-col h-full p-6" key={i}>
                 <div className="flex items-center gap-3 mb-2">
                   <span
                     className={cn(
-                      'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md'
+                      'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md',
+                      !IS_PLATFORM && 'hidden'
                     )}
                   >
                     {item.step}
@@ -61,25 +67,7 @@ export const LogDrainsEmpty = () => {
               </div>
             ))}
           </Card>
-          <div className="flex items-center justify-center gap-1.5 text-sm">
-            <Image
-              className={cn('dark:invert text-muted')}
-              src={`${BASE_PATH}/img/icons/github-icon.svg`}
-              width={16}
-              height={16}
-              alt="GitHub icon"
-            />
-            <p className="text-foreground-light">
-              Don't see your preferred drain?{' '}
-              <Link
-                href="https://github.com/orgs/supabase/discussions/28324?sort=top"
-                className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
-                target="_blank"
-              >
-                Vote here
-              </Link>
-            </p>
-          </div>
+          <VoteLink />
         </div>
       </div>
     </div>

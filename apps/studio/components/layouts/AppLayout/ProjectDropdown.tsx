@@ -6,13 +6,13 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
+import { Badge, Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   const queryArray = Object.entries(routerQueries)
@@ -35,11 +35,11 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
 export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const isBranch = project?.parentRef !== project?.ref
-  const { data: parentProject, isLoading: isLoadingParentProject } = useProjectDetailQuery(
+  const { data: parentProject, isPending: isLoadingParentProject } = useProjectDetailQuery(
     { ref: project?.parent_project_ref },
     { enabled: isBranch }
   )
@@ -87,11 +87,13 @@ export const ProjectDropdown = () => {
           const sanitizedRoute = sanitizeRoute(router.route, router.query)
           const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
           const isSelected = project.ref === ref
+          const isPaused = project.status === 'INACTIVE'
 
           return (
             <Link href={href} className="w-full flex items-center justify-between">
               <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
                 {project.name}
+                {isPaused && <Badge className="ml-2">Paused</Badge>}
               </span>
               {isSelected && <Check size={16} />}
             </Link>

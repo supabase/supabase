@@ -1,8 +1,8 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
 
 type S3AccessKeyDeleteVariables = {
@@ -35,7 +35,7 @@ export function useS3AccessKeyDeleteMutation({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>,
+  UseCustomMutationOptions<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()

@@ -1,15 +1,16 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import { privilegeKeys } from 'data/privileges/keys'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableKeys } from './keys'
 
 export type CreateTableBody = {
   name: string
   schema?: string
-  comment?: string
+  comment?: string | null
 }
 
 export type TableCreateVariables = {
@@ -39,7 +40,7 @@ export const useTableCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
+  UseCustomMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -55,6 +56,9 @@ export const useTableCreateMutation = ({
         }),
         queryClient.invalidateQueries({
           queryKey: tableKeys.list(projectRef, payload.schema, false),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.tablePrivilegesList(projectRef),
         }),
       ])
       await onSuccess?.(data, variables, context)
