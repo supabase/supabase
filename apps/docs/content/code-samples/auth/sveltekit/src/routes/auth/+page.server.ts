@@ -4,11 +4,14 @@ import type { Actions } from './$types'
 export const actions: Actions = {
   login: async ({ locals: { supabase }, url }) => {
     const next = url.searchParams.get('next') ?? '/dashboard'
+    // Validate next parameter to prevent open redirects (must be relative, not protocol-relative)
+    const isValidPath = next.startsWith('/') && !next.startsWith('//')
+    const safePath = isValidPath ? next : '/dashboard'
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(safePath)}`,
       },
     })
 
@@ -26,11 +29,13 @@ export const actions: Actions = {
 
   signup: async ({ locals: { supabase }, url }) => {
     const next = url.searchParams.get('next') ?? '/dashboard'
+    const isValidPath = next.startsWith('/') && !next.startsWith('//')
+    const safePath = isValidPath ? next : '/dashboard'
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(safePath)}`,
       },
     })
 
