@@ -1,17 +1,14 @@
-import { useDebounce } from '@uidotdev/usehooks'
-import { Search, X } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 import {
   NumericFilter,
   ReportsNumericFilter,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { FilterInput } from './components/FilterInput'
+import { IndexAdvisorFilter } from './components/IndexAdvisorFilter'
+import { RolesFilterDropdown } from './components/RolesFilterDropdown'
+import { SortIndicator } from './components/SortIndicator'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
@@ -22,7 +19,6 @@ export const QueryPerformanceFilterBar = ({
   actions?: ReactNode
   showRolesFilter?: boolean
 }) => {
-  const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
@@ -38,68 +34,11 @@ export const QueryPerformanceFilterBar = ({
     } as NumericFilter),
     indexAdvisor: parseAsString.withDefault('false'),
   })
-  const { data, isPending: isLoadingRoles } = useDatabaseRolesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const APP_ACCESS_ROLES = ['anon', 'authenticated', 'service_role']
-  const SUPABASE_SYSTEM_ROLES = [
-    'postgres',
-    'authenticator',
-    'supabase_auth_admin',
-    'supabase_storage_admin',
-    'supabase_etl_admin',
-    'dashboard_user',
-    'supabase_admin',
-  ]
-
-  const roleDescriptions: Record<string, string> = {
-    anon: 'Unauthenticated/public access - for users not logged in',
-    authenticated: 'Authenticated users - for users logged in to your app',
-    service_role: 'Elevated server-side access - bypasses RLS policies',
-    postgres: 'Database superuser - has full administrative access',
-    authenticator: 'API validator - validates JWTs and handles authentication',
-    supabase_auth_admin: 'Auth service - manages authentication and user data',
-    supabase_storage_admin: 'Storage service - manages file storage operations',
-    supabase_etl_admin: 'ETL replication - read-all access for replication purposes',
-    dashboard_user: 'Dashboard access - for viewing and managing via Supabase dashboard',
-    supabase_admin: 'Internal - used by Supabase for administrative tasks',
-  }
-
-  const roles = (data ?? [])
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((role) => ({
-      ...role,
-      description: roleDescriptions[role.name],
-    }))
-
-  const roleGroups = [
-    {
-      name: 'App Access',
-      options: roles.filter((r) => APP_ACCESS_ROLES.includes(r.name)).map((r) => r.name),
-    },
-    {
-      name: 'Supabase System',
-      options: roles.filter((r) => SUPABASE_SYSTEM_ROLES.includes(r.name)).map((r) => r.name),
-    },
-    {
-      name: 'Custom',
-      options: roles
-        .filter(
-          (r) => !APP_ACCESS_ROLES.includes(r.name) && !SUPABASE_SYSTEM_ROLES.includes(r.name)
-        )
-        .map((r) => r.name),
-    },
-  ]
 
   const [filters, setFilters] = useState<{ roles: string[] }>({
     roles: defaultFilterRoles,
   })
   const [inputValue, setInputValue] = useState(searchQuery)
-  const debouncedInputValue = useDebounce(inputValue, 500)
-  // const debouncedMinCalls = useDebounce(minCallsInput, 300)
-  const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const onSearchQueryChange = (value: string) => {
     setSearchParams({ search: value || '' })
@@ -115,38 +54,15 @@ export const QueryPerformanceFilterBar = ({
   }
 
   useEffect(() => {
-    onSearchQueryChange(searchValue)
+    onSearchQueryChange(inputValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue])
-
-  const indexAdvisorOptions = [{ value: 'true', label: 'Index Advisor' }]
+  }, [inputValue])
 
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
-          <Input
-            size="tiny"
-            autoComplete="off"
-            icon={<Search />}
-            value={inputValue}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-            name="keyword"
-            id="keyword"
-            placeholder="Filter by query"
-            className="w-56"
-            actions={[
-              inputValue && (
-                <Button
-                  size="tiny"
-                  type="text"
-                  icon={<X />}
-                  onClick={() => setInputValue('')}
-                  className="p-0 h-5 w-5"
-                />
-              ),
-            ]}
-          />
+          <FilterInput value={inputValue} onChange={setInputValue} />
 
           <ReportsNumericFilter
             label="Calls"
@@ -160,44 +76,20 @@ export const QueryPerformanceFilterBar = ({
           />
 
           {showRolesFilter && (
-            <FilterPopover
-              name="Roles"
-              options={roles}
-              labelKey="name"
-              valueKey="name"
-              descriptionKey="description"
-              activeOptions={isLoadingRoles ? [] : filters.roles}
+            <RolesFilterDropdown
+              activeOptions={filters.roles}
               onSaveFilters={onFilterRolesChange}
-              className="w-56"
-              groups={roleGroups}
             />
           )}
 
           {isIndexAdvisorEnabled && (
-            <FilterPopover
-              name="Warnings"
-              options={indexAdvisorOptions}
-              labelKey="label"
-              valueKey="value"
+            <IndexAdvisorFilter
               activeOptions={indexAdvisor === 'true' ? ['true'] : []}
               onSaveFilters={onIndexAdvisorChange}
-              className="w-56"
             />
           )}
 
-          {sort && (
-            <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
-              <p className="md:inline-flex gap-x-1 hidden truncate">
-                Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
-              </p>
-              <Tooltip>
-                <TooltipTrigger onClick={clearSort}>
-                  <X size={14} className="text-foreground-light hover:text-foreground" />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Clear sort</TooltipContent>
-              </Tooltip>
-            </div>
-          )}
+          {sort && <SortIndicator sort={sort} onClearSort={clearSort} />}
         </div>
       </div>
       <div className="flex gap-2 items-center pl-2">{actions}</div>

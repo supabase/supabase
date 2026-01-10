@@ -50,8 +50,8 @@ interface FilterPopoverProps<T> {
   groupKey?: keyof T
   groups?: Array<{ name: string; options: string[] }>
 
-  // Support for descriptions/tooltip
-  descriptionKey?: keyof T
+  // Support for custom label rendering (e.g., for tooltips)
+  renderLabel?: (option: T, value: string) => React.ReactNode
 }
 
 // [Joshen] Known issue currently that FilterPopover trigger label will not show selected options properly
@@ -83,7 +83,7 @@ export const FilterPopover = <T extends Record<string, any>>({
   isFetchingNextPage = false,
   fetchNextPage = noop,
   groups,
-  descriptionKey,
+  renderLabel,
 }: FilterPopoverProps<T>) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -207,9 +207,8 @@ export const FilterPopover = <T extends Record<string, any>>({
 
                           const value = option[valueKey]
                           const icon = iconKey ? option[iconKey] : undefined
-                          const description = descriptionKey ? option[descriptionKey] : undefined
 
-                          const label = (
+                          const defaultLabel = (
                             <Label_Shadcn_
                               htmlFor={option[valueKey]}
                               className={cn(
@@ -228,6 +227,8 @@ export const FilterPopover = <T extends Record<string, any>>({
                             </Label_Shadcn_>
                           )
 
+                          const label = renderLabel ? renderLabel(option, value) : defaultLabel
+
                           return (
                             <div key={value} className="flex items-center gap-x-2">
                               <Checkbox_Shadcn_
@@ -241,16 +242,7 @@ export const FilterPopover = <T extends Record<string, any>>({
                                   }
                                 }}
                               />
-                              {description ? (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>{label}</TooltipTrigger>
-                                  <TooltipContent side="right">
-                                    <p className="text-xs max-w-xs">{description}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              ) : (
-                                label
-                              )}
+                              {label}
                             </div>
                           )
                         })}
@@ -262,9 +254,8 @@ export const FilterPopover = <T extends Record<string, any>>({
               options.map((option) => {
                 const value = option[valueKey]
                 const icon = iconKey ? option[iconKey] : undefined
-                const description = descriptionKey ? option[descriptionKey] : undefined
 
-                const label = (
+                const defaultLabel = (
                   <Label_Shadcn_
                     htmlFor={option[valueKey]}
                     className={cn('flex items-center gap-x-2 text-xs', labelClass)}
@@ -279,6 +270,8 @@ export const FilterPopover = <T extends Record<string, any>>({
                     <span>{option[labelKey]}</span>
                   </Label_Shadcn_>
                 )
+
+                const label = renderLabel ? renderLabel(option, value) : defaultLabel
 
                 return (
                   <div
@@ -296,16 +289,7 @@ export const FilterPopover = <T extends Record<string, any>>({
                         }
                       }}
                     />
-                    {description ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>{label}</TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p className="text-xs max-w-xs">{description}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      label
-                    )}
+                    {label}
                   </div>
                 )
               })
