@@ -214,7 +214,7 @@ describe('Policies.utils - Policy Generation', () => {
         expect(selectPolicy?.sql).toContain('CREATE POLICY')
         expect(selectPolicy?.sql).toContain('public.posts')
         expect(selectPolicy?.sql).toContain('AS PERMISSIVE FOR SELECT')
-        expect(selectPolicy?.sql).toContain('TO public')
+        expect(selectPolicy?.sql).toContain('TO authenticated')
         expect(selectPolicy?.sql).toContain('USING')
         expect(selectPolicy?.sql).toContain('auth.uid()')
       })
