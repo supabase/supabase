@@ -23,7 +23,7 @@ export const RolesFilterDropdown = ({
     <FilterPopover
       name="Roles"
       options={roles}
-      labelKey="name"
+      labelKey="displayName"
       valueKey="name"
       activeOptions={isLoadingRoles ? [] : activeOptions}
       onSaveFilters={onSaveFilters}
