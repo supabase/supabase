@@ -5,6 +5,18 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
+/**
+ * Parses the exposed schema string returned from PostgREST config.
+ *
+ * @param schemaString - e.g., `public,graphql_public`
+ */
+export const parseDbSchemaString = (schemaString: string): string[] => {
+  return schemaString
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+}
+
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
 }

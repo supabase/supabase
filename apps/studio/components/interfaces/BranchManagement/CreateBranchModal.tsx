@@ -16,11 +16,10 @@ import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchin
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { DiskAttributesData, useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
@@ -55,7 +54,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   estimateComputeSize,
   estimateDiskCost,
@@ -173,7 +172,7 @@ export const CreateBranchModal = () => {
     ...projectDiskAttributes,
     // [Joshen] JFYI for Qiao - this multiplier may eventually be dropped
     size_gb: Math.round(projectDiskAttributes.size_gb * 1.5),
-  }
+  } as DiskAttributesData['attributes']
   const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
   const estimatedDiskCost = estimateDiskCost(branchDiskAttributes)
 

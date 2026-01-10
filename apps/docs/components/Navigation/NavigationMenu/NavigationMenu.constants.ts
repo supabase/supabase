@@ -356,6 +356,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/hono',
         },
         {
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
         },
@@ -372,6 +376,15 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
         {
+          name: 'Flask (Python)',
+          url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+        },
+        {
           name: 'Laravel PHP',
           url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
           enabled: !jsOnly,
@@ -381,7 +394,6 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
           enabled: !jsOnly,
         },
-
         {
           name: 'SolidJS',
           url: '/guides/getting-started/quickstarts/solidjs',
@@ -715,6 +727,7 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
+            { name: 'Overview', url: '/guides/auth/server-side' },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
@@ -910,18 +923,6 @@ export const auth: NavMenuConstant = {
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac' as `/${string}`,
-        },
-      ],
-    },
-    {
-      name: 'Auth UI',
-      url: undefined,
-      enabled: allAuthProvidersEnabled,
-      items: [
-        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
-        {
-          name: 'Flutter Auth UI',
-          url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
         },
       ],
     },
@@ -1482,6 +1483,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Generating Python Types',
+      url: '/guides/api/rest/generating-python-types',
+      items: [],
+    },
+    {
       name: 'Tools',
       url: '/guides/api',
       items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
@@ -1663,7 +1669,14 @@ export const functions: NavMenuConstant = {
       name: 'Integrations',
       url: undefined,
       items: [
-        { name: 'Supabase Auth', url: '/guides/functions/auth' },
+        {
+          name: 'Supabase Auth',
+          url: '/guides/functions/auth',
+          items: [
+            { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
+          ],
+        },
         { name: 'Supabase Database (Postgres)', url: '/guides/functions/connect-to-postgres' },
         { name: 'Supabase Storage', url: '/guides/functions/storage-caching' },
       ],

@@ -1,11 +1,9 @@
-import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, Badge, Separator } from 'ui'
+import { Badge, Card, CardContent, cn, Separator } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
@@ -13,14 +11,17 @@ import { MissingExtensionAlert } from './MissingExtensionAlert'
 
 interface IntegrationOverviewTabProps {
   actions?: ReactNode
+  status?: string | ReactNode
+  alert?: ReactNode
 }
 
 export const IntegrationOverviewTab = ({
   actions,
+  alert,
+  status,
   children,
 }: PropsWithChildren<IntegrationOverviewTabProps>) => {
   const { id } = useParams()
-  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
@@ -47,43 +48,69 @@ export const IntegrationOverviewTab = ({
 
   return (
     <div className="flex flex-col gap-8 py-10">
-      <BuiltBySection integration={integration} />
-      {dependsOnExtension && (
-        <div className="px-4 md:px-10 max-w-4xl">
-          <Alert_Shadcn_ variant="default" className="bg-surface-200/25 border border-default">
-            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-              <Badge className="bg-surface-300 bg-opacity-100 flex items-center gap-x-2 w-max">
-                <img
-                  alt="Supabase"
-                  src={`${router.basePath}/img/supabase-logo.svg`}
-                  className=" h-2.5 cursor-pointer rounded"
-                />
-                <span>Postgres Module</span>
-              </Badge>
-              <Markdown
-                className="max-w-full"
-                content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')}
-              extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
-              ${hasToInstallExtensions && !hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extension${integration.requiredExtensions.length > 1 ? 's' : ''} to use ${integration.name} in your project.` : ''}
-              `}
-              />
-
-              {hasMissingExtensions ? (
-                integration.missingExtensionsAlert
-              ) : (
-                <div className="flex flex-row gap-x-2">
-                  {installableExtensions.map((extension) => (
-                    <MissingExtensionAlert key={extension.name} extension={extension} />
-                  ))}
-                </div>
-              )}
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </div>
-      )}
-      {!!actions && !hasToInstallExtensions && <div className="px-10 max-w-4xl">{actions}</div>}
+      <BuiltBySection integration={integration} status={status} />
+      {alert && <div className="px-10 max-w-4xl">{alert}</div>}
       <MarkdownContent key={integration.id} integrationId={integration.id} />
       <Separator />
+      {dependsOnExtension && (
+        <div className="px-4 md:px-10 max-w-4xl">
+          <h3 className="heading-default mb-4">Required extensions</h3>
+          <Card>
+            <CardContent className="p-0">
+              <ul className="text-foreground-light text-sm">
+                {(integration.requiredExtensions ?? []).map((requiredExtension, idx) => {
+                  const extension = (extensions ?? []).find((ext) => ext.name === requiredExtension)
+                  const isInstalled = !!extension?.installed_version
+                  const isLastRow = idx === (integration.requiredExtensions?.length ?? 0) - 1
+
+                  return (
+                    <li
+                      key={requiredExtension}
+                      className={[
+                        'flex items-center justify-between gap-3 py-2 px-3',
+                        !isLastRow ? 'border-b' : '',
+                      ].join(' ')}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="truncate">
+                          <code>{requiredExtension}</code>
+                        </span>
+                      </div>
+
+                      <div className="shrink-0">
+                        {extension ? (
+                          isInstalled ? (
+                            <Badge>Installed</Badge>
+                          ) : (
+                            <MissingExtensionAlert extension={extension} />
+                          )
+                        ) : (
+                          <span className="text-foreground-muted">Unavailable</span>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+
+              {hasMissingExtensions && (
+                <div className="py-3 px-4 border-t">{integration.missingExtensionsAlert}</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      {!!actions && (
+        <div
+          aria-disabled={hasToInstallExtensions}
+          className={cn(
+            'px-10 max-w-4xl',
+            hasToInstallExtensions && 'opacity-25 [&_button]:pointer-events-none'
+          )}
+        >
+          {actions}
+        </div>
+      )}
       {children}
     </div>
   )

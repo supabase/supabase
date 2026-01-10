@@ -23,6 +23,11 @@ export type ExecuteSqlVariables = {
   contextualInvalidation?: boolean
 }
 
+/**
+ * Executes a SQL query against the user's instance.
+ *
+ * @throws {Error}
+ */
 export async function executeSql<T = any>(
   {
     projectRef,

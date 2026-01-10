@@ -3,4 +3,5 @@ export const miscKeys = {
   defaultRegion: (cloudProvider: string | undefined, useRestrictedPool: boolean) =>
     ['defaultRegion', [cloudProvider, useRestrictedPool]] as const,
   ipAddress: () => ['ip-address'] as const,
+  clockSkew: () => ['clock-skew'] as const,
 }

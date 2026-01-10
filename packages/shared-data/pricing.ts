@@ -76,6 +76,7 @@ export type FeatureKey =
   | 'security.metricsEndpoint'
   | 'security.soc2'
   | 'security.hipaa'
+  | 'security.privateLink'
   | 'security.sso'
   | 'security.uptimeSla'
   | 'security.accessRoles'
@@ -532,7 +533,7 @@ export const pricing: Pricing = {
         key: 'realtime.maxMessageSize',
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
+          free: '256 KB',
           pro: '3 MB',
           team: '3 MB',
           enterprise: 'Custom',
@@ -636,6 +637,17 @@ export const pricing: Pricing = {
           pro: false,
           team: 'Available as paid add-on',
           enterprise: 'Available as paid add-on',
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.privateLink',
+        title: 'AWS PrivateLink',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
         },
         usage_based: false,
       },
