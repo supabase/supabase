@@ -6,6 +6,7 @@ import { mergeRefs, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -26,12 +27,12 @@ import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
 import { PausingState } from './PausingState'
+import { PostgresUpgradePanel } from './PostgresUpgradePanel'
 import ProductMenuBar from './ProductMenuBar'
 import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
-import { UpgradingState } from './UpgradingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -319,7 +320,35 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
-  }, [ref])
+  }, [ref, state])
+
+  // Check eligibility for upgrade (only when not already upgrading)
+  const showUpgradePanel = router.query.upgrade === 'true'
+  const { data: eligibilityData, isSuccess: eligibilityQuerySuccess } =
+    useProjectUpgradeEligibilityQuery(
+      { projectRef: ref },
+      { enabled: !isProjectUpgrading && showUpgradePanel }
+    )
+
+  // Redirect if upgrade query param is set but project is not eligible
+  useEffect(() => {
+    if (
+      showUpgradePanel &&
+      !isProjectUpgrading &&
+      eligibilityQuerySuccess &&
+      eligibilityData?.eligible === false &&
+      ref
+    ) {
+      router.replace(`/project/${ref}/settings/infrastructure`)
+    }
+  }, [
+    showUpgradePanel,
+    isProjectUpgrading,
+    eligibilityQuerySuccess,
+    eligibilityData?.eligible,
+    ref,
+    router,
+  ])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
@@ -333,8 +362,21 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <ResizingState />
   }
 
-  if (isProjectUpgrading && !isBackupsPage) {
-    return <UpgradingState />
+  // Show upgrade panel when reviewing upgrade OR when upgrade is in progress
+  // Only show if project is eligible (or already upgrading)
+  const isEligibleForUpgrade = eligibilityData?.eligible === true
+  if ((showUpgradePanel || isProjectUpgrading) && !isBackupsPage) {
+    // If upgrade query param is set but project is not eligible and not upgrading, don't show panel
+    if (
+      showUpgradePanel &&
+      !isProjectUpgrading &&
+      eligibilityQuerySuccess &&
+      !isEligibleForUpgrade
+    ) {
+      // Will redirect via useEffect above
+      return <LogoLoader />
+    }
+    return <PostgresUpgradePanel />
   }
 
   if (isProjectPausing) {
