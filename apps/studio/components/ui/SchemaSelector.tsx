@@ -38,7 +38,7 @@ interface SchemaSelectorProps {
   align?: 'start' | 'end'
 }
 
-const SchemaSelector = ({
+export const SchemaSelector = ({
   className,
   disabled = false,
   size = 'tiny',
