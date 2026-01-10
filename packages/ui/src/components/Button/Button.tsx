@@ -19,13 +19,9 @@ const buttonVariants = cva(
   font-regular
   ease-out
   duration-200
-  rounded-md
-  outline-none
-  transition-all
-  outline-0
-  focus-visible:outline-4
-  focus-visible:outline-offset-1
+  rounded-md  
   border
+  button-focus
   `,
   {
     variants: {
@@ -36,7 +32,6 @@ const buttonVariants = cva(
           text-foreground
           border-brand-500/75 dark:border-brand/30
           hover:border-brand-600 dark:hover:border-brand
-          focus-visible:outline-brand-600
           data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
           data-[state=open]:outline-brand-600
           `,
@@ -44,7 +39,6 @@ const buttonVariants = cva(
           text-foreground
           bg-alternative dark:bg-muted  hover:bg-selection
           border-strong hover:border-stronger
-          focus-visible:outline-brand-600
           data-[state=open]:bg-selection
           data-[state=open]:outline-brand-600
           data-[state=open]:border-button-hover
@@ -64,7 +58,6 @@ const buttonVariants = cva(
           bg-brand-400 hover:bg-brand-500
           border-brand-500
           focus-visible:border-brand-500
-          focus-visible:outline-brand-600
           data-[state=open]:bg-brand-500
           data-[state=open]:border-brand-500
           data-[state=open]:outline-brand-600
