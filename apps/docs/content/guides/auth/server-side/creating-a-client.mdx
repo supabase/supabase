@@ -89,6 +89,14 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
+<TabPanel id="solidstart" label="SolidStart">
+
+```bash .env
+VITE_SUPABASE_URL=supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+</TabPanel>
 <TabPanel id="express" label="Express">
 
 ```bash .env
@@ -703,6 +711,126 @@ app.post("/hello-world", async function (req, res, next) {
 </Tabs>
 
 ## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
+
+<TabPanel id="solidstart" label="SolidStart">
+
+### Set up middleware
+
+SolidStart uses [middleware](https://docs.solidjs.com/solid-start/reference/server/middleware) to handle server-side logic before requests reach your routes. Create middleware to refresh the session on every request.
+
+<Admonition type="note">
+
+SolidStart middleware differs from Next.js in several key ways:
+
+- **No NextRequest/NextResponse**: SolidStart uses Vinxi's HTTP utilities instead
+- **No "use server" with middleware**: Unlike Next.js Server Actions, SolidStart middleware runs before route handlers
+- **Built on Vinxi**: SolidStart's server runtime uses Vinxi, which provides `getCookie`, `setCookie`, and `getHeader` utilities
+
+</Admonition>
+
+<$CodeSample
+path="/auth/solidstart/src/middleware.ts"
+meta="name=src/middleware.ts"
+language="typescript"
+/>
+
+The middleware helper function handles session refresh:
+
+<$CodeSample
+path="/auth/solidstart/src/lib/supabase/middleware.ts"
+meta="name=src/lib/supabase/middleware.ts"
+language="typescript"
+/>
+
+### Create utility functions for Supabase clients
+
+Create utility functions to instantiate Supabase clients for browser and server environments.
+
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/solidstart/src/lib/supabase/client.ts"
+      meta="name=src/lib/supabase/client.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/solidstart/src/lib/supabase/server.ts"
+      meta="name=src/lib/supabase/server.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
+
+<Accordion>
+
+    <AccordionItem
+      header={<span className="text-foreground">Why can't I use "use server" with middleware?</span>}
+      id="solidstart-use-server"
+    >
+
+    In SolidStart, `"use server"` marks functions as server-only RPC endpoints. However, middleware runs before route handlers in the request lifecycle. Attempting to use both together can cause bundling issues where server-only code leaks into the client bundle.
+
+    Instead, use middleware for session management and `"use server"` for data mutations in route handlers.
+
+    </AccordionItem>
+
+    <AccordionItem
+      header={<span className="text-foreground">How do I protect routes?</span>}
+      id="solidstart-protected-routes"
+    >
+
+    Use a cache function (with `"use server"`) in your route's loader to check authentication:
+
+    ```tsx
+    import { cache, redirect } from '@solidjs/router'
+    import { getSupabaseServerClient } from '~/lib/supabase/server'
+
+    const getUser = cache(async () => {
+      'use server'
+      const supabase = getSupabaseServerClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw redirect('/login')
+      }
+      return user
+    }, 'user')
+
+    export const route = {
+      load: () => getUser()
+    }
+    ```
+
+    Always use `getUser()` instead of `getSession()` for authentication checks. The session can be spoofed, but `getUser()` validates the JWT against Supabase's public keys.
+
+    </AccordionItem>
+
+    <AccordionItem
+      header={<span className="text-foreground">What about the `cookies` object?</span>}
+      id="solidstart-cookies"
+    >
+
+    The `cookies` object adapts `@supabase/ssr`'s cookie handling for SolidStart's Vinxi-based server runtime.
+
+    - `getAll()`: Parses the `Cookie` header into individual cookies
+    - `setAll()`: Sets cookies in the response using Vinxi's `setCookie`
+
+    The cookie is named `sb-<project_ref>-auth-token` by default and stores the user's session.
+
+    </AccordionItem>
+
+</Accordion>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Set up middleware to automatically refresh sessions on every request
+- Created utility functions to instantiate Supabase clients for browser and server
+- Learned how to protect routes using server-side authentication checks
 
 You can now use any Supabase features from your client or server code!
 
