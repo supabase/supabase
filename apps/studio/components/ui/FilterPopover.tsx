@@ -12,6 +12,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -42,6 +45,13 @@ interface FilterPopoverProps<T> {
   isFetching?: boolean
   isFetchingNextPage?: boolean
   fetchNextPage?: () => void
+
+  // Support for grouped options with separators
+  groupKey?: keyof T
+  groups?: Array<{ name: string; options: string[] }>
+
+  // Support for descriptions/tooltip
+  descriptionKey?: keyof T
 }
 
 // [Joshen] Known issue currently that FilterPopover trigger label will not show selected options properly
@@ -72,6 +82,8 @@ export const FilterPopover = <T extends Record<string, any>>({
   isFetching = false,
   isFetchingNextPage = false,
   fetchNextPage = noop,
+  groups,
+  descriptionKey,
 }: FilterPopoverProps<T>) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -178,26 +190,81 @@ export const FilterPopover = <T extends Record<string, any>>({
         )}
         <ScrollArea className={options.length > 7 ? maxHeightClass : ''}>
           <div className="px-3 pt-3 flex flex-col gap-y-2">
-            {options.map((option) => {
-              const value = option[valueKey]
-              const icon = iconKey ? option[iconKey] : undefined
+            {groups ? (
+              <>
+                {groups
+                  .filter((group) => group.options.length > 0)
+                  .map((group: { name: string; options: string[] }, groupIndex: number) => (
+                    <div key={group.name} className={groupIndex > 0 ? 'pt-2' : ''}>
+                      {groupIndex > 0 && <div className="mb-2 border-t border-overlay -mx-3" />}
+                      <span className="text-xs text-foreground-lighter font-medium mb-1 block">
+                        {group.name}
+                      </span>
+                      <div className="flex flex-col gap-y-2">
+                        {group.options.map((optionValue) => {
+                          const option = options.find((x) => x[valueKey] === optionValue)
+                          if (!option) return null
 
-              return (
-                <div
-                  key={value}
-                  className={cn('flex items-center gap-x-2', !hasNextPage && 'last:pb-3')}
-                >
-                  <Checkbox_Shadcn_
-                    id={value}
-                    checked={selectedOptions.includes(value)}
-                    onCheckedChange={() => {
-                      if (selectedOptions.includes(value)) {
-                        setSelectedOptions(selectedOptions.filter((x) => x !== value))
-                      } else {
-                        setSelectedOptions(selectedOptions.concat(value))
-                      }
-                    }}
-                  />
+                          const value = option[valueKey]
+                          const icon = iconKey ? option[iconKey] : undefined
+                          const description = descriptionKey ? option[descriptionKey] : undefined
+
+                          const label = (
+                            <Label_Shadcn_
+                              htmlFor={option[valueKey]}
+                              className={cn(
+                                'flex items-center gap-x-2 text-xs cursor-pointer',
+                                labelClass
+                              )}
+                            >
+                              {icon && (
+                                <img
+                                  src={icon}
+                                  alt={option[labelKey]}
+                                  className={cn('w-4 h-4', option.iconIconClass)}
+                                />
+                              )}
+                              <span>{option[labelKey]}</span>
+                            </Label_Shadcn_>
+                          )
+
+                          return (
+                            <div key={value} className="flex items-center gap-x-2">
+                              <Checkbox_Shadcn_
+                                id={value}
+                                checked={selectedOptions.includes(value)}
+                                onCheckedChange={() => {
+                                  if (selectedOptions.includes(value)) {
+                                    setSelectedOptions(selectedOptions.filter((x) => x !== value))
+                                  } else {
+                                    setSelectedOptions(selectedOptions.concat(value))
+                                  }
+                                }}
+                              />
+                              {description ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>{label}</TooltipTrigger>
+                                  <TooltipContent side="right">
+                                    <p className="text-xs max-w-xs">{description}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                label
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+              </>
+            ) : (
+              options.map((option) => {
+                const value = option[valueKey]
+                const icon = iconKey ? option[iconKey] : undefined
+                const description = descriptionKey ? option[descriptionKey] : undefined
+
+                const label = (
                   <Label_Shadcn_
                     htmlFor={option[valueKey]}
                     className={cn('flex items-center gap-x-2 text-xs', labelClass)}
@@ -206,14 +273,43 @@ export const FilterPopover = <T extends Record<string, any>>({
                       <img
                         src={icon}
                         alt={option[labelKey]}
-                        className={cn('w-4 h-4', option.iconClass)}
+                        className={cn('w-4 h-4', option.iconIconClass)}
                       />
                     )}
                     <span>{option[labelKey]}</span>
                   </Label_Shadcn_>
-                </div>
-              )
-            })}
+                )
+
+                return (
+                  <div
+                    key={value}
+                    className={cn('flex items-center gap-x-2', !hasNextPage && 'last:pb-3')}
+                  >
+                    <Checkbox_Shadcn_
+                      id={value}
+                      checked={selectedOptions.includes(value)}
+                      onCheckedChange={() => {
+                        if (selectedOptions.includes(value)) {
+                          setSelectedOptions(selectedOptions.filter((x) => x !== value))
+                        } else {
+                          setSelectedOptions(selectedOptions.concat(value))
+                        }
+                      }}
+                    />
+                    {description ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>{label}</TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p className="text-xs max-w-xs">{description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      label
+                    )}
+                  </div>
+                )
+              })
+            )}
           </div>
           <div ref={sentinelRef} className="h-1 -mt-1" />
           {hasNextPage && (

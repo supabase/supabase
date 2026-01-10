@@ -42,7 +42,56 @@ export const QueryPerformanceFilterBar = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
+
+  const APP_ACCESS_ROLES = ['anon', 'authenticated', 'service_role']
+  const SUPABASE_SYSTEM_ROLES = [
+    'postgres',
+    'authenticator',
+    'supabase_auth_admin',
+    'supabase_storage_admin',
+    'supabase_etl_admin',
+    'dashboard_user',
+    'supabase_admin',
+  ]
+
+  const roleDescriptions: Record<string, string> = {
+    anon: 'Unauthenticated/public access - for users not logged in',
+    authenticated: 'Authenticated users - for users logged in to your app',
+    service_role: 'Elevated server-side access - bypasses RLS policies',
+    postgres: 'Database superuser - has full administrative access',
+    authenticator: 'API validator - validates JWTs and handles authentication',
+    supabase_auth_admin: 'Auth service - manages authentication and user data',
+    supabase_storage_admin: 'Storage service - manages file storage operations',
+    supabase_etl_admin: 'ETL replication - read-all access for replication purposes',
+    dashboard_user: 'Dashboard access - for viewing and managing via Supabase dashboard',
+    supabase_admin: 'Internal - used by Supabase for administrative tasks',
+  }
+
+  const roles = (data ?? [])
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((role) => ({
+      ...role,
+      description: roleDescriptions[role.name],
+    }))
+
+  const roleGroups = [
+    {
+      name: 'App Access',
+      options: roles.filter((r) => APP_ACCESS_ROLES.includes(r.name)).map((r) => r.name),
+    },
+    {
+      name: 'Supabase System',
+      options: roles.filter((r) => SUPABASE_SYSTEM_ROLES.includes(r.name)).map((r) => r.name),
+    },
+    {
+      name: 'Custom',
+      options: roles
+        .filter(
+          (r) => !APP_ACCESS_ROLES.includes(r.name) && !SUPABASE_SYSTEM_ROLES.includes(r.name)
+        )
+        .map((r) => r.name),
+    },
+  ]
 
   const [filters, setFilters] = useState<{ roles: string[] }>({
     roles: defaultFilterRoles,
@@ -116,9 +165,11 @@ export const QueryPerformanceFilterBar = ({
               options={roles}
               labelKey="name"
               valueKey="name"
+              descriptionKey="description"
               activeOptions={isLoadingRoles ? [] : filters.roles}
               onSaveFilters={onFilterRolesChange}
               className="w-56"
+              groups={roleGroups}
             />
           )}
 
