@@ -119,10 +119,7 @@ export const UsersSearch = ({
         )}
         placeholder={getSearchPlaceholder(specificFilterColumn)}
         value={search}
-        onChange={(e) => {
-          const value = e.target.value.replace(/\s+/g, '').toLowerCase()
-          setSearch(value)
-        }}
+        onChange={(e) => setSearch(e.target.value.toLowerCase())}
         onKeyDown={(e) => {
           if (e.code === 'Enter' || e.code === 'NumpadEnter') {
             if (!searchInvalid) setFilterKeywords(search.trim().toLocaleLowerCase())
