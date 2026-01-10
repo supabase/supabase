@@ -1716,18 +1716,12 @@ export interface HomeActivityStatClickedEvent {
 export interface RealtimeExperimentExposedEvent {
   action: 'realtime_experiment_exposed'
   properties: {
-    /**
-     * The experiment variant shown to the user
-     */
+    /** The PostHog experiment/feature flag name */
+    experiment_id: 'realtimeButtonVariant'
+    /** The experiment variant shown to the user */
     variant: 'control' | 'hide-button' | 'triggers'
-    /**
-     * Whether the table already has realtime enabled
-     */
+    /** Whether the table already has realtime enabled */
     table_has_realtime_enabled: boolean
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
   }
   groups: TelemetryGroups
 }
