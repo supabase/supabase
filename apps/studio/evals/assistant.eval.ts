@@ -7,6 +7,8 @@ import { dataset } from './dataset'
 import {
   completenessScorer,
   concisenessScorer,
+  correctnessScorer,
+  docsFaithfulnessScorer,
   goalCompletionScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
@@ -26,6 +28,8 @@ Eval('Assistant', {
       tools: await getMockTools(),
     })
 
+    const finishReason = await result.finishReason
+
     // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
     const steps = await result.steps
 
@@ -38,6 +42,11 @@ Eval('Assistant', {
         const text = step.text
         return toolCalls ? `${text}\n${toolCalls}` : text
       })
+      .join('\n')
+
+    const textOnly = steps
+      .map((step) => step.text)
+      .filter((text) => text && text.trim().length > 0)
       .join('\n')
 
     const toolNames: string[] = []
@@ -65,7 +74,9 @@ Eval('Assistant', {
     }
 
     return {
+      finishReason,
       stepsSerialized,
+      textOnly,
       toolNames,
       sqlQueries,
       docs,
@@ -77,6 +88,8 @@ Eval('Assistant', {
     goalCompletionScorer,
     concisenessScorer,
     completenessScorer,
+    docsFaithfulnessScorer,
+    correctnessScorer,
   ],
 })
 
