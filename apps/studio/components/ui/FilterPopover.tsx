@@ -232,9 +232,9 @@ export const FilterPopover = <T extends Record<string, any>>({
                 {groups
                   .filter((group) => group.options.length > 0)
                   .map((group: { name: string; options: string[] }, groupIndex: number) => (
-                    <div key={group.name} className={groupIndex > 0 ? 'pt-2' : ''}>
+                    <div key={group.name} className={groupIndex > 0 ? 'py-2' : ''}>
                       {groupIndex > 0 && <div className="mb-2 border-t border-overlay -mx-3" />}
-                      <span className="text-xs text-foreground-lighter font-medium mb-1 block">
+                      <span className="text-xs text-foreground-lighter font-medium mb-2 block">
                         {group.name}
                       </span>
                       <div className="flex flex-col gap-y-2">
