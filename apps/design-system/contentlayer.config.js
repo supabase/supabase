@@ -53,6 +53,9 @@ const NestedProperties = defineNestedType(() => ({
     reactAccessibleTreeview: {
       type: 'boolean',
     },
+    recharts: {
+      type: 'boolean',
+    },
   },
 }))
 
@@ -107,6 +110,7 @@ export const Doc = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: './content',
+  disableImportAliasWarning: true,
   documentTypes: [Doc],
   mdx: {
     remarkPlugins: [remarkGfm, codeImport],

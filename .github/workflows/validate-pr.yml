@@ -1,5 +1,6 @@
 name: Validate pull request
 
+# This workflow will trigger the authorize-vercel-deploys workflow when it's finished.
 on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize, ready_for_review]

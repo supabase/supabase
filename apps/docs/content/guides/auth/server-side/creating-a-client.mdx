@@ -45,6 +45,8 @@ Create a `.env.local` file in the project root directory. In the file, set the p
 <ProjectConfigVariables variable="publishable" />
 <ProjectConfigVariables variable="anon" />
 
+<$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
+
 <Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
 
 <TabPanel id="nextjs" label="Next.js">
@@ -865,5 +867,5 @@ language="typescript"
 ## Next steps
 
 - Implement [Authentication using Email and Password](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr)
-- Implement [Authentication using OAuth](/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr)
+- Implement [Authentication using OAuth](/docs/guides/auth/social-login)
 - [Learn more about SSR](/docs/guides/auth/server-side-rendering)

@@ -1927,7 +1927,7 @@ Absolutely. The SQL Editor includes syntax highlighting to improve code readabil
 
 ### Is the editor accessible via the Supabase CLI?
 
-While the editor is primarily a web-based tool within Supabase Studio, you can execute SQL queries using the [Supabase CLI](/features/cli) by utilizing the supabase db query command. This allows for integration into scripts and automation workflows.
+Yes, the editor is available locally through [Supabase CLI](/features/cli).
 `,
     icon: FileCode2,
     products: [ADDITIONAL_PRODUCTS.STUDIO],

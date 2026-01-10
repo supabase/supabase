@@ -44,7 +44,7 @@ const GenericProjectPage: NextPage = () => {
   const {
     data: organizations = [],
     isSuccess: isSuccessOrganizations,
-    isLoading: isLoadingOrganizations,
+    isPending: isLoadingOrganizations,
     isError: isErrorOrganizations,
   } = useOrganizationsQuery({
     enabled: IS_PLATFORM,
