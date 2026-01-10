@@ -303,6 +303,126 @@ language="typescript"
 />
 </$CodeTabs>
 
+### OAuth Authentication Example
+
+Now that you have the Supabase client set up, you can implement OAuth authentication. This example demonstrates how to sign in users with OAuth providers like Google, GitHub, and Azure.
+
+#### Configure OAuth providers
+
+Before implementing OAuth, enable and configure your OAuth providers in the Supabase Dashboard:
+
+1. Go to your project's [Authentication settings](https://supabase.com/dashboard/project/_/auth/providers)
+2. Enable the OAuth providers you want to use (Google, GitHub, Azure, etc.)
+3. Configure each provider with the required credentials (Client ID, Client Secret)
+4. Add your callback URL: `http://localhost:5173/auth/callback` for development
+
+#### Sign in with OAuth
+
+```svelte src/routes/login/+page.svelte
+<script lang="ts">
+  import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
+  import { createBrowserClient } from '@supabase/ssr'
+
+  const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+
+  const signInWithGitHub = async () => {
+    const redirectToUrl = `${window.location.origin}/auth/callback`
+
+    await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: redirectToUrl,
+      },
+    })
+  }
+
+  const signInWithGoogle = async () => {
+    const redirectToUrl = `${window.location.origin}/auth/callback`
+
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectToUrl,
+      },
+    })
+  }
+
+  const signInWithAzure = async () => {
+    const redirectToUrl = `${window.location.origin}/auth/callback`
+
+    await supabase.auth.signInWithOAuth({
+      provider: 'azure',
+      options: {
+        redirectTo: redirectToUrl,
+      },
+    })
+  }
+</script>
+
+<div>
+  <button on:click={signInWithGitHub}>Sign in with GitHub</button>
+  <button on:click={signInWithGoogle}>Sign in with Google</button>
+  <button on:click={signInWithAzure}>Sign in with Azure</button>
+</div>
+```
+
+#### Handle the OAuth callback
+
+Create a server endpoint to handle the OAuth callback and exchange the code for a session:
+
+```ts src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/'
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      throw redirect(303, `/${next.slice(1)}`)
+    }
+  }
+
+  // Return the user to an error page with instructions
+  throw redirect(303, '/auth/auth-code-error')
+}
+```
+
+#### Protect routes
+
+Use `safeGetSession()` to protect routes and access user data:
+
+```ts src/routes/dashboard/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { PageServerLoad } from './$types'
+
+export const load: PageServerLoad = async ({ locals: { safeGetSession } }) => {
+  const { session, user } = await safeGetSession()
+
+  if (!session) {
+    throw redirect(303, '/login')
+  }
+
+  return { user }
+}
+```
+
+#### Sign out
+
+Create a server endpoint to handle sign out:
+
+```ts src/routes/auth/signout/+server.ts
+import { redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+
+export const POST: RequestHandler = async ({ locals: { supabase } }) => {
+  await supabase.auth.signOut()
+  throw redirect(303, '/login')
+}
+```
+
 ## Congratulations
 
 You're done! To recap, you've successfully:
