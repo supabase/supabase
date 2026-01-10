@@ -8,3 +8,4 @@ export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || 'postgres'
 export const POSTGRES_USER_READ_WRITE = process.env.POSTGRES_USER_READ_WRITE || 'supabase_admin'
 export const POSTGRES_USER_READ_ONLY =
   process.env.POSTGRES_USER_READ_ONLY || 'supabase_read_only_user'
+export const POSTGRES_SSL = process.env.POSTGRES_SSL || ''
