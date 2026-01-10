@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import CopyButton from 'components/ui/CopyButton'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -64,12 +63,8 @@ export function SupportFormPage() {
 }
 
 function SupportFormPageContent() {
-  const { data: organizations } = useOrganizationsQuery()
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
-
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
-  const selectedOrg = organizations?.find((org) => org.slug === orgSlug)
-  const isFreePlan = selectedOrg?.plan.id === 'free'
 
   const {
     data: incidents,
