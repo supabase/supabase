@@ -65,6 +65,14 @@ verify_jwt = false
 import_map = './import_map.json'
 ```
 
+
+<Admonition type="caution">
+
+Using import maps is deprecated; it's recommended to use [deno.json](https://supabase.com/docs/guides/functions/dependencies#importing-dependencies) instead.
+
+</Admonition>
+
+
 ### Not using TypeScript
 
 When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
