@@ -16,7 +16,7 @@ export const RolesFilterDropdown = ({
   const { roles, roleGroups, isLoadingRoles } = useRolesFilter()
 
   const renderLabel = (option: any, value: string) => (
-    <RoleTooltip htmlFor={value} label={option.name} description={option.description} />
+    <RoleTooltip htmlFor={value} label={option.displayName} description={option.description} />
   )
 
   return (
