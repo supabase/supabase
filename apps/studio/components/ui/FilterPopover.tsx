@@ -88,6 +88,43 @@ export const FilterPopover = <T extends Record<string, any>>({
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
+  // Helper function to render an option
+  const renderOption = (option: T) => {
+    const value = option[valueKey]
+    const icon = iconKey ? option[iconKey] : undefined
+
+    const defaultLabel = (
+      <Label_Shadcn_
+        htmlFor={option[valueKey]}
+        className={cn('flex items-center gap-x-2 text-xs cursor-pointer', labelClass)}
+      >
+        {icon && (
+          <img src={icon} alt={option[labelKey]} className={cn('w-4 h-4', option.iconClass)} />
+        )}
+        <span>{option[labelKey]}</span>
+      </Label_Shadcn_>
+    )
+
+    const label = renderLabel ? renderLabel(option, value) : defaultLabel
+
+    return (
+      <div key={value} className="flex items-center gap-x-2">
+        <Checkbox_Shadcn_
+          id={value}
+          checked={selectedOptions.includes(value)}
+          onCheckedChange={() => {
+            if (selectedOptions.includes(value)) {
+              setSelectedOptions(selectedOptions.filter((x) => x !== value))
+            } else {
+              setSelectedOptions(selectedOptions.concat(value))
+            }
+          }}
+        />
+        {label}
+      </div>
+    )
+  }
+
   const scrollRootRef = useRef<HTMLDivElement | null>(null)
   const [sentinelRef, entry] = useIntersectionObserver({
     root: scrollRootRef.current,
@@ -203,96 +240,14 @@ export const FilterPopover = <T extends Record<string, any>>({
                       <div className="flex flex-col gap-y-2">
                         {group.options.map((optionValue) => {
                           const option = options.find((x) => x[valueKey] === optionValue)
-                          if (!option) return null
-
-                          const value = option[valueKey]
-                          const icon = iconKey ? option[iconKey] : undefined
-
-                          const defaultLabel = (
-                            <Label_Shadcn_
-                              htmlFor={option[valueKey]}
-                              className={cn(
-                                'flex items-center gap-x-2 text-xs cursor-pointer',
-                                labelClass
-                              )}
-                            >
-                              {icon && (
-                                <img
-                                  src={icon}
-                                  alt={option[labelKey]}
-                                  className={cn('w-4 h-4', option.iconIconClass)}
-                                />
-                              )}
-                              <span>{option[labelKey]}</span>
-                            </Label_Shadcn_>
-                          )
-
-                          const label = renderLabel ? renderLabel(option, value) : defaultLabel
-
-                          return (
-                            <div key={value} className="flex items-center gap-x-2">
-                              <Checkbox_Shadcn_
-                                id={value}
-                                checked={selectedOptions.includes(value)}
-                                onCheckedChange={() => {
-                                  if (selectedOptions.includes(value)) {
-                                    setSelectedOptions(selectedOptions.filter((x) => x !== value))
-                                  } else {
-                                    setSelectedOptions(selectedOptions.concat(value))
-                                  }
-                                }}
-                              />
-                              {label}
-                            </div>
-                          )
+                          return option ? renderOption(option) : null
                         })}
                       </div>
                     </div>
                   ))}
               </>
             ) : (
-              options.map((option) => {
-                const value = option[valueKey]
-                const icon = iconKey ? option[iconKey] : undefined
-
-                const defaultLabel = (
-                  <Label_Shadcn_
-                    htmlFor={option[valueKey]}
-                    className={cn('flex items-center gap-x-2 text-xs', labelClass)}
-                  >
-                    {icon && (
-                      <img
-                        src={icon}
-                        alt={option[labelKey]}
-                        className={cn('w-4 h-4', option.iconIconClass)}
-                      />
-                    )}
-                    <span>{option[labelKey]}</span>
-                  </Label_Shadcn_>
-                )
-
-                const label = renderLabel ? renderLabel(option, value) : defaultLabel
-
-                return (
-                  <div
-                    key={value}
-                    className={cn('flex items-center gap-x-2', !hasNextPage && 'last:pb-3')}
-                  >
-                    <Checkbox_Shadcn_
-                      id={value}
-                      checked={selectedOptions.includes(value)}
-                      onCheckedChange={() => {
-                        if (selectedOptions.includes(value)) {
-                          setSelectedOptions(selectedOptions.filter((x) => x !== value))
-                        } else {
-                          setSelectedOptions(selectedOptions.concat(value))
-                        }
-                      }}
-                    />
-                    {label}
-                  </div>
-                )
-              })
+              options.map((option) => renderOption(option))
             )}
           </div>
           <div ref={sentinelRef} className="h-1 -mt-1" />
