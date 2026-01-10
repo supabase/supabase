@@ -154,7 +154,7 @@ transforms:
       if err != null || parsed == null {
         .metadata.parsed.error_severity = "info"
       }
-      if parsed != null {
+      if parsed.level != null {
        .metadata.parsed.error_severity = parsed.level
       }
       if .metadata.parsed.error_severity == "info" {
