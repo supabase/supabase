@@ -19,8 +19,6 @@
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
     "pretypecheck": "next typegen",
     "typecheck": "tsc --noEmit",
-    "prettier:check": "prettier --cache --check .",
-    "prettier:write": "prettier --cache --write .",
     "build:deno-types": "tsx scripts/deno-types.ts",
     "build:graphql-types": "tsx scripts/download-graphql-schema.mts && pnpm graphql-codegen --config scripts/codegen.ts",
     "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch",
