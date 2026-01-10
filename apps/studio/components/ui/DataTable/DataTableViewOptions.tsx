@@ -46,7 +46,7 @@ export function DataTableViewOptions() {
           tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
         />
       </PopoverTrigger>
-      <PopoverContent portal side="bottom" align="end" className="w-[200px] p-0">
+      <PopoverContent side="bottom" align="end" className="w-[200px] p-0">
         <Command>
           <CommandInput value={search} onValueChange={setSearch} placeholder="Search columns..." />
           <CommandList>

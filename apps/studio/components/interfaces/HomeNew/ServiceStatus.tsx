@@ -269,7 +269,7 @@ export const ServiceStatus = () => {
           value={<span>{overallStatusLabel}</span>}
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="p-0 w-60" side="bottom" align="start">
+      <PopoverContent_Shadcn_ className="p-0 w-60" side="bottom" align="start">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}

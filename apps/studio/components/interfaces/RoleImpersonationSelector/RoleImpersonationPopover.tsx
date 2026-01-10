@@ -9,7 +9,6 @@ import { RoleImpersonationSelector } from '.'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 
 export interface RoleImpersonationPopoverProps {
-  portal?: boolean
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
@@ -19,7 +18,6 @@ export interface RoleImpersonationPopoverProps {
 }
 
 export const RoleImpersonationPopover = ({
-  portal = true,
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
@@ -71,12 +69,7 @@ export const RoleImpersonationPopover = ({
           </div>
         </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        portal={portal}
-        className="p-0 w-[592px] overflow-hidden"
-        side="bottom"
-        align={align}
-      >
+      <PopoverContent_Shadcn_ className="p-0 w-[592px] overflow-hidden" side="bottom" align={align}>
         <RoleImpersonationSelector
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}

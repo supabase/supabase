@@ -227,7 +227,6 @@ export function FilterCondition({
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
-          portal
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {
@@ -269,7 +268,6 @@ export function FilterCondition({
           className="min-w-[220px] w-fit p-0"
           align="start"
           side="bottom"
-          portal
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {

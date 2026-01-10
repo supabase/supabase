@@ -263,7 +263,6 @@ export const LogsDatePicker = ({
         className="flex w-full p-0"
         side="bottom"
         align={align}
-        portal={true}
         {...popoverContentProps}
       >
         <RadioGroup
