@@ -11,6 +11,7 @@ import { RolesFilterDropdown } from './components/RolesFilterDropdown'
 import { SortIndicator } from './components/SortIndicator'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
 
 export const QueryPerformanceFilterBar = ({
   actions,
@@ -49,14 +50,16 @@ export const QueryPerformanceFilterBar = ({
     setSearchParams({ roles })
   }
 
+  const debouncedInputValue = useDebouncedValue(inputValue, 300)
+
   const onIndexAdvisorChange = (options: string[]) => {
     setSearchParams({ indexAdvisor: options.includes('true') ? 'true' : 'false' })
   }
 
   useEffect(() => {
-    onSearchQueryChange(inputValue)
+    onSearchQueryChange(debouncedInputValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue])
+  }, [debouncedInputValue])
 
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
