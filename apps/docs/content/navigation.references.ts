@@ -7,7 +7,14 @@ const {
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
-} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:elixir', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
+} = isFeatureEnabled([
+  'sdk:csharp',
+  'sdk:dart',
+  'sdk:elixir',
+  'sdk:kotlin',
+  'sdk:python',
+  'sdk:swift',
+])
 
 export const REFERENCES = {
   javascript: {

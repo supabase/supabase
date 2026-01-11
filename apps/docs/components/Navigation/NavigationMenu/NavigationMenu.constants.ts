@@ -60,7 +60,12 @@ const {
 ])
 
 const jsOnly =
-  !sdkCsharpEnabled && !sdkDartEnabled && !sdkElixirEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
+  !sdkCsharpEnabled &&
+  !sdkDartEnabled &&
+  !sdkElixirEnabled &&
+  !sdkKotlinEnabled &&
+  !sdkPythonEnabled &&
+  !sdkSwiftEnabled
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
