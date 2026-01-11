@@ -53,7 +53,6 @@ describe('prod smoke test: crawler pages return correct data', () => {
     const text = await result.text()
 
     const $ = load(text)
-
     const h1 = $('h1').text()
     expect(h1).toBe('JavaScript: Less than or equal to a range')
 
