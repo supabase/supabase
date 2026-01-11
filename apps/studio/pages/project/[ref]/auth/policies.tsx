@@ -2,9 +2,10 @@ import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
@@ -15,6 +16,9 @@ import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
+import { BannerRlsEventTrigger } from 'components/ui/BannerStack/Banners/BannerRlsEventTrigger'
+import { BannerStack } from 'components/ui/BannerStack/BannerStack'
+import { BannerStackProvider, useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -22,6 +26,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -97,6 +102,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
   const deferredSearchString = useDeferredValue(searchString)
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -114,6 +120,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
+  const { addBanner, dismissBanner } = useBannerStack()
+
+  const [isRlsBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
 
   const {
     data: policies,
@@ -161,6 +173,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'policies'
   )
+  const { can: canCreateTriggers, isSuccess: isTriggerPermissionsLoaded } =
+    useAsyncCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   const handleSelectCreatePolicy = useCallback(
     (table: string) => {
@@ -212,6 +226,31 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
+
+  useEffect(() => {
+    if (!isTriggerPermissionsLoaded) return
+
+    if (canCreateTriggers && !isRlsBannerDismissed) {
+      addBanner({
+        id: 'rls-event-trigger-banner',
+        isDismissed: false,
+        content: <BannerRlsEventTrigger />,
+        priority: 2,
+      })
+    } else {
+      dismissBanner('rls-event-trigger-banner')
+    }
+
+    return () => {
+      dismissBanner('rls-event-trigger-banner')
+    }
+  }, [
+    addBanner,
+    dismissBanner,
+    canCreateTriggers,
+    isTriggerPermissionsLoaded,
+    isRlsBannerDismissed,
+  ])
 
   const isUpdatingPolicy = !!selectedPolicyIdToEdit
 
@@ -325,7 +364,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <BannerStackProvider>
+      <AuthLayout>{page}</AuthLayout>
+      <BannerStack />
+    </BannerStackProvider>
   </DefaultLayout>
 )
 

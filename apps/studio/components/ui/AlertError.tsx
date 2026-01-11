@@ -63,9 +63,11 @@ export const AlertError = ({
   useEffect(() => {
     if (!hasTrackedRef.current) {
       hasTrackedRef.current = true
-      track('dashboard_error_created', {
-        source: 'admonition',
-      })
+      if (Math.random() < 0.1) {
+        track('dashboard_error_created', {
+          source: 'admonition',
+        })
+      }
     }
   }, [track])
 
