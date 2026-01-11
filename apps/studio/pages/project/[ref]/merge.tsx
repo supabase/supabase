@@ -49,7 +49,7 @@ const MergePage: NextPageWithLayout = () => {
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
+  const [workflowFinalStatus, setWorkflowFinalStatus] = useState<'SUCCESS' | 'FAILED' | null>(null)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
   const isBranch = project?.parent_project_ref !== undefined
@@ -105,7 +105,7 @@ const MergePage: NextPageWithLayout = () => {
   const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
 
   const handleCurrentBranchWorkflowComplete = useCallback(
-    (status: string) => {
+    (status: 'SUCCESS' | 'FAILED') => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
@@ -114,7 +114,7 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   const handleParentBranchWorkflowComplete = useCallback(
-    (status: string) => {
+    (status: 'SUCCESS' | 'FAILED') => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
@@ -141,14 +141,14 @@ const MergePage: NextPageWithLayout = () => {
     ]
   )
 
-  const { currentWorkflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
+  const { workflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
     useWorkflowManagement({
       workflowRunId: currentWorkflowRunId,
       projectRef: ref,
       onWorkflowComplete: handleCurrentBranchWorkflowComplete,
     })
 
-  const { currentWorkflowRun: parentBranchWorkflow, workflowRunLogs: parentBranchLogs } =
+  const { workflowRun: parentBranchWorkflow, workflowRunLogs: parentBranchLogs } =
     useWorkflowManagement({
       workflowRunId: currentWorkflowRunId,
       projectRef: parentProjectRef,
@@ -158,18 +158,9 @@ const MergePage: NextPageWithLayout = () => {
   const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
   const workflowRunLogs = currentBranchLogs || parentBranchLogs
 
-  const hasCurrentWorkflowFailed = workflowFinalStatus
-    ? ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowFinalStatus)
-    : currentWorkflowRun?.status &&
-      ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(currentWorkflowRun.status)
-
-  const hasCurrentWorkflowCompleted = workflowFinalStatus
-    ? workflowFinalStatus === 'FUNCTIONS_DEPLOYED'
-    : currentWorkflowRun?.status === 'FUNCTIONS_DEPLOYED'
-
-  const isWorkflowRunning =
-    currentWorkflowRun?.status === 'RUNNING_MIGRATIONS' ||
-    currentWorkflowRun?.status === 'CREATING_PROJECT'
+  const hasCurrentWorkflowFailed = workflowFinalStatus === 'FAILED'
+  const hasCurrentWorkflowCompleted = workflowFinalStatus === 'SUCCESS'
+  const isWorkflowRunning = currentBranchWorkflow?.status === 'RUNNING'
 
   const addWorkflowRun = useCallback(
     (workflowRunId: string) => {
