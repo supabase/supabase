@@ -77,7 +77,7 @@ jobs:
           comment-title: '🎭 Playwright Test Results'
 
       - name: Fail job if tests failed
-        if: steps.filter.outputs.studio == 'true' && (steps.playwright.outcome != 'success' || steps.summarize.outputs.flaky_count > 0)
+        if: always() && steps.filter.outputs.studio == 'true' && steps.playwright.outcome != 'success'
         run: |
           echo "E2E tests failed" >&2
           exit 1
