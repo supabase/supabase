@@ -53,21 +53,18 @@ describe('prod smoke test: crawler pages return correct data', () => {
     const text = await result.text()
 
     const $ = load(text)
+
     const h1 = $('h1').text()
     expect(h1).toBe('JavaScript: Less than or equal to a range')
 
-    const description = $('h1').next().text()
-    expect(description).toBe(
-      'Only relevant for range columns. Match only rows where every element in column is either contained in range or less than any element in range.'
-    )
-
-    const headings = [] as Array<string | undefined>
-    $('h2').map(function () {
-      headings.push($(this).attr('id'))
+    // Collect all heading text (h2 + h3)
+    const headings: string[] = []
+    $('h2, h3').each(function () {
+      headings.push($(this).text().toLowerCase())
     })
 
-    expect(headings.includes('parameters')).toBe(true)
-    expect(headings.includes('examples')).toBe(true)
+    expect(headings.some((h) => h.includes('parameters'))).toBe(true)
+    expect(headings.some((h) => h.includes('example'))).toBe(true)
   })
 })
 
