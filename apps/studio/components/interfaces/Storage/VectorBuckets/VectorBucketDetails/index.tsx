@@ -104,7 +104,7 @@ export const VectorBucketDetails = () => {
   } = useS3VectorsWrapperInstance({ bucketId })
 
   const isLoading = isLoadingIndexes || isLoadingWrapper
-  const hasSetUpForeignSchema = wrapperInstance?.server_options.find((x) =>
+  const hasSetUpForeignSchema = (wrapperInstance?.server_options ?? []).find((x) =>
     x.startsWith('supabase_target_schema')
   )
 

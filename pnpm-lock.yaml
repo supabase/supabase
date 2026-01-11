@@ -112,12 +112,18 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+      tsx:
+        specifier: 'catalog:'
+        version: 4.20.3
       turbo:
         specifier: 2.3.3
         version: 2.3.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
 
   apps/cms:
     dependencies:
