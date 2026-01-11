@@ -27,6 +27,7 @@ const {
   integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
+  sdkElixir: sdkElixirEnabled,
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
@@ -52,13 +53,14 @@ const {
   'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
+  'sdk:elixir',
   'sdk:kotlin',
   'sdk:python',
   'sdk:swift',
 ])
 
 const jsOnly =
-  !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
+  !sdkCsharpEnabled && !sdkDartEnabled && !sdkElixirEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -233,6 +235,14 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/reference/python' as `/${string}`,
             level: 'reference_python',
             enabled: sdkPythonEnabled,
+          },
+          {
+            label: 'Elixir',
+            icon: 'reference-elixir',
+            href: '/reference/elixir' as `/${string}`,
+            level: 'reference_elixir',
+            community: true,
+            enabled: sdkElixirEnabled,
           },
           {
             label: 'C#',
@@ -3137,6 +3147,17 @@ export const reference_python_v2 = {
   pkg: {
     name: 'supabase-py',
     repo: 'https://github.com/supabase/supabase-py',
+  },
+}
+
+export const reference_elixir_v0 = {
+  icon: 'reference-elixir',
+  title: 'Elixir',
+  url: '/guides/reference/elixir',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase-ex',
+    repo: 'https://github.com/supabase-community/supabase-ex',
   },
 }
 
