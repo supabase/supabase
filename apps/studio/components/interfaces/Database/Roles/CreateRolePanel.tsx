@@ -21,6 +21,7 @@ import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface CreateRolePanelProps {
   visible: boolean
+  disabled: boolean
   onClose: () => void
 }
 
@@ -44,7 +45,7 @@ const initialValues = {
   canBypassRls: false,
 }
 
-export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
+export const CreateRolePanel = ({ visible, disabled, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
 
   const { data: project } = useSelectedProjectQuery()
@@ -86,6 +87,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
         <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
           <FormActions
             form={formId}
+            disabled={disabled}
             isSubmitting={isCreating}
             hasChanges={form.formState.isDirty}
             handleReset={handleClose}
