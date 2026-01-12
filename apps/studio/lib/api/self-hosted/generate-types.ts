@@ -1,6 +1,6 @@
 import { fetchGet } from 'data/fetchers'
 import { PG_META_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { ResponseError } from 'types'
 import { assertSelfHosted } from './util'
 
 export type GenerateTypescriptTypesOptions = {
@@ -39,10 +39,15 @@ export async function generateTypescriptTypes({
     '_realtime',
   ].join(',')
 
-  const response = await fetchGet<GenerateTypescriptTypesResult>(
-    `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
-    { headers }
-  )
+  const url = `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`
 
-  return response
+  const response = await fetchGet<string>(url, {
+    headers: { Accept: 'text/plain', ...(headers || {}) },
+  })
+
+  if (response instanceof ResponseError) {
+    return response
+  }
+
+  return { types: response }
 }
