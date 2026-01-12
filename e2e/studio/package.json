@@ -15,7 +15,8 @@
     "@playwright/test": "^1.52.0",
     "@supabase/supabase-js": "catalog:",
     "cross-fetch": "^4.1.0",
-    "dotenv": "^16.5.0"
+    "dotenv": "^16.5.0",
+    "otpauth": "^9.4.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",

@@ -494,7 +494,71 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 </TabPanel>
 <TabPanel id="programmatically" label="Programmatically">
 
-You can register clients programmatically by calling your project's auth server admin endpoint with a secret key:
+You can register clients programmatically using the SDK admin endpoints or by calling your project's auth server admin endpoint directly.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://your-project.supabase.co',
+  'your-service-role-key' // Use service_role key for admin operations
+)
+
+// Create an OAuth client
+const { data, error } = await supabase.auth.admin.oauth.createClient({
+  name: 'My Third-Party App',
+  redirect_uris: ['https://my-app.com/auth/callback', 'https://my-app.com/auth/silent-callback'],
+  client_type: 'confidential',
+})
+
+if (error) {
+  console.error('Error creating client:', error)
+} else {
+  console.log('Client created:', data)
+  console.log('Client ID:', data.client_id)
+  console.log('Client Secret:', data.client_secret) // Store this securely!
+}
+```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+supabase = create_client(
+    'https://your-project.supabase.co',
+    'your-service-role-key'  # Use service_role key for admin operations
+)
+
+# Create an OAuth client
+response = supabase.auth.admin.oauth.create_client({
+    'name': 'My Third-Party App',
+    'redirect_uris': [
+        'https://my-app.com/auth/callback',
+        'https://my-app.com/auth/silent-callback'
+    ],
+    'client_type': 'confidential'
+})
+
+print('Client created:', response)
+print('Client ID:', response.client_id)
+print('Client Secret:', response.client_secret)  # Store this securely!
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
 
 **Production:**
 
@@ -538,15 +602,51 @@ Response:
 }
 ```
 
+</TabPanel>
+</Tabs>
+
 <Admonition type="note">
 
-For complete API documentation, see the [OAuth Admin API reference](/todo).
+For complete API documentation, see the [OAuth Admin API reference](/docs/reference/javascript/auth-admin-oauth-admin).
 
 </Admonition>
 
 ### List OAuth clients
 
 To view all registered OAuth clients:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```typescript
+const { data, error } = await supabase.auth.admin.oauth.listClients()
+
+if (error) {
+  console.error('Error listing clients:', error)
+} else {
+  console.log('OAuth clients:', data)
+}
+```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+clients = supabase.auth.admin.oauth.list_clients()
+
+print('OAuth clients:', clients)
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
 
 **Production:**
 
@@ -561,6 +661,9 @@ curl 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
 curl 'http://localhost:54321/auth/v1/admin/oauth/clients' \
   -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}"
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 </Tabs>

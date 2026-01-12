@@ -14,7 +14,7 @@ import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Checkbox_Shadcn_, Label_Shadcn_, Modal } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface AddPaymentMethodFormProps {
   returnUrl: string

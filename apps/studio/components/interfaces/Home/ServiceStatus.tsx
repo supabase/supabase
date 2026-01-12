@@ -8,7 +8,8 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
-  ProjectServiceStatus,
+  ProjectServiceStatus as APIProjectServiceStatus,
+  ServiceHealthResponse,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -24,22 +25,23 @@ import {
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
-const StatusMessage = ({
+export type ProjectServiceStatus = APIProjectServiceStatus | 'DISABLED'
+
+export const StatusMessage = ({
   status,
   isLoading,
-  isHealthy,
   isProjectNew,
 }: {
   isLoading: boolean
-  isHealthy: boolean
   isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
-  if (isHealthy) return 'Healthy'
   if (isLoading) return 'Checking status'
+  if (status === 'DISABLED') return 'Disabled'
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  // isProjectNew has to be after all other statuses
   if (isProjectNew) return 'Coming up...'
   if (status) return status
   return 'Unable to connect'
@@ -53,24 +55,34 @@ const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
 const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 
-const StatusIcon = ({
+export const StatusIcon = ({
   isLoading,
-  isHealthy,
   isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
-  isHealthy: boolean
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isHealthy) return <CheckIcon />
-  if (isLoading) return <LoaderIcon />
-  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
-  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  //
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (projectStatus === 'DISABLED') return <AlertIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (isLoading) return <LoaderIcon />
+  // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
   if (isProjectNew) return <LoaderIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   return <AlertIcon />
+}
+
+/*
+ * Extract the db_schema from the response.info object
+ */
+export const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
+  if (response?.info && 'db_schema' in response.info) {
+    return response.info.db_schema
+  }
+  return undefined
 }
 
 export const ServiceStatus = () => {
@@ -126,7 +138,18 @@ export const ServiceStatus = () => {
     {
       refetchInterval: (query) => {
         const data = query.state.data
-        return data?.some((service) => !service.healthy) ? 5000 : false
+        const isServiceUnhealthy = data?.some((service) => {
+          // if the postgrest service has an empty schema, the user chose to turn off postgrest during project creation
+          if (service.name === 'rest' && extractDbSchema(service) === '') {
+            return false
+          }
+          if (service.status === 'ACTIVE_HEALTHY') {
+            return false
+          }
+          return true
+        })
+
+        return isServiceUnhealthy ? 5000 : false
       },
     }
   )
@@ -155,7 +178,6 @@ export const ServiceStatus = () => {
     error?: string
     docsUrl?: string
     isLoading: boolean
-    isHealthy: boolean
     status: ProjectServiceStatus
     logsUrl: string
   }[] = [
@@ -164,7 +186,6 @@ export const ServiceStatus = () => {
       error: undefined,
       docsUrl: undefined,
       isLoading: isLoading,
-      isHealthy: !!dbStatus?.healthy,
       status: dbStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgres-logs',
     },
@@ -173,8 +194,8 @@ export const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      isHealthy: !!restStatus?.healthy,
-      status: restStatus?.status ?? 'UNHEALTHY',
+      // If PostgREST has an empty schema, it means it's been disabled
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -184,7 +205,6 @@ export const ServiceStatus = () => {
             error: authStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isHealthy: !!authStatus?.healthy,
             status: authStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/auth-logs',
           },
@@ -197,7 +217,6 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isHealthy: !!realtimeStatus?.healthy,
             status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/realtime-logs',
           },
@@ -210,7 +229,6 @@ export const ServiceStatus = () => {
             error: storageStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isHealthy: !!storageStatus?.healthy,
             status: storageStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/storage-logs',
           },
@@ -223,7 +241,6 @@ export const ServiceStatus = () => {
             error: undefined,
             docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
-            isHealthy: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy
               ? 'ACTIVE_HEALTHY'
               : isLoading
@@ -240,7 +257,6 @@ export const ServiceStatus = () => {
             error: undefined,
             docsUrl: undefined,
             isLoading: isBranchesLoading,
-            isHealthy: currentBranch?.status === 'FUNCTIONS_DEPLOYED',
             status: (currentBranch?.status === 'FUNCTIONS_DEPLOYED'
               ? 'ACTIVE_HEALTHY'
               : currentBranch?.status === 'FUNCTIONS_FAILED' ||
@@ -258,7 +274,10 @@ export const ServiceStatus = () => {
     currentBranch?.status === 'CREATING_PROJECT' ||
     currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.isHealthy)
+  // We consider a service operational if it's healthy or intentionally disabled
+  const allServicesOperational = services.every(
+    (service) => service.status === 'ACTIVE_HEALTHY' || service.status === 'DISABLED'
+  )
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
@@ -316,7 +335,6 @@ export const ServiceStatus = () => {
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
-                isHealthy={!!service.isHealthy}
                 isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
@@ -325,7 +343,6 @@ export const ServiceStatus = () => {
                 <p className="text-foreground-light flex items-center gap-1">
                   <StatusMessage
                     isLoading={service.isLoading}
-                    isHealthy={!!service.isHealthy}
                     isProjectNew={isProjectNew}
                     status={service.status}
                   />

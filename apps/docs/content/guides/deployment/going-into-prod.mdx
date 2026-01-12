@@ -4,7 +4,7 @@ title: 'Production Checklist'
 description: 'Things to do before making your app publicly available'
 ---
 
-After developing your project and deciding it's Production Ready, you should run through this checklist to ensure that your project:
+After developing your project and deciding it's production ready, you should run through this checklist to ensure that your project:
 
 - is secure
 - won't falter under the expected load
@@ -13,7 +13,7 @@ After developing your project and deciding it's Production Ready, you should run
 ## Security
 
 - Ensure RLS is enabled
-  - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is unlikely to be what you want in the majority of cases.
+  - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is usually not what you want.
   - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
 - Enable replication on tables containing sensitive data by enabling Row Level Security (RLS) and setting row security policies:
   - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies.
@@ -21,8 +21,8 @@ After developing your project and deciding it's Production Ready, you should run
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) (see: [dashboard](/dashboard/project/_/auth/policies))
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database (see: [dashboard](/dashboard/project/_/database/settings#network-restrictions)).
 - Ensure that your Supabase Account is protected with multi-factor authentication (MFA).
-  - If using a GitHub signin, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
-  - If using email+password signin, set up [MFA for your Supabase account](/docs/guides/platform/multi-factor-authentication#enable-mfa).
+  - If using a GitHub sign-in, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
+  - If using email+password sign-in, set up [MFA for your Supabase account](/docs/guides/platform/multi-factor-authentication#enable-mfa).
 - Enable [MFA enforcement on your organization](/docs/guides/platform/network-restrictions). This ensures all users must have a valid MFA backed session to interact with organization and project resources.
 - Consider [adding multiple owners on your Supabase org](/dashboard/org/_/team). This ensures that if one of the owners is unreachable or loses access to their account, you still have Owner access to your org.
 - Ensure email confirmations are [enabled](/dashboard/project/_/auth/providers) in the `Settings > Auth` page.
@@ -30,7 +30,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Increase the length of the OTP if you need a higher level of entropy.
 - If your application requires a higher level of security, consider setting up [multi-factor authentication](/docs/guides/auth/auth-mfa) (MFA) for your users.
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
-- Think hard about how _you_ would abuse your service as an attacker, and mitigate.
+- Consider how _you_ might abuse your service as an attacker, and take steps to mitigate it.
 - Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).
 - Check and review issues in your database using [Security Advisor](/dashboard/project/_/database/security-advisor).
 
@@ -54,10 +54,10 @@ After developing your project and deciding it's Production Ready, you should run
 - Applications on the Free Plan that exhibit extremely low activity in a 7 day period may be paused by Supabase to save on server resources.
   - You can restore paused projects from the Supabase dashboard.
   - Upgrade to Pro to guarantee that your project will not be paused for inactivity.
-- Database backups are not available for download on the Free Plan.
-  - You can set up your own backup systems using tools like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or [wal-g](https://github.com/wal-g/wal-g).
+- Database backups are not available for download for Free Plan projects.
+  - You can set up your own backup systems using tools like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump) or [wal-g](https://github.com/wal-g/wal-g).
   - Nightly backups for Pro Plan projects are available on the Supabase dashboard for up to 7 days.
-  - Point in Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data. If a lower RPO is required, enable PITR.
+  - Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. If a lower RPO is required, enable PITR.
 - Supabase Projects use disks that offer 99.8-99.9% durability by default.
   - Use Read Replicas if you require availability resilience to a disk failure event
   - Use PITR if you require durability resilience to a disk failure event

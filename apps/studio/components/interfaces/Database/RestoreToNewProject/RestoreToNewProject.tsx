@@ -14,7 +14,6 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
@@ -30,6 +29,7 @@ import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PreviousRestoreItem } from './PreviousRestoreItem'
 
 export const RestoreToNewProject = () => {
@@ -182,8 +182,7 @@ export const RestoreToNewProject = () => {
       <Admonition type="default" title="This project cannot be restored to a new project">
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
-          content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore from a restored project, please reach out via [support](/support/new?projectRef=${project?.ref}).`}
+          content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project.`}
         />
         <Button asChild type="default">
           <Link href={`/project/${cloneStatus?.cloned_from?.source_project?.ref || ''}`}>

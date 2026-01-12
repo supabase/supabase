@@ -1,17 +1,7 @@
 import { expect, Page } from '@playwright/test'
 import { waitForApiResponse } from './wait-for-response.js'
 import { toUrl } from './to-url.js'
-
-/**
- * Dismisses any visible toast notifications
- */
-export const dismissToastsIfAny = async (page: Page) => {
-  const closeButtons = page.getByRole('button', { name: 'Close toast' })
-  const count = await closeButtons.count()
-  for (let i = 0; i < count; i++) {
-    await closeButtons.nth(i).click()
-  }
-}
+import { dismissToastsIfAny } from './dismiss-toast.js'
 
 /**
  * Navigates to a the storage home view
