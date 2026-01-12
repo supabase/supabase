@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,7 +9,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { parseAsString, useQueryState } from 'nuqs'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -22,9 +22,6 @@ export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
 
-  // Track the ID being deleted to exclude it from error checking
-  const deletingSecretNameRef = useRef<string | null>(null)
-
   const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_SECRET_READ,
     '*'
@@ -32,7 +29,7 @@ export const EdgeFunctionSecrets = () => {
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
   const {
-    data,
+    data = [],
     error,
     isPending: isLoading,
     isSuccess,
@@ -44,32 +41,26 @@ export const EdgeFunctionSecrets = () => {
     { enabled: canReadSecrets }
   )
 
-  const { setValue: setSelectedSecretToEdit, value: selectedSecretToEdit } =
-    useQueryStateWithSelect({
-      urlKey: 'edit',
-      select: (secretName: string) =>
-        secretName ? data?.find((secret) => secret.name === secretName) : undefined,
-      enabled: !!data,
-      onError: () => toast.error(`Secret not found`),
-    })
+  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const selectedSecretToEdit = data.find((secret) => secret.name === selectedIdToEdit)
 
-  const { setValue: setSelectedSecretToDelete, value: selectedSecretToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'delete',
-      select: (secretName: string) =>
-        secretName ? data?.find((secret) => secret.name === secretName) : undefined,
-      enabled: !!data,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingSecretNameRef, selectedId, `Secret not found`),
-    })
+  const [selectedIdToDelete, setSelectedIdToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const selectedSecretToDelete = data.find((secret) => secret.name === selectedIdToDelete)
 
-  const { mutate: deleteSecret, isPending: isDeleting } = useSecretsDeleteMutation({
+  const {
+    mutate: deleteSecret,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully deleted secret “${variables.secrets[0]}”`)
-      setSelectedSecretToDelete(null)
-    },
-    onError: () => {
-      deletingSecretNameRef.current = null
+      setSelectedIdToDelete(null)
     },
   })
 
@@ -89,6 +80,26 @@ export const EdgeFunctionSecrets = () => {
   ]
 
   const showLoadingState = isLoadingSecretsPermissions || (canReadSecrets && isLoading)
+
+  useEffect(() => {
+    if (!!selectedIdToEdit && isSuccess && !selectedSecretToEdit) {
+      toast(`Secret ${selectedIdToEdit} cannot be found`)
+      setSelectedIdToEdit(null)
+    }
+  }, [isSuccess, selectedIdToEdit, selectedSecretToEdit, setSelectedIdToEdit])
+
+  useEffect(() => {
+    if (!!selectedIdToDelete && isSuccess && !selectedSecretToDelete && !isSuccessDelete) {
+      toast(`Secret ${selectedIdToDelete} cannot be found`)
+      setSelectedIdToDelete(null)
+    }
+  }, [
+    isSuccess,
+    isSuccessDelete,
+    selectedIdToDelete,
+    selectedSecretToDelete,
+    setSelectedIdToDelete,
+  ])
 
   return (
     <>
@@ -119,7 +130,7 @@ export const EdgeFunctionSecrets = () => {
                       className="w-full md:w-80"
                       placeholder="Search for a secret"
                       value={searchString}
-                      onChange={(e: any) => setSearchString(e.target.value)}
+                      onChange={(e) => setSearchString(e.target.value)}
                       icon={<Search />}
                     />
                   </div>
@@ -135,8 +146,8 @@ export const EdgeFunctionSecrets = () => {
                             <EdgeFunctionSecret
                               key={secret.name}
                               secret={secret}
-                              onSelectEdit={() => setSelectedSecretToEdit(secret.name)}
-                              onSelectDelete={() => setSelectedSecretToDelete(secret.name)}
+                              onSelectEdit={() => setSelectedIdToEdit(secret.name)}
+                              onSelectDelete={() => setSelectedIdToDelete(secret.name)}
                             />
                           ))
                         ) : secrets.length === 0 && searchString.length > 0 ? (
@@ -171,7 +182,7 @@ export const EdgeFunctionSecrets = () => {
       <EditSecretSheet
         secret={selectedSecretToEdit}
         visible={!!selectedSecretToEdit}
-        onClose={() => setSelectedSecretToEdit(null)}
+        onClose={() => setSelectedIdToEdit(null)}
       />
 
       <ConfirmationModal
@@ -181,10 +192,9 @@ export const EdgeFunctionSecrets = () => {
         confirmLabel="Delete secret"
         confirmLabelLoading="Deleting secret"
         title={`Delete secret “${selectedSecretToDelete?.name}”`}
-        onCancel={() => setSelectedSecretToDelete(null)}
+        onCancel={() => setSelectedIdToDelete(null)}
         onConfirm={() => {
           if (selectedSecretToDelete) {
-            deletingSecretNameRef.current = selectedSecretToDelete.name
             deleteSecret({ projectRef, secrets: [selectedSecretToDelete.name] })
           }
         }}
