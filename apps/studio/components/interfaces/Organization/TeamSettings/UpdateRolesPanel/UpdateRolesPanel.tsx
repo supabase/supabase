@@ -321,6 +321,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 <OrganizationProjectSelector
                   open={showProjectDropdown}
                   setOpen={setShowProjectDropdown}
+                  modal={true}
                   onSelect={onSelectProject}
                   renderTrigger={() => (
                     <Button type="default" className="w-min">
