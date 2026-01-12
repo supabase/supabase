@@ -7,7 +7,6 @@ import z from 'zod'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
@@ -33,7 +32,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { validVectorBucketName } from './CreateVectorBucketDialog.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 
 const FormSchema = z.object({
   name: z
@@ -112,10 +110,6 @@ export const CreateVectorBucketDialog = ({
 
   const { mutateAsync: createS3VectorsWrapper } = useS3VectorsWrapperCreateMutation()
 
-  const { mutateAsync: createSchema } = useSchemaCreateMutation({
-    onError: () => {},
-  })
-
   const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation()
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
@@ -146,23 +140,9 @@ export const CreateVectorBucketDialog = ({
           schema: wrappersExtension.schema ?? 'extensions',
           version: wrappersExtension.default_version,
         })
-
-        await createS3VectorsWrapper({ bucketName: values.name })
-
-        await createSchema({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          name: getVectorBucketFDWSchemaName(values.name),
-        })
-      } else if (wrappersExtensionState === 'installed') {
-        await createS3VectorsWrapper({ bucketName: values.name })
-
-        await createSchema({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          name: getVectorBucketFDWSchemaName(values.name),
-        })
       }
+
+      await createS3VectorsWrapper({ bucketName: values.name })
     } catch (error: any) {
       toast.warning(
         `Failed to create vector bucket integration: ${error.message}. The bucket will be created but you will need to manually install the integration.`
@@ -195,7 +175,7 @@ export const CreateVectorBucketDialog = ({
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
+            <DialogSection className="flex flex-col !p-0">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -204,8 +184,9 @@ export const CreateVectorBucketDialog = ({
                   <FormItemLayout
                     name="name"
                     label="Bucket name"
+                    className="px-5 py-5"
                     labelOptional="Cannot be changed after creation"
-                    description="A target schema will be created that matches this name."
+                    description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -221,7 +202,8 @@ export const CreateVectorBucketDialog = ({
                   </FormItemLayout>
                 )}
               />
-              <Admonition type="default">
+
+              <Admonition type="default" className="border-x-0 border-b-0 rounded-none">
                 <p>
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}

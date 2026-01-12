@@ -15,7 +15,7 @@ import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Card, CardContent } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface PoliciesProps {
   search?: string
@@ -51,7 +51,7 @@ export const Policies = ({
   }>()
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
-  const { mutate: updateTable } = useTableUpdateMutation({
+  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
     },
@@ -60,14 +60,15 @@ export const Policies = ({
     },
   })
 
-  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
-    onSuccess: () => {
-      toast.success('Successfully deleted policy!')
-    },
-    onSettled: () => {
-      closeConfirmModal()
-    },
-  })
+  const { mutate: deleteDatabasePolicy, isPending: isDeletingPolicy } =
+    useDatabasePolicyDeleteMutation({
+      onSuccess: () => {
+        toast.success('Successfully deleted policy!')
+      },
+      onSettled: () => {
+        closeConfirmModal()
+      },
+    })
 
   const closeConfirmModal = useCallback(() => {
     setSelectedPolicyToDelete({})
@@ -180,30 +181,30 @@ export const Policies = ({
         ) : null}
       </div>
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={!isEmpty(selectedPolicyToDelete)}
-        title="Confirm to delete policy"
-        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onDeletePolicy}
+        variant="destructive"
+        title="Delete policy"
+        description={`Are you sure you want to delete the policy “${selectedPolicyToDelete.name}”? This action cannot be undone.`}
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        loading={isDeletingPolicy}
+        onCancel={closeConfirmModal}
+        onConfirm={onDeletePolicy}
       />
 
-      <ConfirmModal
-        danger={selectedTableToToggleRLS?.rls_enabled}
+      <ConfirmationModal
         visible={selectedTableToToggleRLS !== undefined}
-        title={`Confirm to ${
-          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security`}
+        variant={selectedTableToToggleRLS?.rls_enabled ? 'destructive' : 'default'}
+        title={`${selectedTableToToggleRLS?.rls_enabled ? 'Disable' : 'Enable'} Row Level Security`}
         description={`Are you sure you want to ${
           selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security for the table "${selectedTableToToggleRLS?.name}"?`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Saving"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onToggleRLS}
+        } Row Level Security (RLS) for the table “${selectedTableToToggleRLS?.name}”?`}
+        confirmLabel={`${selectedTableToToggleRLS?.rls_enabled ? 'Disable' : 'Enable'} RLS`}
+        confirmLabelLoading={`${selectedTableToToggleRLS?.rls_enabled ? 'Disabling' : 'Enabling'} RLS`}
+        loading={isUpdatingTable}
+        onCancel={closeConfirmModal}
+        onConfirm={onToggleRLS}
       />
     </>
   )

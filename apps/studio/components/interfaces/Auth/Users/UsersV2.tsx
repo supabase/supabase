@@ -1,4 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import {
@@ -10,11 +11,12 @@ import {
   WandSparklesIcon,
   X,
 } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from 'components/ui/AlertError'
@@ -34,12 +36,9 @@ import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
-import Link from 'next/link'
-import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -55,6 +54,9 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -123,16 +125,20 @@ export const UsersV2 = () => {
 
   const [specificFilterColumn, setSpecificFilterColumn] = useQueryState<SpecificFilterColumn>(
     'filter',
-    parseAsStringEnum<SpecificFilterColumn>(['id', 'email', 'phone', 'freeform']).withDefault(
-      'email'
-    )
+    parseAsStringEnum<SpecificFilterColumn>([
+      'id',
+      'email',
+      'phone',
+      'name',
+      'freeform',
+    ]).withDefault('email')
   )
   const [filterUserType, setFilterUserType] = useQueryState(
     'userType',
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
   const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
-  const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'id:asc' })
+  const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'created_at:desc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
     'columns',
@@ -142,11 +148,20 @@ export const UsersV2 = () => {
     'providers',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [selectedId, setSelectedId] = useQueryState(
+    'show',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [improvedSearchDismissed, setImprovedSearchDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AUTH_USERS_IMPROVED_SEARCH_DISMISSED(projectRef ?? ''),
+    false
+  )
 
   // [Joshen] Opting to store filter column, into local storage for now, which will initialize
   // the page when landing on auth users page only if no query params for filter column provided
   const [localStorageFilter, setLocalStorageFilter, { isSuccess: isLocalStorageFilterLoaded }] =
-    useLocalStorageQuery<'id' | 'email' | 'phone' | 'freeform'>(
+    useLocalStorageQuery<SpecificFilterColumn>(
       LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''),
       'email'
     )
@@ -195,6 +210,78 @@ export const UsersV2 = () => {
   const totalUsers = totalUsersCountData?.count ?? 0
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
 
+  const isImprovedUserSearchFlagEnabled = useFlag('improvedUserSearch')
+  const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const {
+    data: userSearchIndexes,
+    isError: isUserSearchIndexesError,
+    isLoading: isUserSearchIndexesLoading,
+  } = useUserIndexStatusesQuery({ projectRef, connectionString: project?.connectionString })
+  const { data: indexWorkerStatus, isLoading: isIndexWorkerStatusLoading } =
+    useIndexWorkerStatusQuery({
+      projectRef,
+      connectionString: project?.connectionString,
+    })
+  const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } = useAuthConfigUpdateMutation(
+    {
+      onSuccess: () => {
+        toast.success('Initiated creation of user search indexes')
+      },
+      onError: (error) => {
+        toast.error(`Failed to initiate creation of user search indexes: ${error?.message}`)
+      },
+    }
+  )
+
+  const handleEnableUserSearchIndexes = () => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({
+      projectRef: projectRef,
+      config: { INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST: true },
+    })
+  }
+
+  const userSearchIndexesAreValidAndReady =
+    !isUserSearchIndexesError &&
+    !isUserSearchIndexesLoading &&
+    userSearchIndexes?.length === pgMeta.USER_SEARCH_INDEXES.length &&
+    userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
+
+  /**
+   * We want to show the improved search when:
+   * 1. The feature flag is enabled for them
+   * 2. The user has opted in (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is true)
+   * 3. The required indexes are valid and ready
+   */
+  const improvedSearchEnabled =
+    isImprovedUserSearchFlagEnabled &&
+    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
+    userSearchIndexesAreValidAndReady
+
+  /**
+   * We want to show users the improved search opt-in only if:
+   * 1. The feature flag is enabled for them
+   * 2. They have not opted in yet (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is false)
+   * 3. They have < threshold number of users
+   * 4. They have not dismissed the alert
+   */
+  const isCountWithinThresholdForOptIn =
+    isCountLoaded && totalUsers <= IMPROVED_SEARCH_COUNT_THRESHOLD
+  const showImprovedSearchOptIn =
+    isImprovedUserSearchFlagEnabled &&
+    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === false &&
+    isCountWithinThresholdForOptIn &&
+    !improvedSearchDismissed
+
+  /**
+   * We want to show an "in progress" state when:
+   * 1. The user has opted in (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is true)
+   * 2. The index worker is currently in progress
+   */
+  const indexWorkerInProgress =
+    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
+    indexWorkerStatus?.is_in_progress === true
+
   const {
     data,
     error,
@@ -212,40 +299,42 @@ export const UsersV2 = () => {
       connectionString: project?.connectionString,
       keywords: filterKeywords,
       filter:
-        specificFilterColumn !== 'freeform' || filterUserType === 'all'
+        (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) || filterUserType === 'all'
           ? undefined
           : filterUserType,
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
-      ...(specificFilterColumn !== 'freeform'
+      // improved search will always have a column specified
+      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
+
+      improvedSearchEnabled: improvedSearchEnabled,
     },
     {
       placeholderData: Boolean(filterKeywords) ? keepPreviousData : undefined,
       // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
       // a barrage of requests to invalidate each page esp when the project has many many users.
       staleTime: Infinity,
+      // NOTE(iat): query the user data only after we know whether to show improved search or not
+      enabled: !isUserSearchIndexesLoading && !isAuthConfigLoading && !isIndexWorkerStatusLoading,
     }
   )
 
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
-
-  const { setValue: setSelectedUser, value: selectedUser } = useQueryStateWithSelect({
-    urlKey: 'show',
-    select: (id: string) => (id ? users?.find((u) => u.id === id)?.id : undefined),
-    enabled: !!users && !isLoading,
-    onError: () => toast.error(`User not found`),
-  })
+  const selectedUser = users?.find((u) => u.id === selectedId)?.id
 
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
   const searchInvalid =
-    !search || specificFilterColumn === 'freeform' || specificFilterColumn === 'email'
+    !search ||
+    specificFilterColumn === 'freeform' ||
+    specificFilterColumn === 'email' ||
+    specificFilterColumn === 'name'
       ? false
       : specificFilterColumn === 'id'
         ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
@@ -264,10 +353,10 @@ export const UsersV2 = () => {
     organization: selectedOrg?.slug ?? 'Unknown',
   }
 
-  const updateStorageFilter = (value: 'id' | 'email' | 'phone' | 'freeform') => {
+  const updateStorageFilter = (value: SpecificFilterColumn) => {
     setLocalStorageFilter(value)
     setSpecificFilterColumn(value)
-    if (value !== 'freeform') {
+    if (value !== 'freeform' && !improvedSearchEnabled) {
       updateSortByValue('id:asc')
     }
   }
@@ -345,81 +434,13 @@ export const UsersV2 = () => {
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
 
-      if (userIds.includes(selectedUser)) setSelectedUser(null)
+      if (userIds.includes(selectedUser)) setSelectedId(null)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
     } finally {
       setIsDeletingUsers(false)
     }
   }
-
-  const isImprovedUserSearchEnabled = useFlag('improvedUserSearch')
-  const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const {
-    data: userSearchIndexes,
-    isError: isUserSearchIndexesError,
-    isLoading: isUserSearchIndexesLoading,
-  } = useUserIndexStatusesQuery({ projectRef, connectionString: project?.connectionString })
-  const { data: indexWorkerStatus } = useIndexWorkerStatusQuery({
-    projectRef,
-    connectionString: project?.connectionString,
-  })
-  const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } = useAuthConfigUpdateMutation(
-    {
-      onSuccess: () => {
-        toast.success('Initiated creation of user search indexes')
-      },
-      onError: (error) => {
-        toast.error(`Failed to initiate creation of user search indexes: ${error?.message}`)
-      },
-    }
-  )
-
-  const handleEnableUserSearchIndexes = () => {
-    if (!projectRef) return console.error('Project ref is required')
-    updateAuthConfig({
-      projectRef: projectRef,
-      config: { INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST: true },
-    })
-  }
-
-  const userSearchIndexesAreValidAndReady =
-    !isUserSearchIndexesError &&
-    !isUserSearchIndexesLoading &&
-    userSearchIndexes?.length === pgMeta.USER_SEARCH_INDEXES.length &&
-    userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
-
-  /**
-   * We want to show the improved search when:
-   * 1. The feature flag is enabled for them
-   * 2. The user has opted in (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is true)
-   * 3. The required indexes are valid and ready
-   */
-  const _showImprovedSearch =
-    isImprovedUserSearchEnabled &&
-    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
-    userSearchIndexesAreValidAndReady
-
-  /**
-   * We want to show users the improved search opt-in only if:
-   * 1. The feature flag is enabled for them
-   * 2. They have not opted in yet (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is false)
-   * 3. They have < threshold number of users
-   */
-  const isCountWithinThresholdForOptIn = totalUsers <= IMPROVED_SEARCH_COUNT_THRESHOLD
-  const showImprovedSearchOptIn =
-    isImprovedUserSearchEnabled &&
-    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === false &&
-    isCountWithinThresholdForOptIn
-
-  /**
-   * We want to show an "in progress" state when:
-   * 1. The user has opted in (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is true)
-   * 2. The index worker is currently in progress
-   */
-  const indexWorkerInProgress =
-    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
-    indexWorkerStatus?.is_in_progress === true
 
   useEffect(() => {
     if (
@@ -468,6 +489,7 @@ export const UsersV2 = () => {
         setSortByValue(localStorageSortByValue)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLocalStorageFilterLoaded, isLocalStorageSortByValueLoaded, isCountLoaded])
 
   return (
@@ -476,13 +498,21 @@ export const UsersV2 = () => {
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t relative">
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => setImprovedSearchDismissed(true)}
+                className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
+              >
+                <X size={14} className="text-foreground-light" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Dismiss</TooltipContent>
+            </Tooltip>
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Opt-in to an improved search experience</AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_>Upgrade to an improved search experience</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="flex justify-between items-center">
               <div>
-                Creating the necessary indexes will provide a safer and more performant search
-                experience.
+                Enable faster and more reliable searching, sorting, and filtering of your users.
               </div>
               <Button
                 icon={<WandSparklesIcon />}
@@ -490,7 +520,7 @@ export const UsersV2 = () => {
                 loading={isUpdatingAuthConfig}
                 type="default"
               >
-                Create indexes
+                Upgrade search
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -542,7 +572,7 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   setFilterKeywords={(s) => {
                     setFilterKeywords(s)
-                    setSelectedUser(null)
+                    setSelectedId(null)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
@@ -564,77 +594,80 @@ export const UsersV2 = () => {
                       updateStorageFilter(value)
                     }
                   }}
+                  improvedSearchEnabled={improvedSearchEnabled}
                 />
 
-                {showUserTypeFilter && specificFilterColumn === 'freeform' && (
-                  <Select_Shadcn_
-                    value={filterUserType}
-                    onValueChange={(val) => {
-                      setFilterUserType(val as Filter)
-                      sendEvent({
-                        action: 'auth_users_search_submitted',
-                        properties: {
-                          trigger: 'user_type_filter',
-                          ...telemetryProps,
-                          user_type: val,
-                        },
-                        groups: telemetryGroups,
-                      })
-                    }}
-                  >
-                    <SelectTrigger_Shadcn_
-                      size="tiny"
-                      className={cn(
-                        'w-[140px] !bg-transparent',
-                        filterUserType === 'all' && 'border-dashed'
-                      )}
+                {showUserTypeFilter &&
+                  (specificFilterColumn === 'freeform' || improvedSearchEnabled) && (
+                    <Select_Shadcn_
+                      value={filterUserType}
+                      onValueChange={(val) => {
+                        setFilterUserType(val as Filter)
+                        sendEvent({
+                          action: 'auth_users_search_submitted',
+                          properties: {
+                            trigger: 'user_type_filter',
+                            ...telemetryProps,
+                            user_type: val,
+                          },
+                          groups: telemetryGroups,
+                        })
+                      }}
                     >
-                      <SelectValue_Shadcn_ />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="all" className="text-xs">
-                          All users
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="verified" className="text-xs">
-                          Verified users
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="unverified" className="text-xs">
-                          Unverified users
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="anonymous" className="text-xs">
-                          Anonymous users
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
-                )}
+                      <SelectTrigger_Shadcn_
+                        size="tiny"
+                        className={cn(
+                          'w-[140px] !bg-transparent',
+                          filterUserType === 'all' && 'border-dashed'
+                        )}
+                      >
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
+                        <SelectGroup_Shadcn_>
+                          <SelectItem_Shadcn_ value="all" className="text-xs">
+                            All users
+                          </SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="verified" className="text-xs">
+                            Verified users
+                          </SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                            Unverified users
+                          </SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                            Anonymous users
+                          </SelectItem_Shadcn_>
+                        </SelectGroup_Shadcn_>
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
+                  )}
 
-                {showProviderFilter && specificFilterColumn === 'freeform' && (
-                  <FilterPopover
-                    name="Provider"
-                    options={PROVIDER_FILTER_OPTIONS}
-                    labelKey="name"
-                    valueKey="value"
-                    iconKey="icon"
-                    activeOptions={selectedProviders}
-                    labelClass="text-xs"
-                    maxHeightClass="h-[190px]"
-                    className="w-52"
-                    onSaveFilters={(providers) => {
-                      setSelectedProviders(providers)
-                      sendEvent({
-                        action: 'auth_users_search_submitted',
-                        properties: {
-                          trigger: 'provider_filter',
-                          ...telemetryProps,
-                          providers,
-                        },
-                        groups: telemetryGroups,
-                      })
-                    }}
-                  />
-                )}
+                {showProviderFilter &&
+                  (specificFilterColumn === 'freeform' || improvedSearchEnabled) && (
+                    <FilterPopover
+                      name="Provider"
+                      options={PROVIDER_FILTER_OPTIONS}
+                      labelKey="name"
+                      valueKey="value"
+                      iconKey="icon"
+                      activeOptions={selectedProviders}
+                      labelClass="text-xs"
+                      maxHeightClass="h-[190px]"
+                      className="w-52"
+                      onSaveFilters={(providers) => {
+                        setSelectedProviders(providers)
+                        sendEvent({
+                          action: 'auth_users_search_submitted',
+                          properties: {
+                            trigger: 'provider_filter',
+                            ...telemetryProps,
+                            providers,
+                          },
+                          groups: telemetryGroups,
+                        })
+                      }}
+                    />
+                  )}
 
                 <div className="border-r border-strong h-6" />
 
@@ -706,6 +739,7 @@ export const UsersV2 = () => {
                   }}
                   showSortByEmail={showSortByEmail}
                   showSortByPhone={showSortByPhone}
+                  improvedSearchEnabled={improvedSearchEnabled}
                 />
               </div>
 
@@ -788,7 +822,7 @@ export const UsersV2 = () => {
                           if (user) {
                             const idx = users.indexOf(user)
                             if (props.row.id) {
-                              setSelectedUser(props.row.id)
+                              setSelectedId(props.row.id)
                               gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                             }
                           }
@@ -825,12 +859,7 @@ export const UsersV2 = () => {
               />
             </div>
           </ResizablePanel>
-          {selectedUser !== undefined && (
-            <UserPanel
-              selectedUser={users.find((u) => u.id === selectedUser)}
-              onClose={() => setSelectedUser(null)}
-            />
-          )}
+          {!!selectedId && <UserPanel />}
         </ResizablePanelGroup>
 
         <UsersFooter
@@ -896,17 +925,17 @@ export const UsersV2 = () => {
       <ConfirmationModal
         size="medium"
         visible={showCreateIndexesModal}
-        confirmLabel="Create indexes"
-        title="Create user search indexes"
+        confirmLabel="Upgrade search"
+        title="Upgrade to improved search"
         onConfirm={() => {
           handleEnableUserSearchIndexes()
           setShowCreateIndexesModal(false)
         }}
         onCancel={() => setShowCreateIndexesModal(false)}
         alert={{
-          title: 'Create user search indexes',
+          title: 'Improved search experience',
           description:
-            'This process will create indexes on the auth.users table to improve search performance and enable better sorting and filtering capabilities.',
+            'This will create indexes to enable faster and more reliable searching, sorting, and filtering of your users.',
         }}
       >
         <ul className="text-sm list-disc pl-4 my-3 flex flex-col gap-2">
@@ -914,12 +943,11 @@ export const UsersV2 = () => {
             Creating these indexes may temporarily impact database performance.
           </li>
           <li className="marker:text-foreground-light">
-            Depending on the size of your `auth.users` table, this operation may take some time to
-            complete.
+            Depending on the number of users, this may take some time to complete.
           </li>
           <li className="marker:text-foreground-light">
-            You may continue to use the Auth Users page while the indexes are being created, but
-            search performance improvements will only take effect once the process is complete.
+            You can continue using the Auth Users page while the indexes are being created, but
+            improvements will only take effect once complete.
           </li>
           <li className="marker:text-foreground-light">
             You can monitor the progress in the{' '}
@@ -943,7 +971,7 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
-          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(null)
+          if (selectedUserToDelete?.id === selectedUser) setSelectedId(null)
           setSelectedUserToDelete(undefined)
           cleanPointerEventsNoneOnBody(500)
         }}

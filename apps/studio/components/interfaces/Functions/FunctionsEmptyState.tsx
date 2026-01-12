@@ -1,4 +1,5 @@
 import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -34,7 +35,6 @@ import {
   Separator,
 } from 'ui'
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
-import { TerminalInstructions } from './TerminalInstructions'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
@@ -44,6 +44,7 @@ export const FunctionsEmptyState = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
+  const [, setCreateMethod] = useQueryState('create', parseAsString)
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
@@ -145,27 +146,19 @@ export const FunctionsEmptyState = () => {
               version control.
             </p>
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  type="default"
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_via_cli_button_clicked',
-                      properties: { origin: 'no_functions_block' },
-                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                    })
-                  }
-                >
-                  View CLI Instructions
-                </Button>
-              </DialogTrigger>
-              <DialogContent size="large">
-                <DialogSection padding="small">
-                  <TerminalInstructions />
-                </DialogSection>
-              </DialogContent>
-            </Dialog>
+            <Button
+              type="default"
+              onClick={() => {
+                setCreateMethod('cli')
+                sendEvent({
+                  action: 'edge_function_via_cli_button_clicked',
+                  properties: { origin: 'no_functions_block' },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
+            >
+              View CLI Instructions
+            </Button>
           </div>
         </CardContent>
       </Card>

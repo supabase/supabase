@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -14,7 +14,8 @@ import { OrganizationInviteError } from './OrganizationInviteError'
 
 export const OrganizationInvite = () => {
   const router = useRouter()
-  const { profile } = useProfile()
+  const isLoggedIn = useIsLoggedIn()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { slug, token } = useParams()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
@@ -67,7 +68,7 @@ export const OrganizationInvite = () => {
         'md:w-[400px]'
       )}
     >
-      {!profile ? (
+      {!isLoggedIn || (!profile && !isLoadingProfile) ? (
         <>
           <Admonition
             showIcon={false}
@@ -86,7 +87,7 @@ export const OrganizationInvite = () => {
             )}
           </div>
         </>
-      ) : isLoadingInvitation ? (
+      ) : isLoadingProfile || isLoadingInvitation ? (
         <div className="p-5">
           <GenericSkeletonLoader />
         </div>

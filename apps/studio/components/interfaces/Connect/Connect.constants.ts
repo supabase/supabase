@@ -239,6 +239,34 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'tanstack',
+    label: 'TanStack Start',
+    icon: 'tanstack',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/tanstack`,
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'flask',
+    label: 'Flask (Python)',
+    icon: 'python',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/flask`,
+    children: [
+      {
+        key: 'supabasepy',
+        label: 'supabase-py',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const MOBILES: ConnectionType[] = [
@@ -246,7 +274,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'exporeactnative',
     label: 'Expo React Native',
     icon: 'expo',
-    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-expo-react-native`,
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/expo-react-native`,
     children: [
       {
         key: 'supabasejs',

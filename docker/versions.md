@@ -1,5 +1,11 @@
 # Docker Image Versions
 
+## 2025-12-18
+- supabase/studio:2025.12.17-sha-43f4f7f (prev supabase/studio:2025.12.09-sha-434634f)
+- supabase/gotrue:v2.184.0 (prev supabase/gotrue:v2.183.0)
+- supabase/postgres-meta:v0.95.1 (prev supabase/postgres-meta:v0.93.1)
+- supabase/logflare:1.27.0 (prev supabase/logflare:1.26.25)
+
 ## 2025-12-10
 - supabase/studio:2025.12.09-sha-434634f (prev supabase/studio:2025.11.26-sha-8f096b5)
 - postgrest/postgrest:v14.1 (prev postgrest/postgrest:v13.0.7)

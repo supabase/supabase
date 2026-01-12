@@ -2,8 +2,8 @@ import {
   Activity,
   ArrowUpCircle,
   Ban,
+  ChevronDown,
   ChevronLeft,
-  ExternalLink,
   Info,
   Pause,
   Play,
@@ -14,13 +14,11 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
@@ -32,21 +30,37 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { ErroredTableDetails } from '../ErroredTableDetails'
+import { BatchRestartDialog } from '../BatchRestartDialog'
+import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
 import {
+  getStatusName,
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
-  getStatusName,
 } from '../Pipeline.utils'
 import { PipelineStatus } from '../PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { RestartTableDialog } from '../RestartTableDialog'
 import { UpdateVersionModal } from '../UpdateVersionModal'
-import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
-import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
+import { SlotLagMetrics } from './ReplicationPipelineStatus.types'
+import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
 import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
+import { TableReplicationRow } from './TableReplicationRow'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -57,6 +71,20 @@ export const ReplicationPipelineStatus = () => {
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
+  const [showErrorDialog, setShowErrorDialog] = useState(false)
+  const [selectedTableError, setSelectedTableError] = useState<{
+    tableName: string
+    reason: string
+    solution?: string
+  } | null>(null)
+  const [showRestartDialog, setShowRestartDialog] = useState(false)
+  const [selectedTableForRestart, setSelectedTableForRestart] = useState<{
+    tableId: number
+    tableName: string
+  } | null>(null)
+  const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
+  const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
+  const [restartingTableIds, setRestartingTableIds] = useState<Set<number>>(new Set())
 
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
@@ -112,15 +140,46 @@ export const ReplicationPipelineStatus = () => {
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  const tableStatuses = replicationStatusData?.table_statuses || []
+  // Sort tables by name for consistent ordering (memoized)
+  const tableStatuses = useMemo(
+    () =>
+      (replicationStatusData?.table_statuses || []).sort((a, b) =>
+        a.table_name.localeCompare(b.table_name)
+      ),
+    [replicationStatusData?.table_statuses]
+  )
+
   const applyLagMetrics = replicationStatusData?.apply_lag
-  const filteredTableStatuses =
-    searchString.length === 0
-      ? tableStatuses
-      : tableStatuses.filter((table) =>
-          table.table_name.toLowerCase().includes(searchString.toLowerCase())
-        )
-  const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
+
+  // Filter tables based on search (memoized)
+  const filteredTableStatuses = useMemo(
+    () =>
+      searchString.length === 0
+        ? tableStatuses
+        : tableStatuses.filter((table) =>
+            table.table_name.toLowerCase().includes(searchString.toLowerCase())
+          ),
+    [tableStatuses, searchString]
+  )
+
+  const tablesWithLag = useMemo(
+    () => tableStatuses.filter((table) => Boolean(table.table_sync_lag)),
+    [tableStatuses]
+  )
+
+  const erroredTables = useMemo(
+    () =>
+      tableStatuses.filter(
+        (table) =>
+          table.state.name === 'error' &&
+          'retry_policy' in table.state &&
+          table.state.retry_policy?.policy === 'manual_retry'
+      ),
+    [tableStatuses]
+  )
+
+  const hasErroredTables = erroredTables.length > 0
+  const isAnyRestartInProgress = restartingTableIds.size > 0
 
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
@@ -145,7 +204,7 @@ export const ReplicationPipelineStatus = () => {
         ? 'Stop'
         : statusName === 'failed'
           ? 'Restart'
-          : 'Action unavailable'
+          : statusName
 
   const icon =
     statusName === 'stopped' ? (
@@ -184,7 +243,7 @@ export const ReplicationPipelineStatus = () => {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-3">
             <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
@@ -214,27 +273,6 @@ export const ReplicationPipelineStatus = () => {
                 Update available
               </Button>
             )}
-            <Input
-              icon={<Search />}
-              className="text-xs"
-              placeholder="Search for tables"
-              value={searchString}
-              disabled={isPipelineError}
-              onChange={(e) => setSearchString(e.target.value)}
-              actions={
-                searchString.length > 0
-                  ? [
-                      <X
-                        key="close"
-                        className="mx-2 cursor-pointer text-foreground"
-                        size={14}
-                        strokeWidth={1.5}
-                        onClick={() => setSearchString('')}
-                      />,
-                    ]
-                  : undefined
-              }
-            />
 
             <Button asChild type="default">
               <Link href={logsUrl}>View logs</Link>
@@ -249,6 +287,7 @@ export const ReplicationPipelineStatus = () => {
                 !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
               }
               icon={icon}
+              className="capitalize"
             >
               {label}
             </Button>
@@ -263,30 +302,6 @@ export const ReplicationPipelineStatus = () => {
             <WifiOff size={14} />
             <span className="font-medium">Live updates paused</span>
             <span className="text-warning-700">Retrying automatically</span>
-          </div>
-        )}
-
-        {showDisabledState && (
-          <div
-            className={cn(
-              'p-4 border border-default rounded-lg flex items-center justify-between',
-              config.colors.bg
-            )}
-          >
-            <div className="flex items-center gap-x-3">
-              <div
-                className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center',
-                  config.colors.iconBg
-                )}
-              >
-                <div className={config.colors.icon}>{config.icon}</div>
-              </div>
-              <div className="flex-1">
-                <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
-                <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
-              </div>
-            </div>
           </div>
         )}
 
@@ -353,87 +368,119 @@ export const ReplicationPipelineStatus = () => {
 
         {hasTableData && (
           <div className="flex flex-col gap-y-3">
-            <div className="w-full overflow-hidden overflow-x-auto">
-              {/* [Joshen] Should update to use new Table components next time */}
-              <Table
-                head={[
-                  <Table.th key="table">Table</Table.th>,
-                  <Table.th key="status">Status</Table.th>,
-                  <Table.th key="details">Details</Table.th>,
-                ]}
-                body={
-                  <>
-                    {filteredTableStatuses.length === 0 && hasTableData && (
-                      <Table.tr>
-                        <Table.td colSpan={3}>
-                          <div className="space-y-1">
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{searchString}" did not return any results
-                            </p>
-                          </div>
-                        </Table.td>
-                      </Table.tr>
-                    )}
-                    {filteredTableStatuses.map((table, index) => {
-                      const statusConfig = getStatusConfig(table.state as TableState['state'])
-                      return (
-                        <Table.tr key={`${table.table_name}-${index}`} className="border-t">
-                          <Table.td className="align-top">
-                            <div className="flex items-center gap-x-2">
-                              <p>{table.table_name}</p>
-
-                              <ButtonTooltip
-                                asChild
-                                type="text"
-                                className="px-1.5"
-                                icon={<ExternalLink />}
-                                tooltip={{
-                                  content: { side: 'bottom', text: 'Open in Table Editor' },
-                                }}
-                              >
-                                <Link
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  href={`/project/${projectRef}/editor/${table.table_id}`}
-                                />
-                              </ButtonTooltip>
-                            </div>
-                          </Table.td>
-                          <Table.td className="align-top">
-                            {showDisabledState ? (
-                              <Badge variant="default">Not Available</Badge>
-                            ) : (
-                              statusConfig.badge
-                            )}
-                          </Table.td>
-                          <Table.td className="align-top">
-                            {showDisabledState ? (
-                              <p className="text-sm text-foreground-lighter">
-                                Status unavailable while pipeline is {config.badge.toLowerCase()}
-                              </p>
-                            ) : (
-                              <div className="flex flex-col gap-y-2">
-                                <div className="text-sm text-foreground">
-                                  {statusConfig.description}
-                                </div>
-                                {table.state.name === 'error' && (
-                                  <ErroredTableDetails
-                                    state={table.state}
-                                    tableName={table.table_name}
-                                    tableId={table.table_id}
-                                  />
-                                )}
-                              </div>
-                            )}
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    })}
-                  </>
+            <div className="flex items-center justify-between">
+              <Input
+                icon={<Search />}
+                size="tiny"
+                className="text-xs w-52"
+                placeholder="Search for tables"
+                value={searchString}
+                disabled={isPipelineError}
+                onChange={(e) => setSearchString(e.target.value)}
+                actions={
+                  searchString.length > 0 && [
+                    <X
+                      key="close"
+                      className="mx-2 cursor-pointer text-foreground"
+                      size={14}
+                      strokeWidth={1.5}
+                      onClick={() => setSearchString('')}
+                    />,
+                  ]
                 }
               />
+              {!showDisabledState && (
+                <div className="flex items-center">
+                  <Button
+                    size="tiny"
+                    type="default"
+                    className="rounded-r-none hover:z-[2]"
+                    icon={<RotateCcw />}
+                    disabled={tableStatuses.length === 0 || isAnyRestartInProgress}
+                    loading={isAnyRestartInProgress}
+                    onClick={() => {
+                      setBatchRestartMode('all')
+                      setShowBatchRestartDialog(true)
+                    }}
+                  >
+                    Restart all tables
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        icon={<ChevronDown />}
+                        className="w-7 rounded-l-none -ml-[1px]"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        disabled={!hasErroredTables || isAnyRestartInProgress}
+                        onClick={() => {
+                          setBatchRestartMode('errored')
+                          setShowBatchRestartDialog(true)
+                        }}
+                      >
+                        Restart failed tables only
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
             </div>
+
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead key="table">Table</TableHead>
+                      <TableHead key="status">Status</TableHead>
+                      <TableHead key="details">Details</TableHead>
+                      <TableHead key="actions" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTableStatuses.map((table) => {
+                      const isRestarting = restartingTableIds.has(table.table_id)
+                      const isErrorState = table.state.name === 'error'
+                      const errorReason =
+                        isErrorState && 'reason' in table.state ? table.state.reason : undefined
+                      const errorSolution =
+                        isErrorState && 'solution' in table.state ? table.state.solution : undefined
+                      return (
+                        <TableReplicationRow
+                          key={table.table_id}
+                          table={table}
+                          config={config}
+                          isRestarting={isRestarting}
+                          showDisabledState={showDisabledState}
+                          onSelectRestart={() => {
+                            setSelectedTableForRestart({
+                              tableId: table.table_id,
+                              tableName: table.table_name,
+                            })
+                            setShowRestartDialog(true)
+                          }}
+                          onSelectShowError={
+                            isErrorState && errorReason
+                              ? () => {
+                                  setSelectedTableError({
+                                    tableName: table.table_name,
+                                    reason: errorReason,
+                                    solution: errorSolution,
+                                  })
+                                  setShowErrorDialog(true)
+                                }
+                              : () => {}
+                          }
+                        />
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -472,6 +519,59 @@ export const ReplicationPipelineStatus = () => {
             : 'Update version'
         }
       />
+
+      {/* Restart Table Confirmation Dialog */}
+      {selectedTableForRestart && (
+        <RestartTableDialog
+          open={showRestartDialog}
+          onOpenChange={setShowRestartDialog}
+          tableId={selectedTableForRestart.tableId}
+          tableName={selectedTableForRestart.tableName}
+          onRestartStart={() => {
+            setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.tableId))
+          }}
+          onRestartComplete={() => {
+            setRestartingTableIds((prev) => {
+              const next = new Set(prev)
+              next.delete(selectedTableForRestart.tableId)
+              return next
+            })
+          }}
+        />
+      )}
+
+      {/* Error Details Dialog */}
+      {selectedTableError && (
+        <ErrorDetailsDialog
+          open={showErrorDialog}
+          onOpenChange={setShowErrorDialog}
+          tableName={selectedTableError.tableName}
+          reason={selectedTableError.reason}
+          solution={selectedTableError.solution}
+        />
+      )}
+
+      {/* Batch Restart Dialog */}
+      {batchRestartMode && (
+        <BatchRestartDialog
+          open={showBatchRestartDialog}
+          onOpenChange={setShowBatchRestartDialog}
+          mode={batchRestartMode}
+          totalTables={tableStatuses.length}
+          erroredTablesCount={erroredTables.length}
+          tables={tableStatuses}
+          onRestartStart={(tableIds) => {
+            setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))
+          }}
+          onRestartComplete={(tableIds) => {
+            setRestartingTableIds((prev) => {
+              const next = new Set(prev)
+              tableIds.forEach((id) => next.delete(id))
+              return next
+            })
+          }}
+        />
+      )}
     </>
   )
 }

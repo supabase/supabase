@@ -41,10 +41,6 @@ const RestoringState = () => {
     if (!isProjectStatusSuccess) return
     if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
       setIsCompleted(true)
-    } else {
-      if (ref) {
-        invalidateProjectDetailsQuery(ref)
-      }
     }
   }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
 
@@ -70,7 +66,6 @@ const RestoringState = () => {
 
   const onConfirm = async () => {
     if (!project) return console.error('Project is required')
-
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(ref)
   }

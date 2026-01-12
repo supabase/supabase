@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
-import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -22,7 +21,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -44,22 +42,6 @@ import { ExportDialog } from './ExportDialog'
 import { FilterPopover } from './filter/FilterPopover'
 import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
-
-// [Joshen] CSV exports require this guard as a fail-safe if the table is
-// just too large for a browser to keep all the rows in memory before
-// exporting. Either that or export as multiple CSV sheets with max n rows each
-export const MAX_EXPORT_ROW_COUNT = 500000
-export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
-  <>
-    Sorry! We're unable to support exporting row counts larger than{' '}
-    {MAX_EXPORT_ROW_COUNT.toLocaleString('en-US')} at the moment. Alternatively, you may consider
-    using{' '}
-    <Link href={`${DOCS_URL}/reference/cli/supabase-db-dump`} target="_blank">
-      pg_dump
-    </Link>{' '}
-    via our CLI instead.
-  </>
-)
 
 export type HeaderProps = {
   customHeader: ReactNode

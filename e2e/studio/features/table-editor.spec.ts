@@ -1,7 +1,7 @@
-import { expect, Locator, Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { isCLI } from '../utils/is-cli.js'
+import { env } from '../env.config.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
@@ -13,7 +13,6 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
-import { env } from '../env.config.js'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
@@ -244,14 +243,20 @@ testRunner('table editor', () => {
     await page.getByTestId('table-name-input').fill(tableNameRlsDisabled)
     await page.getByLabel('Enable Row Level Security (').click()
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // Wait for table creation
     const apiPromise = waitForApiResponse(
       page,
       'pg-meta',
       ref,
       'tables?include_columns=false&included_schemas=public'
-    ) // wait for table creation
+    )
+    // Wait for lints refresh
+    const lintsPromise = waitForApiResponse(page, 'projects', ref, 'run-lints')
+
     await page.getByRole('button', { name: 'Save' }).click()
     await apiPromise
+    await lintsPromise
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
   })

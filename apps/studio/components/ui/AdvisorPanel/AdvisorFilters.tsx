@@ -23,7 +23,6 @@ interface AdvisorFiltersProps {
   onSeverityFiltersChange: (filters: AdvisorSeverity[]) => void
   statusFilters: string[]
   onStatusFiltersChange: (filters: string[]) => void
-  hasProjectRef?: boolean
   onClose: () => void
   isPlatform?: boolean
 }
@@ -35,14 +34,13 @@ export const AdvisorFilters = ({
   onSeverityFiltersChange,
   statusFilters,
   onStatusFiltersChange,
-  hasProjectRef = true,
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
   return (
-    <div className="border-b">
-      <div className="flex items-center justify-between gap-3 px-4 h-[46px]">
-        <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full">
+    <div className="border-b overflow-x-auto">
+      <div className="flex items-center justify-between gap-x-4 h-[46px]">
+        <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full pl-4">
           <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
             <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
               All
@@ -63,7 +61,7 @@ export const AdvisorFilters = ({
             )}
           </TabsList_Shadcn_>
         </Tabs_Shadcn_>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-x-2 pr-3">
           {isPlatform && (
             <FilterPopover
               name="Status"

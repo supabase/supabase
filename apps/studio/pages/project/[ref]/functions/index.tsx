@@ -16,11 +16,11 @@ import {
   FunctionsEmptyState,
   FunctionsEmptyStateLocal,
 } from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructionsDialog } from 'components/interfaces/Functions/TerminalInstructionsDialog'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
@@ -36,6 +36,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -199,6 +200,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
           {page}
         </div>
       </EdgeFunctionsLayout>
+      <TerminalInstructionsDialog />
     </DefaultLayout>
   )
 }
