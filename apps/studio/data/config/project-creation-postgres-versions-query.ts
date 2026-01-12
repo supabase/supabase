@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectCreationPostgresVersionsVariables = {
@@ -37,25 +37,23 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     ProjectCreationPostgresVersionData,
     ProjectCreationPostgresVersionError,
     TData
   > = {}
 ) => {
-  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>(
-    configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
-    ({ signal }) =>
+  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>({
+    queryKey: configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
+    queryFn: ({ signal }) =>
       getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof organizationSlug !== 'undefined' &&
-        organizationSlug !== '_' &&
-        typeof dbRegion !== 'undefined',
-      ...options,
-    }
-  )
+    enabled:
+      enabled &&
+      typeof organizationSlug !== 'undefined' &&
+      organizationSlug !== '_' &&
+      typeof dbRegion !== 'undefined',
+    ...options,
+  })
 }
 
 export const useAvailableOrioleImageVersion = (

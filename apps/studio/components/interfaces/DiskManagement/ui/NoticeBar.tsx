@@ -1,15 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { LucideIcon } from 'lucide-react'
-import { ComponentProps } from 'react'
+import { type ComponentProps, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 import { Admonition } from 'ui-patterns'
 
 interface NoticeBarProps extends Omit<ComponentProps<typeof Admonition>, 'description'> {
   title?: string
   description?: string
-  icon?: LucideIcon
+  icon?: ReactNode
   visible: boolean
-  actions?: React.ReactNode
+  actions?: ReactNode
 }
 export function NoticeBar({ visible, description, actions, ...props }: NoticeBarProps) {
   return (
@@ -21,7 +21,7 @@ export function NoticeBar({ visible, description, actions, ...props }: NoticeBar
           exit={{ opacity: 0, height: 0, y: 4 }}
           transition={{ duration: 0.15 }}
         >
-          <Admonition {...props}>
+          <Admonition {...props} className={cn(props.className, 'mb-0')}>
             {description}
             <div className="flex flex-col gap-2">
               {actions && <div className="mt-2">{actions}</div>}

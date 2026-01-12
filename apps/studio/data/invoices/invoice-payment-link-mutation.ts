@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invoicesKeys } from './keys'
 
 export type InvoicePaymentLinkGetVariables = {
@@ -39,27 +39,29 @@ export const useInvoicePaymentLinkGetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>,
+  UseCustomMutationOptions<
+    InvoicePaymentLinkGetData,
+    ResponseError,
+    InvoicePaymentLinkGetVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>(
-    (vars) => updateInvoicePaymentLink(vars),
-    {
-      async onError(error, variables, context) {
-        // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status
-        await Promise.all([
-          queryClient.invalidateQueries(invoicesKeys.listAndCount(variables.slug)),
-        ])
+  return useMutation<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>({
+    mutationFn: (vars) => updateInvoicePaymentLink(vars),
+    async onError(error, variables, context) {
+      // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: invoicesKeys.listAndCount(variables.slug) }),
+      ])
 
-        if (onError === undefined) {
-          toast.error(error.message)
-        } else {
-          onError(error, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      if (onError === undefined) {
+        toast.error(error.message)
+      } else {
+        onError(error, variables, context)
+      }
+    },
+    ...options,
+  })
 }

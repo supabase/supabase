@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import type { ResponseError } from 'types'
-import { integrationKeys } from './keys'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { integrationKeys } from './keys'
 
 export type AwsRedirectVariables = {
   organizationSlug?: string
@@ -26,13 +26,14 @@ export type AwsRedirectError = ResponseError
 
 export const useAwsRedirectQuery = <TData = AwsRedirectData>(
   { organizationSlug }: AwsRedirectVariables,
-  { enabled = true, ...options }: UseQueryOptions<AwsRedirectData, AwsRedirectError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<AwsRedirectData, AwsRedirectError, TData> = {}
 ) =>
-  useQuery<AwsRedirectData, AwsRedirectError, TData>(
-    integrationKeys.awsRedirect(organizationSlug),
-    ({ signal }) => getAwsRedirect({ organizationSlug }, signal),
-    {
-      enabled: enabled && typeof organizationSlug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<AwsRedirectData, AwsRedirectError, TData>({
+    queryKey: integrationKeys.awsRedirect(organizationSlug),
+    queryFn: ({ signal }) => getAwsRedirect({ organizationSlug }, signal),
+    enabled: enabled && typeof organizationSlug !== 'undefined',
+    ...options,
+  })

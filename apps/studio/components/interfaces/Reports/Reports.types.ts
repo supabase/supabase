@@ -25,7 +25,8 @@ export interface ReportQuery {
     filters: ReportFilterItem[],
     where?: string,
     orderBy?: string,
-    runIndexAdvisor?: boolean
+    runIndexAdvisor?: boolean,
+    filterIndexAdvisor?: boolean
   ) => string
 }
 

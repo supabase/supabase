@@ -183,7 +183,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: `${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`,
-    buttonText: 'Enable Custom SMTP',
+    buttonText: 'Enable custom SMTP',
     metric: 'auth_email_rate_limit',
   },
   multiple_resource_warnings: {

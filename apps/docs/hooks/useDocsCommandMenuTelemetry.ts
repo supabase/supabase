@@ -4,10 +4,10 @@ import { useCallback } from 'react'
 
 import type {
   CommandMenuOpenedEvent,
-  CommandMenuCommandSelectedEvent,
+  CommandMenuCommandClickedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 export function useDocsCommandMenuTelemetry() {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -16,7 +16,7 @@ export function useDocsCommandMenuTelemetry() {
     (
       event:
         | CommandMenuOpenedEvent
-        | CommandMenuCommandSelectedEvent
+        | CommandMenuCommandClickedEvent
         | CommandMenuSearchSubmittedEvent
     ) => {
       sendTelemetryEvent(event)

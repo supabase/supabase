@@ -9,10 +9,13 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
 import type { PolicyTable } from './PolicyTableRow.types'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface PolicyTableRowHeaderProps {
   table: PolicyTable
   isLocked: boolean
+  hasApiAccess: boolean
   onSelectToggleRLS: (table: PolicyTable) => void
   onSelectCreatePolicy: (table: PolicyTable) => void
 }
@@ -20,11 +23,13 @@ interface PolicyTableRowHeaderProps {
 export const PolicyTableRowHeader = ({
   table,
   isLocked,
+  hasApiAccess,
   onSelectToggleRLS = noop,
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { can: canCreatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -41,15 +46,24 @@ export const PolicyTableRowHeader = ({
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
-      <div className="flex gap-x-4 text-left">
+      <div className="flex gap-x-4 text-left flex-wrap">
         <EditorTablePageLink
           projectRef={ref}
           id={String(table.id)}
-          className="flex items-center gap-x-3"
+          className="flex items-center gap-3 flex-wrap"
         >
           <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
           <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
-          {!table.rls_enabled && <Badge variant="warning">RLS Disabled</Badge>}
+          {!table.rls_enabled && (
+            <Badge variant="warning" className="shrink-0">
+              RLS Disabled
+            </Badge>
+          )}
+          {!hasApiAccess && (
+            <Badge variant="default" className="shrink-0">
+              API Disabled
+            </Badge>
+          )}
         </EditorTablePageLink>
         {isTableLocked && (
           <Badge>
@@ -67,6 +81,7 @@ export const PolicyTableRowHeader = ({
                 type="default"
                 disabled={!canToggleRLS}
                 onClick={() => onSelectToggleRLS(table)}
+                data-testid={`${table.name}-toggle-rls`}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -83,6 +98,7 @@ export const PolicyTableRowHeader = ({
               type="default"
               disabled={!canToggleRLS || !canCreatePolicies}
               onClick={() => onSelectCreatePolicy(table)}
+              data-testid={`${table.name}-create-policy`}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -101,9 +117,9 @@ export const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new policy',
-                  open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
               }}

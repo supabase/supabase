@@ -84,7 +84,7 @@ const InvalidSyntaxError = ({ error }: { error?: any }) => {
         Verify that your filter values are correct before applying the filters again.
       </p>
       <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
-        Error: <code className="text-xs">{error.message}</code>
+        Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
       <Button type="default" onClick={() => onApplyFilters([])}>
@@ -117,7 +117,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: any }) => {
         again.
       </p>
       <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
-        Error: <code className="text-xs">{error.message}</code>
+        Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
       <Button type="default" onClick={() => onApplySorts([])}>

@@ -1,6 +1,5 @@
-import { toast } from 'sonner'
 import { handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { toast } from 'sonner'
 
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
@@ -11,6 +10,7 @@ import { databaseKeys } from 'data/database/keys'
 import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { tryParseJson } from 'lib/helpers'
+import { ResponseError } from 'types'
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps

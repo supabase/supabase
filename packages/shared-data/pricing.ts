@@ -45,7 +45,7 @@ export type FeatureKey =
   | 'auth.socialOAuthProviders'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
-  | 'auth.auditTrails'
+  | 'auth.auditLogs'
   | 'auth.basicMFA'
   | 'auth.advancedMFAPhone'
   | 'auth.thirdPartyMAUs'
@@ -69,13 +69,14 @@ export type FeatureKey =
   | 'realtime.messagesPerMonth'
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
-  | 'dashboard.auditTrails'
+  | 'security.platformAuditLogs'
   | 'security.byoc'
   | 'security.logRetention'
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
   | 'security.hipaa'
+  | 'security.privateLink'
   | 'security.sso'
   | 'security.uptimeSla'
   | 'security.accessRoles'
@@ -289,8 +290,8 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        key: 'auth.auditTrails',
-        title: 'Audit trails',
+        key: 'auth.auditLogs',
+        title: 'Auth Audit Logs',
         plans: {
           free: '1 hour',
           pro: '7 days',
@@ -532,7 +533,7 @@ export const pricing: Pricing = {
         key: 'realtime.maxMessageSize',
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
+          free: '256 KB',
           pro: '3 MB',
           team: '3 MB',
           enterprise: 'Custom',
@@ -553,17 +554,6 @@ export const pricing: Pricing = {
           pro: 'Unlimited',
           team: 'Unlimited',
           enterprise: 'Unlimited',
-        },
-        usage_based: false,
-      },
-      {
-        key: 'dashboard.auditTrails',
-        title: 'Audit trails',
-        plans: {
-          free: false,
-          pro: false,
-          team: true,
-          enterprise: true,
         },
         usage_based: false,
       },
@@ -607,6 +597,17 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        key: 'security.platformAuditLogs',
+        title: 'Platform Audit Logs',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         key: 'security.metricsEndpoint',
         title: 'Metrics endpoint',
         plans: {
@@ -636,6 +637,17 @@ export const pricing: Pricing = {
           pro: false,
           team: 'Available as paid add-on',
           enterprise: 'Available as paid add-on',
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.privateLink',
+        title: 'AWS PrivateLink',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
         },
         usage_based: false,
       },

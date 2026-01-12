@@ -2,12 +2,13 @@ import { useRouter } from 'next/router'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useAuth } from 'common'
 import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useAuth, useSignOut } from 'lib/auth'
+import { useSignOut } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { NextPageWithLayout, isNextPageWithLayout } from 'types'
+import { isNextPageWithLayout, type NextPageWithLayout } from 'types'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
 
@@ -38,21 +39,30 @@ export function withAuth<T>(
     const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
     const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
 
-    const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
-      onError(error) {
-        toast.error(
-          `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
-        )
-      },
-    })
+    const {
+      isPending: isAALLoading,
+      data: aalData,
+      isError: isErrorAAL,
+      error: errorAAL,
+    } = useAuthenticatorAssuranceLevelQuery()
 
-    usePermissionsQuery({
-      onError(error: any) {
+    useEffect(() => {
+      if (isErrorAAL) {
         toast.error(
-          `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+          `Failed to fetch authenticator assurance level: ${errorAAL?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
-      },
-    })
+      }
+    }, [isErrorAAL, errorAAL])
+
+    const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery()
+
+    useEffect(() => {
+      if (isErrorPermissions) {
+        toast.error(
+          `Failed to fetch permissions: ${errorPermissions?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+        )
+      }
+    }, [isErrorPermissions, errorPermissions])
 
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading

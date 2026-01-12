@@ -1,9 +1,11 @@
 import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
@@ -13,6 +15,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -32,15 +35,16 @@ import {
   Separator,
 } from 'ui'
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
-import { TerminalInstructions } from './TerminalInstructions'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
+  const [, setCreateMethod] = useQueryState('create', parseAsString)
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
@@ -56,7 +60,7 @@ export const FunctionsEmptyState = () => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Create your first edge function</CardTitle>
+          <CardTitle>Deploy your first edge function</CardTitle>
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
@@ -95,9 +99,9 @@ export const FunctionsEmptyState = () => {
             <Button
               type="default"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new edge function',
-                  open: true,
                   initialInput: 'Create a new edge function that ...',
                   suggestions: {
                     title:
@@ -142,27 +146,19 @@ export const FunctionsEmptyState = () => {
               version control.
             </p>
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  type="default"
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_via_cli_button_clicked',
-                      properties: { origin: 'no_functions_block' },
-                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                    })
-                  }
-                >
-                  View CLI Instructions
-                </Button>
-              </DialogTrigger>
-              <DialogContent size="large">
-                <DialogSection padding="small">
-                  <TerminalInstructions />
-                </DialogSection>
-              </DialogContent>
-            </Dialog>
+            <Button
+              type="default"
+              onClick={() => {
+                setCreateMethod('cli')
+                sendEvent({
+                  action: 'edge_function_via_cli_button_clicked',
+                  properties: { origin: 'no_functions_block' },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
+            >
+              View CLI Instructions
+            </Button>
           </div>
         </CardContent>
       </Card>

@@ -5,7 +5,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type {
   CommandMenuOpenedEvent,
-  CommandMenuCommandSelectedEvent,
+  CommandMenuCommandClickedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
 
@@ -18,7 +18,7 @@ export function useStudioCommandMenuTelemetry() {
     (
       event:
         | CommandMenuOpenedEvent
-        | CommandMenuCommandSelectedEvent
+        | CommandMenuCommandClickedEvent
         | CommandMenuSearchSubmittedEvent
     ) => {
       // Add studio-specific groups (project and organization)

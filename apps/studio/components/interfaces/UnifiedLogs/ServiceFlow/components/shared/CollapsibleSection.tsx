@@ -23,7 +23,7 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean
 }
 
-const CollapsibleSection = ({
+export const CollapsibleSection = ({
   title,
   fields,
   data,
@@ -67,5 +67,3 @@ const CollapsibleSection = ({
     </div>
   )
 }
-
-export { CollapsibleSection }
