@@ -212,7 +212,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     return (
       <TableContainer sort={sort} onSortChange={handleSortChange}>
         <TableRow>
-          <TableCell colSpan={5} className="py-12">
+          <TableCell colSpan={4} className="py-12">
             <p className="text-sm text-center text-foreground">No access tokens found</p>
             <p className="text-sm text-center text-foreground-light">
               You do not have any tokens created yet
