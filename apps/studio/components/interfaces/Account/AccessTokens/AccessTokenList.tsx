@@ -237,13 +237,15 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   {x.token_alias}
                 </p>
               </TableCell>
-              <TableCell className="min-w-28">
-                <p className="text-foreground-light">
+              <TableCell className="text-foreground-light min-w-28">
+                {x.last_used_at ? (
                   <TimestampInfo
-                    utcTimestamp={x.last_used_at ?? ''}
-                    label={x.last_used_at ? dayjs(x.last_used_at).fromNow() : 'Never used'}
+                    utcTimestamp={x.last_used_at}
+                    label={dayjs(x.last_used_at).fromNow()}
                   />
-                </p>
+                ) : (
+                  'Never used'
+                )}
               </TableCell>
               <TableCell className="min-w-28 text-foreground-light">
                 {x.expires_at ? (
