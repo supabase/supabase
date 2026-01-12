@@ -41,11 +41,11 @@ export const useRolesFilter = () => {
   const roleGroups = useMemo((): RoleGroup[] => {
     return [
       {
-        name: 'App Access',
+        name: 'User Access',
         options: roles.filter((r) => appAccessRolesSet.has(r.name)).map((r) => r.name),
       },
       {
-        name: 'Supabase System',
+        name: 'System and Services',
         options: roles.filter((r) => supabaseSystemRolesSet.has(r.name)).map((r) => r.name),
       },
       {
@@ -55,7 +55,7 @@ export const useRolesFilter = () => {
           .map((r) => r.name),
       },
     ]
-  }, [roles])
+  }, [appAccessRolesSet, roles, supabaseSystemRolesSet])
 
   return {
     roles,

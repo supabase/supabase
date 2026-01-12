@@ -27,7 +27,7 @@ export const RolesFilterDropdown = ({
       valueKey="name"
       activeOptions={isLoadingRoles ? [] : activeOptions}
       onSaveFilters={onSaveFilters}
-      className={className || 'w-56'}
+      className={className || 'w-64'}
       groups={roleGroups}
       renderLabel={renderLabel}
     />
