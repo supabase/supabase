@@ -178,9 +178,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
             </SheetHeader>
 
-            <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
+            <SheetSection className="h-full overflow-auto flex flex-col">
               {isOptedIntoProjectLevelPermissions && (
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-4 border-b border-border py-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
                     checked={isApplyingRoleToAllProjects}
