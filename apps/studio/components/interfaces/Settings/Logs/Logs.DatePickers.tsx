@@ -8,7 +8,7 @@ import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import {
   Button,
   ButtonProps,
@@ -237,13 +237,16 @@ export const LogsDatePicker = ({
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false
     if (!helper.availableIn?.length) return false
+    if (!entitledToAuditLogDays) return false
 
-    if (helper.availableIn.includes('free')) return false
-    if (helper.availableIn.includes(orgPlan?.id || 'free') && !isOrgPlanLoading) return false
+    const day = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
+    if (day <= entitledToAuditLogDays) return false
     return true
   }
 
@@ -286,15 +289,7 @@ export const LogsDatePicker = ({
                 aria-disabled={helper.disabled}
               ></RadioGroupItem>
               {helper.text}
-              {showHelperBadge(helper) ? (
-                <Badge
-                  size="small"
-                  variant="outline"
-                  className="h-5 text-[10px] text-foreground-light capitalize"
-                >
-                  {helper.availableIn?.[0] || ''}
-                </Badge>
-              ) : null}
+              {showHelperBadge(helper) ? <Badge>{helper.availableIn?.[0] || ''}</Badge> : null}
             </Label>
           ))}
         </RadioGroup>

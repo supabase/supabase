@@ -1,13 +1,18 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
+import {
+  NumericFilter,
+  ReportsNumericFilter,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
@@ -19,12 +24,21 @@ export const QueryPerformanceFilterBar = ({
 }) => {
   const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [{ search: searchQuery, roles: defaultFilterRoles }, setSearchParams] = useQueryStates({
+  const [
+    { search: searchQuery, roles: defaultFilterRoles, callsFilter, indexAdvisor },
+    setSearchParams,
+  ] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault({
+      operator: '>=',
+      value: 0,
+    } as NumericFilter),
+    indexAdvisor: parseAsString.withDefault('false'),
   })
-  const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+  const { data, isPending: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -35,6 +49,7 @@ export const QueryPerformanceFilterBar = ({
   })
   const [inputValue, setInputValue] = useState(searchQuery)
   const debouncedInputValue = useDebounce(inputValue, 500)
+  // const debouncedMinCalls = useDebounce(minCallsInput, 300)
   const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const onSearchQueryChange = (value: string) => {
@@ -46,10 +61,16 @@ export const QueryPerformanceFilterBar = ({
     setSearchParams({ roles })
   }
 
+  const onIndexAdvisorChange = (options: string[]) => {
+    setSearchParams({ indexAdvisor: options.includes('true') ? 'true' : 'false' })
+  }
+
   useEffect(() => {
     onSearchQueryChange(searchValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue])
+
+  const indexAdvisorOptions = [{ value: 'true', label: 'Index Advisor' }]
 
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
@@ -58,7 +79,7 @@ export const QueryPerformanceFilterBar = ({
           <Input
             size="tiny"
             autoComplete="off"
-            icon={<Search size={12} />}
+            icon={<Search />}
             value={inputValue}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             name="keyword"
@@ -78,6 +99,17 @@ export const QueryPerformanceFilterBar = ({
             ]}
           />
 
+          <ReportsNumericFilter
+            label="Calls"
+            value={callsFilter}
+            onChange={(value) => setSearchParams({ callsFilter: value })}
+            operators={['=', '>=', '<=', '>', '<', '!=']}
+            defaultOperator=">="
+            placeholder="e.g. 100"
+            min={0}
+            className="w-auto"
+          />
+
           {showRolesFilter && (
             <FilterPopover
               name="Roles"
@@ -86,6 +118,18 @@ export const QueryPerformanceFilterBar = ({
               valueKey="name"
               activeOptions={isLoadingRoles ? [] : filters.roles}
               onSaveFilters={onFilterRolesChange}
+              className="w-56"
+            />
+          )}
+
+          {isIndexAdvisorEnabled && (
+            <FilterPopover
+              name="Warnings"
+              options={indexAdvisorOptions}
+              labelKey="label"
+              valueKey="value"
+              activeOptions={indexAdvisor === 'true' ? ['true'] : []}
+              onSaveFilters={onIndexAdvisorChange}
               className="w-56"
             />
           )}

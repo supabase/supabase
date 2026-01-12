@@ -8,13 +8,12 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
 
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: FDW
+  wrapper: { name: string }
   wrapperMeta: WrapperMeta
 }
 

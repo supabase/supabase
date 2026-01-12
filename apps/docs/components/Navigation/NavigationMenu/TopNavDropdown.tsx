@@ -20,18 +20,25 @@ import {
   themes,
 } from 'ui'
 import MenuIconPicker from './MenuIconPicker'
+import { isFeatureEnabled } from 'common'
 
 const menu = [
   [
-    {
-      label: 'Supabase.com',
-      icon: 'home',
-      href: 'https://supabase.com',
-      otherProps: {
-        target: '_blank',
-        rel: 'noreferrer noopener',
-      },
-    },
+    isFeatureEnabled('docs:navigation_dropdown_links_home')
+      ? {
+          label: 'Supabase.com',
+          icon: 'home',
+          href: 'https://supabase.com',
+          otherProps: {
+            target: '_blank',
+            rel: 'noreferrer noopener',
+          },
+        }
+      : {
+          label: 'Dashboard',
+          icon: 'home',
+          href: '../dashboard',
+        },
     {
       label: 'GitHub',
       icon: 'github',

@@ -1,10 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import type { SupaTable } from 'components/grid/types'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { describe, expect, it } from 'vitest'
 import { formatTableRowsToSQL } from './TableEntity.utils'
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
   it('should format rows into a single SQL INSERT statement', () => {
-    const table = {
+    const table: SupaTable = {
       id: 1,
+      type: ENTITY_TYPE.TABLE,
       columns: [
         { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
         { name: 'name', dataType: 'text', format: 'text', position: 1 },
@@ -26,8 +29,9 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
   })
 
   it('should not stringify null values', () => {
-    const table = {
+    const table: SupaTable = {
       id: 1,
+      type: ENTITY_TYPE.TABLE,
       columns: [
         { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
         { name: 'name', dataType: 'text', format: 'text', position: 1 },
@@ -49,8 +53,9 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
   })
 
   it('should handle PG JSON and array columns', () => {
-    const table = {
+    const table: SupaTable = {
       id: 1,
+      type: ENTITY_TYPE.TABLE,
       columns: [
         { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
         { name: 'name', dataType: 'text', format: 'text', position: 1 },
@@ -79,13 +84,14 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
       },
     ]
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES ('2', 'Person 1', '{"tag-a","tag-c"}', '{"version": 1}'), ('3', 'ONeil', '{"tag-a"}', '{"version": 1, "name": "O''Neil"}');`
+    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES ('2', 'Person 1', ARRAY["tag-a","tag-c"], '{"version": 1}'), ('3', 'ONeil', ARRAY["tag-a"], '{"version": 1, "name": "O''Neil"}');`
     expect(result).toBe(expected)
   })
 
   it('should return an empty string for empty rows', () => {
-    const table = {
+    const table: SupaTable = {
       id: 1,
+      type: ENTITY_TYPE.TABLE,
       columns: [
         { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
         { name: 'name', dataType: 'text', format: 'text', position: 1 },
@@ -100,8 +106,9 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
   })
 
   it('should remove the idx property', () => {
-    const table = {
+    const table: SupaTable = {
       id: 1,
+      type: ENTITY_TYPE.TABLE,
       columns: [
         { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
         { name: 'name', dataType: 'text', format: 'text', position: 1 },

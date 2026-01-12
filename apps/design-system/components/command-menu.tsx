@@ -1,6 +1,6 @@
 'use client'
 
-import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { CircleIcon, LaptopIcon, MoonIcon, SunIcon, Search } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -17,6 +17,7 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   DialogProps,
+  DialogTitle,
 } from 'ui'
 
 export function CommandMenu({ ...props }: DialogProps) {
@@ -55,8 +56,7 @@ export function CommandMenu({ ...props }: DialogProps) {
       <Button
         type="outline"
         className={cn(
-          `relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:w-40 lg:w-64
-            hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
+          `lg:flex hidden relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:w-40 lg:w-64 hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
           `
         )}
         onClick={() => setOpen(true)}
@@ -68,26 +68,18 @@ export function CommandMenu({ ...props }: DialogProps) {
           <span className="text-sm">⌘</span>K
         </kbd>
       </Button>
+      <Button
+        type="text"
+        size="tiny"
+        className="px-1 group lg:hidden"
+        onClick={() => setOpen(true)}
+        icon={<Search size={16} />}
+      />
       <CommandDialog open={open} onOpenChange={setOpen}>
+        <DialogTitle className="sr-only">Search Design System...</DialogTitle>
         <CommandInput_Shadcn_ placeholder="Type a command or search..." />
         <CommandList_Shadcn_>
           <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-          {/* <CommandGroup_Shadcn_ heading="Links">
-            {docsConfig.mainNav
-              .filter((navitem) => !navitem.external)
-              .map((navItem) => (
-                <CommandItem_Shadcn_
-                  key={navItem.href}
-                  value={navItem.title}
-                  onSelect={() => {
-                    runCommand(() => router.push(navItem.href as string))
-                  }}
-                >
-                  <FileIcon className="mr-2 h-4 w-4" strokeWidth={1} />
-                  {navItem.title}
-                </CommandItem_Shadcn_>
-              ))}
-          </CommandGroup_Shadcn_> */}
           {docsConfig.sidebarNav.map((group) => (
             <CommandGroup_Shadcn_ key={group.title} heading={group.title}>
               {group.items.map((navItem) => (

@@ -67,7 +67,7 @@ export const NewAccessTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: ExpiresAtOptions['month'].value },
     mode: 'onChange',
   })
-  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
+  const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     // Use custom date if custom option is selected
@@ -139,7 +139,7 @@ export const NewAccessTokenDialog = ({
         {tokenScope === 'V0' ? (
           <Admonition
             type="warning"
-            className="rounded-none border-t-0 border-x-0 mb-0"
+            className="rounded-none border-t-0 border-x-0"
             title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
             description={
               <>
@@ -160,7 +160,7 @@ export const NewAccessTokenDialog = ({
         ) : (
           <Admonition
             type="warning"
-            className="rounded-none border-t-0 border-x-0 mb-0"
+            className="rounded-none border-t-0 border-x-0"
             title="Access tokens can be used to control your whole account"
             description="Be careful when sharing your tokens"
           />
@@ -240,7 +240,7 @@ export const NewAccessTokenDialog = ({
         <DialogFooter>
           <Button
             type="default"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => {
               form.reset()
               setCustomExpiryDate(undefined)
@@ -250,7 +250,7 @@ export const NewAccessTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isLoading}>
+          <Button form={formId} htmlType="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

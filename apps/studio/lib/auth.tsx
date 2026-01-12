@@ -6,6 +6,7 @@ import {
   AuthProvider as AuthProviderInternal,
   clearLocalStorage,
   gotrueClient,
+  posthogClient,
   useAuthError,
 } from 'common'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -45,10 +46,11 @@ export function useSignOut() {
 
   return useCallback(async () => {
     const result = await gotrueClient.signOut()
+    posthogClient.reset()
     clearLocalStorage()
     // Clear Assistant IndexedDB
     await clearAssistantStorage()
-    await queryClient.clear()
+    queryClient.clear()
 
     return result
   }, [queryClient, clearAssistantStorage])

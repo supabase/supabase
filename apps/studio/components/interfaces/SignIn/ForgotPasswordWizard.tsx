@@ -120,7 +120,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
     defaultValues: { email: '' },
   })
 
-  const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
+  const { mutate: resetPassword, isPending } = useResetPasswordMutation({
     onSuccess: () => {
       onSuccess(forgotPasswordForm.getValues('email'))
     },
@@ -166,7 +166,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
                   {...field}
                   type="email"
                   placeholder="you@example.com"
-                  disabled={isLoading}
+                  disabled={isPending}
                   autoComplete="email"
                 />
               </FormControl_Shadcn_>
@@ -195,8 +195,8 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
           form="forgot-password-form"
           htmlType="submit"
           size="medium"
-          disabled={isLoading}
-          loading={isLoading}
+          disabled={isPending}
+          loading={isPending}
         >
           Send reset code
         </Button>

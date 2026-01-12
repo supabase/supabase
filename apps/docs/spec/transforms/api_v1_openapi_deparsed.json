@@ -62,7 +62,7 @@
     },
     {
       "name": "Storage",
-      "description": "Storage related endpoints"
+      "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
     }
   ],
   "paths": {
@@ -182,6 +182,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "patch": {
@@ -324,6 +325,30 @@
                     "notify_url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "deletion_scheduled_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "preview_project_status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": [
@@ -359,10 +384,11 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
-        "description": "Deletes the specified database branch",
+        "description": "Deletes the specified database branch. By default, deletes immediately. Use force=false to schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
         "operationId": "v1-delete-a-branch",
         "parameters": [
           {
@@ -385,6 +411,16 @@
                   "deprecated": true
                 }
               ]
+            }
+          },
+          {
+            "name": "force",
+            "required": false,
+            "in": "query",
+            "description": "If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
+            "schema": {
+              "default": "true",
+              "type": "boolean"
             }
           }
         ],
@@ -423,6 +459,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -507,6 +544,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -591,6 +629,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -675,6 +714,74 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
+        "x-oauth-scope": "environment:write"
+      }
+    },
+    "/v1/branches/{branch_id_or_ref}/restore": {
+      "post": {
+        "description": "Cancels scheduled deletion and restores the branch to active state",
+        "operationId": "v1-restore-a-branch",
+        "parameters": [
+          {
+            "name": "branch_id_or_ref",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 20,
+                  "maxLength": 20,
+                  "pattern": "^[a-z]+$",
+                  "description": "Project ref"
+                },
+                {
+                  "type": "string",
+                  "format": "uuid",
+                  "deprecated": true
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "enum": ["Branch restoration initiated"]
+                    }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to restore database branch"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore a scheduled branch deletion",
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -742,12 +849,13 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.",
+        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -762,11 +870,25 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "description": "Id of your project"
+                        "deprecated": true,
+                        "description": "Deprecated: Use `ref` instead."
+                      },
+                      "ref": {
+                        "type": "string",
+                        "minLength": 20,
+                        "maxLength": 20,
+                        "pattern": "^[a-z]+$",
+                        "description": "Project ref"
                       },
                       "organization_id": {
                         "type": "string",
-                        "description": "Slug of your organization"
+                        "description": "Deprecated: Use `organization_slug` instead.",
+                        "deprecated": true
+                      },
+                      "organization_slug": {
+                        "type": "string",
+                        "pattern": "^[\\w-]+$",
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string",
@@ -827,7 +949,9 @@
                     },
                     "required": [
                       "id",
+                      "ref",
                       "organization_id",
+                      "organization_slug",
                       "name",
                       "region",
                       "created_at",
@@ -843,6 +967,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["projects_read"]
           }
         ],
         "summary": "List all projects",
@@ -853,6 +980,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -876,7 +1004,13 @@
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Slug of your organization"
+                    "description": "Deprecated: Use `organization_slug` instead.",
+                    "deprecated": true
+                  },
+                  "organization_slug": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$",
+                    "description": "Organization slug"
                   },
                   "plan": {
                     "type": "string",
@@ -1018,7 +1152,7 @@
                     "deprecated": true
                   }
                 },
-                "required": ["db_pass", "name", "organization_id"],
+                "required": ["db_pass", "name", "organization_slug"],
                 "additionalProperties": false,
                 "hideDefinitions": ["release_channel", "postgres_engine"]
               }
@@ -1035,11 +1169,25 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
-                      "description": "Slug of your organization"
+                      "description": "Deprecated: Use `organization_slug` instead.",
+                      "deprecated": true
+                    },
+                    "organization_slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -1076,7 +1224,16 @@
                       ]
                     }
                   },
-                  "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                  "required": [
+                    "id",
+                    "ref",
+                    "organization_id",
+                    "organization_slug",
+                    "name",
+                    "region",
+                    "created_at",
+                    "status"
+                  ]
                 }
               }
             }
@@ -1085,6 +1242,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_projects_create"]
           }
         ],
         "summary": "Create a project",
@@ -1095,6 +1255,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1279,7 +1440,15 @@
           }
         ],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: organizations:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations": {
@@ -1298,13 +1467,20 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Deprecated: Use `slug` instead.",
+                        "deprecated": true
+                      },
+                      "slug": {
+                        "type": "string",
+                        "pattern": "^[\\w-]+$",
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"]
+                    "required": ["id", "slug", "name"]
                   }
                 }
               }
@@ -1317,6 +1493,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organizations_read"]
           }
         ],
         "summary": "List all organizations",
@@ -1327,6 +1506,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       },
       "post": {
@@ -1340,7 +1520,8 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                   }
                 },
                 "required": ["name"],
@@ -1358,13 +1539,20 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Deprecated: Use `slug` instead.",
+                      "deprecated": true
+                    },
+                    "slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"]
+                  "required": ["id", "slug", "name"]
                 }
               }
             }
@@ -1376,10 +1564,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organizations_create"]
           }
         ],
         "summary": "Create an organization",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-endpoint-owners": ["management-api", "billing"]
       }
     },
     "/v1/oauth/authorize": {
@@ -1485,7 +1677,8 @@
           }
         ],
         "summary": "[Beta] Authorize user through oauth",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/token": {
@@ -1571,7 +1764,8 @@
           }
         ],
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/revoke": {
@@ -1613,7 +1807,8 @@
           }
         ],
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -1701,10 +1896,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Authorize user through oauth and claim a project",
-        "tags": ["OAuth"]
+        "tags": ["OAuth"],
+        "x-endpoint-owners": ["management-api"]
       }
     },
     "/v1/snippets": {
@@ -1868,6 +2067,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["snippets_read"]
           }
         ],
         "summary": "Lists SQL snippets for the logged in user",
@@ -1878,6 +2080,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2009,6 +2212,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["snippets_read"]
           }
         ],
         "summary": "Gets a specific SQL snippet",
@@ -2019,6 +2225,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2171,6 +2378,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "head": {
@@ -2370,6 +2578,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -2540,6 +2749,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -2607,6 +2817,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -2709,6 +2920,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Get project api keys",
@@ -2719,6 +2933,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -2848,6 +3063,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Creates a new API key for the project",
@@ -2858,6 +3076,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -2908,6 +3127,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -2918,6 +3140,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -2975,6 +3198,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -2985,6 +3211,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -3120,6 +3347,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Updates an API key for the project",
@@ -3130,6 +3360,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -3236,6 +3467,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Get API key",
@@ -3246,6 +3480,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -3369,6 +3604,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Deletes an API key for the project",
@@ -3379,6 +3617,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -3470,6 +3709,30 @@
                       "notify_url": {
                         "type": "string",
                         "format": "uri"
+                      },
+                      "deletion_scheduled_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "preview_project_status": {
+                        "type": "string",
+                        "enum": [
+                          "INACTIVE",
+                          "ACTIVE_HEALTHY",
+                          "ACTIVE_UNHEALTHY",
+                          "COMING_UP",
+                          "UNKNOWN",
+                          "GOING_DOWN",
+                          "INIT_FAILED",
+                          "REMOVED",
+                          "RESTORING",
+                          "UPGRADING",
+                          "PAUSING",
+                          "RESTORE_FAILED",
+                          "RESTARTING",
+                          "PAUSE_FAILED",
+                          "RESIZING"
+                        ]
                       }
                     },
                     "required": [
@@ -3515,6 +3778,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "post": {
@@ -3680,6 +3944,30 @@
                     "notify_url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "deletion_scheduled_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "preview_project_status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": [
@@ -3724,6 +4012,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -3773,6 +4062,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -3870,6 +4160,30 @@
                     "notify_url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "deletion_scheduled_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "preview_project_status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": [
@@ -3914,6 +4228,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -4090,6 +4405,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -4138,6 +4454,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4331,6 +4648,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4507,6 +4825,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4683,6 +5002,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4739,6 +5059,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_read"]
           }
         ],
         "summary": "[Beta] Gets project's network bans",
@@ -4749,6 +5072,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -4817,6 +5141,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_read"]
           }
         ],
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
@@ -4827,6 +5154,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -4895,6 +5223,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_write"]
           }
         ],
         "summary": "[Beta] Remove network bans.",
@@ -4905,6 +5236,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5017,6 +5349,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:read"
       },
       "patch": {
@@ -5181,6 +5514,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5317,6 +5651,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5380,6 +5715,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -5457,6 +5793,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -5534,6 +5871,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -5634,6 +5972,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "rest:write"
       }
     },
@@ -5664,11 +6003,25 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
-                      "description": "Slug of your organization"
+                      "description": "Deprecated: Use `organization_slug` instead.",
+                      "deprecated": true
+                    },
+                    "organization_slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -5729,7 +6082,9 @@
                   },
                   "required": [
                     "id",
+                    "ref",
                     "organization_id",
+                    "organization_slug",
                     "name",
                     "region",
                     "created_at",
@@ -5756,6 +6111,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets a specific project that belongs to the authenticated user",
@@ -5766,6 +6124,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       },
       "delete": {
@@ -5820,6 +6179,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Deletes the given project",
@@ -5830,6 +6192,96 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
+        "x-oauth-scope": "projects:write"
+      },
+      "patch": {
+        "operationId": "v1-update-a-project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ref": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "ref", "name"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update project"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
+          }
+        ],
+        "summary": "Updates the given project",
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5903,6 +6355,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -5979,6 +6432,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:write"
       },
       "delete": {
@@ -6041,6 +6495,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -6113,6 +6568,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -6205,6 +6661,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -6278,6 +6735,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -6346,6 +6804,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -6394,6 +6853,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -6473,6 +6933,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -6552,6 +7013,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -6625,6 +7087,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write", "database_write"]
           }
         ],
         "summary": "[Beta] Upgrades the project's Postgres version",
@@ -6635,6 +7100,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -6709,18 +7175,166 @@
                       "type": "array",
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "deprecated": true,
+                      "description": "Use validation_errors instead."
                     },
                     "unsupported_extensions": {
                       "type": "array",
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "deprecated": true,
+                      "description": "Use validation_errors instead."
                     },
                     "user_defined_objects_in_internal_schemas": {
                       "type": "array",
                       "items": {
                         "type": "string"
+                      },
+                      "deprecated": true,
+                      "description": "Use validation_errors instead."
+                    },
+                    "validation_errors": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["objects_depending_on_pg_cron"]
+                              },
+                              "dependents": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": ["type", "dependents"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["indexes_referencing_ll_to_earth"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "table_name": {
+                                "type": "string"
+                              },
+                              "index_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "schema_name", "table_name", "index_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["function_using_obsolete_lang"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "function_name": {
+                                "type": "string"
+                              },
+                              "lang_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "schema_name", "function_name", "lang_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["unsupported_extension"]
+                              },
+                              "extension_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "extension_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["unsupported_fdw_handler"]
+                              },
+                              "fdw_name": {
+                                "type": "string"
+                              },
+                              "fdw_handler_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "fdw_name", "fdw_handler_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["unlogged_table_with_persistent_sequence"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "table_name": {
+                                "type": "string"
+                              },
+                              "sequence_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "schema_name", "table_name", "sequence_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["user_defined_objects_in_internal_schemas"]
+                              },
+                              "obj_type": {
+                                "type": "string",
+                                "enum": ["table", "function"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "obj_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "obj_type", "schema_name", "obj_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["active_replication_slot"]
+                              },
+                              "slot_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "slot_name"]
+                          }
+                        ]
                       }
                     }
                   },
@@ -6734,7 +7348,8 @@
                     "legacy_auth_custom_roles",
                     "objects_to_be_dropped",
                     "unsupported_extensions",
-                    "user_defined_objects_in_internal_schemas"
+                    "user_defined_objects_in_internal_schemas",
+                    "validation_errors"
                   ]
                 }
               }
@@ -6756,6 +7371,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read", "database_read"]
           }
         ],
         "summary": "[Beta] Returns the project's eligibility for upgrades",
@@ -6766,6 +7384,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -6873,6 +7492,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read", "database_read"]
           }
         ],
         "summary": "[Beta] Gets the latest status of the project's upgrade",
@@ -6883,6 +7505,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -6942,6 +7565,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_readonly_config_read"]
           }
         ],
         "summary": "Returns project's readonly mode status",
@@ -6952,6 +7578,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -6992,6 +7619,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_readonly_config_write"]
           }
         ],
         "summary": "Disables project's readonly mode for the next 15 minutes",
@@ -7002,6 +7632,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -7080,10 +7711,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_read_replicas_write"]
           }
         ],
         "summary": "[Beta] Set up a read replica",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["management-api", "infra"]
       }
     },
     "/v1/projects/{ref}/read-replicas/remove": {
@@ -7139,10 +7774,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_read_replicas_write"]
           }
         ],
         "summary": "[Beta] Remove a read replica",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["management-api", "infra"]
       }
     },
     "/v1/projects/{ref}/health": {
@@ -7217,7 +7856,9 @@
                         ]
                       },
                       "healthy": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "deprecated": true,
+                        "description": "Deprecated. Use `status` instead."
                       },
                       "status": {
                         "type": "string",
@@ -7245,7 +7886,9 @@
                             "type": "object",
                             "properties": {
                               "healthy": {
-                                "type": "boolean"
+                                "type": "boolean",
+                                "deprecated": true,
+                                "description": "Deprecated. Use `status` instead."
                               },
                               "db_connected": {
                                 "type": "boolean"
@@ -7303,6 +7946,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -7384,6 +8028,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -7463,6 +8108,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -7769,6 +8415,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -7858,6 +8505,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -7941,7 +8589,8 @@
           }
         ],
         "summary": "Get information about a signing key",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-endpoint-owners": ["auth"]
       },
       "delete": {
         "operationId": "v1-remove-project-signing-key",
@@ -8029,6 +8678,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "patch": {
@@ -8135,6 +8785,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -8193,12 +8844,46 @@
                           "properties": {
                             "enabled": {
                               "type": "boolean"
+                            },
+                            "maxNamespaces": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "maxTables": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "maxCatalogs": {
+                              "type": "integer",
+                              "minimum": 0
                             }
                           },
-                          "required": ["enabled"]
+                          "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+                        },
+                        "vectorBuckets": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "maxBuckets": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "maxIndexes": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": ["enabled", "maxBuckets", "maxIndexes"]
                         }
                       },
-                      "required": ["imageTransformation", "s3Protocol"]
+                      "required": [
+                        "imageTransformation",
+                        "s3Protocol",
+                        "icebergCatalog",
+                        "vectorBuckets"
+                      ]
                     },
                     "capabilities": {
                       "type": "object",
@@ -8221,9 +8906,22 @@
                         }
                       },
                       "required": ["upstreamTarget"]
+                    },
+                    "migrationVersion": {
+                      "type": "string"
+                    },
+                    "databasePoolMode": {
+                      "type": "string"
                     }
                   },
-                  "required": ["fileSizeLimit", "features", "capabilities", "external"]
+                  "required": [
+                    "fileSizeLimit",
+                    "features",
+                    "capabilities",
+                    "external",
+                    "migrationVersion",
+                    "databasePoolMode"
+                  ]
                 }
               }
             }
@@ -8247,7 +8945,8 @@
           }
         ],
         "summary": "Gets project's storage config",
-        "tags": ["Storage"]
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["storage"]
       },
       "patch": {
         "operationId": "v1-update-storage-config",
@@ -8304,12 +9003,40 @@
                         "properties": {
                           "enabled": {
                             "type": "boolean"
+                          },
+                          "maxNamespaces": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maxTables": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maxCatalogs": {
+                            "type": "integer",
+                            "minimum": 0
                           }
                         },
-                        "required": ["enabled"]
+                        "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+                      },
+                      "vectorBuckets": {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "maxBuckets": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maxIndexes": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": ["enabled", "maxBuckets", "maxIndexes"]
                       }
-                    },
-                    "required": ["imageTransformation", "s3Protocol"]
+                    }
                   },
                   "external": {
                     "type": "object",
@@ -8350,7 +9077,8 @@
           }
         ],
         "summary": "Updates project's storage config",
-        "tags": ["Storage"]
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["storage"]
       }
     },
     "/v1/projects/{ref}/config/database/postgres": {
@@ -8446,7 +9174,9 @@
                       "type": "string"
                     },
                     "statement_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "track_commit_timestamp": {
                       "type": "boolean"
@@ -8455,15 +9185,17 @@
                       "type": "string"
                     },
                     "wal_sender_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "work_mem": {
                       "type": "string"
                     },
                     "checkpoint_timeout": {
-                      "type": "integer",
-                      "minimum": 30,
-                      "maximum": 86400
+                      "type": "string",
+                      "description": "Default unit: s",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "hot_standby_feedback": {
                       "type": "boolean"
@@ -8499,6 +9231,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -8592,7 +9325,9 @@
                     "type": "string"
                   },
                   "statement_timeout": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "track_commit_timestamp": {
                     "type": "boolean"
@@ -8601,15 +9336,17 @@
                     "type": "string"
                   },
                   "wal_sender_timeout": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "work_mem": {
                     "type": "string"
                   },
                   "checkpoint_timeout": {
-                    "type": "integer",
-                    "minimum": 30,
-                    "maximum": 86400
+                    "type": "string",
+                    "description": "Default unit: s",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "hot_standby_feedback": {
                     "type": "boolean"
@@ -8699,7 +9436,9 @@
                       "type": "string"
                     },
                     "statement_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "track_commit_timestamp": {
                       "type": "boolean"
@@ -8708,15 +9447,17 @@
                       "type": "string"
                     },
                     "wal_sender_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "work_mem": {
                       "type": "string"
                     },
                     "checkpoint_timeout": {
-                      "type": "integer",
-                      "minimum": 30,
-                      "maximum": 86400
+                      "type": "string",
+                      "description": "Default unit: s",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "hot_standby_feedback": {
                       "type": "boolean"
@@ -8752,6 +9493,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -8834,6 +9576,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -8951,6 +9694,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "patch": {
@@ -9039,6 +9783,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -9073,6 +9818,11 @@
                     },
                     "db_max_pool_size": {
                       "type": "integer",
+                      "nullable": true
+                    },
+                    "db_max_pool_size_unit": {
+                      "type": "string",
+                      "enum": ["connections", "percent"],
                       "nullable": true
                     },
                     "disable_signup": {
@@ -9400,6 +10150,22 @@
                       "nullable": true
                     },
                     "external_twitter_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_x_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_x_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_x_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_x_secret": {
                       "type": "string",
                       "nullable": true
                     },
@@ -9966,6 +10732,7 @@
                   "required": [
                     "api_max_request_duration",
                     "db_max_pool_size",
+                    "db_max_pool_size_unit",
                     "disable_signup",
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
@@ -10048,6 +10815,10 @@
                     "external_twitter_email_optional",
                     "external_twitter_enabled",
                     "external_twitter_secret",
+                    "external_x_client_id",
+                    "external_x_email_optional",
+                    "external_x_enabled",
+                    "external_x_secret",
                     "external_workos_client_id",
                     "external_workos_enabled",
                     "external_workos_secret",
@@ -10217,6 +10988,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       },
       "patch": {
@@ -11078,6 +11850,22 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_x_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "external_x_client_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "external_x_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "external_x_secret": {
+                    "type": "string",
+                    "nullable": true
+                  },
                   "external_workos_enabled": {
                     "type": "boolean",
                     "nullable": true
@@ -11120,6 +11908,11 @@
                   },
                   "db_max_pool_size": {
                     "type": "integer",
+                    "nullable": true
+                  },
+                  "db_max_pool_size_unit": {
+                    "type": "string",
+                    "enum": ["connections", "percent"],
                     "nullable": true
                   },
                   "api_max_request_duration": {
@@ -11193,6 +11986,11 @@
                     },
                     "db_max_pool_size": {
                       "type": "integer",
+                      "nullable": true
+                    },
+                    "db_max_pool_size_unit": {
+                      "type": "string",
+                      "enum": ["connections", "percent"],
                       "nullable": true
                     },
                     "disable_signup": {
@@ -11520,6 +12318,22 @@
                       "nullable": true
                     },
                     "external_twitter_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_x_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_x_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_x_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_x_secret": {
                       "type": "string",
                       "nullable": true
                     },
@@ -12086,6 +12900,7 @@
                   "required": [
                     "api_max_request_duration",
                     "db_max_pool_size",
+                    "db_max_pool_size_unit",
                     "disable_signup",
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
@@ -12168,6 +12983,10 @@
                     "external_twitter_email_optional",
                     "external_twitter_enabled",
                     "external_twitter_secret",
+                    "external_x_client_id",
+                    "external_x_email_optional",
+                    "external_x_enabled",
+                    "external_x_secret",
                     "external_workos_client_id",
                     "external_workos_enabled",
                     "external_workos_secret",
@@ -12337,7 +13156,244 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
+      }
+    },
+    "/v1/projects/{ref}/config/realtime": {
+      "get": {
+        "operationId": "v1-get-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets project's realtime configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "private_only": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "description": "Whether to only allow private channels"
+                    },
+                    "connection_pool": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "nullable": true,
+                      "description": "Sets connection pool size for Realtime Authorization"
+                    },
+                    "max_concurrent_users": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 50000,
+                      "nullable": true,
+                      "description": "Sets maximum number of concurrent users rate limit"
+                    },
+                    "max_events_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 50000,
+                      "nullable": true,
+                      "description": "Sets maximum number of events per second rate per channel limit"
+                    },
+                    "max_bytes_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000000,
+                      "nullable": true,
+                      "description": "Sets maximum number of bytes per second rate per channel limit"
+                    },
+                    "max_channels_per_client": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000,
+                      "nullable": true,
+                      "description": "Sets maximum number of channels per client rate limit"
+                    },
+                    "max_joins_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5000,
+                      "nullable": true,
+                      "description": "Sets maximum number of joins per second rate limit"
+                    },
+                    "max_presence_events_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5000,
+                      "nullable": true,
+                      "description": "Sets maximum number of presence events per second rate limit"
+                    },
+                    "max_payload_size_in_kb": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000,
+                      "nullable": true,
+                      "description": "Sets maximum number of payload size in KB rate limit"
+                    },
+                    "suspend": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "description": "Whether to suspend realtime"
+                    }
+                  },
+                  "required": [
+                    "private_only",
+                    "connection_pool",
+                    "max_concurrent_users",
+                    "max_events_per_second",
+                    "max_bytes_per_second",
+                    "max_channels_per_client",
+                    "max_joins_per_second",
+                    "max_presence_events_per_second",
+                    "max_payload_size_in_kb",
+                    "suspend"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gets realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      },
+      "patch": {
+        "operationId": "v1-update-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "private_only": {
+                    "type": "boolean",
+                    "description": "Whether to only allow private channels"
+                  },
+                  "connection_pool": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Sets connection pool size for Realtime Authorization"
+                  },
+                  "max_concurrent_users": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50000,
+                    "description": "Sets maximum number of concurrent users rate limit"
+                  },
+                  "max_events_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50000,
+                    "description": "Sets maximum number of events per second rate per channel limit"
+                  },
+                  "max_bytes_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000000,
+                    "description": "Sets maximum number of bytes per second rate per channel limit"
+                  },
+                  "max_channels_per_client": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "description": "Sets maximum number of channels per client rate limit"
+                  },
+                  "max_joins_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5000,
+                    "description": "Sets maximum number of joins per second rate limit"
+                  },
+                  "max_presence_events_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5000,
+                    "description": "Sets maximum number of presence events per second rate limit"
+                  },
+                  "max_payload_size_in_kb": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "description": "Sets maximum number of payload size in KB rate limit"
+                  },
+                  "suspend": {
+                    "type": "boolean",
+                    "description": "Whether to suspend realtime"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Updates realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -12444,6 +13500,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -12533,6 +13590,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -12630,6 +13688,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -12725,6 +13784,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -12762,6 +13822,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Pauses the given project",
@@ -12772,6 +13835,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -12839,6 +13903,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Lists available restore versions for the given project",
@@ -12849,6 +13916,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -12884,6 +13952,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Restores the given project",
@@ -12894,6 +13965,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -12931,6 +14003,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Cancels the given project restoration",
@@ -12941,6 +14016,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -13209,7 +14285,8 @@
           }
         ],
         "summary": "List billing addons and compute instance selections",
-        "tags": ["Billing"]
+        "tags": ["Billing"],
+        "x-endpoint-owners": ["billing"]
       },
       "patch": {
         "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
@@ -13315,7 +14392,8 @@
           }
         ],
         "summary": "Apply or update billing addons, including compute instance size",
-        "tags": ["Billing"]
+        "tags": ["Billing"],
+        "x-endpoint-owners": ["billing"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
@@ -13403,7 +14481,8 @@
           }
         ],
         "summary": "Remove billing addons or revert compute instance sizing",
-        "tags": ["Billing"]
+        "tags": ["Billing"],
+        "x-endpoint-owners": ["billing"]
       }
     },
     "/v1/projects/{ref}/claim-token": {
@@ -13463,10 +14542,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "post": {
@@ -13528,10 +14611,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "delete": {
@@ -13567,10 +14654,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       }
     },
@@ -13747,6 +14838,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -13932,12 +15024,13 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
-        "description": "Executes a SQL query on the project's logs.\n\nEither the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources. \n",
         "operationId": "v1-get-project-logs",
         "parameters": [
           {
@@ -13956,6 +15049,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "type": "string"
             }
@@ -14071,6 +15165,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["analytics"],
         "x-oauth-scope": "analytics:read"
       }
     },
@@ -14215,7 +15310,8 @@
           }
         ],
         "summary": "Gets project's usage api counts",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/usage.api-requests-count": {
@@ -14331,7 +15427,8 @@
           }
         ],
         "summary": "Gets project's usage api requests count",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/functions.combined-stats": {
@@ -14456,7 +15553,8 @@
           }
         ],
         "summary": "Gets a project's function combined statistics",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/cli/login-role": {
@@ -14545,6 +15643,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -14607,6 +15706,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -14678,6 +15778,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -14719,6 +15820,9 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "rollback": {
+                    "type": "string"
                   }
                 },
                 "required": ["query"]
@@ -14756,6 +15860,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       },
       "put": {
@@ -14797,6 +15902,9 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "rollback": {
+                    "type": "string"
                   }
                 },
                 "required": ["query"]
@@ -14834,6 +15942,240 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      },
+      "delete": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-rollback-migrations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "gte",
+            "required": true,
+            "in": "query",
+            "description": "Rollback migrations greater or equal to this version",
+            "schema": {
+              "pattern": "^\\d+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to rollback database migration"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/migrations/{version}": {
+      "get": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-get-a-migration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^\\d+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "statements": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "rollback": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "created_by": {
+                      "type": "string"
+                    },
+                    "idempotency_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["version"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get database migration"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Fetch an existing entry from migration history",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-patch-a-migration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^\\d+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "rollback": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to patch database migration"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Patch an existing entry in migration history",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -14908,7 +16250,81 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/query/read-only": {
+      "post": {
+        "description": "All entity references must be schema qualified.",
+        "operationId": "v1-read-only-query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {}
+                  }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to run read-only sql query"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Run a sql query as supabase_read_only_user",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/database/webhooks/enable": {
@@ -14958,6 +16374,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -15043,7 +16460,89 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
+      }
+    },
+    "/v1/projects/{ref}/database/password": {
+      "patch": {
+        "operationId": "v1-update-database-password",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "minLength": 4
+                  }
+                },
+                "required": ["password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update database password"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Updates the database password",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api", "infra"],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/jit": {
@@ -15153,6 +16652,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["security"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -15279,6 +16779,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["security"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -15443,7 +16944,8 @@
           }
         ],
         "summary": "Updates a user mapping for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/database/jit/list": {
@@ -15555,7 +17057,8 @@
           }
         ],
         "summary": "List all user-id to role mappings for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/database/jit/{user_id}": {
@@ -15608,7 +17111,8 @@
           }
         ],
         "summary": "Delete JIT access by user-id",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/functions": {
@@ -15719,6 +17223,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       },
       "post": {
@@ -15813,7 +17318,7 @@
                 "properties": {
                   "slug": {
                     "type": "string",
-                    "pattern": "^[A-Za-z0-9_-]+$"
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
                   },
                   "name": {
                     "type": "string"
@@ -15920,6 +17425,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       },
       "put": {
@@ -15953,7 +17459,7 @@
                     },
                     "slug": {
                       "type": "string",
-                      "pattern": "^[A-Za-z0-9_-]+$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
                     },
                     "name": {
                       "type": "string"
@@ -16090,6 +17596,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -16115,7 +17622,7 @@
             "required": false,
             "in": "query",
             "schema": {
-              "pattern": "^[A-Za-z0-9_-]+$",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
               "type": "string"
             }
           },
@@ -16255,6 +17762,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -16373,6 +17881,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       },
       "patch": {
@@ -16575,6 +18084,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       },
       "delete": {
@@ -16634,6 +18144,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -16703,6 +18214,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       }
     },
@@ -16784,6 +18296,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["storage"],
         "x-oauth-scope": "storage:read"
       }
     },
@@ -17026,6 +18539,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -17193,6 +18707,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -17362,6 +18877,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       },
       "put": {
@@ -17605,6 +19121,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "delete": {
@@ -17772,6 +19289,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       }
     },
@@ -17884,6 +19402,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -17949,6 +19468,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -18030,6 +19550,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       },
@@ -18105,6 +19626,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:read"
       }
@@ -18170,6 +19692,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       }
@@ -18234,6 +19757,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["members_write"]
           }
         ],
         "summary": "List members of an organization",
@@ -18244,6 +19770,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -18278,7 +19805,7 @@
                     },
                     "plan": {
                       "type": "string",
-                      "enum": ["free", "pro", "team", "enterprise"]
+                      "enum": ["free", "pro", "team", "enterprise", "platform"]
                     },
                     "opt_in_tags": {
                       "type": "array",
@@ -18317,6 +19844,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_read"]
           }
         ],
         "summary": "Gets information about the organization",
@@ -18327,6 +19857,7 @@
             "position": "after"
           }
         ],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -18441,11 +19972,11 @@
                         },
                         "source_subscription_plan": {
                           "type": "string",
-                          "enum": ["free", "pro", "team", "enterprise"]
+                          "enum": ["free", "pro", "team", "enterprise", "platform"]
                         },
                         "target_subscription_plan": {
                           "type": "string",
-                          "enum": ["free", "pro", "team", "enterprise"],
+                          "enum": ["free", "pro", "team", "enterprise", "platform"],
                           "nullable": true
                         }
                       },
@@ -18488,10 +20019,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write"]
           }
         ],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "post": {
@@ -18533,16 +20068,20 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write"]
           }
         ],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       }
     },
     "/v1/organizations/{slug}/projects": {
       "get": {
-        "description": "Returns a paginated list of projects for the specified organization.\n\n    This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
+        "description": "Returns a paginated list of projects for the specified organization.\n\nThis endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
         "operationId": "v1-get-all-projects-for-organization",
         "parameters": [
           {
@@ -18787,10 +20326,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_projects_read"]
           }
         ],
         "summary": "Gets all projects for the given organization",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api"]
       }
     }
   },
@@ -18967,6 +20510,30 @@
           "notify_url": {
             "type": "string",
             "format": "uri"
+          },
+          "deletion_scheduled_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "preview_project_status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
           }
         },
         "required": [
@@ -19012,6 +20579,16 @@
           }
         },
         "required": ["workflow_run_id", "message"]
+      },
+      "BranchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Branch restoration initiated"]
+          }
+        },
+        "required": ["message"]
       },
       "V1ListProjectsPaginatedResponse": {
         "type": "object",
@@ -19138,11 +20715,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -19201,7 +20792,17 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
@@ -19217,7 +20818,13 @@
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "plan": {
             "type": "string",
@@ -19359,7 +20966,7 @@
             "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id"],
+        "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
@@ -19368,11 +20975,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -19409,7 +21030,16 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status"
+        ]
       },
       "RegionsInfo": {
         "type": "object",
@@ -19524,19 +21154,27 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Deprecated: Use `slug` instead.",
+            "deprecated": true
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string"
           }
         },
-        "required": ["id", "name"]
+        "required": ["id", "slug", "name"]
       },
       "CreateOrganizationV1": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 256
           }
         },
         "required": ["name"],
@@ -20630,6 +22268,17 @@
         },
         "required": ["id", "ref", "name"]
       },
+      "V1UpdateProjectBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": ["name"]
+      },
       "SecretResponse": {
         "type": "object",
         "properties": {
@@ -20663,6 +22312,12 @@
             }
           },
           "required": ["name", "value"]
+        }
+      },
+      "DeleteSecretsBody": {
+        "type": "array",
+        "items": {
+          "type": "string"
         }
       },
       "SslEnforcementResponse": {
@@ -20819,18 +22474,166 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
           },
           "unsupported_extensions": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
           },
           "user_defined_objects_in_internal_schemas": {
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["objects_depending_on_pg_cron"]
+                    },
+                    "dependents": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": ["type", "dependents"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["indexes_referencing_ll_to_earth"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "table_name": {
+                      "type": "string"
+                    },
+                    "index_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "table_name", "index_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["function_using_obsolete_lang"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "function_name": {
+                      "type": "string"
+                    },
+                    "lang_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "function_name", "lang_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unsupported_extension"]
+                    },
+                    "extension_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "extension_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unsupported_fdw_handler"]
+                    },
+                    "fdw_name": {
+                      "type": "string"
+                    },
+                    "fdw_handler_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "fdw_name", "fdw_handler_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unlogged_table_with_persistent_sequence"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "table_name": {
+                      "type": "string"
+                    },
+                    "sequence_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "table_name", "sequence_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["user_defined_objects_in_internal_schemas"]
+                    },
+                    "obj_type": {
+                      "type": "string",
+                      "enum": ["table", "function"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "obj_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "obj_type", "schema_name", "obj_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["active_replication_slot"]
+                    },
+                    "slot_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "slot_name"]
+                }
+              ]
             }
           }
         },
@@ -20844,7 +22647,8 @@
           "legacy_auth_custom_roles",
           "objects_to_be_dropped",
           "unsupported_extensions",
-          "user_defined_objects_in_internal_schemas"
+          "user_defined_objects_in_internal_schemas",
+          "validation_errors"
         ]
       },
       "DatabaseUpgradeStatusResponse": {
@@ -20974,7 +22778,9 @@
             ]
           },
           "healthy": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true,
+            "description": "Deprecated. Use `status` instead."
           },
           "status": {
             "type": "string",
@@ -21002,7 +22808,9 @@
                 "type": "object",
                 "properties": {
                   "healthy": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "deprecated": true,
+                    "description": "Deprecated. Use `status` instead."
                   },
                   "db_connected": {
                     "type": "boolean"
@@ -21362,12 +23170,41 @@
                 "properties": {
                   "enabled": {
                     "type": "boolean"
+                  },
+                  "maxNamespaces": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxTables": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxCatalogs": {
+                    "type": "integer",
+                    "minimum": 0
                   }
                 },
-                "required": ["enabled"]
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "maxBuckets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxIndexes": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
-            "required": ["imageTransformation", "s3Protocol"]
+            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
           },
           "capabilities": {
             "type": "object",
@@ -21390,9 +23227,22 @@
               }
             },
             "required": ["upstreamTarget"]
+          },
+          "migrationVersion": {
+            "type": "string"
+          },
+          "databasePoolMode": {
+            "type": "string"
           }
         },
-        "required": ["fileSizeLimit", "features", "capabilities", "external"]
+        "required": [
+          "fileSizeLimit",
+          "features",
+          "capabilities",
+          "external",
+          "migrationVersion",
+          "databasePoolMode"
+        ]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
@@ -21429,12 +23279,40 @@
                 "properties": {
                   "enabled": {
                     "type": "boolean"
+                  },
+                  "maxNamespaces": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxTables": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxCatalogs": {
+                    "type": "integer",
+                    "minimum": 0
                   }
                 },
-                "required": ["enabled"]
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "maxBuckets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxIndexes": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
-            },
-            "required": ["imageTransformation", "s3Protocol"]
+            }
           },
           "external": {
             "type": "object",
@@ -21520,7 +23398,9 @@
             "type": "string"
           },
           "statement_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "track_commit_timestamp": {
             "type": "boolean"
@@ -21529,15 +23409,17 @@
             "type": "string"
           },
           "wal_sender_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "work_mem": {
             "type": "string"
           },
           "checkpoint_timeout": {
-            "type": "integer",
-            "minimum": 30,
-            "maximum": 86400
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "hot_standby_feedback": {
             "type": "boolean"
@@ -21615,7 +23497,9 @@
             "type": "string"
           },
           "statement_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "track_commit_timestamp": {
             "type": "boolean"
@@ -21624,15 +23508,17 @@
             "type": "string"
           },
           "wal_sender_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "work_mem": {
             "type": "string"
           },
           "checkpoint_timeout": {
-            "type": "integer",
-            "minimum": 30,
-            "maximum": 86400
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "hot_standby_feedback": {
             "type": "boolean"
@@ -21774,6 +23660,11 @@
           },
           "db_max_pool_size": {
             "type": "integer",
+            "nullable": true
+          },
+          "db_max_pool_size_unit": {
+            "type": "string",
+            "enum": ["connections", "percent"],
             "nullable": true
           },
           "disable_signup": {
@@ -22101,6 +23992,22 @@
             "nullable": true
           },
           "external_twitter_secret": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_x_client_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_x_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_x_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_x_secret": {
             "type": "string",
             "nullable": true
           },
@@ -22667,6 +24574,7 @@
         "required": [
           "api_max_request_duration",
           "db_max_pool_size",
+          "db_max_pool_size_unit",
           "disable_signup",
           "external_anonymous_users_enabled",
           "external_apple_additional_client_ids",
@@ -22749,6 +24657,10 @@
           "external_twitter_email_optional",
           "external_twitter_enabled",
           "external_twitter_secret",
+          "external_x_client_id",
+          "external_x_email_optional",
+          "external_x_enabled",
+          "external_x_secret",
           "external_workos_client_id",
           "external_workos_enabled",
           "external_workos_secret",
@@ -23728,6 +25640,22 @@
             "type": "string",
             "nullable": true
           },
+          "external_x_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_x_client_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_x_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_x_secret": {
+            "type": "string",
+            "nullable": true
+          },
           "external_workos_enabled": {
             "type": "boolean",
             "nullable": true
@@ -23770,6 +25698,11 @@
           },
           "db_max_pool_size": {
             "type": "integer",
+            "nullable": true
+          },
+          "db_max_pool_size_unit": {
+            "type": "string",
+            "enum": ["connections", "percent"],
             "nullable": true
           },
           "api_max_request_duration": {
@@ -23825,6 +25758,151 @@
             "nullable": true
           }
         }
+      },
+      "RealtimeConfigResponse": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "nullable": true,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "required": [
+          "private_only",
+          "connection_pool",
+          "max_concurrent_users",
+          "max_events_per_second",
+          "max_bytes_per_second",
+          "max_channels_per_client",
+          "max_joins_per_second",
+          "max_presence_events_per_second",
+          "max_payload_size_in_kb",
+          "suspend"
+        ]
+      },
+      "UpdateRealtimeConfigBody": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "additionalProperties": false
       },
       "CreateThirdPartyAuthBody": {
         "type": "object",
@@ -24598,6 +26676,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "rollback": {
+            "type": "string"
           }
         },
         "required": ["query"]
@@ -24611,9 +26692,54 @@
           },
           "name": {
             "type": "string"
+          },
+          "rollback": {
+            "type": "string"
           }
         },
         "required": ["query"]
+      },
+      "V1GetMigrationResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "statements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rollback": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": ["version"]
+      },
+      "V1PatchMigrationBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rollback": {
+            "type": "string"
+          }
+        }
       },
       "V1RunQueryBody": {
         "type": "object",
@@ -24628,6 +26754,20 @@
           },
           "read_only": {
             "type": "boolean"
+          }
+        },
+        "required": ["query"]
+      },
+      "V1ReadOnlyQueryBody": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parameters": {
+            "type": "array",
+            "items": {}
           }
         },
         "required": ["query"]
@@ -24663,6 +26803,25 @@
           }
         },
         "required": ["databases"]
+      },
+      "V1UpdatePasswordBody": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 4
+          }
+        },
+        "required": ["password"]
+      },
+      "V1UpdatePasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"]
       },
       "JitAccessResponse": {
         "type": "object",
@@ -24955,7 +27114,7 @@
         "properties": {
           "slug": {
             "type": "string",
-            "pattern": "^[A-Za-z0-9_-]+$"
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
           },
           "name": {
             "type": "string"
@@ -24979,7 +27138,7 @@
             },
             "slug": {
               "type": "string",
-              "pattern": "^[A-Za-z0-9_-]+$"
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
             },
             "name": {
               "type": "string"
@@ -26041,7 +28200,7 @@
           },
           "plan": {
             "type": "string",
-            "enum": ["free", "pro", "team", "enterprise"]
+            "enum": ["free", "pro", "team", "enterprise", "platform"]
           },
           "opt_in_tags": {
             "type": "array",
@@ -26147,11 +28306,11 @@
               },
               "source_subscription_plan": {
                 "type": "string",
-                "enum": ["free", "pro", "team", "enterprise"]
+                "enum": ["free", "pro", "team", "enterprise", "platform"]
               },
               "target_subscription_plan": {
                 "type": "string",
-                "enum": ["free", "pro", "team", "enterprise"],
+                "enum": ["free", "pro", "team", "enterprise", "platform"],
                 "nullable": true
               }
             },
