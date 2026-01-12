@@ -246,7 +246,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       key={`${project.ref}-${project.roleId}`}
                       className="flex items-center justify-between py-2"
                     >
-                      <p className="text-s">{name}</p>
+                      <p>{name}</p>
 
                       <div className="flex items-center gap-x-2">
                         {cannotAddAnyRoles ? (
