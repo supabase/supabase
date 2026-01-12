@@ -33,7 +33,7 @@ export const SignInPartner = () => {
       <Loader2 className="animate-spin" />
       <h2 className="text-lg text-center">Signing in to Supabase Dashboard</h2>
       <p className="text-xs text-foreground-lighter text-center max-w-[220px] sm:max-w-full">
-        By continuing, you agree to Supabase's{' '}
+        By continuing, you agree to Supabase’s{' '}
         <InlineLink
           href="https://supabase.com/terms"
           className="text-foreground-lighter hover:text-foreground"

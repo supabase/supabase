@@ -1,48 +1,71 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { filter, find, get, isEmpty } from 'lodash'
-import { useState } from 'react'
+import { isEmpty } from 'lodash'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
+import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Loader } from 'lucide-react'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { formatPoliciesForStorage } from '../Storage.utils'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.utils'
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
+import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
 export const StoragePolicies = () => {
-  const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { data, isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
-  const buckets = data ?? []
-
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<any>({})
-  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
-  const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<any>({})
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
+  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<PostgresPolicy>()
+  const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<{
+    bucket: string
+    table: string
+  }>()
+  const [searchString, setSearchString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
+  const debouncedSearchString = useDebouncedValue(searchString, 250)
 
   const {
-    data: policiesData,
+    data: bucketsData,
+    isPending: isLoadingBuckets,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = usePaginatedBucketsQuery({
+    projectRef,
+    search: debouncedSearchString || undefined,
+  })
+  const buckets = useMemo(() => bucketsData?.pages.flatMap((page) => page) ?? [], [bucketsData])
+
+  const {
+    data: policies = [],
     refetch,
-    isLoading: isLoadingPolicies,
+    isPending: isLoadingPolicies,
   } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'storage',
   })
-  const policies = policiesData ?? []
 
   const isLoading = isLoadingBuckets || isLoadingPolicies
 
@@ -50,50 +73,77 @@ export const StoragePolicies = () => {
     onError: () => {},
   })
   const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
-  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
-    onSuccess: async () => {
-      await refetch()
-      toast.success('Successfully deleted policy!')
-      setSelectedPolicyToDelete({})
-    },
-  })
+  const { mutate: deleteDatabasePolicy, isPending: isDeletingPolicy } =
+    useDatabasePolicyDeleteMutation({
+      onSuccess: async () => {
+        await refetch()
+        toast.success('Successfully deleted policy!')
+        setSelectedPolicyToDelete(undefined)
+      },
+      onError: (error: any) => {
+        toast.error(`Failed to delete policy: ${error.message}`)
+      },
+    })
 
   // Only use storage policy editor when creating new policies for buckets
   const showStoragePolicyEditor =
     isEmpty(selectedPolicyToEdit) &&
     !isEmpty(isEditingPolicyForBucket) &&
-    get(isEditingPolicyForBucket, ['bucket'], '').length > 0
+    (isEditingPolicyForBucket.bucket ?? '').length > 0
 
   const showGeneralPolicyEditor = !isEmpty(isEditingPolicyForBucket) && !showStoragePolicyEditor
 
+  // Policies under storage.buckets
+  const storageBucketPolicies = policies.filter(
+    (x) => x.schema === 'storage' && x.table === 'buckets'
+  )
   // Policies under storage.objects
-  const storageObjectsPolicies = filter(policies, { table: 'objects' })
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
-  const ungroupedPolicies = get(
-    find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
-    ['policies'],
-    []
+  const storageObjectsPolicies = policies.filter(
+    (x) => x.schema === 'storage' && x.table === 'objects'
   )
 
-  // Policies under storage.buckets
-  const storageBucketPolicies = filter(policies, { table: 'buckets' })
+  const formattedStorageObjectPolicies = useMemo(
+    () => formatPoliciesForStorage(buckets, storageObjectsPolicies),
+    [buckets, storageObjectsPolicies]
+  )
 
-  const onSelectPolicyAdd = (bucketName = '', table = '') => {
-    setSelectedPolicyToEdit({})
+  const ungroupedPolicies =
+    formattedStorageObjectPolicies.find((x) => x.name === UNGROUPED_POLICY_SYMBOL)?.policies ?? []
+
+  const bucketsWithPolicies = useMemo(() => {
+    // Get policies for filtered buckets (show all policies, don't filter them)
+    // Show all filtered buckets, even if they don't have policies
+    return buckets.map((bucket) => {
+      const bucketPolicies =
+        formattedStorageObjectPolicies.find((x) => x.name === bucket.name)?.policies ?? []
+      return { bucket, policies: bucketPolicies }
+    })
+  }, [buckets, formattedStorageObjectPolicies])
+
+  const onSelectPolicyAdd: SelectBucketPolicyForAction['addPolicy'] = (
+    bucketName = '',
+    table = ''
+  ) => {
+    setSelectedPolicyToEdit(undefined)
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
   }
 
-  const onSelectPolicyEdit = (policy: any, bucketName = '', table = '') => {
+  const onSelectPolicyEdit: SelectBucketPolicyForAction['editPolicy'] = (
+    policy,
+    bucketName = '',
+    table = ''
+  ) => {
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
     setSelectedPolicyToEdit(policy)
   }
 
   const onCancelPolicyEdit = () => {
-    setIsEditingPolicyForBucket({})
+    setIsEditingPolicyForBucket(undefined)
   }
 
-  const onSelectPolicyDelete = (policy: any) => setSelectedPolicyToDelete(policy)
-  const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
+  const onSelectPolicyDelete: SelectBucketPolicyForAction['deletePolicy'] = (policy: any) =>
+    setSelectedPolicyToDelete(policy)
+  const onCancelPolicyDelete = () => setSelectedPolicyToDelete(undefined)
 
   const onSavePolicySuccess = async () => {
     toast.success('Successfully saved policy!')
@@ -155,6 +205,10 @@ export const StoragePolicies = () => {
       console.error('Project is required')
       return true
     }
+    if (!selectedPolicyToEdit) {
+      console.error('Unable to find policy')
+      return true
+    }
 
     try {
       await updateDatabasePolicy({
@@ -172,6 +226,8 @@ export const StoragePolicies = () => {
 
   const onDeletePolicy = async () => {
     if (!project) return console.error('Project is required')
+    if (!selectedPolicyToDelete) return console.error('Unable to find policy')
+
     deleteDatabasePolicy({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -180,80 +236,75 @@ export const StoragePolicies = () => {
   }
 
   return (
-    <div className="flex min-h-full w-full flex-col">
-      {isLoading ? (
-        <div className="flex h-full items-center justify-center">
-          <Loader className="animate-spin" size={16} />
-        </div>
-      ) : (
-        <div>
-          <ScaffoldSection isFullWidth>
-            <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription className="mb-6">
-              Write policies for each bucket to control access to the bucket and its contents
-            </ScaffoldSectionDescription>
-            {buckets.length === 0 && <StoragePoliciesPlaceholder />}
+    <>
+      <PageContainer>
+        {isLoading ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <div>
+            <BucketsPolicies
+              buckets={bucketsWithPolicies}
+              search={searchString}
+              debouncedSearch={debouncedSearchString}
+              setSearch={setSearchString}
+              actions={{
+                addPolicy: onSelectPolicyAdd,
+                editPolicy: onSelectPolicyEdit,
+                deletePolicy: onSelectPolicyDelete,
+              }}
+              pagination={{
+                hasNextPage,
+                isFetchingNextPage,
+                fetchNextPage,
+              }}
+            />
 
-            {/* Sections for policies grouped by buckets */}
-            <div className="flex flex-col gap-y-4">
-              {buckets.map((bucket) => {
-                const bucketPolicies = get(
-                  find(formattedStorageObjectPolicies, { name: bucket.name }),
-                  ['policies'],
-                  []
-                ).sort((a: any, b: any) => a.name.localeCompare(b.name))
-
-                return (
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Schema</PageSectionTitle>
+                  <PageSectionDescription>
+                    Write policies for the tables under the storage schema directly for greater
+                    control
+                  </PageSectionDescription>
+                </PageSectionSummary>
+              </PageSectionMeta>
+              <PageSectionContent>
+                <div className="flex flex-col gap-y-4">
+                  {/* Section for policies under storage.objects that are not tied to any buckets */}
                   <StoragePoliciesBucketRow
-                    key={bucket.name}
                     table="objects"
-                    label={bucket.name}
-                    bucket={bucket}
-                    policies={bucketPolicies}
+                    label="Other policies under storage.objects"
+                    policies={ungroupedPolicies}
                     onSelectPolicyAdd={onSelectPolicyAdd}
                     onSelectPolicyEdit={onSelectPolicyEdit}
                     onSelectPolicyDelete={onSelectPolicyDelete}
                   />
-                )
-              })}
-            </div>
-          </ScaffoldSection>
 
-          <ScaffoldSection isFullWidth>
-            <ScaffoldSectionTitle>Schema</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription className="mb-6">
-              Write policies for the tables under the storage schema directly for greater control
-            </ScaffoldSectionDescription>
-
-            <div className="flex flex-col gap-y-4">
-              {/* Section for policies under storage.objects that are not tied to any buckets */}
-              <StoragePoliciesBucketRow
-                table="objects"
-                label="Other policies under storage.objects"
-                policies={ungroupedPolicies}
-                onSelectPolicyAdd={onSelectPolicyAdd}
-                onSelectPolicyEdit={onSelectPolicyEdit}
-                onSelectPolicyDelete={onSelectPolicyDelete}
-              />
-
-              {/* Section for policies under storage.buckets */}
-              <StoragePoliciesBucketRow
-                table="buckets"
-                label="Policies under storage.buckets"
-                policies={storageBucketPolicies}
-                onSelectPolicyAdd={onSelectPolicyAdd}
-                onSelectPolicyEdit={onSelectPolicyEdit}
-                onSelectPolicyDelete={onSelectPolicyDelete}
-              />
-            </div>
-          </ScaffoldSection>
-        </div>
-      )}
+                  {/* Section for policies under storage.buckets */}
+                  <StoragePoliciesBucketRow
+                    table="buckets"
+                    label="Policies under storage.buckets"
+                    policies={storageBucketPolicies}
+                    onSelectPolicyAdd={onSelectPolicyAdd}
+                    onSelectPolicyEdit={onSelectPolicyEdit}
+                    onSelectPolicyDelete={onSelectPolicyDelete}
+                  />
+                </div>
+              </PageSectionContent>
+            </PageSection>
+          </div>
+        )}
+      </PageContainer>
 
       {/* Only used for adding policies to buckets */}
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
-        bucketName={isEditingPolicyForBucket.bucket}
+        bucketName={isEditingPolicyForBucket?.bucket}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -263,7 +314,7 @@ export const StoragePolicies = () => {
       <PolicyEditorModal
         schema="storage"
         visible={showGeneralPolicyEditor}
-        table={isEditingPolicyForBucket.table}
+        table={isEditingPolicyForBucket?.table ?? ''}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicy={onCreatePolicy}
@@ -271,16 +322,17 @@ export const StoragePolicies = () => {
         onSaveSuccess={onSavePolicySuccess}
       />
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={!isEmpty(selectedPolicyToDelete)}
-        title="Confirm to delete policy"
-        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={onCancelPolicyDelete}
-        onSelectConfirm={onDeletePolicy}
+        variant="destructive"
+        title="Delete policy"
+        description={`Are you sure you want to delete the policy “${selectedPolicyToDelete?.name}”? This action cannot be undone.`}
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        loading={isDeletingPolicy}
+        onCancel={onCancelPolicyDelete}
+        onConfirm={onDeletePolicy}
       />
-    </div>
+    </>
   )
 }

@@ -4,9 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfileNameAndPicture } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -23,7 +22,7 @@ import {
   Theme,
   singleThemes,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export function UserDropdown() {
@@ -33,9 +32,14 @@ export function UserDropdown() {
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const signOut = useSignOut()
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const sendTelemetry = useCommandMenuOpenedTelemetry()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
+
+  const handleCommandMenuOpen = () => {
+    setCommandMenuOpen(true)
+    sendTelemetry()
+  }
 
   return (
     <DropdownMenu>
@@ -97,10 +101,6 @@ export function UserDropdown() {
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
-                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Command menu
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
@@ -125,8 +125,8 @@ export function UserDropdown() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={async () => {
-                  await signOut()
+                onSelect={() => {
+                  router.push('/logout')
                 }}
               >
                 Log out

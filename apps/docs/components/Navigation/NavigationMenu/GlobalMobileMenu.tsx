@@ -10,6 +10,7 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Accordion, Button, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
@@ -107,6 +108,8 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
   const isUserLoading = useIsUserLoading()
   const pathname = usePathname()
 
+  const { navigationLogo } = getCustomContent(['navigation:logo'])
+
   // Close mobile menu on route change
   useEffect(() => {
     setOpen(false)
@@ -129,7 +132,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
               <Link href="/" className="flex items-center gap-2">
                 <Image
                   className="cursor-pointer hidden dark:block"
-                  src="/docs/supabase-dark.svg"
+                  src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
                   priority
                   width={96}
                   height={24}
@@ -137,7 +140,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 />
                 <Image
                   className="cursor-pointer block dark:hidden"
-                  src="/docs/supabase-light.svg"
+                  src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
                   priority
                   width={96}
                   height={24}

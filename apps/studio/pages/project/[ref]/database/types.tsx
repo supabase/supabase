@@ -1,35 +1,38 @@
-import { ExternalLink } from 'lucide-react'
-
-import { EnumeratedTypes } from 'components/interfaces/Database'
+import { EnumeratedTypes } from 'components/interfaces/Database/EnumeratedTypes/EnumeratedTypes'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <ScaffoldSectionContent className="!col-span-12">
-          <FormHeader
-            className="!mb-0"
-            title="Database Enumerated Types"
-            description="Custom data types that you can use in your database tables or functions."
-          />
-        </ScaffoldSectionContent>
-        <div className="col-span-12 mt-3">
-          <EnumeratedTypes />
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Enumerated Types</PageHeaderTitle>
+            <PageHeaderDescription>
+              Custom data types that you can use in your database tables or functions
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <EnumeratedTypes />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

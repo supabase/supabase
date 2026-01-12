@@ -71,7 +71,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const {
     mutateAsync: topUpCredits,
-    isLoading: executingTopUp,
+    isPending: executingTopUp,
     error: errorInitiatingTopUp,
   } = useOrganizationCreditTopUpMutation({})
 
@@ -185,7 +185,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const onSuccessfulPayment = async () => {
     onTopUpDialogVisibilityChange(false)
-    await queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug))
+    await queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) })
     toast.success(
       'Successfully topped up balance. It may take a minute to reflect in your account.'
     )

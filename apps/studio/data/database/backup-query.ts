@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type DownloadableBackupVariables = {
@@ -31,10 +31,11 @@ export const useDownloadableBackupQuery = <TData = DownloadableBackupData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DownloadableBackupData, DownloadableBackupError, TData> = {}
+  }: UseCustomQueryOptions<DownloadableBackupData, DownloadableBackupError, TData> = {}
 ) =>
-  useQuery<DownloadableBackupData, DownloadableBackupError, TData>(
-    databaseKeys.backups(projectRef),
-    ({ signal }) => getDownloadableBackup({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DownloadableBackupData, DownloadableBackupError, TData>({
+    queryKey: databaseKeys.backups(projectRef),
+    queryFn: ({ signal }) => getDownloadableBackup({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

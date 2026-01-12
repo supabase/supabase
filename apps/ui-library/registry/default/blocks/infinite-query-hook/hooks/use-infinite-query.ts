@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/registry/default/fixtures/lib/supabase/client'
-import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
+import { PostgrestQueryBuilder, type PostgrestClientOptions } from '@supabase/postgrest-js'
 import { type SupabaseClient } from '@supabase/supabase-js'
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 
@@ -44,8 +44,16 @@ type SupabaseTableName = keyof DatabaseSchema['Tables']
 // Extracts the table definition from the database type
 type SupabaseTableData<T extends SupabaseTableName> = DatabaseSchema['Tables'][T]['Row']
 
+// Default client options for PostgrestQueryBuilder
+type DefaultClientOptions = PostgrestClientOptions
+
 type SupabaseSelectBuilder<T extends SupabaseTableName> = ReturnType<
-  PostgrestQueryBuilder<DatabaseSchema, DatabaseSchema['Tables'][T], T>['select']
+  PostgrestQueryBuilder<
+    DefaultClientOptions,
+    DatabaseSchema,
+    DatabaseSchema['Tables'][T],
+    T
+  >['select']
 >
 
 // A function that modifies the query. Can be used to sort, filter, etc. If .range is used, it will be overwritten.

@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
 import isEqual from 'lodash/isEqual'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
+import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'

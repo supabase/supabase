@@ -45,24 +45,35 @@ export const getPlanChangeType = (
       pro: 'upgrade',
       team: 'upgrade',
       enterprise: 'upgrade',
+      platform: 'upgrade',
     },
     pro: {
       free: 'downgrade',
       pro: 'none',
       team: 'upgrade',
       enterprise: 'upgrade',
+      platform: 'upgrade',
     },
     team: {
       free: 'downgrade',
       pro: 'downgrade',
       team: 'none',
       enterprise: 'upgrade',
+      platform: 'upgrade',
     },
     enterprise: {
       free: 'downgrade',
       pro: 'downgrade',
       team: 'downgrade',
       enterprise: 'none',
+      platform: 'upgrade',
+    },
+    platform: {
+      free: 'downgrade',
+      pro: 'downgrade',
+      team: 'downgrade',
+      enterprise: 'downgrade',
+      platform: 'none',
     },
   }
 

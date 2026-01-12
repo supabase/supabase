@@ -1,15 +1,16 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
-  useInfraMonitoringQuery,
+  useInfraMonitoringAttributesQuery,
 } from 'data/analytics/infra-monitoring-query'
 import {
   ProjectDailyStatsAttribute,
@@ -19,7 +20,7 @@ import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards } from 'types'
+import type { Dashboards } from 'types'
 import { WarningIcon } from 'ui'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
@@ -69,7 +70,7 @@ export const ChartBlock = ({
   const {
     data: dailyStatsData,
     isFetching: isFetchingDailyStats,
-    isLoading: isLoadingDailyStats,
+    isPending: isLoadingDailyStats,
   } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
@@ -81,13 +82,13 @@ export const ChartBlock = ({
   )
 
   const {
-    data: infraMonitoringData,
+    data: infraMonitoringRawData,
     isFetching: isFetchingInfraMonitoring,
-    isLoading: isLoadingInfraMonitoring,
-  } = useInfraMonitoringQuery(
+    isPending: isLoadingInfraMonitoring,
+  } = useInfraMonitoringAttributesQuery(
     {
       projectRef: ref as string,
-      attribute: attribute as InfraMonitoringAttribute,
+      attributes: [attribute as InfraMonitoringAttribute],
       startDate,
       endDate,
       interval: interval as AnalyticsInterval,
@@ -95,6 +96,14 @@ export const ChartBlock = ({
     },
     { enabled: provider === 'infra-monitoring' }
   )
+
+  const infraMonitoringData = useMemo(() => {
+    if (!infraMonitoringRawData) return undefined
+    const mapped = mapMultiResponseToAnalyticsData(infraMonitoringRawData, [
+      attribute as InfraMonitoringAttribute,
+    ])
+    return mapped[attribute]
+  }, [infraMonitoringRawData, attribute])
 
   const chartData =
     provider === 'infra-monitoring'
