@@ -201,7 +201,6 @@ services:
           # to work correctly in browser requests
           preflight_continue: true
           origins: ["*"]
-          credentials: true
           max_age: 3600
 
   ## Analytics routes
