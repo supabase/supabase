@@ -204,11 +204,12 @@ To ensure you get the latest version, create a signed URL and fetch it with `cac
 ```js
 const { data } = await supabase.storage
   .from('avatars')
-  .createSignedUrl('public/avatar1.png', 60)
+  .createSignedUrl('public/avatar1.png', 60) // URL valid for 60 seconds
 
 if (data) {
   const response = await fetch(data.signedUrl, { cache: 'no-store' })
   const blob = await response.blob()
+  // Use blob as needed (e.g., create object URL, read as text, etc.)
 }
 ```
 
