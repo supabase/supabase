@@ -7,18 +7,16 @@ import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
+import { getStripeElementsAppearanceOptions } from './Payment.utils'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean
   returnUrl: string
   onCancel: () => void
   onConfirm: () => void
-  showSetDefaultCheckbox?: boolean
-  autoMarkAsDefaultPaymentMethod?: boolean
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -28,14 +26,11 @@ const AddNewPaymentMethodModal = ({
   returnUrl,
   onCancel,
   onConfirm,
-  showSetDefaultCheckbox,
-  autoMarkAsDefaultPaymentMethod,
 }: AddNewPaymentMethodModalProps) => {
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -63,7 +58,7 @@ const AddNewPaymentMethodModal = ({
     }
 
     const loadPaymentForm = async () => {
-      if (visible && captchaRef && captchaLoaded) {
+      if (visible && captchaRef) {
         let token = captchaToken
 
         try {
@@ -81,7 +76,7 @@ const AddNewPaymentMethodModal = ({
     }
 
     loadPaymentForm()
-  }, [visible, captchaRef, captchaLoaded])
+  }, [visible, captchaRef])
 
   const resetCaptcha = () => {
     setCaptchaToken(null)
@@ -90,7 +85,7 @@ const AddNewPaymentMethodModal = ({
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+    appearance: getStripeElementsAppearanceOptions(resolvedTheme),
   } as any
 
   const onLocalCancel = () => {
@@ -141,8 +136,6 @@ const AddNewPaymentMethodModal = ({
             returnUrl={returnUrl}
             onCancel={onLocalCancel}
             onConfirm={onLocalConfirm}
-            showSetDefaultCheckbox={showSetDefaultCheckbox}
-            autoMarkAsDefaultPaymentMethod={autoMarkAsDefaultPaymentMethod}
           />
         </Elements>
       </Modal>

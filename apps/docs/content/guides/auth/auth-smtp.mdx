@@ -48,7 +48,31 @@ A non-exhaustive list of services that work with Supabase Auth is:
 - [ZeptoMail](https://www.zoho.com/zeptomail/help/smtp-home.html)
 - [Brevo](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP)
 
-Once you've set up your account with an email sending service, head to the [Authentication settings page](/dashboard/project/_/settings/auth) to enable and configure custom SMTP.
+Once you've set up your account with an email sending service, head to the [Authentication settings page](/dashboard/project/_/auth/smtp) to enable and configure custom SMTP.
+
+You can also configure custom SMTP using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure custom SMTP
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_email_enabled": true,
+    "mailer_secure_email_change_enabled": true,
+    "mailer_autoconfirm": false,
+    "smtp_admin_email": "no-reply@example.com",
+    "smtp_host": "smtp.example.com",
+    "smtp_port": 587,
+    "smtp_user": "your-smtp-user",
+    "smtp_pass": "your-smtp-password",
+    "smtp_sender_name": "Your App Name"
+  }'
+```
 
 Once you save these settings, your project's Auth server will send messages to all addresses. To protect the reputation of your newly set up service a low rate-limit of 30 messages per hour is imposed. To adjust this to an acceptable value for your use case head to the [Rate Limits configuration page](/dashboard/project/_/auth/rate-limits).
 

@@ -1,12 +1,16 @@
 import { Edit } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { ComponentProps } from 'react'
 
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import Link from 'next/link'
-import { ComponentProps } from 'react'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
@@ -17,9 +21,6 @@ import {
   TooltipContent,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface EditQueryButtonProps {
   id?: string
@@ -39,8 +40,10 @@ export const EditQueryButton = ({
   const router = useRouter()
   const { ref } = useParams()
   const { newQuery } = useNewQuery()
+
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const { setEditorPanel } = useAppStateSnapshot()
+  const { closeSidebar } = useSidebarManagerSnapshot()
+
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -48,18 +51,8 @@ export const EditQueryButton = ({
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
-
-  const handleEditInSQLEditor = () => {
-    if (sql) {
-      if (isInSQLEditor) {
-        sqlEditorSnap.setDiffContent(sql, DiffType.Addition)
-      } else {
-        newQuery(sql, title)
-      }
-    }
-  }
 
   if (id !== undefined) {
     return (
@@ -68,7 +61,7 @@ export const EditQueryButton = ({
         type={type}
         size="tiny"
         className={cn('w-7 h-7', className)}
-        icon={<Edit size={14} />}
+        icon={<Edit size={14} strokeWidth={1.5} />}
         tooltip={tooltip}
       >
         <Link href={`/project/${ref}/sql/${id}`} />
@@ -81,15 +74,15 @@ export const EditQueryButton = ({
       type={type}
       size="tiny"
       className={cn('w-7 h-7', className)}
-      icon={<Edit size={14} />}
+      icon={<Edit size={14} strokeWidth={1.5} />}
       onClick={() => {
         if (isInlineEditorEnabled) {
-          setEditorPanel({
-            open: true,
-            initialValue: sql,
-          })
+          // This component needs to be updated to work with local EditorPanel state
+          // For now, fall back to creating a new query
+          if (sql) newQuery(sql, title)
+          closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         } else {
-          handleEditInSQLEditor()
+          if (sql) newQuery(sql, title)
         }
         sendEvent({
           action: 'assistant_edit_in_sql_editor_clicked',
@@ -110,7 +103,7 @@ export const EditQueryButton = ({
           size="tiny"
           disabled={!sql}
           className={cn('w-7 h-7', className)}
-          icon={<Edit size={14} />}
+          icon={<Edit size={14} strokeWidth={1.5} />}
           tooltip={!!sql ? tooltip : { content: { side: 'bottom', text: undefined } }}
         />
       </DropdownMenuTrigger>
@@ -124,7 +117,7 @@ export const EditQueryButton = ({
           >
             Replace code
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.NewSnippet)}>
+          <DropdownMenuItem onClick={() => newQuery(sql, title)}>
             Create new snippet
           </DropdownMenuItem>
         </DropdownMenuContent>

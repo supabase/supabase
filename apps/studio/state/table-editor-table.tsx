@@ -3,11 +3,13 @@ import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
+import { useFlag } from 'common'
 import {
   loadTableEditorStateFromLocalStorage,
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
+import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
 import { SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
@@ -17,21 +19,22 @@ import { useTableEditorStateSnapshot } from './table-editor'
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
-  editable,
+  editable = true,
   onAddColumn,
   onExpandJSONEditor,
   onExpandTextEditor,
 }: {
   projectRef: string
   table: Entity
-  editable: boolean
+  /** If set to true, render an additional "+" column to support adding a new column in the grid editor */
+  editable?: boolean
   onAddColumn: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
 }) => {
   const table = parseSupaTable(originalTable)
 
-  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.id)
   const gridColumns = getInitialGridColumns(
     getGridColumns(table, {
       tableId: table.id,
@@ -60,8 +63,8 @@ export const createTableEditorTableState = ({
       const gridColumns = getInitialGridColumns(
         getGridColumns(supaTable, {
           tableId: table.id,
-          editable,
-          onAddColumn: editable ? onAddColumn : undefined,
+          editable: state.editable,
+          onAddColumn: state.editable ? onAddColumn : undefined,
           onExpandJSONEditor,
           onExpandTextEditor,
         }),
@@ -93,21 +96,29 @@ export const createTableEditorTableState = ({
       state.gridColumns.splice(toIdx, 0, moveItem)
     },
     updateColumnSize: (index: number, width: number) => {
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { width?: number }).width = width
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { width?: number }).width = width
+      }
     },
     freezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen = true
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+          true
+      }
     },
     unfreezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-        false
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+          false
+      }
     },
     updateColumnIdx: (columnKey: string, columnIdx: number) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
-
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
+      }
       state.gridColumns.sort((a, b) => a.idx - b.idx)
     },
 
@@ -132,6 +143,21 @@ export const createTableEditorTableState = ({
     },
 
     editable,
+    setEditable: (editable: boolean) => {
+      state.editable = editable
+
+      // When changing the editable flag, all grid columns need to be recreated for the editable flag to be propagated.
+      state.gridColumns = getInitialGridColumns(
+        getGridColumns(state.table, {
+          tableId: table.id,
+          editable,
+          onAddColumn: editable ? onAddColumn : undefined,
+          onExpandJSONEditor,
+          onExpandTextEditor,
+        }),
+        { gridColumns: state.gridColumns }
+      )
+    },
   })
 
   return state
@@ -152,6 +178,7 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
+  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -178,8 +205,7 @@ export const TableEditorTableStateContextProvider = ({
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
           projectRef,
-          tableName: state.table.name,
-          schema: state.table.schema,
+          tableId: state.table.id,
         })
       })
     }
@@ -194,9 +220,21 @@ export const TableEditorTableStateContextProvider = ({
     }
   }, [table])
 
+  useEffect(() => {
+    if (state.editable !== props.editable) {
+      state.setEditable(props.editable ?? true)
+    }
+  }, [props.editable, state])
+
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {children}
+      {showIndexAdvisor && state.table.schema ? (
+        <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
+          {children}
+        </TableIndexAdvisorProvider>
+      ) : (
+        children
+      )}
     </TableEditorTableStateContext.Provider>
   )
 }

@@ -4,9 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { ContentDiff, DiffType } from './SQLEditor.types'
@@ -16,18 +13,24 @@ import {
   compareAsNewSnippet,
   createSqlSnippetSkeletonV2,
 } from './SQLEditor.utils'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const useNewQuery = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const newQuery = async (sql: string, name: string, shouldRedirect: boolean = true) => {
     if (!ref) return console.error('Project ref is required')
@@ -41,7 +44,6 @@ export const useNewQuery = () => {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,
@@ -67,7 +69,6 @@ export const useNewQuery = () => {
 export function useSqlEditorDiff() {
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType>()
-  const [pendingTitle, setPendingTitle] = useState<string>()
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
 
   const isDiffOpen = !!sourceSqlDiff
@@ -91,7 +92,6 @@ export function useSqlEditorDiff() {
 
   const closeDiff = useCallback(() => {
     setSourceSqlDiff(undefined)
-    setPendingTitle(undefined)
     setSelectedDiffType(undefined)
   }, [])
 
@@ -100,8 +100,6 @@ export function useSqlEditorDiff() {
     setSourceSqlDiff,
     selectedDiffType,
     setSelectedDiffType,
-    pendingTitle,
-    setPendingTitle,
     isAcceptDiffLoading,
     setIsAcceptDiffLoading,
     isDiffOpen,

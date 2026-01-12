@@ -1,0 +1,45 @@
+import { useQuery } from '@tanstack/react-query'
+import { executeGraphQL } from 'data/graphql/execute'
+import { graphql } from 'data/graphql/gql'
+import { Service } from 'data/graphql/graphql'
+import { contentApiKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
+
+const ErrorCodeQuery = graphql(`
+  query ErrorCodeQuery($code: String!, $service: Service) {
+    errors(code: $code, service: $service) {
+      nodes {
+        code
+        service
+        message
+      }
+    }
+  }
+`)
+
+interface Variables {
+  code: string
+  service?: Service
+}
+
+async function getErrorCodeDescriptions({ code, service }: Variables, signal?: AbortSignal) {
+  return await executeGraphQL(ErrorCodeQuery, { variables: { code, service }, signal })
+}
+
+type ErrorCodeDescriptionsData = Awaited<ReturnType<typeof getErrorCodeDescriptions>>
+type ErrorCodeDescriptionsError = unknown
+
+export const useErrorCodesQuery = <TData = ErrorCodeDescriptionsData>(
+  variables: Variables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ErrorCodeDescriptionsData, ErrorCodeDescriptionsError, TData> = {}
+) => {
+  return useQuery<ErrorCodeDescriptionsData, ErrorCodeDescriptionsError, TData>({
+    queryKey: contentApiKeys.errorCodes(variables),
+    queryFn: ({ signal }) => getErrorCodeDescriptions(variables, signal),
+    enabled,
+    ...options,
+  })
+}

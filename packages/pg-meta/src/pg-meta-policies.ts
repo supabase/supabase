@@ -128,46 +128,28 @@ type PolicyUpdateParams = {
   roles?: string[]
 }
 
-function update(identifier: PolicyIdentifier, params: PolicyUpdateParams): { sql: string } {
+function update(
+  identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>,
+  params: PolicyUpdateParams
+): { sql: string } {
   const { name, definition, check, roles } = params
-  const indentifyClause = getIdentifierWhereClause(identifier)
-  const sql = `
-do $$
-declare
-  old record;
-begin
-  with policies as (${POLICIES_SQL})
-  select * into old from policies where ${indentifyClause};
-  if old is null then
-    raise exception 'Cannot find policy with id %', ${literal(indentifyClause)};
-  end if;
 
-  ${definition ? `execute(format('alter policy %I on %I.%I using (%s);', old.name, old.schema, old.table, ${literal(definition)}));` : ''}
-  ${check ? `execute(format('alter policy %I on %I.%I with check (%s);', old.name, old.schema, old.table, ${literal(check)}));` : ''}
-  ${roles ? `execute(format('alter policy %I on %I.%I to %s;', old.name, old.schema, old.table, ${literal(roles.map(ident).join(','))}));` : ''}
-  ${name ? `execute(format('alter policy %I on %I.%I rename to %I;', old.name, old.schema, old.table, ${literal(name)}));` : ''}
-end
-$$;`
+  const alter = `ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
+  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)};`
+  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition});`
+  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check});`
+  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(',')};`
+
+  // nameSql must be last
+  const sql = `BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
+
   return { sql }
 }
 
-function remove(identifier: PolicyIdentifier): { sql: string } {
-  const indentifyClause = getIdentifierWhereClause(identifier)
-
-  const sql = `
-do $$
-declare
-  old record;
-begin
-  with policies as (${POLICIES_SQL})
-  select * into old from policies where ${indentifyClause};
-  if old is null then
-    raise exception 'Cannot find policy with id %', ${literal(indentifyClause)};
-  end if;
-
-  execute(format('drop policy %I on %I.%I;', old.name, old.schema, old.table));
-end
-$$;`
+function remove(identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>): { sql: string } {
+  const sql = `DROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(
+    identifier.table
+  )};`
   return { sql }
 }
 

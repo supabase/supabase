@@ -1,12 +1,13 @@
-// import { Icons } from '@/components/icons'
-
+type supportedFrameworks = 'nextjs' | 'react-router' | 'tanstack' | 'react' | 'vue' | 'nuxtjs'
 export interface NavItem {
   title: string
   href?: string
   disabled?: boolean
   external?: boolean
+  new?: boolean
   icon?: any // to do: clean up later | keyof typeof Icons
   label?: string
+  supportedFrameworks?: supportedFrameworks[]
 }
 
 export interface NavItemWithChildren extends NavItem {

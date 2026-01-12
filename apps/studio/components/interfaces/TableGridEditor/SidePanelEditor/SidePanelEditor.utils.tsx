@@ -1,29 +1,42 @@
-import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import pgMeta from '@supabase/pg-meta'
+import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
+import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
+import { createDatabasePolicy } from 'data/database-policies/database-policy-create-mutation'
 import type { Constraint } from 'data/database/constraints-query'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { lintKeys } from 'data/lint/keys'
 import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { tableRowKeys } from 'data/table-rows/keys'
+import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
-import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
-import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
+import {
+  getTable,
+  getTableQuery,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from 'data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
+import { sendEvent } from 'data/telemetry/send-event-mutation'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -41,15 +54,27 @@ const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
  * The functions below are basically just queries but may be supported directly
  * from the pg-meta library in the future
  */
-export const addPrimaryKey = async (
+const getAddPrimaryKeySQL = ({
+  schema,
+  table,
+  columns,
+}: {
+  schema: string
+  table: string
+  columns: string[]
+}) => {
+  const primaryKeyColumns = columns.map((col) => `"${col}"`).join(', ')
+  return `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
+}
+
+const addPrimaryKey = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   schema: string,
   table: string,
   columns: string[]
 ) => {
-  const primaryKeyColumns = columns.join('","')
-  const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY ("${primaryKeyColumns}")`
+  const query = getAddPrimaryKeySQL({ schema, table, columns })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -58,9 +83,9 @@ export const addPrimaryKey = async (
   })
 }
 
-export const dropConstraint = async (
+const dropConstraint = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   schema: string,
   table: string,
   name: string
@@ -74,7 +99,7 @@ export const dropConstraint = async (
   })
 }
 
-export const getAddForeignKeySQL = ({
+const getAddForeignKeySQL = ({
   table,
   foreignKeys,
 }: {
@@ -117,14 +142,14 @@ export const getAddForeignKeySQL = ({
   )
 }
 
-export const addForeignKey = async ({
+const addForeignKey = async ({
   projectRef,
   connectionString,
   table,
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -137,7 +162,7 @@ export const addForeignKey = async ({
   })
 }
 
-export const getRemoveForeignKeySQL = ({
+const getRemoveForeignKeySQL = ({
   table,
   foreignKeys,
 }: {
@@ -158,14 +183,14 @@ DROP CONSTRAINT IF EXISTS "${relation.name}"
   )
 }
 
-export const removeForeignKey = async ({
+const removeForeignKey = async ({
   projectRef,
   connectionString,
   table,
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -178,14 +203,14 @@ export const removeForeignKey = async ({
   })
 }
 
-export const updateForeignKey = async ({
+const updateForeignKey = async ({
   projectRef,
   connectionString,
   table,
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -203,10 +228,28 @@ export const updateForeignKey = async ({
   })
 }
 
+const getUpdateIdentitySequenceSQL = ({
+  schema,
+  table,
+  column,
+}: {
+  schema: string
+  table: string
+  column: string
+}) => {
+  return `SELECT setval('"${schema}"."${table}_${column}_seq"', (SELECT COALESCE(MAX("${column}"), 1) FROM "${schema}"."${table}"))`
+}
+
+const getEnableRLSSQL = ({ schema, table }: { schema: string; table: string }) => {
+  return `ALTER TABLE "${schema}"."${table}" ENABLE ROW LEVEL SECURITY`
+}
+
 /**
  * The methods below involve several contexts due to the UI flow of the
  * dashboard and hence do not sit within their own stores
  */
+
+/** TODO: Refactor to do in a single transaction */
 export const createColumn = async ({
   projectRef,
   connectionString,
@@ -218,9 +261,9 @@ export const createColumn = async ({
   toastId: _toastId,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   payload: CreateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   skipSuccessMessage?: boolean
@@ -230,7 +273,7 @@ export const createColumn = async ({
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await createDatabaseColumn({
+    await createDatabaseColumn({
       projectRef: projectRef,
       connectionString: connectionString,
       payload: formattedPayload,
@@ -246,18 +289,18 @@ export const createColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          payload.schema,
+          payload.table,
           primaryKey.name
         )
       }
 
-      const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+      const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
       await addPrimaryKey(
         projectRef,
         connectionString,
-        column.schema,
-        column.table,
+        payload.schema,
+        payload.table,
         primaryKeyColumns
       )
     }
@@ -267,24 +310,26 @@ export const createColumn = async ({
       await addForeignKey({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: payload.schema, name: payload.table },
         foreignKeys: foreignKeyRelations,
       })
     }
 
     if (!skipSuccessMessage) {
-      toast.success(`Successfully created column "${column.name}"`, { id: toastId })
+      toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
+    return { error: undefined }
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
   }
 }
 
+/** TODO: Refactor to do in a single transaction */
 export const updateColumn = async ({
   projectRef,
   connectionString,
-  id,
+  originalColumn,
   payload,
   selectedTable,
   primaryKey,
@@ -294,10 +339,10 @@ export const updateColumn = async ({
   skipSuccessMessage = false,
 }: {
   projectRef: string
-  connectionString: string | undefined
-  id: string
+  connectionString?: string | null
+  originalColumn: RetrievedTableColumn
   payload: UpdateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   existingForeignKeyRelations?: ForeignKeyConstraint[]
@@ -306,10 +351,10 @@ export const updateColumn = async ({
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await updateDatabaseColumn({
+    await updateDatabaseColumn({
       projectRef,
       connectionString,
-      id,
+      originalColumn,
       payload: formattedPayload,
     })
 
@@ -321,22 +366,23 @@ export const updateColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          originalColumn.schema,
+          originalColumn.table,
           primaryKey.name
         )
       }
 
+      const columnName = formattedPayload.name ?? originalColumn.name
       const primaryKeyColumns = isPrimaryKey
-        ? existingPrimaryKeys.concat([column.name])
-        : existingPrimaryKeys.filter((x) => x !== column.name)
+        ? existingPrimaryKeys.concat([columnName])
+        : existingPrimaryKeys.filter((x) => x !== columnName)
 
       if (primaryKeyColumns.length) {
         await addPrimaryKey(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          originalColumn.schema,
+          originalColumn.table,
           primaryKeyColumns
         )
       }
@@ -347,24 +393,25 @@ export const updateColumn = async ({
       await updateForeignKeys({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: originalColumn.schema, name: originalColumn.table },
         foreignKeys: foreignKeyRelations,
         existingForeignKeyRelations,
       })
     }
 
-    if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
+    if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
     return { error }
   }
 }
 
+/** TODO: Refactor to do in a single transaction */
 export const duplicateTable = async (
   projectRef: string,
-  connectionString: string | undefined,
-  payload: { name: string; comment?: string },
+  connectionString: string | undefined | null,
+  payload: { name: string; comment?: string | null },
   metadata: {
-    duplicateTable: PostgresTable
+    duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
     isDuplicateRows: boolean
     foreignKeyRelations: ForeignKey[]
@@ -382,12 +429,12 @@ export const duplicateTable = async (
     connectionString,
     sql: [
       `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
-      payload.comment !== undefined
+      payload.comment != undefined
         ? `comment on table "${sourceTableSchema}"."${duplicatedTableName}" is '${payload.comment}';`
         : '',
     ].join('\n'),
   })
-  await queryClient.invalidateQueries(tableKeys.list(projectRef, sourceTableSchema))
+  await queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, sourceTableSchema) })
 
   // Duplicate foreign key constraints over
   if (foreignKeyRelations.length > 0) {
@@ -432,6 +479,7 @@ export const duplicateTable = async (
       projectRef,
       connectionString,
       id: duplicatedTable?.id!,
+      name: duplicatedTable?.name!,
       schema: duplicatedTable?.schema!,
       payload: { rls_enabled: isRLSEnabled },
     })
@@ -449,186 +497,273 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
+  organizationSlug,
+  generatedPolicies = [],
+  onCreatePoliciesSuccess,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   toastId: string | number
   payload: {
     name: string
     schema: string
-    comment?: string | undefined
+    comment?: string | null
   }
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
+  organizationSlug?: string
+  generatedPolicies?: GeneratedPolicy[]
+  onCreatePoliciesSuccess?: () => void
 }) => {
   const queryClient = getQueryClient()
 
-  // Create the table first. Error may be thrown.
-  const table = await createTableMutation({
-    projectRef: projectRef,
-    connectionString: connectionString,
-    payload: payload,
+  // Build all SQL statements for table creation, columns, and constraints
+  // to execute in a single transaction for better performance and atomicity
+  const sqlStatements: string[] = []
+
+  // 1. Create table SQL
+  const { sql: createTableSql } = pgMeta.tables.create(payload)
+  sqlStatements.push(createTableSql)
+
+  // 2. Enable RLS if configured
+  if (isRLSEnabled) {
+    const enableRLSSQL = getEnableRLSSQL({ schema: payload.schema, table: payload.name })
+    sqlStatements.push(enableRLSSQL)
+  }
+
+  // 3. Add columns SQL (without primary keys - those are added as constraints)
+  for (const column of columns) {
+    const columnPayload = generateCreateColumnPayload(
+      { schema: payload.schema, name: payload.name } as RetrieveTableResult,
+      { ...column, isPrimaryKey: false }
+    )
+    const { sql: columnSQL } = pgMeta.columns.create({
+      schema: columnPayload.schema,
+      table: columnPayload.table,
+      name: columnPayload.name,
+      type: columnPayload.type,
+      default_value: columnPayload.defaultValue,
+      default_value_format: columnPayload.defaultValueFormat,
+      is_identity: columnPayload.isIdentity,
+      is_nullable: columnPayload.isNullable,
+      is_primary_key: columnPayload.isPrimaryKey,
+      is_unique: columnPayload.isUnique,
+      comment: columnPayload.comment,
+      check: columnPayload.check,
+    })
+    sqlStatements.push(columnSQL)
+  }
+
+  // 4. Add primary key constraint (supports composite keys)
+  const primaryKeyColumns = columns
+    .filter((column) => column.isPrimaryKey)
+    .map((column) => column.name)
+  if (primaryKeyColumns.length > 0) {
+    const primaryKeySQL = getAddPrimaryKeySQL({
+      schema: payload.schema,
+      table: payload.name,
+      columns: primaryKeyColumns,
+    })
+    sqlStatements.push(primaryKeySQL)
+  }
+
+  // 5. Add foreign key constraints
+  if (foreignKeyRelations.length > 0) {
+    const fkSql = getAddForeignKeySQL({
+      table: { schema: payload.schema, name: payload.name },
+      foreignKeys: foreignKeyRelations,
+    })
+    // Remove trailing semicolon since we join with semicolons
+    sqlStatements.push(fkSql.replace(/;+$/, ''))
+  }
+
+  // Execute all table creation SQL in a single transaction
+  toast.loading(`Creating table ${payload.name}...`, { id: toastId })
+
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql: sqlStatements.join(';\n'),
+    queryKey: ['table', 'create-with-columns'],
   })
 
-  // If we face any errors during this process after the actual table creation
-  // We'll delete the table as a way to clean up and not leave behind bits that
-  // got through successfully. This is so that the user can continue editing in
-  // the table side panel editor conveniently
-  try {
-    // Toggle RLS if configured to be
-    if (isRLSEnabled) {
-      await updateTableMutation({
-        projectRef,
-        connectionString,
-        id: table.id,
-        schema: table.schema,
-        payload: { rls_enabled: isRLSEnabled },
-      })
-    }
+  // 6. Create generated RLS policies if any
+  // [Joshen] Possible area for optimization to create all policies in a single query call
+  // Can be subsequently added to the table creation SQL as well for a single transaction
 
-    // Then insert the columns - we don't do Promise.all as we want to keep the integrity
-    // of the column order during creation. Note that we add primary key constraints separately
-    // via the query endpoint to support composite primary keys as pg-meta does not support that OOB
-    toast.loading(`Adding ${columns.length} columns to ${table.name}...`, { id: toastId })
-
-    for (const column of columns) {
-      // We create all columns without primary keys first
-      const columnPayload = generateCreateColumnPayload(table.id, {
-        ...column,
-        isPrimaryKey: false,
-      })
-      await createDatabaseColumn({
-        projectRef,
-        connectionString,
-        payload: columnPayload,
-      })
-    }
-
-    // Then add the primary key constraints here to support composite keys
-    const primaryKeyColumns = columns
-      .filter((column) => column.isPrimaryKey)
-      .map((column) => column.name)
-    if (primaryKeyColumns.length > 0) {
-      await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
-    }
-
-    // Then add the foreign key constraints here
-    if (foreignKeyRelations.length > 0) {
-      await addForeignKey({
-        projectRef,
-        connectionString,
-        table: { schema: table.schema, name: table.name },
-        foreignKeys: foreignKeyRelations,
-      })
-    }
-
-    // If the user is importing data via a spreadsheet
-    if (importContent !== undefined) {
-      if (importContent.file && importContent.rowCount > 0) {
-        // Via a CSV file
-        const { error }: any = await insertRowsViaSpreadsheet(
-          projectRef,
-          connectionString,
-          importContent.file,
-          table,
-          importContent.selectedHeaders,
-          (progress: number) => {
-            toast.loading(
-              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                <SparkBar
-                  value={progress}
-                  max={100}
-                  type="horizontal"
-                  barClass="bg-brand"
-                  labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
-                  labelBottomClass=""
-                  labelTop={`${progress.toFixed(2)}%`}
-                  labelTopClass="tabular-nums"
-                />
-              </div>,
-              { id: toastId }
-            )
-          }
-        )
-
-        // For identity columns, manually raise the sequences
-        const identityColumns = columns.filter((column) => column.isIdentity)
-        for (const column of identityColumns) {
-          await executeSql({
+  const failedPolicies: GeneratedPolicy[] = []
+  if (generatedPolicies.length > 0 && isRLSEnabled) {
+    toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
+    await Promise.all(
+      generatedPolicies.map(async (policy) => {
+        try {
+          return await createDatabasePolicy({
             projectRef,
             connectionString,
-            sql: `SELECT setval('${table.name}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${table.name}"));`,
+            payload: {
+              name: policy.name,
+              table: policy.table,
+              schema: policy.schema,
+              definition: policy.definition,
+              check: policy.check,
+              action: policy.action,
+              command: policy.command,
+              roles: policy.roles,
+            },
           })
+        } catch (error: any) {
+          console.error('Failed to generate policy', error.message)
+          failedPolicies.push(policy)
         }
-
-        if (error !== undefined) {
-          toast.error('Do check your spreadsheet if there are any discrepancies.')
-
-          const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
-          toast.error(message)
-          console.error('Error:', { error, message })
-        }
-      } else {
-        // Via text copy and paste
-        await insertTableRows(
-          projectRef,
-          connectionString,
-          table,
-          importContent.rows,
-          importContent.selectedHeaders,
-          (progress: number) => {
-            toast.loading(
-              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                <SparkBar
-                  value={progress}
-                  max={100}
-                  type="horizontal"
-                  barClass="bg-brand"
-                  labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                  labelBottomClass=""
-                  labelTop={`${progress.toFixed(2)}%`}
-                  labelTopClass="tabular-nums"
-                />
-              </div>,
-              { id: toastId }
-            )
-          }
-        )
-
-        // For identity columns, manually raise the sequences
-        const identityColumns = columns.filter((column) => column.isIdentity)
-        for (const column of identityColumns) {
-          await executeSql({
-            projectRef,
-            connectionString,
-            sql: `SELECT setval('${table.name}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${table.name}"));`,
-          })
-        }
-      }
-    }
-
-    await prefetchEditorTablePage({
-      queryClient,
-      projectRef,
-      connectionString,
-      id: table.id,
-    })
-
-    // Finally, return the created table
-    return table
-  } catch (error) {
-    deleteTableMutation({
-      projectRef,
-      connectionString,
-      id: table.id,
-      schema: table.schema,
-    })
-    throw error
+      })
+    )
+    onCreatePoliciesSuccess?.()
   }
+
+  // Track table creation event (fire-and-forget to avoid blocking)
+  sendEvent({
+    event: {
+      action: 'table_created',
+      properties: {
+        method: 'table_editor',
+        schema_name: payload.schema,
+        table_name: payload.name,
+        has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
+      },
+      groups: {
+        project: projectRef,
+        ...(organizationSlug && { organization: organizationSlug }),
+      },
+    },
+  }).catch((error) => {
+    console.error('Failed to track table creation event:', error)
+  })
+
+  // Track RLS enablement event if enabled (fire-and-forget)
+  if (isRLSEnabled) {
+    sendEvent({
+      event: {
+        action: 'table_rls_enabled',
+        properties: {
+          method: 'table_editor',
+          schema_name: payload.schema,
+          table_name: payload.name,
+        },
+        groups: {
+          project: projectRef,
+          ...(organizationSlug && { organization: organizationSlug }),
+        },
+      },
+    }).catch((error) => {
+      console.error('Failed to track RLS enablement event:', error)
+    })
+  }
+
+  // Fetch the created table
+  const table = await getTableQuery({
+    projectRef,
+    connectionString,
+    name: payload.name,
+    schema: payload.schema,
+  })
+
+  // If the user is importing data via a spreadsheet
+  if (importContent !== undefined) {
+    if (importContent.file && importContent.rowCount > 0) {
+      // Via a CSV file
+      const { error }: any = await insertRowsViaSpreadsheet(
+        projectRef,
+        connectionString,
+        importContent.file,
+        table,
+        importContent.selectedHeaders,
+        (progress: number) => {
+          toast.loading(
+            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+              <SparkBar
+                value={progress}
+                max={100}
+                type="horizontal"
+                barClass="bg-brand"
+                labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
+                labelBottomClass=""
+                labelTop={`${progress.toFixed(2)}%`}
+                labelTopClass="tabular-nums"
+              />
+            </div>,
+            { id: toastId }
+          )
+        }
+      )
+
+      if (error !== undefined) {
+        toast.error('Do check your spreadsheet if there are any discrepancies.')
+        const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
+        toast.error(message)
+        console.error('Error:', { error, message })
+      }
+    } else {
+      // Via text copy and paste
+      await insertTableRows(
+        projectRef,
+        connectionString,
+        table,
+        importContent.rows,
+        importContent.selectedHeaders,
+        (progress: number) => {
+          toast.loading(
+            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+              <SparkBar
+                value={progress}
+                max={100}
+                type="horizontal"
+                barClass="bg-brand"
+                labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
+                labelTop={`${progress.toFixed(2)}%`}
+                labelTopClass="tabular-nums"
+              />
+            </div>,
+            { id: toastId }
+          )
+        }
+      )
+    }
+
+    // For identity columns, manually raise the sequences (batched for performance)
+    const identityColumns = columns.filter((column) => column.isIdentity)
+    if (identityColumns.length > 0) {
+      const updateSequenceSQL = identityColumns
+        .map((column) =>
+          getUpdateIdentitySequenceSQL({
+            schema: table.schema,
+            table: table.name,
+            column: column.name,
+          })
+        )
+        .join(';\n')
+      await executeSql({
+        projectRef,
+        connectionString,
+        sql: updateSequenceSQL,
+        queryKey: ['sequences', 'update-batch'],
+      })
+    }
+  }
+
+  await prefetchEditorTablePage({
+    queryClient,
+    projectRef,
+    connectionString,
+    id: table.id,
+  })
+
+  // Finally, return the created table
+  return { table, failedPolicies }
 }
 
+/** TODO: Refactor to do in a single transaction */
 export const updateTable = async ({
   projectRef,
   connectionString,
@@ -639,22 +774,25 @@ export const updateTable = async ({
   foreignKeyRelations,
   existingForeignKeyRelations,
   primaryKey,
+  organizationSlug,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   toastId: string | number
-  table: PostgresTable
-  payload: any
+  table: RetrieveTableResult
+  payload: UpdateTableBody
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
+  organizationSlug?: string
 }) => {
+  const queryClient = getQueryClient()
+
   // Prepare a check to see if primary keys to the tables were updated or not
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
-
   const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
   const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
@@ -668,16 +806,58 @@ export const updateTable = async ({
     }
   }
 
-  // Update the table
-  const updatedTable = await updateTableMutation({
-    projectRef,
-    connectionString,
-    id: table.id,
-    schema: table.schema,
-    payload,
+  if (Object.keys(payload).length > 0) {
+    await updateTableMutation({
+      projectRef,
+      connectionString,
+      id: table.id,
+      name: table.name,
+      schema: table.schema,
+      payload,
+    })
+  }
+
+  // Track RLS enablement if it's being turned on
+  if (payload.rls_enabled === true) {
+    try {
+      await sendEvent({
+        event: {
+          action: 'table_rls_enabled',
+          properties: {
+            method: 'table_editor',
+            schema_name: table.schema,
+            table_name: payload.name ?? table.name,
+          },
+          groups: {
+            project: projectRef,
+            ...(organizationSlug && { organization: organizationSlug }),
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Failed to track RLS enablement event:', error)
+    }
+  }
+
+  const updatedTable = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(
+      projectRef,
+      payload.name ?? table.name,
+      payload.schema ?? table.schema
+    ),
+    queryFn: ({ signal }) =>
+      getTable(
+        {
+          projectRef,
+          connectionString,
+          name: payload.name ?? table.name,
+          schema: payload.schema ?? table.schema,
+        },
+        signal
+      ),
   })
 
-  const originalColumns = table.columns ?? []
+  const originalColumns = updatedTable.columns ?? []
   const columnIds = columns.map((column) => column.id)
 
   // Delete any removed columns
@@ -687,7 +867,7 @@ export const updateTable = async ({
     await deleteDatabaseColumn({
       projectRef,
       connectionString,
-      id: column.id,
+      column,
     })
   }
 
@@ -698,11 +878,11 @@ export const updateTable = async ({
       toast.loading(`Adding column ${column.name} to ${updatedTable.name}`, { id: toastId })
       // Ensure that columns do not created as primary key first, cause the primary key will
       // be added later on further down in the code
-      const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+      const columnPayload = generateCreateColumnPayload(updatedTable, {
         ...column,
         isPrimaryKey: false,
       })
-      await createColumn({
+      const { error } = await createColumn({
         projectRef: projectRef,
         connectionString: connectionString,
         payload: columnPayload,
@@ -710,8 +890,9 @@ export const updateTable = async ({
         skipSuccessMessage: true,
         toastId,
       })
+      if (!!error) hasError = true
     } else {
-      const originalColumn = find(originalColumns, { id: column.id })
+      const originalColumn = find(table.columns, { id: column.id })
       if (originalColumn) {
         const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
@@ -720,7 +901,12 @@ export const updateTable = async ({
           const res = await updateColumn({
             projectRef: projectRef,
             connectionString: connectionString,
-            id: column.id,
+            // Use the updated table name and schema since the table might have been renamed
+            originalColumn: {
+              ...originalColumn,
+              table: updatedTable.name,
+              schema: updatedTable.schema,
+            },
             payload: columnPayload,
             selectedTable: updatedTable,
             skipPKCreation: true,
@@ -755,18 +941,22 @@ export const updateTable = async ({
     existingForeignKeyRelations,
   })
 
-  const queryClient = getQueryClient()
-
   await Promise.all([
-    queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
-    queryClient.invalidateQueries(databaseKeys.foreignKeyConstraints(projectRef, table.schema)),
-    queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
-    queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+    queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, table.id) }),
+    queryClient.invalidateQueries({
+      queryKey: databaseKeys.foreignKeyConstraints(projectRef, table.schema),
+    }),
+    queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
+    queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
+    queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, table.schema, true) }),
+    queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
   ])
 
   // We need to invalidate tableRowsAndCount after tableEditor
   // to ensure the query sent is correct
-  await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+  await queryClient.invalidateQueries({
+    queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+  })
 
   return {
     table: await prefetchTableEditor(queryClient, {
@@ -778,11 +968,52 @@ export const updateTable = async ({
   }
 }
 
+/**
+ * Used in insertRowsViaSpreadsheet + insertTableRows
+ */
+export const formatRowsForInsert = ({
+  rows,
+  headers,
+  columns = [],
+}: {
+  rows: any[]
+  headers: string[]
+  columns?: RetrieveTableResult['columns']
+}) => {
+  return rows.map((row: any) => {
+    const formattedRow: any = {}
+    headers.forEach((header) => {
+      const column = columns?.find((c) => c.name === header)
+      const originalValue = row[header]
+
+      if ((column?.format ?? '').includes('json')) {
+        formattedRow[header] = tryParseJson(originalValue)
+      } else if ((column?.data_type ?? '') === 'ARRAY') {
+        if (
+          typeof originalValue === 'string' &&
+          originalValue.startsWith('{') &&
+          originalValue.endsWith('}')
+        ) {
+          const formattedPostgresArraytoJsonArray = `[${originalValue.slice(1, originalValue.length - 1)}]`
+          formattedRow[header] = tryParseJson(formattedPostgresArraytoJsonArray)
+        } else {
+          formattedRow[header] = tryParseJson(originalValue)
+        }
+      } else if (originalValue === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
+      } else {
+        formattedRow[header] = originalValue
+      }
+    })
+    return formattedRow
+  })
+}
+
 export const insertRowsViaSpreadsheet = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   file: any,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
 ) => {
@@ -800,25 +1031,17 @@ export const insertRowsViaSpreadsheet = async (
       chunk: async (results: any, parser: any) => {
         parser.pause()
 
-        const formattedData = results.data.map((row: any) => {
-          const formattedRow: any = {}
-          selectedHeaders.forEach((header) => {
-            const column = table.columns?.find((c) => c.name === header)
-            if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-              formattedRow[header] = tryParseJson(row[header])
-            } else if (row[header] === '') {
-              // if the cell is empty string, convert it to NULL
-              formattedRow[header] = column?.is_nullable ? null : ''
-            } else {
-              formattedRow[header] = row[header]
-            }
-          })
-          return formattedRow
+        const formattedData = formatRowsForInsert({
+          rows: results.data,
+          headers: selectedHeaders,
+          columns: table.columns,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeSql({ projectRef, connectionString, sql: insertQuery })
+          await executeWithRetry(() =>
+            executeSql({ projectRef, connectionString, sql: insertQuery })
+          )
         } catch (error) {
           console.warn(error)
           insertError = error
@@ -842,8 +1065,8 @@ export const insertRowsViaSpreadsheet = async (
 
 export const insertTableRows = async (
   projectRef: string,
-  connectionString: string | undefined,
-  table: PostgresTable,
+  connectionString: string | undefined | null,
+  table: RetrieveTableResult,
   rows: any,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
@@ -851,19 +1074,10 @@ export const insertTableRows = async (
   let insertError = undefined
   let insertProgress = 0
 
-  const formattedRows = rows.map((row: any) => {
-    const formattedRow: any = {}
-    selectedHeaders.forEach((header) => {
-      const column = table.columns?.find((c) => c.name === header)
-      if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-        formattedRow[header] = tryParseJson(row[header])
-      } else if (row[header] === '') {
-        formattedRow[header] = column?.is_nullable ? null : ''
-      } else {
-        formattedRow[header] = row[header]
-      }
-    })
-    return formattedRow
+  const formattedRows = formatRowsForInsert({
+    rows,
+    headers: selectedHeaders,
+    columns: table.columns,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)
@@ -905,7 +1119,7 @@ const updateForeignKeys = async ({
   existingForeignKeyRelations,
 }: {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]

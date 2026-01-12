@@ -1,0 +1,402 @@
+---
+title: Processing large jobs with Edge Functions, Cron, and Queues
+description: Learn how to build scalable data processing pipelines using Supabase Edge Functions, cron jobs, and database queues and handle large workloads without timeouts or crashes.
+author: prashant
+image: 2025-09-processing-large-jobs-with-edge-functions/og.png
+thumb: 2025-09-processing-large-jobs-with-edge-functions/og.png
+categories:
+  - postgres
+  - edge functions
+  - cron
+  - queues
+date: 2025-09-16:08:00
+toc_depth: 2
+---
+
+When you're building applications that process large amounts of data, you quickly run into a fundamental problem: trying to do everything at once leads to timeouts, crashes, and frustrated users. The solution isn't to buy bigger servers. It's to break big jobs into small, manageable pieces.
+
+Supabase gives you three tools that work beautifully together for this: [Edge Functions](/edge-functions) for serverless compute, [Cron](/modules/cron) for scheduling, and database [queues](/modules/queues) for reliable job processing.
+
+Here's how to use them to build a system that can handle serious scale.
+
+## The three-layer pattern
+
+The architecture is simple but powerful. Think of it like an assembly line:
+
+**Collection**: Cron jobs run Edge Functions that discover work and add tasks to queues
+
+**Distribution**: Other cron jobs route tasks from main queues to specialized processing queues
+
+**Processing**: Specialized workers handle specific types of tasks from their assigned queues
+
+<Img
+  src={{
+    dark: '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-diagram.png',
+    light:
+      '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-diagram.png',
+  }}
+  alt="A diagram showing the three-layer pattern described above"
+/>
+
+This breaks apart the complexity. Instead of one giant function that scrapes websites, processes content with AI, and stores everything, you have focused functions that each do one thing well.
+
+## Real example: Building an NFL news aggregator
+
+Let's say you want to build a dashboard that tracks NFL (American football) news from multiple sources including NFL-related websites and NFL-related videos on YouTube, automatically tags articles by topic, and lets users search by player or team. When they see an article they’re interested in, they can click on it and visit the website that hosts the article. It’s like a dedicated Twitter feed for the NFL without any of the toxicity.
+
+This sounds straightforward, but at scale this becomes complex fast. You need to monitor dozens of news sites, process hundreds of articles daily, make API calls to OpenAI for content analysis, generate vector embeddings for search, and store everything efficiently. Do this wrong and a single broken webpage crashes your entire pipeline.
+
+We need to build a more resilient approach. With Supabase Edge Functions, Cron, and Queues, we have the building blocks for a robust content extraction and categorization pipeline.
+
+## Setting up the foundation
+
+Everything starts with the [database](/database), and Supabase is Postgres at its core. We know what we’re getting: scalable, dependable, and standard.
+
+The database design for the application follows a clean pattern. You have content tables for storing articles and videos, queue tables for managing work, entity tables for NFL players and teams, and relationship tables linking everything together. For example:
+
+```sql
+create table articles (
+  url text unique not null,
+  headline text,
+  content text,
+  embedding vector(1536)
+);
+```
+
+## Collection: Finding new content
+
+The collection layer seeks out new NFL-related content and runs on a schedule to discover new articles and videos. We create a collector for every site we want to search. A cron job triggers every 30 minutes to begin collection:
+
+```sql
+SELECT cron.schedule(
+  'nfl-collector',
+  '*/30 * * * *',
+  $$SELECT net.http_post(url := '[https://your-project.supabase.co/functions/v1/collect-content')$$](https://your-project.supabase.co/functions/v1/collect-content')$$)
+);
+```
+
+The Edge Function does the actual scraping. The trick is being selective about what you collect:
+
+```tsx
+function isRelevantArticle(url: string): boolean {
+  return url.includes('/news/') && !url.includes('/video/')
+}
+```
+
+This simple filter prevents collecting promotional content or videos. You only want actual news articles.
+
+When parsing HTML, you need to handle relative URLs properly:
+
+```tsx
+if (href.startsWith('/')) {
+  href = BASE_URL + href
+}
+```
+
+And always deduplicate within a single scraping session:
+
+```tsx
+const seen = new Set<string>()
+if (!seen.has(href)) {
+  seen.add(href)
+  articles.push({ url: href, site: 'nfl' })
+}
+```
+
+For database insertion, let the database handle duplicates rather than checking in your application:
+
+```tsx
+const { error } = await supabase.from('articles').insert({ url, site })
+if (error && !error.message.includes('duplicate')) {
+  console.error(`Error inserting: ${url}`, error)
+}
+```
+
+This approach is more reliable than complex application-level deduplication logic.
+
+## Distribution: Smart routing
+
+The distribution layer identifies articles that need processing and routes them to appropriate queues. The key insight is using separate queue tables for different content sources. [NFL.com](http://NFL.com) articles need different parsing than ESPN articles, so they get routed to specialized processors. It runs more frequently than collection: every 5 minutes:
+
+```sql
+SELECT cron.schedule(
+  'distributor',
+  '*/5 * * * *',
+  $$SELECT net.http_post(url := '[https://your-project.supabase.co/functions/v1/distribute-work')$$](https://your-project.supabase.co/functions/v1/distribute-work')$$)
+);
+```
+
+The Edge Function finds unprocessed articles using a simple SQL query:
+
+```tsx
+const { data } = await supabase
+  .from('articles')
+  .select('url, site')
+  .is('headline', null) // Missing headline means unprocessed
+  .limit(50)
+```
+
+Then it routes based on the source site:
+
+```tsx
+if ([article.site](http://article.site) === "nfl") {
+  await supabase.from("nfl_queue").insert({ url: article.url });
+} else if ([article.site](http://article.site) === "espn") {
+  await supabase.from("espn_queue").insert({ url: article.url });
+}
+```
+
+This separation is crucial because each site has different HTML structures and parsing requirements.
+
+## Processing: The heavy lifting
+
+Each content source gets its own processor that runs on its own schedule. [NFL.com](http://NFL.com) gets processed every 15 seconds because it's high-priority:
+
+```sql
+SELECT cron.schedule(
+  'nfl-processor',
+  '*/15 * * * *',
+  $$SELECT net.http_post(url := '[https://your-project.supabase.co/functions/v1/process-nfl')$$](https://your-project.supabase.co/functions/v1/process-nfl')$$)
+);
+```
+
+The processor handles one article at a time to stay within Edge Function timeout limits:
+
+```tsx
+const { data } = await supabase
+  .from('nfl_queue')
+  .select('id, url')
+  .eq('processed', false)
+  .order('created_at')
+  .limit(1)
+```
+
+Content extraction requires site-specific CSS selectors:
+
+```tsx
+const headline = $('h1').first().text().trim()
+const content = $('.article-body').text().trim() || $('article').text().trim()
+```
+
+Date parsing often needs custom logic for each site's format:
+
+```tsx
+const dateText = $('.publish-date').text()
+const match = dateText.match(/(\w+ \d+, \d{4})/)
+if (match) {
+  publication_date = new Date(match[1])
+}
+```
+
+After scraping, the article gets analyzed with AI to extract entities:
+
+```tsx
+const result = await classifyArticle(headline, content)
+const playerIds = await upsertPlayers(supabase, result.players)
+const teamIds = await upsertTeams(supabase, result.teams)
+```
+
+Finally, create the relationships and generate embeddings:
+
+```tsx
+await supabase.from("article_players").insert(
+  [playerIds.map](http://playerIds.map)(id => ({ article_url: url, player_id: id }))
+);
+
+const embedding = await generateEmbedding(`${headline}\n${content}`);
+await supabase.from("articles").update({ embedding }).eq("url", url);
+```
+
+The critical pattern is the finally block. We use it to always mark queue items as processed, preventing infinite loops when articles fail to process:
+
+```tsx
+try {
+  // Process article
+} finally {
+  await supabase.from("nfl_queue")
+    .update({ processed: true })
+    .eq("id", [item.id](http://item.id));
+}
+```
+
+### Monitoring with Sentry
+
+While the finally block prevents infinite loops, you still need visibility into what's actually failing. Sentry integration gives you detailed error tracking for your Edge Functions.
+
+First, set up Sentry in your Edge Function:
+
+```jsx
+import { captureException, init } from 'https://deno.land/x/sentry/index.js'
+
+init({
+  dsn: Deno.env.get('SENTRY_DSN'),
+  environment: Deno.env.get('ENVIRONMENT') || 'production',
+})
+```
+
+Then wrap your processing logic with proper error capture:
+
+```jsx
+try {
+  const content = await scrapeArticle(url);
+  const analysis = await classifyArticle(headline, content);
+  await storeArticle(article, analysis);
+} catch (error) {
+  *// Capture the full context for debugging*
+  captureException(error, {
+    tags: {
+      function: "nfl-processor",
+      site: article.site
+    },
+    extra: {
+      url: article.url,
+      queueId: queueItem.id
+    }
+  });
+  console.error(`Failed to process ${url}:`, error);
+} finally {
+  await supabase.from("nfl_queue")
+    .update({ processed: true })
+    .eq("id", queueItem.id);
+}
+```
+
+This gives you real-time alerts when processors fail and detailed context for debugging production issues.
+
+## Processing user interactions through the pipeline
+
+The same pipeline pattern works for user-generated events. When someone clicks, shares, or saves an article, you don't want to block their response while updating trending scores for every player and team mentioned in that article.
+
+Instead, treat interactions like any other job to be processed:
+
+```tsx
+// Just record the interaction quickly
+await supabase.from('interaction_queue').insert({
+  article_url: url,
+  user_id: userId,
+  interaction_type: 'share',
+})
+```
+
+Then let a separate cron job process the trending updates in batches:
+
+```sql
+SELECT cron.schedule(
+  'process-interactions',
+  '*/2 * * * *',  -- Every 2 minutes
+  $$SELECT net.http_post(url := '[https://your-project.supabase.co/functions/v1/process-interactions')$$](https://your-project.supabase.co/functions/v1/process-interactions')$$)
+);
+```
+
+The processor can handle multiple interactions efficiently:
+
+```tsx
+const { data: interactions } = await supabase
+  .from('interaction_queue')
+  .select('*')
+  .eq('processed', false)
+  .limit(100)
+```
+
+This keeps your user interface snappy while ensuring trending scores get updated reliably. If the trending processor goes down, interactions are safely queued and will be processed when it recovers.
+
+## AI-powered content scoring
+
+To surface the most important content automatically, use AI to analyze article context and assign importance scores.
+
+Define scores for different news types:
+
+```tsx
+const CONTEXT_SCORES = {
+  championship: 9,
+  trade: 6,
+  injury: 4,
+  practice: 1,
+}
+```
+
+Prompt OpenAI with structured output:
+
+```tsx
+const prompt = `Analyze this headline: "${headline}"
+Return JSON: {"context": "trade|injury|etc", "score": 1-9}`;
+
+const result = await [openai.chat](http://openai.chat).completions.create({
+  model: "gpt-3.5-turbo",
+  response_format: { type: "json_object" }
+});
+```
+
+Process articles in batches to manage API costs:
+
+```tsx
+const unprocessed = articles.filter((a) => !processedUrls.has(a.url)).slice(0, 10)
+
+for (const article of unprocessed) {
+  const analysis = await analyzeArticle(article)
+  await storeAnalysis(article.url, analysis)
+}
+```
+
+## Background tasks for expensive operations
+
+Some operations are too expensive to run synchronously, even in your cron-triggered processors. Vector embedding generation and bulk AI analysis benefit from background task patterns.
+
+Edge Functions support background tasks that continue processing after the main response completes:
+
+typescript
+
+```jsx
+*// In your article processor*
+const article = await scrapeAndStore(url);
+
+*// Start expensive operations in background*
+const backgroundTasks = [
+  generateEmbedding(article),
+  analyzeWithAI(article),
+  updateRelatedContent(article)
+];
+
+*// Run background tasks without blocking the main flow*
+Promise.all(backgroundTasks).catch(error => {
+  captureException(error, {
+    tags: { operation: "background-tasks" },
+    extra: { articleUrl: url }
+  });
+});
+
+*// Main processing continues immediately*
+await markAsProcessed(queueItem.id);
+```
+
+For operations that might take longer than Edge Function limits, break them into smaller background chunks:
+
+typescript
+
+```jsx
+async function generateEmbeddingInBackground(article: Article) {
+  *// Process content in chunks*
+  const chunks = splitIntoChunks(article.content, 1000);
+
+  for (const chunk of chunks) {
+    await new Promise(resolve => {
+      *// Use background task for each chunk*
+      setTimeout(async () => {
+        const embedding = await generateEmbedding(chunk);
+        await storeEmbedding(article.id, embedding);
+        resolve(void 0);
+      }, 0);
+    });
+  }
+}
+```
+
+This pattern keeps your main processing pipeline fast while ensuring expensive operations complete reliably.
+
+## Why this works
+
+This pattern succeeds because it embraces the constraints of serverless computing rather than fighting them. Edge Functions have time limits, so you process one item at a time. External APIs have rate limits, so you control timing with cron schedules. Failures happen, so you isolate them to individual tasks.
+
+The result is a system that scales horizontally by adding more cron jobs and queues. Each component can fail independently without bringing down the whole pipeline. Users get fresh content as it becomes available rather than waiting for batch jobs to complete.
+
+Most importantly, it's built entirely with Supabase primitives — no external queue systems or job schedulers required. You get enterprise-grade reliability with startup simplicity.

@@ -38,7 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 }
 
 /**
- * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
+ * @deprecated Use `import { Select_shadcn_ } from "ui"` or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function Listbox({
   children,
@@ -191,7 +191,7 @@ function Listbox({
   if (error) selectClasses.push(__styles.variants.error)
   if (!error) selectClasses.push(__styles.variants.standard)
   // if (icon) selectClasses.push(SelectStyles['sbui-listbox--with-icon'])
-  if (icon) addonBeforeClasses.push(__styles.with_icon)
+  if (icon) addonBeforeClasses.push(__styles.with_icon[size])
   // if (size) selectClasses.push(SelectStyles[`sbui-listbox--${size}`])
   if (size) selectClasses.push(__styles.size[size])
   // if (borderless) selectClasses.push(SelectStyles['sbui-listbox--borderless'])

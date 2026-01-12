@@ -3,7 +3,7 @@ export const monokaiCustomTheme = (isDarkMode: boolean) => {
     hljs: {
       display: 'block',
       overflowX: 'auto',
-      color: isDarkMode ? '#ddd' : '#888',
+      color: isDarkMode ? '#ddd' : '#444',
     },
     'hljs-tag': {
       color: '#569cd6',

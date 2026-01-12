@@ -348,7 +348,8 @@
     "link": "/guides/database/extensions/pgjwt",
     "github_url": "https://github.com/michelp/pgjwt",
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pgroonga",
@@ -419,7 +420,8 @@
     "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#coffeescript-extension",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pljava",
@@ -436,7 +438,8 @@
     "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#livescript-extension",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "plpgsql",
@@ -463,7 +466,8 @@
     "link": "/guides/database/extensions/plv8",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "postgis",
@@ -544,7 +548,8 @@
     "link": "/guides/database/extensions/timescaledb",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "tsm_system_rows",

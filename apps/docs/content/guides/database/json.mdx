@@ -46,7 +46,7 @@ create table books (
 </TabPanel>
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](/dashboard/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table called `books`.
 3. Include a primary key with the following properties and click save:
 
@@ -113,7 +113,7 @@ values
 </TabPanel>
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](/dashboard/project/_/editor) page in the Dashboard.
 2. Select the `books` table in the sidebar.
 3. Click **+ Insert row** and add 5 rows with the following properties:
 
@@ -183,6 +183,7 @@ const { data, error } = await supabase.from('books').insert([
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -237,6 +238,8 @@ await supabase.from('books').insert([
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Supabase Swift provides a convenience `AnyJSON` type.
@@ -301,6 +304,8 @@ try await supabase.from("books")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -330,6 +335,8 @@ val data = supabase.from("books").insert(listOf(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -384,6 +391,7 @@ supabase.from_('books').insert([
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Query JSON data
@@ -417,7 +425,7 @@ from books;
 ```js
 const { data, error } = await supabase.from('books').select(`
     title,
-    description:  metadata->description,
+    description:  metadata->>description,
     price:        metadata->price,
     low_age:      metadata->ages->0,
     high_age:     metadata->ages->1
@@ -425,6 +433,7 @@ const { data, error } = await supabase.from('books').select(`
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -433,7 +442,7 @@ try await supabase
   .select(
     """
       title,
-      description:  metadata->description,
+      description:  metadata->>description,
       price:        metadata->price,
       low_age:      metadata->ages->0,
       high_age:     metadata->ages->1
@@ -443,12 +452,14 @@ try await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
 val data = supabase.from("books").select(Columns.raw("""
     title,
-    description: metadata->description,
+    description: metadata->>description,
     price: metadata->price,
     low_age: metadata->ages->0,
     high_age: metadata->ages->1
@@ -456,12 +467,14 @@ val data = supabase.from("books").select(Columns.raw("""
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 data = supabase.from_('books').select("""
   title,
-  description: metadata->description,
+  description: metadata->>description,
   price: metadata->price,
   low_age: metadata->ages->0,
   high_age: metadata->ages->1
@@ -470,6 +483,7 @@ data = supabase.from_('books').select("""
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="result" label="Result">
 
 | title                               | description                                                        | price | low_age | high_age |

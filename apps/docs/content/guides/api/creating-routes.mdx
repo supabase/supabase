@@ -20,7 +20,7 @@ This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATC
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](/dashboard/project/_/editor) page in the Dashboard.
 1. Click **New Table** and create a table with the name `todos`.
 1. Click **Save**.
 1. Click **New Column** and create a column with the name `task` and type `text`.
@@ -52,27 +52,33 @@ create table
 
 Every Supabase project has a unique API URL. Your API is secured behind an API gateway which requires an API Key for every request.
 
-1. Go to the [Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
+{/* TODO: Further consolidate partial */}
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-url-and-key.mp4"
-    type="video/mp4"
-  />
-</video>
+To do this, you need to get the Project URL and key from [the project's **Connect** dialog](/dashboard/project/_?showConnect=true).
+
+<Admonition type="note" title="Changes to API keys">
+
+Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
+
+In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
+
+- **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
+- **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
+
+</Admonition>
+
+[Read the API keys docs](/docs/guides/api/api-keys) for a full explanation of all key types and their uses.
 
 The REST API is accessible through the URL `https://<project_ref>.supabase.co/rest/v1`
 
-Both of these routes require the `anon` key to be passed through an `apikey` header.
+Both of these routes require the key to be passed through an `apikey` header.
 
 ## Using the API
 
 You can interact with your API directly via HTTP requests, or you can use the client libraries which we provide.
 
 Let's see how to make a request to the `todos` table which we created in the first step,
-using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
+using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_PUBLISHABLE_KEY`) we provided:
 
 <Tabs
   scrollable
@@ -86,7 +92,7 @@ using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
 ```javascript
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
 // Make a request
 const { data: todos, error } = await supabase.from('todos').select('*')
@@ -98,8 +104,8 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 ```bash
 # Append /rest/v1/ to your URL, and then use the table name as the route
 curl '<SUPABASE_URL>/rest/v1/todos' \
--H "apikey: <SUPABASE_ANON_KEY>" \
--H "Authorization: Bearer <SUPABASE_ANON_KEY>"
+-H "apikey: <SUPABASE_PUBLISHABLE_KEY>" \
+-H "Authorization: Bearer <SUPABASE_PUBLISHABLE_KEY>"
 ```
 
 </TabPanel>

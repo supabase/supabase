@@ -1,7 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type EdgeFunctionServiceStatusVariables = {
@@ -9,10 +8,16 @@ export type EdgeFunctionServiceStatusVariables = {
 }
 
 export async function getEdgeFunctionServiceStatus(signal?: AbortSignal) {
-  const res = await get(`https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check`, {
-    signal,
-  })
-  return res as { healthy: boolean }
+  try {
+    const res = await fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check', {
+      method: 'GET',
+      signal,
+    })
+    const response = await res.json()
+    return response as { healthy: boolean }
+  } catch (err) {
+    return { healthy: false }
+  }
 }
 
 export type EdgeFunctionServiceStatusData = Awaited<ReturnType<typeof getEdgeFunctionServiceStatus>>
@@ -23,13 +28,15 @@ export const useEdgeFunctionServiceStatusQuery = <TData = EdgeFunctionServiceSta
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData> = {}
+  }: UseCustomQueryOptions<
+    EdgeFunctionServiceStatusData,
+    EdgeFunctionServiceStatusError,
+    TData
+  > = {}
 ) =>
-  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>(
-    serviceStatusKeys.edgeFunctions(projectRef),
-    ({ signal }) => getEdgeFunctionServiceStatus(signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>({
+    queryKey: serviceStatusKeys.edgeFunctions(projectRef),
+    queryFn: ({ signal }) => getEdgeFunctionServiceStatus(signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

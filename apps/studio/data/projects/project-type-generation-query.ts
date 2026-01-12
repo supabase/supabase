@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 export type GenerateTypesVariables = { ref?: string; included_schemas?: string }
@@ -26,10 +26,14 @@ export type GenerateTypesError = ResponseError
 
 export const useGenerateTypesQuery = <TData = GenerateTypesData>(
   { ref, included_schemas }: GenerateTypesVariables,
-  { enabled = true, ...options }: UseQueryOptions<GenerateTypesData, GenerateTypesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<GenerateTypesData, GenerateTypesError, TData> = {}
 ) =>
-  useQuery<GenerateTypesData, GenerateTypesError, TData>(
-    projectKeys.types(ref),
-    ({ signal }) => generateTypes({ ref, included_schemas }, signal),
-    { enabled: enabled && typeof ref !== 'undefined', ...options }
-  )
+  useQuery<GenerateTypesData, GenerateTypesError, TData>({
+    queryKey: projectKeys.types(ref),
+    queryFn: ({ signal }) => generateTypes({ ref, included_schemas }, signal),
+    enabled: enabled && typeof ref !== 'undefined',
+    ...options,
+  })

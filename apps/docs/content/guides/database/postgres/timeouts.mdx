@@ -71,7 +71,8 @@ alter role example_role set statement_timeout = '10min'; -- could also use secon
 ```
 
 <Admonition type="tip">
-  If you are changing the timeout for the Supabase Client API calls, you will need to reload PostgREST to reflect the timeout changes by running the following script:
+
+If you are changing the timeout for the Supabase Client API calls, you will need to reload PostgREST to reflect the timeout changes by running the following script:
 
 ```sql
 NOTIFY pgrst, 'reload config';
@@ -162,11 +163,10 @@ Each API server uses a designated user for connecting to the database:
 
 | Role                         | API/Tool                                                                  |
 | ---------------------------- | ------------------------------------------------------------------------- |
-| `supabase_admin`             | Used by Supabase to configure projects and for monitoring                 |
+| `supabase_admin`             | Used by Realtime and for project configuration                            |
 | `authenticator`              | PostgREST                                                                 |
 | `supabase_auth_admin`        | Auth                                                                      |
 | `supabase_storage_admin`     | Storage                                                                   |
-| `supabase_realtime_admin`    | Realtime                                                                  |
 | `supabase_replication_admin` | Synchronizes Read Replicas                                                |
 | `postgres`                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
 | Custom roles                 | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |

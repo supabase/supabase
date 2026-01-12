@@ -56,7 +56,11 @@ export const SelectionDetailedRow = ({
 export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
   value,
   className,
-}) => <span className={'font-mono text-xs truncate ' + className}>{value}</span>
+}) => (
+  <span className={cn('font-mono text-xs truncate select-text cursor-text', className)}>
+    {value}
+  </span>
+)
 
 export const ResponseCodeFormatter = ({ value }: { value: string }) => {
   if (!value) {

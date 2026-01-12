@@ -7,6 +7,8 @@ import { cn } from '../../../lib/utils/cn'
 
 const TooltipProvider = TooltipPrimitive.Provider
 
+const TooltipPortal = TooltipPrimitive.Portal
+
 const Tooltip = (props: React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>) => (
   <TooltipPrimitive.Root {...props} />
 )
@@ -38,4 +40,4 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, TooltipPortal }

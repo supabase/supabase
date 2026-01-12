@@ -1,5 +1,6 @@
-import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 
@@ -114,7 +115,7 @@ export async function getEntityTypes(
 }
 
 export type EntityTypesData = Awaited<ReturnType<typeof getEntityTypes>>
-export type EntityTypesError = unknown
+export type EntityTypesError = ResponseError
 
 export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
@@ -129,11 +130,17 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
-) =>
-  useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
-    ({ signal, pageParam }) =>
+  }: UseCustomInfiniteQueryOptions<
+    EntityTypesData,
+    EntityTypesError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number | undefined
+  > = {}
+) => {
+  return useInfiniteQuery({
+    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
         {
           projectRef,
@@ -147,22 +154,22 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
         },
         signal
       ),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        const totalCount = lastPage.data.count
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      const totalCount = lastPage.data.count
 
-        if (currentTotalCount >= totalCount) {
-          return undefined
-        }
+      if (currentTotalCount >= totalCount) {
+        return undefined
+      }
 
-        return page
-      },
-      ...options,
-    }
-  )
+      return page
+    },
+    ...options,
+  })
+}
 
 export function prefetchEntityTypes(
   client: QueryClient,
@@ -176,9 +183,10 @@ export function prefetchEntityTypes(
     filterTypes,
   }: Omit<EntityTypesVariables, 'page'>
 ) {
-  return client.prefetchInfiniteQuery(
-    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
-    ({ signal, pageParam }) =>
+  return client.prefetchInfiniteQuery({
+    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    initialPageParam: 0,
+    queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
         {
           projectRef,
@@ -191,6 +199,6 @@ export function prefetchEntityTypes(
           filterTypes,
         },
         signal
-      )
-  )
+      ),
+  })
 }

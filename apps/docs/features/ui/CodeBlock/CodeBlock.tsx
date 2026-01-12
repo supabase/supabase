@@ -1,15 +1,23 @@
-import { type PropsWithChildren } from 'react'
-import { type BundledLanguage, codeToTokens, type ThemedToken } from 'shiki'
+import { Fragment, type PropsWithChildren } from 'react'
+import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn } from 'ui'
 
-import { CodeCopyButton } from './CodeBlock.client'
+import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
+import { getFontStyle } from './CodeBlock.utils'
+import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
 const twoslasher = createTwoslasher({ extraFiles })
-const TWOSLASHABLE_LANGS = ['js', 'ts', 'jsx', 'tsx', 'javascript', 'typescript']
+const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
+
+const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
+const highlighter = await createHighlighter({
+  themes: [theme],
+  langs: BUNDLED_LANGUAGES,
+})
 
 export async function CodeBlock({
   className,
@@ -17,17 +25,19 @@ export async function CodeBlock({
   lineNumbers = true,
   contents,
   children,
+  skipTypeGeneration,
 }: PropsWithChildren<{
   className?: string
   lang?: string
   lineNumbers?: boolean
   contents?: string
+  skipTypeGeneration?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
-  const lang = tryToBundledLanguage(langSetting) || extractLang(children)
+  const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
 
   let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
-  if (TWOSLASHABLE_LANGS.includes(lang)) {
+  if (!skipTypeGeneration && lang && TWOSLASHABLE_LANGS.includes(lang)) {
     try {
       const { code: editedCode, nodes } = twoslasher(code)
       const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')
@@ -35,15 +45,16 @@ export async function CodeBlock({
       code = editedCode
     } catch (_err) {
       // Silently ignore, if imports aren't defined type compilation fails
+      // Uncomment lines below to debug in dev
+      // console.log('\n==========CODE==========\n')
+      // console.log(code)
+      // console.error(_err.recommendation)
     }
   }
 
-  const { tokens } = await codeToTokens(code, {
-    lang,
-    themes: {
-      light: 'vitesse-light',
-      dark: 'vitesse-dark',
-    },
+  const { tokens } = highlighter.codeToTokens(code, {
+    lang: lang || undefined,
+    theme: 'Supabase Theme',
   })
 
   return (
@@ -53,7 +64,7 @@ export async function CodeBlock({
         'group',
         'relative',
         'not-prose',
-        'w-full overflow-hidden',
+        'w-full overflow-x-auto',
         'border border-default rounded-lg',
         'bg-200',
         'text-sm',
@@ -61,27 +72,42 @@ export async function CodeBlock({
       )}
     >
       <pre>
-        <code className={lineNumbers ? 'flex' : ''}>
-          {lineNumbers && (
-            <div className="flex-shrink-0 select-none text-right text-muted bg-control py-6 px-2">
-              {tokens.map((_, idx) => (
-                <div key={idx} className="w-full">
-                  {idx + 1}
-                </div>
+        <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
+          {lineNumbers ? (
+            <>
+              {tokens.map((line, idx) => (
+                <Fragment key={idx}>
+                  <div
+                    className={cn(
+                      'select-none text-right text-muted bg-control px-2 min-h-5 leading-5',
+                      idx === 0 && 'pt-6',
+                      idx === tokens.length - 1 && 'pb-6'
+                    )}
+                  >
+                    {idx + 1}
+                  </div>
+                  <div
+                    className={cn(
+                      'code-content min-h-5 leading-5 pl-6 pr-6',
+                      idx === 0 && 'pt-6',
+                      idx === tokens.length - 1 && 'pb-6'
+                    )}
+                  >
+                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
+                  </div>
+                </Fragment>
+              ))}
+            </>
+          ) : (
+            <div className="code-content p-6">
+              {tokens.map((line, idx) => (
+                <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
               ))}
             </div>
           )}
-          <div className={cn('p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
-            {tokens.map((line, idx) => (
-              <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-            ))}
-          </div>
         </code>
       </pre>
-      <CodeCopyButton
-        content={code.trim()}
-        className="hidden group-hover:block absolute top-2 right-2"
-      />
+      <CodeBlockControls content={code.trim()} />
     </div>
   )
 }
@@ -101,7 +127,7 @@ function CodeLine({
   })
 
   return (
-    <span className="block h-5">
+    <span className="block min-h-5 leading-5">
       {tokens.map((token) =>
         twoslash?.has(token.offset) ? (
           <AnnotatedSpan
@@ -110,56 +136,15 @@ function CodeLine({
             annotations={twoslash.get(token.offset)!}
           />
         ) : (
-          <span key={token.offset} style={token.htmlStyle}>
+          <span
+            key={token.offset}
+            style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}
+          >
             {token.content}
           </span>
         )
       )}
     </span>
-  )
-}
-
-export function AnnotatedSpan({
-  token,
-  annotations,
-}: {
-  token: ThemedToken
-  annotations: Array<NodeHover>
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger>
-        <span style={token.htmlStyle}>{token.content}</span>
-      </TooltipTrigger>
-      <TooltipContent className="max-w-[min(80vw,400px)] p-0 divide-y">
-        {annotations.map((annotation, idx) => (
-          <Annotation key={idx} annotation={annotation} />
-        ))}
-      </TooltipContent>
-    </Tooltip>
-  )
-}
-
-function Annotation({ annotation }: { annotation: NodeHover }) {
-  const { text, docs, tags } = annotation
-  return (
-    <div className="flex flex-col gap-2">
-      <code className={cn('block bg-200 p-2', (docs || tags) && 'border-b border-default')}>
-        {text}
-      </code>
-      {docs && <p className={cn('p-2', tags && 'border-b border-default')}>{docs}</p>}
-      {tags && (
-        <div className="p-2 flex flex-col">
-          {tags.map((tag, idx) => {
-            return (
-              <span key={idx}>
-                <code>@{tag[0]}</code> {tag[1]}
-              </span>
-            )
-          })}
-        </div>
-      )}
-    </div>
   )
 }
 
@@ -214,288 +199,3 @@ function tryToBundledLanguage(lang: string): BundledLanguage | null {
   }
   return null
 }
-
-const BUNDLED_LANGUAGES = [
-  'abap',
-  'actionscript-3',
-  'ada',
-  'adoc',
-  'angular-html',
-  'angular-ts',
-  'apache',
-  'apex',
-  'apl',
-  'applescript',
-  'ara',
-  'asciidoc',
-  'asm',
-  'astro',
-  'awk',
-  'ballerina',
-  'bash',
-  'bat',
-  'batch',
-  'be',
-  'beancount',
-  'berry',
-  'bibtex',
-  'bicep',
-  'blade',
-  'c',
-  'c#',
-  'c++',
-  'cadence',
-  'cdc',
-  'clarity',
-  'clj',
-  'clojure',
-  'closure-templates',
-  'cmake',
-  'cmd',
-  'cobol',
-  'codeowners',
-  'codeql',
-  'coffee',
-  'coffeescript',
-  'common-lisp',
-  'console',
-  'cpp',
-  'cql',
-  'crystal',
-  'cs',
-  'csharp',
-  'css',
-  'csv',
-  'cue',
-  'cypher',
-  'd',
-  'dart',
-  'dax',
-  'desktop',
-  'diff',
-  'docker',
-  'dockerfile',
-  'dream-maker',
-  'elisp',
-  'elixir',
-  'elm',
-  'emacs-lisp',
-  'erb',
-  'erl',
-  'erlang',
-  'f',
-  'f#',
-  'f03',
-  'f08',
-  'f18',
-  'f77',
-  'f90',
-  'f95',
-  'fennel',
-  'fish',
-  'fluent',
-  'for',
-  'fortran-fixed-form',
-  'fortran-free-form',
-  'fs',
-  'fsharp',
-  'fsl',
-  'ftl',
-  'gdresource',
-  'gdscript',
-  'gdshader',
-  'genie',
-  'gherkin',
-  'git-commit',
-  'git-rebase',
-  'gjs',
-  'gleam',
-  'glimmer-js',
-  'glimmer-ts',
-  'glsl',
-  'gnuplot',
-  'go',
-  'gql',
-  'graphql',
-  'groovy',
-  'gts',
-  'hack',
-  'haml',
-  'handlebars',
-  'haskell',
-  'haxe',
-  'hbs',
-  'hcl',
-  'hjson',
-  'hlsl',
-  'hs',
-  'html',
-  'html-derivative',
-  'http',
-  'hxml',
-  'hy',
-  'imba',
-  'ini',
-  'jade',
-  'java',
-  'javascript',
-  'jinja',
-  'jison',
-  'jl',
-  'js',
-  'json',
-  'json5',
-  'jsonc',
-  'jsonl',
-  'jsonnet',
-  'jssm',
-  'jsx',
-  'julia',
-  'kotlin',
-  'kql',
-  'kt',
-  'kts',
-  'kusto',
-  'latex',
-  'less',
-  'liquid',
-  'lisp',
-  'log',
-  'logo',
-  'lua',
-  'make',
-  'makefile',
-  'markdown',
-  'marko',
-  'matlab',
-  'md',
-  'mdc',
-  'mdx',
-  'mediawiki',
-  'mermaid',
-  'mojo',
-  'move',
-  'nar',
-  'narrat',
-  'nextflow',
-  'nf',
-  'nginx',
-  'nim',
-  'nix',
-  'nu',
-  'nushell',
-  'objc',
-  'objective-c',
-  'objective-cpp',
-  'ocaml',
-  'pascal',
-  'perl',
-  'perl6',
-  'php',
-  'plsql',
-  'po',
-  'postcss',
-  'pot',
-  'potx',
-  'powerquery',
-  'powershell',
-  'prisma',
-  'prolog',
-  'properties',
-  'proto',
-  'ps',
-  'ps1',
-  'pug',
-  'puppet',
-  'purescript',
-  'py',
-  'python',
-  'ql',
-  'qml',
-  'qmldir',
-  'qss',
-  'r',
-  'racket',
-  'raku',
-  'razor',
-  'rb',
-  'reg',
-  'regex',
-  'regexp',
-  'rel',
-  'riscv',
-  'rs',
-  'rst',
-  'ruby',
-  'rust',
-  'sas',
-  'sass',
-  'scala',
-  'scheme',
-  'scss',
-  'sh',
-  'shader',
-  'shaderlab',
-  'shell',
-  'shellscript',
-  'shellsession',
-  'smalltalk',
-  'solidity',
-  'soy',
-  'sparql',
-  'spl',
-  'splunk',
-  'sql',
-  'ssh-config',
-  'stata',
-  'styl',
-  'stylus',
-  'svelte',
-  'swift',
-  'system-verilog',
-  'systemd',
-  'tasl',
-  'tcl',
-  'terraform',
-  'tex',
-  'tf',
-  'tfvars',
-  'toml',
-  'ts',
-  'tsp',
-  'tsv',
-  'tsx',
-  'turtle',
-  'twig',
-  'typ',
-  'typescript',
-  'typespec',
-  'typst',
-  'v',
-  'vala',
-  'vb',
-  'verilog',
-  'vhdl',
-  'vim',
-  'viml',
-  'vimscript',
-  'vue',
-  'vue-html',
-  'vy',
-  'vyper',
-  'wasm',
-  'wenyan',
-  'wgsl',
-  'wiki',
-  'wikitext',
-  'wl',
-  'wolfram',
-  'xml',
-  'xsl',
-  'yaml',
-  'yml',
-  'zenscript',
-  'zig',
-  'zsh',
-  '文言',
-]

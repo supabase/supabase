@@ -44,7 +44,7 @@ You can use the `http` extension to make these network requests from Postgres.
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for `http` and enable the extension.
 
@@ -94,7 +94,7 @@ A successful call to a web URL from the `http` extension returns a record with t
 select
   "status", "content"::jsonb
 from
-  http_get('https://jsonplaceholder.typicode.com/todos/1');
+  extensions.http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
 
 ### Simple `POST` example
@@ -103,7 +103,7 @@ from
 select
   "status", "content"::jsonb
 from
-  http_post(
+  extensions.http_post(
     'https://jsonplaceholder.typicode.com/posts',
     '{ "title": "foo", "body": "bar", "userId": 1 }',
     'application/json'

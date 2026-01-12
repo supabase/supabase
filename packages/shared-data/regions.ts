@@ -1,11 +1,16 @@
-export type CloudProvider = 'FLY' | 'AWS' | 'AWS_NEW'
-export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
+export type CloudProvider = 'FLY' | 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
+export type Region = Partial<typeof AWS_REGIONS> | Partial<typeof FLY_REGIONS>
 
 export const AWS_REGIONS = {
   WEST_US: {
     code: 'us-west-1',
     displayName: 'West US (North California)',
     location: [37.774929, -122.419418],
+  },
+  WEST_US_2: {
+    code: 'us-west-2',
+    displayName: 'West US (Oregon)',
+    location: [45.51, -122.67],
   },
   EAST_US: {
     code: 'us-east-1',
@@ -24,7 +29,7 @@ export const AWS_REGIONS = {
     displayName: 'West Europe (London)',
     location: [51.507351, -0.127758],
   },
-  // WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)', location: [2.352222, 48.856613] },
+  WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)', location: [2.352222, 48.856613] },
   CENTRAL_EU: {
     code: 'eu-central-1',
     displayName: 'Central EU (Frankfurt)',
@@ -77,3 +82,9 @@ export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
 export const FLY_REGIONS = {
   SOUTHEAST_ASIA: { code: 'sin', displayName: 'Singapore', location: [1.3521, 103.8198] },
 } as const
+
+export const SMART_REGION_TO_EXACT_REGION_MAP = new Map([
+  ['Americas', 'East US (North Virginia)'],
+  ['Europe', 'Central EU (Frankfurt)'],
+  ['APAC', 'Southeast Asia (Singapore)'],
+])

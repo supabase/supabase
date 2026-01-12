@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  payload:
+    image: node:18-alpine
+    ports:
+      - '3030:3030'
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    working_dir: /home/node/app/
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  # Uncomment the following to use postgres 
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  data:
+  # pgdata:
+  node_modules:

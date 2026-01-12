@@ -287,6 +287,14 @@ export const METRICS: Metric[] = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
+
+  {
+    key: 'total_cached_egress',
+    label: 'All Cached Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+
   {
     key: 'total_storage_patch_requests',
     label: 'Storage PATCH Requests',
@@ -372,6 +380,14 @@ export const TIME_PERIODS_REPORTS = [
 ]
 
 export const TIME_PERIODS_INFRA = [
+  {
+    key: '10m',
+    label: 'Last 10 minutes',
+  },
+  {
+    key: '30m',
+    label: 'Last 30 minutes',
+  },
   {
     key: '1h',
     label: 'Last hour',

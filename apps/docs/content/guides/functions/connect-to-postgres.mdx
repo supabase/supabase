@@ -1,26 +1,28 @@
 ---
 id: 'examples-postgres-on-the-edge'
-title: 'Connecting directly to Postgres'
+title: 'Integrating with Supabase Database (Postgres)'
 description: 'Connecting to Postgres from Edge Functions.'
-subtitle: 'Connecting to Postgres from Edge Functions.'
+subtitle: 'Connect to your Postgres database from Edge Functions.'
 tocVideo: 'cl7EuF1-RsY'
 ---
 
 Connect to your Postgres database from an Edge Function by using the `supabase-js` client.
 You can also use other Postgres clients like [Deno Postgres](https://deno.land/x/postgres)
 
+---
+
 ## Using supabase-js
 
-The `supabase-js` client is a great option for connecting to your Supabase database since it handles authorization with Row Level Security, and it automatically formats your response as JSON.
+The `supabase-js` client handles authorization with Row Level Security and automatically formats responses as JSON. This is the recommended approach for most applications:
 
 ```ts index.ts
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '',
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
@@ -40,59 +42,35 @@ Deno.serve(async (req) => {
 })
 ```
 
+This enables:
+
+- Automatic Row Level Security enforcement
+- Built-in JSON serialization
+- Consistent error handling
+- TypeScript support for database schema
+
+---
+
 ## Using a Postgres client
 
 Because Edge Functions are a server-side technology, it's safe to connect directly to your database using any popular Postgres client. This means you can run raw SQL from your Edge Functions.
 
-Here is how you can connect to the database using Deno Postgres driver and run raw SQL.
+Here is how you can connect to the database using Deno Postgres driver and run raw SQL. Check out the [full example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/postgres-on-the-edge).
 
-Check out the [full example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/postgres-on-the-edge).
+<$CodeSample
+path="/edge-functions/supabase/functions/postgres-on-the-edge/index.ts"
+title="Select from table with auth RLS"
+language="typescript"
 
-```ts index.ts
-import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
+/>
 
-// Get the connection string from the environment variable "SUPABASE_DB_URL"
-const databaseUrl = Deno.env.get('SUPABASE_DB_URL')!
-
-// Create a database pool with three connections that are lazily established
-const pool = new postgres.Pool(databaseUrl, 3, true)
-
-Deno.serve(async (_req) => {
-  try {
-    // Grab a connection from the pool
-    const connection = await pool.connect()
-
-    try {
-      // Run a query
-      const result = await connection.queryObject`SELECT * FROM animals`
-      const animals = result.rows // [{ id: 1, name: "Lion" }, ...]
-
-      // Encode the result as pretty printed JSON
-      const body = JSON.stringify(
-        animals,
-        (key, value) => (typeof value === 'bigint' ? value.toString() : value),
-        2
-      )
-
-      // Return the response with the correct content type header
-      return new Response(body, {
-        status: 200,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      })
-    } finally {
-      // Release the connection back into the pool
-      connection.release()
-    }
-  } catch (err) {
-    console.error(err)
-    return new Response(String(err?.message ?? err), { status: 500 })
-  }
-})
-```
+---
 
 ## Using Drizzle
 
 You can use Drizzle together with [Postgres.js](https://github.com/porsager/postgres). Both can be loaded directly from npm:
+
+**Set up dependencies in `import_map.json`**:
 
 ```json supabase/functions/import_map.json
 {
@@ -103,6 +81,8 @@ You can use Drizzle together with [Postgres.js](https://github.com/porsager/post
   }
 }
 ```
+
+**Use in your function**:
 
 ```ts supabase/functions/drizzle/index.ts
 import { drizzle } from 'drizzle-orm/postgres-js'
@@ -123,26 +103,28 @@ Deno.serve(async (_req) => {
 
 You can find the full example on [GitHub](https://github.com/thorwebdev/edgy-drizzle).
 
+---
+
 ## SSL connections
+
+### Production
 
 Deployed edge functions are pre-configured to use SSL for connections to the Supabase database. You don't need to add any extra configurations.
 
+### Local development
+
 If you want to use SSL connections during local development, follow these steps:
 
-- Download the SSL certificate from [Database settings](https://supabase.com/dashboard/project/_/settings/database)
-
-- In your [local .env file](https://supabase.com/docs/guides/functions/secrets), add these two variables:
+1. Download the SSL certificate from [Database Settings](/dashboard/project/_/database/settings)
+2. Add to your [local .env file](/docs/guides/functions/secrets), add these two variables:
 
 ```bash
 SSL_CERT_FILE=/path/to/cert.crt # set the path to the downloaded cert
 DENO_TLS_CA_STORE=mozilla,system
 ```
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/cl7EuF1-RsY"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+Then, restart your local development server:
+
+```bash
+supabase functions serve your-function
+```

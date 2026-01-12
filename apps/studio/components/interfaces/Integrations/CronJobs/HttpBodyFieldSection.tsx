@@ -2,7 +2,6 @@ import { UseFormReturn } from 'react-hook-form'
 
 import {
   FormControl_Shadcn_,
-  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
@@ -10,7 +9,7 @@ import {
   SheetSection,
   TextArea_Shadcn_,
 } from 'ui'
-import { CreateCronJobForm } from './CreateCronJobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 
 interface HttpBodyFieldSectionProps {
   form: UseFormReturn<CreateCronJobForm>

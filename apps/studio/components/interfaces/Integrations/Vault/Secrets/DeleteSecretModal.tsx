@@ -1,18 +1,19 @@
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { VaultSecret } from 'types'
 import { Modal } from 'ui'
 
 interface DeleteSecretModalProps {
   selectedSecret: VaultSecret | undefined
   onClose: () => void
+  onDeleteStart?: (secretId: string) => void
 }
 
-const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
-  const { project } = useProjectContext()
-  const { mutate: deleteSecret, isLoading: isDeleting } = useVaultSecretDeleteMutation({
+const DeleteSecretModal = ({ selectedSecret, onClose, onDeleteStart }: DeleteSecretModalProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { mutate: deleteSecret, isPending: isDeleting } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
       onClose()
@@ -26,6 +27,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
     if (!project) return console.error('Project is required')
     if (!selectedSecret) return
 
+    onDeleteStart?.(selectedSecret.id)
     deleteSecret({
       projectRef: project.ref,
       connectionString: project?.connectionString,
@@ -35,7 +37,6 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
 
   return (
     <Modal
-      closable
       size="small"
       alignFooter="right"
       visible={selectedSecret !== undefined}
@@ -51,7 +52,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
         <div className="space-y-1">
           <p className="text-sm">{selectedSecret?.description}</p>
           <p className="text-sm text-foreground-light">
-            ID: <span className="font-mono">{selectedSecret?.key_id}</span>
+            ID: <span className="font-mono">{selectedSecret?.id}</span>
           </p>
         </div>
       </Modal.Content>

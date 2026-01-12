@@ -1,12 +1,12 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicaKeys } from './keys'
 
 // [Joshen] Is it possible to import this from the code gen?
-// https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
+// https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
 export enum ReplicaInitializationStatus {
   'InProgress' = 'in_progress',
   'Completed' = 'completed',
@@ -46,14 +46,12 @@ export const useReadReplicasStatusesQuery = <TData = ReadReplicasStatusesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
+  }: UseCustomQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
 ) => {
-  return useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>(
-    replicaKeys.statuses(projectRef),
-    ({ signal }) => getReadReplicasStatuses({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>({
+    queryKey: replicaKeys.statuses(projectRef),
+    queryFn: ({ signal }) => getReadReplicasStatuses({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }

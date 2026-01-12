@@ -2,7 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { createClient, SupabaseClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'npm:supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

@@ -97,6 +97,7 @@ function create({
         if (!t.includes('.')) {
           return ident(t)
         }
+
         const [schema, ...rest] = t.split('.')
         const table = rest.join('.')
         return `${ident(schema)}.${ident(table)}`
@@ -104,16 +105,16 @@ function create({
       .join(',')}`
   }
 
-  const publishOps = [
-    ...(publish_insert ? ['insert'] : []),
-    ...(publish_update ? ['update'] : []),
-    ...(publish_delete ? ['delete'] : []),
-    ...(publish_truncate ? ['truncate'] : []),
-  ]
+  let publishOps = []
+  if (publish_insert) publishOps.push('insert')
+  if (publish_update) publishOps.push('update')
+  if (publish_delete) publishOps.push('delete')
+  if (publish_truncate) publishOps.push('truncate')
 
-  const sql = `CREATE PUBLICATION ${ident(name)} ${tableClause} WITH (publish = '${publishOps.join(
-    ','
-  )}');`
+  const sql = `
+CREATE PUBLICATION ${ident(name)} ${tableClause}
+  WITH (publish = '${publishOps.join(',')}');`
+
   return { sql }
 }
 
@@ -128,108 +129,115 @@ type PublicationUpdateParams = {
 }
 
 function update(
-  identifier: PublicationIdentifier,
-  params: PublicationUpdateParams
+  id: number,
+  {
+    name,
+    owner,
+    publish_insert,
+    publish_update,
+    publish_delete,
+    publish_truncate,
+    tables,
+  }: PublicationUpdateParams
 ): { sql: string } {
   const sql = `
 do $$
 declare
+  id oid := ${literal(id)};
   old record;
-  new_name text := ${params.name === undefined ? null : literal(params.name)};
-  new_owner text := ${params.owner === undefined ? null : literal(params.owner)};
-  new_publish_insert bool := ${params.publish_insert ?? null};
-  new_publish_update bool := ${params.publish_update ?? null};
-  new_publish_delete bool := ${params.publish_delete ?? null};
-  new_publish_truncate bool := ${params.publish_truncate ?? null};
+  new_name text := ${name === undefined ? null : literal(name)};
+  new_owner text := ${owner === undefined ? null : literal(owner)};
+  new_publish_insert bool := ${publish_insert ?? null};
+  new_publish_update bool := ${publish_update ?? null};
+  new_publish_delete bool := ${publish_delete ?? null};
+  new_publish_truncate bool := ${publish_truncate ?? null};
   new_tables text := ${
-    params.tables === undefined
+    tables === undefined
       ? null
       : literal(
-          params.tables === null
+          tables === null
             ? 'all tables'
-            : params.tables
+            : tables
                 .map((t) => {
                   if (!t.includes('.')) {
                     return ident(t)
                   }
+
                   const [schema, ...rest] = t.split('.')
                   const table = rest.join('.')
                   return `${ident(schema)}.${ident(table)}`
                 })
-                .join(', ')
+                .join(',')
         )
   };
 begin
-  with publications as (${PUBLICATIONS_SQL})
-  select * into old from publications where ${getIdentifierWhereClause(identifier)};
+  select * into old from pg_publication where oid = id;
   if old is null then
-    raise exception 'Cannot find publication with %', ${literal(getIdentifierWhereClause(identifier))};
+    raise exception 'Cannot find publication with id %', id;
   end if;
+
   if new_tables is null then
     null;
-  elsif new_tables = 'all tables' AND old.tables is not null then
+  elsif new_tables = 'all tables' then
+    if old.puballtables then
+      null;
+    else
       -- Need to recreate because going from list of tables <-> all tables with alter is not possible.
-      execute(format('drop publication %1$I; create publication %1$I for all tables;', old.name));
+      execute(format('drop publication %1$I; create publication %1$I for all tables;', old.pubname));
+    end if;
   else
-    if old.tables is null then
+    if old.puballtables then
       -- Need to recreate because going from list of tables <-> all tables with alter is not possible.
-      execute(format('drop publication %1$I; create publication %1$I;', old.name));
-    elsif exists(select from pg_publication_rel where prpubid = old.id) then
+      execute(format('drop publication %1$I; create publication %1$I;', old.pubname));
+    elsif exists(select from pg_publication_rel where prpubid = id) then
       execute(
         format(
           'alter publication %I drop table %s',
-          old.name,
-          (select string_agg(prrelid::regclass::text, ', ') from pg_publication_rel where prpubid = old.id)
+          old.pubname,
+          (select string_agg(prrelid::regclass::text, ', ') from pg_publication_rel where prpubid = id)
         )
       );
     end if;
 
     -- At this point the publication must have no tables.
+
     if new_tables != '' then
-      execute(format('alter publication %I add table %s', old.name, new_tables));
+      execute(format('alter publication %I add table %s', old.pubname, new_tables));
     end if;
   end if;
 
   execute(
     format(
       'alter publication %I set (publish = %L);',
-      old.name,
+      old.pubname,
       concat_ws(
         ', ',
-        case when coalesce(new_publish_insert, old.publish_insert) then 'insert' end,
-        case when coalesce(new_publish_update, old.publish_update) then 'update' end,
-        case when coalesce(new_publish_delete, old.publish_delete) then 'delete' end,
-        case when coalesce(new_publish_truncate, old.publish_truncate) then 'truncate' end
+        case when coalesce(new_publish_insert, old.pubinsert) then 'insert' end,
+        case when coalesce(new_publish_update, old.pubupdate) then 'update' end,
+        case when coalesce(new_publish_delete, old.pubdelete) then 'delete' end,
+        case when coalesce(new_publish_truncate, old.pubtruncate) then 'truncate' end
       )
     )
   );
 
-  if new_owner is not null then
-    execute(format('alter publication %I owner to %I;', old.name, new_owner));
-  end if;
+  execute(format('alter publication %I owner to %I;', old.pubname, coalesce(new_owner, old.pubowner::regrole::name)));
 
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
-  if new_name is not null and new_name != old.name then
-    execute(format('alter publication %I rename to %I;', old.name, new_name));
+  if new_name is not null and new_name != old.pubname then
+    execute(format('alter publication %I rename to %I;', old.pubname, coalesce(new_name, old.pubname)));
   end if;
-end $$;`
+
+  -- We need to retrieve the publication later, so we need a way to uniquely identify which publication this is.
+  -- We can't rely on id because it gets changed if it got recreated.
+  -- We use a temp table to store the unique name - DO blocks can't return a value.
+  create temp table pg_meta_publication_tmp (name) on commit drop as values (coalesce(new_name, old.pubname));
+end $$;
+`
   return { sql }
 }
 
-function remove(identifier: PublicationIdentifier): { sql: string } {
-  const sql = `
-    do $$
-    declare
-      v_name name;
-    begin
-      with publications as (${PUBLICATIONS_SQL})
-      select name into v_name from publications where ${getIdentifierWhereClause(identifier)};
-      if v_name is not null then
-            execute(format('drop publication if exists %I', v_name));
-      end if;
-    end
-    $$;
-    `
+function remove(publication: Pick<PGPublication, 'name'>): { sql: string } {
+  const sql = `DROP PUBLICATION IF EXISTS ${ident(publication.name)};`
   return { sql }
 }
 

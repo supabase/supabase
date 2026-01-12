@@ -1,12 +1,11 @@
 'use client'
 
-import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
 import { PanelLeft } from 'lucide-react'
-
-import { useIsMobile } from '../hooks/useMobile'
+import * as React from 'react'
 import { cn } from './../../../lib/utils'
+import { useIsMobile } from './../../hooks/use-mobile'
 import { Button } from './button'
 import { Input } from './input'
 import { Separator } from './separator'
@@ -220,8 +219,8 @@ const Sidebar = React.forwardRef<
         {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            overflowing ? 'absolute top-0' : 'relative', // sidebar custom changes - to contain the absolute sidebar below
-            'duration-100 h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
+            overflowing ? 'absolute top-0' : 'relative',
+            'duration-100 h-full w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
@@ -503,7 +502,7 @@ SidebarMenuItem.displayName = 'SidebarMenuItem'
 
 const sidebarMenuButtonVariants = cva(
   cn(
-    'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md py-2 px-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0 text-foreground-lighter data-[active=true]:text-foreground'
+    'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md py-2 px-1.5 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0 text-foreground-lighter data-[active=true]:text-foreground'
   ),
   {
     variants: {
@@ -554,6 +553,13 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? Slot : 'button'
     const { isMobile, state } = useSidebar()
+    const { disabled, tabIndex } = props
+
+    // Set default tabIndex for proper Safari focus handling
+    // - Explicit tabIndex prop takes precedence
+    // - If disabled, default to -1 (unless explicitly set)
+    // - Otherwise, default to 0 for keyboard accessibility
+    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     const button = (
       <Comp
@@ -562,6 +568,7 @@ const SidebarMenuButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         data-has-icon={hasIcon}
+        tabIndex={computedTabIndex}
         className={cn(sidebarMenuButtonVariants({ variant, size, hasIcon }), className)}
         {...props}
       />
@@ -751,6 +758,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-  useSidebar,
   sidebarMenuButtonVariants,
+  useSidebar,
 }

@@ -45,9 +45,11 @@ export const SelectHeaderCell = ({
 
 export const HeaderCell = ({
   col,
+  specificFilterColumn,
   setSortByValue,
 }: {
   col: any
+  specificFilterColumn: string
   setSortByValue: (value: string) => void
 }) => {
   const ref = useRef<number>(0)
@@ -62,7 +64,7 @@ export const HeaderCell = ({
       <div className="flex items-center gap-x-2">
         <p className="!text-foreground">{col.name}</p>
       </div>
-      {['created_at', 'email', 'phone'].includes(col.id) && (
+      {specificFilterColumn === 'freeform' && ['created_at', 'email', 'phone'].includes(col.id) && (
         <DropdownMenu
           open={open}
           onOpenChange={(val) => {

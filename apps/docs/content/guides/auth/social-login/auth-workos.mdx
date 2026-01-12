@@ -40,6 +40,25 @@ You must be signed in to see these values.
 1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy.
 1. Click Save.
 
+You can also configure the WorkOS auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure WorkOS auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_workos_enabled": true,
+    "external_workos_url": "https://api.workos.com",
+    "external_workos_client_id": "your-workos-client-id",
+    "external_workos_secret": "your-workos-client-secret"
+  }'
+```
+
 ## Step 4. Set your Supabase redirect URI in the WorkOS Dashboard
 
 Visit the WorkOS dashboard and click the redirects button in the left navigation panel.
@@ -53,6 +72,11 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 When a user signs in, call `signInWithOAuth` with `workos` as the provider.
 
 ```javascript
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>');
+const redirect = (url: string) => {}
+
+// ---cut---
 async function signInWithWorkOS() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'workos',
@@ -86,7 +110,11 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get('next') ?? '/'
+  let next = searchParams.get('next') ?? '/'
+  if (!next.startsWith('/')) {
+    // if "next" is not a relative URL, use the default
+    next = '/'
+  }
 
   if (code) {
     const supabase = await createClient()

@@ -32,11 +32,15 @@ import fetchRetry from 'fetch-retry'
 const fetchWithRetry = fetchRetry(fetch)
 
 // Create a Supabase client instance with the custom fetch
-const supabase = createClient('https://your-supabase-url.supabase.co', 'your-anon-key', {
-  global: {
-    fetch: fetchWithRetry,
-  },
-})
+const supabase = createClient(
+  'https://your-supabase-url.supabase.co',
+  'sb_publishable_... or anon key',
+  {
+    global: {
+      fetch: fetchWithRetry,
+    },
+  }
+)
 ```
 
 ## 3. Configure retry options

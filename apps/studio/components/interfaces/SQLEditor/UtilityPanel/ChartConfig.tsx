@@ -2,13 +2,11 @@ import dayjs from 'dayjs'
 import { ArrowUpDown, X } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Link from 'next/link'
 import {
   Badge,
@@ -70,7 +68,6 @@ export const ChartConfig = ({
   onConfigChange,
 }: ChartConfigProps) => {
   const { ref } = useParams()
-  const supportSQLBlocks = useFlag('reportsV2')
 
   const [acknowledged, setAcknowledged] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
@@ -204,27 +201,25 @@ export const ChartConfig = ({
           )}
         </div>
 
-        {supportSQLBlocks && !acknowledged && (
+        {!acknowledged && (
           <Admonition showIcon={false} type="tip" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-3 right-3 opacity-30 group-hover:opacity-100 transition-opacity"
               >
                 <X size={14} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <div className="flex items-center gap-x-2">
-              <Badge variant="success" className="text-xs rounded px-1">
-                NEW
-              </Badge>
+              <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light mt-1">
+            <p className="text-xs text-foreground-light !mt-1">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" type="default" className="mt-2">
+            <Button asChild size="tiny" type="default" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>

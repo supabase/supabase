@@ -11,7 +11,7 @@ export interface AuthorizedAppRowProps {
   onSelectRevoke: () => void
 }
 
-const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
+export const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
   return (
     <Table.tr>
       <Table.td>
@@ -45,5 +45,3 @@ const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
     </Table.tr>
   )
 }
-
-export default AuthorizedAppRow

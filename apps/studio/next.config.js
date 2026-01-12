@@ -2,103 +2,10 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
+const { getCSP } = require('./csp')
 
 // Required for nextjs standalone build
 const path = require('path')
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-  : ''
-const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
-const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
-  ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
-  : ''
-const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
-const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
-
-// construct the URL for the Websocket Local URLs
-let SUPABASE_LOCAL_PROJECTS_URL_WS = ''
-if (SUPABASE_URL) {
-  const url = new URL(SUPABASE_URL)
-  const wsUrl = `${url.hostname}:${url.port}`
-  SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
-}
-
-// Needed to test docs search in local dev
-const SUPABASE_DOCS_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
-  : ''
-
-const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
-const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
-const SUPABASE_COM_URL = 'https://supabase.com'
-const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
-const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
-const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
-const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
-const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
-const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
-const STRIPE_JS_URL = 'https://js.stripe.com'
-const STRIPE_NETWORK_URL = 'https://*.stripe.network'
-const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
-const VERCEL_URL = 'https://vercel.com'
-const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
-const GITHUB_API_URL = 'https://api.github.com'
-const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
-const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
-const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
-const VERCEL_LIVE_URL = 'https://vercel.live'
-const SENTRY_URL =
-  'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
-const SUPABASE_ASSETS_URL =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? 'https://frontend-assets.supabase.green'
-    : 'https://frontend-assets.supabase.com'
-
-// used by vercel live preview
-const PUSHER_URL = 'https://*.pusher.com'
-const PUSHER_URL_WS = 'wss://*.pusher.com'
-
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL} ${SUPABASE_ASSETS_URL}`
-const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${SUPABASE_ASSETS_URL}`
-const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL} ${SUPABASE_ASSETS_URL}`
-const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
-const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
-
-const csp = [
-  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL} ${SENTRY_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]
-    : [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS} ${SENTRY_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]),
-  `object-src 'none';`,
-  `base-uri 'self';`,
-  `form-action 'self';`,
-  `frame-ancestors 'none';`,
-  `block-all-mixed-content;`,
-  ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? [`upgrade-insecure-requests;`]
-    : []),
-].join(' ')
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN
@@ -111,6 +18,11 @@ function getAssetPrefix() {
     return undefined
   }
 
+  const SUPABASE_ASSETS_URL =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? 'https://frontend-assets.supabase.green'
+      : 'https://frontend-assets.supabase.com'
+
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }
 
@@ -121,9 +33,6 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
-  experimental: {
-    webpackBuildWorker: true,
-  },
   async rewrites() {
     return [
       {
@@ -151,7 +60,7 @@ const nextConfig = {
             },
             {
               source: '/',
-              destination: '/projects',
+              destination: '/org',
               permanent: false,
             },
             {
@@ -218,13 +127,13 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/database',
-        destination: '/project/:ref/database/tables',
+        source: '/project/:ref/auth/advanced',
+        destination: '/project/:ref/auth/performance',
         permanent: true,
       },
       {
-        source: '/project/:ref/database/replication',
-        destination: '/project/:ref/database/publications',
+        source: '/project/:ref/database',
+        destination: '/project/:ref/database/tables',
         permanent: true,
       },
       {
@@ -234,7 +143,42 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/storage',
-        destination: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/policies',
+        destination: '/project/:ref/storage/files/policies',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets/:bucketId',
+        destination: '/project/:ref/storage/files/buckets/:bucketId',
+        permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/api-keys/new',
+        destination: '/project/:ref/settings/api-keys',
+      },
+      {
+        source: '/project/:ref/settings/storage',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/database',
+        destination: '/project/:ref/database/settings',
         permanent: true,
       },
       {
@@ -280,7 +224,7 @@ const nextConfig = {
             value: 'computeInstance',
           },
         ],
-        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        destination: '/project/:ref/settings/compute-and-disk',
         permanent: true,
       },
       {
@@ -299,6 +243,11 @@ const nextConfig = {
         source: '/project/:ref/settings/billing/subscription',
         destination: '/org/_/billing',
         permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/signing-keys',
+        destination: '/project/:ref/settings/jwt',
       },
       {
         source: '/project/:ref/database/api-logs',
@@ -381,24 +330,34 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
-        permanent: true,
-      },
-      {
         permanent: true,
         source: '/project/:ref/reports/linter',
         destination: '/project/:ref/database/linter',
       },
       {
         permanent: true,
-        source: '/project/:ref/reports/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        source: '/project/:ref/reports',
+        destination: '/project/:ref/observability',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/:path*',
+        destination: '/project/:ref/observability/:path*',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/query-performance',
+        destination: '/project/:ref/observability/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
@@ -465,6 +424,22 @@ const nextConfig = {
         source: '/project/:ref/settings/functions',
         destination: '/project/:ref/functions/secrets',
       },
+      {
+        source: '/org/:slug/invoices',
+        destination: '/org/:slug/billing#invoices',
+        permanent: true,
+      },
+      {
+        source: '/projects',
+        destination: '/organizations',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
+        permanent: false,
+      },
+
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
@@ -475,6 +450,22 @@ const nextConfig = {
             },
           ]
         : []),
+
+      ...(process.env.MAINTENANCE_MODE === 'true'
+        ? [
+            {
+              source: '/((?!maintenance|img).*)', // Redirect all paths except /maintenance and /img
+              destination: '/maintenance',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/maintenance',
+              destination: '/',
+              permanent: false,
+            },
+          ]),
     ]
   },
   async headers() {
@@ -499,7 +490,8 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? getCSP() : "frame-ancestors 'none';",
           },
           {
             key: 'Referrer-Policy',
@@ -531,8 +523,7 @@ const nextConfig = {
     ]
   },
   images: {
-    // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns: [
       {
         protocol: 'https',
@@ -569,41 +560,34 @@ const nextConfig = {
     'icons',
     'libpg-query',
   ],
-  webpack(config) {
-    config.module?.rules
-      .find((rule) => rule.oneOf)
-      .oneOf.forEach((rule) => {
-        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
-          const and = rule.issuer.and
-          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
-          delete rule.issuer.and
-        }
-      })
-
-    // .md files to be loaded as raw text
-    config.module.rules.push({
-      test: /\.md$/,
-      type: 'asset/source',
-    })
-
-    return config
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      // special case for Deno libs to be loaded as a raw text. They're passed as raw text to the Monaco editor.
+      'edge-runtime.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      'lib.deno.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
   },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    // Typechecking is run via GitHub Action only for efficiency
+    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
   },
 }
 
-// module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =

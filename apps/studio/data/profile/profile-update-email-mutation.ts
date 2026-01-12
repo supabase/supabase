@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
 import { auth } from 'lib/gotrue'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
 
 export type EmailUpdateVariables = {
@@ -27,29 +27,27 @@ export const useEmailUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EmailUpdateData, ResponseError, EmailUpdateVariables>,
+  UseCustomMutationOptions<EmailUpdateData, ResponseError, EmailUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EmailUpdateData, ResponseError, EmailUpdateVariables>(
-    (vars) => updateEmail(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          auth.refreshSession(),
-          queryClient.invalidateQueries(profileKeys.profile()),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update email: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EmailUpdateData, ResponseError, EmailUpdateVariables>({
+    mutationFn: (vars) => updateEmail(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        auth.refreshSession(),
+        queryClient.invalidateQueries({ queryKey: profileKeys.profile() }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update email: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

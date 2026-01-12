@@ -1,5 +1,5 @@
-import { ident, literal, format } from '../pg-format'
-import type { Filter, QueryPagination, QueryTable, Sort, Dictionary } from './types'
+import { format, ident, literal } from '../pg-format'
+import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
 
 export function countQuery(
   table: QueryTable,
@@ -39,7 +39,7 @@ export function deleteQuery(
   }
 ) {
   if (!filters || filters.length === 0) {
-    throw { message: 'no filters for this delete query' }
+    throw new Error('no filters for this delete query')
   }
   let query = `delete from ${queryTable(table)}`
   const { returning, enumArrayColumns } = options ?? {}
@@ -64,7 +64,7 @@ export function insertQuery(
   }
 ) {
   if (!values || values.length === 0) {
-    throw { message: 'no value to insert' }
+    throw new Error('no value to insert')
   }
   const { returning, enumArrayColumns } = options ?? {}
   const queryColumns = Object.keys(values[0])
@@ -101,11 +101,13 @@ export function selectQuery(
     filters?: Filter[]
     pagination?: QueryPagination
     sorts?: Sort[]
-  }
+  },
+  isFinal = true,
+  isCTE = false
 ) {
   let query = ''
   const queryColumn = columns ?? '*'
-  query += `select ${queryColumn} from ${queryTable(table)}`
+  query += `select ${queryColumn} from ${isCTE ? queryCTE(table) : queryTable(table)}`
 
   const { filters, pagination, sorts } = options ?? {}
   if (filters) {
@@ -118,7 +120,7 @@ export function selectQuery(
     const { limit, offset } = pagination ?? {}
     query += ` limit ${literal(limit)} offset ${literal(offset)}`
   }
-  return query + ';'
+  return `${query}${isFinal ? ';' : ''}`
 }
 
 export function updateQuery(
@@ -132,7 +134,7 @@ export function updateQuery(
 ) {
   const { filters, returning, enumArrayColumns } = options ?? {}
   if (!filters || filters.length === 0) {
-    throw { message: 'no filters for this update query' }
+    throw new Error('no filters for this update query')
   }
   const queryColumns = Object.keys(value)
     .map((x) => ident(x))
@@ -164,11 +166,33 @@ function applyFilters(query: string, filters: Filter[]) {
   if (filters.length === 0) return query
   query += ` where ${filters
     .map((filter) => {
+      // Handle composite values
+      if (Array.isArray(filter.column)) {
+        switch (filter.operator) {
+          case 'in':
+            return inTupleFilterSql(filter)
+          case '=':
+          case '<>':
+          case '>':
+          case '<':
+          case '>=':
+          case '<=':
+            return defaultTupleFilterSql(filter)
+          default:
+            throw new Error(`Cannot use ${filter.operator} operator in a tuple filter`)
+        }
+      }
+
       switch (filter.operator) {
         case 'in':
           return inFilterSql(filter)
         case 'is':
           return isFilterSql(filter)
+        case '~~':
+        case '~~*':
+        case '!~~':
+        case '!~~*':
+          return castColumnToText(filter)
         default:
           return `${ident(filter.column)} ${filter.operator} ${filterLiteral(filter.value)}`
       }
@@ -178,14 +202,59 @@ function applyFilters(query: string, filters: Filter[]) {
 }
 
 function inFilterSql(filter: Filter) {
-  let values
+  let values: Array<unknown>
   if (Array.isArray(filter.value)) {
-    values = filter.value.map((x: any) => filterLiteral(x))
+    values = filter.value.map((x) => filterLiteral(x))
   } else {
     const filterValueTxt = String(filter.value)
-    values = filterValueTxt.split(',').map((x: any) => filterLiteral(x))
+    values = filterValueTxt.split(',').map((x) => filterLiteral(x))
   }
   return `${ident(filter.column)} ${filter.operator} (${values.join(',')})`
+}
+
+function defaultTupleFilterSql(filter: Filter) {
+  if (!Array.isArray(filter.column)) {
+    throw new Error('Use standard applyFilters for single column')
+  }
+  if (!Array.isArray(filter.value)) {
+    throw new Error('Tuple filter value must be an array')
+  }
+  if (filter.value.length !== filter.column.length) {
+    throw new Error('Tuple filter value must have the same length as the column array')
+  }
+
+  const columns = `(${filter.column.map((c) => ident(c)).join(', ')})`
+  const values = `(${filter.value.map((v) => filterLiteral(v)).join(', ')})`
+  return `${columns} ${filter.operator} ${values}`
+}
+
+function inTupleFilterSql(filter: Filter) {
+  if (!Array.isArray(filter.column)) {
+    throw new Error('Use inFilterSql for single columns')
+  }
+  if (!Array.isArray(filter.value)) {
+    throw new Error(`Values for a tuple 'in' filter must be an array`)
+  }
+
+  const columns = `(${filter.column.map((c) => ident(c)).join(', ')})`
+
+  const values = filter.value.map((v) => {
+    if (Array.isArray(v)) {
+      if (v.length !== filter.column.length) {
+        throw new Error(`Tuple value length must match column length`)
+      }
+      return `(${v.map((x) => filterLiteral(x)).join(', ')})`
+    } else {
+      const filterValueTxt = String(v)
+      const currValues = filterValueTxt.split(',')
+      if (currValues.length !== filter.column.length) {
+        throw new Error(`Tuple value length must match column length`)
+      }
+      return `(${currValues.map((x) => filterLiteral(x)).join(', ')})`
+    }
+  })
+
+  return `${columns} ${filter.operator} (${values.join(', ')})`
 }
 
 function isFilterSql(filter: Filter) {
@@ -199,6 +268,10 @@ function isFilterSql(filter: Filter) {
     default:
       return `${ident(filter.column)} ${filter.operator} ${filterLiteral(filter.value)}`
   }
+}
+
+function castColumnToText(filter: Filter) {
+  return `${ident(filter.column)}::text ${filter.operator} ${filterLiteral(filter.value)}`
 }
 
 function filterLiteral(value: any) {
@@ -235,4 +308,8 @@ function applySorts(query: string, sorts: Sort[]) {
 
 function queryTable(table: QueryTable) {
   return `${ident(table.schema)}.${ident(table.name)}`
+}
+
+function queryCTE(table: QueryTable) {
+  return `${ident(table.name)}`
 }

@@ -1,0 +1,129 @@
+{
+  "$schema": "./enabled-features.schema.json",
+
+  "account:show_security_settings": true,
+
+  "ai:opt_in_level_disabled": true,
+  "ai:opt_in_level_schema": true,
+  "ai:opt_in_level_schema_and_log": true,
+  "ai:opt_in_level_schema_and_log_and_data": true,
+
+  "authentication:sign_in_providers": true,
+  "authentication:third_party_auth": true,
+  "authentication:rate_limits": true,
+  "authentication:emails": true,
+  "authentication:multi_factor": true,
+  "authentication:attack_protection": true,
+  "authentication:performance": true,
+
+  "authentication:show_email_phone_columns": true,
+  "authentication:show_manual_linking": true,
+  "authentication:show_provider_filter": true,
+  "authentication:show_providers": true,
+  "authentication:show_send_invitation": true,
+  "authentication:show_sort_by_email": true,
+  "authentication:show_sort_by_phone": true,
+  "authentication:show_user_type_filter": true,
+
+  "billing:all": true,
+
+  "branding:large_logo": false,
+
+  "cli:disable_custom_profiles": true,
+
+  "dashboard_auth:sign_up": true,
+  "dashboard_auth:sign_in_with_github": true,
+  "dashboard_auth:sign_in_with_sso": true,
+  "dashboard_auth:sign_in_with_email": true,
+  "dashboard_auth:show_testimonial": true,
+  "dashboard_auth:show_tos": true,
+
+  "database:replication": true,
+  "database:roles": true,
+  "database:restore_to_new_project": true,
+  "database:network_restrictions": true,
+
+  "docs:auth_architecture": true,
+  "docs:auth_configuration": true,
+  "docs:auth_flows": true,
+  "docs:auth_full_security": true,
+  "docs:auth_troubleshooting": true,
+  "docs:compliance": true,
+  "docs:contribution": true,
+  "docs:fdw": true,
+  "docs:footer": true,
+  "docs:navigation_dropdown_links_home": true,
+  "docs:self-hosting": true,
+  "docs:framework_quickstarts": true,
+  "docs:full_getting_started": true,
+  "docs:full_platform": true,
+  "docs:hide_cli_profiles": true,
+  "docs:local_development": true,
+  "docs:mobile_tutorials": true,
+  "docs:pgtap": true,
+  "docs:production_checklist": true,
+  "docs:web_apps": true,
+
+  "edge_functions:show_stripe_example": true,
+  "edge_functions:show_all_edge_function_invocation_examples": true,
+
+  "feedback:docs": true,
+
+  "integrations:partners": true,
+  "integrations:wrappers": true,
+  "integrations:vercel": true,
+  "integrations:aws_private_link": true,
+
+  "infrastructure:read_replicas": true,
+
+  "logs:templates": true,
+  "logs:collections": true,
+  "logs:metadata": true,
+  "logs:show_metadata_ip_template": true,
+
+  "organization:show_sso_settings": true,
+  "organization:show_security_settings": true,
+  "organization:show_legal_documents": true,
+
+  "profile:show_email": true,
+  "profile:show_information": true,
+  "profile:show_analytics_and_marketing": true,
+  "profile:show_account_deletion": true,
+
+  "project_connection:show_app_frameworks": true,
+  "project_connection:show_mobile_frameworks": true,
+  "project_connection:show_orms": true,
+
+  "project_creation:show_advanced_config": true,
+
+  "project_homepage:show_instance_size": true,
+  "project_homepage:show_examples": true,
+
+  "project_addons:dedicated_ipv4_address": true,
+  "project_addons:show_compute_price": true,
+
+  "project_settings:custom_domains": true,
+  "project_settings:show_disable_legacy_api_keys": true,
+  "project_settings:legacy_jwt_keys": true,
+  "project_settings:log_drains": true,
+  "project_settings:database_upgrades": true,
+  "project_settings:restart_project": true,
+
+  "quickstarts:hide_nimbus": true,
+
+  "reports:all": true,
+
+  "sdk:auth": true,
+  "sdk:csharp": true,
+  "sdk:dart": true,
+  "sdk:kotlin": true,
+  "sdk:python": true,
+  "sdk:swift": true,
+
+  "storage:analytics": true,
+  "storage:vectors": true,
+
+  "search:fullIndex": true,
+
+  "support:show_client_libraries": true
+}

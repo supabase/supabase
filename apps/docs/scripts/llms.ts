@@ -1,6 +1,11 @@
+import './utils/dotenv.js'
+
 import 'dotenv/config'
 import fs from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 
+import { isFeatureEnabled } from '../../../packages/common/enabled-features/index.js'
+import { getCustomContent } from '../lib/custom-content/getCustomContent.js'
 import {
   fetchCliLibReferenceSource,
   fetchCSharpLibReferenceSource,
@@ -11,7 +16,7 @@ import {
   fetchPythonLibReferenceSource,
   fetchSwiftLibReferenceSource,
   type SearchSource,
-} from './search/sources'
+} from './search/sources/index.js'
 
 interface Source {
   title: string
@@ -20,7 +25,18 @@ interface Source {
    */
   relPath: string
   fetch: () => Promise<SearchSource[]>
+  enabled: boolean
 }
+
+const {
+  sdkCsharp: sdkCsharpEnabled,
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkPython: sdkPythonEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 function toLink(source: Source) {
   return `[${source.title}](https://supabase.com/${source.relPath})`
@@ -31,47 +47,78 @@ const SOURCES: Source[] = [
     title: 'Supabase Guides',
     relPath: 'llms/guides.txt',
     fetch: fetchGuideSources,
+    enabled: true,
   },
   {
     title: 'Supabase Reference (JavaScript)',
     relPath: 'llms/js.txt',
-    fetch: fetchJsLibReferenceSource,
+    fetch: async () =>
+      (await fetchJsLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: true,
   },
   {
     title: 'Supabase Reference (Dart)',
     relPath: 'llms/dart.txt',
-    fetch: fetchDartLibReferenceSource,
+    fetch: async () =>
+      (await fetchDartLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: sdkDartEnabled,
   },
   {
     title: 'Supabase Reference (Swift)',
     relPath: 'llms/swift.txt',
-    fetch: fetchSwiftLibReferenceSource,
+    fetch: async () =>
+      (await fetchSwiftLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: sdkSwiftEnabled,
   },
   {
     title: 'Supabase Reference (Kotlin)',
-    relPath: 'llms/kt.txt',
-    fetch: fetchKtLibReferenceSource,
+    relPath: 'llms/kotlin.txt',
+    fetch: async () =>
+      (await fetchKtLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: sdkKotlinEnabled,
   },
   {
     title: 'Supabase Reference (Python)',
-    relPath: 'llms/py.txt',
-    fetch: fetchPythonLibReferenceSource,
+    relPath: 'llms/python.txt',
+    fetch: async () =>
+      (await fetchPythonLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: sdkPythonEnabled,
   },
   {
     title: 'Supabase Reference (C#)',
     relPath: 'llms/csharp.txt',
-    fetch: fetchCSharpLibReferenceSource,
+    fetch: async () =>
+      (await fetchCSharpLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: sdkCsharpEnabled,
   },
   {
-    title: 'Supabase Reference (CLI)',
+    title: 'Supabase CLI Reference',
     relPath: 'llms/cli.txt',
-    fetch: fetchCliLibReferenceSource,
+    fetch: async () =>
+      (await fetchCliLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
+    enabled: true,
   },
 ]
 
 async function generateMainLlmsTxt() {
-  const sourceLinks = SOURCES.map((source) => `- ${toLink(source)}`).join('\n')
-  const fullText = `# Supabase Docs\n\n${sourceLinks}`
+  const sourceLinks = SOURCES.filter((source) => source.enabled !== false)
+    .map((source) => `- ${toLink(source)}`)
+    .join('\n')
+  const fullText = `# ${metadataTitle}\n\n${sourceLinks}`
   fs.writeFile('public/llms.txt', fullText)
 }
 
@@ -91,12 +138,15 @@ async function generateSourceLlmsTxt(sourceDefn: Source) {
 async function generateLlmsTxt() {
   try {
     await fs.mkdir('public/llms', { recursive: true })
-    await Promise.all([generateMainLlmsTxt(), ...SOURCES.map(generateSourceLlmsTxt)])
+    await Promise.all([
+      generateMainLlmsTxt(),
+      ...SOURCES.filter((source) => source.enabled !== false).map(generateSourceLlmsTxt),
+    ])
   } catch (err) {
     console.error(err)
   }
 }
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   generateLlmsTxt()
 }

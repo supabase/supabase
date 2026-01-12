@@ -1,202 +1,206 @@
-import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { ExternalLink, Search, X } from 'lucide-react'
+import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import React, { useMemo } from 'react'
 
 import { useParams } from 'common'
+import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
+import {
+  EDGE_FUNCTIONS_SORT_VALUES,
+  EdgeFunctionsSort,
+  EdgeFunctionsSortColumn,
+  EdgeFunctionsSortDropdown,
+  EdgeFunctionsSortOrder,
+} from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
-import { FunctionsEmptyState } from 'components/interfaces/Functions/FunctionsEmptyState'
-import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
+import {
+  FunctionsEmptyState,
+  FunctionsEmptyStateLocal,
+} from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructionsDialog } from 'components/interfaces/Functions/TerminalInstructionsDialog'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useAppStateSnapshot } from 'state/app-state'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  AiIconAnimation,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogSection,
-  DialogTrigger,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
-  const router = useRouter()
   const {
     data: functions,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
-  const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
+
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSortQueryParam] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
+  )
+
+  const filteredFunctions = useMemo(() => {
+    const temp = (functions ?? []).filter((x) =>
+      x.name.toLowerCase().includes(search.toLowerCase())
+    )
+    const [sortCol, sortOrder] = sort.split(':') as [
+      EdgeFunctionsSortColumn,
+      EdgeFunctionsSortOrder,
+    ]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return temp.sort((a, b) => {
+      if (sortCol === 'name') {
+        return a.name.localeCompare(b.name) * orderMultiplier
+      }
+      if (sortCol === 'created_at') {
+        return (a.created_at - b.created_at) * orderMultiplier
+      }
+      if (sortCol === 'updated_at') {
+        return (a.updated_at - b.updated_at) * orderMultiplier
+      }
+      return 0
+    })
+  }, [functions, search, sort])
 
   const hasFunctions = (functions ?? []).length > 0
 
-  const deployButton = (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}>
-          Deploy a new function
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        {edgeFunctionCreate && (
-          <DropdownMenuItem
-            onSelect={() => {
-              router.push(`/project/${ref}/functions/new`)
-              sendEvent({
-                action: 'edge_function_via_editor_button_clicked',
-                properties: { origin: 'secondary_action' },
-                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-              })
-            }}
-            className="gap-4"
-          >
-            <Code className="shrink-0" size={16} strokeWidth={1.5} />
-            <div>
-              <span className="text-foreground">Via Editor</span>
-              <p>
-                Create an edge function in the Supabase Studio editor and then deploy your function
-              </p>
-            </div>
-          </DropdownMenuItem>
-        )}
-        <Dialog>
-          <DialogTrigger asChild>
-            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
-              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
-              <div>
-                <span className="text-foreground">Via CLI</span>
-                <p>
-                  Create an edge function locally and then deploy your function via the Supabase CLI
-                </p>
-              </div>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent size="large">
-            <DialogSection padding="small">
-              <TerminalInstructions />
-            </DialogSection>
-          </DialogContent>
-        </Dialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-
-  const secondaryActions = [
-    <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
-    <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-      >
-        Examples
-      </a>
-    </Button>,
-    <ButtonTooltip
-      key="edge-function-create"
-      type="default"
-      className="px-1 pointer-events-auto"
-      icon={<AiIconAnimation size={16} />}
-      onClick={() => {
-        setAiAssistantPanel({
-          open: true,
-          initialInput: `Create a new edge function that ...`,
-          suggestions: {
-            title:
-              'I can help you create a new edge function. Here are a few example prompts to get you started:',
-            prompts: [
-              'Create a new edge function that processes payments with Stripe',
-              'Create a new edge function that sends emails with Resend',
-              'Create a new edge function that generates PDFs from HTML templates',
-            ],
-          },
-        })
-        sendEvent({
-          action: 'edge_function_ai_assistant_button_clicked',
-          properties: { origin: 'secondary_action' },
-          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-        })
-      }}
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: 'Create with Supabase Assistant',
-        },
-      }}
-    />,
-  ]
-
   return (
-    <PageLayout
-      size="large"
-      title="Edge Functions"
-      subtitle="Deploy edge functions to handle complex business logic"
-      primaryActions={deployButton}
-      secondaryActions={secondaryActions}
-    >
-      <ScaffoldContainer size="large">
-        <ScaffoldSection isFullWidth>
-          {isLoading && <GenericSkeletonLoader />}
-
-          {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
-
-          {isSuccess && (
+    <PageContainer size="large">
+      <PageSection>
+        <PageSectionContent>
+          {IS_PLATFORM ? (
             <>
-              {hasFunctions ? (
-                <Table
-                  head={
-                    <>
-                      <Table.th>Name</Table.th>
-                      <Table.th>URL</Table.th>
-                      <Table.th className="hidden 2xl:table-cell">Created</Table.th>
-                      <Table.th className="lg:table-cell">Last updated</Table.th>
-                      <Table.th className="lg:table-cell">Deployments</Table.th>
-                    </>
-                  }
-                  body={
-                    <>
-                      {functions.length > 0 &&
-                        functions.map((item) => (
-                          <EdgeFunctionsListItem key={item.id} function={item} />
-                        ))}
-                    </>
-                  }
-                />
-              ) : (
-                <FunctionsEmptyState />
+              {isLoading && <GenericSkeletonLoader />}
+              {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
+              {isSuccess && (
+                <>
+                  {hasFunctions ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="relative">
+                            <Input
+                              placeholder="Search function names"
+                              icon={<Search />}
+                              size="tiny"
+                              className="w-32 md:w-64"
+                              value={search}
+                              onChange={(event) => setSearch(event.target.value)}
+                              actions={[
+                                search && (
+                                  <Button
+                                    size="tiny"
+                                    type="text"
+                                    icon={<X />}
+                                    onClick={() => setSearch('')}
+                                    className="p-0 h-5 w-5"
+                                  />
+                                ),
+                              ]}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
+                        </div>
+                      </div>
+                      <Card>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Name</TableHead>
+                              <TableHead>URL</TableHead>
+                              <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                              <TableHead className="lg:table-cell">Updated</TableHead>
+                              <TableHead className="lg:table-cell">Deployments</TableHead>
+                            </TableRow>
+                          </TableHeader>
+
+                          <TableBody>
+                            <>
+                              {filteredFunctions.length > 0 ? (
+                                filteredFunctions.map((item) => (
+                                  <EdgeFunctionsListItem key={item.id} function={item} />
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={5}>
+                                    <p className="text-sm text-foreground">No results found</p>
+                                    <p className="text-sm text-foreground-light">
+                                      Your search for "{search}" did not return any results
+                                    </p>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </>
+                          </TableBody>
+                        </Table>
+                      </Card>
+                    </div>
+                  ) : (
+                    <FunctionsEmptyState />
+                  )}
+                </>
               )}
             </>
+          ) : (
+            <FunctionsEmptyStateLocal />
           )}
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </PageLayout>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
-EdgeFunctionsPage.getLayout = (page) => {
+EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout>
+        <div className="w-full min-h-full flex flex-col items-stretch">
+          <PageHeader size="large">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+                <PageHeaderDescription>
+                  Run server-side logic close to your users
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+              <PageHeaderAside>
+                <DocsButton href={`${DOCS_URL}/guides/functions`} />
+                <Button asChild type="default" icon={<ExternalLink />}>
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+                  >
+                    Examples
+                  </a>
+                </Button>
+                {IS_PLATFORM && <DeployEdgeFunctionButton />}
+              </PageHeaderAside>
+            </PageHeaderMeta>
+          </PageHeader>
+
+          {page}
+        </div>
+      </EdgeFunctionsLayout>
+      <TerminalInstructionsDialog />
     </DefaultLayout>
   )
 }

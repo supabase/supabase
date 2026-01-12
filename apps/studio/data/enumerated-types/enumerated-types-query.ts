@@ -1,13 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type EnumeratedType = components['schemas']['PostgresType']
@@ -22,9 +23,11 @@ export async function getEnumeratedTypes(
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/types', {
-    // @ts-expect-error: We don't need to pass included included_schemas / excluded_schemas in query params
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
     },
     headers: Object.fromEntries(headers),
@@ -43,13 +46,11 @@ export const useEnumeratedTypesQuery = <TData = EnumeratedTypesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EnumeratedTypesData, EnumeratedTypesError, TData> = {}
+  }: UseCustomQueryOptions<EnumeratedTypesData, EnumeratedTypesError, TData> = {}
 ) =>
-  useQuery<EnumeratedTypesData, EnumeratedTypesError, TData>(
-    enumeratedTypesKeys.list(projectRef),
-    ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EnumeratedTypesData, EnumeratedTypesError, TData>({
+    queryKey: enumeratedTypesKeys.list(projectRef),
+    queryFn: ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

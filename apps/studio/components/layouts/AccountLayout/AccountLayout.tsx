@@ -2,38 +2,42 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { AppBannerWrapper } from 'components/interfaces/App'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import type { SidebarSection } from './AccountLayout.types'
-import WithSidebar from './WithSidebar'
+import { useAppStateSnapshot } from 'state/app-state'
+import { cn } from 'ui'
+import { WithSidebar } from './WithSidebar'
 
 export interface AccountLayoutProps {
   title: string
-  breadcrumbs: {
-    key: string
-    label: string
-  }[]
 }
 
-const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<AccountLayoutProps>) => {
+const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
-  const { data: organizations } = useOrganizationsQuery()
-  const selectedOrganization = useSelectedOrganization()
+  const appSnap = useAppStateSnapshot()
 
-  const { mutateAsync: sendReset } = useSendResetMutation()
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
-  const signOut = useSignOut()
-  const onClickLogout = async () => {
-    await sendReset()
-    await signOut()
-    await router.push('/sign-in')
-  }
+  const { appTitle } = useCustomContent(['app:title'])
+  const titleSuffix = appTitle || 'Supabase'
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const backToDashboardURL =
+    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+      ? appSnap.lastRouteBeforeVisitingAccountPage
+      : !!lastVisitedOrganization
+        ? `/org/${lastVisitedOrganization}`
+        : '/organizations'
+
+  const currentPath = router.pathname
 
   useEffect(() => {
     if (!IS_PLATFORM) {
@@ -41,118 +45,60 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
     }
   }, [router])
 
-  const organizationsLinks = (organizations ?? [])
-    .map((organization) => ({
-      isActive:
-        router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
-      label: organization.name,
-      href: `/org/${organization.slug}/general`,
-      key: organization.slug,
-      icon: <PartnerIcon organization={organization} />,
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-
-  const sectionsWithHeaders: SidebarSection[] = [
-    {
-      heading: 'Projects',
-      key: 'projects',
-      links: [
-        {
-          isActive: router.pathname === '/projects',
-          label: 'All projects',
-          href: '/projects',
-          key: 'all-projects-item',
-        },
-      ],
-    },
-    ...(IS_PLATFORM && organizationsLinks?.length > 0
-      ? [
-          {
-            heading: 'Organizations',
-            key: 'organizations',
-            links: organizationsLinks,
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
-            heading: 'Account',
-            key: 'account',
-            links: [
-              {
-                isActive: router.pathname === `/account/me`,
-                label: 'Preferences',
-                href: `/account/me`,
-                key: `/account/me`,
-              },
-              {
-                isActive: router.pathname === `/account/tokens`,
-                label: 'Access Tokens',
-                href: `/account/tokens`,
-                key: `/account/tokens`,
-              },
-
-              {
-                isActive: router.pathname === `/account/security`,
-                label: 'Security',
-                href: `/account/security`,
-                key: `/account/security`,
-              },
-              {
-                isActive: router.pathname === `/account/audit`,
-                label: 'Audit Logs',
-                href: `/account/audit`,
-                key: `/account/audit`,
-              },
-            ],
-          },
-        ]
-      : []),
-    {
-      heading: 'Documentation',
-      key: 'documentation',
-      links: [
-        {
-          key: 'ext-guides',
-          label: 'Guides',
-          href: 'https://supabase.com/docs',
-          isExternal: true,
-        },
-        {
-          key: 'ext-guides',
-          label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
-          isExternal: true,
-        },
-      ],
-    },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'logout-link',
-            links: [
-              {
-                key: `logout`,
-                label: 'Log out',
-                href: undefined,
-                onClick: onClickLogout,
-              },
-            ],
-          },
-        ]
-      : []),
-  ]
-
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <title>{title ? `${title} | ${titleSuffix}` : titleSuffix}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex flex-col h-screen w-screen">
-        <AppBannerWrapper />
-        <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
+      <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
+        <WithSidebar
+          title=""
+          breadcrumbs={[]}
+          backToDashboardURL={backToDashboardURL}
+          sections={[
+            {
+              key: 'account-settings',
+              heading: 'Account Settings',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+                {
+                  key: 'access-tokens',
+                  label: 'Access Tokens',
+                  href: '/account/tokens',
+                  isActive: currentPath === '/account/tokens',
+                },
+                ...(showSecuritySettings
+                  ? [
+                      {
+                        key: 'security',
+                        label: 'Security',
+                        href: '/account/security',
+                        isActive: currentPath === '/account/security',
+                      },
+                    ]
+                  : []),
+              ],
+            },
+            {
+              key: 'logs',
+              heading: 'Logs',
+              links: [
+                {
+                  key: 'audit-logs',
+                  label: 'Audit Logs',
+                  href: '/account/audit',
+                  isActive: currentPath === '/account/audit',
+                },
+              ],
+            },
+          ]}
+        >
           {children}
         </WithSidebar>
       </div>

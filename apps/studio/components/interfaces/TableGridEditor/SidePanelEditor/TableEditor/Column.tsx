@@ -15,9 +15,9 @@ import {
   cn,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { useState } from 'react'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
@@ -71,7 +71,7 @@ const Column = ({
   onRemoveColumn,
   onEditForeignKey,
 }: ColumnProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
@@ -171,7 +171,7 @@ const Column = ({
                               </div>
                             ) : (
                               <div className="flex items-center gap-x-2 truncate">
-                                <Badge variant={status === 'ADD' ? 'brand' : 'warning'}>
+                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
                                   {status}
                                 </Badge>
                                 <p className="truncate">
@@ -295,7 +295,7 @@ const Column = ({
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ align="end" className="w-96 p-0">
               <div className="flex items-center justify-center bg-surface-200 space-y-1 py-1.5 px-3 border-b border-overlay">
-                <h5 className="text-sm text-foreground">Extra options</h5>
+                <h5 className="text-foreground">Extra options</h5>
               </div>
 
               <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>

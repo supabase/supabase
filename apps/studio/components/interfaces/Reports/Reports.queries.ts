@@ -1,10 +1,11 @@
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import useDbQuery from 'hooks/analytics/useDbQuery'
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
-import useDbQuery from 'hooks/analytics/useDbQuery'
 
 export type QueryPerformanceSort = {
   column:
+    | 'query'
+    | 'rolname'
     | 'total_time'
     | 'prop_total_time'
     | 'calls'
@@ -15,11 +16,21 @@ export type QueryPerformanceSort = {
   order: 'asc' | 'desc'
 }
 
-type QueryPerformanceQueryOpts = {
-  preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
+export type QueryPerformanceQueryOpts = {
+  preset:
+    | 'mostFrequentlyInvoked'
+    | 'mostTimeConsuming'
+    | 'slowestExecutionTime'
+    | 'queryHitRate'
+    | 'unified'
+    | 'slowQueriesCount'
+    | 'queryMetrics'
   searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]
+  runIndexAdvisor?: boolean
+  minCalls?: number
+  filterIndexAdvisor?: boolean
 }
 
 export const useQueryPerformanceQuery = ({
@@ -27,6 +38,9 @@ export const useQueryPerformanceQuery = ({
   orderBy,
   searchQuery = '',
   roles,
+  runIndexAdvisor = false,
+  minCalls,
+  filterIndexAdvisor = false,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
@@ -35,13 +49,20 @@ export const useQueryPerformanceQuery = ({
     roles !== undefined && roles.length > 0
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
-    searchQuery.length > 0 ? `statements.query ~ '${searchQuery}'` : '',
+    searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
+    typeof minCalls === 'number' && minCalls > 0 ? `statements.calls >= ${minCalls}` : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')
 
   const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
-  const sql = baseSQL.sql([], whereSql.length > 0 ? `WHERE ${whereSql}` : undefined, orderBySql)
+  const sql = baseSQL.sql(
+    [],
+    whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
+    orderBySql,
+    runIndexAdvisor,
+    filterIndexAdvisor
+  )
   return useDbQuery({
     sql,
     params: undefined,

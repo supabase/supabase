@@ -1,12 +1,23 @@
+import { useRouter } from 'next/router'
+import { useEffect, useMemo } from 'react'
+
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useRouter } from 'next/compat/router'
-import { useEffect, useMemo } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -40,23 +51,48 @@ const IntegrationPage: NextPageWithLayout = () => {
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isIntegrationsLoading, pageId, router])
+  }, [installation, isIntegrationsLoading, pageId, router, ref, id])
 
-  if (!router?.isReady || isIntegrationsLoading) {
-    return (
-      <div className="px-10 py-6">
-        <GenericSkeletonLoader />
-      </div>
-    )
-  }
+  // Determine content based on state
+  const content = useMemo(() => {
+    if (!router?.isReady || isIntegrationsLoading) {
+      return (
+        <PageContainer size="full">
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      )
+    } else if (!Component || !id || !integration) {
+      return (
+        <PageContainer size="full">
+          <PageHeader size="full">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Integration not found</PageHeaderTitle>
+                <PageHeaderDescription>
+                  If you think this is an error, please contact support.
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+            </PageHeaderMeta>
+          </PageHeader>
+          <PageSection>
+            <PageSectionContent>
+              <Admonition type="warning" title="This integration is not currently available">
+                Please try again later or contact support if the problem persists.
+              </Admonition>
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      )
+    } else {
+      return <Component />
+    }
+  }, [router?.isReady, isIntegrationsLoading, id, integration, Component])
 
-  if (!id || !integration) {
-    return <div>Integration not found</div>
-  }
-
-  if (!Component) return <div className="p-10 text-sm">Component not found</div>
-
-  return <Component />
+  return content
 }
 
 IntegrationPage.getLayout = (page) => (

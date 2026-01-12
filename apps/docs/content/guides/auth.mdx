@@ -17,7 +17,7 @@ Authentication and authorization are the core responsibilities of any Auth syste
 - **Authentication** means checking that a user is who they say they are.
 - **Authorization** means checking what resources a user is allowed to access.
 
-Supabase Auth uses [JSON Web Tokens (JWTs)](/docs/guides/auth/jwts) for authentication. Auth integrates with Supabase's database features, making it easy to use [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for authorization.
+Supabase Auth uses [JSON Web Tokens (JWTs)](/docs/guides/auth/jwts) for authentication. For a complete reference of all JWT fields, see the [JWT Fields Reference](/docs/guides/auth/jwt-fields). Auth integrates with Supabase's database features, making it easy to use [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for authorization.
 
 ## The Supabase ecosystem
 
@@ -27,17 +27,11 @@ Auth uses your project's Postgres database under the hood, storing user data and
 
 Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
 
-## Providers
+<$Show if="authentication:show_providers">
+<$Partial path="providers.mdx" />
+</$Show>
 
-Supabase Auth works with many popular Auth methods, including Social and Phone Auth using third-party providers. See the following sections for a list of supported third-party providers.
-
-### Social Auth
-
-<AuthProviders type="social" />
-
-### Phone Auth
-
-<AuthProviders type="phone" />
+<$Show if="billing:all">
 
 ## Pricing
 
@@ -47,3 +41,5 @@ Charges apply to Monthly Active Users (MAU), Monthly Active Third-Party Users (T
 - [Pricing Third-Party MAU](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party)
 - [Pricing SSO MAU](/docs/guides/platform/manage-your-usage/monthly-active-users-sso)
 - [Advanced MFA - Phone](/docs/guides/platform/manage-your-usage/advanced-mfa-phone)
+
+</$Show>

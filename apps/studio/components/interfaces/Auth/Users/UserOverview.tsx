@@ -15,7 +15,8 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
@@ -25,7 +26,7 @@ import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
@@ -44,6 +45,11 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
+  const isVerified = user.confirmed_at != null
+
+  const { authenticationSignInProviders } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+  ])
 
   const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
     (provider: string) => {
@@ -59,12 +65,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   )
 
-  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
-  const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
-  const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
-  const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
-  const canRemoveMFAFactors = useCheckPermissions(
+  const { can: canUpdateUser } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canSendMagicLink } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_magic_link'
+  )
+  const { can: canSendRecovery } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_recovery'
+  )
+  const { can: canSendOtp } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
+  const { can: canRemoveUser } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_DELETE,
+    'auth.users'
+  )
+  const { can: canRemoveMFAFactors } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.mfa_factors'
   )
@@ -84,7 +99,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const seconds = Math.floor(mailerOtpExpiry % 60)
   const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
 
-  const { mutate: resetPassword, isLoading: isResettingPassword } = useUserResetPasswordMutation({
+  const { mutate: resetPassword, isPending: isResettingPassword } = useUserResetPasswordMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_recovery')
       toast.success(`Sent password recovery to ${vars.user.email}`)
@@ -93,16 +108,24 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send password recovery: ${err.message}`)
     },
   })
-  const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
+  const { mutate: sendMagicLink, isPending: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
-      toast.success(`Sent magic link to ${vars.user.email}`)
+      toast.success(
+        isVerified
+          ? `Sent magic link to ${vars.user.email}`
+          : `Sent confirmation email to ${vars.user.email}`
+      )
     },
     onError: (err) => {
-      toast.error(`Failed to send magic link: ${err.message}`)
+      toast.error(
+        isVerified
+          ? `Failed to send magic link: ${err.message}`
+          : `Failed to send confirmation email: ${err.message}`
+      )
     },
   })
-  const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
+  const { mutate: sendOTP, isPending: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_otp')
       toast.success(`Sent OTP to ${vars.user.phone}`)
@@ -117,7 +140,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
+  const { mutate: updateUser, isPending: isUpdatingUser } = useUserUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully unbanned user')
       setIsUnbanModalOpen(false)
@@ -159,7 +182,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <Admonition
             type="warning"
             label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
-            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
+            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
           />
         ) : (
           <Separator />
@@ -199,18 +222,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
-                x.title.toLowerCase() ===
-                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
+                ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
               provider.name === 'email'
-                ? 'email'
-                : provider.name === 'linkedin'
-                  ? 'LinkedIn'
-                  : providerMeta?.title ?? provider.name
+                ? provider.name.toLowerCase()
+                : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -229,13 +249,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
-                  <Button asChild type="default" className="mt-2">
-                    <Link
-                      href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
-                    >
-                      Configure {providerName} provider
-                    </Link>
-                  </Button>
+                  {authenticationSignInProviders && (
+                    <Button asChild type="default" className="mt-2">
+                      <Link
+                        href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                      >
+                        Configure {providerName} provider
+                      </Link>
+                    </Button>
+                  )}
                 </div>
                 {isActive ? (
                   <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
@@ -281,11 +303,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title="Send magic link"
-                description="Passwordless login via email for the user"
+                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                description={
+                  isVerified
+                    ? 'Passwordless login via email for the user'
+                    : 'Send a confirmation email to the user'
+                }
                 button={{
                   icon: <Mail />,
-                  text: 'Send magic link',
+                  text: isVerified ? 'Send magic link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -295,8 +321,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: 'Magic link sent',
-                        description: `The link in the email is valid for ${formattedExpiry}`,
+                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
+                        description: isVerified
+                          ? `The link in the email is valid for ${formattedExpiry}`
+                          : 'The confirmation email has been sent to the user',
                       }
                     : undefined
                 }
@@ -340,7 +368,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
-            description="This will log the user out of all active sessions"
+            description="Removes all MFA factors associated with the user"
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
@@ -409,12 +437,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         onConfirm={() => handleDeleteFactors()}
         alert={{
           base: { variant: 'warning' },
-          title: 'Removing MFA factors is irreversible',
-          description: 'This will log the user out of all active sessions.',
+          title:
+            "Removing MFA factors will drop the user's authentication assurance level (AAL) to AAL1",
+          description: 'Note that this does not sign the user out',
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          Are you sure you want to remove the MFA factors for the user{' '}
           <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>

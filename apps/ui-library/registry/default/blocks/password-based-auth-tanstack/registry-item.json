@@ -22,9 +22,9 @@
       "target": "routes/_protected.tsx"
     },
     {
-      "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/info.tsx",
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/protected.tsx",
       "type": "registry:file",
-      "target": "routes/_protected/info.tsx"
+      "target": "routes/_protected/protected.tsx"
     },
     {
       "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts",

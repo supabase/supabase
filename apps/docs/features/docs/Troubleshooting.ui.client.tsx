@@ -4,6 +4,7 @@ import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useRef, useState, Suspense, useCallback, useMemo } from 'react'
 
+import { useBreakpoint } from 'common'
 import {
   Input_Shadcn_,
   cn,
@@ -13,22 +14,13 @@ import {
   CollapsibleContent_Shadcn_ as CollapsibleContent,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
   TROUBLESHOOTING_CONTAINER_ID,
   TROUBLESHOOTING_DATA_ATTRIBUTES,
   troubleshootingSearchParams,
 } from './Troubleshooting.utils.shared'
-import { useBreakpoint } from 'common'
 
 function useTroubleshootingSearchState() {
   const [_state, _setState] = useQueryStates(troubleshootingSearchParams)
@@ -115,10 +107,10 @@ function entryMatchesFilter(
 }
 
 interface TroubleshootingFilterProps {
-  products: string[]
+  className?: string
+  products?: string[]
   errors: ITroubleshootingMetadata['errors']
   keywords: string[]
-  className?: string
 }
 
 export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
@@ -223,18 +215,20 @@ function TroubleshootingFilterInternal({
     <>
       <h2 className="sr-only">Search and filter</h2>
       <div className={cn('flex flex-wrap gap-2 items-center', className)}>
-        <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
-          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
-          <MultiSelector.Content>
-            <MultiSelector.List>
-              {products?.map((product) => (
-                <MultiSelector.Item key={`product-${product}`} value={product}>
-                  {product}
-                </MultiSelector.Item>
-              ))}
-            </MultiSelector.List>
-          </MultiSelector.Content>
-        </MultiSelector>
+        {!!products && (
+          <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
+            <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
+            <MultiSelector.Content>
+              <MultiSelector.List>
+                {products?.map((product) => (
+                  <MultiSelector.Item key={`product-${product}`} value={product}>
+                    {product}
+                  </MultiSelector.Item>
+                ))}
+              </MultiSelector.List>
+            </MultiSelector.Content>
+          </MultiSelector>
+        )}
         <MultiSelector values={selectedErrorCodes} onValuesChange={setSelectedErrorCodes}>
           <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Error codes" />
           <MultiSelector.Content>

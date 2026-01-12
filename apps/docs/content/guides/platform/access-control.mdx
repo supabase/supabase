@@ -14,7 +14,7 @@ For each organization and project, a member can have one of the following roles:
 
 <Admonition type="note">
 
-Read-Only role is only available on the [Team and Enterprise plans](https://supabase.com/pricing).
+Read-Only role is only available on the [Team and Enterprise plans](/pricing).
 
 </Admonition>
 
@@ -32,6 +32,20 @@ This is a security measure to prevent accidental invites to accounts not managed
 
 </Admonition>
 
+### Viewing organization members using the Management API
+
+You can also view organization members using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export ORG_ID="your-organization-id"
+
+# List organization members
+curl "https://api.supabase.com/v1/organizations/$ORG_ID/members" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 ### Transferring ownership of an organization
 
 Each Supabase organization must have at least one owner. If your organization has other owners then you can relinquish ownership and leave the organization by clicking **Leave team** in your organization's team [settings](/dashboard/org/_/team).
@@ -42,13 +56,16 @@ Otherwise, you'll need to invite a user as **Owner**, and they need to accept th
 
 <Admonition type="note">
 
-Project scoped roles are only available on the [Enterprise Plan](https://supabase.com/pricing)
+Project scoped roles are only available on the [Team and Enterprise plans](/pricing).
 
 </Admonition>
 
-Each member in the organization can be assigned a role scoped to the organization or to specific projects. If the member has a role at the organization level, they will have the equivalent permissions for that role across all current and future projects in the organization.
+Each member in the organization can be assigned a role that is scoped either to the entire organization or to specific projects.
 
-With project scoped permissions, you can assign members to roles scoped to specific projects.
+- If a member has an organization-level role, they will have the corresponding permissions across all current and future projects within that organization.
+- If a member is assigned a project-scoped role, they will only have access to the specific projects they've been assigned to. They will not be able to view, access, or even see other projects within the organization on the Supabase Dashboard.
+
+This allows for more granular control, ensuring that users only have visibility and access to the projects relevant to their role.
 
 ### Organization permissions across roles
 
@@ -243,25 +260,18 @@ The table below shows the actions each role can take on the resources belonging 
 |                                                                                                        | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Run                    | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
-| Events Collections                                                                                     | Create                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-|                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-|                                                                                                        | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-|                                                                                                        | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
-|                                                                                                        | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
-| Warehouse Access Tokens                                                                                | Create                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-|                                                                                                        | Revoke                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-|                                                                                                        | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 | <a href="#branching-permissions" id="branching-permissions">**Branching**</a>                          |                        |                                         |                                         |                                         |                                                                 |
-| Enable branching                                                                                       | -                      | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-| Disable branching                                                                                      | -                      | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
+| Production Branch                                                                                      | Read                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
+|                                                                                                        | Write                  | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
+| Development Branches                                                                                   | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Create                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
+|                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 |                                                                                                        | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
-|                                                                                                        | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 
 [^1]: Available on the Team and Enterprise Plans.
 [^2]: Sending anonymous data to OpenAI is opt in and can improve Studio AI Assistant's responses.
 [^3]: Invites sent from a SSO account can only be accepted by another SSO account coming from the same identity provider. This is a security measure that prevents accidental invites to accounts not managed by your company's enterprise systems.
-[^4]: Available on the Enterprise Plan.
+[^4]: Available on the Team and Enterprise Plans.
 [^5]: Read-Only role is able to access secrets.
 [^6]: Listed permissions are for the API and Dashboard.
 [^7]: Limited to executing SELECT queries. SQL Query Snippets run by the Read-Only role are run against the database using the **supabase_read_only_user**. This role has the [predefined Postgres role pg_read_all_data](https://www.postgresql.org/docs/current/predefined-roles.html).

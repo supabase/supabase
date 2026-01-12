@@ -26,7 +26,7 @@ console.log('Hello, world!');
 
     expect(output).toEqual(
       `
-<Tabs listClassNames="flex-nowrap overflow-x-auto">
+<Tabs listClassNames="flex-nowrap overflow-x-auto -mb-6">
   <TabPanel id="a.js" label="a.js">
     \`\`\`js name=a.js
     console.log('Hello, world!');
@@ -61,5 +61,34 @@ console.log('Hello, world!');
 `.trim()
     const mdast = fromDocsMarkdown(mdx)
     expect(() => codeTabsRemark()(mdast)).toThrowError()
+  })
+
+  it('should add a name to a code block outside of CodeTabs if meta present', () => {
+    const mdx = `
+\`\`\`js name=a.js
+console.log('Hello, world!');
+\`\`\`
+
+\`\`\`js
+console.log('Hello, world!');
+\`\`\`
+`.trim()
+    const mdast = fromDocsMarkdown(mdx)
+    const transformed = codeTabsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    expect(output).toEqual(
+      `
+<NamedCodeBlock name="a.js">
+  \`\`\`js name=a.js
+  console.log('Hello, world!');
+  \`\`\`
+</NamedCodeBlock>
+
+\`\`\`js
+console.log('Hello, world!');
+\`\`\`
+`.trimStart()
+    )
   })
 })

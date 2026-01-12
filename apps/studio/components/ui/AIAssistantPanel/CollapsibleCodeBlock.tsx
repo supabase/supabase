@@ -1,48 +1,47 @@
-import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import { useState } from 'react'
-import { Button, CodeBlock, CodeBlockProps, cn } from 'ui'
+import { Code, X } from 'lucide-react'
+
+import {
+  Button,
+  CodeBlock,
+  CodeBlockProps,
+  cn,
+  HoverCard_Shadcn_,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+} from 'ui'
 
 interface CollapsibleCodeBlockProps extends CodeBlockProps {
   onRemove?: () => void
 }
 
-const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBlockProps) => {
-  const [isExpanded, setIsExpanded] = useState(false)
-
+export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBlockProps) => {
   const codeString = (props.value || props.children) as string
-  const firstLine = isExpanded
-    ? codeString
-    : codeString?.substring(0, codeString.indexOf('\n')) || codeString
+  const firstLine = codeString?.substring(0, codeString.indexOf('\n')) || codeString
 
   return (
     <div className="relative">
       <div
         className={cn(
-          'flex items-center gap-1 p-1 bg-surface-100 border border-default w-full overflow-hidden',
-          'rounded-md'
+          'flex items-center gap-1 px-2 py-1.5 bg-surface-100 border border-default w-full overflow-hidden',
+          'rounded-md',
+          props.className
         )}
       >
-        <Button
-          type="text"
-          size="tiny"
-          className="w-6 h-6"
-          onClick={() => setIsExpanded(!isExpanded)}
-          icon={isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        />
-        <div className="flex-1 shrink-1 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <CodeBlock
-            {...props}
-            value={firstLine}
-            hideCopy
-            className={cn(
-              'block !bg-transparent max-h-32 max-w-full !py-0 !px-0 !border-t-0 prose dark:prose-dark border-0 text-foreground !rounded-none w-full text-wrap whitespace-pre-wrap',
-              // change the look of the code block. The flex hack is so that the code is wrapping since
-              // every word is a separate span
-              '[&>code]:m-0 [&>code>span]:flex border-t-0 [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground text-wrap whitespace-pre-wrap',
-              props.className
-            )}
-          />
-        </div>
+        <HoverCard_Shadcn_>
+          <HoverCardTrigger_Shadcn_ asChild>
+            <div className="flex flex-1 items-center gap-2 text-foreground-light px-2 hover:text-foreground cursor-pointer overflow-hidden">
+              <Code size={14} strokeWidth={1.5} />
+              <span className="text-xs font-mono flex-1 truncate pointer">{firstLine}...</span>
+            </div>
+          </HoverCardTrigger_Shadcn_>
+          <HoverCardContent_Shadcn_ className="w-96 max-h-96 overflow-auto p-0">
+            <CodeBlock
+              {...props}
+              value={codeString}
+              className={cn('text-xs font-mono border-none p-3')}
+            />
+          </HoverCardContent_Shadcn_>
+        </HoverCard_Shadcn_>
 
         {onRemove && (
           <Button
@@ -57,5 +56,3 @@ const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBlockProps)
     </div>
   )
 }
-
-export default CollapsibleCodeBlock

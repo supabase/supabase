@@ -1,16 +1,17 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 
 import Table from 'components/to-be-cleaned/Table'
-import HookList from './HookList'
+import { HookList } from './HookList'
 
 interface SchemaTableProps {
   schema: string
   filterString: string
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
+  editHook: (hook: PostgresTrigger) => void
+  deleteHook: (hook: PostgresTrigger) => void
 }
 
-const SchemaTable = ({
+export const SchemaTable = ({
   schema,
   filterString,
   editHook = noop,
@@ -55,5 +56,3 @@ const SchemaTable = ({
     </div>
   )
 }
-
-export default SchemaTable

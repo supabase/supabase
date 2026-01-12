@@ -24,6 +24,10 @@ Using the browser cache can effectively lower your egress since the asset remain
 
 You have the option to set a maximum upload size for your bucket. Doing this can prevent users from uploading and then downloading excessively large files. You can control the maximum file size by configuring this option at the [bucket level](/docs/guides/storage/buckets/creating-buckets).
 
+#### Smart CDN
+
+By leveraging our [Smart CDN](/docs/guides/storage/cdn/smart-cdn), you can achieve a higher cache hit rate and therefore lower your egress cached, as we charge less for cached egress (see [egress pricing](/docs/guides/platform/manage-your-usage/egress#pricing)).
+
 ## Optimize listing objects
 
 Once you have a substantial number of objects, you might observe that the `supabase.storage.list()` method starts to slow down. This occurs because the endpoint is quite generic and attempts to retrieve both folders and objects in a single query. While this approach is very useful for building features like the Storage viewer on the Supabase dashboard, it can impact performance with a large number of objects.

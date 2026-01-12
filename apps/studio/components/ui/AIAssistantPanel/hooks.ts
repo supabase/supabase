@@ -69,5 +69,5 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
     }
   }, [container, enabled, scrollToEnd])
 
-  return { ref, isSticky, scrollToEnd }
+  return { ref, isSticky, scrollToEnd, setIsSticky }
 }

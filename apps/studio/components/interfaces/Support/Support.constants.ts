@@ -1,9 +1,20 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { isFeatureEnabled } from 'common'
 
-export const CATEGORY_OPTIONS = [
+const billingEnabled = isFeatureEnabled('billing:all')
+
+export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade' | 'Others'
+
+export const CATEGORY_OPTIONS: {
+  value: ExtendedSupportCategories
+  label: string
+  description: string
+  query?: string
+  hidden?: boolean
+}[] = [
   {
     value: SupportCategories.PROBLEM,
-    label: 'Issues with APIs / client libraries',
+    label: 'APIs and client libraries',
     description: "Issues with your project's API and client libraries",
     query: undefined,
   },
@@ -26,27 +37,9 @@ export const CATEGORY_OPTIONS = [
     query: 'Performance',
   },
   {
-    value: SupportCategories.SALES_ENQUIRY,
-    label: 'Sales enquiry',
-    description: 'Questions about pricing, paid plans and Enterprise plans',
-    query: undefined,
-  },
-  {
-    value: SupportCategories.BILLING,
-    label: 'Billing',
-    description: 'Issues with credit card charges | invoices | overcharging',
-    query: undefined,
-  },
-  {
     value: SupportCategories.ABUSE,
     label: 'Abuse report',
     description: 'Report abuse of a Supabase project or Supabase brand',
-    query: undefined,
-  },
-  {
-    value: SupportCategories.REFUND,
-    label: 'Refund enquiry',
-    description: 'Formal enquiry form for requesting refunds',
     query: undefined,
   },
   {
@@ -54,6 +47,43 @@ export const CATEGORY_OPTIONS = [
     label: 'Issues with logging in',
     description: 'Issues with logging in and MFA',
     query: undefined,
+  },
+  ...(billingEnabled
+    ? [
+        {
+          value: SupportCategories.SALES_ENQUIRY,
+          label: 'Sales enquiry',
+          description: 'Questions about pricing, paid plans and Enterprise plans',
+          query: undefined,
+        },
+        {
+          value: SupportCategories.BILLING,
+          label: 'Billing',
+          description: 'Issues with credit card charges | invoices | overcharging',
+          query: undefined,
+        },
+        {
+          value: SupportCategories.REFUND,
+          label: 'Refund enquiry',
+          description: 'Formal enquiry form for requesting refunds',
+          query: undefined,
+        },
+      ]
+    : [
+        // [Joshen] Ideally shift this to shared-types, although not critical as API isn't validating the category
+        {
+          value: 'Plan_upgrade' as const,
+          label: 'Plan upgrade',
+          description: 'Enquire a plan upgrade for your organization',
+          query: undefined,
+        },
+      ]),
+  {
+    value: 'Others' as const,
+    label: 'Others',
+    description: 'Issues that are not related to any of the other categories',
+    query: undefined,
+    hidden: true,
   },
 ]
 

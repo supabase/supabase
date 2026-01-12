@@ -1,144 +1,190 @@
-import { useRouter } from 'next/router'
-import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import {
+  isValidElement,
+  memo,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactElement,
+} from 'react'
+import type { StreamdownProps } from 'streamdown'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useProfile } from 'lib/profile'
-import { Dashboards } from 'types'
-import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
-import { DebouncedComponent } from '../DebouncedComponent'
-import { QueryBlock } from '../QueryBlock/QueryBlock'
-import { AssistantSnippetProps } from './AIAssistant.types'
-import { identifyQueryType } from './AIAssistant.utils'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { MessageContext } from './Message'
+import {
+  Button,
+  cn,
+  CodeBlock,
+  CodeBlockLang,
+  markdownComponents,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
+import { AssistantSnippetProps } from './AIAssistant.types'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
+import { defaultUrlTransform } from './Message.utils'
 
-export const OrderedList = memo(({ children }: { children: ReactNode }) => (
+const Streamdown = dynamic<StreamdownProps>(
+  () => import('streamdown').then((mod) => mod.Streamdown),
+  { ssr: false }
+)
+
+export const OrderedList = memo(({ children }: { children?: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
 ))
 OrderedList.displayName = 'OrderedList'
 
-export const ListItem = memo(({ children }: { children: ReactNode }) => (
+export const ListItem = memo(({ children }: { children?: ReactNode }) => (
   <li className="[&>pre]:mt-2">{children}</li>
 ))
 ListItem.displayName = 'ListItem'
 
-export const Heading3 = memo(({ children }: { children: ReactNode }) => (
+export const Heading3 = memo(({ children }: { children?: ReactNode }) => (
   <h3 className="underline">{children}</h3>
 ))
 Heading3.displayName = 'Heading3'
 
 export const InlineCode = memo(
-  ({ className, children }: { className?: string; children: ReactNode }) => (
+  ({ className, children }: { className?: string; children?: ReactNode }) => (
     <code className={cn('text-xs', className)}>{children}</code>
   )
 )
 InlineCode.displayName = 'InlineCode'
 
-export const Link = memo(({ href, children }: { href?: string; children: ReactNode }) => (
-  <a
-    target="_blank"
-    rel="noopener noreferrer"
-    href={href}
-    className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-  >
-    {children}
-  </a>
-))
-Link.displayName = 'Link'
+export const Hyperlink = memo(({ href, children }: { href?: string; children?: ReactNode }) => {
+  const isExternalURL = !href?.startsWith('https://supabase.com/dashboard')
+  const safeUrl = defaultUrlTransform(href ?? '')
+  const isSafeUrl = safeUrl.length > 0
 
-const MemoizedQueryBlock = memo(
-  ({
-    sql,
-    title,
-    xAxis,
-    yAxis,
-    isChart,
-    isLoading,
-    isDraggable,
-    runQuery,
-    onRunQuery,
-    onDragStart,
-    onUpdateChartConfig,
-  }: {
-    sql: string
-    title: string
-    xAxis?: string
-    yAxis?: string
-    isChart: boolean
-    isLoading: boolean
-    isDraggable: boolean
-    runQuery: boolean
-    onRunQuery: (queryType: 'select' | 'mutation') => void
-    onDragStart: (e: DragEvent<Element>) => void
-    onUpdateChartConfig?: ({
-      chart,
-      chartConfig,
-    }: {
-      chart?: Partial<Dashboards.Chart>
-      chartConfig: Partial<ChartConfig>
-    }) => void
-  }) => (
-    <DebouncedComponent
-      delay={500}
-      value={sql}
-      fallback={
-        <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
-          Writing SQL...
-        </div>
-      }
-    >
-      <QueryBlock
-        lockColumns
-        label={title}
-        sql={sql}
-        chartConfig={{
-          type: 'bar',
-          cumulative: false,
-          xKey: xAxis ?? '',
-          yKey: yAxis ?? '',
-          view: isChart ? 'chart' : 'table',
-        }}
-        tooltip={
-          isDraggable ? (
-            <div className="flex items-center gap-x-2">
-              <Badge variant="success" className="text-xs rounded px-1">
-                NEW
-              </Badge>
-              <p>Drag to add this chart into your custom report</p>
-            </div>
-          ) : undefined
-        }
-        showSql={!isChart}
-        isChart={isChart}
-        isLoading={isLoading}
-        draggable={isDraggable}
-        runQuery={runQuery}
-        onRunQuery={onRunQuery}
-        onDragStart={onDragStart}
-        onUpdateChartConfig={onUpdateChartConfig}
-      />
-    </DebouncedComponent>
+  if (!isSafeUrl) {
+    return <span className="text-foreground">{children}</span>
+  }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <span
+          className={cn(
+            '!m-0 text-foreground cursor-pointer transition',
+            'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
+          )}
+        >
+          {children}
+        </span>
+      </DialogTrigger>
+      <DialogContent size="small">
+        <DialogHeader className="border-b">
+          <DialogTitle>Verify the link before navigating</DialogTitle>
+        </DialogHeader>
+
+        <DialogSection className="flex flex-col">
+          <p className="text-sm text-foreground-light">
+            This link will take you to the following URL:
+          </p>
+          <p className="text-sm text-foreground">{safeUrl}</p>
+          <p className="text-sm text-foreground-light mt-2">Are you sure you want to head there?</p>
+        </DialogSection>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="default" className="opacity-100">
+              Cancel
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button asChild type="primary" className="opacity-100">
+              {isExternalURL ? (
+                <a href={safeUrl} target="_blank" rel="noreferrer noopener">
+                  Head to link
+                </a>
+              ) : (
+                <Link href={safeUrl}>Head to link</Link>
+              )}
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
-)
-MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
+})
+Hyperlink.displayName = 'Hyperlink'
 
-export const MarkdownPre = ({ children }: { children: any }) => {
-  const router = useRouter()
-  const { profile } = useProfile()
-  const { isLoading, readOnly } = useContext(MessageContext)
-  const { mutate: sendEvent } = useSendEventMutation()
-  const supportSQLBlocks = useFlag('reportsV2')
+const baseMarkdownComponents = {
+  ol: OrderedList,
+  li: ListItem,
+  h3: Heading3,
+  code: InlineCode,
+  a: Hyperlink,
+  img: ({ src }: JSX.IntrinsicElements['img']) => (
+    <span className="text-foreground-light font-mono">[Image: {src}]</span>
+  ),
+}
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+export function MessageMarkdown({
+  id,
+  isLoading,
+  readOnly,
+  className,
+  children,
+}: {
+  id: string
+  isLoading: boolean
+  readOnly?: boolean
+  className?: string
+  children: ReactNode
+}) {
+  const markdownSource = useMemo(() => {
+    if (typeof children === 'string') {
+      return children
+    }
 
+    if (Array.isArray(children)) {
+      return children.filter((child): child is string => typeof child === 'string').join('')
+    }
+
+    return ''
+  }, [children])
+
+  const allMarkdownComponents = useMemo(
+    () => ({
+      ...markdownComponents,
+      ...baseMarkdownComponents,
+      pre: (props: JSX.IntrinsicElements['pre']) => (
+        <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
+          {props.children}
+        </MarkdownPre>
+      ),
+    }),
+    [id, isLoading, readOnly]
+  )
+
+  return (
+    <Streamdown className={className} components={allMarkdownComponents}>
+      {markdownSource}
+    </Streamdown>
+  )
+}
+
+export const MarkdownPre = ({
+  children,
+  id,
+  isLoading,
+  readOnly,
+}: {
+  children: any
+  id: string
+  isLoading: boolean
+  readOnly?: boolean
+}) => {
   // [Joshen] Using a ref as this data doesn't need to trigger a re-render
   const chartConfig = useRef<ChartConfig>({
     view: 'table',
@@ -148,25 +194,35 @@ export const MarkdownPre = ({ children }: { children: any }) => {
     cumulative: false,
   })
 
-  const language = children[0].props.className?.replace('language-', '') || 'sql'
-  const rawContent = children[0].props.children[0]
+  const childArray = Array.isArray(children) ? children : [children]
+  const codeElement = childArray.find((child): child is ReactElement => isValidElement(child))
+  const codeProps = codeElement?.props || {}
+  const language = codeProps.className?.replace('language-', '') || 'sql'
+  const codeChildren = codeProps.children
+  const rawContent = Array.isArray(codeChildren)
+    ? codeChildren.map((node) => (typeof node === 'string' ? node : '')).join('')
+    : typeof codeChildren === 'string'
+      ? codeChildren
+      : ''
   const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
-  const snippetProps: AssistantSnippetProps = useMemo(
-    () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
-    [propsMatch]
-  )
+  const snippetProps: AssistantSnippetProps = useMemo(() => {
+    try {
+      if (propsMatch) {
+        return JSON.parse(propsMatch[1])
+      }
+    } catch {}
+    return {}
+  }, [propsMatch])
 
   const { xAxis, yAxis } = snippetProps
+  const snippetId = snippetProps.id
   const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
-  const runQuery = snippetProps.runQuery === 'true'
-
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
-  const isDraggableToReports =
-    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const toolCallId = String(snippetId ?? id)
 
   useEffect(() => {
     chartConfig.current = {
@@ -178,20 +234,12 @@ export const MarkdownPre = ({ children }: { children: any }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
 
-  const onRunQuery = async (queryType: 'select' | 'mutation') => {
-    sendEvent({
-      action: 'assistant_suggestion_run_query_clicked',
-      properties: {
-        queryType,
-        ...(queryType === 'mutation'
-          ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
-          : {}),
-      },
-    })
+  if (!codeElement) {
+    return <pre className="w-auto overflow-x-auto not-prose my-4">{children}</pre>
   }
 
   return (
-    <div className="w-auto -ml-[36px] overflow-x-hidden">
+    <div className="w-auto overflow-x-hidden not-prose my-4 ">
       {language === 'edge' ? (
         <EdgeFunctionBlock
           label={title}
@@ -203,24 +251,21 @@ export const MarkdownPre = ({ children }: { children: any }) => {
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
-          <MemoizedQueryBlock
-            sql={cleanContent}
-            title={title}
-            xAxis={xAxis}
-            yAxis={yAxis}
-            isChart={isChart}
-            isLoading={isLoading}
-            isDraggable={isDraggableToReports}
-            runQuery={runQuery}
-            onRunQuery={onRunQuery}
-            onUpdateChartConfig={({ chartConfig: config }) => {
-              chartConfig.current = { ...chartConfig.current, ...config }
+          <DisplayBlockRenderer
+            messageId={id}
+            toolCallId={toolCallId}
+            initialArgs={{
+              sql: cleanContent,
+              label: title,
+              isWriteQuery: false,
+              view: isChart ? 'chart' : 'table',
+              xAxis: xAxis ?? '',
+              yAxis: yAxis ?? '',
             }}
-            onDragStart={(e: DragEvent<Element>) => {
-              e.dataTransfer.setData(
-                'application/json',
-                JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
-              )
+            onError={() => {}}
+            showConfirmFooter={false}
+            onChartConfigChange={(config) => {
+              chartConfig.current = { ...config }
             }}
           />
         )
@@ -230,7 +275,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
           value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
-            'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+            'my-4 max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />

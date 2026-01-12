@@ -28,9 +28,34 @@ IPv4 addresses are guaranteed to be static for ingress traffic. If your database
 
 You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons).
 
+You can also manage the IPv4 add-on using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current IPv4 add-on status
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+# Enable IPv4 add-on
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/addons" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "addon_type": "ipv4"
+  }'
+
+# Disable IPv4 add-on
+curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons/ipv4" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 <Admonition type="caution">
-  Note that direct database connections can experience a short amount of downtime when toggling the
-  add-on due to DNS reconfiguration and propagation. Generally, this should be less than a minute.
+
+Note that direct database connections can experience a short amount of downtime when toggling the add-on due to DNS reconfiguration and propagation. Generally, this should be less than a minute.
+
 </Admonition>
 
 ## Read replicas and IPv4 add-on
@@ -51,13 +76,7 @@ By default, Supabase Postgres use IPv6 addresses. If your system doesn't support
 
 ### Checking your network IPv6 support
 
-Most services are IPv6 compatible, but some exceptions exist (listed below). To verify your personal network supports it, run this command on your server:
-
-```sh
-curl -6 https://ifconfig.co/ip
-```
-
-If it returns an IPv6 address then your system is compatible. An example IPv6 address might look like: `2a05:d014:1c06:5f0c:d7a9:8616:bee2:30df`.
+You can check if your personal network is IPv6 compatible at https://test-ipv6.com.
 
 ### Checking platforms for IPv6 support:
 
@@ -78,7 +97,7 @@ nslookup db.<PROJECT_REF>.supabase.co
 
 ## Identifying your connections
 
-The pooler and direct connection strings can be found in the [database settings](https://supabase.com/dashboard/project/_/settings/database):
+The pooler and direct connection strings can be found in the [project connect page](/dashboard/project/_?showConnect=true):
 
 #### Direct connection
 
@@ -107,6 +126,6 @@ Always uses an IPv4 address
 postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
 ```
 
-## Pricing
-
-For a detailed breakdown of how charges are calculated, refer to [Manage IPv4 usage](/docs/guides/platform/manage-your-usage/ipv4).
+<$Show if="billing:all">
+<$Partial path="billing/pricing/pricing_ipv4.mdx" />
+</$Show>

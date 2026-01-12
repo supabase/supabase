@@ -41,7 +41,7 @@ export class QueryModifier implements IQueryModifier {
   /**
    * Return SQL string for query chains
    */
-  toSql() {
+  toSql(options: { isCTE: boolean; isFinal: boolean } = { isCTE: false, isFinal: true }) {
     try {
       const { actionValue, actionOptions, filters, sorts } = this.options ?? {}
       switch (this.action) {
@@ -61,11 +61,17 @@ export class QueryModifier implements IQueryModifier {
           })
         }
         case 'select': {
-          return selectQuery(this.table, actionValue as string | undefined, {
-            filters,
-            pagination: this.pagination,
-            sorts,
-          })
+          return selectQuery(
+            this.table,
+            actionValue as string | undefined,
+            {
+              filters,
+              pagination: this.pagination,
+              sorts,
+            },
+            options.isFinal,
+            options.isCTE
+          )
         }
         case 'update': {
           return updateQuery(this.table, actionValue as Dictionary<any>, {

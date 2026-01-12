@@ -1,42 +1,42 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-
-const FLY_POSTGRES_DEPRECATION_WARNING_KEY = LOCAL_STORAGE_KEYS.FLY_POSTGRES_DEPRECATION_WARNING
+const MAINTENANCE_WINDOW_BANNER_KEY = LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER
 
 // [Joshen] This file is meant to be dynamic - update this as and when we need to use the NoticeBanner
 
 type AppBannerContextType = {
-  flyPostgresBannerAcknowledged: boolean
-  onUpdateAcknowledged: (key: 'fly-postgres') => void
+  maintenanceWindowBannerAcknowledged: boolean
+  onUpdateAcknowledged: (key: typeof MAINTENANCE_WINDOW_BANNER_KEY) => void
 }
 
 const AppBannerContext = createContext<AppBannerContextType>({
-  flyPostgresBannerAcknowledged: false,
+  maintenanceWindowBannerAcknowledged: false,
   onUpdateAcknowledged: noop,
 })
 
 export const useAppBannerContext = () => useContext(AppBannerContext)
 
 export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [flyPostgresBannerAcknowledged, setFlyPostgresBannerAcknowledged] = useState<boolean>(false)
+  const [maintenanceWindowBannerAcknowledged, setMaintenanceWindowBannerAcknowledged] =
+    useState<boolean>(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const acknowledged = localStorage.getItem(FLY_POSTGRES_DEPRECATION_WARNING_KEY) === 'true'
-      setFlyPostgresBannerAcknowledged(acknowledged)
+      const maintenanceAcknowledged = localStorage.getItem(MAINTENANCE_WINDOW_BANNER_KEY) === 'true'
+      setMaintenanceWindowBannerAcknowledged(maintenanceAcknowledged)
     }
   }, [])
 
   const value = {
-    flyPostgresBannerAcknowledged,
-    onUpdateAcknowledged: (key: 'fly-postgres') => {
-      if (key === 'fly-postgres') {
+    maintenanceWindowBannerAcknowledged,
+    onUpdateAcknowledged: (key: typeof MAINTENANCE_WINDOW_BANNER_KEY) => {
+      if (key === MAINTENANCE_WINDOW_BANNER_KEY) {
         if (typeof window !== 'undefined') {
-          window.localStorage.setItem(FLY_POSTGRES_DEPRECATION_WARNING_KEY, 'true')
+          window.localStorage.setItem(MAINTENANCE_WINDOW_BANNER_KEY, 'true')
         }
-        setFlyPostgresBannerAcknowledged(true)
+        setMaintenanceWindowBannerAcknowledged(true)
       }
     },
   }
@@ -45,6 +45,6 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
 }
 
 export const useIsNoticeBannerShown = () => {
-  const { flyPostgresBannerAcknowledged } = useAppBannerContext()
-  return flyPostgresBannerAcknowledged
+  const { maintenanceWindowBannerAcknowledged } = useAppBannerContext()
+  return maintenanceWindowBannerAcknowledged
 }
