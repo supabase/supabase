@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Info, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
+import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -88,7 +88,7 @@ const GitHubIntegrationConnectionForm = ({
 
   const {
     data: githubReposData,
-    isLoading: isLoadingGitHubRepos,
+    isPending: isLoadingGitHubRepos,
     refetch: refetchGitHubRepositories,
   } = useGitHubRepositoriesQuery({
     enabled: Boolean(gitHubAuthorization),

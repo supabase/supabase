@@ -22,7 +22,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
 
   function onDeleteRow(p: RowContextMenuItemProps) {
     const rowIdx = p.props?.rowIdx
-    if (!rowIdx) return
+    if (rowIdx === undefined || rowIdx === null) return
 
     const row = rows[rowIdx]
     if (row) tableEditorSnap.onDeleteRows([row])
@@ -30,7 +30,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
 
   function onEditRowClick(p: RowContextMenuItemProps) {
     const rowIdx = p.props?.rowIdx
-    if (!rowIdx) return
+    if (rowIdx === undefined || rowIdx === null) return
 
     const row = rows[rowIdx]
     tableEditorSnap.onEditRow(row)
@@ -39,7 +39,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const onCopyCellContent = useCallback(
     (p: RowContextMenuItemProps) => {
       const rowIdx = p.props?.rowIdx
-      if (!snap.selectedCellPosition || !rowIdx) return
+      if (!snap.selectedCellPosition || rowIdx === undefined || rowIdx === null) return
 
       const row = rows[rowIdx]
       const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
@@ -56,7 +56,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const onCopyRowContent = useCallback(
     (p: RowContextMenuItemProps) => {
       const rowIdx = p.props?.rowIdx
-      if (!rowIdx) return
+      if (rowIdx === undefined || rowIdx === null) return
 
       const row = rows[rowIdx]
       copyToClipboard(JSON.stringify(row))

@@ -1,4 +1,3 @@
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -10,8 +9,9 @@ import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-doma
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { DOCS_URL } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -59,36 +59,33 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       <div className="flex flex-col items-start">
         <Panel.Content>
           <div className="flex flex-col gap-2">
-            <h4 className="text-foreground">
-              Setup complete! Press activate to enable the custom domain{' '}
-              <code className="text-sm">{customDomain.hostname}</code> for this project.
-            </h4>
-            <span className="text-sm text-foreground-light">
+            <h4 className="text-foreground">Enable your custom domain</h4>
+            <p className="text-sm text-foreground-light">
+              Set up is almost complete. Press “Activate” below to enable{' '}
+              <code className="text-code-inline">{customDomain.hostname}</code> for this project.
+            </p>
+            <p className="text-sm text-foreground-light">
               We recommend that you schedule a downtime window of 20 - 30 minutes for your
               application, as you will need to update any services that need to know about your
-              custom domain (e.g client side code or OAuth providers)
-            </span>
+              custom domain (e.g client side code or OAuth providers).
+            </p>
           </div>
           <div className="mt-4">
-            <Alert_Shadcn_>
-              <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
-              <AlertTitle_Shadcn_>
-                Remember to retain your CNAME record for service continuity after activation
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                <p className="col-span-12 text-sm lg:col-span-7 leading-6">
-                  Your custom domain CNAME record for{' '}
-                  <code className="text-code-inline">{customDomain.hostname}</code> should resolve
-                  to{' '}
-                  {endpoint ? (
-                    <code className="text-xs">{endpoint}</code>
-                  ) : (
-                    "your project's API URL"
-                  )}
-                  . If you're using Cloudflare as your DNS provider, disable the proxy option.
-                </p>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+            <Admonition
+              type="note"
+              title="Retain your CNAME record for service continuity after activation"
+            >
+              <p>
+                Your custom domain CNAME record for{' '}
+                <code className="text-code-inline">{customDomain.hostname}</code> should resolve to{' '}
+                {endpoint ? (
+                  <code className="text-code-inline">{endpoint}</code>
+                ) : (
+                  "your project's API URL"
+                )}
+                . If you're using Cloudflare as your DNS provider, disable the proxy option.
+              </p>
+            </Admonition>
           </div>
         </Panel.Content>
 
@@ -107,22 +104,6 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                 Cancel
               </Button>
               <Button
-                icon={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1}
-                    stroke="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-                    />
-                  </svg>
-                }
                 disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"
@@ -138,20 +119,16 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         size="small"
         loading={isCheckingRecord || isActivating}
         visible={isActivateConfirmModalVisible}
-        title={
-          <>
-            Are you sure you want to activate the custom domain{' '}
-            <code className="text-sm">{customDomain.hostname}</code> for the project?
-          </>
-        }
+        title="Activate custom domain"
         confirmLabel="Activate"
         confirmLabelLoading="Activating"
         onCancel={() => setIsActivateConfirmModalVisible(false)}
         onConfirm={onActivateCustomDomain}
       >
         <p className="text-sm">
-          This will activate the custom domain <code>{customDomain.hostname}</code>. Your project's
-          Supabase domain will also remain active.
+          Activating <code className="text-code-inline !break-normal">{customDomain.hostname}</code>{' '}
+          will make it visible to users in place of your project’s Supabase domain. The Supabase
+          domain will continue to work too.
         </p>
       </ConfirmationModal>
     </>

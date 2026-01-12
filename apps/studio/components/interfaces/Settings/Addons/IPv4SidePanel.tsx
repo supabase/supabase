@@ -10,6 +10,7 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
@@ -18,7 +19,6 @@ import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
@@ -35,7 +35,7 @@ const IPv4SidePanel = () => {
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'ipv4'
 
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
   const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)

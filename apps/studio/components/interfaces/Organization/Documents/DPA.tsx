@@ -7,12 +7,12 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDpaRequestMutation } from 'data/documents/dpa-request-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import { Button } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export const DPA = () => {
   const { profile } = useProfile()

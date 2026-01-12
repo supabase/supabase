@@ -1,6 +1,8 @@
 /**
- * The components are listed here so that VsCode can find out about them and list them as import suggestions. Don't
- * import directly from here.
+ * The components are listed here so that VsCode can find out about them and list them as import suggestions.
+ *
+ * DO NOT import directly from here.
+ * DO NOT add new components to this file.
  */
 export * from './src/admonition'
 export * from './src/AssistantChat/AssistantChatForm'
@@ -17,8 +19,8 @@ export * from './src/PageContainer'
 export * from './src/PageHeader'
 export * from './src/PageSection'
 export * from './src/PopupFrame'
+export * from './src/PromoToast'
+export * from './src/Row'
 export * from './src/ShimmeringLoader'
 export * from './src/TimestampInfo'
 export * from './src/Toc'
-export * from './src/PromoToast'
-export * from './src/Row'

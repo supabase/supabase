@@ -1,19 +1,19 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates, parseAsJson } from 'nuqs'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
+import {
+  NumericFilter,
+  ReportsNumericFilter,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import {
-  ReportsNumericFilter,
-  NumericFilter,
-} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
   actions,
@@ -38,7 +38,7 @@ export const QueryPerformanceFilterBar = ({
     } as NumericFilter),
     indexAdvisor: parseAsString.withDefault('false'),
   })
-  const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+  const { data, isPending: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

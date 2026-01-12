@@ -25,7 +25,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
             rel="noopener noreferrer"
             className="underline text-foreground hover:text-foreground-light transition"
           >
-            Let Us Know
+            Let us know
           </a>
         </div>
       </div>

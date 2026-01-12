@@ -21,7 +21,14 @@ const AWSReInvent2025: NextPage = () => {
         openGraph={{
           title: data.metadata.metaTitle,
           description: data.metadata.metaDescription,
-          url: `https://supabase.com/aws-reinvent-2025`,
+          images: [
+            {
+              url: data.metadata.ogImage,
+              width: 1280,
+              height: 685,
+              alt: 'Supabase AWS Re:Invent 2025',
+            },
+          ],
         }}
       />
       <Layout className="overflow-visible">
@@ -100,7 +107,9 @@ const AWSReInvent2025: NextPage = () => {
                                   <Clock className="w-4 h-4" />
                                   <span className="font-mono">{event.time}</span>
                                 </div>
-                                {event.type === 'keynote' && <Badge variant="brand">Keynote</Badge>}
+                                {event.type === 'keynote' && (
+                                  <Badge variant="success">Keynote</Badge>
+                                )}
                                 {event.type === 'networking' && (
                                   <Badge variant="default">Networking</Badge>
                                 )}

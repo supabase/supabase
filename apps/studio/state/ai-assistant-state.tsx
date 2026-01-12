@@ -18,7 +18,7 @@ type SuggestionsType = {
   prompts?: { label: string; description: string }[]
 }
 
-export type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+export type AssistantMessageType = MessageType
 
 export type SqlSnippet = string | { label: string; content: string }
 
@@ -230,7 +230,7 @@ function createChatInstance(
 ) {
   return new Chat<MessageType>({
     id: options.id,
-    messages: options.initialMessages,
+    messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
@@ -461,15 +461,6 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.suggestions = undefined
     },
 
-    getCachedSQLResults: ({ messageId, snippetId }: { messageId: string; snippetId?: string }) => {
-      const chat = state.activeChat
-      if (!chat || !snippetId) return
-
-      const message = chat.messages.find((msg) => msg.id === messageId)
-      const results = (message?.results ?? {})[snippetId]
-      return results
-    },
-
     // --- New function to load persisted state ---
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
       state.chats = persistedState.chats
@@ -535,7 +526,6 @@ export type AiAssistantState = AiAssistantData & {
   updateMessage: (message: MessageType) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
-  getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
   clearStorage: () => Promise<void>
 }

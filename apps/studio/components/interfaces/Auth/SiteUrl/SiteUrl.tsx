@@ -40,7 +40,7 @@ const SiteUrl = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
@@ -112,9 +112,9 @@ const SiteUrl = () => {
       </PageSectionMeta>
       <PageSectionContent>
         <Form_Shadcn_ {...siteUrlForm}>
-          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
+          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent>
                 <FormField_Shadcn_
                   control={siteUrlForm.control}
                   name="SITE_URL"
