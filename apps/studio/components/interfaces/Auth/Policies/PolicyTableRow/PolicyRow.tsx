@@ -111,7 +111,12 @@ export const PolicyRow = ({
         {!isLocked && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={<MoreVertical />}
+                data-testid={`policy-${policy.name}-actions-button`}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>

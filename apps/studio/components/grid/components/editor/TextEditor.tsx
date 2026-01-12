@@ -45,7 +45,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
   const isTruncated = isValueTruncated(initialValue)
 
@@ -121,7 +121,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 value={value ?? ''}
                 language="markdown"
               />
-              <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
+              <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
             </div>
           ) : (
             <BlockKeys

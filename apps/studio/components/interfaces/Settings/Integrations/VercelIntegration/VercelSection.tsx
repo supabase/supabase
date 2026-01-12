@@ -18,11 +18,11 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import type {
+  Integration,
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
@@ -33,10 +33,11 @@ import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
-const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
@@ -69,10 +70,19 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
         if (integration.metadata && integration.integration.name === 'Vercel') {
           const avatarSrc =
             !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48&format=png`
               : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-          integration['metadata']['account']['avatar'] = avatarSrc
+          return {
+            ...integration,
+            metadata: {
+              ...integration.metadata,
+              account: {
+                ...integration.metadata.account,
+                avatar: avatarSrc,
+              },
+            },
+          } as Integration
         }
 
         return integration
@@ -155,7 +165,7 @@ You can change the scope of the access for Supabase by configuring
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={VercelTitle}>
           <Markdown content={VercelDetailsSection} />
           <IntegrationImageHandler title="vercel" />
@@ -253,5 +263,3 @@ You can change the scope of the access for Supabase by configuring
     </ScaffoldContainer>
   )
 }
-
-export default VercelSection
