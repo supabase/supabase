@@ -15,9 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
