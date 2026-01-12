@@ -108,7 +108,7 @@ export const FilterPopover = <T extends Record<string, any>>({
     const label = renderLabel ? renderLabel(option, value) : defaultLabel
 
     return (
-      <div key={value} className="flex items-center gap-x-2">
+      <div key={value} className="group flex items-center gap-x-2">
         <Checkbox_Shadcn_
           id={value}
           checked={selectedOptions.includes(value)}
@@ -120,7 +120,16 @@ export const FilterPopover = <T extends Record<string, any>>({
             }
           }}
         />
-        {label}
+        <div className="flex-1">{label}</div>
+        <button
+          className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => {
+            e.preventDefault()
+            setSelectedOptions([value])
+          }}
+        >
+          Only
+        </button>
       </div>
     )
   }
