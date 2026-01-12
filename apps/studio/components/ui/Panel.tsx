@@ -70,7 +70,7 @@ const PanelNotice = forwardRef<
   {
     className?: string | false
     title?: string
-    description?: string
+    description?: ReactNode
     href?: string
     buttonText?: string
     layout?: 'horizontal' | 'vertical'

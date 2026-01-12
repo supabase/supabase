@@ -2638,6 +2638,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/replication/etl-destinations',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
     destination: '/docs/guides/auth/server-side',
   },

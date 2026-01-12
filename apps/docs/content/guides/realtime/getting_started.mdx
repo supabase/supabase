@@ -501,14 +501,14 @@ BEGIN
   -- Send custom notification when new message is created
   IF TG_OP = 'INSERT' THEN
     PERFORM realtime.send(
-      'room:' || NEW.room_id::text || ':notifications',
-      'message_created',
       jsonb_build_object(
         'message_id', NEW.id,
         'user_id', NEW.user_id,
         'room_id', NEW.room_id,
         'created_at', NEW.created_at
       ),
+      'message_created',
+      'room:' || NEW.room_id::text || ':notifications',
       true  -- private channel
     );
   END IF;

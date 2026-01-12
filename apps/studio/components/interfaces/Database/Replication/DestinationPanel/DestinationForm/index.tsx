@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AnimatePresence, motion } from 'framer-motion'
 import { snakeCase } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -10,7 +11,6 @@ import { useFlag, useParams } from 'common'
 import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import {
   BatchConfig,
   BigQueryDestinationConfig,
@@ -25,10 +25,15 @@ import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-help
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import {
+  useValidateDestinationMutation,
+  type ValidationFailure,
+} from 'data/replication/validate-destination-mutation'
+import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2 } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -38,12 +43,14 @@ import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
+import { buildDestinationConfigForValidation } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
 import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
+import { ValidationFailuresSection } from './ValidationFailuresSection'
 
 const formId = 'destination-editor'
 
@@ -67,7 +74,6 @@ export const DestinationForm = ({
   onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { setRequestStatus } = usePipelineRequestStatus()
 
   const etlEnableBigQuery = useFlag('etlEnableBigQuery')
@@ -81,6 +87,15 @@ export const DestinationForm = ({
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
+  const [hasRunValidation, setHasRunValidation] = useState(false)
+  const [destinationValidationFailures, setDestinationValidationFailures] = useState<
+    ValidationFailure[]
+  >([])
+  const [pipelineValidationFailures, setPipelineValidationFailures] = useState<ValidationFailure[]>(
+    []
+  )
+
+  const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
 
@@ -141,6 +156,14 @@ export const DestinationForm = ({
   const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
     useIcebergNamespaceCreateMutation()
 
+  const { mutateAsync: validateDestination, isPending: isValidatingDestination } =
+    useValidateDestinationMutation()
+
+  const { mutateAsync: validatePipeline, isPending: isValidatingPipeline } =
+    useValidatePipelineMutation()
+
+  const isValidating = isValidatingDestination || isValidatingPipeline
+
   const defaultValues = useMemo(() => {
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
@@ -150,12 +173,14 @@ export const DestinationForm = ({
       // Common fields
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
-      maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
+      maxSize: pipelineData?.config?.batch?.max_size ?? undefined,
+      maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
       serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
-      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined,
+      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
       // Analytics Bucket fields
       warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
       namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
@@ -221,17 +246,28 @@ export const DestinationForm = ({
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
-  const selectedPublication = publications.find((pub) => pub.name === publicationName)
 
-  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      tables: selectedPublication?.tables ?? [],
-    },
-    { enabled: visible && !!selectedPublication }
-  )
-  const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
+  const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
+  const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
+
+  const isSaving =
+    creatingDestinationPipeline ||
+    updatingDestinationPipeline ||
+    startingPipeline ||
+    isCreatingS3AccessKey ||
+    isCreatingNamespace ||
+    isValidating
+
+  const isSubmitDisabled =
+    isSaving || isSelectedPublicationMissing || (!editMode && hasNoAvailableDestinations)
+
+  const getSubmitButtonText = () => {
+    if (editMode) {
+      return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
+    } else {
+      return 'Create and start'
+    }
+  }
 
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
@@ -247,6 +283,70 @@ export const DestinationForm = ({
       return data.newNamespaceName
     }
     return data.namespace
+  }
+
+  // Helper function to validate configuration
+  const validateConfiguration = async (data: z.infer<typeof FormSchema>) => {
+    if (!projectRef || !sourceId) return false
+
+    setHasRunValidation(true)
+
+    // Call both validation endpoints in parallel and wait for both to complete
+    // even if one fails - this makes the validation feel like a single operation
+    const results = await Promise.allSettled([
+      validateDestination({
+        projectRef,
+        destinationConfig: buildDestinationConfigForValidation({ projectRef, selectedType, data }),
+      }),
+      validatePipeline({
+        projectRef,
+        sourceId,
+        publicationName: data.publicationName,
+        maxFillMs: data.maxFillMs,
+        maxSize: data.maxSize,
+        maxTableSyncWorkers: data.maxTableSyncWorkers,
+      }),
+    ])
+
+    // Extract results from settled promises
+    const destResult = results[0]
+    const pipelineResult = results[1]
+
+    // Check if any validation request failed completely
+    const hasRequestError = results.some((r) => r.status === 'rejected')
+
+    if (hasRequestError) {
+      // If any request failed, show a generic error and stop
+      toast.error('Failed to validate configuration. Please try again.')
+      setHasRunValidation(false)
+      return false
+    }
+
+    // Both requests succeeded, extract validation failures
+    const destValidationResult =
+      destResult.status === 'fulfilled' ? destResult.value : { validation_failures: [] }
+    const pipelineValidationResult =
+      pipelineResult.status === 'fulfilled' ? pipelineResult.value : { validation_failures: [] }
+
+    setDestinationValidationFailures(destValidationResult.validation_failures)
+    setPipelineValidationFailures(pipelineValidationResult.validation_failures)
+
+    // Check if there are critical failures or warnings
+    const allFailures = [
+      ...destValidationResult.validation_failures,
+      ...pipelineValidationResult.validation_failures,
+    ]
+    const hasCriticalFailures = allFailures.some((f) => f.failure_type === 'critical')
+    const hasAnyFailures = allFailures.length > 0
+
+    // Scroll to validation section if there are any failures
+    if (hasAnyFailures) {
+      setTimeout(() => {
+        validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+
+    return !hasCriticalFailures
   }
 
   // [Joshen] I reckon this function can be refactored to be a bit more modular, it's currently pretty
@@ -302,9 +402,13 @@ export const DestinationForm = ({
           destinationConfig = { iceberg: icebergConfig }
         }
 
-        const batchConfig: BatchConfig | undefined = !!data.maxFillMs
-          ? { maxFillMs: data.maxFillMs }
-          : undefined
+        const batchConfig: BatchConfig | undefined =
+          data.maxFillMs !== undefined || data.maxSize !== undefined
+            ? {
+                ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
+                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
+              }
+            : undefined
         const hasBatchFields = batchConfig !== undefined
 
         if (!destinationConfig) throw new Error('Destination configuration is missing')
@@ -317,6 +421,7 @@ export const DestinationForm = ({
           destinationConfig,
           pipelineConfig: {
             publicationName: data.publicationName,
+            maxTableSyncWorkers: data.maxTableSyncWorkers,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
           sourceId,
@@ -380,9 +485,13 @@ export const DestinationForm = ({
           }
           destinationConfig = { iceberg: icebergConfig }
         }
-        const batchConfig: BatchConfig | undefined = !!data.maxFillMs
-          ? { maxFillMs: data.maxFillMs }
-          : undefined
+        const batchConfig: BatchConfig | undefined =
+          data.maxFillMs !== undefined || data.maxSize !== undefined
+            ? {
+                ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
+                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
+              }
+            : undefined
         const hasBatchFields = batchConfig !== undefined
 
         if (!destinationConfig) throw new Error('Destination configuration is missing')
@@ -394,6 +503,7 @@ export const DestinationForm = ({
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
+            maxTableSyncWorkers: data.maxTableSyncWorkers,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
         })
@@ -409,22 +519,20 @@ export const DestinationForm = ({
     }
   }
 
-  const isSaving =
-    creatingDestinationPipeline ||
-    updatingDestinationPipeline ||
-    startingPipeline ||
-    isCreatingS3AccessKey ||
-    isCreatingNamespace
-
-  const isSubmitDisabled =
-    isSaving ||
-    isSelectedPublicationMissing ||
-    (!!selectedPublication && isLoadingCheck) ||
-    hasTablesWithNoPrimaryKeys ||
-    (!editMode && hasNoAvailableDestinations)
-
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!editMode) {
+      // For new pipelines, validate configuration first if not already validated
+      // OR if user has critical failures and clicks "Validate again"
+      if (!hasRunValidation || isValidating || hasValidationFailures) {
+        const isValid = await validateConfiguration(data)
+        if (!isValid) {
+          // Validation failed with critical errors, show inline and stop
+          return
+        }
+        // Validation passed or only has warnings, continue to disclaimer
+      }
+
+      // Validation passed or only warnings, proceed to disclaimer
       setPendingFormValues(data)
       setShowDisclaimerDialog(true)
       return
@@ -460,6 +568,9 @@ export const DestinationForm = ({
     if (visible) {
       form.reset(defaultValues)
       setIsFormInteracting(false)
+      setHasRunValidation(false)
+      setDestinationValidationFailures([])
+      setPipelineValidationFailures([])
     }
   }, [visible, defaultValues, form])
 
@@ -506,22 +617,53 @@ export const DestinationForm = ({
               <DialogSectionSeparator />
 
               <AdvancedSettings type={selectedType} form={form} />
+
+              {!editMode && hasRunValidation && !isValidating && (
+                <>
+                  <DialogSectionSeparator />
+
+                  <div ref={validationSectionRef}>
+                    <ValidationFailuresSection
+                      destinationFailures={destinationValidationFailures}
+                      pipelineFailures={pipelineValidationFailures}
+                    />
+                  </div>
+                </>
+              )}
             </form>
           </Form_Shadcn_>
         )}
       </SheetSection>
 
-      <SheetFooter>
-        <Button disabled={isSaving} type="default" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
-          {editMode
-            ? existingDestination?.enabled
-              ? 'Apply and restart'
-              : 'Apply and start'
-            : 'Create and start'}
-        </Button>
+      <SheetFooter className="!justify-between">
+        <AnimatePresence mode="wait">
+          {isValidating || isSaving ? (
+            <motion.div
+              className="flex items-center gap-x-2"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <Loader2 className="animate-spin" size={14} />
+              <p className="text-foreground-light text-sm">
+                {isValidating
+                  ? 'Validating destination configuration...'
+                  : `${editMode ? 'Updating' : 'Creating'} destination...`}
+              </p>
+            </motion.div>
+          ) : (
+            <div />
+          )}
+        </AnimatePresence>
+        <div className="flex items-center gap-x-2">
+          <Button disabled={isSaving} type="default" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
+            {getSubmitButtonText()}
+          </Button>
+        </div>
       </SheetFooter>
 
       <NewPublicationPanel

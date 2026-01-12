@@ -57,7 +57,6 @@ const TableContainer = ({ children }: { children: React.ReactNode }) => (
       <Table className="p-5 table-auto">
         <TableHeader>
           <TableRow className="bg-200">
-            <TableHead className={tableHeaderClass}>Name</TableHead>
             <TableHead className={tableHeaderClass}>Token</TableHead>
             <TableHead className={tableHeaderClass}>Last used</TableHead>
             <TableHead className={tableHeaderClass}>Expires</TableHead>
@@ -152,15 +151,15 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         {filteredTokens?.map((x) => {
           return (
             <TableRow key={x.token_alias}>
-              <TableCell className="max-w-32 lg:max-w-40">
+              <TableCell className="w-auto max-w-96">
                 <p className="truncate" title={x.name}>
                   {x.name}
                 </p>
+                <p className="font-mono text-foreground-lighter truncate text-xs mt-1">
+                  {x.token_alias}
+                </p>
               </TableCell>
-              <TableCell className="max-w-36 lg:max-w-80">
-                <p className="font-mono text-foreground-light truncate">{x.token_alias}</p>
-              </TableCell>
-              <TableCell className="min-w-32">
+              <TableCell className="min-w-28">
                 <p className="text-foreground-light">
                   {x.last_used_at ? (
                     <Tooltip>
@@ -174,7 +173,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   )}
                 </p>
               </TableCell>
-              <TableCell className="min-w-32">
+              <TableCell className="min-w-28">
                 {x.expires_at ? (
                   dayjs(x.expires_at).isBefore(dayjs()) ? (
                     <Tooltip>

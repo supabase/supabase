@@ -3,8 +3,10 @@
  *
  * Note that events are not emitted for users that have opted out of telemetry.
  *
- * Original definitions located at:
- * https://github.com/supabase/supabase/blob/master/packages/common/telemetry-constants.ts
+ * ## Naming conventions
+ * Event names and actions should use standardized past-tense verbs for data quality and consistency.
+ * Only use verbs already established in this file or in https://github.com/supabase/platform/blob/develop/shared/src/telemetry.ts
+ * Adding new verbs requires @growth-eng review to prevent data pollution.
  *
  * @module telemetry-frontend
  */
@@ -165,14 +167,14 @@ export interface CronJobUpdatedEvent {
 }
 
 /**
- * Cron job deleted.
+ * Cron job removed. Previously: cron_job_deleted
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
-export interface CronJobDeletedEvent {
-  action: 'cron_job_deleted'
+export interface CronJobRemovedEvent {
+  action: 'cron_job_removed'
   groups: TelemetryGroups
 }
 
@@ -668,7 +670,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAddSQLBlockClicked {
+export interface CustomReportAddSQLBlockClickedEvent {
   action: 'custom_report_add_sql_block_clicked'
   groups: TelemetryGroups
 }
@@ -1407,7 +1409,7 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
  * @source studio
  * @page /dashboard/org/{slug}/security
  */
-export interface OrganizationMfaEnforcementUpdated {
+export interface OrganizationMfaEnforcementUpdatedEvent {
   action: 'organization_mfa_enforcement_updated'
   properties: {
     mfaEnforced: boolean
@@ -1539,14 +1541,14 @@ export interface BranchMergeSubmittedEvent {
 }
 
 /**
- * Triggered when a branch merge is successful.
+ * Triggered when a branch merge completes successfully. Previously: branch_merge_succeeded
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/merge
  */
-export interface BranchMergeSucceededEvent {
-  action: 'branch_merge_succeeded'
+export interface BranchMergeCompletedEvent {
+  action: 'branch_merge_completed'
   properties: {
     /**
      * The type of branch being merged, e.g. preview, persistent
@@ -2046,9 +2048,9 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Whether RLS was enabled on the table
      */
@@ -2058,7 +2060,7 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     has_rls_policies: boolean
     /**
-     * Whether AI-generated policies were used (only possible in treatment)
+     * Whether AI-generated policies were used (only possible in variation)
      */
     has_generated_policies: boolean
   }
@@ -2080,9 +2082,9 @@ export interface TableCreateGeneratePoliciesExperimentExposedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Days since project creation (to segment by new user cohorts)
      */
@@ -2602,15 +2604,33 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
- * User succesfully installed an integration via the integrations marketplace in the dashboard.
- * Note: This excludes Wrappers and Postgres Extensions.
+ * Triggered when a Studio error UI element is displayed (mounted).
+ * This includes error Admonitions and Toast notifications.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DashboardErrorCreatedEvent {
+  action: 'dashboard_error_created'
+  properties: {
+    /**
+     * Source of the error
+     */
+    source?: 'admonition' | 'toast'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully completed installing an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_installed
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationInstalledEvent {
-  action: 'integration_installed'
+export interface IntegrationInstallCompletedEvent {
+  action: 'integration_install_completed'
   properties: {
     /**
      * The name of the integration installed
@@ -2621,14 +2641,14 @@ export interface IntegrationInstalledEvent {
 }
 
 /**
- * User started installing an integration via the integrations marketplace.
+ * User submitted an integration install via the integrations marketplace. Previously: integration_install_started
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationInstallStartedEvent {
-  action: 'integration_install_started'
+export interface IntegrationInstallSubmittedEvent {
+  action: 'integration_install_submitted'
   properties: {
     /**
      * The name of the integration being installed
@@ -2639,14 +2659,14 @@ export interface IntegrationInstallStartedEvent {
 }
 
 /**
- * User started uninstalling an integration via the integrations marketplace.
+ * User submitted an integration uninstall via the integrations marketplace. Previously: integration_uninstall_started
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationUninstallStartedEvent {
-  action: 'integration_uninstall_started'
+export interface IntegrationUninstallSubmittedEvent {
+  action: 'integration_uninstall_submitted'
   properties: {
     /**
      * The name of the integration being uninstalled
@@ -2675,21 +2695,33 @@ export interface IntegrationInstallFailedEvent {
 }
 
 /**
- * User uninstalled an integration via the integrations marketplace in the dashboard.
- * Note: This excludes Wrappers and Postgres Extensions.
+ * User successfully completed uninstalling an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_uninstalled
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/{integration_slug}
  */
-export interface IntegrationUninstalledEvent {
-  action: 'integration_uninstalled'
+export interface IntegrationUninstallCompletedEvent {
+  action: 'integration_uninstall_completed'
   properties: {
     /**
      * The name of the integration installed
      */
     integrationName: string
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the enable Create rls_ensure trigger button in the RLS Event Trigger banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/auth/policies
+ */
+export interface RlsEventTriggerBannerCreateButtonClickedEvent {
+  action: 'rls_event_trigger_banner_create_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2705,7 +2737,7 @@ export type TelemetryEvent =
   | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
-  | CronJobDeletedEvent
+  | CronJobRemovedEvent
   | CronJobCreateClickedEvent
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
@@ -2747,7 +2779,7 @@ export type TelemetryEvent =
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
-  | CustomReportAddSQLBlockClicked
+  | CustomReportAddSQLBlockClickedEvent
   | CustomReportAssistantSQLBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
@@ -2784,7 +2816,7 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
-  | OrganizationMfaEnforcementUpdated
+  | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | BranchCreateButtonClickedEvent
@@ -2792,7 +2824,7 @@ export type TelemetryEvent =
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent
-  | BranchMergeSucceededEvent
+  | BranchMergeCompletedEvent
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
@@ -2838,8 +2870,10 @@ export type TelemetryEvent =
   | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
-  | IntegrationInstalledEvent
-  | IntegrationInstallStartedEvent
-  | IntegrationUninstallStartedEvent
+  | DashboardErrorCreatedEvent
+  | IntegrationInstallCompletedEvent
+  | IntegrationInstallSubmittedEvent
+  | IntegrationUninstallSubmittedEvent
   | IntegrationInstallFailedEvent
-  | IntegrationUninstalledEvent
+  | IntegrationUninstallCompletedEvent
+  | RlsEventTriggerBannerCreateButtonClickedEvent
