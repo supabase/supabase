@@ -60,6 +60,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
   const orgProjects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
@@ -97,7 +98,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
   const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
-  const numberOfAccessHasChanges = originalConfiguration.length !== noAccessProjects.length
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
   const onSelectProject = (project: OrgProject) => {
@@ -206,7 +206,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
               {!isApplyingRoleToAllProjects &&
                 projectsRoleConfiguration.length > 0 &&
-                projectsRoleConfiguration.length !== orgProjects.length && (
+                projectsRoleConfiguration.length < totalNumOrgProjects && (
                   <Collapsible_Shadcn_ className="bg-alternative border rounded-lg py-4 group">
                     <CollapsibleTrigger_Shadcn_ className="w-full text-left px-4 flex items-center justify-between">
                       <span className="text-sm">
