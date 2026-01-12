@@ -233,7 +233,10 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                 <p className="truncate" title={x.name}>
                   {x.name}
                 </p>
-                <p className="font-mono text-foreground-lighter truncate text-xs mt-1">
+                <p
+                  className="font-mono text-foreground-lighter truncate text-xs mt-1 max-w-32 sm:max-w-48 lg:max-w-full"
+                  title={x.token_alias}
+                >
                   {x.token_alias}
                 </p>
               </TableCell>
