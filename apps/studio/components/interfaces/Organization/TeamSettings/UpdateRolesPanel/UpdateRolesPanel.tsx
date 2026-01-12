@@ -168,7 +168,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <SheetContent
           showClose={false}
           size="default"
-          className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[400px]')}
+          className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[600px]')}
         >
           <div className={cn('flex flex-col grow w-full')}>
             <SheetHeader
