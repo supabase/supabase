@@ -23,9 +23,24 @@ import {
   TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
+
+const ACCESS_TOKEN_SORT_VALUES = [
+  'created_at:asc',
+  'created_at:desc',
+  'last_used_at:asc',
+  'last_used_at:desc',
+  'expires_at:asc',
+  'expires_at:desc',
+] as const
+
+type AccessTokenSort = (typeof ACCESS_TOKEN_SORT_VALUES)[number]
+type AccessTokenSortColumn = AccessTokenSort extends `${infer Column}:${string}` ? Column : unknown
+type AccessTokenSortOrder = AccessTokenSort extends `${string}:${infer Order}` ? Order : unknown
 
 const RowLoading = () => (
   <TableRow>
@@ -49,15 +64,29 @@ const RowLoading = () => (
 
 const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter py-2'
 
-const TableContainer = ({ children }: { children: React.ReactNode }) => (
+interface TableContainerProps {
+  children: React.ReactNode
+  sort: AccessTokenSort
+  onSortChange: (column: AccessTokenSortColumn) => void
+}
+
+const TableContainer = ({ children, sort, onSortChange }: TableContainerProps) => (
   <Card className="w-full overflow-hidden">
     <CardContent className="p-0">
       <Table className="p-5 table-auto">
         <TableHeader>
           <TableRow className="bg-200">
             <TableHead className={tableHeaderClass}>Token</TableHead>
-            <TableHead className={tableHeaderClass}>Last used</TableHead>
-            <TableHead className={tableHeaderClass}>Expires</TableHead>
+            <TableHead className={tableHeaderClass}>
+              <TableHeadSort column="last_used_at" currentSort={sort} onSortChange={onSortChange}>
+                Last used
+              </TableHeadSort>
+            </TableHead>
+            <TableHead className={tableHeaderClass}>
+              <TableHeadSort column="expires_at" currentSort={sort} onSortChange={onSortChange}>
+                Expires
+              </TableHeadSort>
+            </TableHead>
             <TableHead className={cn(tableHeaderClass, '!text-right')} />
           </TableRow>
         </TableHeader>
@@ -75,6 +104,10 @@ export interface AccessTokenListProps {
 export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral<AccessTokenSort>(ACCESS_TOKEN_SORT_VALUES).withDefault('created_at:desc')
+  )
 
   const { data: tokens, error, isPending: isLoading, isError } = useAccessTokensQuery()
 
@@ -89,23 +122,70 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     },
   })
 
+  const handleSortChange = (column: AccessTokenSortColumn) => {
+    const [currentCol, currentOrder] = sort.split(':') as [
+      AccessTokenSortColumn,
+      AccessTokenSortOrder,
+    ]
+    if (currentCol === column) {
+      if (currentOrder === 'asc') {
+        setSort(`${column}:desc` as AccessTokenSort)
+      } else {
+        setSort('created_at:desc')
+      }
+    } else {
+      setSort(`${column}:asc` as AccessTokenSort)
+    }
+  }
+
   const onDeleteToken = async (tokenId: number) => {
     deleteToken({ id: tokenId })
   }
 
   const filteredTokens = useMemo(() => {
-    return !searchString
+    const filtered = !searchString
       ? tokens
       : tokens?.filter((token) => {
           return token.name.toLowerCase().includes(searchString.toLowerCase())
         })
-  }, [tokens, searchString])
+
+    if (!filtered) return filtered
+
+    const [sortCol, sortOrder] = sort.split(':') as [AccessTokenSortColumn, AccessTokenSortOrder]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return [...filtered].sort((a, b) => {
+      if (sortCol === 'created_at') {
+        return (
+          (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * orderMultiplier
+        )
+      }
+      if (sortCol === 'last_used_at') {
+        if (!a.last_used_at && !b.last_used_at) return 0
+        if (!a.last_used_at) return 1
+        if (!b.last_used_at) return -1
+        return (
+          (new Date(a.last_used_at).getTime() - new Date(b.last_used_at).getTime()) *
+          orderMultiplier
+        )
+      }
+      if (sortCol === 'expires_at') {
+        if (!a.expires_at && !b.expires_at) return 0
+        if (!a.expires_at) return 1
+        if (!b.expires_at) return -1
+        return (
+          (new Date(a.expires_at).getTime() - new Date(b.expires_at).getTime()) * orderMultiplier
+        )
+      }
+      return 0
+    })
+  }, [tokens, searchString, sort])
 
   const empty = filteredTokens?.length === 0 && !isLoading
 
   if (isError) {
     return (
-      <TableContainer>
+      <TableContainer sort={sort} onSortChange={handleSortChange}>
         <TableRow>
           <TableCell colSpan={5} className="p-0">
             <AlertError
@@ -121,7 +201,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   if (isLoading) {
     return (
-      <TableContainer>
+      <TableContainer sort={sort} onSortChange={handleSortChange}>
         <RowLoading />
         <RowLoading />
       </TableContainer>
@@ -130,7 +210,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   if (empty) {
     return (
-      <TableContainer>
+      <TableContainer sort={sort} onSortChange={handleSortChange}>
         <TableRow>
           <TableCell colSpan={5} className="py-12">
             <p className="text-sm text-center text-foreground">No access tokens found</p>
@@ -145,7 +225,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   return (
     <>
-      <TableContainer>
+      <TableContainer sort={sort} onSortChange={handleSortChange}>
         {filteredTokens?.map((x) => {
           return (
             <TableRow key={x.token_alias}>
