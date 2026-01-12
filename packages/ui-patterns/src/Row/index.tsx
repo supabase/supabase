@@ -1,10 +1,10 @@
 'use client'
 
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type React from 'react'
+import type { ReactNode } from 'react'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
-import type { ReactNode } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMeasuredWidth } from './Row.utils'
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -40,7 +40,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     return smCols
   }
 
-  const renderColumns = useMemo(
+  const numberOfColumns = useMemo(
     () => resolveColumnsForWidth(measuredWidth ?? 0),
     [measuredWidth, columns]
   )
@@ -49,7 +49,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     const el = containerRef.current
     if (!el) return
     const widthLocal = measuredWidth ?? el.getBoundingClientRect().width
-    const colsLocal = renderColumns
+    const colsLocal = numberOfColumns
     const columnWidth = (widthLocal - (colsLocal - 1) * gap) / colsLocal
     const scrollAmount = columnWidth + gap
     setScrollPosition((prev) => {
@@ -63,14 +63,16 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
   const maxScroll = useMemo(() => {
     if (measuredWidth == null) return -1
-    const colsLocal = renderColumns
+    const colsLocal = numberOfColumns
     const columnWidth = (measuredWidth - (colsLocal - 1) * gap) / colsLocal
     const totalWidth = childrenArray.length * columnWidth + (childrenArray.length - 1) * gap
     return Math.max(0, totalWidth - measuredWidth)
-  }, [measuredWidth, renderColumns, childrenArray.length, gap])
+  }, [measuredWidth, numberOfColumns, childrenArray.length, gap])
 
   const canScrollLeft = scrollPosition > 0
   const canScrollRight = scrollPosition < maxScroll
+
+  const hasContentToScroll = childrenArray.length > numberOfColumns
 
   const rafIdRef = useRef(0 as number)
   const pendingDeltaRef = useRef(0)
@@ -125,7 +127,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
         </Button>
       )}
 
-      {showArrows && canScrollRight && (
+      {showArrows && canScrollRight && hasContentToScroll && (
         <Button
           type="default"
           onClick={scrollRight}
@@ -152,7 +154,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
           style={
             {
               gap: `${gap}px`,
-              '--column-width': `calc((100% - ${(renderColumns - 1) * gap}px) / ${renderColumns})`,
+              '--column-width': `calc((100% - ${(numberOfColumns - 1) * gap}px) / ${numberOfColumns})`,
               transform: `translateX(-${scrollPosition}px)`,
               willChange: 'transform',
             } as React.CSSProperties

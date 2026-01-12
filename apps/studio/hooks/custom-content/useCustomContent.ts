@@ -24,7 +24,7 @@ function contentToCamelCase(feature: CustomContent) {
     .join('') as CustomContentToCamelCase<typeof feature>
 }
 
-const useCustomContent = <T extends CustomContent[]>(
+export const useCustomContent = <T extends CustomContent[]>(
   contents: T
 ): {
   [key in CustomContentToCamelCase<T[number]>]:
@@ -40,5 +40,3 @@ const useCustomContent = <T extends CustomContent[]>(
       | null
   }
 }
-
-export { useCustomContent }

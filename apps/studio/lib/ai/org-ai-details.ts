@@ -1,5 +1,5 @@
 import { getOrganizations } from 'data/organizations/organizations-query'
-import { getProjects } from 'data/projects/projects-query'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 export const getOrgAIDetails = async ({
@@ -11,28 +11,20 @@ export const getOrgAIDetails = async ({
   authorization: string
   projectRef: string
 }) => {
-  const [organizations, projects] = await Promise.all([
-    getOrganizations({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-    getProjects({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(authorization && { Authorization: authorization }),
+  }
+
+  const [organizations, selectedProject] = await Promise.all([
+    getOrganizations({ headers }),
+    getProjectDetail({ ref: projectRef }, undefined, headers),
   ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const selectedProject = projects.projects.find(
-    (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
-  )
 
   // If the project is not in the organization specific by the org slug, return an error
-  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+  if (selectedProject?.organization_id !== selectedOrg?.id) {
     throw new Error('Project and organization do not match')
   }
 

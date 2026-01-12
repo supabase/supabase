@@ -1,9 +1,9 @@
-import { UseMutationOptions, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 type BucketObjectPublicUrlParams = {
   projectRef: string
@@ -39,23 +39,21 @@ export const useGetBucketObjectPublicUrlMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>,
+  UseCustomMutationOptions<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>(
-    (vars) => getPublicUrlForBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get public URL of bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>({
+    mutationFn: (vars) => getPublicUrlForBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get public URL of bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

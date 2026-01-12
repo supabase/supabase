@@ -1,6 +1,8 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "account:show_security_settings": true,
+
   "ai:opt_in_level_disabled": true,
   "ai:opt_in_level_schema": true,
   "ai:opt_in_level_schema_and_log": true,
@@ -12,7 +14,7 @@
   "authentication:emails": true,
   "authentication:multi_factor": true,
   "authentication:attack_protection": true,
-  "authentication:advanced": true,
+  "authentication:performance": true,
 
   "authentication:show_email_phone_columns": true,
   "authentication:show_manual_linking": true,
@@ -22,13 +24,19 @@
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
+
   "billing:all": true,
+
+  "branding:large_logo": false,
+
+  "cli:disable_custom_profiles": true,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
   "dashboard_auth:sign_in_with_sso": true,
   "dashboard_auth:sign_in_with_email": true,
   "dashboard_auth:show_testimonial": true,
+  "dashboard_auth:show_tos": true,
 
   "database:replication": true,
   "database:roles": true,
@@ -44,6 +52,7 @@
   "docs:contribution": true,
   "docs:fdw": true,
   "docs:footer": true,
+  "docs:navigation_dropdown_links_home": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
@@ -63,6 +72,7 @@
   "integrations:partners": true,
   "integrations:wrappers": true,
   "integrations:vercel": true,
+  "integrations:aws_private_link": true,
 
   "infrastructure:read_replicas": true,
 
@@ -73,14 +83,13 @@
 
   "organization:show_sso_settings": true,
   "organization:show_security_settings": true,
+  "organization:show_legal_documents": true,
 
   "profile:show_email": true,
   "profile:show_information": true,
   "profile:show_analytics_and_marketing": true,
   "profile:show_account_deletion": true,
 
-  "project_connection:javascript_example": true,
-  "project_connection:dart_example": true,
   "project_connection:show_app_frameworks": true,
   "project_connection:show_mobile_frameworks": true,
   "project_connection:show_orms": true,
@@ -110,6 +119,9 @@
   "sdk:kotlin": true,
   "sdk:python": true,
   "sdk:swift": true,
+
+  "storage:analytics": true,
+  "storage:vectors": true,
 
   "search:fullIndex": true,
 

@@ -55,6 +55,19 @@ Deno.serve(async (req) => {
 })
 ```
 
+## Handling errors
+
+We recommend using `try`/`catch` blocks within your background task function to handle errors.
+
+You can also add an event listener to [`unhandledrejection`](https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event) to handle any promises without a rejection handler.
+
+```tsx
+addEventListener('unhandledrejection', (ev) => {
+  console.log('unhandledrejection', ev.reason)
+  ev.preventDefault()
+})
+```
+
 <Admonition type="note">
 
 The maximum duration is capped based on the wall-clock, CPU, and memory limits. The function will shut down when it reaches one of these [limits](/docs/guides/functions/limits).
@@ -73,9 +86,3 @@ To prevent that, you can update the `supabase/config.toml` with the following se
 [edge_runtime]
 policy = "per_worker"
 ```
-
-<Admonition type="caution">
-
-When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.
-
-</Admonition>

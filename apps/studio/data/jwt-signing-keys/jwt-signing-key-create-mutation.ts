@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { JWTAlgorithm } from './jwt-signing-keys-query'
 import { jwtSigningKeysKeys } from './keys'
 
@@ -38,29 +38,27 @@ export const useJWTSigningKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>,
+  UseCustomMutationOptions<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>(
-    (vars) => createJWTSigningKey(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>({
+    mutationFn: (vars) => createJWTSigningKey(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jwtSigningKeysKeys.list(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create new JWT signing key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create new JWT signing key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

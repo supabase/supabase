@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
-import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
+import { CONTEXT_MENU_KEYS, STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { ColumnContextMenu } from './ColumnContextMenu'
 import { FileExplorerColumn } from './FileExplorerColumn'
@@ -32,6 +32,9 @@ export const FileExplorer = ({
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
 
+  // [Joshen] StorageExplorer will always have at least 1 column once data is loaded
+  const hasLoaded = columns.length > 0
+
   useEffect(() => {
     if (fileExplorerRef) {
       const { scrollWidth, clientWidth } = fileExplorerRef.current
@@ -52,7 +55,12 @@ export const FileExplorer = ({
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
-      {snap.view === STORAGE_VIEWS.COLUMNS ? (
+
+      {!hasLoaded ? (
+        <FileExplorerColumn
+          column={{ id: '', name: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
+        />
+      ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
           {columns.map((column, index) => (
             <FileExplorerColumn

@@ -96,3 +96,18 @@ export const deployEdgeFunctionInputSchema = z
 export const deployEdgeFunctionOutputSchema = z
   .object({ success: z.boolean().optional() })
   .passthrough()
+
+export const rateMessageResponseSchema = z.object({
+  category: z.enum([
+    'sql_generation',
+    'schema_design',
+    'rls_policies',
+    'edge_functions',
+    'database_optimization',
+    'debugging',
+    'general_help',
+    'other',
+  ]),
+})
+
+export type RateMessageResponse = z.infer<typeof rateMessageResponseSchema>

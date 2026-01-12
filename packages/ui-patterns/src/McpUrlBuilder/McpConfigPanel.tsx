@@ -1,14 +1,15 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { cn, Separator } from 'ui'
+import { cn, Separator, CodeBlock } from 'ui'
 
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS_PLATFORM, FEATURE_GROUPS_NON_PLATFORM, MCP_CLIENTS } from './constants'
-import type { McpClient } from './types'
+import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
+import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
+import { InfoTooltip } from '../info-tooltip'
 
 export interface McpConfigPanelProps {
   basePath: string
@@ -16,6 +17,8 @@ export interface McpConfigPanelProps {
   projectRef?: string
   initialSelectedClient?: McpClient
   onClientSelect?: (client: McpClient) => void
+  onCopyCallback: (type?: McpOnCopyCallback) => void
+  onInstallCallback?: () => void
   theme?: 'light' | 'dark'
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
@@ -27,6 +30,8 @@ export function McpConfigPanel({
   projectRef,
   initialSelectedClient,
   onClientSelect,
+  onCopyCallback,
+  onInstallCallback,
   className,
   theme = 'dark',
   isPlatform,
@@ -43,7 +48,7 @@ export function McpConfigPanel({
     )
   }, [selectedFeatures, supportedFeatures])
 
-  const { clientConfig } = getMcpUrl({
+  const { mcpUrl, clientConfig } = getMcpUrl({
     projectRef,
     isPlatform,
     apiUrl,
@@ -78,6 +83,25 @@ export function McpConfigPanel({
           onFeaturesChange={setSelectedFeatures}
           featureGroups={isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM}
         />
+        <div className={innerPanelSpacing}>
+          <CodeBlock
+            focusable={false}
+            title={
+              <div className="flex items-center gap-2">
+                Server URL
+                <InfoTooltip>
+                  {`MCP clients should support the Streamable HTTP transport${isPlatform ? ' and OAuth 2.1 with dynamic client registration' : ''}`}
+                </InfoTooltip>
+              </div>
+            }
+            hideLineNumbers
+            language="http"
+            className="max-h-64 overflow-y-auto"
+            onCopyCallback={() => onCopyCallback?.('url')}
+          >
+            {mcpUrl}
+          </CodeBlock>
+        </div>
       </div>
       <div className="flex flex-col gap-y-3">
         <ClientSelectDropdown
@@ -103,6 +127,8 @@ export function McpConfigPanel({
           basePath={basePath}
           selectedClient={selectedClient}
           clientConfig={clientConfig}
+          onCopyCallback={onCopyCallback}
+          onInstallCallback={onInstallCallback}
         />
       </div>
     </div>

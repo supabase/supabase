@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { organizationKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
 
@@ -36,13 +37,11 @@ export const useFreeProjectLimitCheckQuery = <TData = FreeProjectLimitCheckData>
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData> = {}
+  }: UseCustomQueryOptions<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData> = {}
 ) =>
-  useQuery<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData>(
-    organizationKeys.freeProjectLimitCheck(slug),
-    ({ signal }) => getFreeProjectLimitCheck({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData>({
+    queryKey: organizationKeys.freeProjectLimitCheck(slug),
+    queryFn: ({ signal }) => getFreeProjectLimitCheck({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

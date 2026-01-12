@@ -1,12 +1,8 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-import { useMemo, type PropsWithChildren } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { type Components } from 'react-markdown/lib/ast-to-react'
-import remarkGfm from 'remark-gfm'
 
-import { cn, markdownComponents } from 'ui'
+import { cn } from 'ui'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -16,71 +12,7 @@ import {
   deployEdgeFunctionOutputSchema,
   parseExecuteSqlChartResult,
 } from './Message.utils'
-import {
-  Heading3,
-  Hyperlink,
-  InlineCode,
-  ListItem,
-  MarkdownPre,
-  OrderedList,
-} from './MessageMarkdown'
-
-const baseMarkdownComponents: Partial<Components> = {
-  ol: OrderedList,
-  li: ListItem,
-  h3: Heading3,
-  code: InlineCode,
-  a: Hyperlink,
-  img: ({ src }) => <span className="text-foreground-light font-mono">[Image: {src}]</span>,
-}
-
-export function MessageMarkdown({
-  id,
-  isLoading,
-  readOnly,
-  className,
-  children,
-}: PropsWithChildren<{
-  id: string
-  isLoading: boolean
-  readOnly?: boolean
-  className?: string
-}>) {
-  const markdownSource = useMemo(() => {
-    if (typeof children === 'string') {
-      return children
-    }
-
-    if (Array.isArray(children)) {
-      return children.filter((child): child is string => typeof child === 'string').join('')
-    }
-
-    return ''
-  }, [children])
-
-  const allMarkdownComponents: Partial<Components> = useMemo(
-    () => ({
-      ...markdownComponents,
-      ...baseMarkdownComponents,
-      pre: ({ children }) => (
-        <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
-          {children}
-        </MarkdownPre>
-      ),
-    }),
-    [id, isLoading, readOnly]
-  )
-
-  return (
-    <ReactMarkdown
-      className={className}
-      remarkPlugins={[remarkGfm]}
-      components={allMarkdownComponents}
-    >
-      {markdownSource}
-    </ReactMarkdown>
-  )
-}
+import { MessageMarkdown } from './MessageMarkdown'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -91,7 +23,7 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
       isLoading={isLoading}
       readOnly={readOnly}
       className={cn(
-        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h2:font-medium prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
         isUserMessage && 'text-foreground [&>p]:font-medium',
         state === 'editing' && 'animate-pulse'
       )}

@@ -1,4 +1,4 @@
-import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -104,20 +104,16 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
                 type="text"
                 tooltip={{
                   content: {
+                    side: 'left',
                     text: isLoading ? 'Loading log...' : 'Copy as JSON',
                   },
                 }}
+                icon={showCopied ? <Check /> : <Copy />}
                 onClick={() => {
                   setShowCopied(true)
                   copyToClipboard(JSON.stringify(log, null, 2))
                 }}
-              >
-                {showCopied ? (
-                  <Check size={14} strokeWidth={2} />
-                ) : (
-                  <Clipboard size={14} strokeWidth={2} />
-                )}
-              </ButtonTooltip>
+              />
 
               <Button type="text" onClick={onClose}>
                 <X size={14} strokeWidth={2} />

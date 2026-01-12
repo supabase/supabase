@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -41,7 +41,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
           onClick={async () => {
             // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
-            if (!config.enabled && config.token.startsWith('sb_temp')) {
+            if (!config.enabled && (config.token.startsWith('sb_temp') || !IS_PLATFORM)) {
               const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
               const token = data.api_key
               onChangeConfig({ ...config, token, enabled: !config.enabled })
