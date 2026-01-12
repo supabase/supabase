@@ -187,7 +187,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     return (
       <TableContainer sort={sort} onSortChange={handleSortChange}>
         <TableRow>
-          <TableCell colSpan={5} className="p-0">
+          <TableCell colSpan={4} className="p-0">
             <AlertError
               error={error}
               subject="Failed to retrieve access tokens"
