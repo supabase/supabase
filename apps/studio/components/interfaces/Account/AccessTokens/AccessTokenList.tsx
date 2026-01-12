@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 const RowLoading = () => (
   <TableRow>
@@ -49,7 +50,7 @@ const RowLoading = () => (
   </TableRow>
 )
 
-const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
+const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter py-2'
 
 const TableContainer = ({ children }: { children: React.ReactNode }) => (
   <Card className="w-full overflow-hidden">
@@ -161,40 +162,21 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
               </TableCell>
               <TableCell className="min-w-28">
                 <p className="text-foreground-light">
-                  {x.last_used_at ? (
-                    <Tooltip>
-                      <TooltipTrigger>{dayjs(x.last_used_at).format('DD MMM YYYY')}</TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Last used on {dayjs(x.last_used_at).format('DD MMM, YYYY HH:mm:ss')}
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    'Never used'
-                  )}
+                  <TimestampInfo
+                    utcTimestamp={x.last_used_at ?? ''}
+                    label={x.last_used_at ? dayjs(x.last_used_at).fromNow() : 'Never used'}
+                  />
                 </p>
               </TableCell>
-              <TableCell className="min-w-28">
+              <TableCell className="min-w-28 text-foreground-light">
                 {x.expires_at ? (
                   dayjs(x.expires_at).isBefore(dayjs()) ? (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <p className="text-foreground-light">Expired</p>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Expired on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm:ss')}
-                      </TooltipContent>
-                    </Tooltip>
+                    <TimestampInfo utcTimestamp={x.expires_at} label="Expired" />
                   ) : (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <p className="text-foreground-light">
-                          {dayjs(x.expires_at).format('DD MMM YYYY')}
-                        </p>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Expires on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm:ss')}
-                      </TooltipContent>
-                    </Tooltip>
+                    <TimestampInfo
+                      utcTimestamp={x.expires_at}
+                      label={dayjs(x.expires_at).format('DD MMM YYYY')}
+                    />
                   )
                 ) : (
                   <p className="text-foreground-light">Never</p>
