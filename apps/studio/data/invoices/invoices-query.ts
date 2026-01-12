@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { invoicesKeys } from './keys'
 
 export type InvoicesVariables = {
@@ -32,14 +32,12 @@ export type InvoicesError = ResponseError
 
 export const useInvoicesQuery = <TData = InvoicesData>(
   { slug, offset, limit }: InvoicesVariables,
-  { enabled = true, ...options }: UseQueryOptions<InvoicesData, InvoicesError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<InvoicesData, InvoicesError, TData> = {}
 ) =>
   // [Joshen] Switch to useInfiniteQuery
-  useQuery<InvoicesData, InvoicesError, TData>(
-    invoicesKeys.list(slug, offset),
-    ({ signal }) => getInvoices({ slug, offset, limit }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<InvoicesData, InvoicesError, TData>({
+    queryKey: invoicesKeys.list(slug, offset),
+    queryFn: ({ signal }) => getInvoices({ slug, offset, limit }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

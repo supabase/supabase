@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayout } from 'components/layouts/ProjectLayout'
 import AlertError from 'components/ui/AlertError'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'

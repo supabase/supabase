@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -8,12 +7,13 @@ import { toast } from 'sonner'
 import { useFlag } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -22,14 +22,15 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const RestartServerButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
@@ -45,7 +46,7 @@ const RestartServerButton = () => {
     'reboot'
   )
 
-  const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
+  const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {
       onRestartSuccess()
     },
@@ -53,7 +54,7 @@ const RestartServerButton = () => {
       onRestartFailed(error, 'project')
     },
   })
-  const { mutate: restartProjectServices, isLoading: isRestartingServices } =
+  const { mutate: restartProjectServices, isPending: isRestartingServices } =
     useProjectRestartServicesMutation({
       onSuccess: () => {
         onRestartSuccess()
@@ -85,7 +86,7 @@ const RestartServerButton = () => {
   }
 
   const onRestartSuccess = () => {
-    setProjectStatus(queryClient, projectRef, 'RESTARTING')
+    setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESTARTING })
     toast.success('Restarting server...')
     router.push(`/project/${projectRef}`)
     setServiceToRestart(undefined)
@@ -168,22 +169,21 @@ const RestartServerButton = () => {
         </Button>
       )}
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={serviceToRestart !== undefined}
+        variant="destructive"
         title={`Restart ${serviceToRestart}`}
-        // @ts-ignore
         description={
           <>
-            Are you sure you want to restart the{' '}
-            <span className="text-foreground">{serviceToRestart}</span>? There will be a few minutes
-            of downtime.
+            Are you sure you want to restart your {serviceToRestart}? There will be a few minutes of
+            downtime.
           </>
         }
-        buttonLabel="Restart"
-        buttonLoadingLabel="Restarting"
-        onSelectCancel={() => setServiceToRestart(undefined)}
-        onSelectConfirm={async () => {
+        confirmLabel="Restart"
+        confirmLabelLoading="Restarting"
+        loading={isLoading}
+        onCancel={() => setServiceToRestart(undefined)}
+        onConfirm={async () => {
           if (serviceToRestart === 'project') {
             await requestProjectRestart()
           } else if (serviceToRestart === 'database') {

@@ -5,6 +5,8 @@
 
   "dashboard_auth:custom_provider": "Nimbus",
 
+  "docs:row_level_security_guide_path": "/guides/database/postgres/row-level-security",
+
   "organization:legal_documents": [
     {
       "id": "doc1",

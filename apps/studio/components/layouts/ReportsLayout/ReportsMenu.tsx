@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus, ArrowUpRight } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -9,7 +9,6 @@ import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -17,7 +16,9 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ReportMenuItem } from './ReportMenuItem'
+import { useQueryState, parseAsBoolean } from 'nuqs'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -57,11 +58,11 @@ const ReportsMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')
@@ -73,7 +74,10 @@ const ReportsMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
   const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
 
@@ -149,8 +153,7 @@ const ReportsMenu = () => {
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          url: `/project/${ref}/reports/query-performance${preservedQueryParams}`,
         },
         ...(postgrestReportEnabled
           ? [
@@ -261,9 +264,6 @@ const ReportsMenu = () => {
                           className="flex-grow h-7 flex justify-between items-center pl-3"
                         >
                           <span>{subItem.name}</span>
-                          {subItem.rightIcon && (
-                            <span className="shrink-0">{subItem.rightIcon}</span>
-                          )}
                         </Link>
                       </li>
                     ))}

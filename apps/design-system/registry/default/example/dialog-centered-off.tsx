@@ -1,29 +1,31 @@
-import { Button, DialogSection, DialogSectionSeparator } from 'ui'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  Input_Shadcn_,
+  Label_Shadcn_,
 } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
 
 export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Edit Profile</Button>
+        <Button type="default">Edit profile</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" centered={false}>
-        <DialogHeader padding={'small'}>
+        <DialogHeader>
           <DialogTitle>This dialog is not centered.</DialogTitle>
           <DialogDescription>This dialog is not centered.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="space-y-4" padding={'small'}>
+        <DialogSection className="space-y-4">
           <div>
             <Label_Shadcn_ htmlFor="name" className="text-right">
               Name
@@ -37,7 +39,7 @@ export default function DialogDemo() {
             <Input_Shadcn_ id="username" defaultValue="@peduarte" className="col-span-3" />
           </div>
         </DialogSection>
-        <DialogFooter padding={'small'}>
+        <DialogFooter>
           <Button htmlType="submit">Save changes</Button>
         </DialogFooter>
       </DialogContent>

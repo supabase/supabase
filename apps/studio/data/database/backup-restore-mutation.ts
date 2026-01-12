@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type BackupRestoreVariables = {
   ref: string
@@ -38,23 +38,21 @@ export const useBackupRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
+  UseCustomMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>(
-    (vars) => restoreFromBackup(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to restore from backup: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>({
+    mutationFn: (vars) => restoreFromBackup(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to restore from backup: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

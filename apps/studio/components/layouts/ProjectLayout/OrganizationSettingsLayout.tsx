@@ -16,7 +16,12 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const {
     organizationShowSsoSettings: showSsoSettings,
     organizationShowSecuritySettings: showSecuritySettings,
-  } = useIsFeatureEnabled(['organization:show_sso_settings', 'organization:show_security_settings'])
+    organizationShowLegalDocuments: showLegalDocuments,
+  } = useIsFeatureEnabled([
+    'organization:show_sso_settings',
+    'organization:show_security_settings',
+    'organization:show_legal_documents',
+  ])
 
   const navMenuItems = [
     {
@@ -48,10 +53,14 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
     },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
+    ...(showLegalDocuments
+      ? [
+          {
+            label: 'Legal Documents',
+            href: `/org/${slug}/documents`,
+          },
+        ]
+      : []),
   ]
 
   return (

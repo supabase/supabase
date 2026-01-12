@@ -7,8 +7,8 @@ thumb: 2024-11-13-supabase-dynamic-functions/dynamic-og.png
 categories:
   - engineering
 tags:
-  - edge-funcion
-  - funcions
+  - edge-function
+  - functions
   - AI
 date: '2024-11-13'
 toc_depth: 3
@@ -16,7 +16,7 @@ toc_depth: 3
 
 We're always looking for ways to improve the developer experience and reduce complexity across your application development pipeline. One way you can use Supabase to do that is with dynamic JavaScript in Edge Functions. This greatly increases the versatility of your edge functions and reduces the need for you to redeploy your functions if you need to change business logic.
 
-### Introduction to Edge Functions
+## Introduction to Edge Functions
 
 Edge Functions in Supabase are serverless functions that execute in response to HTTP requests. These functions are deployed at the edge, meaning they run close to the user's location, resulting in faster response times.
 
@@ -50,7 +50,7 @@ These are the functions we'll use to execute the JavaScript code:
 
 You can skip this section if you are only interested in using the dynamic execution of JavaScript code. However, if you want to understand how the helper functions work, keep reading.
 
-### `edge.http_request` Function
+#### Function: edge.http_request
 
 This function handles the actual HTTP request and processes the response. It ensures consistency in response format.
 
@@ -103,7 +103,7 @@ $$ LANGUAGE plpgsql;
 
 ```
 
-### `edge_wrapper` Function
+#### Function: edge.edge_wrapper
 
 The `edge_wrapper` function manages HTTP requests with features like retries, custom headers, and region selection. Below are the parameters it accepts:
 

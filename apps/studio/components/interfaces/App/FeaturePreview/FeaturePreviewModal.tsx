@@ -13,8 +13,6 @@ import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-import { InlineEditorPreview } from './InlineEditorPreview'
-import { NewStorageUIPreview } from './NewStorageUIPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
@@ -22,11 +20,9 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 } = {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]: <Branching2Preview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]: <NewStorageUIPreview />,
 }
 
 const FeaturePreviewModal = () => {
@@ -105,7 +101,7 @@ const FeaturePreviewModal = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-2">
                 <p>{selectedFeature?.name}</p>
-                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+                {selectedFeature?.isNew && <Badge variant="success">New</Badge>}
               </div>
               <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (

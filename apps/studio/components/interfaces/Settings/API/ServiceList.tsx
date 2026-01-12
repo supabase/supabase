@@ -1,8 +1,10 @@
 import { AlertCircle } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -12,21 +14,29 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Badge, Card, CardContent, CardHeader } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {
-  const { data: project, isLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoading } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
     data: databases,
     isError,
-    isLoading: isLoadingDatabases,
+    isPending: isLoadingDatabases,
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
+
+  useEffect(() => {
+    if (querySource && querySource !== state.selectedDatabaseId) {
+      state.setSelectedDatabaseId(querySource)
+    }
+  }, [querySource, state, projectRef])
 
   // Get the API service
   const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
@@ -61,6 +71,9 @@ export const ServiceList = () => {
                     ? [{ id: 'load-balancer', name: 'API Load Balancer' }]
                     : []
                 }
+                onSelectId={() => {
+                  setQuerySource(null)
+                }}
               />
             </CardHeader>
             <CardContent>
@@ -76,7 +89,7 @@ export const ServiceList = () => {
                 </Alert_Shadcn_>
               ) : (
                 <FormLayout
-                  layout="horizontal"
+                  layout="flex-row-reverse"
                   label={
                     isCustomDomainActive ? (
                       <div className="flex items-center space-x-2">
@@ -94,8 +107,9 @@ export const ServiceList = () => {
                         ? 'RESTful endpoint for querying your read replica'
                         : 'RESTful endpoint for querying and managing your database'
                   }
+                  className="[&>div]:xl:w-1/2 [&>div>div]:w-full"
                 >
-                  <Input copy readOnly disabled className="input-mono" value={endpoint} />
+                  <Input copy readOnly className="font-mono" value={endpoint} />
                 </FormLayout>
               )}
             </CardContent>

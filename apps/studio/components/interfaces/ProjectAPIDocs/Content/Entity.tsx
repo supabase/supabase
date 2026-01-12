@@ -30,7 +30,7 @@ function getColumnType(type: string, format: string) {
   }
 }
 
-const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
+export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
@@ -144,5 +144,3 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
     </div>
   )
 }
-
-export default Entity
