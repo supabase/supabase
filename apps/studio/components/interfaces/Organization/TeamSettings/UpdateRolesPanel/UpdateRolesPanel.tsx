@@ -168,12 +168,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <SheetContent
           showClose={false}
           size="default"
-          className={cn('bg-surface-200 p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full')}
+          className="bg-surface-200 p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full"
         >
-          <div className={cn('flex flex-col grow w-full')}>
-            <SheetHeader
-              className={cn('py-3 flex flex-row justify-between gap-x-4 items-center border-b')}
-            >
+          <div className="flex flex-col grow w-full">
+            <SheetHeader className="py-3 flex flex-row justify-between gap-x-4 items-center border-b">
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
