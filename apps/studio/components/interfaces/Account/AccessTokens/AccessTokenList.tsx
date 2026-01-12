@@ -205,9 +205,9 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="text"
+                        type="default"
                         title="More options"
-                        className="px-1.5"
+                        className="px-1"
                         disabled={isLoading}
                         loading={isLoading}
                         icon={<MoreVertical />}
