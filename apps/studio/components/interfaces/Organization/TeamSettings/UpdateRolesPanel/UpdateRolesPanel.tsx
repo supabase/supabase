@@ -168,7 +168,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <SheetContent
           showClose={false}
           size="default"
-          className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[600px]')}
+          className={cn('bg-surface-200 p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full')}
         >
           <div className={cn('flex flex-col grow w-full')}>
             <SheetHeader
@@ -234,7 +234,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   </Collapsible_Shadcn_>
                 )}
 
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col divide-y divide-border">
                 {projectsRoleConfiguration.map((project) => {
                   const name = project.ref === undefined ? 'All projects' : project.name
                   const role = orgScopedRoles.find((r) => {
@@ -246,9 +246,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   return (
                     <div
                       key={`${project.ref}-${project.roleId}`}
-                      className="flex items-center justify-between"
+                      className="flex items-center justify-between py-2"
                     >
-                      <p className="text-sm">{name}</p>
+                      <p className="text-s">{name}</p>
 
                       <div className="flex items-center gap-x-2">
                         {cannotAddAnyRoles ? (
@@ -269,7 +269,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           >
                             <SelectTrigger_Shadcn_
                               className={cn(
-                                'text-sm h-10 w-56',
+                                ' w-40',
                                 role?.name === undefined && 'text-foreground-light'
                               )}
                             >
