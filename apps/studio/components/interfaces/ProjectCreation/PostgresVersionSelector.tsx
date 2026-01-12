@@ -69,7 +69,7 @@ export const PostgresVersionSelector = ({
 
   const {
     data: createVersions,
-    isLoading: isLoadingProjectCreateVersions,
+    isPending: isLoadingProjectCreateVersions,
     isSuccess,
   } = useProjectCreationPostgresVersionsQuery(
     {
@@ -80,7 +80,7 @@ export const PostgresVersionSelector = ({
     { enabled: type === 'create' }
   )
 
-  const { data: unpauseVersions, isLoading: isLoadingProjectUnpauseVersions } =
+  const { data: unpauseVersions, isPending: isLoadingProjectUnpauseVersions } =
     useProjectUnpausePostgresVersionsQuery(
       { projectRef: project?.ref },
       { enabled: type === 'unpause' }

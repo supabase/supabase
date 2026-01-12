@@ -1,8 +1,9 @@
 import {
+  InfiniteData,
+  keepPreviousData,
   useInfiniteQuery,
   useQuery,
   useQueryClient,
-  type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
@@ -152,19 +153,26 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<BucketsWithPaginationData, BucketsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    BucketsWithPaginationData,
+    BucketsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number
+  > = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { keepPreviousData, ...restOptions } = options
-  const resolvedKeepPreviousData = keepPreviousData ?? true
+  const { placeholderData, ...restOptions } = options
+  const resolvedPlaceholderData = placeholderData ?? keepPreviousData
 
-  return useInfiniteQuery<BucketsWithPaginationData, BucketsError, TData>({
+  return useInfiniteQuery({
     queryKey: storageKeys.bucketsList(projectRef, params),
     queryFn: ({ signal, pageParam }) =>
       getBucketsPaginated({ projectRef, page: pageParam, ...params }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => {
       const nextPageNumber = pages.length
       const limit = params.limit ?? DEFAULT_PAGE_SIZE
@@ -174,7 +182,7 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
       return nextPageNumber
     },
     ...restOptions,
-    keepPreviousData: resolvedKeepPreviousData,
+    placeholderData: resolvedPlaceholderData,
     retry: shouldRetryBucketsQuery,
   })
 }
@@ -190,7 +198,7 @@ export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: s
     if (!bucketId) return undefined
 
     const bucketsPages = queryClient.getQueryData(storageKeys.bucketsList(projectRef)) as
-      | UseInfiniteQueryResult<Bucket[]>['data']
+      | InfiniteData<Bucket[]>
       | undefined
     const buckets = bucketsPages?.pages.flatMap((page) => page) ?? []
     return buckets.find((b) => b.name === bucketId)

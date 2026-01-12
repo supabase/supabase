@@ -43,7 +43,14 @@ const TableSelector = ({
   const { data: project } = useSelectedProjectQuery()
   const [searchInput, setSearchInput] = useState('')
 
-  const { data, isLoading, isSuccess, isError, error, refetch } = useEntityTypesQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+    refetch,
+  } = useEntityTypesQuery({
     projectRef: project?.ref,
     search: searchInput,
     connectionString: project?.connectionString,

@@ -1,13 +1,13 @@
-import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
-import { useMemo } from 'react'
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
   FeatureKey,
 } from 'data/entitlements/entitlements-query'
+import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { useMemo } from 'react'
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 function isNumericConfig(
   config: EntitlementConfig,
@@ -66,7 +66,7 @@ export function useCheckEntitlements(
   const shouldGetSelectedOrg = !organizationSlug && options?.enabled !== false
   const {
     data: selectedOrg,
-    isLoading: isLoadingSelectedOrg,
+    isPending: isLoadingSelectedOrg,
     isSuccess: isSuccessSelectedOrg,
   } = useSelectedOrganizationQuery({
     enabled: shouldGetSelectedOrg,
@@ -77,7 +77,7 @@ export function useCheckEntitlements(
 
   const {
     data: entitlementsData,
-    isLoading: isLoadingEntitlements,
+    isPending: isLoadingEntitlements,
     isSuccess: isSuccessEntitlements,
   } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })
 
@@ -96,15 +96,17 @@ export function useCheckEntitlements(
     }
   }, [entitlementsData, featureKey, finalOrgSlug])
 
-  const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
+  const isLoading = shouldGetSelectedOrg
+    ? isLoadingSelectedOrg || isLoadingEntitlements
+    : isLoadingEntitlements
   const isSuccess = shouldGetSelectedOrg
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
   return {
     hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
-    isLoading,
-    isSuccess,
+    isLoading: IS_PLATFORM ? isLoading : false,
+    isSuccess: IS_PLATFORM ? isSuccess : true,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
     isEntitlementUnlimited: () => isEntitlementUnlimited(entitlement),
     getEntitlementSetValues: () => getEntitlementSetValues(entitlement),

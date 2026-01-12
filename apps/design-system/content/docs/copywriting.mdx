@@ -1,0 +1,240 @@
+---
+title: Copywriting
+description: A concise guide for writing UI copy in Supabase.
+---
+
+Write UI copy that helps developers complete tasks quickly. Be direct, action-oriented, and respectful of developer time.
+
+## Voice and tone
+
+Supabase UI copy is:
+
+- **Direct**: Say what something does, not what it "enables" you to do.
+- **Action-oriented**: Focus on what happens, not what we built.
+- **Technical without jargon**: Use precise terms but explain when necessary.
+- **Pragmatic**: Acknowledge tradeoffs and limitations when relevant.
+
+## Buttons and actions
+
+### Use verbs, not nouns
+
+<ComponentPreview name="copy-button-verbs" hideCode />
+
+### Be specific about outcomes
+
+| Bad         | Good             |
+| ----------- | ---------------- |
+| "Remove"    | "Delete project" |
+| "Change"    | "Revoke access"  |
+| "Configure" | "Enable RLS"     |
+
+### Match button text to the action
+
+| Action            | Bad       | Good           |
+| ----------------- | --------- | -------------- |
+| Primary action:   | "Submit"  | "Create table" |
+| Secondary action: | "Go back" | "Cancel"       |
+
+## Form labels and descriptions
+
+### Labels describe the field, not the feature
+
+<ComponentPreview name="copy-form-labels" hideCode />
+
+| Action       | Bad                                                                                              | Good                                     |
+| ------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| Label:       | "Name your table"                                                                                | "Table name"                             |
+| Description: | "This field allows you to specify a name for your table using letters, numbers, and underscores" | "Letters, numbers, and underscores only" |
+
+### Descriptions explain constraints, not concepts
+
+| Bad                                                             | Good                               |
+| --------------------------------------------------------------- | ---------------------------------- |
+| "This ensures your table name is unique"                        | "Must be unique within the schema" |
+| "You can enter up to 255 characters here"                       | "Maximum 255 characters"           |
+| "This field is required when using Row Level Security policies" | "Required for RLS policies"        |
+
+### Use present tense
+
+| Bad                                    | Good                              |
+| -------------------------------------- | --------------------------------- |
+| "Will store connection pool settings"  | "Stores connection pool settings" |
+| "This will limit query execution time" | "Limits query execution time"     |
+
+## Error messages
+
+### State what went wrong, then how to fix it
+
+<ComponentPreview name="copy-error-messages" hideCode />
+
+| Bad                                       | Good                                                  |
+| ----------------------------------------- | ----------------------------------------------------- |
+| "An error occurred"                       | "Table name already exists. Choose a different name." |
+| "Something went wrong. Please try again." | "Invalid API key. Check your project settings."       |
+
+### Be specific about the problem
+
+| Bad                | Good                                          |
+| ------------------ | --------------------------------------------- |
+| "Invalid input"    | "Password must be at least 8 characters"      |
+| "Connection error" | "Connection failed: timeout after 30 seconds" |
+
+### Avoid blame or apology
+
+| Bad                          | Good                                             |
+| ---------------------------- | ------------------------------------------------ |
+| "Sorry, we couldn't connect" | "Unable to connect to database"                  |
+| "Oops! Something went wrong" | "Table creation failed: column name is reserved" |
+
+## Success messages
+
+### Confirm what happened
+
+<ComponentPreview name="copy-success-messages" hideCode />
+
+| Bad                   | Good                         |
+| --------------------- | ---------------------------- |
+| "Success!"            | "Table created successfully" |
+| "Done"                | "API key revoked"            |
+| "Operation completed" | "Changes saved"              |
+
+### Keep it brief
+
+| Bad                                                           | Good                |
+| ------------------------------------------------------------- | ------------------- |
+| "Your backup has been successfully restored to your database" | "Backup restored"   |
+| "The migration has been applied successfully to your project" | "Migration applied" |
+
+## Tooltips and help text
+
+### Explain why, not what
+
+<ComponentPreview name="copy-tooltips" hideCode />
+
+| Bad                       | Good                                             |
+| ------------------------- | ------------------------------------------------ |
+| "This is a toggle switch" | "Enables real-time subscriptions for this table" |
+| "Click to delete"         | "Prevents accidental deletions"                  |
+
+### One sentence maximum
+
+| Bad                                                                                                                                        | Good                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| "Row Level Security restricts access based on user policies. When enabled, users can only access rows that match their policy conditions." | "Restricts access based on user policies"  |
+| "This setting controls the maximum number of concurrent connections that can be established to your database at any given time."           | "Maximum number of concurrent connections" |
+
+## Navigation and headings
+
+### Use sentence case
+
+| Bad                     | Good                    |
+| ----------------------- | ----------------------- |
+| "Set Up Authentication" | "Set up authentication" |
+| "Database Settings"     | "Database settings"     |
+| "Create New Project"    | "Create new project"    |
+
+### Headings describe the page, not the feature
+
+| Bad                            | Good                 |
+| ------------------------------ | -------------------- |
+| "Manage your API keys"         | "API keys"           |
+| "Configure connection pooling" | "Connection pooling" |
+| "Edit your tables"             | "Table editor"       |
+
+## Empty states
+
+### Explain what's missing, then how to add it
+
+<ComponentPreview name="copy-empty-states" hideCode />
+
+| Bad                               | Good                                                       |
+| --------------------------------- | ---------------------------------------------------------- |
+| "You don't have any tables"       | "No tables yet. Create your first table to get started."   |
+| "There are no API keys available" | "No API keys. Generate a key to connect your application." |
+
+### Include the action
+
+| Bad                      | Good                                              |
+| ------------------------ | ------------------------------------------------- |
+| "No buckets found"       | "No buckets yet. [Create bucket] button"          |
+| "No functions available" | "No functions deployed. [Deploy function] button" |
+
+## Loading states
+
+### Describe what's happening
+
+<ComponentPreview name="copy-loading-states" hideCode />
+
+| Bad              | Good                    |
+| ---------------- | ----------------------- |
+| "Please wait..." | "Creating table..."     |
+| "Loading..."     | "Loading schema..."     |
+| "Processing..."  | "Applying migration..." |
+
+### Match the action verb
+
+| Action                      | Bad              | Good                  |
+| --------------------------- | ---------------- | --------------------- |
+| "Delete project" → Loading: | "Processing..."  | "Deleting project..." |
+| "Save changes" → Loading:   | "Please wait..." | "Saving changes..."   |
+
+## Confirmations and dialogs
+
+### State consequences clearly
+
+<ComponentPreview name="copy-confirmations" hideCode />
+
+| Bad                                   | Good                                                                                      |
+| ------------------------------------- | ----------------------------------------------------------------------------------------- |
+| "Are you sure?"                       | "Delete this project? This action cannot be undone and will permanently delete all data." |
+| "This action is permanent. Continue?" | "Revoke this API key? Applications using this key will stop working immediately."         |
+
+### Use active voice
+
+| Bad                                                          | Good                                                |
+| ------------------------------------------------------------ | --------------------------------------------------- |
+| "All data will be removed if this project is deleted"        | "Deleting this project will remove all data"        |
+| "Existing connections will be broken if this key is revoked" | "Revoking this key will break existing connections" |
+
+## Words to avoid
+
+### Marketing language
+
+| Bad                          | Good                 |
+| ---------------------------- | -------------------- |
+| "Easily create tables"       | "Create tables"      |
+| "Simply configure settings"  | "Configure settings" |
+| "Powerful database features" | "Database features"  |
+
+### Vague verbs
+
+| Bad              | Good                             |
+| ---------------- | -------------------------------- |
+| "Manage tables"  | "Create, edit, or delete tables" |
+| "Handle errors"  | "View and resolve errors"        |
+| "Work with data" | "Query and update data"          |
+
+## Capitalization
+
+- **Sentence case** for all UI text (buttons, labels, headings)
+- **Product names:** Database, Auth, Storage, Edge Functions, Realtime, Vector
+- **Postgres**, not PostgreSQL
+- **Supabase** (capitalize except in code)
+
+## Formatting
+
+- **Bold for emphasis** only when necessary
+- **Inline code** for technical terms: `RLS`, `API key`, `supabase init`
+- **No italics** for emphasis
+- **No exclamation marks** unless critical (e.g., destructive actions)
+
+## Quick checklist
+
+Before publishing UI copy, ask:
+
+- Does it use an action verb?
+- Is it specific about what happens?
+- Can a developer complete the task without reading more?
+- Does it avoid marketing language?
+- Is it in sentence case?
+- Is it one sentence or less (for labels, buttons, tooltips)?

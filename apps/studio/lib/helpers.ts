@@ -353,4 +353,17 @@ export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
   }
 }
 
+export const createWrappedSymbol = (name: string, display: string): Symbol => {
+  const sym = Symbol(name)
+  const wrapper = Object(sym)
+
+  wrapper.toString = () => display
+
+  Object.freeze(wrapper)
+  return wrapper
+}
+
+// Intentional for generic use; does not affect type safety since this branch is
+// unreachable.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function neverGuard(_: never): any {}

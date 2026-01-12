@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
+import { Auth, Database, Realtime, Storage } from 'icons'
 import sumBy from 'lodash/sumBy'
 import { ChevronDown } from 'lucide-react'
-import { Auth, Database, Realtime, Storage } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -80,7 +80,7 @@ const ProjectUsage = () => {
 
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
-  const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
+  const { data, isPending: isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDateLocal = dayjs().subtract(

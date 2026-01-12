@@ -12,6 +12,7 @@ import {
   CommandList_Shadcn_,
 } from 'ui'
 import type { ResourcePickerRenderProps } from './SecondLevelNav.Layout'
+import { keepPreviousData } from '@tanstack/react-query'
 
 type StorageResourceListProps = ResourcePickerRenderProps & {
   projectRef?: string
@@ -47,7 +48,7 @@ const useInfiniteLoadingBuckets = ({
       { projectRef, search: searchQuery },
       {
         enabled: !!projectRef,
-        keepPreviousData: rawQuery.length === 0,
+        placeholderData: rawQuery.length === 0 ? keepPreviousData : undefined,
       }
     )
   const buckets = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data])
