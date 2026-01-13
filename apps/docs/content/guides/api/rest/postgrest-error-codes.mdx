@@ -85,22 +85,22 @@ Errors with data structures or request formatting
 | Code     | HTTP status | Description                                                                                                                               |
 | -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | PGRST100 | 400         | Parsing error in the query string parameter. See `:ref:`h_filter``, `:ref:`operators`` and `:ref:`ordering``.                             |
-| PGRST101 | 405         | For `:ref:`functions <functions>`, only `GET`and`POST`` verbs are allowed. Any other verb will throw this error.                          |
+| PGRST101 | 405         | For `:ref:`functions /<functions/>`, only `GET`and`POST`` verbs are allowed. Any other verb will throw this error.                          |
 | PGRST102 | 400         | An invalid request body was sent(e.g. an empty body or malformed JSON).                                                                   |
 | PGRST103 | 416         | An invalid range was specified for `:ref:`limits``.                                                                                       |
-| PGRST105 | 405         | An invalid `:ref:`PUT <upsert_put>`` request was done                                                                                     |
-| PGRST106 | 406         | The schema specified when `:ref:`switching schemas <multiple-schemas>`` is not present in the `:ref:`db-schemas`` configuration variable. |
+| PGRST105 | 405         | An invalid `:ref:`PUT /<upsert_put/>`` request was done                                                                                     |
+| PGRST106 | 406         | The schema specified when `:ref:`switching schemas /<multiple-schemas/>`` is not present in the `:ref:`db-schemas`` configuration variable. |
 | PGRST107 | 415         | The `Content-Type` sent in the request is invalid.                                                                                        |
 | PGRST108 | 400         | The filter is applied to a embedded resource that is not specified in the `select` part of the query string. See `:ref:`embed_filters``.  |
 | PGRST111 | 500         | An invalid `response.headers` was set. See `:ref:`guc_resp_hdrs``.                                                                        |
 | PGRST112 | 500         | The status code must be a positive integer. See `:ref:`guc_resp_status``.                                                                 |
-| PGRST114 | 400         | For an `:ref:`UPSERT using PUT <upsert_put>``, when `:ref:`limits and offsets <limits>`` are used.                                        |
-| PGRST115 | 400         | For an `:ref:`UPSERT using PUT <upsert_put>``, when the primary key in the query string and the body are different.                       |
+| PGRST114 | 400         | For an `:ref:`UPSERT using PUT /<upsert_put/>``, when `:ref:`limits and offsets /<limits/>`` are used.                                        |
+| PGRST115 | 400         | For an `:ref:`UPSERT using PUT /<upsert_put/>``, when the primary key in the query string and the body are different.                       |
 | PGRST116 | 406         | More than 1 or no items where returned when requesting a singular response. See `:ref:`singular_plural``.                                 |
 | PGRST117 | 405         | The HTTP verb used in the request in not supported.                                                                                       |
 | PGRST118 | 400         | Could not order the result using the related table because there is no many-to-one or one-to-one relationship between them.               |
-| PGRST120 | 400         | An embedded resource can only be filtered using the `is.null` or `not.is.null` `:ref:`operators <operators>``.                            |
-| PGRST121 | 500         | PostgREST can't parse the JSON objects in RAISE `PGRST` error. See `:ref:`raise headers <raise_headers>``.                                |
+| PGRST120 | 400         | An embedded resource can only be filtered using the `is.null` or `not.is.null` `:ref:`operators /<operators/>``.                            |
+| PGRST121 | 500         | PostgREST can't parse the JSON objects in RAISE `PGRST` error. See `:ref:`raise headers /<raise_headers/>``.                                |
 | PGRST122 | 400         | Invalid preferences found in `Prefer` header with `Prefer: handling=strict`. See `:ref:`prefer_handling``.                                |
 | PGRST123 | 400         | Aggregate functions are disabled. See `:ref:`db-aggregates-enabled``.                                                                     |
 | PGRST124 | 400         | `max-affected` preference is violated. See `:ref:`prefer_max_affected``.                                                                  |
@@ -119,8 +119,8 @@ The API is unable to identify relationships or objects within the query requests
 | PGRST201 | 300         | An ambiguous embedding request was made. See `:ref:`complex_rels``.                                                                                                                                                                                                                     |
 | PGRST202 | 404         | Caused by a stale function signature, otherwise the function may not exist in the database.                                                                                                                                                                                             |
 | PGRST203 | 300         | Caused by requesting overloaded functions with the same argument names but different types, or by using a `POST` verb to request overloaded functions with a `JSON` or `JSONB` type unnamed parameter. The solution is to rename the function or add/modify the names of the arguments. |
-| PGRST204 | 400         | Caused when the `:ref:`column specified <specify_columns>`in the`columns`` query parameter is not found.                                                                                                                                                                                |
-| PGRST205 | 404         | Caused when the `:ref:`table specified <tables_views>`` in the URI is not found.                                                                                                                                                                                                        |
+| PGRST204 | 400         | Caused when the `:ref:`column specified /<specify_columns/>`in the`columns`` query parameter is not found.                                                                                                                                                                                |
+| PGRST205 | 404         | Caused when the `:ref:`table specified /<tables_views/>`` in the URI is not found.                                                                                                                                                                                                        |
 
 ### Authentication errors
 
@@ -128,10 +128,10 @@ The request lacks the proper credentials to request data
 
 | Code     | HTTP status | Description                                                                                                                            |
 | -------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| PGRST300 | 500         | A `:ref:`JWT secret <jwt-secret>`` is missing from the configuration.                                                                  |
+| PGRST300 | 500         | A `:ref:`JWT secret /<jwt-secret/>`` is missing from the configuration.                                                                  |
 | PGRST301 | 401         | Provided JWT couldn't be decoded or it is invalid.                                                                                     |
 | PGRST302 | 401         | Attempted to do a request without `:ref:`bearer_auth`` when the anonymous role is disabled by not setting it in `:ref:`db-anon-role``. |
-| PGRST303 | 401         | `:ref:`JWT claims validation <jwt_claims_validation>`` or parsing failed.                                                              |
+| PGRST303 | 401         | `:ref:`JWT claims validation /<jwt_claims_validation/>`` or parsing failed.                                                              |
 
 ### Internal errors
 
