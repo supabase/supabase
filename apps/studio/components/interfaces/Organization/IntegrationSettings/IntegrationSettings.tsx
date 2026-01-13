@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
-import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
+import { VercelSection } from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,

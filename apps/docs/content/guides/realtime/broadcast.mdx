@@ -33,7 +33,20 @@ You can use the Supabase client libraries to receive Broadcast messages.
 
 ### Initialize the client
 
-Go to your Supabase project's [API Settings](/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+{/* TODO: Further consolidate partial */}
+
+Get the Project URL and key from [the project's **Connect** dialog](/dashboard/project/_?showConnect=true).
+
+<Admonition type="note" title="Changes to API keys">
+
+Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
+
+In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
+
+- **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
+- **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
+
+</Admonition>
 
 <Tabs
   scrollable

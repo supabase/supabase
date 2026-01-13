@@ -11,11 +11,26 @@ const data = {
   },
   cards: [
     {
-      title: 'Issues',
-      paragraph: "Found a bug? We'd love to hear about it in our GitHub issues.",
+      title: 'Community support',
+      paragraph:
+        'Our Discord community can help with code-related issues. Many questions are answered in minutes.',
       links: [
         {
-          label: 'Open GitHub Issue',
+          label: 'Join us on Discord',
+          link: 'https://discord.supabase.com/',
+          target: '_blank',
+          icon: <IconDiscord fill="hsl(var(--background-default))" />,
+          type: 'secondary',
+        },
+      ],
+      className: 'col-span-full xl:col-span-1',
+    },
+    {
+      title: 'Issues',
+      paragraph: 'Found a bug? We’d love to hear about it in our GitHub issues.',
+      links: [
+        {
+          label: 'Report an issue',
           link: 'https://github.com/supabase/supabase/issues',
           target: '_blank',
           icon: <IconGitHubSolid />,
@@ -25,42 +40,20 @@ const data = {
     },
     {
       title: 'Feature requests',
-      paragraph: 'Want to suggest a new feature? Share it with us and the community.',
+      paragraph: 'Want to suggest a new feature? Share it with us on GitHub discussions.',
       links: [
         {
-          label: 'Request feature',
+          label: 'Suggest a feature',
           link: 'https://github.com/orgs/supabase/discussions/categories/feature-requests',
-          target: '_blank',
-          icon: <IconGitHubSolid />,
-          type: 'default',
-        },
-      ],
-    },
-    {
-      title: 'Ask the Community',
-      paragraph:
-        'Join our GitHub discussions or our Discord server to browse for help and best practices.',
-      links: [
-        {
-          label: 'Ask a question',
-          link: 'https://github.com/supabase/supabase/discussions',
           target: '_blank',
           icon: <IconDiscussions />,
           type: 'default',
         },
-        {
-          label: 'Join Discord',
-          link: 'https://discord.supabase.com/',
-          target: '_blank',
-          icon: <IconDiscord fill="hsl(var(--background-default))" />,
-          type: 'secondary',
-        },
       ],
-      className: 'col-span-full xl:col-span-1',
     },
   ],
   banner: {
-    title: "Can't find what you're looking for?",
+    title: 'Can’t find what you’re looking for?',
     paragraph: (
       <>
         <p className="text-foreground-light">The Supabase Support Team is ready to help.</p>
@@ -72,13 +65,13 @@ const data = {
     ),
     links: [
       {
-        label: 'Contact Enterprise Sales',
+        label: 'Contact enterprise sales',
         link: 'https://forms.supabase.com/enterprise',
         target: '_blank',
         type: 'default',
       },
       {
-        label: 'Open Ticket',
+        label: 'Open support ticket',
         link: 'https://supabase.com/dashboard/support/new',
         target: '_blank',
         icon: <ArrowUpRight />,

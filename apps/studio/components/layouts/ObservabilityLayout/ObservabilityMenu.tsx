@@ -2,23 +2,24 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ObservabilityMenuItem } from './ObservabilityMenuItem'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { ObservabilityMenuItem } from './ObservabilityMenuItem'
+import { useQueryState, parseAsBoolean } from 'nuqs'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -58,11 +59,11 @@ const ObservabilityMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')
@@ -74,7 +75,10 @@ const ObservabilityMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
   const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
 
@@ -275,9 +279,9 @@ const ObservabilityMenu = () => {
           </div>
 
           {menuItems.map((item, idx) => (
-            <>
+            <Fragment key={idx}>
               <div className="h-px w-full bg-border-overlay first:hidden" />
-              <div key={item.key + '-menu-group'}>
+              <div>
                 {item.items ? (
                   <div className="px-2">
                     <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
@@ -305,7 +309,7 @@ const ObservabilityMenu = () => {
                   </div>
                 ) : null}
               </div>
-            </>
+            </Fragment>
           ))}
 
           <UpdateCustomReportModal

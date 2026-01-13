@@ -252,7 +252,11 @@ export const getStaticEvents = async (): Promise<{
         thumb: post.thumb || '',
         cover_url: (post as any).cover_url || '',
         path: post.path || '',
-        url: post.url || '',
+        // For webinars, use internal path; for other events, use external link if available
+        url:
+          (post as any).type === 'webinar'
+            ? post.url || post.path || ''
+            : post.link?.href || post.url || post.path || '',
         tags: post.tags || [],
         categories: post.categories || [],
         timezone: (post as any).timezone || 'America/Los_Angeles',

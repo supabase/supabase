@@ -430,6 +430,8 @@ const OrganizationLinks = () => {
     },
   ]
 
+  if (!organizationSlug) return null
+
   return (
     <SidebarMenu className="flex flex-col gap-1 items-start">
       <SidebarGroup className="gap-0.5">

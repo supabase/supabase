@@ -124,6 +124,12 @@ jobs:
           docker buildx imagetools create -t supabase/studio:latest \
           supabase/studio@${{ needs.release_x86.outputs.image_digest }} \
           supabase/studio@${{ needs.release_arm.outputs.image_digest }}
+          echo "Published Registry Images" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | Link |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`supabase/studio:${{ needs.settings.outputs.image_version }}\` | [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=${{ needs.settings.outputs.image_version }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`supabase/studio:latest\` | [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=latest) |" >> $GITHUB_STEP_SUMMARY
 
   publish:
     needs:

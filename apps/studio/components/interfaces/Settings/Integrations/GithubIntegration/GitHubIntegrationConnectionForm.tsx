@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Info, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
+import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -88,7 +88,7 @@ const GitHubIntegrationConnectionForm = ({
 
   const {
     data: githubReposData,
-    isLoading: isLoadingGitHubRepos,
+    isPending: isLoadingGitHubRepos,
     refetch: refetchGitHubRepositories,
   } = useGitHubRepositoriesQuery({
     enabled: Boolean(gitHubAuthorization),
@@ -120,24 +120,24 @@ const GitHubIntegrationConnectionForm = ({
     { enabled: !!selectedProject?.ref }
   )
 
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingBranch } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
 
-  const { mutate: createConnection, isLoading: isCreatingConnection } =
+  const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onSuccess: () => {
         toast.success('GitHub integration successfully updated')
       },
     })
 
-  const { mutateAsync: deleteConnection, isLoading: isDeletingConnection } =
+  const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
       onSuccess: () => {
         toast.success('Successfully removed GitHub integration')
       },
     })
 
-  const { mutate: updateConnectionSettings, isLoading: isUpdatingConnection } =
+  const { mutate: updateConnectionSettings, isPending: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation()
 
   const githubRepos = useMemo(

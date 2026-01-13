@@ -1,8 +1,6 @@
-import * as React from 'react'
-import { Sparkles } from 'lucide-react'
 import { ActiveInput } from './hooks'
-import { FilterGroup, FilterProperty } from './types'
-import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
+import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { findConditionByPath, isCustomOptionObject, isFilterOptionObject, isFilterOperatorObject } from './utils'
 
 export type MenuItem = {
   value: string
@@ -10,12 +8,16 @@ export type MenuItem = {
   icon?: React.ReactNode
   isCustom?: boolean
   customOption?: (props: any) => React.ReactElement
+  isAction?: boolean
+  action?: FilterBarAction
+  actionInputValue?: string
 }
 
 export function buildOperatorItems(
   activeInput: Extract<ActiveInput, { type: 'operator' }> | null,
   activeFilters: FilterGroup,
-  filterProperties: FilterProperty[]
+  filterProperties: FilterProperty[],
+  hasTypedSinceFocus: boolean = true
 ): MenuItem[] {
   if (!activeInput) return []
   const condition = findConditionByPath(activeFilters, activeInput.path)
@@ -23,18 +25,30 @@ export function buildOperatorItems(
   const operatorValue = condition?.operator?.toUpperCase() || ''
   const availableOperators = property?.operators || ['=']
 
+  // Only filter if user has typed since focusing
+  const shouldFilter = hasTypedSinceFocus && operatorValue.length > 0
+
   return availableOperators
-    .filter((op) => op.toUpperCase().includes(operatorValue))
-    .map((op) => ({ value: op, label: op }))
+    .filter((op) => {
+      if (!shouldFilter) return true
+      const searchText = isFilterOperatorObject(op) ? op.value : op
+      return searchText.toUpperCase().includes(operatorValue)
+    })
+    .map((op) => {
+      if (isFilterOperatorObject(op)) {
+        return { value: op.value, label: op.label }
+      }
+      return { value: op, label: op }
+    })
 }
 
 export function buildPropertyItems(params: {
   filterProperties: FilterProperty[]
   inputValue: string
-  aiApiUrl?: string
   supportsOperators?: boolean
+  actions?: FilterBarAction[]
 }): MenuItem[] {
-  const { filterProperties, inputValue, aiApiUrl, supportsOperators } = params
+  const { filterProperties, inputValue, supportsOperators, actions } = params
   const items: MenuItem[] = []
 
   items.push(
@@ -47,11 +61,17 @@ export function buildPropertyItems(params: {
     items.push({ value: 'group', label: 'New Group' })
   }
 
-  if (inputValue.trim().length > 0 && aiApiUrl) {
-    items.push({
-      value: 'ai-filter',
-      label: 'Filter by AI',
-      icon: React.createElement(Sparkles, { className: 'mr-2 h-4 w-4', strokeWidth: 1.25 }),
+  const trimmedInput = inputValue.trim()
+  if (actions && trimmedInput.length > 0) {
+    actions.forEach((action) => {
+      items.push({
+        value: action.value,
+        label: action.label,
+        icon: action.icon,
+        isAction: true,
+        action,
+        actionInputValue: trimmedInput,
+      })
     })
   }
 
@@ -64,7 +84,8 @@ export function buildValueItems(
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,
   loadingOptions: Record<string, boolean>,
-  inputValue: string
+  inputValue: string,
+  hasTypedSinceFocus: boolean = true
 ): MenuItem[] {
   if (!activeInput) return []
   const activeCondition = findConditionByPath(activeFilters, activeInput.path)
@@ -83,7 +104,7 @@ export function buildValueItems(
   } else if (loadingOptions[property.name]) {
     items.push({ value: 'loading', label: 'Loading options...' })
   } else if (Array.isArray(property.options)) {
-    items.push(...getArrayOptionItems(property.options, inputValue))
+    items.push(...getArrayOptionItems(property.options, inputValue, hasTypedSinceFocus))
   } else if (propertyOptionsCache[property.name]) {
     items.push(...getCachedOptionItems(propertyOptionsCache[property.name].options))
   }
@@ -91,19 +112,28 @@ export function buildValueItems(
   return items
 }
 
-function getArrayOptionItems(options: any[], inputValue: string): MenuItem[] {
+function getArrayOptionItems(
+  options: any[],
+  inputValue: string,
+  hasTypedSinceFocus: boolean
+): MenuItem[] {
   const items: MenuItem[] = []
+  const normalizedInput = inputValue.toLowerCase()
+
+  // Only filter if user has typed since focusing
+  const shouldFilter = hasTypedSinceFocus && inputValue.length > 0
+
   for (const option of options) {
     if (typeof option === 'string') {
-      if (option.toLowerCase().includes(inputValue.toLowerCase())) {
+      if (!shouldFilter || option.toLowerCase().includes(normalizedInput)) {
         items.push({ value: option, label: option })
       }
     } else if (isFilterOptionObject(option)) {
-      if (option.label.toLowerCase().includes(inputValue.toLowerCase())) {
+      if (!shouldFilter || option.label.toLowerCase().includes(normalizedInput)) {
         items.push({ value: option.value, label: option.label })
       }
     } else if (isCustomOptionObject(option)) {
-      if (option.label?.toLowerCase().includes(inputValue.toLowerCase()) ?? true) {
+      if (!shouldFilter || (option.label?.toLowerCase().includes(normalizedInput) ?? true)) {
         items.push({
           value: 'custom',
           label: option.label || 'Custom...',

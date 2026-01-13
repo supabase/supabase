@@ -1,8 +1,8 @@
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
@@ -30,7 +30,7 @@ import {
   Separator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -46,7 +46,7 @@ export const QueueTab = () => {
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
 
-  const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
+  const { data: tables, isPending: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'pgmq',
@@ -66,7 +66,13 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, fetchNextPage, isFetching } = useQueueMessagesInfiniteQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    fetchNextPage,
+    isFetching,
+  } = useQueueMessagesInfiniteQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -78,7 +84,7 @@ export const QueueTab = () => {
   )
   const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
-  const { mutate: updateTable, isLoading: isUpdatingTable } = useTableUpdateMutation({
+  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onSettled: () => {
       toast.success(`Successfully enabled RLS for ${queueName}`)
       setRlsConfirmModalOpen(false)
@@ -269,7 +275,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
+        title="Enable Row Level Security"
         confirmLabel="Enable RLS"
         confirmLabelLoading="Enabling RLS"
         loading={isUpdatingTable}

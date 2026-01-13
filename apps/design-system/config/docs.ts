@@ -1,4 +1,4 @@
-import { MainNavItem, SidebarNavItem } from 'types/nav'
+import { MainNavItem, SidebarNavItem } from '@/types/nav'
 
 interface DocsConfig {
   mainNav?: MainNavItem[]
@@ -9,25 +9,28 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {
@@ -36,18 +39,45 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
-          href: '/docs/ui-patterns/accessibility',
-          title: 'Accessibility',
+        },
+        {
+          title: 'Theming',
+          href: '/docs/theming',
+          items: [],
+        },
+        {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
         },
       ],
     },
     {
       title: 'UI Patterns',
+      sortOrder: 'alphabetical',
       items: [
         {
-          title: 'Navigation',
-          href: '/docs/ui-patterns/navigation',
+          title: 'Introduction',
+          href: '/docs/ui-patterns/ui-patterns',
+          items: [],
+          priority: true,
+        },
+        {
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
+          items: [],
+        },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
           items: [],
         },
         {
@@ -56,19 +86,31 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Empty States',
-          href: '/docs/ui-patterns/empty-states',
+          href: '/docs/ui-patterns/modality',
+          title: 'Modality',
+          items: [],
+        },
+        {
+          href: '/docs/ui-patterns/navigation',
+          title: 'Navigation',
+          items: [],
+        },
+        {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
           items: [],
         },
       ],
     },
     {
       title: 'Fragment Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/fragment-components',
+          href: '/docs/fragments/fragment-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Admonition',
@@ -78,6 +120,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
+          title: 'Empty State Presentational',
+          href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
         {
@@ -150,15 +197,22 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/toc',
           items: [],
         },
+        {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
       ],
     },
     {
       title: 'Atom Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs/components/atom-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Accordion',
@@ -217,11 +271,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Chart',
-          href: '/docs/components/chart',
-          items: [],
-        },
-        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
@@ -252,11 +301,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Data Table',
-          href: '/docs/components/data-table',
-          items: [],
-        },
-        {
           title: 'Date Picker',
           href: '/docs/components/date-picker',
           items: [],
@@ -274,6 +318,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Dropdown Menu',
           href: '/docs/components/dropdown-menu',
+          items: [],
+        },
+        {
+          title: 'Field',
+          href: '/docs/components/field',
           items: [],
         },
         {
@@ -303,12 +352,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Mermaid',
+          href: '/docs/components/mermaid',
+          items: [],
+          label: 'New',
+        },
+        {
           title: 'Menubar',
           href: '/docs/components/menubar',
           items: [],
         },
         {
-          title: 'NavMenu',
+          title: 'Nav Menu',
           href: '/docs/components/nav-menu',
           items: [],
         },

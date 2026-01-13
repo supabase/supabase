@@ -24,7 +24,7 @@ export function EventGalleryFilters() {
         <SearchIcon className="absolute left-3 top-[9px] size-4 text-foreground-muted" />
         <Input
           placeholder="Search events"
-          className="pl-10"
+          className="pl-9"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -38,7 +38,7 @@ export function EventGalleryFilters() {
           return (
             <Badge
               key={category.value}
-              variant={isActive ? 'brand' : 'outline'}
+              variant={isActive ? 'success' : 'default'}
               className="cursor-pointer"
               onClick={() => toggleCategory(category.value)}
             >
