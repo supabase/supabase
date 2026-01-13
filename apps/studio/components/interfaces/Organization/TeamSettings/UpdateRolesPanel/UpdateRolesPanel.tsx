@@ -168,21 +168,19 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <SheetContent
           showClose={false}
           size="default"
-          className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[400px]')}
+          className="bg-surface-200 p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full"
         >
-          <div className={cn('flex flex-col grow w-full')}>
-            <SheetHeader
-              className={cn('py-3 flex flex-row justify-between gap-x-4 items-center border-b')}
-            >
+          <div className="flex flex-col grow w-full">
+            <SheetHeader className="py-3 flex flex-row justify-between gap-x-4 items-center border-b bg-transparent">
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
               <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
             </SheetHeader>
 
-            <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
+            <SheetSection className="h-full overflow-auto flex flex-col">
               {isOptedIntoProjectLevelPermissions && (
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-4 border-b border-border pb-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
                     checked={isApplyingRoleToAllProjects}
@@ -234,7 +232,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   </Collapsible_Shadcn_>
                 )}
 
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col divide-y divide-border">
                 {projectsRoleConfiguration.map((project) => {
                   const name = project.ref === undefined ? 'All projects' : project.name
                   const role = orgScopedRoles.find((r) => {
@@ -246,7 +244,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   return (
                     <div
                       key={`${project.ref}-${project.roleId}`}
-                      className="flex items-center justify-between"
+                      className="flex items-center justify-between py-2"
                     >
                       <p className="text-sm">{name}</p>
 
@@ -269,7 +267,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           >
                             <SelectTrigger_Shadcn_
                               className={cn(
-                                'text-sm h-10 w-56',
+                                ' w-40',
                                 role?.name === undefined && 'text-foreground-light'
                               )}
                             >
@@ -323,6 +321,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 <OrganizationProjectSelector
                   open={showProjectDropdown}
                   setOpen={setShowProjectDropdown}
+                  modal={true}
                   onSelect={onSelectProject}
                   renderTrigger={() => (
                     <Button type="default" className="w-min">
