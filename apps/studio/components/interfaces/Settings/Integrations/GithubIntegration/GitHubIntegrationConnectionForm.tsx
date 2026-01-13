@@ -474,7 +474,10 @@ const GitHubIntegrationConnectionForm = ({
                         align="start"
                       >
                         <Command_Shadcn_>
-                          <CommandInput_Shadcn_ placeholder="Search repositories..." />
+                          <CommandInput_Shadcn_
+                            className="text-xs"
+                            placeholder="Search repositories..."
+                          />
                           <CommandList_Shadcn_ className="!max-h-[200px]">
                             <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
                             {githubRepos.length > 0 ? (
