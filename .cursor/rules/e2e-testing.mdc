@@ -1,0 +1,324 @@
+---
+description: E2E testing best practices for Playwright tests in Studio
+globs:
+  - e2e/studio/**/*.ts
+  - e2e/studio/**/*.spec.ts
+alwaysApply: true
+---
+
+# E2E Testing Best Practices
+
+## Getting Context
+
+Before writing or modifying tests, use the Playwright MCP to understand:
+
+- Available page elements and their roles/locators
+- Current page state and network activity
+- Existing test patterns in the codebase
+
+Avoid extensive code reading - let Playwright's inspection tools guide your understanding of the UI.
+
+## Avoiding Race Conditions
+
+### Set up API waiters BEFORE triggering actions
+
+The most common source of flaky tests is race conditions between UI actions and API calls. Always create response waiters before clicking buttons or navigating.
+
+```ts
+// ❌ Bad - race condition: response might complete before waiter is set up
+await page.getByRole('button', { name: 'Save' }).click()
+await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
+
+// ✅ Good - waiter is ready before action
+const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
+await page.getByRole('button', { name: 'Save' }).click()
+await apiPromise
+```
+
+### Use `createApiResponseWaiter` for pre-navigation waits
+
+When you need to wait for a response that happens during navigation:
+
+```ts
+// ✅ Good - waiter created before navigation
+const loadPromise = waitForTableToLoad(page, ref)
+await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+await loadPromise
+```
+
+### Wait for multiple related API calls with Promise.all
+
+When an action triggers multiple API calls, wait for all of them:
+
+```ts
+// ✅ Good - wait for all related API calls
+const createTablePromise = waitForApiResponseWithTimeout(page, (response) =>
+  response.url().includes('query?key=table-create')
+)
+const tablesPromise = waitForApiResponseWithTimeout(page, (response) =>
+  response.url().includes('tables?include_columns=true')
+)
+const entitiesPromise = waitForApiResponseWithTimeout(page, (response) =>
+  response.url().includes('query?key=entity-types-')
+)
+
+await page.getByRole('button', { name: 'Save' }).click()
+await Promise.all([createTablePromise, tablesPromise, entitiesPromise])
+```
+
+## Waiting Strategies
+
+### Prefer Playwright's built-in auto-waiting
+
+Playwright automatically waits for elements to be actionable. Use this instead of manual timeouts:
+
+```ts
+// ❌ Bad - arbitrary timeout
+await page.waitForTimeout(2000)
+await page.getByRole('button', { name: 'Submit' }).click()
+
+// ✅ Good - auto-waits for element to be visible and enabled
+await page.getByRole('button', { name: 'Submit' }).click()
+```
+
+### Use `expect.poll` for dynamic assertions
+
+When waiting for state to change:
+
+```ts
+// ✅ Good - polls until condition is met
+await expect
+  .poll(async () => {
+    return await page.getByLabel(`View ${tableName}`).count()
+  })
+  .toBe(0)
+```
+
+### Use `waitForSelector` with state for element lifecycle
+
+```ts
+// ✅ Good - wait for panel to close
+await page.waitForSelector('[data-testid="side-panel"]', { state: 'detached' })
+```
+
+### Avoid `networkidle` - use specific API waits instead
+
+```ts
+// ❌ Bad - unreliable and slow
+await page.waitForLoadState('networkidle')
+
+// ✅ Good - wait for specific API response
+await waitForApiResponse(page, 'pg-meta', ref, 'tables')
+```
+
+### Use timeouts sparingly and only for non-API waits
+
+```ts
+// ✅ Acceptable - waiting for client-side debounce
+await page.getByRole('textbox').fill('search term')
+await page.waitForTimeout(300) // Allow debounce to complete
+
+// ✅ Acceptable - waiting for clipboard API
+await page.evaluate(() => navigator.clipboard.readText())
+await page.waitForTimeout(500)
+```
+
+## Test Structure
+
+### Use the custom test utility
+
+Always import from the custom test utility for consistent fixtures:
+
+```ts
+import { test } from '../utils/test.js'
+```
+
+### Use `withFileOnceSetup` for expensive setup
+
+When setup is expensive (cleanup, seeding), run it once per file:
+
+```ts
+test.beforeAll(async ({ browser, ref }) => {
+  await withFileOnceSetup(import.meta.url, async () => {
+    const ctx = await browser.newContext()
+    const page = await ctx.newPage()
+
+    // Expensive setup logic (e.g., cleanup old test data)
+    await deleteTestTables(page, ref)
+  })
+})
+
+test.afterAll(async () => {
+  await releaseFileOnceCleanup(import.meta.url)
+})
+```
+
+### Dismiss toasts before interacting with UI
+
+Toasts can overlay buttons and block interactions:
+
+```ts
+const dismissToastsIfAny = async (page: Page) => {
+  const closeButtons = page.getByRole('button', { name: 'Close toast' })
+  const count = await closeButtons.count()
+  for (let i = 0; i < count; i++) {
+    await closeButtons.nth(i).click()
+  }
+}
+
+// ✅ Good - dismiss toasts before clicking
+await dismissToastsIfAny(page)
+await page.getByRole('button', { name: 'New table' }).click()
+```
+
+## Assertions
+
+### Always include descriptive messages
+
+```ts
+// ❌ Bad - no context on failure
+await expect(page.getByRole('button', { name: 'Save' })).toBeVisible()
+
+// ✅ Good - clear message on failure
+await expect(
+  page.getByRole('button', { name: 'Save' }),
+  'Save button should be visible after form is filled'
+).toBeVisible()
+```
+
+### Use appropriate timeouts for slow operations
+
+```ts
+// ✅ Good - explicit timeout for slow operations
+await expect(
+  page.getByText(`Table ${tableName} is good to go!`),
+  'Success toast should be visible after table creation'
+).toBeVisible({ timeout: 50000 })
+```
+
+## Locators
+
+### Prefer role-based locators
+
+```ts
+// ✅ Good - semantic and resilient
+page.getByRole('button', { name: 'Save' })
+page.getByRole('textbox', { name: 'Username' })
+page.getByRole('menuitem', { name: 'Delete' })
+
+// ❌ Avoid - brittle CSS selectors
+page.locator('.btn-primary')
+page.locator('#submit-button')
+```
+
+### Use test IDs for complex elements
+
+```ts
+// ✅ Good - stable identifier for complex elements
+page.getByTestId('table-editor-side-panel')
+page.getByTestId('action-bar-save-row')
+```
+
+### Use `filter` for finding elements in context
+
+```ts
+// ✅ Good - find button within specific row
+const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
+await bucketRow.getByRole('button').click()
+```
+
+## Helper Functions
+
+### Extract reusable operations into helpers
+
+Create helper functions for common operations:
+
+```ts
+// e2e/studio/utils/storage-helpers.ts
+export const createBucket = async (
+  page: Page,
+  ref: string,
+  bucketName: string,
+  isPublic: boolean = false
+) => {
+  await navigateToStorageFiles(page, ref)
+
+  // Check if already exists
+  const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
+  if ((await bucketRow.count()) > 0) return
+
+  await dismissToastsIfAny(page)
+
+  // Create bucket with proper waits
+  const apiPromise = waitForApiResponse(page, 'storage', ref, 'bucket', { method: 'POST' })
+  await page.getByRole('button', { name: 'New bucket' }).click()
+  await page.getByRole('textbox', { name: 'Bucket name' }).fill(bucketName)
+  await page.getByRole('button', { name: 'Create' }).click()
+  await apiPromise
+
+  await expect(
+    page.getByRole('row').filter({ hasText: bucketName }),
+    `Bucket ${bucketName} should be visible`
+  ).toBeVisible()
+}
+```
+
+### Use the existing wait utilities
+
+```ts
+import {
+  createApiResponseWaiter,
+  waitForApiResponse,
+  waitForGridDataToLoad,
+  waitForTableToLoad,
+} from '../utils/wait-for-response.js'
+```
+
+## API Mocking
+
+### Mock APIs for isolated testing
+
+```ts
+// ✅ Good - mock API response
+await page.route('*/**/logs.all*', async (route) => {
+  await route.fulfill({ body: JSON.stringify(mockAPILogs) })
+})
+```
+
+### Use soft waits for optional API calls
+
+```ts
+// ✅ Good - don't fail if API doesn't respond
+await waitForApiResponse(page, 'pg-meta', ref, 'optional-endpoint', {
+  soft: true,
+  fallbackWaitMs: 1000,
+})
+```
+
+## Cleanup
+
+### Clean up test data in beforeAll/beforeEach
+
+```ts
+test.beforeEach(async ({ page, ref }) => {
+  await deleteAllBuckets(page, ref)
+})
+```
+
+### Handle existing state gracefully
+
+```ts
+// ✅ Good - check before trying to delete
+const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
+if ((await bucketRow.count()) === 0) return
+// proceed with deletion
+```
+
+### Reset local storage when needed
+
+```ts
+import { resetLocalStorage } from '../utils/reset-local-storage.js'
+
+// Clean up after tests that modify local storage
+await resetLocalStorage(page, ref)
+```

@@ -68,7 +68,6 @@
     "openai": "^5.9.0",
     "openapi-fetch": "0.12.4",
     "react": "catalog:",
-    "react-docgen": "^7.0.3",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
     "react-markdown": "^10.1.0",
@@ -88,7 +87,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@react-router/dev": "^7.1.5",
+    "@react-router/dev": "^7.9.0",
     "@shikijs/compat": "^1.1.7",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "catalog:",

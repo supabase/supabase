@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { boolean, object } from 'yup'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -60,7 +60,7 @@ export const AuditLogsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
@@ -171,20 +171,23 @@ export const AuditLogsForm = () => {
                     type="warning"
                     className="mt-4"
                     title="Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data"
-                  >
-                    <p className="!mb-0 !leading-normal prose text-foreground-light text-sm max-w-full">
-                      Future audit logs will only appear in the project's{' '}
-                      <InlineLink
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
-                      >
-                        auth logs
-                      </InlineLink>
-                      . You are responsible for backing up, copying, or migrating existing data from
-                      the <code>{AUDIT_LOG_ENTRIES_TABLE}</code> table if needed.
-                    </p>
-                  </Admonition>
+                    description={
+                      <p>
+                        Future audit logs will only appear in the project’s{' '}
+                        <InlineLink
+                          href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
+                        >
+                          auth logs
+                        </InlineLink>
+                        . You are responsible for backing up, copying, or migrating existing data
+                        from the{' '}
+                        <code className="text-code-inline !break-keep">
+                          {AUDIT_LOG_ENTRIES_TABLE}
+                        </code>{' '}
+                        table if needed.
+                      </p>
+                    }
+                  />
                 )}
               </CardContent>
 

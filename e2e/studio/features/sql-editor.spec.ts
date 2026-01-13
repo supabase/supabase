@@ -1,12 +1,12 @@
 import { expect, Page } from '@playwright/test'
 import fs from 'fs'
+import { env } from '../env.config.js'
 import { isCLI } from '../utils/is-cli.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
-import { env } from '../env.config.js'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -215,23 +215,23 @@ hello world`)
   })
 
   test('snippet favourite works as expected', async ({ ref }) => {
-    if (!isCLI()) {
-      // clean up private snippets and snippets shared with the team
-      await waitForApiResponseWithTimeout(
-        page,
-        (response) => response.url().includes('query?key=table-columns'),
-        3000
-      )
-      const privateSnippetSection = page.getByLabel('private-snippets')
-      if ((await privateSnippetSection.getByText(newSqlSnippetName, { exact: true }).count()) > 0) {
-        await deleteSqlSnippet(page, ref, newSqlSnippetName)
-      }
+    test.skip(isCLI(), 'This test does not work in self-hosted environments.')
 
-      if (
-        (await privateSnippetSection.getByText(sqlSnippetNameFavorite, { exact: true }).count()) > 0
-      ) {
-        await deleteSqlSnippet(page, ref, sqlSnippetNameFavorite)
-      }
+    // clean up private snippets and snippets shared with the team
+    await waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-columns'),
+      3000
+    )
+    const privateSnippetSection = page.getByLabel('private-snippets')
+    if ((await privateSnippetSection.getByText(newSqlSnippetName, { exact: true }).count()) > 0) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    }
+
+    if (
+      (await privateSnippetSection.getByText(sqlSnippetNameFavorite, { exact: true }).count()) > 0
+    ) {
+      await deleteSqlSnippet(page, ref, sqlSnippetNameFavorite)
     }
 
     // create sql snippet
@@ -242,7 +242,6 @@ hello world`)
     await page.getByTestId('sql-run-button').click()
 
     // rename snippet
-    const privateSnippetSection = page.getByLabel('private-snippets')
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
@@ -283,10 +282,7 @@ hello world`)
   })
 
   test('share with team works as expected', async ({ ref }) => {
-    if (!isCLI()) {
-      console.log('Sharing and unsharing SQL snippet has issues in staging')
-      return
-    }
+    test.skip(isCLI(), 'Sharing and unsharing SQL snippet has issues in staging')
 
     // clean up private snippets and snippets shared with the team
     await waitForApiResponseWithTimeout(
@@ -379,25 +375,21 @@ hello world`)
   })
 
   test('folders works as expected', async ({ ref }) => {
-    if (!isCLI()) {
-      // clean up folders and snippets
-      await waitForApiResponseWithTimeout(
-        page,
-        (response) => response.url().includes('query?key=table-columns'),
-        3000
-      )
-      const privateSnippetSection = page.getByLabel('private-snippets')
-      if ((await privateSnippetSection.getByText(sqlFolderName, { exact: true }).count()) > 0) {
-        await deleteFolder(page, ref, sqlFolderName)
-      }
-      if (
-        (await privateSnippetSection.getByText(sqlFolderNameUpdated, { exact: true }).count()) > 0
-      ) {
-        await deleteFolder(page, ref, sqlFolderNameUpdated)
-      }
-    } else {
-      console.log('This test does not work in self-hosted environments.')
-      return
+    test.skip(isCLI(), 'This test does not work in self-hosted environments.')
+    // clean up folders and snippets
+    await waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-columns'),
+      3000
+    )
+    const privateSnippetSection = page.getByLabel('private-snippets')
+    if ((await privateSnippetSection.getByText(sqlFolderName, { exact: true }).count()) > 0) {
+      await deleteFolder(page, ref, sqlFolderName)
+    }
+    if (
+      (await privateSnippetSection.getByText(sqlFolderNameUpdated, { exact: true }).count()) > 0
+    ) {
+      await deleteFolder(page, ref, sqlFolderNameUpdated)
     }
 
     // create sql snippet
@@ -408,7 +400,6 @@ hello world`)
     await page.getByTestId('sql-run-button').click()
 
     // rename snippet
-    const privateSnippetSection = page.getByLabel('private-snippets')
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
@@ -473,26 +464,22 @@ hello world`)
   })
 
   test('other SQL snippets actions work as expected', async ({ ref }) => {
-    if (!isCLI()) {
-      // clean up 'Untitled query', 'pw_sql_snippet' and 'pw_sql_snippet (Duplicate)' snippets if exists
-      await waitForApiResponseWithTimeout(
-        page,
-        (response) => response.url().includes('query?key=table-columns'),
-        3000
-      )
-      const privateSnippet = page.getByLabel('private-snippets')
-      if ((await privateSnippet.getByText(newSqlSnippetName).count()) > 0) {
-        deleteSqlSnippet(page, ref, newSqlSnippetName)
-      }
-      if ((await privateSnippet.getByText(sqlSnippetNameDuplicate, { exact: true }).count()) > 0) {
-        await deleteSqlSnippet(page, ref, sqlSnippetNameDuplicate)
-      }
-      if ((await privateSnippet.getByText(sqlSnippetName, { exact: true }).count()) > 0) {
-        await deleteSqlSnippet(page, ref, sqlSnippetName)
-      }
-    } else {
-      console.log('This test does not work in self-hosted environments.')
-      return
+    test.skip(isCLI(), 'This test does not work in self-hosted environments.')
+    // clean up 'Untitled query', 'pw_sql_snippet' and 'pw_sql_snippet (Duplicate)' snippets if exists
+    await waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-columns'),
+      3000
+    )
+    const privateSnippet = page.getByLabel('private-snippets')
+    if ((await privateSnippet.getByText(newSqlSnippetName).count()) > 0) {
+      deleteSqlSnippet(page, ref, newSqlSnippetName)
+    }
+    if ((await privateSnippet.getByText(sqlSnippetNameDuplicate, { exact: true }).count()) > 0) {
+      await deleteSqlSnippet(page, ref, sqlSnippetNameDuplicate)
+    }
+    if ((await privateSnippet.getByText(sqlSnippetName, { exact: true }).count()) > 0) {
+      await deleteSqlSnippet(page, ref, sqlSnippetName)
     }
 
     // create sql snippet

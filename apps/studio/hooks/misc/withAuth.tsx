@@ -40,7 +40,7 @@ export function withAuth<T>(
     const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
 
     const {
-      isLoading: isAALLoading,
+      isPending: isAALLoading,
       data: aalData,
       isError: isErrorAAL,
       error: errorAAL,

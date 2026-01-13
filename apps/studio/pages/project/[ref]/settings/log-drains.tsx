@@ -7,18 +7,21 @@ import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/Lo
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import {
-  useCreateLogDrainMutation,
   LogDrainCreateVariables,
+  useCreateLogDrainMutation,
 } from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronDown } from 'lucide-react'
+import { cloneElement } from 'react'
 import type { NextPageWithLayout } from 'types'
 import {
   Alert_Shadcn_,
@@ -29,11 +32,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ChevronDown } from 'lucide-react'
-import { cloneElement } from 'react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(

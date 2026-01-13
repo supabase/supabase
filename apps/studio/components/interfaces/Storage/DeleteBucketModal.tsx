@@ -1,4 +1,3 @@
-import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
@@ -7,9 +6,9 @@ import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
+import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatPoliciesForStorage } from './Storage.utils'
+import { extractBucketNameFromDefinition } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
   visible: boolean
@@ -21,9 +20,6 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const router = useRouter()
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-
-  const { data } = useBucketsQuery({ projectRef })
-  const buckets = data ?? []
 
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
@@ -39,20 +35,16 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       if (!project) return console.error('Project is required')
 
       // Clean up policies from the corresponding bucket that was deleted
-      const storageObjectsPolicies = (policies ?? []).filter((policy) => policy.table === 'objects')
-      const formattedStorageObjectPolicies = formatPoliciesForStorage(
-        buckets,
-        storageObjectsPolicies
-      )
-      const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket.id }),
-        ['policies'],
-        []
-      )
+      const bucketPolicies = (policies ?? []).filter((policy) => {
+        if (policy.table !== 'objects') return false
+
+        const policyBucket = extractBucketNameFromDefinition(policy.definition ?? policy.check)
+        return policyBucket === bucket.name
+      })
 
       try {
         await Promise.all(
-          bucketPolicies.map((policy: any) =>
+          bucketPolicies.map((policy) =>
             deletePolicy({
               projectRef: project?.ref,
               connectionString: project?.connectionString,

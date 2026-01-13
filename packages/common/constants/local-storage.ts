@@ -28,6 +28,8 @@ export const LOCAL_STORAGE_KEYS = {
   AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,
   AUTH_USERS_SORT_BY_VALUE: (ref: string) => `auth-users-sort-by-value-${ref}`,
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  AUTH_USERS_IMPROVED_SEARCH_DISMISSED: (ref: string) =>
+    `auth-users-improved-search-dismissed-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
@@ -80,11 +82,16 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
 
+  LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
+
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
+  // RLS event trigger banner dismissed
+  RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
@@ -110,8 +117,9 @@ export const LOCAL_STORAGE_KEYS = {
    */
   BLOG_VIEW: 'supabase-blog-view',
 
-  // Used to track if user has dismissed table editor quickstart prompt
-  TABLE_QUICKSTART_DISMISSED: 'table-quickstart-dismissed',
+  // Used to track if user has been exposed to table quickstart experiment (prevents duplicate exposure events)
+  TABLE_QUICKSTART_EXPOSURE_TRACKED: (userId: string) =>
+    `table-quickstart-exposure-tracked-${userId}`,
 } as const
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
@@ -133,7 +141,6 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
-  LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
 ]
 
 export function clearLocalStorage() {
