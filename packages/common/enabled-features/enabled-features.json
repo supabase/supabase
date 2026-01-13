@@ -90,8 +90,6 @@
   "profile:show_analytics_and_marketing": true,
   "profile:show_account_deletion": true,
 
-  "project_connection:javascript_example": true,
-  "project_connection:dart_example": true,
   "project_connection:show_app_frameworks": true,
   "project_connection:show_mobile_frameworks": true,
   "project_connection:show_orms": true,

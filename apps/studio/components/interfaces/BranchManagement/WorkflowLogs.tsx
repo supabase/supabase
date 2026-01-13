@@ -108,6 +108,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                       <li key={workflowRun.id} className="py-3">
                         <button
                           type="button"
+                          disabled={workflowRun.id === projectRef}
                           onClick={() => setSelectedWorkflowRun(workflowRun)}
                           className="flex items-center gap-2 w-full justify-between"
                         >
@@ -121,7 +122,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                               {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
                             </span>
                           </div>
-                          <ArrowRight size={16} />
+                          {workflowRun.id !== projectRef && <ArrowRight size={16} />}
                         </button>
                       </li>
                     ))}

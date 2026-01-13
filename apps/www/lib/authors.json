@@ -808,5 +808,13 @@
     "position": "AI Tooling Engineer",
     "author_url": "https://github.com/Rodriguespn",
     "author_image_url": "https://github.com/Rodriguespn.png"
+  },
+  {
+    "author_id": "matt_linkous",
+    "author": "Matt Linkous",
+    "username": "matlin",
+    "position": "Head of Integrations",
+    "author_url": "https://github.com/matlin",
+    "author_image_url": "https://github.com/matlin.png"
   }
 ]

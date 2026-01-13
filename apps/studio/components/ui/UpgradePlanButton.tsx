@@ -23,6 +23,7 @@ interface UpgradePlanButtonProps {
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
   featureProposition?: string
   disabled?: boolean
+  className?: string
 }
 
 /**
@@ -38,6 +39,7 @@ export const UpgradePlanButton = ({
   featureProposition,
   disabled,
   children,
+  className,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -62,7 +64,9 @@ export const UpgradePlanButton = ({
   const href = isRequestingToDisableSpendCap
     ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
     : isOnPaidPlanAndRequestingToPurchaseAddon
-      ? `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+      ? addon === 'computeSize'
+        ? `/project/${ref ?? '_'}/settings/compute-and-disk`
+        : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
   const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
@@ -80,6 +84,7 @@ export const UpgradePlanButton = ({
         plan={plan}
         addon={addon}
         featureProposition={featureProposition}
+        className={className}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -91,6 +96,7 @@ export const UpgradePlanButton = ({
       <ButtonTooltip
         disabled
         type="primary"
+        className={className}
         tooltip={{
           content: {
             side: 'bottom',
@@ -104,7 +110,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={type} disabled={disabled}>
+    <Button asChild type={type} disabled={disabled} className={className}>
       {link}
     </Button>
   )
