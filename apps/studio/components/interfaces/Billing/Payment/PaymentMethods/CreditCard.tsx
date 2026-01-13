@@ -68,7 +68,7 @@ const CreditCard = ({
       <div className="flex items-center gap-2">
         {isExpiringSoon && <Badge variant="warning">Expiring soon</Badge>}
         {isExpired && <Badge variant="destructive">Expired</Badge>}
-        {isActive && <Badge variant="brand">Active</Badge>}
+        {isActive && <Badge variant="success">Active</Badge>}
 
         {canUpdatePaymentMethods && (
           <DropdownMenu>

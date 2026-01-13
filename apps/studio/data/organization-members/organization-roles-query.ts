@@ -19,11 +19,14 @@ export async function getOrganizationRoles(
 
   const { data, error } = await get('/platform/organizations/{slug}/roles', {
     params: { path: { slug } },
+    headers: { Version: 2 },
     signal,
   })
 
   if (error) handleError(error)
-  return data
+
+  // [Joshen] Temp while API has versioning on this endpoint
+  return data as unknown as OrganizationRolesResponse
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>

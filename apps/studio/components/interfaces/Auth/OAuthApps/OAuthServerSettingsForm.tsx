@@ -7,18 +7,13 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Card,
@@ -33,6 +28,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -78,10 +74,10 @@ export const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
-    isLoading: isAuthConfigLoading,
+    isPending: isAuthConfigLoading,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({
     onSuccess: () => {
       toast.success('OAuth server settings updated successfully')
     },
@@ -100,12 +96,7 @@ export const OAuthServerSettingsForm = () => {
     isSuccess: isPermissionsLoaded,
   } = useAsyncCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-
-  const { data: oAuthAppsData } = useOAuthServerAppsQuery({
-    projectRef,
-    supabaseClient: supabaseClientData?.supabaseClient,
-  })
+  const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
 
   const oauthApps = oAuthAppsData?.clients || []
 
@@ -185,58 +176,138 @@ export const OAuthServerSettingsForm = () => {
   }
 
   if (isPermissionsLoaded && !canReadConfig) {
-    return (
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">OAuth Server</ScaffoldSectionTitle>
-        <div className="mt-8">
-          <NoPermission resourceText="view OAuth server settings" />
-        </div>
-      </ScaffoldSection>
-    )
+    return <NoPermission resourceText="view OAuth server settings" />
   }
 
   if (isAuthConfigLoading || isLoadingPermissions) {
-    return (
-      <div className="pt-12">
-        <GenericSkeletonLoader />
-      </div>
-    )
+    return <GenericSkeletonLoader />
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionContent>
-          <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="pb-10">
-              <Card>
-                <CardContent className="flex flex-col py-6 gap-y-4">
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Card>
+            <CardContent>
+              <FormField_Shadcn_
+                control={form.control}
+                name="OAUTH_SERVER_ENABLED"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Enable the Supabase OAuth Server"
+                    description={
+                      <>
+                        Enable OAuth server functionality for your project to create and manage
+                        OAuth applications.{' '}
+                        <InlineLink href={`${DOCS_URL}/guides/auth/oauth-server`}>
+                          Learn more
+                        </InlineLink>
+                      </>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={handleOAuthServerToggle}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
+            {/* Site URL and Authorization Path - Only show when OAuth Server is enabled */}
+            {form.watch('OAUTH_SERVER_ENABLED') && (
+              <>
+                <CardContent>
+                  <FormItemLayout
+                    label="Site URL"
+                    layout="flex-row-reverse"
+                    description={
+                      <>
+                        The base URL of your application, configured in{' '}
+                        <Link
+                          href={`/project/${projectRef}/auth/url-configuration`}
+                          rel="noreferrer"
+                          className="text-foreground-light underline hover:text-foreground transition"
+                        >
+                          Auth URL Configuration
+                        </Link>{' '}
+                        settings.
+                      </>
+                    }
+                  >
+                    <Input_Shadcn_
+                      value={authConfig?.SITE_URL}
+                      disabled
+                      placeholder="https://example.com"
+                    />
+                  </FormItemLayout>
+                </CardContent>
+                <CardContent className="space-y-4">
                   <FormField_Shadcn_
                     control={form.control}
-                    name="OAUTH_SERVER_ENABLED"
+                    name="OAUTH_SERVER_AUTHORIZATION_PATH"
                     render={({ field }) => (
                       <FormItemLayout
+                        label="Authorization Path"
                         layout="flex-row-reverse"
-                        label="Enable the Supabase OAuth Server"
+                        description="Path where you'll implement the OAuth authorization UI (consent screens)."
+                      >
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ {...field} placeholder="/auth/authorize" />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                  {(() => {
+                    const authorizationUrl = `${authConfig?.SITE_URL}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`
+                    return (
+                      <Admonition
+                        type="tip"
+                        title="Make sure this path is implemented in your application."
                         description={
                           <>
-                            Enable OAuth server functionality for your project to create and manage
-                            OAuth applications.{' '}
-                            <Link
-                              href="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
+                            Preview Authorization URL:{' '}
+                            <a
+                              href={authorizationUrl}
                               target="_blank"
                               rel="noreferrer"
                               className="text-foreground-light underline hover:text-foreground transition"
                             >
+                              {authorizationUrl}
+                            </a>
+                          </>
+                        }
+                      />
+                    )
+                  })()}
+                </CardContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Allow Dynamic OAuth Apps"
+                        description={
+                          <>
+                            Enable dynamic OAuth app registration. Apps can be registered
+                            programmatically via APIs.{' '}
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/auth/oauth-server/mcp-authentication#oauth-client-setup`}
+                            >
                               Learn more
-                            </Link>
+                            </InlineLink>
                           </>
                         }
                       >
                         <FormControl_Shadcn_>
                           <Switch
                             checked={field.value}
-                            onCheckedChange={handleOAuthServerToggle}
+                            onCheckedChange={handleDynamicAppsToggle}
                             disabled={!canUpdateConfig}
                           />
                         </FormControl_Shadcn_>
@@ -244,139 +315,52 @@ export const OAuthServerSettingsForm = () => {
                     )}
                   />
                 </CardContent>
-                {/* Site URL and Authorization Path - Only show when OAuth Server is enabled */}
-                {form.watch('OAUTH_SERVER_ENABLED') && (
-                  <>
-                    <CardContent className="flex flex-col py-6 gap-y-4">
-                      <FormItemLayout
-                        label="Site URL"
-                        description={
-                          <>
-                            The base URL of your application, configured in{' '}
-                            <Link
-                              href={`/project/${projectRef}/auth/url-configuration`}
-                              rel="noreferrer"
-                              className="text-foreground-light underline hover:text-foreground transition"
-                            >
-                              Auth URL Configuration
-                            </Link>{' '}
-                            settings.
-                          </>
-                        }
-                      >
-                        <Input_Shadcn_
-                          value={authConfig?.SITE_URL}
-                          disabled
-                          placeholder="https://example.com"
-                        />
-                      </FormItemLayout>
+              </>
+            )}
 
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="OAUTH_SERVER_AUTHORIZATION_PATH"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Authorization Path"
-                            description="Path where you'll implement the OAuth authorization UI (consent screens)."
-                          >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="/auth/authorize" />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                      <Admonition
-                        type="tip"
-                        title="Make sure this path is implemented in your application."
-                        description={`Preview Authorization URL: ${authConfig?.SITE_URL}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`}
-                      />
-                    </CardContent>
-                    <CardContent className="py-6">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Allow Dynamic OAuth Apps"
-                            description={
-                              <>
-                                Enable dynamic OAuth app registration. Apps can be registered
-                                programmatically via apis.{' '}
-                                <Link
-                                  href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#dynamic-oauth-apps"
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-foreground-light underline hover:text-foreground transition"
-                                >
-                                  Learn more
-                                </Link>
-                              </>
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={handleDynamicAppsToggle}
-                                disabled={!canUpdateConfig}
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
-                  </>
-                )}
-
-                <CardFooter className="justify-end space-x-2">
-                  <Button type="default" onClick={() => form.reset()} disabled={isLoading}>
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={!canUpdateConfig || !form.formState.isDirty}
-                    loading={isLoading}
-                  >
-                    Save changes
-                  </Button>
-                </CardFooter>
-              </Card>
-            </form>
-          </Form_Shadcn_>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+            <CardFooter className="justify-end space-x-2">
+              <Button type="default" onClick={() => form.reset()} disabled={isPending}>
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={!canUpdateConfig || !form.formState.isDirty}
+                loading={isPending}
+              >
+                Save changes
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form_Shadcn_>
 
       {/* Dynamic Apps Confirmation Modal */}
       <ConfirmationModal
         variant="warning"
         visible={showDynamicAppsConfirmation}
         size="large"
-        title="Enable dynamic client registration"
-        confirmLabel="Enable dynamic registration"
+        title="Enable dynamic OAuth app registration"
+        confirmLabel="Enable dynamic app registration"
         onConfirm={confirmDynamicApps}
         onCancel={cancelDynamicApps}
         alert={{
           title:
-            'By confirming, you acknowledge the risks and would like to move forward with enabling dynamic client registration.',
+            'By confirming, you acknowledge the risks and would like to move forward with enabling dynamic OAuth app registration.',
         }}
       >
         <p className="text-sm text-foreground-lighter pb-4">
-          Enabling dynamic client registration will open up a public API endpoint that anyone can
-          use to register OAuth applications with your app. This can be a security concern, as
-          attackers could register OAuth applications with legitimate-sounding names and send them
-          to your users for approval.
+          Dynamic OAuth apps (also known as dynamic client registration) exposes a public endpoint
+          allowing anyone to register OAuth clients. Bad actors could create malicious apps with
+          legitimate-sounding names to phish your users for authorization.
         </p>
         <p className="text-sm text-foreground-lighter pb-4">
-          If your users don't look carefully and accept, the attacker could potentially take over
-          the user's account. Attackers can also flood your application with thousands of OAuth
-          applications that cannot be attributed to anyone (as it's a public endpoint), and make it
-          difficult for you to find and shut them down, or even find legitimate ones.
+          You may also see spam registrations that are difficult to trace or moderate, making it
+          harder to identify trustworthy applications in your OAuth apps list.
         </p>
         <p className="text-sm text-foreground-lighter pb-4">
-          If dynamic client registration is enabled, the consent screen is forced to be enabled for
-          all OAuth flows and can no longer be disabled. Disabling the consent screen opens up a
-          CSRF vulnerability in your app.
+          Only enable this if you have a specific use case requiring programmatic client
+          registration and understand the security implications.
         </p>
       </ConfirmationModal>
 

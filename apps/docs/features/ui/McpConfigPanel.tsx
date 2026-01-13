@@ -19,11 +19,16 @@ import {
   ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
+import {
+  createMcpCopyHandler,
+  McpConfigPanel as McpConfigPanelBase,
+  type McpClient,
+} from 'ui-patterns/McpUrlBuilder'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -260,10 +265,44 @@ function PlatformSelector({
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
-  const { theme } = useTheme()
+  const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
+  const { resolvedTheme } = useTheme()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
+
+  const handleCopy = useMemo(
+    () =>
+      createMcpCopyHandler({
+        selectedClient,
+        source: 'docs',
+        onTrack: (event) => {
+          sendTelemetryEvent({
+            action: event.action,
+            properties: event.properties,
+            groups: (event.groups || {}) as any,
+          })
+        },
+        projectRef: project?.ref,
+      }),
+    [selectedClient, sendTelemetryEvent, project?.ref]
+  )
+
+  const handleInstall = () => {
+    if (selectedClient?.label) {
+      sendTelemetryEvent({
+        action: 'mcp_install_button_clicked',
+        properties: {
+          client: selectedClient.label,
+          source: 'docs',
+        },
+        groups: {
+          ...(project?.ref && { project: project.ref }),
+        } as any,
+      })
+    }
+  }
 
   return (
     <>
@@ -286,8 +325,11 @@ export function McpConfigPanel() {
           basePath="/docs"
           className="mt-6"
           projectRef={project?.ref}
-          theme={theme as 'light' | 'dark'}
+          theme={resolvedTheme as 'light' | 'dark'}
           isPlatform={isPlatform}
+          onCopyCallback={handleCopy}
+          onInstallCallback={handleInstall}
+          onClientSelect={setSelectedClient}
         />
       </div>
       {isPlatform && (

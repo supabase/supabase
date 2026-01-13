@@ -23,7 +23,7 @@ import {
   DropdownMenuSubTrigger,
   SQL_ICON,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DEPRECATED_REPORTS } from './Reports.constants'
 
 interface MetricOptionsProps {
@@ -56,7 +56,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
   const { mutate: sendEvent } = useSendEventMutation()
 
   const debouncedSearch = useDebounce(search, 300)
-  const { data, isLoading } = useContentQuery({
+  const { data, isPending: isLoading } = useContentQuery({
     projectRef,
     type: 'sql',
     name: debouncedSearch.length === 0 ? undefined : debouncedSearch,

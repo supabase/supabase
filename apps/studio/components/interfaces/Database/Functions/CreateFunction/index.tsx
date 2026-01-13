@@ -92,9 +92,9 @@ export const CreateFunction = ({
     onClose,
   })
 
-  const { mutate: createDatabaseFunction, isLoading: isCreating } =
+  const { mutate: createDatabaseFunction, isPending: isCreating } =
     useDatabaseFunctionCreateMutation()
-  const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
+  const { mutate: updateDatabaseFunction, isPending: isUpdating } =
     useDatabaseFunctionUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {

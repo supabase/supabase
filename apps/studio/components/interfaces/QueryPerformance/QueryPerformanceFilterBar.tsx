@@ -1,13 +1,18 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
+import {
+  NumericFilter,
+  ReportsNumericFilter,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
@@ -19,14 +24,21 @@ export const QueryPerformanceFilterBar = ({
 }) => {
   const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [{ search: searchQuery, roles: defaultFilterRoles, minCalls }, setSearchParams] =
-    useQueryStates({
-      search: parseAsString.withDefault(''),
-      roles: parseAsArrayOf(parseAsString).withDefault([]),
-      minCalls: parseAsInteger,
-    })
-  const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+  const [
+    { search: searchQuery, roles: defaultFilterRoles, callsFilter, indexAdvisor },
+    setSearchParams,
+  ] = useQueryStates({
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault({
+      operator: '>=',
+      value: 0,
+    } as NumericFilter),
+    indexAdvisor: parseAsString.withDefault('false'),
+  })
+  const { data, isPending: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -36,30 +48,21 @@ export const QueryPerformanceFilterBar = ({
     roles: defaultFilterRoles,
   })
   const [inputValue, setInputValue] = useState(searchQuery)
-  const [minCallsInput, setMinCallsInput] = useState(
-    typeof minCalls === 'number' && Number.isFinite(minCalls) && minCalls >= 0
-      ? String(minCalls)
-      : ''
-  )
   const debouncedInputValue = useDebounce(inputValue, 500)
-  const debouncedMinCalls = useDebounce(minCallsInput, 300)
+  // const debouncedMinCalls = useDebounce(minCallsInput, 300)
   const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const onSearchQueryChange = (value: string) => {
-    const sanitizedMinCalls =
-      typeof minCalls === 'number' && Number.isFinite(minCalls) && minCalls >= 0
-        ? Math.floor(minCalls)
-        : undefined
-    setSearchParams({ search: value || '', minCalls: sanitizedMinCalls })
+    setSearchParams({ search: value || '' })
   }
 
   const onFilterRolesChange = (roles: string[]) => {
     setFilters({ ...filters, roles })
-    const sanitizedMinCalls =
-      typeof minCalls === 'number' && Number.isFinite(minCalls) && minCalls >= 0
-        ? Math.floor(minCalls)
-        : undefined
-    setSearchParams({ roles, minCalls: sanitizedMinCalls })
+    setSearchParams({ roles })
+  }
+
+  const onIndexAdvisorChange = (options: string[]) => {
+    setSearchParams({ indexAdvisor: options.includes('true') ? 'true' : 'false' })
   }
 
   useEffect(() => {
@@ -67,20 +70,7 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue])
 
-  useEffect(() => {
-    const value = debouncedMinCalls.trim()
-    if (value === '') {
-      setSearchParams({ minCalls: undefined })
-      return
-    }
-    const parsed = Number(value)
-    if (Number.isFinite(parsed) && parsed >= 0) {
-      setSearchParams({ minCalls: Math.floor(parsed) })
-    } else {
-      setSearchParams({ minCalls: undefined })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedMinCalls])
+  const indexAdvisorOptions = [{ value: 'true', label: 'Index Advisor' }]
 
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
@@ -89,7 +79,7 @@ export const QueryPerformanceFilterBar = ({
           <Input
             size="tiny"
             autoComplete="off"
-            icon={<Search size={12} />}
+            icon={<Search />}
             value={inputValue}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             name="keyword"
@@ -109,28 +99,15 @@ export const QueryPerformanceFilterBar = ({
             ]}
           />
 
-          <Input
-            size="tiny"
-            type="number"
-            autoComplete="off"
-            value={minCallsInput}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setMinCallsInput(e.target.value)}
-            name="minCalls"
-            id="minCalls"
+          <ReportsNumericFilter
+            label="Calls"
+            value={callsFilter}
+            onChange={(value) => setSearchParams({ callsFilter: value })}
+            operators={['=', '>=', '<=', '>', '<', '!=']}
+            defaultOperator=">="
+            placeholder="e.g. 100"
             min={0}
-            placeholder="Min. calls (e.g. 100)"
-            className="w-32"
-            actions={[
-              minCallsInput && (
-                <Button
-                  size="tiny"
-                  type="text"
-                  icon={<X />}
-                  onClick={() => setMinCallsInput('')}
-                  className="p-0 h-5 w-5"
-                />
-              ),
-            ]}
+            className="w-auto"
           />
 
           {showRolesFilter && (
@@ -141,6 +118,18 @@ export const QueryPerformanceFilterBar = ({
               valueKey="name"
               activeOptions={isLoadingRoles ? [] : filters.roles}
               onSaveFilters={onFilterRolesChange}
+              className="w-56"
+            />
+          )}
+
+          {isIndexAdvisorEnabled && (
+            <FilterPopover
+              name="Warnings"
+              options={indexAdvisorOptions}
+              labelKey="label"
+              valueKey="value"
+              activeOptions={indexAdvisor === 'true' ? ['true'] : []}
+              onSaveFilters={onIndexAdvisorChange}
               className="w-56"
             />
           )}

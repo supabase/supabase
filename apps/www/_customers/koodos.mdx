@@ -1,0 +1,128 @@
+---
+title: Koodos scales its social discovery app Shelf on Supabase
+meta_title: Koodos scales its social discovery app Shelf on Supabase
+name: Koodos
+description: Koodos built its app Shelf from day one on Supabase, growing to support millions of users and billions of data points without dedicated database staff.
+author: prashant
+author_title: Prashant Sridharan
+author_url: https://github.com/CoolAssPuppy
+author_image_url: https://avatars.githubusercontent.com/u/914007?v=4
+logo: /images/customers/logos/koodos.svg
+logo_inverse: /images/customers/logos/light/koodos.svg
+og_image: /images/customers/og/koodos.png
+tags:
+  - supabase
+date: '2025-12-16'
+company_url: 'https://shelf.im/'
+misc: [{ label: 'Founded', text: 'USA' }]
+about: Social app that helps users understand themselves better by connecting their media platforms into one place.
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['social', 'media']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'startup'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'North America'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth', 'storage']
+---
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  We grew from zero to a million users in a short period and Supabase has kept up every step of the
+  way. The combination of Postgres performance and developer support has been incredible.
+</Quote>
+
+[Koodos](https://shelf.im/) is the company behind Shelf, a social app that helps users understand themselves better by connecting their media platforms into one place. Users can link Spotify, Apple Music, Netflix, Letterboxd, Goodreads, and more to build a personalized shelf of their interests, track how their tastes change over time, and discover connections with others based on shared media preferences.
+
+With billions of data points flowing through the system and millions of users, Koodos needed a backend that could scale without requiring a dedicated database team. Supabase has been that foundation since day zero.
+
+## The challenge
+
+Shelf processes massive amounts of user activity data. Each data point represents a discrete action, like a user watching a specific episode of a show or listening to a particular song. Imagine millions of users each with thousands, if not tens of thousands, of such data points. The team needed to support billions of these data points while maintaining fast, reliable performance.
+
+As the app scaled, the engineering team faced mounting infrastructure pressure:
+
+- Billions of rows of activity and media data across multiple connected platforms
+- Heavy concurrent reads and writes from background sync jobs and live user actions
+- Massive ingestion spikes from data syncers updating user media libraries every few hours
+- Strict reliability requirements during viral growth surges
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  We're syncing Spotify and other platforms for millions of users. Each sync job touches Postgres
+  thousands of times per user, so efficiency matters at this scale.
+</Quote>
+
+## Choosing Supabase
+
+Koodos chose Supabase from day one. The team evaluated alternatives like PlanetScale and Amazon RDS, but found they lacked the complete picture that Supabase offered.
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  We started from day zero with Supabase. Supabase helped us get started really quickly, helped us
+  build a prototype very easily, had really strong integrations with Web SDKs and frontend SDKs that
+  we needed, has really good backend support.
+</Quote>
+
+Key reasons for choosing Supabase:
+
+- Speed to prototype without upfront architecture work
+- Complete platform with [Auth](https://www.supabase.com/auth), [Database](https://www.supabase.com/database), and [Storage](https://www.supabase.com/storage) in one place
+- Strong SDK support for fast frontend integration
+- Managed Postgres with real-time monitoring for compute, memory, and IOPS
+- Enterprise support with direct access to Supabase engineers
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  Many of the alternatives kind of work, but they don't complete the whole picture. They don't offer
+  object storage hosting. They don't offer user management. So we'd have to think about other
+  solutions to answer those for us. Supabase handles a lot of these core features out of the box.
+</Quote>
+
+Supabase's combination of observability and hands-on support set it apart from the competition.
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  We looked at other hosted databases, but Supabase gave us full visibility. We can inspect queries,
+  benchmark IOPS, and actually talk to the engineers helping us optimize. That's rare.
+</Quote>
+
+## The approach
+
+Koodos uses Supabase as the backbone of Shelf's entire backend, powering authentication, user management, and critical transactional data.
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  Supabase is really the brains of our operation here at Koodos.
+</Quote>
+
+- **Authentication and user management.** Supabase Auth handles thousands of users signing up from around the world. One-time passwords and login flows are managed through Supabase.
+- **Source of truth for presentation data.** All critical transactional data that users see when they open the app lives in Supabase. Usernames, profiles, and other high-read data are stored in Postgres.
+- **Performance optimization.** Working with Supabase's solutions team, the team reduced CPU load from 80 percent to 30 percent through query optimization, better indexing, and partitioning plans for their largest tables.
+- **Rightsizing and cost management.** By analyzing compute and IOPS usage, the team identified safe opportunities to downsize from 16 XL instances after major launches, balancing performance and cost.
+- **Observability.** Using Supabase's Performance Advisor, Grafana metrics, and direct SQL inspection, the team tracks slow queries, vacuum activity, and connection spikes in real time.
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  Supabase's database reviews feel like health check-ups for our app. Their engineers spot issues
+  before they become production problems.
+</Quote>
+
+The team is also evolving their architecture to optimize how data flows through the system. They plan to send event data directly to Snowflake for heavy computation, then push aggregated results back into Postgres for fast reads. This lets Supabase do what it does best: fast, reliable reads with strong data integrity.
+
+## The results
+
+Supabase enabled Koodos to scale Shelf's backend in lockstep with explosive user growth, all without adding DevOps overhead.
+
+- **80% to 30% reduction** in CPU utilization after tuning and indexing
+- **Predictable performance** with IOPS stabilized at approximately 75% utilization under heavy load
+- **Seamless growth** to 1 million users and billions of rows without downtime
+- **Enterprise-level visibility** and support through dedicated performance reviews and architectural guidance
+- **No dedicated database staff** required despite massive scale
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  We're able to run an app with millions of users and syncing huge amounts of data without a lot of
+  thought on our Postgres instance. We don't have anybody dedicated to our Postgres instance.
+</Quote>
+
+## What's next
+
+Koodos is preparing for its next phase of growth. The team is excited about Supabase's new [analytics and Iceberg capabilities](https://supabase.com/blog/introducing-analytics-buckets) for handling their large-scale data needs. They are also optimizing their architecture to leverage Postgres for what it does best while offloading heavy computation to Snowflake.
+
+<Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
+  We know Supabase can take us from one million to ten million users. The roadmap, from Iceberg to
+  Multigres, aligns perfectly with how we want to grow.
+</Quote>

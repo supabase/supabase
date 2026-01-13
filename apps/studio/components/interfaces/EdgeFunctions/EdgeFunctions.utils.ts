@@ -10,7 +10,10 @@ export const getFallbackEntrypointPath = (files: Omit<EdgeFunctionFile, 'id' | '
   // when there's no matching entrypoint path is set,
   // we use few heuristics to find an entrypoint file
   // 1. If the function has only a single TS / JS file, if so set it as entrypoint
-  const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
+  const jsFiles = files.filter(
+    ({ name }) =>
+      name.endsWith('.js') || name.endsWith('.ts') || name.endsWith('.jsx') || name.endsWith('.tsx')
+  )
   if (jsFiles.length === 1) {
     return jsFiles[0].name
   } else if (jsFiles.length) {

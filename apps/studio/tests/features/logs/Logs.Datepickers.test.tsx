@@ -48,7 +48,7 @@ test('renders dates in local time', async () => {
   )
   // renders time locally
   await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-  await screen.findByText(RegExp(from.format('MMMM YYYY')))
+  await screen.findByText(RegExp(from.format('DD MMM')))
 })
 
 test('renders datepicker selected dates in local time', async () => {

@@ -37,8 +37,16 @@ const generateRssItem = (post: any): string => {
 `
 }
 
-// we generate a main rss.xml flie as well as individual files for
-// authors who publish under the `planetpg` tag
+// This utility generates RSS feeds for specialized content:
+// 1. Customer stories RSS feed (customers-rss.xml) - used by pages/customers.tsx via getStaticProps
+// 2. Author-specific PlanetPG RSS feeds (planetpg-{authorID}-rss.xml) - filtered feeds for individual authors
+//
+// Note: The main blog RSS feed (rss.xml) containing all blog posts is generated separately
+// in generateStaticContent.mjs during the build process. This file is NOT used for the main blog feed.
+//
+// Usage:
+//   - Without authorID: Generates generic RSS feed (used for customer stories)
+//   - With authorID: Generates author-specific feed with custom title/description for PlanetPG authors
 export const generateRss = (posts: any[], authorID?: string): string => {
   const authorInfo = authors.find((item) => item.author_id === authorID)
 

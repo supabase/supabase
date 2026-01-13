@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-11-06T16:46:13.786Z
+Last updated: 2025-11-20T11:14:14.146Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -35,6 +35,8 @@ Library of components for your project. The components integrate with Supabase a
     - Supabase client for Nuxt.js
 - [Password-based Authentication](https://supabase.com/ui/docs/nuxtjs/password-based-auth)
     - Password-based authentication block for Nuxt.js
+- [Social Authentication](https://supabase.com/ui/docs/nuxtjs/social-auth)
+    - Social authentication block for Nuxt.js
 - [Platform Kit](https://supabase.com/ui/docs/platform/platform-kit)
     - The easiest way to build platforms on top of Supabase
 - [Supabase Client Libraries](https://supabase.com/ui/docs/react-router/client)
@@ -89,3 +91,5 @@ Library of components for your project. The components integrate with Supabase a
     - Supabase client for Vue Single Page Applications
 - [Password-based Authentication](https://supabase.com/ui/docs/vue/password-based-auth)
     - Password-based authentication block for Vue Single Page Applications
+- [Social Authentication](https://supabase.com/ui/docs/vue/social-auth)
+    - Social authentication block for Vue Single Page Applications
