@@ -139,17 +139,7 @@ export const CreateFunction = ({
   }
 
   useEffect(() => {
-    if (!visible) {
-      // Reset tracking when panel closes
-      lastInitializedFuncIdRef.current = undefined
-      return
-    }
-
-    const funcId = func?.id
-    const shouldReset =
-      lastInitializedFuncIdRef.current === undefined || funcId !== lastInitializedFuncIdRef.current
-
-    if (shouldReset) {
+    if (visible) {
       setFocusedEditor(false)
       form.reset({
         name: func?.name ?? '',
@@ -162,7 +152,6 @@ export const CreateFunction = ({
         security_definer: func?.security_definer ?? false,
         config_params: convertConfigParams(func?.config_params).value,
       })
-      lastInitializedFuncIdRef.current = funcId
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, func?.id])
