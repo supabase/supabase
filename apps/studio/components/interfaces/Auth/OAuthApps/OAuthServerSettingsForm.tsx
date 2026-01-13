@@ -96,7 +96,12 @@ export const OAuthServerSettingsForm = () => {
     isSuccess: isPermissionsLoaded,
   } = useAsyncCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
-  const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
+  const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
+
+  const { data: oAuthAppsData } = useOAuthServerAppsQuery(
+    { projectRef },
+    { enabled: isOAuthServerEnabled && !isAuthConfigLoading }
+  )
 
   const oauthApps = oAuthAppsData?.clients || []
 

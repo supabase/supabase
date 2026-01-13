@@ -76,7 +76,10 @@ export const OAuthAppsList = () => {
     isPending: isLoading,
     isError,
     error,
-  } = useOAuthServerAppsQuery({ projectRef }, { enabled: isOAuthServerEnabled })
+  } = useOAuthServerAppsQuery(
+    { projectRef },
+    { enabled: isOAuthServerEnabled && !isAuthConfigLoading }
+  )
 
   const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
