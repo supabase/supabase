@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -79,7 +79,6 @@ export const CreateFunction = ({
   const { data: project } = useSelectedProjectQuery()
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
-  const lastInitializedFuncIdRef = useRef<number | undefined>(undefined)
 
   const isEditing = !isDuplicating && !!func?.id
 
