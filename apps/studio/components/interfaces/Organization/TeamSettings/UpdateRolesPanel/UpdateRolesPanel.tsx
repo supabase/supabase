@@ -180,7 +180,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
             <SheetSection className="h-full overflow-auto flex flex-col">
               {isOptedIntoProjectLevelPermissions && (
-                <div className="flex items-center gap-x-4 border-b border-border py-4">
+                <div className="flex items-center gap-x-4 border-b border-border pb-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
                     checked={isApplyingRoleToAllProjects}
@@ -246,7 +246,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       key={`${project.ref}-${project.roleId}`}
                       className="flex items-center justify-between py-2"
                     >
-                      <p>{name}</p>
+                      <p className="text-sm">{name}</p>
 
                       <div className="flex items-center gap-x-2">
                         {cannotAddAnyRoles ? (
