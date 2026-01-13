@@ -18,7 +18,7 @@ import { useChartHighlight } from './useChartHighlight'
 import dayjs from 'dayjs'
 import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import type { ChartData } from './Charts.types'
-import { MultiAttribute } from './ComposedChart.utils'
+import { MultiAttribute, StackingMode } from './ComposedChart.utils'
 
 export interface ComposedChartHandlerProps {
   id?: string
@@ -45,6 +45,8 @@ export interface ComposedChartHandlerProps {
   docsUrl?: string
   hide?: boolean
   syncId?: string
+  stackingMode?: StackingMode
+  hideHighlightedValue?: boolean
 }
 
 /**
@@ -174,6 +176,7 @@ const ComposedChartHandler = ({
           }
 
           if (attr.provider === 'reference-line') return
+          if (attr.attribute === 'rest') return
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
@@ -321,7 +324,7 @@ const useAttributeQueries = (
   isVisible: boolean
 ) => {
   const infraAttributes = attributes
-    .filter((attr) => attr?.provider === 'infra-monitoring')
+    .filter((attr) => attr?.provider === 'infra-monitoring' && attr.attribute !== 'rest')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
   const dailyStatsAttributes = attributes
     .filter((attr) => attr?.provider === 'daily-stats')
