@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { BASE_PATH } from 'lib/constants'
@@ -26,6 +26,7 @@ import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
@@ -40,6 +41,9 @@ export const AnalyticsBuckets = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  const { data: config } = useProjectStorageConfigQuery({ projectRef: ref })
+  const maxAnalyticsBuckets = config?.features.icebergCatalog.maxCatalogs ?? 2
 
   const {
     data: buckets = [],
@@ -101,13 +105,12 @@ export const AnalyticsBuckets = () => {
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
-                              {analyticsBuckets.length}
-                              /2
+                              {analyticsBuckets.length}/{maxAnalyticsBuckets}
                             </span>
                           </TooltipTrigger>
-                          <TooltipContent side="bottom" className="w-64 text-center">
-                            Each project can only have up to 2 buckets while analytics buckets are
-                            in alpha{' '}
+                          <TooltipContent side="bottom" className="w-72 text-center">
+                            Each project can only have up to {maxAnalyticsBuckets} buckets while
+                            analytics buckets are in alpha{' '}
                           </TooltipContent>
                         </Tooltip>
                       )}

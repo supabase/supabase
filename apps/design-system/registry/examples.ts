@@ -44,6 +44,24 @@ export const examples: Registry = [
     files: ['example/alert-dialog-demo.tsx'],
   },
   {
+    name: 'alert-dialog-close-only',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-close-only.tsx'],
+  },
+  {
+    name: 'alert-dialog-destructive',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-destructive.tsx'],
+  },
+  {
+    name: 'alert-dialog-warning',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-warning.tsx'],
+  },
+  {
     name: 'aspect-ratio-demo',
     type: 'components:example',
     registryDependencies: ['aspect-ratio'],
@@ -732,6 +750,12 @@ export const examples: Registry = [
     files: ['example/sheet-demo.tsx'],
   },
   {
+    name: 'sheet-nonmodal',
+    type: 'components:example',
+    registryDependencies: ['sheet'],
+    files: ['example/sheet-nonmodal.tsx'],
+  },
+  {
     name: 'sheet-side',
     type: 'components:example',
     registryDependencies: ['sheet'],
@@ -1040,21 +1064,6 @@ export const examples: Registry = [
     files: ['example/text-confirm-dialog-demo.tsx'],
   },
   {
-    name: 'text-confirm-dialog-with-info-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-info-alert.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-warning-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-warning-alert.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-destructive-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-destructive-alert.tsx'],
-  },
-  {
     name: 'text-confirm-dialog-with-size',
     type: 'components:example',
     files: ['example/text-confirm-dialog-with-size.tsx'],
@@ -1360,24 +1369,9 @@ export const examples: Registry = [
     files: ['example/tree-view-multi-select.tsx'],
   },
   {
-    name: 'modal-demo',
+    name: 'confirmation-modal-demo',
     type: 'components:example',
-    files: ['example/modal-demo.tsx'],
-  },
-  {
-    name: 'modal-aligned-footer',
-    type: 'components:example',
-    files: ['example/modal-aligned-footer.tsx'],
-  },
-  {
-    name: 'modal-custom-footer',
-    type: 'components:example',
-    files: ['example/modal-custom-footer.tsx'],
-  },
-  {
-    name: 'modal-hide-footer',
-    type: 'components:example',
-    files: ['example/modal-hide-footer.tsx'],
+    files: ['example/confirmation-modal-demo.tsx'],
   },
   {
     name: 'assistant-chat-demo',

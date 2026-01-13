@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'

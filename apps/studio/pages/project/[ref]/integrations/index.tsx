@@ -25,14 +25,16 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
+import { useFlag } from 'common'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
+const FEATURED_INTEGRATIONS = ['cron', 'queues'] // + either stripe_sync_engine or stripe_wrapper depending on feature flag
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   cron: 'img/integrations/covers/cron-cover.webp',
   queues: 'img/integrations/covers/queues-cover.png',
   stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
+  stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
@@ -44,6 +46,16 @@ const IntegrationsPage: NextPageWithLayout = () => {
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
+
+  const isStripeSyncEngineEnabled = useFlag('enableStripeSyncEngineIntegration')
+
+  const featuredIntegrationIds = useMemo(() => {
+    if (isStripeSyncEngineEnabled) {
+      return FEATURED_INTEGRATIONS.concat(['stripe_sync_engine'])
+    } else {
+      return FEATURED_INTEGRATIONS.concat(['stripe_wrapper'])
+    }
+  }, [isStripeSyncEngineEnabled])
 
   const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
     useInstalledIntegrations()
@@ -105,8 +117,9 @@ const IntegrationsPage: NextPageWithLayout = () => {
     }
 
     const featured = filteredAndSortedIntegrations.filter((i) =>
-      FEATURED_INTEGRATIONS.includes(i.id)
+      featuredIntegrationIds.includes(i.id)
     )
+
     const allIntegrations = filteredAndSortedIntegrations // Include all integrations, including featured
 
     return {

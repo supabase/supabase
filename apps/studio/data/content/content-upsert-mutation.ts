@@ -9,6 +9,7 @@ import { contentKeys } from './keys'
 import type { Snippet } from './sql-folders-query'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
+  id: string
   content: Partial<Content['content']>
   favorite?: boolean
 }

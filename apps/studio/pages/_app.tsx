@@ -15,6 +15,7 @@ import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/typography.scss'
 import 'styles/ui.scss'
+import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
@@ -57,8 +58,10 @@ import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
+import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
+import { ToastErrorTracker } from 'lib/toast-errors'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -159,17 +162,19 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         disableTransitionOnChange
                       >
                         <AppBannerContextProvider>
-                          <CommandProvider>
-                            <FeaturePreviewContextProvider>
-                              <MainScrollContainerProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                              </MainScrollContainerProvider>
-                              <StudioCommandMenu />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                            <SonnerToaster position="top-right" />
-                            <MonacoThemeProvider />
-                          </CommandProvider>
+                          <AiAssistantStateContextProvider>
+                            <CommandProvider>
+                              <FeaturePreviewContextProvider>
+                                <MainScrollContainerProvider>
+                                  {getLayout(<Component {...pageProps} />)}
+                                </MainScrollContainerProvider>
+                                <StudioCommandMenu />
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                              <SonnerToaster position="top-right" />
+                              <MonacoThemeProvider />
+                            </CommandProvider>
+                          </AiAssistantStateContextProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

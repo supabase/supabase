@@ -5,7 +5,6 @@ import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
@@ -19,6 +18,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const AuditLogsPage: NextPageWithLayout = () => {
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(

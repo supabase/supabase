@@ -1,75 +1,60 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { AlertCircle, Loader } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import { Loader } from 'lucide-react'
 
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
+import { Connect } from 'components/interfaces/Connect/Connect'
+import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
+import { AlertError } from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { Input, SimpleCodeBlock } from 'ui'
-
-const generateInitSnippet = (endpoint: string) => ({
-  js: `
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = '${endpoint}'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)`,
-  dart: `
-const supabaseUrl = '${endpoint}';
-const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
-
-Future<void> main() async {
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
-  runApp(MyApp());
-}`,
-})
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const APIKeys = () => {
   const { ref: projectRef } = useParams()
-
-  const {
-    projectConnectionJavascriptExample: javascriptExampleEnabled,
-    projectConnectionDartExample: dartExampleEnabled,
-  } = useIsFeatureEnabled([
-    'project_connection:javascript_example',
-    'project_connection:dart_example',
-  ])
-
-  const availableLanguages = [
-    {
-      name: javascriptExampleEnabled ? 'Javascript' : 'Typescript',
-      key: 'js',
-    },
-    ...(dartExampleEnabled ? [{ name: 'Dart', key: 'dart' }] : []),
-  ]
-  const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const {
     data: settings,
+    error: projectSettingsError,
     isError: isProjectSettingsError,
     isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { anonKey, serviceKey } = getKeys(apiKeys)
+  const { data: legacyAPIKeysStatusData, isPending: isLoadingAPIKeysStatus } =
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
-  const isApiKeysEmpty = !anonKey && !serviceKey
+  const {
+    data: apiKeys,
+    error: errorAPIKeys,
+    isError: isErrorAPIKeys,
+    isPending: isLoadingAPIKeys,
+  } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, serviceKey, publishableKey, secretKey } = getKeys(apiKeys)
+
+  const hasNewAPIKeys = !!publishableKey && !!secretKey
+  const isLegacyKeysEnabled = legacyAPIKeysStatusData?.enabled ?? false
+  const isApiKeysEmpty = !hasNewAPIKeys && !anonKey && !serviceKey
 
   const {
     data,
+    error: jwtSecretUpdateError,
     isError: isJwtSecretUpdateStatusError,
     isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery(
     { projectRef },
     { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
   )
+
+  const isLoading = isLoadingAPIKeys || isLoadingAPIKeysStatus || isProjectSettingsLoading
+  const isError = isErrorAPIKeys || isProjectSettingsError || isJwtSecretUpdateStatusError
 
   // Only show JWT loading state if the query is actually enabled
   const showJwtLoading =
@@ -84,136 +69,150 @@ export const APIKeys = () => {
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
-  const clientInitSnippet: any = generateInitSnippet(apiUrl)
-  const selectedLanguageSnippet = !!selectedLanguage
-    ? clientInitSnippet[selectedLanguage.key]
-    : 'No snippet available'
-
   return (
-    <Panel
-      title={
-        <div className="space-y-3">
-          <h5 className="text-base">Project API</h5>
-          <p className="text-sm text-foreground-light">
-            Your API is secured behind an API gateway which requires an API Key for every request.
-            <br />
-            You can use the parameters below to use Supabase client libraries.
-          </p>
-        </div>
-      }
-    >
-      {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="flex items-center justify-center py-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">
-            {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
-          </p>
-        </div>
-      ) : isProjectSettingsLoading ? (
-        <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">Retrieving API keys</p>
-        </div>
-      ) : isApiKeysEmpty ? (
-        <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">Retrieving API keys</p>
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Project API</CardTitle>
+        <CardDescription>
+          Your API is secured behind an API gateway which requires an API Key for every request.
+          <br />
+          You can use the parameters below to use Supabase client libraries.
+        </CardDescription>
+      </CardHeader>
+
+      {isLoading ? (
+        <CardContent>
+          <GenericSkeletonLoader />
+        </CardContent>
+      ) : isError ? (
+        <AlertError
+          className="rounded-none border-0"
+          subject={
+            isErrorAPIKeys
+              ? 'Failed to retrieve API Keys'
+              : isProjectSettingsError
+                ? 'Failed to retrieve project settings'
+                : isJwtSecretUpdateStatusError
+                  ? 'Failed to update JWT secret'
+                  : ''
+          }
+          error={errorAPIKeys ?? projectSettingsError ?? jwtSecretUpdateError}
+        />
       ) : showJwtLoading ? (
-        <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">JWT secret is being updated</p>
-        </div>
+        <CardContent>
+          <div className="flex items-center justify-center py-4 space-x-2">
+            <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+            <p className="text-sm text-foreground-light">JWT secret is being updated</p>
+          </div>
+        </CardContent>
+      ) : !isLegacyKeysEnabled && !hasNewAPIKeys ? (
+        <Admonition
+          type="default"
+          className="border-0 rounded-none"
+          title="Project has no API keys created yet"
+          description={
+            <>
+              Create a set of API keys from your{' '}
+              <InlineLink href={`/project/${projectRef}/settings/api-keys`}>
+                project settings
+              </InlineLink>{' '}
+              to connect to your project
+            </>
+          }
+        />
       ) : (
         <>
-          <Panel.Content>
-            <Input
+          <CardContent>
+            <FormItemLayout
+              isReactForm={false}
+              layout="horizontal"
               label="Project URL"
-              readOnly
-              copy
-              disabled
-              className="input-mono"
-              value={apiUrl}
-              descriptionText="A RESTful endpoint for querying and managing your database."
+              description="A RESTful endpoint for querying and managing your database."
+            >
+              <Input readOnly copy className="input-mono" value={apiUrl} />
+            </FormItemLayout>
+          </CardContent>
+
+          <CardContent>
+            <FormItemLayout
+              isReactForm={false}
               layout="horizontal"
-            />
-          </Panel.Content>
-          <Panel.Content
-            className={
-              'border-t border-panel-border-interior-light dark:border-panel-border-interior-dark'
-            }
-          >
-            <Input
-              readOnly
-              disabled
-              layout="horizontal"
-              className="input-mono"
-              // @ts-ignore
               label={
-                <div className="space-y-2">
-                  <p className="text-sm">API Key</p>
-                  <div className="flex items-center space-x-1 -ml-1">
-                    <code className="text-code-inline">{anonKey?.name}</code>
-                    <code className="text-code-inline">public</code>
+                hasNewAPIKeys ? (
+                  'Publishable API Key'
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-sm">API Key</p>
+                    <div className="flex items-center space-x-1 -ml-1">
+                      <code className="text-code-inline">{anonKey?.name}</code>
+                      <code className="text-code-inline">public</code>
+                    </div>
                   </div>
-                </div>
+                )
               }
-              copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-              reveal={anonKey?.name !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
-              value={
-                !canReadAPIKeys
-                  ? 'You need additional permissions to view API keys'
-                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                    ? 'JWT secret update failed, new API key may have issues'
-                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                      ? 'Updating JWT secret...'
-                      : anonKey?.api_key
-              }
-              onChange={() => {}}
-              descriptionText={
+              description={
                 <p>
                   This key is safe to use in a browser if you have enabled Row Level Security (RLS)
-                  for your tables and configured policies. You may also use the service key which
-                  can be found{' '}
-                  <Link
-                    href={`/project/${projectRef}/settings/api`}
-                    className="transition text-brand hover:text-brand-600"
+                  for your tables and configured policies. You may also use the{' '}
+                  {hasNewAPIKeys ? 'secret' : 'service'} key which can be found{' '}
+                  <InlineLink
+                    href={`/project/${projectRef}/settings/api-keys${!hasNewAPIKeys ? '/legacy' : ''}`}
                   >
                     here
-                  </Link>{' '}
+                  </InlineLink>{' '}
                   to bypass RLS.
                 </p>
               }
+            >
+              <Input
+                readOnly
+                className="input-mono"
+                copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+                reveal={anonKey?.name !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+                value={
+                  !canReadAPIKeys
+                    ? 'You need additional permissions to view API keys'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                      ? 'JWT secret update failed, new API key may have issues'
+                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                        ? 'Updating JWT secret...'
+                        : publishableKey?.api_key ?? anonKey?.api_key
+                }
+              />
+            </FormItemLayout>
+          </CardContent>
+
+          <CardContent className="relative overflow-hidden">
+            <div
+              className="absolute inset-0 rounded-md -mt-[1px]"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to top, hsl(var(--background-surface-100)/1) 0%, hsl(var(--background-surface-100)/1) 30%, hsl(var(--background-surface-75)/0) 100%),
+                  linear-gradient(to right, hsl(var(--border-default)/0.33) 1px, transparent 1px),
+                  linear-gradient(to bottom, hsl(var(--border-default)/0.33) 1px, transparent 1px)
+                `,
+                backgroundSize: '100% 100%, 15px 15px, 15px 15px',
+                backgroundPosition: '0 0, 0 0, 0 0',
+              }}
             />
-          </Panel.Content>
-          {availableLanguages.length > 0 && (
-            <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <div className="flex items-center bg-studio">
-                {availableLanguages.map((language) => {
-                  const isSelected = selectedLanguage.key === language.key
-                  return (
-                    <div
-                      key={language.key}
-                      className={[
-                        'px-3 py-1 text-sm cursor-pointer transition',
-                        `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
-                      ].join(' ')}
-                      onClick={() => setSelectedLanguage(language)}
-                    >
-                      {language.name}
-                    </div>
-                  )
-                })}
+            <div className="relative mt-6 mb-3">
+              <div className="flex gap-x-3.5 relative ml-0.5 mb-4 opacity-80">
+                <ConnectionIcon icon="nextjs" size={26} />
+                <ConnectionIcon icon="react" size={26} />
+                <ConnectionIcon icon="svelte" size={22} />
+                <ConnectionIcon icon="flutter" size={23} />
+                <ConnectionIcon icon="prisma" size={22} />
               </div>
-              <div className="bg-surface-100 px-4 py-6 min-h-[200px]">
-                <SimpleCodeBlock className={selectedLanguage.key}>
-                  {selectedLanguageSnippet}
-                </SimpleCodeBlock>
-              </div>
+              <p className="mb-1">Choose your preferred framework</p>
+              <p className="text-sm text-foreground-light mb-4 md:mr-20 text-balance">
+                Connect to your project from a variety of frameworks, ORMs, an MCP server, or even
+                directly via connection string.
+              </p>
+              <Connect />
             </div>
-          )}
+          </CardContent>
         </>
       )}
-    </Panel>
+    </Card>
   )
 }

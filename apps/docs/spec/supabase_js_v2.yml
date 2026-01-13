@@ -204,7 +204,7 @@ functions:
 
         > No storage option exists to persist the session, which may result in unexpected behavior when using auth. If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
 
-        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
+        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/supabase-js/blob/master/packages/core/auth-js/src/lib/types.ts#L1053).
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
       - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
 
@@ -1235,7 +1235,7 @@ functions:
         3. `invite` – Used when verifying an OTP sent as part of an invitation to join a project or organization.
         4. `email_change` – Used when verifying an OTP sent to a new email address during an email update process.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
-      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
+      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in.  You may wish to use the hash for the PKCE flow for Server Side Auth. Read [the Password-based Auth guide](/docs/guides/auth/passwords) for more details.
     examples:
       - id: verify-signup-one-time-password(otp)
         name: Verify Signup One-Time Password (OTP)

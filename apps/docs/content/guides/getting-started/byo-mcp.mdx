@@ -155,46 +155,6 @@ https://<your-project-ref>.supabase.co/functions/v1/mcp
 
 Update your MCP client configuration to use the production URL.
 
-## Adding more tools
-
-Extend your MCP server by registering additional tools. Here's an example that queries your Supabase database:
-
-```ts
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-
-// Create Supabase client
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-)
-
-server.registerTool(
-  'list_users',
-  {
-    title: 'List Users',
-    description: 'Get a list of users from the database',
-    inputSchema: { limit: z.number().optional().default(10) },
-  },
-  async ({ limit }) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, email, created_at')
-      .limit(limit)
-
-    if (error) {
-      return {
-        content: [{ type: 'text', text: `Error: ${error.message}` }],
-        isError: true,
-      }
-    }
-
-    return {
-      content: [{ type: 'text', text: JSON.stringify(data, null, 2) }],
-    }
-  }
-)
-```
-
 ## Examples
 
 You can find ready-to-use MCP server implementations here:

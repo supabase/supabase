@@ -5,11 +5,6 @@ import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -21,6 +16,14 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -46,13 +49,18 @@ const Security: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader className="pt-0">
-          <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer bottomPadding>
-        <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Security</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your account security settings and authentication methods.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="small">
+        <Collapsible_Shadcn_ className={cn('mt-8', collapsibleClasses)}>
           <CollapsibleTrigger_Shadcn_ asChild>
             <button
               type="button"
@@ -74,7 +82,7 @@ const Security: NextPageWithLayout = () => {
             <TOTPFactors />
           </CollapsibleContent_Shadcn_>
         </Collapsible_Shadcn_>
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }

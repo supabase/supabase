@@ -1,11 +1,11 @@
-import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -14,6 +14,7 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/table-api-access-query'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -52,6 +53,7 @@ export interface EntityListItemProps {
   isActive?: boolean
   style?: CSSProperties
   onExportCLI: () => void
+  apiAccessMap?: TableApiAccessMap
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -59,7 +61,7 @@ function isTableLikeEntityListItem(entity: { type?: string }) {
   return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
-const EntityListItem = ({
+export const EntityListItem = ({
   id,
   projectRef,
   item: entity,
@@ -67,6 +69,7 @@ const EntityListItem = ({
   isActive: _isActive,
   style,
   onExportCLI,
+  apiAccessMap,
 }: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -101,10 +104,18 @@ const EntityListItem = ({
     projectRef: project?.ref,
   })
 
-  const tableHasLints: boolean = getEntityLintDetails(
+  const tableHasRlsDisabledLint: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const tableHasRlsEnabledNoPolicyLint: boolean = getEntityLintDetails(
+    entity.name,
+    'rls_enabled_no_policy',
+    ['ERROR', 'WARN', 'INFO'],
     lints,
     selectedSchema
   ).hasLint
@@ -132,6 +143,8 @@ const EntityListItem = ({
     lints,
     selectedSchema
   ).hasLint
+
+  const apiAccessData = apiAccessMap?.[entity.name]
 
   const formatTooltipText = (entityType: string) => {
     const text =
@@ -167,13 +180,12 @@ const EntityListItem = ({
       title={entity.name}
       style={style}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+      href={buildTableEditorUrl({ projectRef, tableId: entity.id, schema: entity.schema })}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(
         TreeViewItemVariant({
           isSelected: isActive && !isPreview,
-          isOpened: isOpened && !isPreview,
           isPreview,
         }),
         'pl-4 pr-1'
@@ -206,15 +218,15 @@ const EntityListItem = ({
           >
             {entity.name}
           </span>
-          <div>
-            <EntityTooltipTrigger
-              entity={entity}
-              tableHasLints={tableHasLints}
-              viewHasLints={viewHasLints}
-              materializedViewHasLints={materializedViewHasLints}
-              foreignTableHasLints={foreignTableHasLints}
-            />
-          </div>
+          <EntityTooltipTrigger
+            entity={entity}
+            tableHasRlsDisabledLint={tableHasRlsDisabledLint}
+            tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
+            viewHasLints={viewHasLints}
+            materializedViewHasLints={materializedViewHasLints}
+            foreignTableHasLints={foreignTableHasLints}
+            apiAccessData={apiAccessData}
+          />
         </div>
 
         {canEdit && (
@@ -377,18 +389,23 @@ const EntityListItem = ({
 
 const EntityTooltipTrigger = ({
   entity,
-  tableHasLints,
+  tableHasRlsDisabledLint,
+  tableHasRlsEnabledNoPolicyLint,
   viewHasLints,
   materializedViewHasLints,
   foreignTableHasLints,
+  apiAccessData,
 }: {
   entity: Entity
-  tableHasLints: boolean
+  tableHasRlsDisabledLint: boolean
+  tableHasRlsEnabledNoPolicyLint: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
+  apiAccessData?: TableApiAccessData
 }) => {
   const { ref } = useParams()
+  const isDataApiExposedBadgeEnabled = useFlag('dataApiExposedBadge')
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
@@ -402,10 +419,11 @@ const EntityTooltipTrigger = ({
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
-      if (tableHasLints) {
+      if (tableHasRlsDisabledLint) {
         tooltipContent = (
           <>
-            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+            This table can be accessed by anyone via the Data API as RLS is disabled. {learnMoreCTA}
+            .
           </>
         )
       }
@@ -447,14 +465,43 @@ const EntityTooltipTrigger = ({
         <TooltipTrigger className="min-w-4">
           <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-52 text-center">
+        <TooltipContent side="right" className="max-w-52">
           {tooltipContent}
         </TooltipContent>
       </Tooltip>
     )
   }
 
+  const isRlsEnabledNoPolicies =
+    entity.type === ENTITY_TYPE.TABLE &&
+    apiAccessData?.apiAccessType === 'access' &&
+    tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isRlsEnabledNoPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-52">
+          This table can be accessed via the Data API but no RLS policies exist so no data will be
+          returned
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  const isApiExposedWithRlsAndPolicies =
+    apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isApiExposedWithRlsAndPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
+      </Tooltip>
+    )
+  }
+
   return null
 }
-
-export default EntityListItem

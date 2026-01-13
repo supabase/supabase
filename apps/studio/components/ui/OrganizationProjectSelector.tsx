@@ -21,7 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string

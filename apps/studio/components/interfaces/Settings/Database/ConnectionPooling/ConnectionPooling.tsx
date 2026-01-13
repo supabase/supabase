@@ -35,7 +35,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'pooling-configuration-form'

@@ -1,43 +1,36 @@
-// hooks/useTelemetryCookie.ts
-import { useRouter } from 'next/compat/router'
 import { useEffect } from 'react'
-import { IS_PROD, LOCAL_STORAGE_KEYS } from '../constants'
-import { getSharedTelemetryData } from '../telemetry-utils'
+import { LOCAL_STORAGE_KEYS } from '../constants'
+import { getSharedTelemetryData, getTelemetryCookieOptions } from '../telemetry-utils'
 
 interface UseTelemetryCookieProps {
-  hasAcceptedConsent: boolean
-  title: string
-  referrer: string
+  enabled: boolean
 }
 
 /**
- * This hook saves the telemetry data to a cookie. The cookie will be sent when the user consents to telemetry. If they
- * don't consent, the cookie will never be sent.
+ * This hook saves the initial telemetry data to a cookie so we can preserve first-touch attribution
+ * (e.g. `document.referrer`) until the initial pageview is emitted. If the user never
+ * consents, this cookie is never used.
  */
-export function useTelemetryCookie({
-  hasAcceptedConsent,
-  title,
-  referrer,
-}: UseTelemetryCookieProps) {
-  const router = useRouter()
+export function useTelemetryCookie({ enabled }: UseTelemetryCookieProps) {
   const telemetryStorageKey = LOCAL_STORAGE_KEYS.TELEMETRY_DATA
 
   useEffect(() => {
-    if (!router?.isReady) return
+    if (typeof window === 'undefined') return
+    if (!enabled) return
 
     const cookies = document.cookie.split(';')
-    const cookieOptions = IS_PROD ? 'path=/; domain=supabase.com' : 'path=/'
+    const cookieOptions = getTelemetryCookieOptions()
 
-    const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(telemetryStorageKey))
+    const telemetryCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith(`${telemetryStorageKey}=`)
+    )
     if (telemetryCookie) return
 
-    const telemetryData = getSharedTelemetryData(router.pathname)
+    const telemetryData = getSharedTelemetryData(window.location.pathname)
 
-    if (!hasAcceptedConsent) {
-      const encodedData = encodeURIComponent(JSON.stringify(telemetryData))
-      document.cookie = `${telemetryStorageKey}=${encodedData}; ${cookieOptions}`
-    }
-  }, [hasAcceptedConsent, router?.isReady, telemetryStorageKey, title, router?.pathname, referrer])
+    const encodedData = encodeURIComponent(JSON.stringify(telemetryData))
+    document.cookie = `${telemetryStorageKey}=${encodedData}; ${cookieOptions}`
+  }, [enabled, telemetryStorageKey])
 }
 
 export default useTelemetryCookie

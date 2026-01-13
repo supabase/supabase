@@ -28,7 +28,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const AccountConnections = () => {
   const {

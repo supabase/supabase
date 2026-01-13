@@ -13,6 +13,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/code/complete',
   '/ai/sql/cron-v2',
   '/ai/sql/title-v2',
+  '/ai/sql/filter-v1',
   '/ai/onboarding/design',
   '/ai/feedback/classify',
   '/ai/docs',
@@ -24,6 +25,8 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/generate-attachment-url',
+  '/incident-status',
+  '/api/integrations/stripe-sync',
 ]
 
 export function proxy(request: NextRequest) {
