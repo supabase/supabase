@@ -17,7 +17,7 @@ Sometimes it can help to look at Postgres query plans inside a function. The pro
 - `auto_explain.log_analyze`: capture the `explain analyze` results instead of `explain`
 - `auto_explain.log_min_duration`: if a query is expected to run for longer than the setting's threshold, log the plan
 
-Changing these settings at a broad scale can result in excess logging. Instead, one can change the configs within a `begin/rollback` block with the `set local` command. This ensures the changes are isolated to the transaction, and any writes made during testing are undone.
+Changing these settings at a broad scale can lead to excessive logging. Instead, you can change the configs within a `begin/rollback` block with the `set local` command. This ensures the changes are isolated to the transaction, and any writes made during testing are undone.
 
 ```sql
 begin;
