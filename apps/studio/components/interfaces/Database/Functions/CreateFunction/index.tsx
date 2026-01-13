@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -79,6 +79,8 @@ export const CreateFunction = ({
   const { data: project } = useSelectedProjectQuery()
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
+  const lastInitializedFuncIdRef = useRef<number | undefined>(undefined)
+  const wasVisibleRef = useRef(false)
 
   const isEditing = !isDuplicating && !!func?.id
 
@@ -138,21 +140,35 @@ export const CreateFunction = ({
   }
 
   useEffect(() => {
+    const funcId = func?.id
+    const isOpening = visible && !wasVisibleRef.current
+    const funcChanged = funcId !== lastInitializedFuncIdRef.current
+
     if (visible) {
-      setFocusedEditor(false)
-      form.reset({
-        name: func?.name ?? '',
-        schema: func?.schema ?? 'public',
-        args: convertArgumentTypes(func?.argument_types || '').value,
-        behavior: func?.behavior ?? 'VOLATILE',
-        definition: func?.definition ?? '',
-        language: func?.language ?? 'plpgsql',
-        return_type: func?.return_type ?? 'void',
-        security_definer: func?.security_definer ?? false,
-        config_params: convertConfigParams(func?.config_params).value,
-      })
+      // Only reset if panel is opening or function ID actually changed
+      if (isOpening || funcChanged) {
+        setFocusedEditor(false)
+        form.reset({
+          name: func?.name ?? '',
+          schema: func?.schema ?? 'public',
+          args: convertArgumentTypes(func?.argument_types || '').value,
+          behavior: func?.behavior ?? 'VOLATILE',
+          definition: func?.definition ?? '',
+          language: func?.language ?? 'plpgsql',
+          return_type: func?.return_type ?? 'void',
+          security_definer: func?.security_definer ?? false,
+          config_params: convertConfigParams(func?.config_params).value,
+        })
+        lastInitializedFuncIdRef.current = funcId
+      }
+      wasVisibleRef.current = true
+    } else {
+      // Reset tracking when panel closes
+      wasVisibleRef.current = false
+      lastInitializedFuncIdRef.current = undefined
     }
-  }, [visible, func])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, func?.id])
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
