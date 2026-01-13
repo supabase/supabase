@@ -303,12 +303,77 @@ language="typescript"
 />
 </$CodeTabs>
 
+### Sign in with OAuth
+
+To sign in with an OAuth provider (like Google, GitHub, etc.), create a form action that calls `signInWithOAuth` and redirects to the provider's authentication page.
+
+```ts name=src/routes/login/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { Actions } from './$types'
+
+export const actions: Actions = {
+  signInWithOAuth: async ({ locals: { supabase }, url }) => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github', // or 'google', 'discord', etc.
+      options: {
+        redirectTo: `${url.origin}/auth/callback`
+      }
+    })
+
+    if (error) {
+      console.error(error)
+      return redirect(303, '/auth/error')
+    }
+
+    // Redirect to the OAuth provider
+    return redirect(303, data.url)
+  }
+}
+```
+
+Then create a form to trigger the action:
+
+```svelte name=src/routes/login/+page.svelte
+<form method="POST" action="?/signInWithOAuth">
+  <button type="submit">Sign in with GitHub</button>
+</form>
+```
+
+After the user authenticates with the OAuth provider, they'll be redirected back to your callback route. Create a callback route to handle the code exchange:
+
+```ts name=src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/'
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      return redirect(303, `/${next.slice(1)}`)
+    }
+  }
+
+  // Return the user to an error page with instructions
+  return redirect(303, '/auth/error')
+}
+```
+
+<Admonition type="tip">
+
+Make sure to add your callback URL (`http://localhost:5173/auth/callback` for local development) to your [redirect allow list](/docs/guides/auth/redirect-urls) in the Supabase dashboard.
+
+</Admonition>
+
 ## Congratulations
 
 You're done! To recap, you've successfully:
 
 - Set up server-side hooks to create a request-specific Supabase client and guard protected pages.
 - Created a Supabase client in your root layout to use on both the client and server.
+- Set up OAuth authentication with a callback route to exchange the auth code for a session.
 
 You can now use any Supabase features from your client or server code!
 
