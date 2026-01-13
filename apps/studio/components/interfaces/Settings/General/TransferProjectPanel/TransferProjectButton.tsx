@@ -3,33 +3,37 @@ import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useQueryClient } from '@tanstack/react-query'
+import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { projectKeys } from 'data/projects/keys'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-const TransferProjectButton = () => {
-  const project = useSelectedProject()
+export const TransferProjectButton = () => {
+  const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
-  const { data: allOrganizations } = useOrganizationsQuery()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { data: allOrganizations } = useOrganizationsQuery({ enabled: isOpen })
   const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || []).filter((it) => it.id !== projectOrgId)
 
-  const [isOpen, setIsOpen] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState()
 
   const {
     mutate: transferProject,
     error: transferError,
-    isLoading: isTransferring,
+    isPending: isTransferring,
   } = useProjectTransferMutation({
     onSuccess: () => {
       toast.success(`Successfully transferred project ${project?.name}.`)
@@ -40,12 +44,12 @@ const TransferProjectButton = () => {
   const {
     data: transferPreviewData,
     error: transferPreviewError,
-    isLoading: transferPreviewIsLoading,
-    remove,
+    isPending: transferPreviewIsLoading,
   } = useProjectTransferPreviewQuery(
     { projectRef, targetOrganizationSlug: selectedOrg },
     { enabled: !isTransferring && isOpen }
   )
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (isOpen) {
@@ -53,11 +57,17 @@ const TransferProjectButton = () => {
       setSelectedOrg(undefined)
     } else {
       // Invalidate cache
-      remove()
+      queryClient.removeQueries({
+        queryKey: projectKeys.projectTransferPreview(projectRef, selectedOrg),
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canTransferProject } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const toggle = () => {
     setIsOpen(!isOpen)
@@ -161,7 +171,7 @@ const TransferProjectButton = () => {
           <DocsButton
             abbrev={false}
             className="mt-6"
-            href="https://supabase.com/docs/guides/platform/project-transfer"
+            href={`${DOCS_URL}/guides/platform/project-transfer`}
           />
         </Modal.Content>
 
@@ -172,8 +182,7 @@ const TransferProjectButton = () => {
             <div className="space-y-2">
               {organizations.length === 0 ? (
                 <div className="flex items-center gap-3 bg-surface-200 p-3 text-sm rounded-md border">
-                  <InfoIcon /> You do not have any organizations with an organization-based
-                  subscription.
+                  <InfoIcon /> You do not have any organizations you can transfer your project to.
                 </div>
               ) : (
                 <Listbox
@@ -206,15 +215,6 @@ const TransferProjectButton = () => {
           <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
             <Modal.Content>
               <div className="space-y-2">
-                {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-                  <Admonition type="warning" title="Warnings for project transfer" className="mt-3">
-                    <div className="space-y-1">
-                      {transferPreviewData.warnings.map((warning) => (
-                        <p key={warning.key}>{warning.message}</p>
-                      ))}
-                    </div>
-                  </Admonition>
-                )}
                 {transferPreviewData && transferPreviewData.errors.length > 0 && (
                   <Admonition type="danger" title="Project cannot be transferred">
                     <div className="space-y-1">
@@ -246,26 +246,38 @@ const TransferProjectButton = () => {
                     )}
                   </Admonition>
                 )}
+                {transferPreviewData &&
+                  (transferPreviewData.warnings.length > 0 ||
+                    transferPreviewData.info.length > 0) && (
+                    <Admonition type="caution" showIcon={false} className="mt-3">
+                      <div className="flex flex-col gap-y-2">
+                        {transferPreviewData.warnings.map((warning) => (
+                          <div key={warning.key} className="flex items-center gap-2">
+                            <WarningIcon className="flex-shrink-0" />
+                            <p className="mb-0.5">{warning.message}</p>
+                          </div>
+                        ))}
+                        {transferPreviewData.info.map((info) => (
+                          <div key={info.key} className="flex items-start gap-2">
+                            <InfoIcon className="flex-shrink-0 mt-0.5" />
+                            <p className="mb-0.5">{info.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Admonition>
+                  )}
                 {transferPreviewError && !transferError && (
                   <Admonition
                     type="danger"
                     title="Project cannot be transferred"
-                    description={
-                      <>
-                        <p>{transferPreviewError.message}</p>
-                      </>
-                    }
+                    description={transferPreviewError.message}
                   />
                 )}
                 {transferError && (
                   <Admonition
                     type="danger"
                     title="Project cannot be transferred"
-                    description={
-                      <>
-                        <p>{transferError.message}</p>
-                      </>
-                    }
+                    description={transferError.message}
                   />
                 )}
               </div>
@@ -276,5 +288,3 @@ const TransferProjectButton = () => {
     </>
   )
 }
-
-export default TransferProjectButton

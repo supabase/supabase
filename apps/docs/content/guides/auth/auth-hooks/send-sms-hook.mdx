@@ -1,14 +1,15 @@
 ---
 id: 'send-sms-hook'
 title: 'Send SMS Hook'
-subtitle: 'Use a custom SMS provider to send authentication messages'
+subtitle: 'Use your own SMS service to send authentication messages.'
 ---
 
-Runs before a message is sent. Use the hook to:
+The Send SMS Hook replaces Supabase's built-in SMS sending. You can use this hook to:
 
 - Use a regional SMS Provider
 - Use alternate messaging channels such as WhatsApp
-- Adjust the message body to include platform specific fields such as the [AppHash](https://developers.google.com/identity/sms-retriever/overview)
+- Fall back to another provider if your primary one fails
+- Adjust the message body to include platform specific fields such as the [`AppHash`](https://developers.google.com/identity/sms-retriever/overview)
 
 **Inputs**
 
@@ -464,7 +465,7 @@ const sendTextMessage = async (
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET').replace('v1,whsec_', '')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret)
   try {
@@ -494,7 +495,7 @@ Deno.serve(async (req) => {
       )
     }
     return new Response(
-      {},
+      JSON.stringify({}),
       {
         status: 200,
         headers: {
@@ -527,12 +528,8 @@ Deno.serve(async (req) => {
 Your company is expanding into Latin America and would like to use WhatsApp for higher deliverability. Write a hook to send WhatsApp messages to requests from the continent and SMS messages to all other numbers.
 
 ```javascript
-import {
-    Webhook
-} from "https://esm.sh/standardwebhooks@1.0.0";
-import {
-    readAll
-} from "https://deno.land/std/io/read_all.ts";
+import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
+import { readAll } from "https://deno.land/std/io/read_all.ts";
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
 const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -580,7 +577,7 @@ const sendMessage = async (
 
 Deno.serve(async (req) => {
     const payload = await req.text();
-    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET");
+    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET").replace('v1,whsec_', '');
     const headers = Object.fromEntries(req.headers);
     const wh = new Webhook(base64_secret);
     try {

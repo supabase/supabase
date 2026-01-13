@@ -1,4 +1,4 @@
-import { A_Const, A_Expr, ColumnRef, CreatePolicyStmt, Node, parseQuery } from 'libpg-query'
+import { A_Const, A_Expr, ColumnRef, CreatePolicyStmt, Node, parseQuery } from 'libpg-query/wasm'
 
 export type PolicyInfo = {
   name: string

@@ -1,5 +1,7 @@
+import { DOCS_URL } from 'lib/constants'
+
 interface ResourceWarningMessage {
-  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
   restrictToRoutes?: string[]
 
   bannerContent: {
@@ -41,8 +43,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'Database is no longer accepting write requests.',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View Compute and Disk',
+    docsUrl: `${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`,
+    buttonText: 'Learn more',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -69,8 +71,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
-    buttonText: 'Check usage',
+    docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
+    buttonText: 'Learn more',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
@@ -79,12 +81,12 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         title:
           'Your project is about to exhaust its available disk space, and may become unresponsive once fully exhausted',
         description:
-          'You can opt to increase your disk size up to 200GB on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the Database Settings page.',
       },
       critical: {
         title: 'Your project has exhausted its available disk space, and may become unresponsive',
         description:
-          'You can opt to increase your disk size up to 200GB on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the Database Settings page.',
       },
     },
     cardContent: {
@@ -97,7 +99,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+    docsUrl: `${DOCS_URL}/guides/platform/database-size#disk-management`,
     buttonText: undefined,
     metric: 'disk_space',
   },
@@ -124,8 +126,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
-    buttonText: 'Check usage',
+    docsUrl: `${DOCS_URL}/guides/troubleshooting/high-cpu-usage`,
+    buttonText: 'Learn more',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -152,8 +154,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
-    buttonText: 'Check usage',
+    docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-ram`,
+    buttonText: 'Learn more',
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {
@@ -180,8 +182,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: undefined,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits',
-    buttonText: 'Enable Custom SMTP',
+    docsUrl: `${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`,
+    buttonText: 'Enable custom SMTP',
     metric: 'auth_email_rate_limit',
   },
   multiple_resource_warnings: {

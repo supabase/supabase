@@ -1,0 +1,42 @@
+---
+id: 'metrics'
+title: 'Metrics API'
+description: 'Export Supabase database metrics to any Prometheus-compatible tool'
+---
+
+Every Supabase project exposes a [Prometheus](https://prometheus.io/)-compatible **Metrics API** endpoint that surfaces ~200 Postgres performance and health series. You can scrape it into any observability stack to power custom dashboards, alerting rules, or long-term retention that goes beyond what Supabase Studio provides out of the box.
+
+<Admonition type="note">
+
+The Metrics API is currently in beta. Metric names and labels might evolve as we expand the dataset, and the feature is not available in self-hosted Supabase instances.
+
+</Admonition>
+
+## What you can do with the Metrics API
+
+- Stream database CPU, IO, WAL, connection, and query stats into Prometheus-compatible systems.
+- Combine Supabase metrics with application signals in Grafana, Datadog, or any other observability vendor.
+- Reuse our [supabase-grafana dashboard JSON](https://github.com/supabase/supabase-grafana) to bootstrap over 200 ready-made charts.
+- Build your own alerting policies (right-sizing, saturation detection, index regression, and more).
+
+<$Partial path="metrics_access.mdx" />
+
+## Choose your monitoring stack
+
+Pick the workflow that best matches your tooling. Cards link to Supabase-authored guides or vendor integration docs, and some include a “Community” pill when there’s an accompanying vendor reference.
+
+<MetricsStackCards />
+
+<img
+  src="/docs/img/guides/platform/supabase-grafana-prometheus.png"
+  alt="Supabase Grafana dashboard showcasing database metrics"
+  className="mt-8 rounded-lg border border-foreground/10 shadow-sm"
+/>
+
+## Additional resources
+
+- [Supabase Grafana repository](https://github.com/supabase/supabase-grafana) for dashboard JSON and alert examples.
+- [Grafana Cloud’s Supabase integration doc](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) (community-maintained, built on this Metrics API).
+- [Datadog’s Supabase integration doc](https://docs.datadoghq.com/integrations/supabase/) (community-maintained, built on this Metrics API).
+- [Log Drains ](/docs/guides/telemetry/log-drains) for exporting event-based telemetry alongside metrics.
+- [Query Performance report](/dashboard/project/_/observability/query-performance) for built-in visualizations based on the same underlying metrics.

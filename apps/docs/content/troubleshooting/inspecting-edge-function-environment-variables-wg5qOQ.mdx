@@ -22,7 +22,7 @@ Sometimes it can be informative to log values from your Edge Functions. This wal
 npx supabase init
 ```
 
-3. create a .env file in the supabase folder
+3. create a .env file in the `supabase` folder
 
 ```bash
 echo "MY_NAME=Some_name" >> ./supabase/.env
@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
 })
 ```
 
-After calling your function, you can check your [edge function logs](https://supabase.com/dashboard/project/_/functions/hello-world/logs?s=logging) to observe the logged values. It should look something like this:
+After calling your function, you can check your [edge function logs](/dashboard/project/_/functions/hello-world/logs?s=logging) to observe the logged values. It should look something like this:
 
 > Note: search filters are case sensitive and must be present in the event message.
 

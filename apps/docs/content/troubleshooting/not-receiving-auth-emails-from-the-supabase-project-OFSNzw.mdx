@@ -7,11 +7,11 @@ keywords = [ "smtp", "email", "delivery", "logs", "provider", "firewalls" ]
 database_id = "98e3b318-ad9a-41f5-ada0-44b61970ab4f"
 ---
 
-**We strongly recommend configuring your own custom SMTP provider** in your projects to avoid running into issues with sending emails from your project. The built-in email provider is for demonstration purposes only and offers a very low rate limit. You can read more details about the rate limits [here](https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits).
+**We strongly recommend configuring your own custom SMTP provider** in your projects to avoid running into issues with sending emails from your project. The built-in email provider is for demonstration purposes only and offers a very low rate limit. You can read more details about the rate limits [here](/docs/guides/platform/going-into-prod#auth-rate-limits).
 
 If you're testing your Supabase projects, consider configuring an email testing tool like [Mailtrap](https://mailtrap.io/) to test your emails. It's an email sandbox tool that helps debug emails without actually sending an email to an end user.
 
-As the initial step in debugging not-delivered emails, check your project's [Auth logs](https://supabase.com/dashboard/project/_/logs/auth-logs) for errors that can occur when handing over to the email providers. In general, handover issues can occur due to misconfiguration of the custom SMTP provider.
+As the initial step in debugging not-delivered emails, check your project's [Auth logs](/dashboard/project/_/logs/auth-logs) for errors that can occur when handing over to the email providers. In general, handover issues can occur due to misconfiguration of the custom SMTP provider.
 
 Once handed over to the email provider, Supabase has no control over email delivery. There can be multiple reasons why emails do not reach the user's inbox.
 
@@ -23,7 +23,6 @@ The email provider's logs are the next place to look for email delivery issues. 
 
 Many email firewalls maintain a denylist of IPs and domain names for security reasons and as spam filters. Sometimes, they block incoming emails from unknown addresses with certain keywords such as password reset, verification link, etc. In these cases, ask the user to check with their email server admin to see if they are blocking your email domain or quarantining the incoming emails. If you use the default provider, the email domain is `supabase.io`. Some information on email firewalls are available here - https://mailchimp.com/help/about-email-firewalls/.
 
-I haven't mentioned the most obvious cases, like checking a user's spam inbox. However, It's worth noting that sometimes this can happen with a default provider. It's also one of the reasons that you should configure your own email provider where you have more control over email delivery.
-
+There are other obvious failure reasons, including a message going to spam. These can sometimes happen with a default provider. For this reason (among others), you should configure your own email provider to have control over email delivery.
 References:
 Configure a Custom SMTP - https://supabase.com/docs/guides/auth/auth-smtp

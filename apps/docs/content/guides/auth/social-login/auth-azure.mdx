@@ -24,7 +24,7 @@ Setting up OAuth with Azure consists of four broad steps:
 
 - Under Microsoft Entra ID, select _App registrations_ in the side panel and select _New registration._
 - Choose a name and select your preferred option for the supported account types.
-- Specify a _Web_ _Redirect URI_. It should should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
+- Specify a _Web_ _Redirect URI_. It should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
 - Finally, select _Register_ at the bottom of the screen.
 
 ![Register an application.](/docs/img/guides/auth-azure/azure-register-app.png)
@@ -43,6 +43,25 @@ Setting up OAuth with Azure consists of four broad steps:
 - Once the secret is generated place the _Value_ column (not _Secret ID_) in the Azure configuration screen in the Supabase Auth dashboard.
 
 ![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
+
+You can also configure the Azure auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Azure auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_azure_enabled": true,
+    "external_azure_client_id": "your-azure-client-id",
+    "external_azure_secret": "your-azure-client-secret",
+    "external_azure_url": "your-azure-url"
+  }'
+```
 
 ## Guarding against unverified email domains
 
@@ -103,6 +122,7 @@ By default, Supabase Auth uses the _common_ Microsoft tenant (`https://login.mic
 
 If your app is registered as _Personal Microsoft accounts only_ for the _Supported account types_ set Microsoft tenant to _consumers_ (`https://login.microsoftonline.com/consumers`).
 
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 If your app is registered as _My organization only_ for the _Supported account types_ you may want to configure Supabase Auth with the organization's tenant URL. This will use the tenant's authorization flows instead, and will limit access at the Supabase Auth level to Microsoft accounts arising from only the specified tenant.
 
 Configure this by storing a value under _Azure Tenant URL_ in the Supabase Auth provider configuration page for Azure that has the following format `https://login.microsoftonline.com/<tenant-id>`.
@@ -124,11 +144,15 @@ Supabase Auth requires that Azure returns a valid email address. Therefore you m
 >
 <TabPanel id="js" label="JavaScript">
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
@@ -142,7 +166,7 @@ async function signInWithAzure() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `azure` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```dart
 Future<void> signInWithAzure() async {
@@ -156,6 +180,7 @@ Future<void> signInWithAzure() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Azure` as the `Provider`:
@@ -169,9 +194,10 @@ suspend fun signInWithAzure() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -185,6 +211,10 @@ suspend fun signInWithAzure() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
@@ -202,6 +232,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -213,6 +244,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Obtain the provider refresh token
@@ -229,6 +261,10 @@ Azure OAuth2.0 doesn't return the `provider_refresh_token` by default. If you ne
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
@@ -252,6 +288,7 @@ Future<void> signInWithAzure() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -263,6 +300,7 @@ suspend fun signInWithAzure() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

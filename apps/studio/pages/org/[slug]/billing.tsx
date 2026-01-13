@@ -1,10 +1,11 @@
-import { useParams } from 'common'
-import { BillingSettings } from 'components/interfaces/Organization'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { Loading } from 'components/ui/Loading'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useEffect } from 'react'
+
+import { useParams } from 'common'
+import { BillingSettings } from 'components/interfaces/Organization/BillingSettings/BillingSettings'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
@@ -12,10 +13,10 @@ import {
 import type { NextPageWithLayout } from 'types'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
-  const { panel } = useParams()
+  const { panel, slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
-  const selectedOrganization = useSelectedOrganization()
+
+  const showBilling = useIsFeatureEnabled('billing:all')
 
   useEffect(() => {
     const allowedValues = ['subscriptionPlan', 'costControl']
@@ -26,16 +27,16 @@ const OrgBillingSettings: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel])
 
-  return (
-    <>
-      {selectedOrganization === undefined && isLoadingPermissions ? (
-        <Loading />
-      ) : (
-        <BillingSettings />
-      )}
-    </>
-  )
+  if (!showBilling) {
+    return <UnknownInterface urlBack={`/org/${slug}`} />
+  }
+
+  return <BillingSettings />
 }
 
-OrgBillingSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgBillingSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <OrganizationLayout>{page}</OrganizationLayout>
+  </DefaultLayout>
+)
 export default OrgBillingSettings

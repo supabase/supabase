@@ -11,7 +11,7 @@ database_id = "188986c9-019d-4f26-baaf-6f58cec8fa7a"
 
 # Navigating the API logs:
 
-The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](https://supabase.com/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
+The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
 
 The log table that contains API requests is `edge_logs`.
 
@@ -43,7 +43,7 @@ from
 
 The most useful fields for debugging are:
 
-> NOTE: not every field is included below. For a full list, check the API Edge field reference in the [Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer)
+> NOTE: not every field is included below. For a full list, check the API Edge field reference in the [Log Explorer](/dashboard/project/_/logs/explorer)
 
 ## Request object
 
@@ -215,7 +215,7 @@ PostgREST has an [error reference table](https://postgrest.org/en/v12/references
 
 ### Database-level errors
 
-However, some errors that are reported through the Database API occur at the PostgreSQL level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
+However, some errors that are reported through the Database API occur at the Postgres level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
 
 ```sql
 select
@@ -246,11 +246,11 @@ order by
 limit 100;
 ```
 
-Like PostgREST, PostgreSQL has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
+Like PostgREST, Postgres has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
 
 ## PostgREST server and Cloudflare errors
 
-In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](https://supabase.com/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout))
+In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout))
 
 # Practical examples:
 

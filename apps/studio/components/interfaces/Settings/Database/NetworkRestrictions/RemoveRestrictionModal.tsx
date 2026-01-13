@@ -19,13 +19,13 @@ const RemoveRestrictionModal = ({
 }: RemoveRestrictionModalProps) => {
   const { ref } = useParams()
 
-  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: visible })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
   // @ts-ignore [Joshen] API typing issue
   const ipv6Restrictions: string[] = data?.config?.dbAllowedCidrsV6 ?? []
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
 
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
       onError: (error) => {
@@ -68,8 +68,8 @@ const RemoveRestrictionModal = ({
     >
       <Modal.Content className="space-y-4">
         <p className="text-sm text-foreground-light">
-          The IPv4 address <code className="text-xs">{selectedRestriction}</code> will be removed
-          from your list of network restrictions
+          The IPv4 address <code className="text-code-inline">{selectedRestriction}</code> will be
+          removed from your list of network restrictions
           {isRemovingOnlyRestriction
             ? '.'
             : ", and no longer have access to your project's database."}

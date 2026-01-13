@@ -1,4 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { fdwKeys } from './keys'
 
@@ -59,13 +60,13 @@ export type FDW = {
   name: string
   handler: string
   server_name: string
-  server_options: string[]
+  server_options: string[] | null
   tables: FDWTable[]
 }
 
 export type FDWsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getFDWs(
@@ -87,13 +88,11 @@ export type FDWsError = ExecuteSqlError
 
 export const useFDWsQuery = <TData = FDWsData>(
   { projectRef, connectionString }: FDWsVariables,
-  { enabled = true, ...options }: UseQueryOptions<FDWsData, FDWsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<FDWsData, FDWsError, TData> = {}
 ) =>
-  useQuery<FDWsData, FDWsError, TData>(
-    fdwKeys.list(projectRef),
-    ({ signal }) => getFDWs({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FDWsData, FDWsError, TData>({
+    queryKey: fdwKeys.list(projectRef),
+    queryFn: ({ signal }) => getFDWs({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

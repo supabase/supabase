@@ -3,11 +3,11 @@ import { Menu, X } from 'lucide-react'
 import { memo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
-import type { DragItem, Sort, SupaTable } from 'components/grid/types'
-import { Button, Toggle } from 'ui'
+import type { DragItem, Sort } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button, Switch } from 'ui'
 
 export interface SortRowProps {
-  table: SupaTable
   index: number
   columnName: string
   sort: Sort
@@ -16,8 +16,9 @@ export interface SortRowProps {
   onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
-  const column = table.columns.find((x) => x.name === columnName)
+const SortRow = ({ index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const column = snap.table.columns.find((x) => x.name === columnName)
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -112,17 +113,14 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
           <span className="text-xs text-foreground-lighter">
             {index > 0 ? 'then by' : 'sort by'}
           </span>
-          {column.name}
+          <span className="text-xs">{column.name}</span>
         </span>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-x-1.5">
         <label className="text-xs text-foreground-lighter">ascending:</label>
-        <Toggle
-          size="tiny"
-          layout="flex"
+        <Switch
           defaultChecked={sort.ascending}
-          // @ts-ignore
-          onChange={(e: boolean) => onToggle(columnName, e)}
+          onCheckedChange={(e: boolean) => onToggle(columnName, e)}
         />
       </div>
       <Button

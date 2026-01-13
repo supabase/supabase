@@ -9,7 +9,7 @@ Firebase Auth can be used as a third-party authentication provider alongside Sup
 ## Getting started
 
 1. First you need to add an integration to connect your Supabase project with your Firebase project. You will need to get the Project ID in the [Firebase Console](https://console.firebase.google.com/u/0/project/_/settings/general).
-2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party).
 3. If you are using Third Party Auth when self hosting, create and attach restrictive RLS policies to all tables in your public schema, Storage and Realtime to **prevent unauthorized access from unrelated Firebase projects**.
 4. Assign the `role: 'authenticated'` [custom user claim](https://firebase.google.com/docs/auth/admin/custom-claims) to all your users.
 5. Finally set up the Supabase client in your application.
@@ -25,16 +25,45 @@ Creating a client for the Web is as easy as passing the `accessToken` async func
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    return await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
-  },
-})
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return (await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
+    },
+  }
+)
 ```
 
 Make sure the all users in your application have the `role: 'authenticated'` [custom claim](https://firebase.google.com/docs/auth/admin/custom-claims) set. If you're using the `onCreate` Cloud Function to add this custom claim to newly signed up users, you will need to call `getIdToken(/* forceRefresh */ true)` immediately after sign up as the `onCreate` function does not run synchronously.
 
 </TabPanel>
+
+<$Show if="sdk:dart">
+
+<TabPanel id="dart" label="Flutter">
+
+Creating a client for the Web is as easy as passing the `accessToken` async function. This function should [return the Firebase Auth JWT of the current user](https://firebase.google.com/docs/auth/admin/verify-id-tokens) (or null if no such user) is found.
+
+```dart
+await Supabase.initialize(
+  url: supabaseUrl,
+  anonKey: supabaseKey,
+  debug: false,
+  accessToken: () async {
+    final token = await FirebaseAuth.instance.currentUser?.getIdToken();
+    return token;
+  },
+);
+```
+
+Make sure the all users in your application have the `role: 'authenticated'` [custom claim](https://firebase.google.com/docs/auth/admin/custom-claims) set. If you're using the `onCreate` Cloud Function to add this custom claim to newly signed up users, you will need to call `getIdToken(/* forceRefresh */ true)` immediately after sign up as the `onCreate` function does not run synchronously.
+
+</TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -46,7 +75,7 @@ struct MissingFirebaseTokenError: Error {}
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -62,6 +91,9 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlin" label="Kotlin (Android)">
 
@@ -73,7 +105,7 @@ import com.google.firebase.ktx.Firebase
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         Firebase.auth.currentUser?.getIdToken(false)?.await()?.token
@@ -82,6 +114,9 @@ val supabase = createSupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlinmp" label="Kotlin (Multiplatform)">
 
@@ -93,7 +128,7 @@ import dev.gitlive.firebase.auth.auth
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         Firebase.auth.currentUser?.getIdToken(false)
@@ -102,12 +137,13 @@ val supabase = createSupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 
 ## Add a new Third-Party Auth integration to your project
 
-In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
 In the CLI add the following config to your `supabase/config.toml` file:
 
@@ -121,7 +157,7 @@ project_id = "<id>"
 
 <Admonition type="caution">
 
-**Please follow this section carefully to prevent unauthorized access to your project's data when self-hosting.**
+**Follow this section carefully to prevent unauthorized access to your project's data when self-hosting.**
 
 When using the Supabase hosted platform, following this step is optional.
 

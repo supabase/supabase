@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router'
 
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import { LogsTableEmptyState } from 'components/interfaces/Settings/Logs/LogsTableEmptyState'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
-import { LogsTableEmptyState } from 'components/interfaces/Settings/Logs/LogsTableEmptyState'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -26,6 +27,10 @@ export const LogPage: NextPageWithLayout = () => {
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Postgrest Logs">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Postgrest Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

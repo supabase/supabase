@@ -2,9 +2,10 @@ export const SCHEMAS_SQL = /* SQL */ `
 -- Adapted from information_schema.schemata
 
 select
-  n.oid::int8 as id,
+  n.oid as id,
   n.nspname as name,
-  u.rolname as owner
+  u.rolname as owner,
+   obj_description(n.oid, 'pg_namespace') AS comment
 from
   pg_namespace n,
   pg_roles u

@@ -4,14 +4,17 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
-import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import {
-  ProjectServiceStatus,
+  ProjectServiceStatus as APIProjectServiceStatus,
+  ServiceHealthResponse,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   InfoIcon,
@@ -19,27 +22,28 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
-const StatusMessage = ({
+export type ProjectServiceStatus = APIProjectServiceStatus | 'DISABLED'
+
+export const StatusMessage = ({
   status,
   isLoading,
-  isSuccess,
   isProjectNew,
 }: {
   isLoading: boolean
-  isSuccess: boolean
   isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
   if (isLoading) return 'Checking status'
-  if (isProjectNew) return 'Coming up...'
-  if (isSuccess) return 'No issues'
+  if (status === 'DISABLED') return 'Disabled'
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  // isProjectNew has to be after all other statuses
+  if (isProjectNew) return 'Coming up...'
+  if (status) return status
   return 'Unable to connect'
 }
 
@@ -51,27 +55,39 @@ const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
 const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 
-const StatusIcon = ({
+export const StatusIcon = ({
   isLoading,
-  isSuccess,
   isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
-  isSuccess: boolean
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isLoading || isProjectNew) return <LoaderIcon />
-  if (isSuccess) return <CheckIcon />
-  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
+  //
+  if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (projectStatus === 'DISABLED') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (isLoading) return <LoaderIcon />
+  // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
+  if (isProjectNew) return <LoaderIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   return <AlertIcon />
 }
 
-const ServiceStatus = () => {
+/*
+ * Extract the db_schema from the response.info object
+ */
+export const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
+  if (response?.info && 'db_schema' in response.info) {
+    return response.info.db_schema
+  }
+  return undefined
+}
+
+export const ServiceStatus = () => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
   const {
@@ -88,17 +104,53 @@ const ServiceStatus = () => {
 
   const isBranch = project?.parentRef !== project?.ref
 
+  // Get branches data when on a branch
+  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
+    { projectRef: isBranch ? project?.parentRef : undefined },
+    {
+      enabled: isBranch,
+      refetchInterval: (query) => {
+        const data = query.state.data
+        if (!data) return false
+        const currentBranch = data.find((branch) => branch.project_ref === ref)
+        return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
+          currentBranch?.status || ''
+        )
+          ? false
+          : 5000
+      },
+    }
+  )
+
+  const currentBranch = isBranch
+    ? branches?.find((branch) => branch.project_ref === ref)
+    : undefined
+
   // [Joshen] Need pooler service check eventually
   const {
     data: status,
-    isLoading,
+    isPending: isLoading,
     refetch: refetchServiceStatus,
   } = useProjectServiceStatusQuery(
     {
       projectRef: ref,
     },
     {
-      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
+      refetchInterval: (query) => {
+        const data = query.state.data
+        const isServiceUnhealthy = data?.some((service) => {
+          // if the postgrest service has an empty schema, the user chose to turn off postgrest during project creation
+          if (service.name === 'rest' && extractDbSchema(service) === '') {
+            return false
+          }
+          if (service.status === 'ACTIVE_HEALTHY') {
+            return false
+          }
+          return true
+        })
+
+        return isServiceUnhealthy ? 5000 : false
+      },
     }
   )
   const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
@@ -107,27 +159,18 @@ const ServiceStatus = () => {
         projectRef: ref,
       },
       {
-        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
+        refetchInterval: (query) => {
+          const data = query.state.data
+          return !data?.healthy ? 5000 : false
+        },
       }
     )
-  const {
-    isLoading: isLoadingPostgres,
-    isSuccess: isSuccessPostgres,
-    refetch: refetchPostgresServiceStatus,
-  } = usePostgresServiceStatusQuery(
-    {
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      refetchInterval: (data) => (data === null ? 5000 : false),
-    }
-  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
+  const dbStatus = status?.find((service) => service.name === 'db')
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -135,16 +178,15 @@ const ServiceStatus = () => {
     error?: string
     docsUrl?: string
     isLoading: boolean
-    isSuccess?: boolean
+    status: ProjectServiceStatus
     logsUrl: string
-    status?: ProjectServiceStatus
   }[] = [
     {
       name: 'Database',
       error: undefined,
       docsUrl: undefined,
-      isLoading: isLoadingPostgres,
-      isSuccess: isSuccessPostgres,
+      isLoading: isLoading,
+      status: dbStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgres-logs',
     },
     {
@@ -152,8 +194,8 @@ const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      isSuccess: restStatus?.healthy,
-      status: restStatus?.status,
+      // If PostgREST has an empty schema, it means it's been disabled
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -163,8 +205,7 @@ const ServiceStatus = () => {
             error: authStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: authStatus?.healthy,
-            status: authStatus?.status,
+            status: authStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/auth-logs',
           },
         ]
@@ -176,8 +217,7 @@ const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: realtimeStatus?.healthy,
-            status: realtimeStatus?.status,
+            status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/realtime-logs',
           },
         ]
@@ -189,8 +229,7 @@ const ServiceStatus = () => {
             error: storageStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: storageStatus?.healthy,
-            status: storageStatus?.status,
+            status: storageStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/storage-logs',
           },
         ]
@@ -200,17 +239,45 @@ const ServiceStatus = () => {
           {
             name: 'Edge Functions',
             error: undefined,
-            docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+            docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
-            isSuccess: edgeFunctionsStatus?.healthy,
+            status: edgeFunctionsStatus?.healthy
+              ? 'ACTIVE_HEALTHY'
+              : isLoading
+                ? 'COMING_UP'
+                : ('UNHEALTHY' as ProjectServiceStatus),
             logsUrl: '/logs/edge-functions-logs',
+          },
+        ]
+      : []),
+    ...(isBranch
+      ? [
+          {
+            name: 'Migrations',
+            error: undefined,
+            docsUrl: undefined,
+            isLoading: isBranchesLoading,
+            status: (currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+              ? 'ACTIVE_HEALTHY'
+              : currentBranch?.status === 'FUNCTIONS_FAILED' ||
+                  currentBranch?.status === 'MIGRATIONS_FAILED'
+                ? 'UNHEALTHY'
+                : 'COMING_UP') as ProjectServiceStatus,
+            logsUrl: '/branches',
           },
         ]
       : []),
   ]
 
+  const isMigrationLoading =
+    isBranchesLoading ||
+    currentBranch?.status === 'CREATING_PROJECT' ||
+    currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.isSuccess)
+  // We consider a service operational if it's healthy or intentionally disabled
+  const allServicesOperational = services.every(
+    (service) => service.status === 'ACTIVE_HEALTHY' || service.status === 'DISABLED'
+  )
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
@@ -228,7 +295,6 @@ const ServiceStatus = () => {
 
       timer = setTimeout(() => {
         refetchServiceStatus()
-        refetchPostgresServiceStatus()
         refetchEdgeFunctionServiceStatus()
       }, remainingTimeTillNextCheck * 1000)
     }
@@ -245,7 +311,7 @@ const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks || isProjectNew ? (
+            isLoadingChecks || (!allServicesOperational && isProjectNew && isMigrationLoading) ? (
               <LoaderIcon />
             ) : (
               <div
@@ -256,10 +322,10 @@ const ServiceStatus = () => {
             )
           }
         >
-          {isBranch ? 'Preview Branch' : 'Project'} Status
+          {isBranch ? 'Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -269,7 +335,6 @@ const ServiceStatus = () => {
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
-                isSuccess={!!service.isSuccess}
                 isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
@@ -278,7 +343,6 @@ const ServiceStatus = () => {
                 <p className="text-foreground-light flex items-center gap-1">
                   <StatusMessage
                     isLoading={service.isLoading}
-                    isSuccess={!!service.isSuccess}
                     isProjectNew={isProjectNew}
                     status={service.status}
                   />
@@ -291,16 +355,29 @@ const ServiceStatus = () => {
             </div>
           </Link>
         ))}
-        <PopoverSeparator />
-        <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
-          <div className="mt-0.5">
-            <InfoIcon />
+        {!allServicesOperational && (
+          <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
+            <div className="mt-0.5">
+              <InfoIcon />
+            </div>
+            <div className="flex flex-col gap-y-1">
+              <p>
+                {isProjectNew ? 'New' : 'Recently restored'} projects can take up to{' '}
+                {SERVICE_STATUS_THRESHOLD} minutes to become fully operational.
+              </p>
+              <p>
+                If services stay unhealthy, refer to our{' '}
+                <InlineLink
+                  href={`${DOCS_URL}/guides/troubleshooting/project-status-reports-unhealthy-services`}
+                >
+                  docs
+                </InlineLink>{' '}
+                for more information.
+              </p>
+            </div>
           </div>
-          Recently restored projects can take up to 5 minutes to become fully operational.
-        </div>
+        )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
 }
-
-export default ServiceStatus

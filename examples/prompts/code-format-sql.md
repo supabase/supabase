@@ -1,3 +1,9 @@
+---
+# Specify the following for Cursor rules
+description: Guidelines for writing Postgres SQL
+alwaysApply: false
+---
+
 # Postgres SQL Style Guide
 
 ## General

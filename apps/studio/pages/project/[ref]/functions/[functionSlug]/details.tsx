@@ -1,8 +1,14 @@
-import { EdgeFunctionDetails } from 'components/interfaces/Functions'
-import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
+import { EdgeFunctionDetails } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => <EdgeFunctionDetails />
-PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout

@@ -1,71 +1,58 @@
-import Link from 'next/link'
-import { cn, Collapsible_Shadcn_, CollapsibleTrigger_Shadcn_, CollapsibleContent_Shadcn_ } from 'ui'
-import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { InlineLink } from 'components/ui/InlineLink'
 
-interface OptInToOpenAIToggleProps {
-  className?: string
-}
-export default function OptInToOpenAIToggle({ className }: OptInToOpenAIToggleProps) {
-  const [open, setOpen] = useState(false)
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 
+export const OptInToOpenAIToggle = () => {
   return (
-    <Collapsible_Shadcn_ open={open} onOpenChange={setOpen} className={cn('mt-4', className)}>
-      <CollapsibleTrigger_Shadcn_ asChild>
-        <div className="flex items-center space-x-2 cursor-pointer">
-          <ChevronRight
-            strokeWidth={2}
-            size={16}
-            className={cn('transition-all', open ? 'rotate-90' : '')}
-          />
-          <p className="text-sm text-foreground-light underline">
-            Important information regarding opting in
-          </p>
-        </div>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_>
-        <div className="space-y-2 py-4 text-sm text-foreground-light">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button type="outline" className="w-fit">
+          Learn more about data privacy
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader padding="small" className="border-b">
+          <DialogTitle>Data Privacy and Supabase AI</DialogTitle>
+        </DialogHeader>
+        <DialogSection
+          padding="small"
+          className="flex flex-col gap-y-4 text-sm text-foreground-light"
+        >
           <p>
-            Supabase AI is a chatbot support tool powered by OpenAI. Supabase will share the query
-            you submit and information about the databases you manage through Supabase with OpenAI,
-            L.L.C. and its affiliates in order to provide the Supabase AI tool.
+            Supabase AI utilizes third-party AI providers designed with a strong focus on data
+            privacy and security.
           </p>
+
           <p>
-            OpenAI will only access information about the structure of your databases, such as table
-            names, column and row headings. OpenAI will not access the contents of the database
-            itself.
+            By default, only schema data is shared with third-party AI providers. This is not
+            retained by them nor used as training data. With your permission, Supabase may also
+            share customer-generated prompts, database data, and project logs with these providers.
+            This information is used solely to generate responses to your queries and is not
+            retained by the providers or used to train their models.
           </p>
+
           <p>
-            OpenAI uses this information to generate responses to your query, and does not retain or
-            use the information to train its algorithms or otherwise improve its products and
-            services.
+            For organizations with HIPAA compliance enabled in their Supabase configuration, any
+            consented information will only be shared with third-party AI providers with whom
+            Supabase has established a Business Associate Agreement (BAA).
           </p>
+
           <p>
-            If you have your own individual account on Supabase, we will use any personal
-            information collected through [Supabase AI] to provide you with the [Supabase AI] tool.
-            If you are in the UK, EEA or Switzerland, the processing of this personal information is
-            necessary for the performance of a contract between you and us.
+            For more detailed information about how we collect and use your data, see our{' '}
+            <InlineLink href="https://supabase.com/privacy">Privacy Policy</InlineLink>. You can
+            choose which types of information you consent to share by selecting from the options in
+            the AI settings.
           </p>
-          <p>
-            Supabase collects information about the queries you submit through Supabase AI and the
-            responses you receive to assess the performance of the Supabase AI tool and improve our
-            services. If you are in the UK, EEA or Switzerland, the processing is necessary for our
-            legitimate interests, namely informing our product development and improvement.
-          </p>
-          <p>
-            For more information about how we use personal information, please see our{' '}
-            <Link
-              href="https://supabase.com/privacy"
-              target="_blank"
-              rel="noreferrer"
-              className="text-brand border-b border-brand"
-            >
-              privacy policy
-            </Link>
-            .
-          </p>
-        </div>
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+        </DialogSection>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -6,20 +7,22 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -27,10 +30,8 @@ import {
   CriticalIcon,
   Radio,
   SidePanel,
-  WarningIcon,
   cn,
 } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -55,25 +56,28 @@ const PITR_CATEGORY_OPTIONS: {
 const PITRSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
 
-  const canUpdatePitr = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const { can: canUpdatePitr } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'pitr'
 
-  const { data: databases } = useReadReplicasQuery({ projectRef })
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
       closePanel()
@@ -82,7 +86,7 @@ const PITRSidePanel = () => {
       toast.error(`Unable to update PITR: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
       closePanel()
@@ -100,12 +104,28 @@ const PITRSidePanel = () => {
   const subscriptionPitr = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
-  const hasReadReplicas = (databases ?? []).length > 1
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
+  const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements('pitr.available_variants')
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
-  const isFreePlan = subscription?.plan?.id === 'free'
-  const blockDowngradeDueToReadReplicas =
-    hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
+  const hasSufficientCompute =
+    !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
+
+  // These are illegal states. If they are true, we should block the user from saving them.
+  const blockDowngradeDueToHipaa =
+    hasHipaaAddon &&
+    (selectedCategory !== 'on' ||
+      // If the project is HIPAA, we don't allow the user to downgrade below 28 days
+      selectedPitr?.identifier !== 'pitr_28')
+
+  const onConfirm = async () => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
+      removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
+    } else {
+      updateAddon({ projectRef, type: 'pitr', variant: selectedOption as AddonVariantId })
+    }
+  }
 
   useEffect(() => {
     if (visible) {
@@ -119,16 +139,6 @@ const PITRSidePanel = () => {
     }
   }, [visible, isLoading])
 
-  const onConfirm = async () => {
-    if (!projectRef) return console.error('Project ref is required')
-
-    if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
-      removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
-    } else {
-      updateAddon({ projectRef, type: 'pitr', variant: selectedOption as AddonVariantId })
-    }
-  }
-
   return (
     <SidePanel
       size="xlarge"
@@ -137,19 +147,19 @@ const PITRSidePanel = () => {
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
-        isFreePlan ||
+        !hasAccessToPitrVariants ||
         isLoading ||
         !hasChanges ||
         isSubmitting ||
         !canUpdatePitr ||
-        hasHipaaAddon ||
-        blockDowngradeDueToReadReplicas
+        (!!selectedPitr && !hasSufficientCompute) ||
+        blockDowngradeDueToHipaa
       }
       tooltip={
-        hasHipaaAddon
-          ? 'Unable to change PITR with HIPAA add-on'
-          : isFreePlan
-            ? 'Unable to enable point in time recovery on a Free Plan'
+        blockDowngradeDueToHipaa
+          ? 'Unable to disable PITR with HIPAA add-on'
+          : !hasAccessToPitrVariants
+            ? 'Unable to enable point in time recovery on your Plan'
             : !canUpdatePitr
               ? 'You do not have permission to update PITR'
               : undefined
@@ -159,7 +169,7 @@ const PITRSidePanel = () => {
           <h4>Point in Time Recovery</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+              href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
               target="_blank"
               rel="noreferrer"
             >
@@ -170,20 +180,6 @@ const PITRSidePanel = () => {
       }
     >
       <SidePanel.Content>
-        {hasHipaaAddon && (
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              All projects should have PITR enabled by default and cannot be changed with HIPAA
-              enabled. Contact support for further assistance.
-            </AlertDescription_Shadcn_>
-            <div className="mt-4">
-              <Button type="default" asChild>
-                <Link href="/support/new">Contact support</Link>
-              </Button>
-            </div>
-          </Alert_Shadcn_>
-        )}
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter
@@ -198,7 +194,10 @@ const PITRSidePanel = () => {
                 return (
                   <div
                     key={option.id}
-                    className={cn('col-span-3 group space-y-1', isFreePlan && 'opacity-75')}
+                    className={cn(
+                      'col-span-3 group space-y-1',
+                      !hasAccessToPitrVariants && 'opacity-75'
+                    )}
                     onClick={() => {
                       setSelectedCategory(option.id)
                       if (option.id === 'off') {
@@ -206,7 +205,11 @@ const PITRSidePanel = () => {
                       } else if (subscriptionPitr?.variant.identifier !== undefined) {
                         setSelectedOption(subscriptionPitr.variant.identifier)
                       } else {
-                        setSelectedOption('pitr_7')
+                        if (hasHipaaAddon) {
+                          setSelectedOption('pitr_28')
+                        } else {
+                          setSelectedOption('pitr_7')
+                        }
                       }
                     }}
                   >
@@ -250,62 +253,39 @@ const PITRSidePanel = () => {
             </Alert_Shadcn_>
           )}
 
-          {blockDowngradeDueToReadReplicas && (
+          {blockDowngradeDueToHipaa ? (
             <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>PITR cannot be disabled on HIPAA projects</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                You currently have active read replicas. The minimum compute size for using read
-                replicas is the Small Compute. You need to remove all read replicas before
-                downgrading Compute as it requires at least a Small compute instance.
+                PITR is enabled by default for all HIPAA projects and cannot be turned off. Contact
+                support for further assistance.
               </AlertDescription_Shadcn_>
-              <AlertDescription_Shadcn_ className="mt-2">
-                <Button asChild type="default">
-                  <Link href={`/project/${projectRef}/settings/infrastructure`}>
-                    Manage read replicas
-                  </Link>
+              <div className="mt-4">
+                <Button type="default" asChild>
+                  <SupportLink>Contact support</SupportLink>
                 </Button>
-              </AlertDescription_Shadcn_>
+              </div>
             </Alert_Shadcn_>
-          )}
+          ) : null}
 
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
-              {isFreePlan ? (
-                <Alert
-                  withIcon
-                  variant="info"
+              {!hasAccessToPitrVariants ? (
+                <UpgradeToPro
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  actions={
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                        View available plans
-                      </Link>
-                    </Button>
-                  }
-                >
-                  Upgrade your plan to change PITR for your project
-                </Alert>
-              ) : subscriptionCompute === undefined ? (
-                <Alert
-                  withIcon
-                  variant="warning"
+                  addon="pitr"
+                  primaryText="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
+                  secondaryText="Upgrade your plan to change PITR for your project"
+                  featureProposition="enable PITR"
+                />
+              ) : !hasSufficientCompute ? (
+                <UpgradeToPro
                   className="mb-4"
-                  title="Your project is required to minimally be on a Small compute size to enable PITR"
-                  actions={[
-                    <Button
-                      key="change-compute"
-                      type="default"
-                      onClick={() => setPanel('computeInstance')}
-                    >
-                      Change compute size
-                    </Button>,
-                  ]}
-                >
-                  This is to ensure that your project has enough resources to execute PITR
-                  successfully
-                </Alert>
+                  addon="computeSize"
+                  primaryText="Project needs to be at least on a Small compute size to enable PITR"
+                  secondaryText="This ensures enough resources to execute PITR successfully"
+                  featureProposition="enable PITR"
+                />
               ) : null}
 
               <Radio.Group
@@ -318,7 +298,7 @@ const PITRSidePanel = () => {
                 {availableOptions.map((option) => (
                   <Radio
                     name="pitr"
-                    disabled={isFreePlan || subscriptionCompute === undefined}
+                    disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
                     className="col-span-4 !p-0"
                     key={option.identifier}
                     checked={selectedOption === option.identifier}
@@ -335,7 +315,9 @@ const PITRSidePanel = () => {
                           {option.identifier.split('_')[1]} days ago
                         </p>
                         <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                          <p className="text-foreground text-sm" translate="no">
+                            {formatCurrency(option.price)}
+                          </p>
                           <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
@@ -346,7 +328,7 @@ const PITRSidePanel = () => {
             </div>
           )}
 
-          {hasChanges && !blockDowngradeDueToReadReplicas && selectedOption !== 'pitr_0' && (
+          {hasChanges && selectedOption !== 'pitr_0' && (
             <p className="text-sm text-foreground-light">
               There are no immediate charges. The addon is billed at the end of your billing cycle
               based on your usage and prorated to the hour.

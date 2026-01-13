@@ -1,14 +1,18 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { ArrowRight, Key, Link, Lock, Lightbulb } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import {
+  useColumnHasIndexSuggestion,
+  useTableIndexAdvisor,
+} from '../../context/TableIndexAdvisorContext'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useDispatch, useTrackedState } from '../../store/Store'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
-import { ColumnMenu } from '../menu'
+import { ColumnMenu } from '../menu/ColumnMenu'
 
 export function ColumnHeader<R>({
   column,
@@ -19,22 +23,22 @@ export function ColumnHeader<R>({
   foreignKey,
 }: ColumnHeaderProps<R>) {
   const ref = useRef<HTMLDivElement>(null)
-  const dispatch = useDispatch()
   const columnIdx = column.idx
   const columnKey = column.key
   const columnFormat = getColumnFormat(columnType, format)
-  const state = useTrackedState()
+  const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
+  const hasIndexSuggestion = useColumnHasIndexSuggestion(column.name as string)
+  const { openSheet } = useTableIndexAdvisor()
 
-  // keep state.gridColumns' order in sync with data grid component
+  // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
-    if (state.gridColumns[columnIdx].key != columnKey) {
-      dispatch({
-        type: 'UPDATE_COLUMN_IDX',
-        payload: { columnKey, columnIdx },
-      })
+    const snapGridColumnKey = snap.gridColumns[columnIdx]?.key
+
+    if (snapGridColumnKey != columnKey) {
+      snap.updateColumnIdx(columnKey, columnIdx)
     }
-  }, [columnKey, columnIdx, state.gridColumns])
+  }, [columnKey, columnIdx, snap.gridColumns])
 
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',
@@ -98,7 +102,7 @@ export function ColumnHeader<R>({
       }
 
       // Time to actually perform the action
-      moveColumn(dragKey, hoverKey)
+      snap.moveColumn(dragKey, hoverKey)
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
@@ -107,14 +111,6 @@ export function ColumnHeader<R>({
       ;(item as DragItem).index = hoverIndex
     },
   })
-
-  const moveColumn = (fromKey: string, toKey: string) => {
-    if (fromKey == toKey) return
-    dispatch({
-      type: 'MOVE_COLUMN',
-      payload: { fromKey, toKey },
-    })
-  }
 
   const opacity = isDragging ? 0 : 1
   const cursor = column.frozen ? 'sb-grid-column-header--cursor' : ''
@@ -140,7 +136,10 @@ export function ColumnHeader<R>({
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
-          <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
+          <span className="sb-grid-column-header__inner__format">
+            {columnFormat}
+            {columnFormat === 'bytea' ? ` (hex)` : ''}
+          </span>
           {isEncrypted && (
             <Tooltip>
               <TooltipTrigger>
@@ -148,6 +147,21 @@ export function ColumnHeader<R>({
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {hasIndexSuggestion && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="flex items-center"
+                  onClick={() => openSheet(column.name as string)}
+                >
+                  <Lightbulb size={14} strokeWidth={2} className="!text-warning" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                Index might improve performance. Click for details.
               </TooltipContent>
             </Tooltip>
           )}

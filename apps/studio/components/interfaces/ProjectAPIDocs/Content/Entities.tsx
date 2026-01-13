@@ -1,3 +1,4 @@
+import { Download } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -5,13 +6,13 @@ import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { generateTypes } from 'data/projects/project-type-generation-query'
-import { Download } from 'lucide-react'
+import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
-const Entities = ({ language }: ContentProps) => {
+export const Entities = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
@@ -42,7 +43,7 @@ const Entities = ({ language }: ContentProps) => {
       <div>
         <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.generatingTypes} />
         <div className="flex items-center gap-x-2 px-4 mt-3">
-          <DocsButton href="https://supabase.com/docs/guides/database/api/generating-types" />
+          <DocsButton href={`${DOCS_URL}/guides/database/api/generating-types`} />
           <Button
             type="default"
             disabled={isGeneratingTypes}
@@ -61,5 +62,3 @@ const Entities = ({ language }: ContentProps) => {
     </>
   )
 }
-
-export default Entities

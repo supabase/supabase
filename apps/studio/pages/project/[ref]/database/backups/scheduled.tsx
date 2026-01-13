@@ -2,49 +2,72 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Info } from 'lucide-react'
 
 import { useParams } from 'common'
-import { BackupsList } from 'components/interfaces/Database'
+import { BackupsList } from 'components/interfaces/Database/Backups/BackupsList'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const {
+    data: backups,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef })
 
-  const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled
-  const isPermissionsLoaded = usePermissionsLoaded()
 
-  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
+  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'back_ups'
+  )
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <div className="space-y-6">
-            <FormHeader className="!mb-0" title="Database Backups" />
-
-            <DatabaseBackupsNav active="scheduled" />
-
-            {isOrioleDb ? (
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Backups</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+        <PageHeaderNavigationTabs>
+          <DatabaseBackupsNav active="scheduled" />
+        </PageHeaderNavigationTabs>
+      </PageHeader>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
+            {isOrioleDbInAws ? (
               <Admonition
                 type="default"
                 title="Database backups are not available for OrioleDB"
                 description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
               >
-                <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+                <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
               </Admonition>
             ) : (
               <div className="flex flex-col gap-y-4">
@@ -76,7 +99,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                             terms of the granular recovery that can be performed.{' '}
                             <a
                               className="text-brand transition-colors hover:text-brand-600"
-                              href="https://supabase.com/docs/guides/platform/backups"
+                              href={`${DOCS_URL}/guides/platform/backups`}
                             >
                               Learn more
                             </a>
@@ -94,15 +117,17 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                 )}
               </div>
             )}
-          </div>
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 
 DatabaseScheduledBackups.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseScheduledBackups

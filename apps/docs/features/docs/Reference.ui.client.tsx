@@ -3,6 +3,7 @@
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 import {
   cn,
@@ -44,7 +45,7 @@ export function ReferenceSectionWrapper({
         initialScrollHappened &&
         window.scrollY > 0 /* Don't update on first navigation to introduction */
       ) {
-        window.history.replaceState(null, '', link)
+        safeHistoryReplaceState(link)
       }
     },
   })
@@ -67,7 +68,7 @@ export function ApiOperationBodySchemeSelector({
   requestBody: IApiEndPoint['requestBody']
   className?: string
 }) {
-  const availableSchemes = Object.keys(requestBody.content) as Array<
+  const availableSchemes = Object.keys(requestBody?.content || {}) as Array<
     'application/json' | 'application/x-www-form-urlencoded'
   >
   const [selectedScheme, setSelectedScheme] = useState(availableSchemes[0])
@@ -75,11 +76,10 @@ export function ApiOperationBodySchemeSelector({
   const containerRef = useRef<HTMLDivElement>(null)
   const allSchemeDetails = useRef<HTMLUListElement[]>([])
   useEffect(() => {
-    allSchemeDetails.current = Array.from(
-      containerRef.current?.querySelectorAll(
-        `[${API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY}]`
-      )
+    const elements = containerRef.current?.querySelectorAll(
+      `[${API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY}]`
     )
+    allSchemeDetails.current = elements ? (Array.from(elements) as HTMLUListElement[]) : []
   }, [])
 
   useEffect(() => {

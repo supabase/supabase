@@ -12,6 +12,6 @@ message = "no pg_hba.conf entry for host \"xx.xxx.xxx.xxx\", user \"postgres\", 
 
 This error indicates a failed authentication attempt to the database and the connection couldn't be established.
 
-In Supabase, this is generally seen when [SSL enforcement](https://supabase.com/docs/guides/platform/ssl-enforcement) is enabled on your Supabase Project. The authentication failed because the incoming connection didn't use SSL encryption when connecting to the database.
+In Supabase, this is generally seen when [SSL enforcement](/docs/guides/platform/ssl-enforcement) is enabled on your Supabase Project. The authentication failed because the incoming connection didn't use SSL encryption when connecting to the database.
 
 You can ignore this message if the attempt is from an unknown user. If you want this connection attempt to be successful, you will either need to connect with SSL or disable SSL enforcement on your Supabase project.

@@ -1,0 +1,16 @@
+/* Font face definitions for Launch Week 14 */
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/launchweek/14/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nippo-Variable';
+  src: url('/fonts/launchweek/14/Nippo-Variable.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}

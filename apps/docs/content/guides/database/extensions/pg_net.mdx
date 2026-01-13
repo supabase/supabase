@@ -10,7 +10,7 @@ The pg_net API is in beta. Functions signatures may change.
 
 </Admonition>
 
-[pg_net](https://github.com/supabase/pg_net/) enables PostgreSQL to make asynchronous HTTP/HTTPS requests in SQL. It differs from the [`http`](https://supabase.com/docs/guides/database/extensions/http) extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
+[pg_net](https://github.com/supabase/pg_net/) enables Postgres to make asynchronous HTTP/HTTPS requests in SQL. It differs from the [`http`](/docs/guides/database/extensions/http) extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
 
 It eliminates the need for servers to continuously poll for database changes and instead allows the database to proactively notify external resources about significant events.
 
@@ -25,7 +25,7 @@ It eliminates the need for servers to continuously poll for database changes and
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pg_net" and enable the extension.
 
@@ -58,7 +58,7 @@ Creates an HTTP GET request returning the request's ID. HTTP requests are not st
 
 <Admonition type="caution">
 
-This is a Postgres [SECURITY DEFINER](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function.
+This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function.
 
 </Admonition>
 
@@ -104,7 +104,7 @@ The body's character set encoding matches the database's `server_encoding` setti
 
 <Admonition type="caution">
 
-This is a Postgres [SECURITY DEFINER](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
+This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
 
 </Admonition>
 
@@ -151,7 +151,7 @@ Creates an HTTP DELETE request, returning the request's ID. HTTP requests are no
 
 <Admonition type="caution">
 
-This is a Postgres [SECURITY DEFINER](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
+This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
 
 </Admonition>
 
@@ -226,7 +226,7 @@ The responses can be observed with the following query:
 select * from net._http_response;
 ```
 
-The data can also be observed in the `net` schema with the [Supabase Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/editor)
+The data can also be observed in the `net` schema with the [Supabase Dashboard's SQL Editor](/dashboard/project/_/editor)
 
 ## Debugging requests
 
@@ -256,7 +256,7 @@ where id = <request_id>
 -- including the body sent: {"key": "value", "key": 5}
 ```
 
-Alternatively, by wrapping a request in a [database function](https://supabase.com/docs/guides/database/functions), sent row data can be logged or returned for inspection and debugging.
+Alternatively, by wrapping a request in a [database function](/docs/guides/database/functions), sent row data can be logged or returned for inspection and debugging.
 
 ```sql
 create or replace function debugging_example (row_id int)
@@ -311,7 +311,7 @@ order by "created" desc;
 
 <Admonition type="note" label="Must be on pg_net v0.12.0 or above to reconfigure ">
 
-Supabase supports reconfiguring pg*net starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [Infrastructure Settings](https://supabase.com/dashboard/project/*/settings/infrastructure).
+Supabase supports reconfiguring pg*net starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [Infrastructure Settings](/dashboard/project/*/settings/infrastructure).
 
 </Admonition>
 
@@ -357,9 +357,9 @@ select
     ) as request_id;
 ```
 
-### Call an endpoint every minute with [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)
+### Call an endpoint every minute with [pg_cron](/docs/guides/database/extensions/pgcron)
 
-The pg_cron extension enables PostgreSQL to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
+The pg_cron extension enables Postgres to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
 
 ```sql
 select cron.schedule(
@@ -435,7 +435,7 @@ More examples can be seen on the [Extension's GitHub page](https://github.com/su
 - Can only make POST requests with JSON data. No other data formats are supported
 - Intended to handle at most 200 requests per second. Increasing the rate can introduce instability
 - Does not have support for PATCH/PUT requests
-- Can only work with one database at a time. It defaults to the postgres database.
+- Can only work with one database at a time. It defaults to the `postgres` database.
 
 ## Resources
 

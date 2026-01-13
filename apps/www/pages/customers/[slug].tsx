@@ -142,7 +142,7 @@ function CaseStudyPage(props: any) {
                       Customer Stories
                     </Link>
                     <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">{title}</h1>
-                    <h2 className="text-foreground text-xl xl:text-2xl">{description}</h2>
+                    <p className="text-foreground text-xl xl:text-2xl">{description}</p>
                   </div>
 
                   <div className="grid grid-cols-12 prose max-w-none gap-8 lg:gap-20">

@@ -9,16 +9,21 @@ import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button, Image } from 'ui'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import CTABanner from '~/components/CTABanner'
-import ExampleCard from '~/components/ExampleCard'
 import FeatureColumn from '~/components/FeatureColumn'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import ProductsNav from '~/components/Products/ProductsNav'
-import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import dynamic from 'next/dynamic'
+
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
+const ExampleCard = dynamic(() => import('~/components/ExampleCard'))
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 function StoragePage() {
   // base path for images
@@ -114,14 +119,35 @@ function StoragePage() {
                   }
                 />
               </div>
-              <h4 className="h4">Multiple Protocol Support</h4>
+              <h4 className="h4">Multiple Bucket Types</h4>
 
               <p className="p">
-                S3, Resumable Uploads and Standard Uploads. Enterprise-level scalability.
+                Choose the right storage models for your application: Files, Analytics, or Vectors.
               </p>
             </div>
           </div>
         </SectionContainer>
+
+        <SingleQuote
+          id="quote"
+          className="[&_q]:max-w-3xl"
+          quote={{
+            text: "Supabase is great because it has everything. I don't need a different solution for authentication, a different solution for database, or a different solution for storage.",
+            author: 'Yasser Elsaid',
+            role: 'Founder of Chatbase',
+            link: '/customers/chatbase',
+            logo: (
+              <Image
+                draggable={false}
+                src="/images/blog/avatars/yasser-elsaid-chatbase.jpeg"
+                alt="Yasser Elsaid, Founder of Chatbase"
+                className="max-w-10 w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
 
         <SectionContainer className="pt-16">
           <div className="mb-16 block">
@@ -165,6 +191,63 @@ function StoragePage() {
               </>
             }
           />
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="mb-12">
+            <h2 className="h3">Bucket types for every application</h2>
+            <p className="p text-lg">
+              Store, serve, or analyze data the way your app needs. Supabase Storage supports three
+              purpose-built bucket types so you can pick the right tools for the job without adding
+              extra systems.
+            </p>
+          </div>
+          <div className="grid grid-cols-12 gap-8">
+            <div className="col-span-12 lg:col-span-4">
+              <h4 className="h4">Files buckets</h4>
+              <p className="p">
+                Ideal for everyday assets and user content. Store images, videos, documents, PDFs,
+                archives, and more, then serve them fast from a global CDN with fine-grained access
+                controls.
+              </p>
+              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+                <Link href="/docs/guides/storage">Read the docs</Link>
+              </Button>
+            </div>
+            <div className="col-span-12 lg:col-span-4">
+              <h4 className="h4">Analytics buckets</h4>
+              <p className="p">
+                Built for large-scale analytical workloads on open table formats such as Apache
+                Iceberg. Keep historical or time-series data, logs, or ETL outputs in a format that
+                is efficient to query, partition, and transform, and optionally expose via Postgres.
+              </p>
+              <div className="mt-4 flex gap-2">
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/docs/guides/storage/analytics-buckets">Read the docs</Link>
+                </Button>
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/analytics-buckets">Read the blog post</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="col-span-12 lg:col-span-4">
+              <h4 className="h4">Vector buckets</h4>
+              <p className="p">
+                Designed for AI and ML use cases that rely on semantic search or similarity
+                matching. Store and index vector embeddings with support for multiple distance
+                metrics, metadata filtering, and fast similarity queries for RAG systems, AI-powered
+                search, and more.
+              </p>
+              <div className="mt-4 flex gap-2">
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/docs/guides/storage/vector-buckets">Read the docs</Link>
+                </Button>
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/vector-buckets">Read the blog post</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </SectionContainer>
 
         <SectionContainer className="pt-0">

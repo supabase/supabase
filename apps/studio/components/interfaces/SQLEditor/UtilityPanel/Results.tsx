@@ -1,15 +1,15 @@
-import { Clipboard, Expand } from 'lucide-react'
+import { Copy, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
-import { useKeyboardShortcuts } from 'hooks/deprecated'
-import { copyToClipboard } from 'lib/helpers'
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import {
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
 
@@ -25,54 +25,35 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
 
-  const onCopyCell = () => {
-    if (cellPosition) {
-      const { rowIdx, column } = cellPosition
-      const colKey = column.key
-      const cellValue = rows[rowIdx]?.[colKey] ?? ''
-      const value = formatClipboardValue(cellValue)
-      copyToClipboard(value)
-    }
-  }
-
-  useKeyboardShortcuts(
-    {
-      'Command+c': (event: any) => {
-        event.stopPropagation()
-        onCopyCell()
-      },
-      'Control+c': (event: any) => {
-        event.stopPropagation()
-        onCopyCell()
-      },
-    },
-    ['INPUT', 'TEXTAREA'] as any
-  )
-
   const formatter = (column: any, row: any) => {
+    const cellValue = row[column]
+
     return (
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <div
             className={cn(
               'flex items-center h-full font-mono text-xs w-full whitespace-pre',
-              row[column] === null && 'text-foreground-lighter'
+              cellValue === null && 'text-foreground-lighter'
             )}
           >
-            {row[column] === null ? 'NULL' : JSON.stringify(row[column])}
+            {cellValue === null
+              ? 'NULL'
+              : typeof cellValue === 'string'
+                ? cellValue
+                : JSON.stringify(cellValue)}
           </div>
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem_Shadcn_
             className="gap-x-2"
             onSelect={() => {
-              const cellValue = row[column] ?? ''
-              const value = formatClipboardValue(cellValue)
+              const value = formatClipboardValue(cellValue ?? '')
               copyToClipboard(value)
             }}
             onFocusCapture={(e) => e.stopPropagation()}
           >
-            <Clipboard size={14} />
+            <Copy size={12} />
             Copy cell content
           </ContextMenuItem_Shadcn_>
           <ContextMenuItem_Shadcn_
@@ -80,7 +61,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             onSelect={() => setExpandCell(true)}
             onFocusCapture={(e) => e.stopPropagation()}
           >
-            <Expand size={14} />
+            <Expand size={12} />
             View cell content
           </ContextMenuItem_Shadcn_>
         </ContextMenuContent_Shadcn_>
@@ -127,19 +108,30 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
 
   return (
     <>
-      <DataGrid
-        columns={columns}
-        rows={rows}
-        className="h-full flex-grow border-t-0"
-        rowClass={() => '[&>.rdg-cell]:items-center'}
-        onSelectedCellChange={setCellPosition}
-      />
-      <CellDetailPanel
-        column={cellPosition?.column.name ?? ''}
-        value={cellPosition?.row?.[cellPosition.column.name]}
-        visible={expandCell}
-        onClose={() => setExpandCell(false)}
-      />
+      {rows.length === 0 ? (
+        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+          <p className="m-0 border-0 px-4 py-3 font-mono text-sm text-foreground-light">
+            Success. No rows returned
+          </p>
+        </div>
+      ) : (
+        <>
+          <DataGrid
+            columns={columns}
+            rows={rows}
+            className="h-full flex-grow border-t-0"
+            rowClass={() => '[&>.rdg-cell]:items-center'}
+            onSelectedCellChange={setCellPosition}
+            onCellKeyDown={handleCopyCell}
+          />
+          <CellDetailPanel
+            column={cellPosition?.column.name ?? ''}
+            value={cellPosition?.row?.[cellPosition.column.name]}
+            visible={expandCell}
+            onClose={() => setExpandCell(false)}
+          />
+        </>
+      )}
     </>
   )
 }

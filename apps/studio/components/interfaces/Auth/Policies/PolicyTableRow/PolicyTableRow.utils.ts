@@ -1,22 +1,20 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 
-export const generatePolicyCreateSQL = (policy: PostgresPolicy) => {
+export const generatePolicyUpdateSQL = (policy: PostgresPolicy) => {
   let expression = ''
   if (policy.definition !== null && policy.definition !== undefined) {
-    expression += `USING (${policy.definition})${
+    expression += `using (${policy.definition})${
       policy.check === null || policy.check === undefined ? ';' : ''
     }\n`
   }
   if (policy.check !== null && policy.check !== undefined) {
-    expression += `WITH CHECK (${policy.check});\n`
+    expression += `with check (${policy.check});\n`
   }
 
   return `
-CREATE POLICY "${policy.name}" 
-ON "${policy.schema}"."${policy.table}"
-AS ${policy.action}
-FOR ${policy.command}
-TO ${policy.roles.join(', ')}
+alter policy "${policy.name}" 
+on "${policy.schema}"."${policy.table}"
+to ${policy.roles.join(', ')}
 ${expression}
 `.trim()
 }

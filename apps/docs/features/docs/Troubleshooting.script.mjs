@@ -7,6 +7,8 @@
  * Discussions.
  */
 
+import '../../scripts/utils/dotenv.js'
+
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { createClient } from '@supabase/supabase-js'
@@ -19,15 +21,12 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readFile, writeFile } from 'node:fs/promises'
-import { stringify } from 'smol-toml'
-import toml from 'toml'
+import { parse, stringify } from 'smol-toml'
 
 import {
   getAllTroubleshootingEntriesInternal as getAllTroubleshootingEntries,
   getArticleSlug,
 } from './Troubleshooting.utils.common.mjs'
-
-import 'dotenv/config'
 
 const REPOSITORY_ID = 'MDEwOlJlcG9zaXRvcnkyMTQ1ODcxOTM='
 const TROUBLESHOOTING_CATEGORY_ID = 'DIC_kwDODMpXOc4CUvEr'
@@ -53,9 +52,9 @@ function octokit() {
     octokitInstance = new Octokit({
       authStrategy: createAppAuth,
       auth: {
-        appId: process.env.SEARCH_GITHUB_APP_ID,
-        installationId: process.env.SEARCH_GITHUB_APP_INSTALLATION_ID,
-        privateKey: process.env.SEARCH_GITHUB_APP_PRIVATE_KEY,
+        appId: process.env.DOCS_GITHUB_APP_ID,
+        installationId: process.env.DOCS_GITHUB_APP_INSTALLATION_ID,
+        privateKey: process.env.DOCS_GITHUB_APP_PRIVATE_KEY,
       },
     })
   }
@@ -173,7 +172,7 @@ function calculateChecksum(content) {
 
   const { data, content: body } = matter(bodyNormalized, {
     language: 'toml',
-    engines: { toml: toml.parse.bind(toml) },
+    engines: { toml: parse },
   })
   const newFrontmatter = stringify(data)
   const normalized = `---\n${newFrontmatter}\n---\n${body}`
@@ -258,21 +257,50 @@ async function updateChecksumIfNeeded(entry) {
 }
 
 /**
+ * Converts relative links to absolute URLs for GitHub discussions using MDAST
+ * @param {string} content - The markdown content to process (already stripped of JSX)
+ */
+function rewriteRelativeLinks(content) {
+  const baseUrl = 'https://supabase.com'
+
+  // Parse the markdown to AST
+  const mdast = fromMarkdown(content, {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  })
+
+  // Walk the tree and modify link nodes
+  /**
+   * @param {import('mdast').Root|import('mdast').Content} node
+   */
+  function visitNode(node) {
+    if (node.type === 'link' && node.url && node.url.startsWith('/')) {
+      // Convert relative URL to absolute
+      node.url = `${baseUrl}${node.url}`
+    }
+
+    // Recursively visit children
+    if ('children' in node) {
+      node.children.forEach(visitNode)
+    }
+  }
+
+  visitNode(mdast)
+
+  // Convert back to markdown
+  return toMarkdown(mdast, { extensions: [gfmToMarkdown()] })
+}
+
+/**
  * @param {TroubleshootingEntry} entry
  */
 function addCanonicalUrl(entry) {
   const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry)
+  const contentWithAbsoluteLinks = rewriteRelativeLinks(entry.contentWithoutJsx)
   const content =
     `_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._\n\n` +
-    entry.contentWithoutJsx
+    contentWithAbsoluteLinks
   return content
-}
-
-/**
- * @param {string} str
- */
-function escapeGraphQlString(str) {
-  return str.replace(/"/g, '\\"')
 }
 
 /**
@@ -280,15 +308,20 @@ function escapeGraphQlString(str) {
  */
 async function createGithubDiscussion(entry) {
   console.log(`[INFO] Creating GitHub discussion for ${entry.data.title}`)
-  const content = escapeGraphQlString(addCanonicalUrl(entry))
+  const content = addCanonicalUrl(entry)
 
   const mutation = `
-    mutation {
+    mutation CreateDiscussionMutation(
+      $repository: ID!,
+      $category: ID!,
+      $title: String!,
+      $body: String!
+    ) {
       createDiscussion(input: {
-        repositoryId: "${REPOSITORY_ID}",
-        categoryId: "${TROUBLESHOOTING_CATEGORY_ID}",
-        body: "${content}",
-        title: "${entry.data.title}"
+        repositoryId: $repository,
+        categoryId: $category,
+        body: $body,
+        title: $title
       }) {
         discussion {
           id
@@ -300,7 +333,12 @@ async function createGithubDiscussion(entry) {
 
   const {
     createDiscussion: { discussion },
-  } = await octokit().graphql(mutation)
+  } = await octokit().graphql(mutation, {
+    repository: REPOSITORY_ID,
+    category: TROUBLESHOOTING_CATEGORY_ID,
+    body: content,
+    title: entry.data.title,
+  })
   console.log(`[INFO] Created GitHub discussion for ${entry.data.title}: %s`, discussion.url)
   return discussion
 }
@@ -378,12 +416,15 @@ async function updateGithubDiscussion(entry) {
     throw error
   }
 
-  const content = escapeGraphQlString(addCanonicalUrl(entry))
+  const content = addCanonicalUrl(entry)
   const mutation = `
-    mutation {
+    mutation UpdateDiscussionMutation(
+      $discussionId: ID!,
+      $body: String!
+    ) {
       updateDiscussion(input: {
-        discussionId: "${data.github_id}",
-        body: "${content}",
+        discussionId: $discussionId,
+        body: $body
       }) {
         discussion {
           id
@@ -391,18 +432,24 @@ async function updateGithubDiscussion(entry) {
       }
     }
     `
-
-  await octokit().graphql(mutation)
-  console.log(`[INFO] Updated discussion content for ${entry.data.title}`)
+  try {
+    await octokit().graphql(mutation, { discussionId: data.github_id, body: content })
+    console.log(`[INFO] Updated discussion content for ${entry.data.title}`)
+  } catch (err) {
+    console.error('[DEBUG] Failed GraphQL mutation:\n', mutation)
+    throw err
+  }
 }
 
 /** @param {string} id */
 async function rollbackGithubDiscussion(id) {
   try {
     const mutation = `
-    mutation {
+    mutation DeleteDiscussionMutation(
+      $discussionId: ID!
+    ) {
       deleteDiscussion(input: {
-        id: "${id}",
+        discussionId: $discussionId,
       }) {
         discussion {
           id
@@ -411,7 +458,7 @@ async function rollbackGithubDiscussion(id) {
     }
     `
 
-    await octokit().graphql(mutation)
+    await octokit().graphql(mutation, { discussionId: id })
     console.log(`[INFO] Rolled back discussion creation for ${id}`)
   } catch (error) {
     console.error(`[ERROR] Failed to rollback discussion creation for ${id}: %O`, error)
@@ -430,7 +477,7 @@ async function updateFileId(entry, id) {
   const fileContents = await readFile(entry.filePath, 'utf-8')
   const { data, content } = matter(fileContents, {
     language: 'toml',
-    engines: { toml: toml.parse.bind(toml) },
+    engines: { toml: parse },
   })
   data.database_id = id
 

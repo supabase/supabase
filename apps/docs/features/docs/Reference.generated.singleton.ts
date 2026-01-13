@@ -27,14 +27,19 @@ async function _typeSpecSingleton() {
   return typeSpec
 }
 
+function normalizeRefPath(path: string) {
+  return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
+}
+
 export async function getTypeSpec(ref: string) {
   const modules = await _typeSpecSingleton()
 
-  const delimiter = ref.indexOf('.')
-  const refMod = ref.substring(0, delimiter)
+  const normalizedRef = normalizeRefPath(ref)
+  const delimiter = normalizedRef.indexOf('.')
+  const refMod = normalizedRef.substring(0, delimiter)
 
   const mod = modules.find((mod) => mod.name === refMod)
-  return mod?.methods.get(ref)
+  return mod?.methods.get(normalizedRef)
 }
 
 let cliSpec: Json
@@ -96,7 +101,6 @@ const referenceSections = new Map<string, Array<AbbrevApiReferenceSection>>()
 
 export async function getReferenceSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
-  console.log('Getting reference sections for %s', key)
   if (!referenceSections.has(key)) {
     const data = await readFile(
       join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.sections.json`),
@@ -107,7 +111,6 @@ export async function getReferenceSections(sdkId: string, version: string) {
   }
 
   const result = referenceSections.get(key)
-  console.log('Got reference sections for %s', key)
   return result
 }
 
@@ -115,7 +118,6 @@ const flatSections = new Map<string, Array<AbbrevApiReferenceSection>>()
 
 export async function getFlattenedSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
-  console.log('Getting flattened sections for %s', key)
   if (!flatSections.has(key)) {
     const data = await readFile(
       join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.flat.json`),
@@ -126,7 +128,6 @@ export async function getFlattenedSections(sdkId: string, version: string) {
   }
 
   const result = flatSections.get(key)
-  console.log('Got flattened sections for %s', key)
   return result
 }
 

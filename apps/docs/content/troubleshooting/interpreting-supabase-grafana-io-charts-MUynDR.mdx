@@ -7,7 +7,7 @@ keywords = [ "io", "disk", "database", "grafana" ]
 database_id = "0056cd40-df04-4045-bbfb-c245cb15b85d"
 ---
 
-> [Supabase Grafana Installation Guide](https://supabase.com/docs/guides/platform/metrics#deploying-supabase-grafana)
+> [Supabase Grafana Installation Guide](/docs/guides/platform/metrics#deploying-supabase-grafana)
 
 There are two primary values that matter for IO:
 
@@ -53,8 +53,8 @@ Excessive IO usage is highly problematic as it clarifies that your database is e
 
 - **Excessive and needless sequential scans:** poorly indexed tables force requests to scan disk ([guide to resolve](https://github.com/orgs/supabase/discussions/22449))
 - **Too little cache**: There is not enough memory, so instead of reading data from the memory cache, it is accessed from disk ([guide to inspect](https://github.com/orgs/supabase/discussions/22449))
-- **Poorly optimized RLS policies**: RLS that rely heavily on joins are more likely to hit disk. If possible, they should optimized ([RLS best practice guide](https://supabase.com/docs/guides/database/postgres/row-level-security#rls-performance-recommendations))
-- **Excessive bloat**: This is the least likely to cause major issues, but bloat can take up space, preventing data on disk from being placed in the same locality. This can force the database to scan more pages than necessary. ([explainer guide](https://supabase.com/blog/postgres-bloat))
+- **Poorly optimized RLS policies**: RLS that rely heavily on joins are more likely to hit disk. If possible, they should optimized ([RLS best practice guide](/docs/guides/database/postgres/row-level-security#rls-performance-recommendations))
+- **Excessive bloat**: This is the least likely to cause major issues, but bloat can take up space, preventing data on disk from being placed in the same locality. This can force the database to scan more pages than necessary. ([explainer guide](/blog/postgres-bloat))
 - **Uploading high amounts of data:** temporarily increase compute add-on size for the duration of the uploads
 - **Insufficient memory**: Sometimes an inadequate amount of memory forces queries to hit disk instead of the memory cache. Address memory issues ([guide](https://github.com/orgs/supabase/discussions/27021)) can reduce disk strain.
 
@@ -62,9 +62,9 @@ If a database exhibited some of these metrics for prolonged periods, then there 
 
 - Scale the database to get more IO if possible
 - Optimize queries/tables or refactor database/app to reduce IO
-- Spin-up a [read-replica](https://supabase.com/dashboard/project/_/settings/infrastructure)
-- Modify IO configs in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
-- [Partitions](https://supabase.com/docs/guides/database/partitions): Generally should be used on very large tables to minimize data pulled from disk
+- Spin-up a [read-replica](/dashboard/project/_/settings/infrastructure)
+- Modify IO configs in the [Compute and Disk settings](/dashboard/project/_/settings/compute-and-disk)
+- [Partitions](/docs/guides/database/partitions): Generally should be used on very large tables to minimize data pulled from disk
 
 Other useful Supabase Grafana guides:
 

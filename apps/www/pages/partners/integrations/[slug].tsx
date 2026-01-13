@@ -222,20 +222,18 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
 
   return (
     <div className="lg:col-span-3">
-      <div className="sticky top-20 flex flex-col gap-8">
+      <div className="sticky top-20 flex flex-col gap-4">
         <h2 className="text-foreground" style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
           Details
         </h2>
 
         {partner.video && (
-          <div className="mb-6">
-            <ExpandableVideo
-              videoId={partner.video}
-              imgUrl={videoThumbnail}
-              imgOverlayText="Watch an introductory video"
-              triggerContainerClassName="w-full"
-            />
-          </div>
+          <ExpandableVideo
+            videoId={partner.video}
+            // imgUrl={videoThumbnail}
+            imgOverlayText="Watch an introductory video"
+            triggerContainerClassName="w-full"
+          />
         )}
 
         <div className="text-foreground divide-y">
@@ -250,7 +248,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             <span className="text-lighter">Category</span>
             <Link
               href={`/partners/integrations#${partner.category.toLowerCase()}`}
-              className="text-brand hover:underline transition-colors"
+              className="text-brand-link hover:underline transition-colors"
             >
               {partner.category}
             </Link>
@@ -262,7 +260,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
               href={partner.website}
               target="_blank"
               rel="noreferrer"
-              className="text-brand hover:underline transition-colors"
+              className="text-brand-link hover:underline transition-colors"
             >
               {new URL(partner.website).host}
             </a>
@@ -275,7 +273,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
                 href={partner.docs}
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand hover:underline transition-colors"
+                className="text-brand-link hover:underline transition-colors"
               >
                 <span className="flex items-center space-x-1">
                   <span>Learn</span>

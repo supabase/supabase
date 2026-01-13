@@ -78,7 +78,7 @@ functions:
       - id: create-client
         name: create_client()
         code: |
-          ```
+          ```python
           import os
           from supabase import create_client, Client
 
@@ -89,19 +89,22 @@ functions:
       - id: with-timeout-option
         name: With timeout option
         code: |
-          ```
+          ```python
           import os
           from supabase import create_client, Client
           from supabase.client import ClientOptions
 
           url: str = os.environ.get("SUPABASE_URL")
           key: str = os.environ.get("SUPABASE_KEY")
-          supabase: Client = create_client(url, key,
-            options=ClientOptions(
-              postgrest_client_timeout=10,
-              storage_client_timeout=10,
-              schema="public",
-            ))
+          supabase: Client = create_client(
+              url,
+              key,
+              options=ClientOptions(
+                  postgrest_client_timeout=10,
+                  storage_client_timeout=10,
+                  schema="public",
+              )
+          )
           ```
 
   - id: auth-api
@@ -167,9 +170,12 @@ functions:
       - id: signup
         name: Sign up with an email and password
         code: |
-          ```python          
+          ```python
           response = supabase.auth.sign_up(
-              {"email": "email@example.com", "password": "password"}
+              {
+                  "email": "email@example.com",
+                  "password": "password",
+              }
           )
           ```
         response: |
@@ -274,7 +280,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              {"phone": "123456789", "password": "password"}
+              {
+                  "phone": "123456789",
+                  "password": "password",
+              }
           )
           ```
       - id: sign-up-phone-whatsapp
@@ -457,7 +466,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_with_password(
-              {"email": "email@example.com", "password": "example-password"}
+              {
+                  "email": "email@example.com",
+                  "password": "example-password",
+              }
           )
           ```
         response: |
@@ -538,7 +550,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_with_password(
-              {"phone": "+13334445555", "password": "some-password"}
+              {
+                  "phone": "+13334445555",
+                  "password": "some-password",
+              }
           )
           ```
   - id: sign-in-with-otp
@@ -593,7 +608,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -605,7 +620,9 @@ functions:
           response = supabase.auth.sign_in_with_otp(
               {
                   "email": "email@example.com",
-                  "options": {"email_redirect_to": "https://example.com/welcome"},
+                  "options": {
+                      "email_redirect_to": "https://example.com/welcome",
+                  },
               }
           )
           ```
@@ -623,9 +640,9 @@ functions:
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```python
-          response = supabase.auth.sign_in_with_otp({
-            "phone": '+13334445555',
-          })
+          response = supabase.auth.sign_in_with_otp(
+              {"phone": "+13334445555"}
+          )
           ```
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
@@ -633,12 +650,14 @@ functions:
         description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
         code: |
           ```python
-          supabase.auth.sign_in_with_otp({
-            "phone": "+13334445555",
-            "options": {
-              "channel": "whatsapp",
-            }
-          })
+          response = supabase.auth.sign_in_with_otp(
+              {
+                  "phone": "+13334445555",
+                  "options": {
+                      "channel": "whatsapp",
+                  },
+              }
+          )
           ```
   - id: sign-in-with-oauth
     title: 'sign_in_with_oauth'
@@ -675,25 +694,27 @@ functions:
         name: Sign in using a third-party provider
         isSpotlight: true
         code: |
-          ```
-          response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github'
-          })
+          ```python
+          response = supabase.auth.sign_in_with_oauth(
+              {"provider": "github"}
+          )
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
-          ```
-          response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github',
-            "options": {
-              "redirect_to": 'https://example.com/welcome'
-            }
-          })
+          ```python
+          response = supabase.auth.sign_in_with_oauth(
+              {
+                  "provider": "github",
+                  "options": {
+                      "redirect_to": "https://example.com/welcome",
+                  }
+              }
+          )
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -702,13 +723,15 @@ functions:
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
-          ```
-          response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github',
-            "options": {
-              "scopes": 'repo gist notifications'
-            }
-          })
+          ```python
+          response = supabase.auth.sign_in_with_oauth(
+              {
+                  "provider": "github",
+                  "options": {
+                      "scopes": "repo gist notifications",
+                  }
+              }
+          )
           ```
 
   - id: sign-in-with-id-token
@@ -752,7 +775,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_with_id_token(
-            {"provider": "google", "token": "your-id-token"}
+              {
+                  "provider": "google",
+                  "token": "your-id-token",
+              }
           )
           ```
         response: |
@@ -878,7 +904,9 @@ functions:
           You can extract the user's email domain and use it to trigger the authentication flow with the correct identity provider.
         code: |
           ```python
-            response = supabase.auth.sign_in_with_sso({"domain": "company.com"})
+          response = supabase.auth.sign_in_with_sso(
+              {"domain": "company.com"}
+          )
           ```
         response: |
           ```json
@@ -893,9 +921,77 @@ functions:
           Useful when you need to map a user's sign in request according to different rules that can't use email domains.
         code: |
           ```python
-            response = supabase.auth.sign_in_with_sso(
+          response = supabase.auth.sign_in_with_sso(
               {"provider_id": "21648a9d-8d5a-4555-a9d1-d6375dc14e92"}
-            )
+          )
+          ```
+  - id: get-claims
+    title: 'get_claims'
+    params:
+      - name: jwt
+        isOptional: true
+        type: string
+        description: An optional specific JWT you wish to verify, not the one you can obtain from [`get_session`](/docs/reference/python/auth-getsession).
+      - name: jwks
+        isOptional: true
+        type: JWKSet
+        description: If set, this JSON Web Key Set is going to have precedence over the cached value available on the server.
+        subContent:
+          - name: keys
+            isOptional: false
+            type: list<JWK>
+            subContent:
+              - name: key_opt
+                isOptional: false
+                type: list[string]
+              - name: kty
+                isOptional: false
+                type: RSA | EC | oct
+              - name: alg
+                isOptional: false
+                type: string
+              - name: kid
+                isOptional: false
+                type: string
+    notes: |
+      Extracts the JWT claims present in the access token by first verifying the JWT against the server's JSON Web Key Set endpoint /.well-known/jwks.json which is often cached, resulting in significantly faster responses. Prefer this method over [`get_user`](/docs/reference/python/auth-getuser) which always sends a request to the Auth server for each JWT.
+    examples:
+      - id: get-user-object
+        name: Get user object
+        isSpotlight: true
+        code: |
+          ```
+          response = supabase.auth.get_claims()
+          ```
+        response: |
+          ```json
+          {
+            "claims": {
+              "aal": "aal1",
+              "amr": [{
+                "method": "email",
+                "timestamp": 1715766000
+              }],
+              "app_metadata": {},
+              "aud": "authenticated",
+              "email": "example@email.com",
+              "exp": 1715769600,
+              "iat": 1715766000,
+              "is_anonymous": false,
+              "iss": "https://api.supabase.com/auth/v1",
+              "phone": "+13334445555",
+              "role": "authenticated",
+              "session_id": "11111111-1111-1111-1111-111111111111",
+              "sub": "11111111-1111-1111-1111-111111111111",
+              "user_metadata": {}
+            },
+            "header": {
+              "alg": "RS256",
+              "typ": "JWT",
+              "kid": "abcdefgh"
+            },
+            "signature": [/** Uint8Array */],
+          }
           ```
   - id: sign-out
     title: 'sign_out()'
@@ -963,7 +1059,7 @@ functions:
     notes: |
       - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verify_otp` to sign up / sign-in a user.
-      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
+      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash for the PKCE flow for Server Side Auth. Read [the Password-based Auth guide](/docs/guides/auth/passwords) for more details.
     examples:
       - id: verify-signup-one-time-password(otp)
         name: Verify Signup One-Time Password (OTP)
@@ -971,7 +1067,11 @@ functions:
         code: |
           ```python
           response = supabase.auth.verify_otp(
-            {"email": "email@example.com", "token": "123456", "type": "email"}
+              {
+                  "email": "email@example.com",
+                  "token": "123456",
+                  "type": "email",
+              }
           )
           ```
         response: |
@@ -1048,7 +1148,11 @@ functions:
         code: |
           ```python
           response = supabase.auth.verify_otp(
-            {"phone": "+13334445555", "token": "123456", "type": "sms"}
+              {
+                  "phone": "+13334445555",
+                  "token": "123456",
+                  "type": "sms",
+              }
           )
           ```
       - id: verify-email-auth(tokenhash)
@@ -1057,7 +1161,11 @@ functions:
         code: |
           ```python
           response = supabase.auth.verify_otp(
-            {"email": "email@example.com", "token_hash": "<token-hash>", "type": "email"}
+              {
+                  "email": "email@example.com",
+                  "token_hash": "<token-hash>",
+                  "type": "email",
+              }
           )
           ```
   - id: get-session
@@ -1178,7 +1286,38 @@ functions:
       - In order to use the `update_user()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
-
+    params:
+      - name: attributes
+        isOptional: false
+        type: UserAttributes
+        subContent:
+          - name: data
+            isOptional: true
+            type: object
+            description: A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+          - name: email
+            isOptional: true
+            type: string
+            description: The user's email.
+          - name: nonce
+            isOptional: true
+            type: string
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: password
+            isOptional: true
+            type: string
+            description: The user's password.
+          - name: phone
+            isOptional: true
+            type: string
+            description: The user's phone.
+      - name: options
+        isOptional: true
+        type: object
+        subContent:
+          - name: email_redirect_to
+            isOptional: true
+            type: string
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -1186,9 +1325,9 @@ functions:
         isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.update_user({
-            "email": "new@email.com"
-          })
+          response = supabase.auth.update_user(
+              {"email": "new@email.com"}
+          )
           ```
         response: |
           ```json
@@ -1246,27 +1385,29 @@ functions:
         isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.update_user({
-            "phone": "123456789"
-          })
+          response = supabase.auth.update_user(
+              {"phone": "123456789"}
+          )
           ```
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.update_user({
-            "password": "new password"
-          })
+          response = supabase.auth.update_user(
+              {"password": "new password"}
+          )
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.update_user({
-            "data": { "hello": "world" }
-          })
+          response = supabase.auth.update_user(
+              {
+                  "data": {"hello": "world"},
+              }
+          )
           ```
       - id: update-password-with-reauthentication
         name: Update the user's password with a nonce
@@ -1275,10 +1416,12 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.update_user({
-            "password": "new password",
-            "nonce": "123456"
-          })
+          response = supabase.auth.update_user(
+              {
+                  "password": "new password",
+                  "nonce": "123456",
+              }
+          )
           ```
   - id: get-user-identities
     title: 'get_user_identities()'
@@ -1354,9 +1497,9 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.link_identity({
-            provider: 'github'
-          })
+          response = supabase.auth.link_identity(
+              {provider: "github"}
+          )
           ```
         response: |
           ```json
@@ -1407,12 +1550,12 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          # retrieve all identites linked to a user
-          res = supabase.auth.get_user_identities()
+          # retrieve all identities linked to a user
+          response = supabase.auth.get_user_identities()
 
-          # find the google identity 
+          # find the google identity
           google_identity = list(
-            filter(lambda identity: identity.provider == "google", res.identities)
+              filter(lambda identity: identity.provider == "google", res.identities)
           ).pop()
 
           # unlink the google identity
@@ -1477,43 +1620,51 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.resend({
-            "type": "signup",
-            "email": "email@example.com",
-            "options": {
-              "email_redirect_to": "https://example.com/welcome"
-            }
-          })
+          response = supabase.auth.resend(
+              {
+                  "type": "signup",
+                  "email": "email@example.com",
+                  "options": {
+                      "email_redirect_to": "https://example.com/welcome",
+                  },
+              }
+          )
           ```
       - id: resend-phone-signup-confirmation
         name: Resend a phone signup confirmation
         description: Resends the phone signup confirmation email to the user
         code: |
           ```python
-          response = supabase.auth.resend({
-            "type": "sms",
-            "phone": "1234567890"
-          })
+          response = supabase.auth.resend(
+              {
+                  "type": "sms",
+                  "phone": "1234567890",
+              }
+          )
           ```
       - id: resend-email-change-email
         name: Resend email change email
         description: Resends the email change email to the user
         code: |
           ```python
-          response = supabase.auth.resend({
-            "type": "email_change",
-            "email": "email@example.com"
-          })
+          response = supabase.auth.resend(
+              {
+                  "type": "email_change",
+                  "email": "email@example.com",
+              }
+          )
           ```
       - id: resend-phone-change
         name: Resend phone change OTP
         description: Resends the phone change OTP to the user
         code: |
           ```python
-          response = supabase.auth.resend({
-            "type": "phone_change",
-            "phone": "1234567890"
-          })
+          response = supabase.auth.resend(
+              {
+                  "type": "phone_change",
+                  "phone": "1234567890",
+              }
+          )
           ```
   - id: set-session
     title: 'set_session()'
@@ -1714,7 +1865,9 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.exchange_code_for_session("auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          response = supabase.auth.exchange_code_for_session(
+              {"auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225"}
+          )
           ```
         response: |
           ```json
@@ -1889,11 +2042,13 @@ functions:
         name: Enroll a time-based, one-time password (TOTP) factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.enroll({
-            "factor_type": "totp",
-            "friendly_name": "your_friendly_name"
-          })
+          ```python
+          response = supabase.auth.mfa.enroll(
+              {
+                  "factor_type": "totp",
+                  "friendly_name": "your_friendly_name",
+              }
+          )
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -1905,10 +2060,10 @@ functions:
         name: Create a challenge for a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.challenge({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225'
-          })
+          ```python
+          response = supabase.auth.mfa.challenge(
+              {"factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225"}
+          )
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
@@ -1919,12 +2074,14 @@ functions:
         name: Verify a challenge for a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.verify({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            "challenge_id": '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
-            "code": '123456'
-          })
+          ```python
+          response = supabase.auth.mfa.verify(
+              {
+                  "factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+                  "challenge_id": "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
+                  "code": "123456",
+              }
+          )
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challenge_and_verify()'
@@ -1936,11 +2093,13 @@ functions:
         name: Create and verify a challenge for a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.challenge_and_verify({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            "code": '123456'
-          })
+          ```python
+          response = supabase.auth.mfa.challenge_and_verify(
+              {
+                  "factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+                  "code": "123456",
+              }
+          )
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
@@ -1949,10 +2108,10 @@ functions:
         name: Unenroll a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.unenroll({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-          })
+          ```python
+          response = supabase.auth.mfa.unenroll(
+              {"factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225"}
+          )
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.get_authenticator_assurance_level()'
@@ -1965,8 +2124,8 @@ functions:
         name: Get the AAL details of a session
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.get_authenticator_assurance_level()
+          ```python
+          response = supabase.auth.mfa.get_authenticator_assurance_level()
           ```
   - id: admin-api
     title: 'Overview'
@@ -1983,12 +2142,12 @@ functions:
           from supabase.lib.client_options import ClientOptions
 
           supabase = create_client(
-            supabase_url, 
-            service_role_key,
-            options=ClientOptions(
-              auto_refresh_token=False,
-              persist_session=False,
-            )
+              supabase_url,
+              service_role_key,
+              options=ClientOptions(
+                  auto_refresh_token=False,
+                  persist_session=False,
+              )
           )
 
           # Access auth admin api
@@ -2062,7 +2221,7 @@ functions:
         isOptional: true
         type: PageParams
         description: |
-          An object which supports page and perPage as numbers, to alter the paginated results.
+          An object which supports page and per_page as numbers, to alter the paginated results.
         subContent:
           - name: page
             isOptional: true
@@ -2088,8 +2247,8 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.list_users(
-            page=1,
-            perPage=1000
+              page=1,
+              per_page=1000,
           )
           ```
   - id: create-user
@@ -2151,11 +2310,13 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.admin.create_user({
-            "email": "user@email.com",
-            "password": "password",
-            "user_metadata": { "name": "Yoda" }
-          })
+          response = supabase.auth.admin.create_user(
+              {
+                  "email": "user@email.com",
+                  "password": "password",
+                  "user_metadata": {"name": "Yoda"},
+              }
+          )
           ```
         response: |
           ```json
@@ -2200,19 +2361,23 @@ functions:
         name: Auto-confirm the user's email
         code: |
           ```python
-          response = supabase.auth.admin.create_user({
-            "email": "user@email.com",
-            "email_confirm": True
-          })
+          response = supabase.auth.admin.create_user(
+              {
+                  "email": "user@email.com",
+                  "email_confirm": True,
+              }
+          )
           ```
       - id: auto-confirm-the-users-phone-number
         name: Auto-confirm the user's phone number
         code: |
           ```python
-          response = supabase.auth.admin.create_user({
-            "phone": "1234567890",
-            "phone_confirm": True
-          })
+          response = supabase.auth.admin.create_user(
+              {
+                  "phone": "1234567890",
+                  "phone_confirm": True,
+              }
+          )
           ```
   - id: delete-user
     title: 'delete_user()'
@@ -2238,7 +2403,7 @@ functions:
         code: |
           ```python
           supabase.auth.admin.delete_user(
-            "715ed5db-f090-4b8c-a067-640ecee36aa0"
+              "715ed5db-f090-4b8c-a067-640ecee36aa0"
           )
           ```
   - id: invite-user-by-email
@@ -2358,11 +2523,13 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.admin.generate_link({
-            "type": "signup",
-            "email": "email@example.com",
-            "password": "secret"
-          })
+          response = supabase.auth.admin.generate_link(
+              {
+                  "type": "signup",
+                  "email": "email@example.com",
+                  "password": "secret",
+              }
+          )
           ```
         response: |
           ```json
@@ -2417,49 +2584,59 @@ functions:
         isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.admin.generate_link({
-            "type": "invite",
-            "email": "email@example.com"
-          })
+          response = supabase.auth.admin.generate_link(
+              {
+                  "type": "invite",
+                  "email": "email@example.com",
+              }
+          )
           ```
       - id: generate-a-magic-link
         name: Generate a magic link
         isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.admin.generate_link({
-            "type": "magiclink",
-            "email": "email@example.com"
-          })
+          response = supabase.auth.admin.generate_link(
+              {
+                  "type": "magiclink",
+                  "email": "email@example.com",
+              }
+          )
           ```
       - id: generate-a-recovery-link
         name: Generate a recovery link
         isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.admin.generate_link({
-            "type": "recovery",
-            "email": "email@example.com"
-          })
+          response = supabase.auth.admin.generate_link(
+              {
+                  "type": "recovery",
+                  "email": "email@example.com",
+              }
+          )
           ```
       - id: generate-links-to-change-current-email-address
         name: Generate links to change current email address
         isSpotlight: false
         code: |
           ```python
-          # generate an email change link to be sent to the current email address
-          response = supabase.auth.admin.generate_link({
-            "type": "email_change_current",
-            "email": "current.email@example.com",
-            "new_email": "new.email@example.com"
-          })
+          # Generate an email change link to be sent to the current email address
+          response = supabase.auth.admin.generate_link(
+              {
+                  "type": "email_change_current",
+                  "email": "current.email@example.com",
+                  "new_email": "new.email@example.com",
+              }
+          )
 
-          # generate an email change link to be sent to the new email address
-          response = supabase.auth.admin.generate_link({
-            "type": "email_change_new",
-            "email": "current.email@example.com",
-            "new_email": "new.email@example.com"
-          })
+          # Generate an email change link to be sent to the new email address
+          response = supabase.auth.admin.generate_link(
+              {
+                  "type": "email_change_new",
+                  "email": "current.email@example.com",
+                  "new_email": "new.email@example.com",
+              }
+          )
           ```
   - id: update-user-by-id
     title: 'update_user_by_id()'
@@ -2523,8 +2700,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.update_user_by_id(
-            "11111111-1111-1111-1111-111111111111",
-            { "email": "new@email.com" }
+              "11111111-1111-1111-1111-111111111111",
+              {
+                  "email": "new@email.com",
+              }
           )
           ```
         response: |
@@ -2582,8 +2761,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.update_user_by_id(
-            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
-            { "password": "new_password" }
+              "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+              {
+                  "password": "new_password",
+              }
           )
           ```
       - id: updates-a-users-metadata
@@ -2592,8 +2773,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.update_user_by_id(
-            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
-            { "user_metadata": { "hello": "world" } }
+              "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+              {
+                  "user_metadata": {"hello": "world"},
+              }
           )
           ```
       - id: updates-a-users-app-metadata
@@ -2602,8 +2785,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.update_user_by_id(
-            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
-            { "app_metadata": { "plan": "trial" } }
+              "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+              {
+                  "app_metadata": {"plan": "trial"},
+              }
           )
           ```
       - id: confirms-a-users-email-address
@@ -2612,8 +2797,10 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.update_user_by_id(
-            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
-            { "email_confirm": True }
+              "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+              {
+                  "email_confirm": True,
+              }
           )
           ```
       - id: confirms-a-users-phone-number
@@ -2622,10 +2809,221 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.update_user_by_id(
-            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
-            { "phone_confirm": True }
+              "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+              {
+                  "phone_confirm": True,
+              }
           )
           ```
+
+  - id: oauth-admin-api
+    title: 'Overview'
+    notes: |
+      - OAuth 2.1 client administration endpoints are available via the `supabase.auth.admin.oauth` namespace.
+      - These methods require a `service_role` key and should only be called server-side.
+      - Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      - This is an alpha feature and may change in the future.
+
+  - id: auth-js-gotrueadminoauthapi-listclients
+    title: 'admin.oauth.list_clients()'
+    description: |
+      Lists OAuth clients with optional pagination.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: params
+        isOptional: true
+        type: PageParams
+        description: Optional pagination parameters.
+        subContent:
+          - name: page
+            isOptional: true
+            type: number
+            description: Page number (1-indexed).
+          - name: per_page
+            isOptional: true
+            type: number
+            description: Number of items per page.
+    examples:
+      - id: list-oauth-clients
+        name: List OAuth clients
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.list_clients()
+          ```
+      - id: list-oauth-clients-paginated
+        name: List OAuth clients with pagination
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.list_clients(
+              params={"page": 1, "per_page": 10}
+          )
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-createclient
+    title: 'admin.oauth.create_client()'
+    description: |
+      Creates a new OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: params
+        isOptional: false
+        type: CreateOAuthClientParams
+        description: Parameters for creating a new OAuth client.
+        subContent:
+          - name: name
+            isOptional: false
+            type: string
+            description: The name of the OAuth client.
+          - name: redirect_uris
+            isOptional: false
+            type: list[string]
+            description: List of allowed redirect URIs.
+          - name: grant_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed grant types.
+          - name: response_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed response types.
+          - name: client_type
+            isOptional: true
+            type: string
+            description: The client type.
+          - name: registration_type
+            isOptional: true
+            type: string
+            description: The registration type.
+    examples:
+      - id: create-oauth-client
+        name: Create OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.create_client(
+              {
+                  "name": "My OAuth Client",
+                  "redirect_uris": ["https://example.com/callback"]
+              }
+          )
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-updateclient
+    title: 'admin.oauth.update_client()'
+    description: |
+      Updates an existing OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client to update.
+      - name: params
+        isOptional: false
+        type: UpdateOAuthClientParams
+        description: Parameters for updating the OAuth client.
+        subContent:
+          - name: name
+            isOptional: true
+            type: string
+            description: The name of the OAuth client.
+          - name: redirect_uris
+            isOptional: true
+            type: list[string]
+            description: List of allowed redirect URIs.
+          - name: grant_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed grant types.
+          - name: response_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed response types.
+    examples:
+      - id: update-oauth-client
+        name: Update OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.update_client(
+              "client-id",
+              {
+                  "name": "Updated OAuth Client",
+                  "redirect_uris": ["https://example.com/callback", "https://example.com/callback2"]
+              }
+          )
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-getclient
+    title: 'admin.oauth.get_client()'
+    description: |
+      Retrieves details of an OAuth client by ID.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client to retrieve.
+    examples:
+      - id: get-oauth-client
+        name: Get OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.get_client("client-id")
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-deleteclient
+    title: 'admin.oauth.delete_client()'
+    description: |
+      Deletes an OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client to delete.
+    examples:
+      - id: delete-oauth-client
+        name: Delete OAuth client
+        code: |
+          ```python
+          supabase.auth.admin.oauth.delete_client("client-id")
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
+    title: 'admin.oauth.regenerate_client_secret()'
+    description: |
+      Regenerates the client secret for an OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client.
+    examples:
+      - id: regenerate-oauth-client-secret
+        name: Regenerate OAuth client secret
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.regenerate_client_secret("client-id")
+          ```
+
   - id: mfa-delete-factor
     title: 'mfa.delete_factor()'
     params:
@@ -2649,10 +3047,12 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.admin.mfa.delete_factor({
-            "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
-            "user_id": "a89baba7-b1b7-440f-b4bb-91026967f66b",
-          })
+          response = supabase.auth.admin.mfa.delete_factor(
+              {
+                  "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+                  "user_id": "a89baba7-b1b7-440f-b4bb-91026967f66b"
+              }
+          )
           ```
         response: |
           ```json
@@ -2688,12 +3088,12 @@ functions:
       To update the user's password, see [`update_user()`](/docs/reference/python/auth-updateuser).
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `update_user()`:
       ```python
-      response = supabase.auth.update_user({
-        "password": new_password
-      })
+      response = supabase.auth.update_user(
+          {"password": new_password}
+      )
       ```
     examples:
       - id: reset-password
@@ -2701,9 +3101,12 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.auth.reset_password_for_email(email, {
-            "redirect_to": "https://example.com/update-password",
-          })
+          supabase.auth.reset_password_for_email(
+              email,
+              {
+                  "redirect_to": "https://example.com/update-password",
+              }
+          )
           ```
 
   - id: select
@@ -2727,20 +3130,24 @@ functions:
         name: Getting your data
         code: |
           ```python
-          response = supabase.table("countries").select("*").execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -2748,15 +3155,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -2765,34 +3172,38 @@ functions:
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
-          ```
-          response = supabase.table("countries").select("name").execute()
+          ```python
+          response = (
+              supabase.table("planets")
+              .select("name")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
-                "name": "Albania"
+                "name": "Earth"
               },
               {
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -2804,48 +3215,52 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
         code: |
           ```python
-          response = supabase.table("countries").select("name, cities(name)").execute()
+          response = (
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               },
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -2857,7 +3272,11 @@ functions:
         name: Query referenced tables through a join table
         code: |
           ```python
-          response = supabase.table("users").select("name, teams(name)").execute()
+          response = (
+              supabase.table("users")
+              .select("name, teams(name)")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -2992,9 +3411,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("cities")
-              .select("name, countries(*)")
-              .eq("countries.name", "Estonia")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(*)")
+              .eq("instruments.name", "guqin")
               .execute()
           )
           ```
@@ -3002,36 +3421,36 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": null
+                "name": "strings",
+                "instruments": null
               },
               {
-                "name": "Munich",
-                "countries": null
+                "name": "woodwinds",
+                "instruments": null
               }
             ],
             "count": null
@@ -3046,31 +3465,35 @@ functions:
         name: Querying referenced table with count
         code: |
           ```python
-          response = supabase.table("countries").select("*, cities(count)").execute()
+          response = (
+              supabase.table("orchestral_sections")
+              .select("*, instruments(count)")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table instruments (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('strings') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('violin', (select id from section)),
+            ('viola', (select id from section)),
+            ('cello', (select id from section)),
+            ('double bass', (select id from section));
             ```
         response: |
           ```json
@@ -3078,8 +3501,8 @@ functions:
             "data": [
               {
                 "id": "c31e7151-5a6f-453c-915b-caf31ec9a0a0",
-                "name": "united kingdom",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
                     "count": 4
                   }
@@ -3097,20 +3520,24 @@ functions:
         name: Querying with count option
         code: |
           ```python
-          response = supabase.table("countries").select("*", count="exact").execute()
+          response = (
+              supabase.table("planets")
+              .select("*", count="exact")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -3118,15 +3545,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": 3
@@ -3140,7 +3567,11 @@ functions:
         name: Querying JSON data
         code: |
           ```python
-          response = supabase.table("users").select("id, name, address->city").execute()
+          response = (
+              supabase.table("users")
+              .select("id, name, address->city")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3181,9 +3612,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("cities")
-              .select("name, countries!inner(name)")
-              .eq("countries.name", "Indonesia")
+              supabase.table("instruments")
+              .select("name, orchestral_sections!inner(name)")
+              .eq("orchestral_sections.name", "woodwinds")
               .execute()
           )
           ```
@@ -3191,33 +3622,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": {
-                  "name": "Indonesia"
+                "name": "flute",
+                "orchestral_sections": {
+                  "name": "woodwinds"
                 }
               }
             ],
@@ -3226,13 +3657,18 @@ functions:
           ```
         description: |
           If you don't want to return the referenced table contents, you can leave the parenthesis empty.
-          Like `.select('name, countries!inner()')`.
+          Like `.select('name, orchestral_sections!inner()')`.
         hideCodeBlock: true
       - id: switching-schemas-per-query
         name: Switching schemas per query
         code: |
           ```python
-          response = supabase.schema("myschema").table("mytable").select("*").execute()
+          response = (
+              supabase.schema("myschema")
+              .table("mytable")
+              .select("*")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3288,8 +3724,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .insert({"id": 1, "name": "Denmark"})
+              supabase.table("planets")
+              .insert({"id": 1, "name": "Pluto"})
               .execute()
           )
           ```
@@ -3297,7 +3733,7 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -3305,7 +3741,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Denmark"
+                "name": "Pluto"
               }
             ],
             "count": null
@@ -3318,21 +3754,23 @@ functions:
         code: |
           ```python
           try:
-            response = supabase.table("countries")
-              .insert([
-                { "id": 1, "name": "Nepal" },
-                { "id": 1, "name": "Vietnam" },
-              ])
-              .execute()
-            return response
+              response = (
+                  supabase.table("characters")
+                  .insert([
+                      {"id": 1, "name": "Frodo"},
+                      {"id": 2, "name": "Sam"},
+                  ])
+                  .execute()
+              )
+              return response
           except Exception as exception:
-            return exception
+              return exception
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -3341,9 +3779,9 @@ functions:
               "code": "23505",
               "details": "Key (id)=(1) already exists.",
               "hint": null,
-              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+              "message": "duplicate key value violates unique constraint \"characters_pkey\""
             },
-            "message": "duplicate key value violates unique constraint \"countries_pkey\"",
+            "message": "duplicate key value violates unique constraint \"characters_pkey\"",
             "code": "23505",
             "hint": null,
             "details": "Key (id)=(1) already exists."
@@ -3372,8 +3810,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .update({"name": "Australia"})
+              supabase.table("instruments")
+              .update({"name": "piano"})
               .eq("id", 1)
               .execute()
           )
@@ -3382,12 +3820,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Denmark');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3395,7 +3833,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "piano"
               }
             ],
             "count": null
@@ -3483,8 +3921,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .upsert({"id": 1, "name": "Australia"})
+              supabase.table("instruments")
+              .upsert({"id": 1, "name": "piano"})
               .execute()
           )
           ```
@@ -3492,12 +3930,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3505,7 +3943,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "piano"
               }
             ],
             "count": null
@@ -3518,8 +3956,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .upsert([{"id": 1, "name": "Albania"}, {"id": 2, "name": "Algeria"}])
+              supabase.table("instruments")
+              .upsert([{"id": 1, "name": "piano"}, {"id": 2, "name": "guitar"}])
               .execute()
           )
           ```
@@ -3527,12 +3965,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3540,11 +3978,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "piano"
               },
               {
                 "id": 2,
-                "name": "Algeria"
+                "name": "guitar"
               }
             ],
             "count": null
@@ -3623,7 +4061,12 @@ functions:
         name: Delete records
         code: |
           ```python
-          response = supabase.table('countries').delete().eq('id', 1).execute()
+          response = (
+              supabase.table("countries")
+              .delete()
+              .eq("id", 1)
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3634,7 +4077,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain');
+              (1, 'Mordor');
             ```
         response: |
           ```
@@ -3642,7 +4085,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Spain"
+                "name": "Mordor"
               }
             ],
             "count": null
@@ -3654,18 +4097,23 @@ functions:
         name: Delete multiple records
         code: |
           ```python
-          response = supabase.table("countries").delete().in_("id", [1, 2, 3]).execute()
+          response = (
+              supabase.table("countries")
+              .delete()
+              .in_("id", [1, 2, 3])
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Spain'), (2, 'France'), (3, 'Germany');
+              (1, 'Harry'), (2, 'Hermione'), (3, 'Ron');
             ```
         response: |
           ```json
@@ -3673,15 +4121,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Spain"
+                "name": "Harry"
               },
               {
                 "id": 2,
-                "name": "France"
+                "name": "Hermione"
               },
               {
                 "id": 3,
-                "name": "Germany"
+                "name": "Ron"
               }
             ],
             "count": null
@@ -3728,7 +4176,10 @@ functions:
         name: Call a Postgres function without arguments
         code: |
           ```python
-          response = supabase.rpc("hello_world").execute()
+          response = (
+              supabase.rpc("hello_world")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3750,7 +4201,10 @@ functions:
         name: Call a Postgres function with arguments
         code: |
           ```python
-          response = supabase.rpc("echo", { "say": "👋" }).execute()
+          response = (
+              supabase.rpc("echo", { "say": "👋" })
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3771,7 +4225,10 @@ functions:
         name: Bulk processing
         code: |
           ```python
-          response = supabase.rpc("add_one_each", {"arr": [1, 2, 3]}).execute()
+          response = (
+              supabase.rpc("add_one_each", {"arr": [1, 2, 3]})
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3798,22 +4255,27 @@ functions:
         name: Call a Postgres function with filters
         code: |
           ```python
-          response = supabase.rpc("list_stored_countries").eq("id", 1).single().execute()
+          response = (
+              supabase.rpc("list_stored_planets")
+              .eq("id", 1)
+              .single()
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'France'),
-              (2, 'United Kingdom');
+              (1, 'Earth'),
+              (2, 'Mars');
 
-            create function list_stored_countries() returns setof countries as $$
-              select * from countries;
+            create function list_stored_planets() returns setof planets as $$
+              select * from planets;
             $$ language sql;
             ```
         response: |
@@ -3821,7 +4283,7 @@ functions:
           {
             "data": {
               "id": 1,
-              "name": "France"
+              "name": "Earth"
             },
             "count": null
           }
@@ -3833,7 +4295,10 @@ functions:
         name: Call a read-only Postgres function
         code: |
           ```python
-          response = supabase.rpc('hello_world', get=True).execute()
+          response = (
+              supabase.rpc("hello_world", get=True)
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3870,17 +4335,17 @@ functions:
           ```python
           # Correct
           response = (
-              supabase.table("cities")
-              .select("name, country_id")
-              .eq("name", "Bali")
+              supabase.table("instruments")
+              .select("name, section_id")
+              .eq("name", "flute")
               .execute()
           )
 
           # Incorrect
           response = (
-              supabase.table("cities")
-              .eq("name", "Bali")
-              .select("name, country_id")
+              supabase.table("instruments")
+              .eq("name", "flute")
+              .select("name, section_id")
               .execute()
           )
           ```
@@ -3888,37 +4353,37 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
       - id: chaining-filters
         name: Chaining
         description: |
           Filters can be chained together to produce advanced queries. For example,
-          to query cities with population between 1,000 and 10,000.
+          to query instruments with octave ranges between 3 and 7 (non-inclusive).
         code: |
           ```python
           response = (
-              supabase.table("cities")
-              .select("name, country_id")
-              .gte("population", 1000)
-              .lt("population", 10000)
+              supabase.table("instruments")
+              .select("name, section_id")
+              .gte("octave_range", 3)
+              .lt("octave_range", 7)
               .execute()
           )
           ```
@@ -3926,33 +4391,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                secttion_id int8 not null references orchestral_sections,
                 name text,
-                population int8
+                octave_range int8
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'percussion'),
+              (2, 'strings');
             insert into
-              cities (id, country_id, name, population)
+              instruments (id, section_id, name, octave_range)
             values
-              (1, 2, 'Bali', 9980),
-              (2, 1, 'Munich', 250000);
+              (1, 2, 'violin', 4),
+              (2, 1, 'piano', 7);
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "country_id": 2
+                "name": "violin",
+                "section_id": 2
               }
             ],
             "count": null
@@ -3965,19 +4430,19 @@ functions:
         code: |
           ```python
           filterByName = None
-          filterPopLow = 1000
-          filterPopHigh = 10000
+          filterOctaveLow = 3
+          filterOctaveHigh = 7
 
-          query = supabase.table("cities").select("name, country_id")
+          query = supabase.table("instruments").select("name, section_id")
 
           if filterByName:
               query = query.eq("name", filterByName)
 
-          if filterPopLow:
-              query = query.gte("population", filterPopLow)
+          if filterAgeLow:
+              query = query.gte("octave_range", filterOctaveLow)
 
-          if filterPopHigh:
-              query = query.lt("population", filterPopHigh)
+          if filterAgeHigh:
+              query = query.lt("octave_range", filterOctaveHigh)
 
           response = query.execute()
           ```
@@ -3985,33 +4450,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text,
-                population int8
+                octave_range int8
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'percussion'),
+              (2, 'strings');
             insert into
-              cities (id, country_id, name, population)
+              instruments (id, section_id, name, octave_range)
             values
-              (1, 2, 'Bali', 9980),
-              (2, 1, 'Munich', 250000);
+              (1, 2, 'violin', 4),
+              (2, 1, 'piano', 7);
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "country_id": 2
+                "name": "violin",
+                "section_id": 2
               }
             ],
             "count": null
@@ -4064,9 +4529,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities!inner(name)")
-              .eq("cities.name", "Bali")
+              supabase.table("orchestral_sections")
+              .select("name, instruments!inner(name)")
+              .eq("instruments.name", "flute")
               .execute()
           )
           ```
@@ -4074,34 +4539,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -4131,20 +4596,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").eq("name", "Albania").execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .eq("name", "Earth")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4152,7 +4622,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4178,20 +4648,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").neq("name", "Albania").execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .neq("name", "Earth")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4199,11 +4674,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -4229,20 +4704,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").gt("id", 2).execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .gt("id", 2)
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4250,7 +4730,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -4279,20 +4759,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").gte("id", 2).execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .gte("id", 2)
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4300,11 +4785,11 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -4330,20 +4815,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").lt("id", 2).execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .lt("id", 2)
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4351,7 +4841,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -4377,20 +4867,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").lte("id", 2).execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .lte("id", 2)
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4398,11 +4893,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4428,20 +4923,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").like("name", "%Alba%").execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .like("name", "%Ea%")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4449,7 +4949,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4475,20 +4975,25 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").ilike("name", "%alba%").execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .ilike("name", "%ea%")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4496,7 +5001,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4522,18 +5027,23 @@ functions:
         name: Checking for nullness, True or False
         code: |
           ```python
-          response = supabase.table("countries").select("*").is_("name", "null").execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .is_("name", "null")
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Germany'),
+              (1, 'Earth'),
               (2, null);
             ```
         response: |
@@ -4575,9 +5085,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .in_("name", ["Albania", "Algeria"])
+              .in_("name", ["Earth", "Mars"])
               .execute()
           )
           ```
@@ -4585,14 +5095,14 @@ functions:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4600,11 +5110,11 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -5010,7 +5520,7 @@ functions:
               }
             ],
             "count": null
-          }  
+          }
           ```
         description: |
           Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
@@ -5328,7 +5838,11 @@ functions:
           response = (
               supabase.table("texts")
               .select("content")
-              .text_search("content", "'eggs' & 'ham'", options={"config": "english"})
+              .text_search(
+                  "content",
+                  "'eggs' & 'ham'",
+                  options={"config": "english"},
+              )
               .execute()
           )
           ```
@@ -5432,9 +5946,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .match({"id": 2, "name": "Albania"})
+              .match({"id": 2, "name": "Earth"})
               .execute()
           )
           ```
@@ -5442,14 +5956,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -5457,7 +5971,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -5480,7 +5994,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
               .not_.is_("name", "null")
               .execute()
@@ -5490,12 +6004,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Albania'),
+              (1, 'Mercury'),
               (2, null);
             ```
         response: |
@@ -5504,7 +6018,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5536,9 +6050,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("name")
-              .or_("id.eq.2,name.eq.Algeria")
+              .or_("id.eq.2,name.eq.Mars")
               .execute()
           )
           ```
@@ -5546,24 +6060,24 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Albania"
+                "name": "Earth"
               },
               {
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -5576,9 +6090,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("name")
-              .or_("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
+              .or_("id.gt.3,and(id.eq.1,name.eq.Mercury)")
               .execute()
           )
           ```
@@ -5586,21 +6100,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         reponse: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5612,9 +6126,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities!inner(name)")
-              .or_("country_id.eq.1,name.eq.Beijing", reference_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments!inner(name)")
+              .or_("book_id.eq.1,name.eq.guqin", reference_table="instruments")
               .execute()
           )
           ```
@@ -5622,34 +6136,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               }
@@ -5687,9 +6201,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .filter("name", "in", '("Algeria","Japan")')
+              .filter("name", "in", '("Mars","Tatooine")')
               .execute()
           )
           ```
@@ -5697,14 +6211,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -5712,7 +6226,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -5725,9 +6239,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities!inner(name)")
-              .filter("cities.name", "eq", "Bali")
+              supabase.table("orchestral_sections")
+              .select("name, instruments!inner(name)")
+              .filter("instruments.name", "eq", "flute")
               .execute()
           )
           ```
@@ -5735,36 +6249,128 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+  - id: max-affected
+    title: max_affected()
+    description: |
+      Set the maximum number of rows that can be affected by an update or delete operation.
+      If the query would affect more rows than the specified limit, the operation will fail with an error.
+
+      This uses PostgREST's `Prefer: max-affected` header with `handling=strict`.
+    notes: |
+      - Only available in PostgREST v13+
+      - Only works with PATCH (update) and DELETE methods
+      - The operation will fail if it would affect more rows than specified
+    params:
+      - name: value
+        isOptional: false
+        type: int
+        description: The maximum number of rows that can be affected
+    examples:
+      - id: with-update
+        name: Limit affected rows on update
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .update({"name": "Updated"})
+              .eq("id", 1)
+              .max_affected(1)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+
+            insert into
+              planets (id, name)
+            values
+              (1, 'Mercury'),
+              (2, 'Earth');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Updated"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: with-delete
+        name: Limit affected rows on delete
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .delete()
+              .eq("id", 1)
+              .max_affected(1)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+
+            insert into
+              planets (id, name)
+            values
+              (1, 'Mercury'),
+              (2, 'Earth');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5809,7 +6415,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
               .order("name", desc=True)
               .execute()
@@ -5819,14 +6425,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -5834,15 +6440,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
-              },
-              {
-                "id": 2,
-                "name": "Albania"
+                "name": "Mercury"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
+              },
+              {
+                "id": 2,
+                "name": "Earth"
               }
             ],
             "count": null
@@ -5855,51 +6461,53 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities(name)")
-              .order("name", desc=True, foreign_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .order("name", desc=True, foreign_table="instruments")
               .execute()
           )
           ```
         data:
           sql: |
+            ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
+            ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "New York City"
+                    "name": "violin"
                   },
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               },
               {
-                "name": "Vanuatu",
-                "cities": []
+                "name": "woodwinds",
+                "instruments": []
               }
             ],
             "count": null
@@ -5908,6 +6516,60 @@ functions:
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
+        hideCodeBlock: true
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```python
+          response = (
+              supabase.table("instruments")
+              .select("name, section:orchestral_sections(name)")
+              .order("section(name)", desc=False)
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 1, 'violin'),
+              (2, 2, 'flute');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "violin",
+                "section": { "name": "strings" }
+              },
+              {
+                "name": "flute",
+                "section": { "name": "woodwinds" }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering with `referenced_table(col)` affects the ordering of the
+          parent table.
         hideCodeBlock: true
   - id: limit
     title: limit()
@@ -5925,27 +6587,32 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("name").limit(1).execute()
+          response = (
+              supabase.table("planets")
+              .select("name")
+              .limit(1)
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5958,9 +6625,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities(name)")
-              .limit(1, foreign_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .limit(1, foreign_table="instruments")
               .execute()
           )
           ```
@@ -5968,33 +6635,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'strings');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               }
@@ -6027,30 +6694,35 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("name").range(0, 1).execute()
+          response = (
+              supabase.table("planets")
+              .select("name")
+              .range(0, 1)
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -6063,9 +6735,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities(name)")
-              .range(0, 1, foreign_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .range(0, 1, foreign_table="instruments")
               .execute()
           )
           ```
@@ -6073,53 +6745,53 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'brass'),
+              (2, 'strings'),
+              (3, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Kabul'),
-              (2, 1, 'Herat'),
-              (3, 2, 'Berat');
+              (1, 1, 'horn'),
+              (2, 1, 'tuba'),
+              (3, 2, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan",
-                "cities": [
+                "name": "brass",
+                "instruments": [
                   {
-                    "name": "Kabul"
+                    "name": "horn"
                   },
                   {
-                    "name": "Herat"
+                    "name": "tuba"
                   }
                 ]
               },
               {
-                "name": "Albania",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Berat"
+                    "name": "violin"
                   }
                 ]
               },
               {
-                "name": "Algeria",
-                "cities": []
+                "name": "woodwinds",
+                "instruments": []
               }
             ],
             "count": null
@@ -6134,26 +6806,32 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("name").limit(1).single().execute()
+          response = (
+              supabase.table("planets")
+              .select("name")
+              .limit(1)
+              .single()
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": {
-              "name": "Afghanistan"
+              "name": "Mercury"
             },
             "count": null
           }
@@ -6169,9 +6847,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .eq("name", "Albania")
+              .eq("name", "Earth")
               .maybe_single()
               .execute()
           )
@@ -6180,21 +6858,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": {
               "id": 2,
-              "name": "Albania"
+              "name": "Earth"
             },
             "count": null
           }
@@ -6210,25 +6888,30 @@ functions:
         name: Return data as CSV
         code: |
           ```python
-          response = supabase.table("countries").select("*").csv().execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .csv()
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "data": "id,name\n1,Mercury\n2,Earth\n3,Mars",
             "count": null
           }
           ```
@@ -6281,26 +6964,31 @@ functions:
         name: Get the execution plan
         code: |
           ```python
-          response = supabase.table("countries").select("*").explain().execute()
+          response = (
+              supabase.table("planets")
+              .select("*")
+              .explain()
+              .execute()
+          )
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on planets  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -6312,7 +7000,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
               .explain(analyze=True, verbose=True)
               .execute()
@@ -6322,23 +7010,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
-            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            Output: NULL::bigint, count(ROW(planets.id, planets.name)), COALESCE(json_agg(ROW(planets.id, planets.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
-                  Output: countries.id, countries.name
-                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
-                        Output: countries.id, countries.name
+                  Output: planets.id, planets.name
+                  ->  Seq Scan on public.planets  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: planets.id, planets.name
           Query Identifier: -4730654291623321173
           Planning Time: 0.407 ms
           Execution Time: 0.119 ms
@@ -6362,7 +7050,10 @@ functions:
         code: |
           ```python
           response = supabase.functions.invoke(
-              "hello-world", invoke_options={"body": {"name": "Functions"}}
+              "hello-world",
+              invoke_options={
+                  "body": {"name": "Functions"},
+              },
           )
           ```
       - id: error-handling
@@ -6378,44 +7069,71 @@ functions:
           from supafunc.errors import FunctionsRelayError, FunctionsHttpError
 
           try:
-            response = supabase.functions.invoke(
-                "hello-world",
-                invoke_options={
-                    "body": {"foo": "bar"},
-                    "headers": {"my-custom-header": "my-custom-header-value"},
-                },
-            )
+              response = supabase.functions.invoke(
+                  "hello-world",
+                  invoke_options={
+                      "body": {"foo": "bar"},
+                      "headers": {"my-custom-header": "my-custom-header-value"},
+                  },
+              )
           except FunctionsHttpError as exception:
-            err = exception.to_dict()
-            print(f"Function returned an error {err.get("message")}")
+              err = exception.to_dict()
+              print(f'Function returned an error {err.get("message")}')
           except FunctionsRelayError as exception:
-            err = exception.to_dict()
-            print(f"Relay error: {err.get("message")}")
+              err = exception.to_dict()
+              print(f'Relay error: {err.get("message")}')
           ```
       - id: passing-custom-headers
         name: Passing custom headers
         description: |
-          The library accepts custom headers via the `headers` option. 
+          The library accepts custom headers via the `headers` option.
 
           Note: `supabase-py` automatically populates the `Authorization` header if there is a signed in user.
         isSpotlight: true
         code: |
           ```python
           response = supabase.functions.invoke(
-            "hello-world", 
-            invoke_options={
-              "headers": {
-                "my-custom-header": "my-custom-header-value"
+              "hello-world",
+              invoke_options={
+                  "headers": {
+                      "my-custom-header": "my-custom-header-value",
+                  },
+                  "body": {"foo": "bar"},
               },
-              "body": { "foo": "bar" }
-            }
           )
+          ```
+
+  - id: realtime-api
+    title: 'Overview'
+    description: |
+      Realtime in Python only works with the asynchronous client.
+      You can initialize a new Supabase client using the `acreate_client()` method.
+
+      - Some Realtime methods are asynchronous and must be awaited. Ensure these methods are called within an `async` function.
+      - In the following Realtime examples, certain methods are awaited. These should be enclosed within an `async` function.
+      - When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the `acreate_client` example includes an import of `asyncio`.
+    examples:
+      - id: acreate-client
+        name: acreate_client()
+        code: |
+          ```python
+          import os
+          import asyncio
+          from supabase import acreate_client, AsyncClient
+
+          url: str = os.environ.get("SUPABASE_URL")
+          key: str = os.environ.get("SUPABASE_KEY")
+
+          async def create_supabase():
+            supabase: AsyncClient = await acreate_client(url, key)
+            return supabase
           ```
 
   - id: subscribe
     title: on().subscribe()
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
+      - Presence is automatically enabled when you attach presence callbacks (`on_presence_sync()`, `on_presence_join()`, or `on_presence_leave()`). If you add presence callbacks to an already joined channel, the channel will automatically resubscribe with presence enabled.
       - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
@@ -6428,90 +7146,96 @@ functions:
           channel = supabase.channel("room1")
 
           def on_subscribe(status, err):
-            if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+              if status == RealtimeSubscribeStates.SUBSCRIBED:
+                  asyncio.create_task(channel.send_broadcast(
+                      "cursor-pos",
+                      {"x": random.random(), "y": random.random()}
+                  ))
 
           def handle_broadcast(payload):
-            print("Cursor position received!", payload)
+              print("Cursor position received!", payload)
 
-          channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
+          await channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-sync
         name: Listen to presence sync
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def on_subscribe(status, err):
-            if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              if status == RealtimeSubscribeStates.SUBSCRIBED:
+                  asyncio.create_task(channel.track({"online_at": datetime.datetime.now().isoformat()}))
 
           def handle_presence_sync():
-            print('Synced presence state: ', channel.presence.state)
+              print("Synced presence state: ", channel.presence.state)
 
-          channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
+          await channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-join
         name: Listen to presence join
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def handle_presence_join(key, current_presence, new_presence):
-            print('Newly joined presences: ', new_presence)
+              print("Newly joined presences: ", new_presence)
 
           def on_subscribe(status, err):
-            if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              if status == RealtimeSubscribeStates.SUBSCRIBED:
+                  asyncio.create_task(channel.track({"online_at": datetime.datetime.now().isoformat()}))
 
-          channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
+          await channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-leave
         name: Listen to presence leave
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def handle_presence_leave(key, current_presence, left_presence):
-            print('Newly left presences: ', left_presence)
+              print("Newly left presences: ", left_presence)
 
           def on_subscribe(status, err):
-            if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.track({ "online_at": datetime.datetime.now().isoformat() })
-              channel.untrack()
+              if status == RealtimeSubscribeStates.SUBSCRIBED:
+                  asyncio.create_task(channel.track({"online_at": datetime.datetime.now().isoformat()}))
+                  asyncio.create_task(channel.untrack())
 
-          channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
+          await channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
           ```
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         isSpotlight: true
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("*", schema="*", callback=handle_record_updated)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("*", schema="*", callback=handle_record_updated)
+              .subscribe()
+          )
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
+              .subscribe()
+          )
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
+              .subscribe()
+          )
           ```
       - id: listen-to-updates
         name: Listen to updates
@@ -6524,10 +7248,11 @@ functions:
           ```
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
+              .subscribe()
+          )
           ```
       - id: listen-to-deletes
         name: Listen to deletes
@@ -6540,21 +7265,23 @@ functions:
           ```
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
+              .subscribe()
+          )
           ```
       - id: listen-to-multiple-events
         name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
-            .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
+              .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
+              .subscribe()
+          )
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
@@ -6563,10 +7290,11 @@ functions:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```python
-          supabase
-            .channel('room1')
-            .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
-            .subscribe()
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
+              .subscribe()
+          )
           ```
   - id: broadcast-message
     title: broadcastMessage()
@@ -6578,13 +7306,13 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def on_subscribe(status, err):
-            if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+              if status == RealtimeSubscribeStates.SUBSCRIBED:
+                  asyncio.create_task(channel.send_broadcast('cursor-pos', {"x": random.random(), "y": random.random()}))
 
-          channel.subscribe(on_subscribe)
+          await channel.subscribe(on_subscribe)
           ```
         response: |
           ```
@@ -6611,7 +7339,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.remove_channel(myChannel)
+          await supabase.remove_channel(myChannel)
           ```
 
   - id: remove-all-channels
@@ -6624,8 +7352,13 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.remove_all_channels()
+          await supabase.remove_all_channels()
           ```
+
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
 
   - id: list-buckets
     title: 'list_buckets()'
@@ -6680,7 +7413,7 @@ functions:
         name: Get bucket
         code: |
           ```python
-          response = supabase.storage.get_bucket('avatars')
+          response = supabase.storage.get_bucket("avatars")
           ```
         response: |
           ```json
@@ -6733,12 +7466,16 @@ functions:
         name: Create bucket
         code: |
           ```python
-          response = supabase.storage.create_bucket('avatars',   
-            options={
-              "public": False,
-              "allowed_mime_types": ["image/png"],
-              "file_size_limit": 1024,
-            }
+          response = (
+              supabase.storage
+              .create_bucket(
+                  "avatars",
+                  options={
+                      "public": False,
+                      "allowed_mime_types": ["image/png"],
+                      "file_size_limit": 1024,
+                  }
+              )
           )
           ```
         response: |
@@ -6767,7 +7504,7 @@ functions:
         name: Empty bucket
         code: |
           ```python
-          response = supabase.storage.empty_bucket('avatars')
+          response = supabase.storage.empty_bucket("avatars")
           ```
         response: |
           ```json
@@ -6810,12 +7547,16 @@ functions:
         name: Update bucket
         code: |
           ```python
-          response = supabase.storage.update_bucket('avatars',   
-            options={
-              "public": False,
-              "allowed_mime_types": ["image/png"],
-              "file_size_limit": 1024,
-            }
+          response = (
+              supabase.storage
+              .update_bucket(
+                  "avatars",
+                  options={
+                      "public": False,
+                      "allowed_mime_types": ["image/png"],
+                      "file_size_limit": 1024,
+                  }
+              )
           )
           ```
         response: |
@@ -6844,7 +7585,7 @@ functions:
         name: Delete bucket
         code: |
           ```python
-          response = supabase.storage.delete_bucket('avatars')
+          response = supabase.storage.delete_bucket("avatars")
           ```
         response: |
           ```json
@@ -6871,7 +7612,7 @@ functions:
         isOptional: false
         type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
-      - name: options
+      - name: file_options
         isOptional: false
         type: FileOptions
         subContent:
@@ -6893,13 +7634,17 @@ functions:
       - id: upload-file
         name: Upload file using filepath
         code: |
-          ```py
-          with open('./public/avatar1.png', 'rb') as f:
-            response = supabase.storage.from_("avatars").upload(
-                file=f,
-                path="public/avatar1.png",
-                file_options={"cache-control": "3600", "upsert": "false"},
-            )
+          ```python
+          with open("./public/avatar1.png", "rb") as f:
+              response = (
+                  supabase.storage
+                  .from_("avatars")
+                  .upload(
+                      file=f,
+                      path="public/avatar1.png",
+                      file_options={"cache-control": "3600", "upsert": "false"}
+                  )
+              )
           ```
         response: |
           ```json
@@ -6925,7 +7670,7 @@ functions:
         isOptional: false
         type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
-      - name: options
+      - name: file_options
         isOptional: false
         type: FileOptions
         subContent:
@@ -6948,12 +7693,16 @@ functions:
         name: Update file
         code: |
           ```python
-          with open('./public/avatar1.png', 'rb') as f:
-            response = supabase.storage.from_("avatars").update(
-                file=f,
-                path="public/avatar1.png",
-                file_options={"cache-control": "3600", "upsert": "true"},
-            )
+          with open("./public/avatar1.png", "rb") as f:
+              response = (
+                  supabase.storage
+                  .from_("avatars")
+                  .update(
+                      file=f,
+                      path="public/avatar1.png",
+                      file_options={"cache-control": "3600", "upsert": "true"}
+                  )
+              )
           ```
         response: |
           ```json
@@ -6983,9 +7732,14 @@ functions:
       - id: move-file
         name: Move file
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").move(
-            "public/avatar1.png", "private/avatar2.png"
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .move(
+                  "public/avatar1.png",
+                  "private/avatar2.png"
+              )
           )
           ```
         response: |
@@ -7015,9 +7769,14 @@ functions:
       - id: copy-file
         name: Copy file
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").copy(
-            "public/avatar1.png", "private/avatar2.png"
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .copy(
+                  "public/avatar1.png",
+                  "private/avatar2.png"
+              )
           )
           ```
         response: |
@@ -7040,7 +7799,7 @@ functions:
         isOptional: false
         type: list[string]
         description: |
-          The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
+          The file paths to be downloaded, including the current file names. For example `["folder/image.png", "folder2/image2.png"]`.
       - name: expires_in
         isOptional: false
         type: number
@@ -7060,8 +7819,13 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.storage.from_("avatars").create_signed_urls(
-            ["folder/avatar1.png", "folder/avatar2.png"], 60
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_urls(
+                  ["folder/avatar1.png", "folder/avatar2.png"],
+                  60
+              )
           )
           ```
         response: |
@@ -7094,7 +7858,7 @@ functions:
         isOptional: false
         type: string
         description: |
-          The file path, including the file name. For example `'folder/image.png'`.
+          The file path, including the file name. For example `"folder/image.png"`.
       - name: expires_in
         isOptional: false
         type: number
@@ -7139,8 +7903,13 @@ functions:
         name: Create Signed URL
         code: |
           ```python
-          response = supabase.storage.from_("avatars").create_signed_url(
-            "folder/avatar1.png", 60
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_url(
+                  "folder/avatar1.png",
+                  60
+              )
           )
           ```
         response: |
@@ -7153,18 +7922,30 @@ functions:
         name: Create a signed URL for an asset with transformations
         isSpotlight: true
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").create_signed_url(
-            "folder/avatar1.png", 60, {"transform": {"width": 100, "height": 100}}
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_url(
+                  "folder/avatar1.png",
+                  60,
+                  {"transform": {"width": 100, "height": 100}}
+              )
           )
           ```
       - id: create-signed-url-with-download
         name: Create a signed URL which triggers the download of the asset
         isSpotlight: true
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").create_signed_url(
-            "folder/avatar1.png", 60, {"download": True}
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_url(
+                  "folder/avatar1.png",
+                  60,
+                  {"download": True}
+              )
           )
           ```
 
@@ -7181,14 +7962,46 @@ functions:
         isOptional: false
         type: string
         description: |
-          The file path, including the current file name. For example `'folder/image.png'`.
+          The file path, including the current file name. For example `"folder/image.png"`.
+      - name: options
+        isOptional: true
+        type: CreateSignedUploadUrlOptions
+        description: Additional options for the upload URL creation.
+        subContent:
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: create-signed-url
         name: Create Signed URL
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").create_signed_upload_url(
-            "folder/avatar1.png"
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_upload_url("folder/avatar1.png")
+          )
+          ```
+        response: |
+          ```json
+          {
+            "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+              "path": "folder/cat.jpg",
+              "token": "<TOKEN>"
+          }
+          ```
+      - id: create-signed-url-with-upsert
+        name: Create Signed URL with upsert option
+        code: |
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_upload_url(
+                  "folder/avatar1.png",
+                  options={"upsert": "true"}
+              )
           )
           ```
         response: |
@@ -7223,7 +8036,7 @@ functions:
         description: The body of the file to be stored in the bucket.
       - name: options
         isOptional: false
-        type: FileOptions
+        type: UploadSignedUrlFileOptions
         subContent:
           - name: cache-control
             isOptional: true
@@ -7235,21 +8048,21 @@ functions:
             type: string
             description: |
               The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
-          - name: upsert
-            isOptional: true
-            type: string
-            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: create-signed-url
         name: Create Signed URL
         code: |
-          ```py
+          ```python
           with open("./public/avatar1.png", "rb") as f:
-            response = supabase.storage.from_("avatars").upload_to_signed_url(
-                path="folder/cat.jpg",
-                token="token-from-create_signed_upload_url",
-                file=f,
-            )
+              response = (
+                  supabase.storage
+                  .from_("avatars")
+                  .upload_to_signed_url(
+                      path="folder/cat.jpg",
+                      token="token-from-create_signed_upload_url",
+                      file=f,
+                  )
+              )
           ```
         response: |
           ```json
@@ -7314,9 +8127,11 @@ functions:
       - id: get-public-url
         name: Returns the URL for an asset in a public bucket
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").get_public_url(
-            "folder/avatar1.jpg"
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .get_public_url("folder/avatar1.jpg")
           )
           ```
         response: |
@@ -7329,19 +8144,30 @@ functions:
         name: Returns the URL for an asset in a public bucket with transformations
         isSpotlight: true
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").get_public_url(
-            "folder/avatar1.jpg", {"transform": {"width": 100, "height": 100}}
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .get_public_url(
+                  "folder/avatar1.jpg",
+                  {"transform": {"width": 100, "height": 100}}
+              )
           )
           ```
       - id: download-asset-in-public-bucket
         name: Returns the URL which triggers the download of an asset in a public bucket
         isSpotlight: true
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").get_public_url(
-            "folder/avatar1.jpg", {"download": True}
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .get_public_url(
+                  "folder/avatar1.jpg",
+                  {"download": True}
+              )
           )
+          ```
 
   - id: from-download
     title: 'from_.download()'
@@ -7390,24 +8216,30 @@ functions:
       - id: download-file
         name: Download file
         code: |
-          ```py
+          ```python
           with open("./myfolder/avatar1.png", "wb+") as f:
-            response = supabase.storage.from_("avatars").download(
-              "folder/avatar1.png"
-            )
-            f.write(response)
+              response = (
+                  supabase.storage
+                  .from_("avatars")
+                  .download("folder/avatar1.png")
+              )
+              f.write(response)
           ```
       - id: download-file-with-transformations
         name: Download file with transformations
         isSpotlight: true
         code: |
-          ```py
+          ```python
           with open("./myfolder/avatar1.png", "wb+") as f:
-            response = supabase.storage.from_("avatars").download(
-                "folder/avatar1.png",
-                {"transform": {"width": 100, "height": 100, "quality": 80}},
-            )
-            f.write(response)
+              response = (
+                  supabase.storage
+                  .from_("avatars")
+                  .download(
+                      "folder/avatar1.png",
+                      {"transform": {"width": 100, "height": 100, "quality": 80}},
+                  )
+              )
+              f.write(response)
           ```
 
   - id: from-remove
@@ -7423,13 +8255,17 @@ functions:
         isOptional: false
         type: list[string]
         description: |
-          An array of files to delete, including the path and file name. For example `['folder/image.png']`.
+          An array of files to delete, including the path and file name. For example `["folder/image.png"]`.
     examples:
       - id: delete-file
         name: Delete file
         code: |
-          ```py
-          response = supabase.storage.from_('avatars').remove(['folder/avatar1.png'])
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .remove(["folder/avatar1.png"])
+          )
           ```
         response: |
           ```json
@@ -7503,10 +8339,18 @@ functions:
       - id: list-files
         name: List files in a bucket
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").list(
-            "folder",
-            {"limit": 100, "offset": 0, "sortBy": {"column": "name", "order": "desc"}},
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .list(
+                  "folder",
+                  {
+                      "limit": 100,
+                      "offset": 0,
+                      "sortBy": {"column": "name", "order": "desc"},
+                  }
+              )
           )
           ```
         response: |
@@ -7533,14 +8377,545 @@ functions:
       - id: search-files-in-a-bucket
         name: Search files in a bucket
         code: |
-          ```py
-          response = supabase.storage.from_("avatars").list(
-            "folder",
-            {
-                "limit": 100,
-                "offset": 0,
-                "sortBy": {"column": "name", "order": "desc"},
-                "search": "jon",
-            },
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .list(
+                  "folder",
+                  {
+                      "limit": 100,
+                      "offset": 0,
+                      "sortBy": {"column": "name", "order": "desc"},
+                      "search": "jon",
+                  }
+              )
           )
+          ```
+
+  - id: analytics-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+      - Analytics buckets are accessed via the `supabase.storage.analytics()` namespace.
+      - Analytics buckets are used for storing and querying analytics data.
+
+  - id: storageanalytics-createbucket
+    title: 'analytics().create()'
+    description: |
+      Creates a new Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Analytics buckets are used for storing and querying analytics data.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the analytics bucket to create.
+    examples:
+      - id: create-analytics-bucket
+        name: Create analytics bucket
+        code: |
+          ```python
+          response = supabase.storage.analytics().create("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "name": "analytics-bucket",
+            "type": "ANALYTICS",
+            "created_at": "2024-12-03T18:00:00.000Z",
+            "updated_at": "2024-12-03T18:00:00.000Z"
+          }
+          ```
+
+  - id: storageanalytics-listbuckets
+    title: 'analytics().list()'
+    description: |
+      Lists all Analytics buckets with optional filtering and sorting.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: limit
+        isOptional: true
+        type: number
+        description: Maximum number of buckets to return.
+      - name: offset
+        isOptional: true
+        type: number
+        description: Number of buckets to skip.
+      - name: sort_column
+        isOptional: true
+        type: string
+        description: 'Column to sort by. Options: `id`, `name`, `created_at`, `updated_at`.'
+      - name: sort_order
+        isOptional: true
+        type: string
+        description: 'Sort order. Options: `asc`, `desc`.'
+      - name: search
+        isOptional: true
+        type: string
+        description: Search term to filter buckets by name.
+    examples:
+      - id: list-analytics-buckets
+        name: List analytics buckets
+        code: |
+          ```python
+          response = supabase.storage.analytics().list()
+          ```
+        response: |
+          ```json
+          [
+            {
+              "name": "analytics-bucket",
+              "type": "ANALYTICS",
+              "created_at": "2024-12-03T18:00:00.000Z",
+              "updated_at": "2024-12-03T18:00:00.000Z"
+            }
+          ]
+          ```
+
+  - id: storageanalytics-deletebucket
+    title: 'analytics().delete()'
+    description: |
+      Deletes an Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the analytics bucket to delete.
+    examples:
+      - id: delete-analytics-bucket
+        name: Delete analytics bucket
+        code: |
+          ```python
+          response = supabase.storage.analytics().delete("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "message": "Successfully deleted"
+          }
+          ```
+
+  - id: vector-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Buckets.
+
+  - id: storagevectors-create-bucket
+    title: 'vectors().create_bucket()'
+    description: |
+      Creates a new Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Vector buckets are used for storing and querying vector embeddings.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket to create.
+    examples:
+      - id: create-vector-bucket
+        name: Create vector bucket
+        code: |
+          ```python
+          supabase.storage.vectors().create_bucket("vectors-bucket")
+          ```
+
+  - id: storagevectors-get-bucket
+    title: 'vectors().get_bucket()'
+    description: |
+      Retrieves details of a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket to retrieve.
+    examples:
+      - id: get-vector-bucket
+        name: Get vector bucket
+        code: |
+          ```python
+          response = supabase.storage.vectors().get_bucket("vectors-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "vectorBucket": {
+              "vectorBucketName": "vectors-bucket",
+              "creationTime": "2024-12-03T18:00:00.000Z"
+            }
+          }
+          ```
+
+  - id: storagevectors-list-buckets
+    title: 'vectors().list_buckets()'
+    description: |
+      Lists all Vector buckets with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: prefix
+        isOptional: true
+        type: string
+        description: Filter buckets by name prefix.
+      - name: max_results
+        isOptional: true
+        type: number
+        description: Maximum number of buckets to return.
+      - name: next_token
+        isOptional: true
+        type: string
+        description: Token for pagination.
+    examples:
+      - id: list-vector-buckets
+        name: List vector buckets
+        code: |
+          ```python
+          response = supabase.storage.vectors().list_buckets()
+          ```
+        response: |
+          ```json
+          {
+            "vectorBuckets": [
+              {
+                "vectorBucketName": "vectors-bucket"
+              }
+            ],
+            "nextToken": null
+          }
+          ```
+
+  - id: storagevectors-delete-bucket
+    title: 'vectors().delete_bucket()'
+    description: |
+      Deletes a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket to delete.
+    examples:
+      - id: delete-vector-bucket
+        name: Delete vector bucket
+        code: |
+          ```python
+          supabase.storage.vectors().delete_bucket("vectors-bucket")
+          ```
+
+  - id: vectorbucket-createindex
+    title: 'vectors().from_().create_index()'
+    description: |
+      Creates a new vector index in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index to create.
+      - name: dimension
+        isOptional: false
+        type: number
+        description: The dimension of the vectors in this index.
+      - name: distance_metric
+        isOptional: false
+        type: string
+        description: 'The distance metric to use. Options: `cosine`, `euclidean`.'
+      - name: data_type
+        isOptional: false
+        type: string
+        description: The data type of the vectors.
+      - name: metadata
+        isOptional: true
+        type: MetadataConfiguration
+        description: Optional metadata configuration for the index.
+    examples:
+      - id: create-vector-index
+        name: Create vector index
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").create_index(
+              index_name="my-index",
+              dimension=128,
+              distance_metric="cosine",
+              data_type="float32"
+          )
+          ```
+
+  - id: vectorbucket-getindex
+    title: 'vectors().from_().get_index()'
+    description: |
+      Retrieves details of a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index to retrieve.
+    examples:
+      - id: get-vector-index
+        name: Get vector index
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").get_index("my-index")
+          ```
+
+  - id: vectorbucket-listindexes
+    title: 'vectors().from_().list_indexes()'
+    description: |
+      Lists all indexes in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: next_token
+        isOptional: true
+        type: string
+        description: Token for pagination.
+      - name: max_results
+        isOptional: true
+        type: number
+        description: Maximum number of indexes to return.
+      - name: prefix
+        isOptional: true
+        type: string
+        description: Filter indexes by name prefix.
+    examples:
+      - id: list-vector-indexes
+        name: List vector indexes
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").list_indexes()
+          ```
+
+  - id: vectorbucket-deleteindex
+    title: 'vectors().from_().delete_index()'
+    description: |
+      Deletes a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index to delete.
+    examples:
+      - id: delete-vector-index
+        name: Delete vector index
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").delete_index("my-index")
+          ```
+
+  - id: vectorindex-putvectors
+    title: 'vectors().from_().index().put()'
+    description: |
+      Inserts or updates vectors in an index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: vectors
+        isOptional: false
+        type: list[VectorObject]
+        description: List of vector objects to insert or update.
+    examples:
+      - id: put-vectors
+        name: Put vectors
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").index("my-index").put([
+              {
+                  "key": "vector-1",
+                  "data": {"float32": [0.1, 0.2, 0.3]},
+                  "metadata": {"category": "example"}
+              }
+          ])
+          ```
+
+  - id: vectorindex-getvectors
+    title: 'vectors().from_().index().get()'
+    description: |
+      Retrieves vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: keys
+        isOptional: false
+        type: list[string]
+        description: List of vector keys to retrieve.
+      - name: return_data
+        isOptional: true
+        type: bool
+        description: Whether to return vector data. Defaults to `true`.
+      - name: return_metadata
+        isOptional: true
+        type: bool
+        description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: get-vectors
+        name: Get vectors
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").get("vector-1")
+          ```
+
+  - id: vectorindex-listvectors
+    title: 'vectors().from_().index().list()'
+    description: |
+      Lists vectors in an index with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: max_results
+        isOptional: true
+        type: number
+        description: Maximum number of vectors to return.
+      - name: next_token
+        isOptional: true
+        type: string
+        description: Token for pagination.
+      - name: return_data
+        isOptional: true
+        type: bool
+        description: Whether to return vector data. Defaults to `true`.
+      - name: return_metadata
+        isOptional: true
+        type: bool
+        description: Whether to return metadata. Defaults to `true`.
+      - name: segment_count
+        isOptional: true
+        type: number
+        description: Number of segments for distributed queries.
+      - name: segment_index
+        isOptional: true
+        type: number
+        description: Segment index for distributed queries.
+    examples:
+      - id: list-vectors
+        name: List vectors
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").list()
+          ```
+
+  - id: vectorindex-queryvectors
+    title: 'vectors().from_().index().query()'
+    description: |
+      Queries vectors using a query vector to find similar vectors.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: query_vector
+        isOptional: false
+        type: VectorData
+        description: The query vector to search with.
+      - name: topK
+        isOptional: true
+        type: number
+        description: Number of results to return.
+      - name: filter
+        isOptional: true
+        type: VectorFilter
+        description: Optional filter to apply to the query.
+      - name: return_distance
+        isOptional: true
+        type: bool
+        description: Whether to return distance scores. Defaults to `true`.
+      - name: return_metadata
+        isOptional: true
+        type: bool
+        description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: query-vectors
+        name: Query vectors
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").query(
+              query_vector={"float32": [0.1, 0.2, 0.3]},
+              topK=10
+          )
+          ```
+
+  - id: vectorindex-deletevectors
+    title: 'vectors().from_().index().delete()'
+    description: |
+      Deletes vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Keys batch size must be between 1 and 500.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: keys
+        isOptional: false
+        type: list[string]
+        description: List of vector keys to delete. Must contain between 1 and 500 keys.
+    examples:
+      - id: delete-vectors
+        name: Delete vectors
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").index("my-index").delete(["vector-1", "vector-2"])
           ```

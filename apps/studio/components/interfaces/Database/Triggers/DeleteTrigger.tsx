@@ -1,51 +1,52 @@
-import { toast } from 'sonner'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 interface DeleteTriggerProps {
-  trigger?: any
+  trigger?: PostgresTrigger
   visible: boolean
-  setVisible: (value: boolean) => void
+  setVisible: (value: string | null) => void
+  onDelete: (params: {
+    projectRef: string
+    connectionString?: string | null
+    trigger: PostgresTrigger
+  }) => void
+  isLoading: boolean
 }
 
-const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
-  const { project } = useProjectContext()
-  const { id, name, schema } = trigger ?? {}
-
-  const { mutate: deleteDatabaseTrigger, isLoading } = useDatabaseTriggerDeleteMutation()
+export const DeleteTrigger = ({
+  trigger,
+  visible,
+  setVisible,
+  onDelete,
+  isLoading,
+}: DeleteTriggerProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { name, schema } = trigger ?? {}
 
   async function handleDelete() {
     if (!project) return console.error('Project is required')
-    if (!id) return console.error('Trigger ID is required')
+    if (!trigger) return console.error('Trigger ID is required')
 
-    deleteDatabaseTrigger(
-      {
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        id,
-      },
-      {
-        onSuccess: () => {
-          toast.success(`Successfully removed ${name}`)
-          setVisible(false)
-        },
-      }
-    )
+    onDelete({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      trigger,
+    })
   }
 
   return (
     <TextConfirmModal
       variant={'warning'}
       visible={visible}
-      onCancel={() => setVisible(!visible)}
+      onCancel={() => setVisible('')}
       onConfirm={handleDelete}
       title="Delete this trigger"
       loading={isLoading}
       confirmLabel={`Delete trigger ${name}`}
       confirmPlaceholder="Type in name of trigger"
-      confirmString={name}
+      confirmString={name ?? ''}
       text={
         <>
           This will delete your trigger called{' '}
@@ -59,5 +60,3 @@ const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => 
     />
   )
 }
-
-export default DeleteTrigger

@@ -1,12 +1,16 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionVariables = {
   projectRef?: string
   slug?: string
 }
+
+export type EdgeFunction = components['schemas']['FunctionSlugResponse']
 
 export async function getEdgeFunction(
   { projectRef, slug }: EdgeFunctionVariables,
@@ -25,18 +29,19 @@ export async function getEdgeFunction(
 }
 
 export type EdgeFunctionData = Awaited<ReturnType<typeof getEdgeFunction>>
-export type EdgeFunctionError = unknown
+export type EdgeFunctionError = ResponseError
 
 export const useEdgeFunctionQuery = <TData = EdgeFunctionData>(
   { projectRef, slug }: EdgeFunctionVariables,
-  { enabled = true, ...options }: UseQueryOptions<EdgeFunctionData, EdgeFunctionError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<EdgeFunctionData, EdgeFunctionError, TData> = {}
 ) =>
-  useQuery<EdgeFunctionData, EdgeFunctionError, TData>(
-    edgeFunctionsKeys.detail(projectRef, slug),
-    ({ signal }) => getEdgeFunction({ projectRef, slug }, signal),
-    {
-      enabled:
-        IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionData, EdgeFunctionError, TData>({
+    queryKey: edgeFunctionsKeys.detail(projectRef, slug),
+    queryFn: ({ signal }) => getEdgeFunction({ projectRef, slug }, signal),
+    enabled:
+      IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
+    ...options,
+  })

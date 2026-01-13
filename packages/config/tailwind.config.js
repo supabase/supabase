@@ -112,6 +112,16 @@ const uiConfig = ui({
     extend: {
       colors: {
         ...kebabToNested(colorExtend),
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
+        },
       },
 
       typography: ({ theme }) => ({
@@ -361,8 +371,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+        sans: 'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
+        mono: 'var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace)',
       },
 
       // shadcn defaults START

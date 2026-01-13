@@ -1,14 +1,16 @@
-import { Check, Lightbulb, Table2 } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { Check, Table2, Lightbulb } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -24,44 +26,61 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
+import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
+import {
+  calculateImprovement,
+  createIndexes,
+  hasIndexRecommendations,
+} from './IndexAdvisor/index-advisor.utils'
+import { QueryPerformanceRow } from './QueryPerformance.types'
+import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
+import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
 interface QueryIndexesProps {
-  selectedRow: any
+  selectedRow: Pick<QueryPerformanceRow, 'query'>
+  columnName?: string
+  suggestedSelectQuery?: string
+
+  onClose?: () => void
 }
 
 // [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
 // e.g understanding "costs", what numbers of "costs" are actually considered insignificant
 
-export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
+export const QueryIndexes = ({
+  selectedRow,
+  columnName,
+  suggestedSelectQuery,
+  onClose,
+}: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
+  const [isExecuting, setIsExecuting] = useState(false)
+  const track = useTrack()
+  const [hasTrackedTabView, setHasTrackedTabView] = useState(false)
 
   const {
     data: usedIndexes,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
+    isError,
+    error,
   } = useGetIndexesFromSelectQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     query: selectedRow?.['query'],
   })
 
-  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { data: extensions, isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const hypopgExtension = (extensions ?? []).find((ext) => ext.name === 'hypopg')
-  const indexAdvisorExtension = (extensions ?? []).find((ext) => ext.name === 'index_advisor')
-  const isIndexAdvisorAvailable =
-    indexAdvisorExtension !== undefined &&
-    indexAdvisorExtension.installed_version !== null &&
-    hypopgExtension !== undefined &&
-    hypopgExtension.installed_version !== null
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const {
     data: indexAdvisorResult,
@@ -76,7 +95,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       connectionString: project?.connectionString,
       query: selectedRow?.['query'],
     },
-    { enabled: isIndexAdvisorAvailable }
+    { enabled: isIndexAdvisorEnabled }
   )
 
   const {
@@ -86,45 +105,127 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     total_cost_after,
     total_cost_before,
   } = indexAdvisorResult ?? { index_statements: [], total_cost_after: 0, total_cost_before: 0 }
-  const hasIndexRecommendation = isSuccessIndexAdvisorResult && index_statements.length > 0
-  const totalImprovement = isSuccessIndexAdvisorResult
-    ? ((total_cost_before - total_cost_after) / total_cost_before) * 100
-    : 0
+  const hasIndexRecommendation = hasIndexRecommendations(
+    indexAdvisorResult,
+    isSuccessIndexAdvisorResult
+  )
+  const totalImprovement = calculateImprovement(total_cost_before, total_cost_after)
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: async () => {
-      await refetch()
-      toast.success(`Successfully created index`)
-    },
-    onError: (error) => {
-      toast.error(`Failed to create index: ${error.message}`)
-    },
-  })
+  const invalidateQueries = useIndexInvalidation()
 
-  const createIndex = () => {
+  useEffect(() => {
+    if (!isLoadingIndexAdvisorResult && !hasTrackedTabView) {
+      track('index_advisor_tab_clicked', {
+        hasRecommendations: hasIndexRecommendation,
+        isIndexAdvisorEnabled: isIndexAdvisorEnabled,
+      })
+      setHasTrackedTabView(true)
+    }
+  }, [
+    isLoadingIndexAdvisorResult,
+    hasIndexRecommendation,
+    hasTrackedTabView,
+    track,
+    isIndexAdvisorEnabled,
+  ])
+
+  const createIndex = async () => {
     if (index_statements.length === 0) return
 
-    execute({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      sql: index_statements.join(';\n') + ';',
-    })
+    setIsExecuting(true)
+    track('index_advisor_create_indexes_button_clicked')
+
+    try {
+      await createIndexes({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        indexStatements: index_statements,
+        onSuccess: () => refetch(),
+      })
+
+      // Only invalidate queries if index creation was successful
+      invalidateQueries()
+    } catch (error) {
+      // Error is already handled by createIndexes with a toast notification
+      // But we could add component-specific error handling here if needed
+      console.error('Failed to create index:', error)
+      setIsExecuting(false)
+    } finally {
+      setIsExecuting(false)
+
+      onClose?.()
+    }
+  }
+
+  if (!isLoadingExtensions && !isIndexAdvisorEnabled) {
+    return (
+      <QueryPanelContainer className="h-full">
+        <QueryPanelSection className="pt-2">
+          <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+            <p className="text-sm text-foreground-light">Enable Index Advisor</p>
+            <p className="text-center text-xs text-foreground-lighter mb-2">
+              Recommends indexes to improve query performance.
+            </p>
+            <div className="flex items-center gap-x-2">
+              <DocsButton href={`${DOCS_URL}/guides/database/extensions/index_advisor`} />
+              <EnableIndexAdvisorButton />
+            </div>
+          </div>
+        </QueryPanelSection>
+      </QueryPanelContainer>
+    )
   }
 
   return (
-    <QueryPanelContainer className="h-full">
-      <QueryPanelSection>
-        <div>
-          <p className="text-sm">Indexes in use</p>
+    <QueryPanelContainer className="h-full overflow-y-auto py-0 pt-4">
+      {(columnName || suggestedSelectQuery) && (
+        <QueryPanelSection className="pt-2 pb-6 border-b">
+          <div className="flex flex-col gap-y-3">
+            <div>
+              <h4 className="mb-2">Recommendation reason</h4>
+              {columnName && (
+                <p className="text-sm text-foreground-light">
+                  Recommendation for column: <span className="font-mono">{columnName}</span>
+                </p>
+              )}
+            </div>
+            {suggestedSelectQuery && (
+              <div className="flex flex-col gap-y-4">
+                <p className="text-sm text-foreground-light">Based on the following query:</p>
+                <CodeBlock
+                  hideLineNumbers
+                  value={suggestedSelectQuery}
+                  language="sql"
+                  className={cn(
+                    'max-w-full max-h-[200px]',
+                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                  )}
+                />
+              </div>
+            )}
+          </div>
+        </QueryPanelSection>
+      )}
+      <QueryPanelSection className="pt-2 mb-6">
+        <div className="mb-4 flex flex-col gap-y-1">
+          <h4 className="mb-2">Indexes in use</h4>
           <p className="text-sm text-foreground-light">
             This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
           </p>
         </div>
         {isLoading && <GenericSkeletonLoader />}
+        {isError && (
+          <AlertError
+            projectRef={project?.ref}
+            error={error}
+            subject="Failed to retrieve indexes in use"
+          />
+        )}
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (
-              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-20 gap-y-1">
+              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
                 <p className="text-sm text-foreground-light">
                   No indexes are involved in this query
                 </p>
@@ -153,15 +254,12 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           </div>
         )}
       </QueryPanelSection>
-
-      <div className="border-t" />
-
-      <QueryPanelSection className="flex flex-col gap-y-6">
-        <div className="flex flex-col gap-y-2">
-          <p className="text-sm">New index recommendations</p>
+      <QueryPanelSection className="flex flex-col gap-y-6 py-6 border-t">
+        <div className="flex flex-col gap-y-1">
+          <h4 className="mb-2">New index recommendations</h4>
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
-          ) : !isIndexAdvisorAvailable ? (
+          ) : !isIndexAdvisorEnabled ? (
             <IndexAdvisorDisabledState />
           ) : (
             <>
@@ -188,7 +286,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                       {isLinterWarning ? (
                         <Alert_Shadcn_
                           variant="default"
-                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
                         >
                           <Lightbulb />
                           <AlertTitle_Shadcn_>
@@ -203,12 +301,12 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>
                       ) : (
-                        <p className="text-sm text-foreground-light">
-                          Creating the following {index_statements.length > 1 ? 'indexes' : 'index'}{' '}
-                          on <code className="text-xs">public.files</code> can improve this query's
-                          performance by{' '}
-                          <span className="text-brand">{totalImprovement.toFixed(2)}%</span>:
-                        </p>
+                        <IndexImprovementText
+                          indexStatements={index_statements}
+                          totalCostBefore={total_cost_before}
+                          totalCostAfter={total_cost_after}
+                          className="text-sm text-foreground-light"
+                        />
                       )}
                       <CodeBlock
                         hideLineNumbers
@@ -220,10 +318,10 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                         )}
                       />
-                      <p className="text-sm text-foreground-light">
+                      <p className="text-sm text-foreground-light mt-3">
                         This recommendation serves to prevent your queries from slowing down as your
                         application grows, and hence the index may not be used immediately after
-                        it's created. (e.g If your table is still small at this time)
+                        it's created (e.g If your table is still small at this time).
                       </p>
                     </>
                   )}
@@ -232,10 +330,12 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
             </>
           )}
         </div>
-        {isIndexAdvisorAvailable && hasIndexRecommendation && (
-          <>
-            <div className="flex flex-col gap-y-2">
-              <p className="text-sm">Query costs</p>
+      </QueryPanelSection>
+      {isIndexAdvisorEnabled && hasIndexRecommendation && (
+        <>
+          <QueryPanelSection className="py-6 border-t">
+            <div className="flex flex-col gap-y-1">
+              <h4 className="mb-2">Query costs</h4>
               <div className="border rounded-md flex flex-col bg-surface-100">
                 <QueryPanelScoreSection
                   name="Total cost of query"
@@ -260,8 +360,10 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                 </Collapsible_Shadcn_>
               </div>
             </div>
+          </QueryPanelSection>
+          <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-2">
-              <p className="text-sm">FAQ</p>
+              <h4 className="mb-2">FAQ</h4>
               <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
                 <AccordionItem_Shadcn_ value="1">
                   <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
@@ -293,13 +395,13 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                 </AccordionItem_Shadcn_>
               </Accordion_Shadcn_>
             </div>
-          </>
-        )}
-      </QueryPanelSection>
+          </QueryPanelSection>
+        </>
+      )}
 
-      {isIndexAdvisorAvailable && hasIndexRecommendation && (
+      {isIndexAdvisorEnabled && hasIndexRecommendation && (
         <div className="bg-studio sticky bottom-0 border-t py-3 flex items-center justify-between px-5">
-          <div className="flex flex-col gap-y-1 text-sm">
+          <div className="flex flex-col gap-y-0.5 text-xs">
             <span>Apply index to database</span>
             <span className="text-xs text-foreground-light">
               This will run the SQL that is shown above

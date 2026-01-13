@@ -5,108 +5,230 @@ description: 'How to solve common problems and issues related to Edge Functions.
 subtitle: 'How to solve common problems and issues related to Edge Functions.'
 ---
 
-If you encounter any problems or issues with your Edge Functions, here are some tips and steps to help you resolve them.
+{/* supa-mdx-lint-disable Rule001HeadingCase */}
+
+When developing Edge Functions, you can run into various issues during development, deployment, and at runtime. Most problems fall under these categories:
+
+- [Deployment issues](/docs/guides/functions/troubleshooting#deployment-issues)
+- [Runtime issues](/docs/guides/functions/troubleshooting#runtime-issues)
+- [Performance issues](/docs/guides/functions/troubleshooting#performance-optimization)
+- [Local development problems](/docs/guides/functions/troubleshooting#local-development-issues)
+
+This guide will cover most of the common issues.
+
+<Admonition type="note">
+
+Before troubleshooting, make sure you're using the latest version of the Supabase CLI:
+
+```bash
+supabase --version
+supabase update
+```
+
+</Admonition>
+
+---
+
+## Deployment issues
 
 ### Unable to deploy Edge Function
 
-- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
-- If the output from the commands above does not help you to resolve the issue, open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output from the commands mentioned above.
+1. **Check function syntax:** Run `deno check` on your function files locally
+2. **Review dependencies:** Verify all imports are accessible and compatible with Deno
+3. **Examine bundle size:** Large functions may fail to deploy
 
-### Unable to call Edge Function
+```bash
+# Check for syntax errors
+deno check ./supabase/functions/your-function/index.ts
 
-If you’re unable to call your Edge Function or are experiencing any CORS issues:
+# Deploy with verbose output
+supabase functions deploy your-function --debug
+```
 
-- Make sure you followed the [CORS guide](/docs/guides/functions/cors). This guide explains how to enable and configure CORS for your Edge Functions, and how to avoid common pitfalls and errors.
-- Check your function logs. Navigate to the [Functions section](https://supabase.com/dashboard/project/_/functions) in your dashboard, select your function from the list, and click `Logs`. Check for any errors or warnings that may indicate the cause of the problem.
+<Admonition type="note">
 
-There are two debugging tools available: Invocations and Logs. Invocations shows the Request and Response for each execution, while Logs shows any platform events, including deployments and errors.
+If these steps don't resolve the issue, open a support ticket via the Supabase Dashboard and
+include all output from the diagnostic commands.
+
+</Admonition>
+
+### Bundle size issues
+
+Functions have a 10MB source code limit. Check your bundle size:
+
+```bash
+deno info /path/to/function/index.ts
+```
+
+Look for the "size" field in the output. If your bundle is too large:
+
+- Remove unused dependencies
+- Use selective imports: `import { specific } from 'npm:package/specific'`
+- Consider splitting large functions into smaller ones
+
+---
+
+## Runtime issues
 
 ### Edge Function takes too long to respond
 
-If your Edge Function takes too long to respond or times out:
+Functions have a 60-second execution limit.
 
-- Navigate to the [Functions section](https://supabase.com/dashboard/project/_/functions) in your dashboard, select your function from the list, and click `Logs`.
-- In the logs, look for the `booted` event and check if they have consistent boot times.
-  - If the boot times are similar, it’s likely an issue with your function’s code, such as a large dependency, a slow API call, or a complex computation. You can try to optimize your code, reduce the size of your dependencies, or use caching techniques to improve the performance of your function.
-  - If only some of the `booted` events are slow, find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
+1. **Check function logs:** Navigate to Functions > [Your Function] > Logs in the dashboard
+2. **Examine boot times:** Look for `booted` events and check for consistent boot times
+3. **Identify bottlenecks:** Review your code for slow operations
+   - If the boot times are similar, it’s likely an issue with your function’s code, such as a large dependency, a slow API call, or a complex computation. You can try to optimize your code, reduce the size of your dependencies, or use caching techniques to improve the performance of your function.
+   - If only some of the `booted` events are slow, find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+```tsx
+// ✅ Optimize database queries
+const { data } = await supabase
+  .from('users')
+  .select('id, name') // Only select needed columns
+  .limit(10)
 
-### Receiving 546 Error Response
+// ❌ Avoid fetching large datasets
+const { data } = await supabase.from('users').select('*') // Fetches all columns
+```
 
-The 546 error response might occur because:
+### 546 Error Response
 
-- **Memory or CPU Limits**: The function might have exhausted its memory or encountered CPU limits enforced during execution.
-- **Event Loop Completion**: If you observe "Event loop completed" in your error logs, it's likely your function is not implemented correctly. You should check your function code for any syntax errors, infinite loops, or unresolved promises that might cause this error. Or you can try running the function locally (using Supabase CLI **`functions serve`**) to see if you can debug the error. The local console should give a full stack trace on the error with line numbers of the source code. You can also refer to [Edge Functions examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) for guidance.
+The 546 error typically indicates resource exhaustion or code issues:
 
-### Issues serving Edge Functions locally with the Supabase CLI
+- **Memory or CPU Limits:** Your function may have exceeded available resources. Check the resource usage metrics in your dashboard.
+- **Event Loop Completion:** If logs show "Event loop completed," your function has implementation issues. You should check your function code for any syntax errors, infinite loops, or unresolved promises that might cause this error.
 
-- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
-- Run the serve command with the `-debug` flag.
-- Support engineers can then try to run the provided sample code locally and see if they can reproduce the issue.
-- Search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repos for the error message, to see if it has been reported before.
-- If the output from the commands above does not help you to resolve the issue, please open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output and details about your commands.
+  You can also try running the function locally (using Supabase CLI **`functions serve`**) to see if you can debug the error. The local console should give a full stack trace on the error with line numbers of the source code. You can also refer to [Edge Functions examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) for guidance.
 
-## Advanced techniques
+Run the function locally with `supabase functions serve` to get detailed stack traces.
 
-### Monitoring Edge Function resource usage
+### Unable to call Edge Function
 
-To determine how much memory and CPU your Edge Function consumes, follow these steps:
+For invocation or CORS issues:
 
-- Navigate to the Supabase Dashboard.
-- Go to **Edge Functions**.
-- Select the specific function by clicking on its name.
-- View the resource usage **Metrics** on the charts provided.
+1. **Review CORS configuration:** Check out the [CORS guide](/docs/guides/functions/cors), and ensure you've properly configured CORS headers
+2. **Check function logs:** Look for errors in the Functions > Logs section
+3. **Verify authentication:** Confirm JWT tokens and permissions are correct
+
+```tsx
+// ✅ Proper CORS handling
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    })
+  }
+
+  // Your function logic here
+  return new Response('Success', {
+    headers: { 'Access-Control-Allow-Origin': '*' },
+  })
+})
+```
+
+There are two debugging tools available: Invocations and Logs. Invocations shows the Request and Response for each execution, while Logs shows any platform events, including deployments and errors.
+
+---
+
+## Local development issues
+
+### Issues serving functions locally
+
+When `supabase functions serve` fails:
+
+1. **Use debug mode:** Run with the `--debug` flag for detailed output
+2. **Check port availability:** Ensure ports `54321` and `8081` are available
+
+```bash
+# Serve with debug output
+supabase functions serve your-function --debug
+
+# Check specific port usage
+lsof -i :54321
+```
+
+If the problem persists, search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repositories for similar error messages.
 
 <Admonition type="note">
-  Edge Functions have limited resources (CPU, memory, and execution time) compared to traditional
-  servers. Make sure your functions are optimized for performance and don't exceed the allocated
-  resources.
+
+If the output from the commands above does not help you to resolve the issue, open a support
+ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all
+output and details about your commands.
+
 </Admonition>
 
-### Understanding CPU soft and hard limits
+## Performance optimization
 
-An isolate is like a worker that can handle multiple requests for a function. It works until a time limit of 400 seconds is reached. Now, there are two types of limits for the CPU.
+### Monitoring resource usage
+
+Track your function's performance through the dashboard:
+
+1. Navigate to Edge Functions > [Your Function] > Metrics
+2. Review CPU, memory, and execution time charts
+3. Identify potential problems in resource consumption
+
+<Admonition type="note">
+
+Edge Functions have limited resources compared to traditional servers. Optimize for:
+
+- **Memory efficiency:** Avoid loading large datasets into memory
+- **CPU optimization:** Minimize complex computations
+- **Execution time:** Keep functions under 60 seconds
+
+</Admonition>
+
+### Understanding CPU limits
+
+An isolate is like a worker that can handle multiple requests for a function. It works until a time limit of 400 seconds is reached. Edge Functions use isolates with soft and hard CPU limits:
 
 1. **Soft Limit**: When the isolate hits the soft limit, it retires. This means it won't take on any new requests, but it will finish processing the ones it's already working on. It keeps going until it either hits the hard limit for CPU time or reaches the 400-second time limit, whichever comes first.
 2. **Hard Limit**: If there are new requests after the soft limit is reached, a new isolate is created to handle them. The original isolate continues until it hits the hard limit or the time limit. This ensures that existing requests are completed, and new ones will be managed by a newly created isolate.
 
-### Checking function boot time
+### Dependency Analysis
 
-Check the logs for the function. In the logs, look for a "Booted" event and note the reported boot time. If available, click on the event to access more details, including the regions from where the function was served. Investigate if the boot time is excessively high (longer than 1 second) and note any patterns or regions where it occurs. You can refer to this guide for troubleshooting [regional invocations](/docs/guides/functions/regional-invocation).
+It’s important to optimize your dependencies for better performance. Large or unnecessary dependencies can significantly impact bundle size, boot time, and memory usage.
 
-### Finding bundle size
+**Deno Dependencies**
 
-To find the bundle size of a function, run the following command locally:
-
-`deno info /path/to/function/index.ts`
-
-Look for the "size" field in the output which represents the approximate bundle size of the function. You can find the accurate bundle size when you deploy your function via Supabase CLI. If the function is part of a larger application, consider examining the bundle size of the specific function independently.
-
-The source code of a function is subject to 10MB site limit.
-
-### Analyze dependencies
-
-When analyzing dependencies for your Supabase Edge Functions, it's essential to review both Deno and NPM dependencies to ensure optimal performance and resource utilization.
-By selectively importing only the required submodules, you can effectively reduce the size of your function's dependencies and optimize its performance.
-Before finalizing your imports, ensure to review both Deno and NPM dependencies, checking for any unnecessary or redundant dependencies that can be removed. Additionally, check for outdated dependencies and update to the latest versions if possible.
-
-#### Deno dependencies
-
-Run `deno info`, providing the path to your input map if you use one.
-Review the dependencies listed in the output. Pay attention to any significantly large dependencies, as they can contribute to increased bundle size and potential boot time issues.
-Examine if there are any unnecessary or redundant dependencies that can be removed. Check for outdated dependencies and update to the latest versions if possible.
+Start by analyzing your dependency tree to understand what's being imported:
 
 ```bash
+# Basic dependency analysis
+deno info /path/to/function/index.ts
+
+# With import map (if using one)
 deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
 ```
 
-#### NPM dependencies
+Review the output for:
 
-Additionally, if you utilize NPM modules in your Edge Functions, it's crucial to be mindful of their size and impact on the overall bundle size. While importing NPM modules, consider using the notation `import { submodule } from 'npm:package/submodule'` to selectively import specific submodules rather than importing the entire package. This approach can help minimize unnecessary overhead and streamline the execution of your function.
+- **Large dependencies:** Look for packages that contribute significantly to bundle size
+- **Redundant imports:** Multiple packages providing similar functionality
+- **Outdated versions:** Dependencies that can be updated to more efficient versions
+- **Unused imports:** Dependencies imported but not actually used in your code
 
-For example, if you only need the `Sheets` submodule from the `googleapis` package, you can import it like this:
+**NPM Dependencies**
 
-```typescript
+When using NPM modules, keep their impact on bundle size in mind. Many NPM packages are designed for Node.js and may include unnecessary polyfills or large dependency trees.
+
+Use selective imports to minimize overhead:
+
+```tsx
+// ✅ Import specific submodules
 import { Sheets } from 'npm:@googleapis/sheets'
+import { JWT } from 'npm:google-auth-library/build/src/auth/jwtclient'
+
+// ❌ Import entire package
+import * as googleapis from 'npm:googleapis'
+import * as googleAuth from 'npm:google-auth-library'
 ```
+
+- **Tree-shake aggressively:** Only import what you actually use
+- **Choose lightweight alternatives:** Research smaller packages that provide the same functionality
+- **Bundle analysis:** Use `deno info` before and after changes to measure impact
+- **Version pinning:** Lock dependency versions to avoid unexpected size increases

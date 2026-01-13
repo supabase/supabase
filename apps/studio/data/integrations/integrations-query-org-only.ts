@@ -1,25 +1,22 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
-import type { Integration, IntegrationsVariables } from './integrations.types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { Integration } from './integrations.types'
 import { integrationKeys } from './keys'
 
-export type IntegrationsResponse = Integration[]
+type IntegrationsVariables = {
+  orgSlug?: string
+}
 
 export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal?: AbortSignal) {
-  if (!orgSlug) {
-    throw new Error('orgSlug is required')
-  }
-  const response = await get(`${API_URL}/integrations/${orgSlug}?expand=true`, {
-    signal,
-  })
-  if (response.error) {
-    throw response.error
-  }
+  if (!orgSlug) throw new Error('orgSlug is required')
 
-  return response as IntegrationsResponse
+  const { data, error } = await get('/platform/integrations/{slug}', {
+    params: { path: { slug: orgSlug } },
+  })
+  if (error) handleError(error)
+  return data as unknown as Integration[]
 }
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
@@ -28,10 +25,15 @@ export type IntegrationsError = ResponseError
 
 export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
   { orgSlug }: IntegrationsVariables,
-  { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
-  useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.integrationsListWithOrg(orgSlug),
-    ({ signal }) => getIntegrations({ orgSlug }, signal),
-    { enabled: enabled && typeof orgSlug !== 'undefined', ...options }
-  )
+  useQuery<IntegrationsData, IntegrationsError, TData>({
+    queryKey: integrationKeys.integrationsListWithOrg(orgSlug),
+    queryFn: ({ signal }) => getIntegrations({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined',
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })

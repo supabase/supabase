@@ -8,8 +8,12 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { useShowNewReplicaPanel } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/use-show-new-replica'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
+import { timeout } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
@@ -34,24 +38,31 @@ interface DatabaseSelectorProps {
   additionalOptions?: { id: string; name: string }[]
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
+  portal?: boolean
+  className?: string
 }
 
-const DatabaseSelector = ({
+export const DatabaseSelector = ({
   selectedDatabaseId: _selectedDatabaseId,
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
   buttonProps,
+  portal = true,
+  className,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
+
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const state = useDatabaseSelectorStateSnapshot()
   const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
-  const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
+  const { data, isPending: isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
   const sortedDatabases = databases
     .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
@@ -71,7 +82,7 @@ const DatabaseSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <div className="flex cursor-pointer">
+        <div className={cn('flex cursor-pointer', className)}>
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Source
           </span>
@@ -107,7 +118,7 @@ const DatabaseSelector = ({
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={portal}>
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             {additionalOptions.length > 0 && (
@@ -198,34 +209,40 @@ const DatabaseSelector = ({
                 })}
               </ScrollArea>
             </CommandGroup_Shadcn_>
-            <CommandGroup_Shadcn_ className="border-t">
-              <CommandItem_Shadcn_
-                className="cursor-pointer w-full"
-                onSelect={() => {
-                  setOpen(false)
-                  router.push(`/project/${projectRef}/settings/infrastructure`)
-                }}
-                onClick={() => setOpen(false)}
-              >
-                <Link
-                  href={`/project/${projectRef}/settings/infrastructure`}
-                  onClick={() => {
+            {IS_PLATFORM && infrastructureReadReplicas && (
+              <CommandGroup_Shadcn_ className="border-t">
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
                     setOpen(false)
-                    // [Joshen] This is used in the Connect UI which is available across all pages
-                    setShowConnect(null)
+                    router.push(`/project/${projectRef}/settings/infrastructure`)
                   }}
-                  className="w-full flex items-center gap-2"
+                  onClick={() => setOpen(false)}
                 >
-                  <Plus size={14} strokeWidth={1.5} />
-                  <p>Create a new read replica</p>
-                </Link>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
+                  <Link
+                    href={`/project/${projectRef}/settings/infrastructure`}
+                    onClick={async () => {
+                      setOpen(false)
+                      // [Joshen] This is used in the Connect UI which is available across all pages
+                      setShowConnect(false)
+
+                      // [Joshen] Adding a short timeout to compensate for the shift in focus
+                      // the replica panel from a "portal" based component (e.g dialog, sheet, dropdown, etc)
+                      // Although I'd prefer if there's a better way to resolve this
+                      await timeout(50)
+                      setShowNewReplicaPanel(true)
+                    }}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Plus size={14} strokeWidth={1.5} />
+                    <p>Create a new read replica</p>
+                  </Link>
+                </CommandItem_Shadcn_>
+              </CommandGroup_Shadcn_>
+            )}
           </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
 }
-
-export default DatabaseSelector

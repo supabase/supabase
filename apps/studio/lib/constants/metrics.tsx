@@ -12,58 +12,59 @@ export type Metric = {
 
 type MetricCategory = {
   label: string
-  icon: ReactNode
+  icon: (className?: string) => ReactNode
   key: string
 }
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <ActivityIcon size={16} />,
+    icon: (className?: string) => <ActivityIcon size={16} className={className} />,
     key: 'api',
   },
   API_DATABASE: {
     label: 'Database API',
-    icon: <DatabaseIcon size={16} />,
+    icon: (className?: string) => <DatabaseIcon size={16} className={className} />,
     key: 'api_database',
   },
   API_AUTH: {
-    label: 'Auth API',
-    icon: <Auth size={16} />,
+    label: 'Authentication',
+    icon: (className?: string) => <Auth size={16} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
-    label: 'Storage API',
-    icon: <Storage size={16} />,
+    label: 'Storage',
+    icon: (className?: string) => <Storage size={16} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
-    label: 'Realtime API',
-    icon: <Realtime size={16} />,
+    label: 'Realtime',
+    icon: (className?: string) => <Realtime size={16} className={className} />,
     key: 'api_realtime',
   },
   INSTANCE: {
     label: 'Instance health',
-    icon: <HeartIcon size={16} />,
+    icon: (className?: string) => <HeartIcon size={16} className={className} />,
     key: 'instance',
   },
   SUPAVISOR: {
     label: 'Supavisor',
-    icon: <ServerIcon size={16} />,
+    icon: (className?: string) => <ServerIcon size={16} className={className} />,
     key: 'supavisor',
   },
 }
 
+// [Joshen] Eventually we can remove some charts here from DEPRECATED_REPORTS from Reports.constants.ts
 export const METRICS: Metric[] = [
   {
     key: 'avg_cpu_usage',
-    label: 'Average CPU % usage',
+    label: 'Average CPU % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
     key: 'max_cpu_usage',
-    label: 'Max CPU % usage',
+    label: 'Max CPU % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -81,7 +82,7 @@ export const METRICS: Metric[] = [
   },
   {
     key: 'ram_usage',
-    label: 'Memory % usage',
+    label: 'Memory % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -204,13 +205,13 @@ export const METRICS: Metric[] = [
   },
   {
     key: 'total_auth_patch_requests',
-    label: 'Auth PATCH requests',
+    label: 'Auth PATCH Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
     key: 'total_auth_options_requests',
-    label: 'Auth OPTIONS requests',
+    label: 'Auth OPTIONS Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },
@@ -286,6 +287,14 @@ export const METRICS: Metric[] = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
+
+  {
+    key: 'total_cached_egress',
+    label: 'All Cached Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+
   {
     key: 'total_storage_patch_requests',
     label: 'Storage PATCH Requests',
@@ -333,7 +342,7 @@ export const METRICS: Metric[] = [
   /** Supavisor */
   {
     key: 'total_supavisor_egress_bytes',
-    label: 'Supavisor Egress',
+    label: 'Shared Pooler Egress',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.SUPAVISOR,
   },
@@ -371,6 +380,14 @@ export const TIME_PERIODS_REPORTS = [
 ]
 
 export const TIME_PERIODS_INFRA = [
+  {
+    key: '10m',
+    label: 'Last 10 minutes',
+  },
+  {
+    key: '30m',
+    label: 'Last 30 minutes',
+  },
   {
     key: '1h',
     label: 'Last hour',

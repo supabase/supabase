@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { createAppAuth } from '@octokit/auth-app'
+import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
 import dayjs from 'dayjs'
@@ -41,6 +42,87 @@ export type DiscussionsResponse = {
   }
 }
 
+// uses the graphql api
+async function fetchDiscussions(
+  owner: string,
+  repo: string,
+  categoryId: string,
+  cursor: string | null = null
+) {
+  const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+  type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+
+  const octokit = new ExtendedOctokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.GITHUB_CHANGELOG_APP_ID,
+      installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
+      privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
+    },
+  })
+
+  const query = `
+    query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+      repository(owner: $owner, name: $repo) {
+        discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          totalCount
+          pageInfo {
+            hasPreviousPage
+            hasNextPage
+            startCursor
+            endCursor
+          }
+          nodes {
+            id
+            publishedAt
+            createdAt
+            url
+            title
+            body
+          }
+        }
+      }
+    }
+  `
+  const queryVars = {
+    owner,
+    repo,
+    categoryId,
+    cursor,
+  }
+
+  // fetch discussions
+  const {
+    repository: {
+      discussions: { nodes: discussions, pageInfo },
+    },
+  } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
+
+  return { discussions, pageInfo }
+}
+
+function isEncoded(uri: string | null | undefined) {
+  uri = uri ?? ''
+  return uri !== decodeURIComponent(uri)
+}
+
+// Decodes a URI if it is encoded
+const recursiveDecodeURI = (uri: string | null) => {
+  if (!uri) {
+    return uri
+  }
+  let tries = 0
+  while (isEncoded(uri)) {
+    uri = decodeURIComponent(uri)
+    tries++
+    if (tries > 10) {
+      break
+    }
+  }
+
+  return uri
+}
+
 /**
  * [Terry]
  * this page powers supabase.com/changelog
@@ -54,7 +136,9 @@ export type DiscussionsResponse = {
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
   // refresh every 15 minutes
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-  const next = query.next ?? (null as string | null)
+  const encodedNext = (query.next ?? null) as string | null
+  // in some cases the next cursor is encoded twice or more times due to the user pasting the url, so we need to decode it multiple times.
+  const next = recursiveDecodeURI(encodedNext)
   const restPage = query.restPage ? Number(query.restPage) : 1
 
   const octokitRest = new OctokitRest({
@@ -80,7 +164,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   // Process as of Feb. 2024:
   // create a Release each month and create a corresponding changelog discussion
-  // — we don't want to pull in both the changelog entry and the release entry
+  // — we don't want to pull in both the changelog entry and the release entry
   // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
   // — so we have this list of old releases that we want to show
   const oldReleases = [
@@ -92,66 +176,11 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     (release) => release.id && oldReleases.includes(release.id)
   )
 
-  // uses the graphql api
-  async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
-    const { Octokit } = await import('@octokit/core')
-    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-    type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
-
-    const octokit = new ExtendedOctokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId: process.env.GITHUB_CHANGELOG_APP_ID,
-        installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
-        privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
-      },
-    })
-
-    const query = `
-      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
-        repository(owner: $owner, name: $repo) {
-          discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
-            totalCount
-            pageInfo {
-              hasPreviousPage
-              hasNextPage
-              startCursor
-              endCursor
-            }
-            nodes {
-              id
-              publishedAt
-              createdAt
-              url
-              title
-              body
-            }
-          }
-        }
-      }
-    `
-    const queryVars = {
-      owner,
-      repo,
-      categoryId,
-      cursor: next,
-    }
-
-    // fetch discussions
-    const {
-      repository: {
-        discussions: { nodes: discussions, pageInfo },
-      },
-    } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
-
-    return { discussions, pageInfo }
-  }
-
   const { discussions, pageInfo } = await fetchDiscussions(
     'supabase',
     'supabase',
     'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
-    next as string
+    next
   )
 
   if (!discussions) {
@@ -211,7 +240,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Combine discussions and releases into a single array of entries
   const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
 
-  const sortedCombinedEntries = combinedEntries.sort((a, b) => {
+  const sortedCombinedEntries = combinedEntries.sort((a: any, b: any) => {
     const dateA = dayjs(a.created_at)
     const dateB = dayjs(b.created_at)
 
@@ -296,7 +325,7 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                         </div>
                       </div>
                       <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
-                        <article className="prose prose-docs max-w-none">
+                        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
                           <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                         </article>
                       </div>

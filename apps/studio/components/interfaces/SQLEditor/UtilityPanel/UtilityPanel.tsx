@@ -1,25 +1,31 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
-import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
+import { UtilityTabExplain } from './UtilityTabExplain'
 
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
+  isExplainExecuting?: boolean
   isDebugging?: boolean
   isDisabled?: boolean
   hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  executeExplainQuery: () => void
   onDebug: () => void
+  activeTab?: string
+  onActiveTabChange?: (tab: string) => void
 }
 
 const DEFAULT_CHART_CONFIG: ChartConfig = {
@@ -34,19 +40,34 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
 const UtilityPanel = ({
   id,
   isExecuting,
+  isExplainExecuting,
   isDebugging,
   isDisabled,
   hasSelection,
   prettifyQuery,
   executeQuery,
+  executeExplainQuery,
   onDebug,
+  activeTab = 'results',
+  onActiveTabChange,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
+  const { data: org } = useSelectedOrganizationQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = snapV2.results[id]?.[0]
+
+  const handleTabChange = (tab: string) => {
+    // When switching to the explain tab, trigger the explain query
+    if (tab === 'explain') {
+      executeExplainQuery()
+    }
+    onActiveTabChange?.(tab)
+  }
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -107,16 +128,50 @@ const UtilityPanel = ({
   }
 
   return (
-    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
+    <Tabs_Shadcn_
+      value={activeTab}
+      onValueChange={handleTabChange}
+      className="w-full h-full flex flex-col"
+    >
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
           </TabsTrigger_Shadcn_>
+          {/* Only show Explain tab if ShowPrettyExplain flag is on */}
+          {showPrettyExplain && (
+            <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
+              <span className="translate-y-[1px]">Explain</span>
+            </TabsTrigger_Shadcn_>
+          )}
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
-          {result?.rows && <ResultsDropdown id={id} />}
+          {result?.rows && (
+            <DownloadResultsButton
+              type="text"
+              results={result.rows as any[]}
+              fileName={`Supabase Snippet ${snippet.name}`}
+              onDownloadAsCSV={() =>
+                sendEvent({
+                  action: 'sql_editor_result_download_csv_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }
+              onCopyAsMarkdown={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_markdown_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+              onCopyAsJSON={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_json_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+            />
+          )}
         </div>
         <UtilityActions
           id={id}
@@ -136,6 +191,13 @@ const UtilityPanel = ({
           isDebugging={isDebugging}
         />
       </TabsContent_Shadcn_>
+
+      {/* Only render Explain tab content if ShowPrettyExplain flag is on */}
+      {showPrettyExplain && (
+        <TabsContent_Shadcn_ asChild value="explain" className="mt-0 flex-grow">
+          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+        </TabsContent_Shadcn_>
+      )}
 
       <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />

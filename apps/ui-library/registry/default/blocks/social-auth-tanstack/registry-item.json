@@ -1,0 +1,43 @@
+{
+  "name": "social-auth-tanstack",
+  "type": "registry:block",
+  "title": "Social Auth flow for TanStack and Supabase",
+  "description": "Social Auth flow for TanStack and Supabase",
+  "registryDependencies": ["button", "card"],
+  "dependencies": ["@supabase/ssr@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/components/login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/routes/_protected.tsx",
+      "type": "registry:file",
+      "target": "routes/_protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/routes/_protected/protected.tsx",
+      "type": "registry:file",
+      "target": "routes/_protected/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/routes/auth/error.tsx",
+      "type": "registry:file",
+      "target": "routes/auth/error.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/routes/auth/oauth.ts",
+      "type": "registry:file",
+      "target": "routes/auth/oauth.ts"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-tanstack/routes/login.tsx",
+      "type": "registry:file",
+      "target": "routes/login.tsx"
+    }
+  ]
+}

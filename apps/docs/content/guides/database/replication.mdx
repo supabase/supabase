@@ -1,93 +1,85 @@
 ---
 id: 'replication'
-title: 'Replication'
-slug: 'replication'
+title: 'Database Replication'
+description: 'Replicate your database to external destinations using Supabase replication or manual replication.'
+subtitle: 'An introduction to database replication and change data capture.'
+sidebar_label: 'Overview'
 ---
 
-Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
+Replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
 
-- Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
-- Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
+## Use cases
 
-Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://supabase.com/dashboard) or with SQL.
+You might use database replication for:
 
-## Manage publications in the dashboard
+- **Analytics and Data Warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
+- **Data Integration**: Keep your data synchronized across different systems and services in your tech stack.
+- **Backup and Disaster Recovery**: Maintain up-to-date copies of your data in different locations.
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
-2. Click on **Publications** in the sidebar.
-3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
-4. Control which tables broadcast changes by selecting **Source** and toggling each table.
+## Replication methods
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
-    type="video/mp4"
-  />
-</video>
+Supabase supports two methods for replicating your database to external destinations:
 
-## Create a publication
+### Replication
 
-This publication contains changes to all tables.
+<Admonition type="caution" label="Private Alpha">
 
-```sql
-create publication publication_name
-for all tables;
-```
+Replication is currently in private alpha. Access is limited and features may change.
 
-## Create a publication to listen to individual tables
+</Admonition>
 
-```sql
-create publication publication_name
-for table table_one, table_two;
-```
+Replication powered by [Supabase ETL](https://github.com/supabase/etl) automatically replicates data to supported systems.
 
-## Add tables to an existing publication
+- [Set up replication](/docs/guides/database/replication/replication-setup)
 
-```sql
-alter publication publication_name
-add table table_name;
-```
+### Manual replication
 
-## Listen to `insert`
+Configure your own replication using external tools and Postgres's native logical replication. This gives you full control over the replication process and allows you to use any tool that supports Postgres logical replication.
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'insert');
-```
+- [Set up Manual Replication](/docs/guides/database/replication/manual-replication-setup)
 
-## Listen to `update`
+## Related features
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'update');
-```
+Choose the data syncing method based on your use case:
 
-## Listen to `delete`
+- For realtime features and syncing data to clients (browsers, mobile apps), see [Realtime](/docs/guides/realtime)
+- For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas)
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'delete');
-```
+## Concepts and terms
 
-## Remove a publication
+### Write-Ahead Log (WAL)
 
-```sql
-drop publication if exists publication_name;
-```
+Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL, which is a series of files (also called "segments") where the file size can be specified. Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
-## Recreate a publication
+### Logical replication and WAL
 
-If you're recreating a publication, it's best to do it in a transaction to ensure the operation succeeds.
+Logical replication is a method of replication where Postgres uses the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files.
 
-```sql
-begin;
-  -- remove the realtime publication
-  drop publication if exists publication_name;
+### LSN
 
-  -- re-create the publication but don't enable it for any tables
-  create publication publication_name;
-commit;
-```
+LSN is a Log Sequence Number that is used to identify the position of a WAL file in the WAL directory. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
+
+## Logical replication architecture
+
+When setting up logical replication, three key components are involved:
+
+- `publication` - A set of tables on your primary database that will be `published`
+- `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
+- `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
+
+## Logical replication output format
+
+Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
+
+## Logical replication configuration
+
+When using logical replication, Postgres is then configured to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
+
+In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
+
+| Setting                                                                                  | Description                                            | User-facing | Default |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------- | ------- |
+| [`max_replication_slots`](https://postgresqlco.nf/doc/en/param/max_replication_slots/)   | Max count of replication slots allowed                 | No          |         |
+| [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                   | Minimum size of WAL files to keep for replication      | No          |         |
+| [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/) | Max WAL size that can be reserved by replication slots | No          |         |
+| [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)         | Max time between WAL checkpoints                       | No          |         |

@@ -2,28 +2,66 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { FormsContainer } from 'components/ui/Forms/FormsContainer'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const Hooks: NextPageWithLayout = () => {
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's auth hooks" />
-  } else {
-    return (
-      <FormsContainer>
-        <HooksListing />
-      </FormsContainer>
-    )
   }
+
+  return (
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Auth Hooks</PageHeaderTitle>
+            <PageHeaderDescription>Customize your authentication flow</PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks`} />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <HooksListing />
+        )}
+      </PageContainer>
+    </>
+  )
 }
 
-Hooks.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
-}
+Hooks.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>{page}</AuthLayout>
+  </DefaultLayout>
+)
 
 export default Hooks

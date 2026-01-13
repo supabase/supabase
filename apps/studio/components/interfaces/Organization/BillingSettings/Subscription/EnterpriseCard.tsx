@@ -1,17 +1,23 @@
 import { Check } from 'lucide-react'
 
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
-import { pickFeatures } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
-  const features = pickFeatures(plan, billingPartner)
+export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const orgSlug = selectedOrganization?.slug
+
+  const features = plan.features
+  const currentPlan = selectedOrganization?.plan.name
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div
@@ -37,11 +43,23 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
 
         <p className="text-sm mt-2 mb-4">{plan.description}</p>
 
-        <a href={plan.href} className="hidden md:block" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            sendEvent({
+              action: 'studio_pricing_plan_cta_clicked',
+              properties: { selectedPlan: 'Enterprise', currentPlan },
+              groups: { organization: orgSlug ?? 'Unknown' },
+            })
+          }
+        >
+          <a href={plan.href} className="hidden md:block" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
 
       <div className="flex flex-col justify-center col-span-2 px-4 md:px-0">
@@ -62,14 +80,24 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
           ))}
         </ul>
 
-        <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            sendEvent({
+              action: 'studio_pricing_plan_cta_clicked',
+              properties: { selectedPlan: 'Enterprise', currentPlan },
+              groups: { organization: orgSlug ?? 'Unknown' },
+            })
+          }
+        >
+          <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
     </div>
   )
 }
-
-export default EnterpriseCard

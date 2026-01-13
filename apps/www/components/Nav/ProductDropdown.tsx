@@ -1,6 +1,7 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { ChevronRight, Sparkles } from 'lucide-react'
 
@@ -9,13 +10,12 @@ import { TextLink } from 'ui'
 import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
 
-import ComparisonsData from '~/data/Comparisons'
-import CustomersData from '~/data/CustomerStories'
-import MainProductsData from '~/data/MainProducts'
-import ProductModulesData from '~/data/ProductModules'
+import ComparisonsData from 'data/Comparisons'
+import CustomersData from 'data/CustomerStories'
+import MainProductsData from 'data/MainProducts'
+import ProductModulesData from 'data/ProductModules'
 
-const ProductDropdown = () => {
-  const { basePath } = useRouter()
+export const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
 
   return (
@@ -123,8 +123,8 @@ const ProductDropdown = () => {
           </div>
         </div>
       </div>
-      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l p-6 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[350px]">
-        <div className="col-span-3 flex flex-col gap-8 xl:w-auto">
+      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l p-6 gap-8 flex flex-col w-full xl:w-[400px]">
+        <div className="col-span-3 flex flex-row gap-8 xl:w-auto">
           <div>
             <Link
               href="/customers"
@@ -133,8 +133,8 @@ const ProductDropdown = () => {
               Customer Stories
               <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
             </Link>
-            <ul className="flex flex-col gap-2">
-              {CustomersData.slice(0, isTablet ? 2 : 1).map((customer) => (
+            <ul className="flex flex-row gap-2">
+              {CustomersData.slice(0, isTablet ? 1 : 1).map((customer) => (
                 <li key={customer.organization}>
                   <Link
                     href={customer.url}
@@ -142,7 +142,7 @@ const ProductDropdown = () => {
                   >
                     <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 flex-shrink-0 overflow-auto">
                       <Image
-                        src={`${basePath}/${customer.imgUrl}`}
+                        src={`/${customer.imgUrl}`}
                         alt={customer.title}
                         fill
                         className="!p-3 object-contain brightness-70 contrast-[.35] filter"
@@ -159,8 +159,8 @@ const ProductDropdown = () => {
             </ul>
           </div>
         </div>
-        <div className="col-span-2 grid grid-cols-1 gap-6 xl:gap-2">
-          <div>
+        <div className="w-full col-span-2 grid grid-cols-4 xl:grid-cols-5 gap-6 xl:gap-2">
+          <div className="col-span-2 xl:col-span-3">
             <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-3">
               {ComparisonsData.label}
             </p>
@@ -182,5 +182,3 @@ const ProductDropdown = () => {
     </div>
   )
 }
-
-export default ProductDropdown

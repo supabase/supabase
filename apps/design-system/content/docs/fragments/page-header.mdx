@@ -1,0 +1,24 @@
+---
+title: Page Header
+description: A compound component for building page headers with consistent structure.
+fragment: true
+---
+
+<ComponentPreview
+  name="page-header-demo"
+  description="Basic page header with title, description, and actions"
+  peekCode
+  wide
+/>
+
+## Sub-components
+
+- `PageHeader` - Root container with size variants (`default`, `small`, `large`, `full`)
+- `PageHeaderBreadcrumb` - Breadcrumb navigation wrapper (should be first child)
+- `PageHeaderMeta` - Meta wrapper for icon, summary, and aside (groups icon and summary together, places aside on the right)
+- `PageHeaderIcon` - Icon container positioned left of title (should be inside PageHeaderMeta, has `shrink-0`)
+- `PageHeaderSummary` - Container for title and description (should be inside PageHeaderMeta, has `flex-1`)
+- `PageHeaderTitle` - Primary page heading (h1)
+- `PageHeaderDescription` - Supporting text below title
+- `PageHeaderAside` - Container for action buttons (should be inside PageHeaderMeta, has `shrink-0`)
+- `PageHeaderNavigationTabs` - Container for tab navigation (NavMenu, should be last child)

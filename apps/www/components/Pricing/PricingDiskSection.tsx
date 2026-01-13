@@ -10,7 +10,7 @@ const diskTypes = [
     maxSize: '16 TB',
     size: '8 GB included\nthen $0.125 per GB',
     iops: '3,000 IOPS included\nthen $0.024 per IOPS',
-    throughput: '125 Mbps included\nthen $0.095 per Mbps',
+    throughput: '125 MB/s included\nthen $0.095 per MB/s',
     durability: '99.9%',
   },
   {
@@ -54,9 +54,15 @@ const PricingDiskSection = () => (
                   <span className="text-foreground-lighter">{diskType.tagline}</span>
                 </td>
                 <td className="p-3">{diskType.maxSize}</td>
-                <td className="p-3 whitespace-pre-line">{diskType.size}</td>
-                <td className="p-3 whitespace-pre-line">{diskType.iops}</td>
-                <td className="p-3 whitespace-pre-line">{diskType.throughput}</td>
+                <td className="p-3 whitespace-pre-line" translate="no">
+                  {diskType.size}
+                </td>
+                <td className="p-3 whitespace-pre-line" translate="no">
+                  {diskType.iops}
+                </td>
+                <td className="p-3 whitespace-pre-line" translate="no">
+                  {diskType.throughput}
+                </td>
                 <td>{diskType.durability}</td>
               </tr>
             ))}

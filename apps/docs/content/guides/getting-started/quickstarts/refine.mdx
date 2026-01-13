@@ -1,6 +1,6 @@
 ---
-title: 'Use Supabase with refine'
-subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a refine app.'
+title: 'Use Supabase with Refine'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Refine app.'
 breadcrumb: 'Framework Quickstarts'
 hideToc: true
 ---
@@ -8,24 +8,24 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
-    <QuickstartDbSetup />
+
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Create a refine app">
+    <StepHikeCompact.Details title="Create a Refine app">
 
-    Create a [refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
+    Create a [Refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
 
-    The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports Supabase in a refine app. `@refinedev/supabase` out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
+    The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports Supabase in a Refine app. `@refinedev/supabase` out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm create refine-app@latest -- --preset refine-supabase my-app
       ```
 
@@ -34,15 +34,15 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Open your refine app in VS Code">
+    <StepHikeCompact.Details title="Open your Refine app in VS Code">
 
-    You will develop your app, connect to the Supabase backend and run the refine app in VS Code.
+    You will develop your app, connect to the Supabase backend and run the Refine app in VS Code.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app
       code .
       ```
@@ -54,18 +54,18 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, go to http://localhost:5173 in a browser, and you should be greeted with the refine Welcome page.
+    Start the app, go to http://localhost:5173 in a browser, and you should be greeted with the Refine Welcome page.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 
 <StepHikeCompact.Code>
-  ![refine welcome page](/docs/img/refine-qs-welcome-page.png)
+  ![Refine welcome page](/docs/img/refine-qs-welcome-page.png)
 </StepHikeCompact.Code>
 
     </StepHikeCompact.Code>
@@ -75,16 +75,17 @@ hideToc: true
 <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Update `supabaseClient`">
 
-      You now have to update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your Supabase backend.
+      You now have to update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```ts src/utility/supabaseClient.ts
+      ```ts name=src/utility/supabaseClient.ts
       import { createClient } from "@refinedev/supabase";
 
       const SUPABASE_URL = YOUR_SUPABASE_URL;
@@ -99,25 +100,26 @@ hideToc: true
         },
       });
       ```
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Add countries resource and pages">
+    <StepHikeCompact.Details title="Add instruments resource and pages">
 
-      You have to then configure resources and define pages for `countries` resource.
+      You have to then configure resources and define pages for `instruments` resource.
 
-      Use the following command to automatically add resources and generate code for pages for `countries` using refine Inferencer.
+      Use the following command to automatically add resources and generate code for pages for `instruments` using Refine Inferencer.
 
-      This defines pages for `list`, `create`, `show` and `edit` actions inside the `src/pages/countries/` directory with `<HeadlessInferencer />` component.
+      This defines pages for `list`, `create`, `show` and `edit` actions inside the `src/pages/instruments/` directory with `<HeadlessInferencer />` component.
 
       The `<HeadlessInferencer />` component depends on `@refinedev/react-table` and `@refinedev/react-hook-form` packages. In order to avoid errors, you should install them as dependencies with `npm install @refinedev/react-table @refinedev/react-hook-form`.
 
       <Admonition type="note">
 
-        The `<HeadlessInferencer />` is a refine Inferencer component that automatically generates necessary code for the `list`, `create`, `show` and `edit` pages.
+        The `<HeadlessInferencer />` is a Refine Inferencer component that automatically generates necessary code for the `list`, `create`, `show` and `edit` pages.
 
         More on [how the Inferencer works is available in the docs here](https://refine.dev/docs/packages/documentation/inferencer/).
 
@@ -128,19 +130,19 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
-      npm run refine create-resource countries
+      ```bash name=Terminal
+      npm run refine create-resource instruments
       ```
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Add routes for countries pages">
+    <StepHikeCompact.Details title="Add routes for instruments pages">
 
       Add routes for the `list`, `create`, `show`, and `edit` pages.
 
-      <Admonition type="important">
+      <Admonition type="tip">
 
         You should remove the `index` route for the Welcome page presented with the `<Welcome />` component.
 
@@ -149,21 +151,21 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```tsx src/App.tsx
-      import { Refine, WelcomePage } from "@refinedev/core";
+      ```tsx name=src/App.tsx
+      import { Refine } from "@refinedev/core";
       import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-      import routerBindings, {
+      import routerProvider, {
         DocumentTitleHandler,
         NavigateToResource,
         UnsavedChangesNotifier,
-      } from "@refinedev/react-router-v6";
+      } from "@refinedev/react-router";
       import { dataProvider, liveProvider } from "@refinedev/supabase";
       import { BrowserRouter, Route, Routes } from "react-router-dom";
 
       import "./App.css";
       import authProvider from "./authProvider";
       import { supabaseClient } from "./utility";
-      import { CountriesCreate, CountriesEdit, CountriesList, CountriesShow } from "./pages/countries";
+      import { InstrumentsCreate, InstrumentsEdit, InstrumentsList, InstrumentsShow } from "./pages/instruments";
 
       function App() {
         return (
@@ -173,27 +175,27 @@ hideToc: true
                 dataProvider={dataProvider(supabaseClient)}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
-                routerProvider={routerBindings}
+                routerProvider={routerProvider}
                 options={{
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
                 }}
                 resources={[{
-                  name: "countries",
-                  list: "/countries",
-                  create: "/countries/create",
-                  edit: "/countries/edit/:id",
-                  show: "/countries/show/:id"
+                  name: "instruments",
+                  list: "/instruments",
+                  create: "/instruments/create",
+                  edit: "/instruments/edit/:id",
+                  show: "/instruments/show/:id"
                 }]}>
                 <Routes>
                   <Route index
-                    element={<NavigateToResource resource="countries" />}
+                    element={<NavigateToResource resource="instruments" />}
                   />
-                  <Route path="/countries">
-                    <Route index element={<CountriesList />} />
-                    <Route path="create" element={<CountriesCreate />} />
-                    <Route path="edit/:id" element={<CountriesEdit />} />
-                    <Route path="show/:id" element={<CountriesShow />} />
+                  <Route path="/instruments">
+                    <Route index element={<InstrumentsList />} />
+                    <Route path="create" element={<InstrumentsCreate />} />
+                    <Route path="edit/:id" element={<InstrumentsEdit />} />
+                    <Route path="show/:id" element={<InstrumentsShow />} />
                   </Route>
                 </Routes>
                 <RefineKbar />
@@ -212,16 +214,12 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={8}>
-    <StepHikeCompact.Details title="View countries pages">
+    <StepHikeCompact.Details title="View instruments pages">
 
-      Now you should be able to see the countries pages along the `/countries` routes. You may now edit and add new countries using the Inferencer generated UI.
+      Now you should be able to see the instruments pages along the `/instruments` routes. You may now edit and add new instruments using the Inferencer generated UI.
 
       The Inferencer auto-generated code gives you a good starting point on which to keep building your `list`, `create`, `show` and `edit` pages. They can be obtained by clicking the `Show the auto-generated code` buttons in their respective pages.
     </StepHikeCompact.Details>
-
-     <StepHikeCompact.Code>
-      ![refine List Page](/docs/img/refine-qs-countries-ui.png)
-    </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>

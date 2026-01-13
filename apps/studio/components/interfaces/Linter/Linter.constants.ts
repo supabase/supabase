@@ -12,6 +12,7 @@ export type LintInfo = {
   link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
   linkText: string
   docsLink: string
+  category: 'security' | 'performance'
 }
 
 export const LINT_TABS = [

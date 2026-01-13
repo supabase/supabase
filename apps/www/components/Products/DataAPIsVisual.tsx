@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { range } from 'lodash'
+import { range } from 'lib/helpers'
 import { cn } from 'ui'
 
 interface Props {
@@ -16,38 +16,42 @@ const DataAPIsVisual: React.FC<Props> = ({ className }) => (
           className="relative h-full !aspect-[330/430] -right-10 -left-10 items-end pb-2 z-10 flex pause animate-[marquee-reverse_30000ms_linear_both_infinite] motion-safe:group-hover:run will-change-transform"
         >
           <Image
+            draggable={false}
             src="/images/index/products/data-apis-lines-dark.svg"
             alt="Supabase restful DataAPIs"
-            fill
-            sizes="100%"
+            width={330}
+            height={430}
             quality={100}
-            className="hidden dark:block !h-full !aspect-[330/430]"
+            className="hidden dark:block !h-full object-contain !aspect-[330/430]"
           />
           <Image
+            draggable={false}
             src="/images/index/products/data-apis-lines-light.svg"
             alt="Supabase restful DataAPIs"
-            fill
-            sizes="100%"
+            width={330}
+            height={430}
             quality={100}
-            className="dark:block !h-full !aspect-[330/430]"
+            className="dark:block !h-full !aspect-[330/430] not-sr-only"
           />
         </div>
       ))}
       <Image
+        draggable={false}
         src="/images/index/products/data-apis-dark.svg"
         alt="Supabase restful DataAPIs"
         fill
         sizes="100%"
         quality={100}
-        className="hidden dark:block absolute h-full aspect-[330/430] inset-0 z-10 object-contain xl:object-cover 2xl:object-contain object-center bottom-0"
+        className="hidden dark:block absolute !h-full aspect-[330/430] inset-0 z-10 object-contain -mt-1.5 object-center bottom-0"
       />
       <Image
+        draggable={false}
         src="/images/index/products/data-apis-light.svg"
         alt="Supabase restful DataAPIs"
         fill
         sizes="100%"
         quality={100}
-        className="dark:hidden absolute h-full aspect-[330/430] inset-0 z-10 object-contain xl:object-cover 2xl:object-contain object-center bottom-0"
+        className="dark:hidden absolute h-full aspect-[330/430] inset-0 z-10 object-contain -mt-1.5 object-center bottom-0"
       />
     </div>
   </figure>

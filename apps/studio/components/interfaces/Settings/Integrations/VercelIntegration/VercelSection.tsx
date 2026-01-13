@@ -22,37 +22,35 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import type {
+  Integration,
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Button, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
-const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
   const isBranch = project?.parent_project_ref !== undefined
 
-  const canReadVercelConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.vercel_connections'
-  )
-  const canCreateVercelConnection = useCheckPermissions(
+  const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const canUpdateVercelConnection = useCheckPermissions(
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
@@ -72,10 +70,19 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
         if (integration.metadata && integration.integration.name === 'Vercel') {
           const avatarSrc =
             !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48&format=png`
               : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-          integration['metadata']['account']['avatar'] = avatarSrc
+          return {
+            ...integration,
+            metadata: {
+              ...integration.metadata,
+              account: {
+                ...integration.metadata.account,
+                avatar: avatarSrc,
+              },
+            },
+          } as Integration
         }
 
         return integration
@@ -158,13 +165,15 @@ You can change the scope of the access for Supabase by configuring
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={VercelTitle}>
           <Markdown content={VercelDetailsSection} />
           <IntegrationImageHandler title="vercel" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadVercelConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadVercelConnection ? (
             <NoPermission resourceText="view this organization's Vercel connections" />
           ) : (
             <>
@@ -216,7 +225,6 @@ You can change the scope of the access for Supabase by configuring
                     />
                   )}
                   <EmptyIntegrationConnection
-                    orgSlug={org?.slug}
                     disabled={isBranch || !canCreateVercelConnection}
                     onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >
@@ -255,5 +263,3 @@ You can change the scope of the access for Supabase by configuring
     </ScaffoldContainer>
   )
 }
-
-export default VercelSection

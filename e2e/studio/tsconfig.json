@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext",
+    "jsx": "react",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true
+  }
+}

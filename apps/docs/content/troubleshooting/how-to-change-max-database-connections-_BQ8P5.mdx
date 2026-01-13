@@ -14,7 +14,7 @@ cli = [ "supabase-postgres-config-update" ]
 
 # Changing max database connections:
 
-Each compute instance has a default direct connection and pooler connection settings. You can find the most recent settings in the [compute docs](https://supabase.com/docs/guides/platform/compute-add-ons#disk-io):
+Each compute instance has a default direct connection and pooler connection settings. You can find the most recent settings in the [compute docs](/docs/guides/platform/compute-add-ons#disk-io):
 
 | Compute Size | Direct Connections | Pooler Connections |
 | ------------ | ------------------ | ------------------ |
@@ -34,7 +34,7 @@ Each compute instance has a default direct connection and pooler connection sett
 
 > Note: the Supavisor connection limits are hard-coded and cannot be changed without upgrading the compute size:
 
-You can configure the maximum amount of connections that Postgres will tolerate with the [Supabase CLI.](https://supabase.com/docs/guides/platform/custom-postgres-config)
+You can configure the maximum amount of connections that Postgres will tolerate with the [Supabase CLI.](/docs/guides/platform/custom-postgres-config)
 
 You can run the following commands:
 
@@ -75,7 +75,7 @@ This is a Grafana Chart of unhealthy memory usage:
 - Green: it is unclaimed (the system will always leave some memory unclaimed)
 - Blue: it is cached data and a buffer
 
-The cache in PostgreSQL is important because the database will store frequently accessed data in it for rapid retrieval. If too much active memory is needed, it runs the risk of excessively displacing cache. This will force queries to check disk, which is slow.
+The cache in Postgres is important because the database will store frequently accessed data in it for rapid retrieval. If too much active memory is needed, it runs the risk of excessively displacing cache. This will force queries to check disk, which is slow.
 
 Most data in a database is idle. However, when there is little available memory or uncached data is rapidly accessed, [thrashing](<https://en.wikipedia.org/wiki/Thrashing_(computer_science)>) can occur.
 
@@ -83,7 +83,7 @@ To avoid displacing cache or straining system resources, it is advised to not in
 
 Postgres will allow you to overcommit memory. You can run the below query to find out the hypothetical max value you could change it to without risking memory failure:
 
-> NOTE: You can find your server memory in the [compute add-ons docs](https://supabase.com/docs/guides/platform/compute-add-ons)
+> NOTE: You can find your server memory in the [compute add-ons docs](/docs/guides/platform/compute-add-ons)
 
 ```sql
 select

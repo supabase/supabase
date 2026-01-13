@@ -1,14 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
+import { Check } from 'lucide-react'
+import { plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
-import { Check } from 'lucide-react'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -16,12 +13,7 @@ interface PricingPlansProps {
 }
 
 const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
@@ -31,11 +23,18 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
             const isProPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
             const isUpgradablePlan = isProPlan || isTeamPlan
-            const features = pickFeatures(plan)
-            const footer = pickFooter(plan)
+            const features = plan.features
+            const footer = plan.footer
 
             const sendPricingEvent = () => {
-              sendTelemetryEvent(gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`])
+              sendTelemetryEvent({
+                action: 'www_pricing_plan_cta_clicked',
+                properties: {
+                  plan: plan.name,
+                  showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
+                  section: 'main',
+                },
+              })
             }
 
             return (
@@ -74,7 +73,11 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     {plan.description}
                   </p>
                   {isUpgradablePlan && hasExistingOrganizations ? (
-                    <UpgradePlan organizations={organizations} onClick={sendPricingEvent} />
+                    <UpgradePlan
+                      planId={plan.planId}
+                      organizations={organizations}
+                      onClick={sendPricingEvent}
+                    />
                   ) : (
                     <Button
                       block
@@ -108,6 +111,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                               className={`mt-2 pb-1 font-mono ${
                                 plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                               }`}
+                              translate="no"
                             >
                               {plan.name !== 'Enterprise' ? '$' : ''}
                               {plan.priceMonthly}
