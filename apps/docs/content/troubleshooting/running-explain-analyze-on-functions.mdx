@@ -11,7 +11,7 @@ Sometimes it can help to look at Postgres query plans inside a function. The pro
 
 [`auto_explain`](https://www.postgresql.org/docs/current/auto-explain.html) is a pre-installed module that is able to log query plans for queries within functions.
 
-Auto_explain has a few settings that will need to be configured:
+`auto_explain` has a few settings that you still need to configure:
 
 - `auto_explain.log_nested_statements`: log the plans of queries within functions
 - `auto_explain.log_analyze`: capture the `explain analyze` results instead of `explain`
