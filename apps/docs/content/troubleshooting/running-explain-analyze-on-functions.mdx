@@ -40,7 +40,7 @@ For instance, you could change the value for the authenticator role (powers the 
 ALTER ROLE postgres SET auto_explain.log_min_duration = '.5s';
 ```
 
-After running your test, you should be able to find the plan in the [postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs?s=duration:). The auto_explain module always starts logs with the term "duration:", which can be used as a filter keyword.
+After running your test, you should be able to find the plan in the [postgres logs](/dashboard/project/_/logs/postgres-logs?s=duration:). The auto_explain module always starts logs with the term "duration:", which can be used as a filter keyword.
 
 You can also filter for the specific function in the [log explorer](https://supabase.com/dashboard/project/_/logs/explorer?q=select%0A++cast%28postgres_logs.timestamp+as+datetime%29+as+timestamp%2C%0A++event_message+AS+query_and_plan%2C%0A++parsed.user_name%2C%0A++parsed.context%0Afrom%0A++postgres_logs%0A++cross+join+unnest%28metadata%29+as+metadata%0A++cross+join+unnest%28metadata.parsed%29+as+parsed%0Awhere%0A++regexp_contains%28event_message%2C+%27duration%3A%27%29%0A++AND%0A++regexp_contains%28context%2C+%27example_func%27%29+--%3C----ADD+FUNCTION+NAME+HERE.+IS+CASE+SENSITIVE%0Aorder+by+timestamp+desc%0Alimit+100%3B) with the below query:
 
