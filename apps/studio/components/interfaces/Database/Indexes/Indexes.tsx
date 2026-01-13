@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -29,6 +28,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
@@ -43,7 +43,7 @@ const Indexes = () => {
   const {
     data: allIndexes,
     error: indexesError,
-    isLoading: isLoadingIndexes,
+    isPending: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
     isError: isErrorIndexes,
   } = useIndexesQuery({
@@ -75,7 +75,7 @@ const Indexes = () => {
 
   const {
     data: schemas,
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({
@@ -177,10 +177,10 @@ const Indexes = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead key="schema">Schema</TableHead>
                       <TableHead key="table">Table</TableHead>
+                      <TableHead key="columns">Columns</TableHead>
                       <TableHead key="name">Name</TableHead>
-                      <TableHead key="buttons"></TableHead>
+                      <TableHead key="buttons" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -208,10 +208,10 @@ const Indexes = () => {
                       indexes.map((index) => (
                         <TableRow key={index.name}>
                           <TableCell>
-                            <p title={index.schema}>{index.schema}</p>
+                            <p title={index.table}>{index.table}</p>
                           </TableCell>
                           <TableCell>
-                            <p title={index.table}>{index.table}</p>
+                            <p title={index.columns}>{index.columns}</p>
                           </TableCell>
                           <TableCell>
                             <p title={index.name}>{index.name}</p>

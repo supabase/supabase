@@ -52,7 +52,7 @@ The following charts are available for Free and Pro plans:
 
 ### Advanced Telemetry
 
-The following charts provide a more advanced and detailed view of your database performance and are available only for Teams and Enterprise plans.
+The following charts provide a more advanced and detailed view of your database performance and are available only for Team, Enterprise, and Platform plans.
 
 ### Memory usage
 
@@ -154,35 +154,27 @@ Actions you can take:
 | Batch write operations                                         | Reduce write IOPS by grouping database writes             |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances        |
 
-### Disk IO Usage
+### Disk throughput
 
-<Image
-  alt="Disk IO Usage chart"
-  zoomable
-  src={{
-    dark: '/docs/img/database/reports/disk-io-chart-dark.png',
-    light: '/docs/img/database/reports/disk-io-chart-light.png',
-  }}
-/>
+Available on Team and Enterprise plans.
 
-This chart displays the percentage of your allocated IOPS (Input/Output Operations Per Second) currently being used.
+This chart displays read and write throughput (bytes per second) with a reference line showing your compute size's maximum disk throughput.
 
 How it helps debug issues:
 
-| Issue                       | Description                                                 |
-| --------------------------- | ----------------------------------------------------------- |
-| IOPS limit monitoring       | Identify when approaching your allocated IOPS capacity      |
-| Performance correlation     | Correlate high IO usage with application performance issues |
-| Operation impact assessment | Monitor how database operations affect disk performance     |
+| Issue                                | Description                                             |
+| ------------------------------------ | ------------------------------------------------------- |
+| Throughput bottleneck identification | Spot when disk bandwidth is saturated                   |
+| Workload pattern analysis            | Differentiate read-heavy vs write-heavy bandwidth usage |
+| Performance correlation              | Correlate spikes with query performance changes         |
 
 Actions you can take:
 
-| Action                                                         | Description                                        |
-| -------------------------------------------------------------- | -------------------------------------------------- |
-| Optimize disk-intensive queries                                | Reduce queries that perform excessive reads/writes |
-| Add strategic indexes                                          | Reduce sequential scans with appropriate indexing  |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances |
-| Review database design                                         | Optimize schema and query patterns for efficiency  |
+| Action                                                         | Description                                                   |
+| -------------------------------------------------------------- | ------------------------------------------------------------- |
+| Optimize query patterns                                        | Reduce large sequential reads/writes                          |
+| Tune caching and batching                                      | Minimize repeated disk access and improve throughput headroom |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase throughput limits for sustained workloads            |
 
 ### Disk size
 

@@ -1,7 +1,9 @@
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
+
+import { useFlag } from 'common'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
+import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import {
   Button,
   DropdownMenu,
@@ -10,6 +12,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
 
@@ -17,18 +20,23 @@ export const APIKeyRow = ({
   apiKey,
   lastSeen,
   isDeleting,
+  isDeleteModalOpen,
+  isLoadingLastSeen = false,
+  showLastSeen = true,
   onDelete,
   setKeyToDelete,
-  isDeleteModalOpen,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
-  lastSeen?: { timestamp: string }
+  lastSeen?: { timestamp: number; relative: string }
+  showLastSeen?: boolean
   isDeleting: boolean
+  isDeleteModalOpen: boolean
+  isLoadingLastSeen?: boolean
   onDelete: () => void
   setKeyToDelete: (id: string | null) => void
-  isDeleteModalOpen: boolean
 }) => {
   const MotionTableRow = motion.create(TableRow)
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   return (
     <>
@@ -44,7 +52,7 @@ export const APIKeyRow = ({
           mass: 1,
         }}
       >
-        <TableCell className="py-2">
+        <TableCell className="py-2 w-56">
           <div className="flex flex-col">
             <span className="font-medium">{apiKey.name}</span>
             <div className="text-sm text-foreground-lighter">
@@ -52,17 +60,30 @@ export const APIKeyRow = ({
             </div>
           </div>
         </TableCell>
+
         <TableCell className="py-2">
           <div className="flex flex-row gap-2">
             <ApiKeyPill apiKey={apiKey} />
           </div>
         </TableCell>
 
-        <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
-          <div className="truncate" title={lastSeen?.timestamp || 'Never used'}>
-            {lastSeen?.timestamp ?? <span className="text-foreground-lighter">Never used</span>}
-          </div>
-        </TableCell>
+        {showLastSeen && showApiKeysLastUsed && (
+          <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
+            <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
+              {isLoadingLastSeen ? (
+                <ShimmeringLoader />
+              ) : lastSeen?.timestamp ? (
+                <TimestampInfo
+                  className="text-sm"
+                  utcTimestamp={lastSeen?.timestamp}
+                  label={lastSeen.relative}
+                />
+              ) : (
+                <span className="text-foreground-lighter">Never used</span>
+              )}
+            </div>
+          </TableCell>
+        )}
 
         <TableCell className="py-2">
           <div className="flex justify-end">
@@ -86,6 +107,7 @@ export const APIKeyRow = ({
           </div>
         </TableCell>
       </MotionTableRow>
+
       <TextConfirmModal
         visible={isDeleteModalOpen}
         onCancel={() => setKeyToDelete(null)}

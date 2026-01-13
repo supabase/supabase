@@ -34,7 +34,7 @@ export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialo
         },
       }}
     >
-      <Trash2 size={14} strokeWidth={1.5} /> Delete API key
+      <Trash2 size={14} /> Delete API key
     </DropdownMenuItemTooltip>
   )
 }

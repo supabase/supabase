@@ -10,9 +10,9 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getVectorBucketFDWName } from './VectorBuckets.utils'
 
 export const useS3VectorsWrapperInstance = ({ bucketId }: { bucketId?: string }) => {
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
 
-  const { data, isLoading: isLoadingFDWs } = useFDWsQuery(
+  const { data, isPending: isLoadingFDWs } = useFDWsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

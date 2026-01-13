@@ -13,7 +13,7 @@ Vector buckets organize your vector data into logical units. Within each bucket,
 
 ## Creating a Vector bucket
 
-You can create vector buckets using either the Supabase Dashboard or the JavaScript SDK.
+You can create vector buckets using either the Supabase Dashboard or the SDK.
 
 ### Using the Supabase Dashboard
 
@@ -25,7 +25,16 @@ You can create vector buckets using either the Supabase Dashboard or the JavaScr
 
 Your vector bucket is now ready. The next step is to create indexes within it.
 
-### Using the JavaScript SDK
+### Using the SDK
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
@@ -37,6 +46,25 @@ await supabase.storage.vectors.createBucket('embeddings')
 
 console.log('✓ Vector bucket created: embeddings')
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+
+# Create a vector bucket
+supabase.storage.vectors().create_bucket('embeddings')
+
+print('✓ Vector bucket created: embeddings')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ## Creating indexes
 
@@ -51,7 +79,16 @@ Indexes organize vectors within a bucket with consistent dimensions and distance
 5. Select the distance metric (`cosine`, `euclidean`, or `l2`).
 6. Click **Create**.
 
-### Quick start: Creating an index via JavaScript SDK
+### Quick start: Creating an index via SDK
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 const bucket = supabase.storage.vectors.from('embeddings')
@@ -66,6 +103,28 @@ await bucket.createIndex({
 
 console.log('✓ Index created: documents-openai')
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+bucket = supabase.storage.vectors().from_('embeddings')
+
+# Create an index
+bucket.create_index(
+    index_name='documents-openai',
+    dimension=1536,
+    distance_metric='cosine',
+    data_type='float32'
+)
+
+print('✓ Index created: documents-openai')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ### Key details
 

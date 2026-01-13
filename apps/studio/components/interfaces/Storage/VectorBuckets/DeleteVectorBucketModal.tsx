@@ -47,7 +47,7 @@ export const DeleteVectorBucketModal = ({
     },
   })
 
-  const { data: { indexes = [] } = {}, isLoading: isLoadingIndexes } = useVectorBucketsIndexesQuery(
+  const { data: { indexes = [] } = {}, isPending: isLoadingIndexes } = useVectorBucketsIndexesQuery(
     {
       projectRef: project?.ref,
       vectorBucketName: bucketName,
