@@ -7,7 +7,7 @@ keywords = [] # any strings (topics are automatically added so no need to duplic
 sdk = ["rpc"]
 ---
 
-Sometimes it can help to look at Postgres query plans inside a function. The problem is that running [EXPLAIN ANALYZE](https://www.depesz.com/2013/04/16/explaining-the-unexplainable/) on a function usually just shows a [function scan](https://pganalyze.com/docs/explain/scan-nodes/function-scan) or result node, which gives little insight into how the queries actually perform.
+Sometimes it can help to look at Postgres query plans inside a function. The problem is that running [`EXPLAIN ANALYZE`](https://www.depesz.com/2013/04/16/explaining-the-unexplainable/) on a function usually just shows a [function scan](https://pganalyze.com/docs/explain/scan-nodes/function-scan) or result node, which gives little insight into how the queries actually perform.
 
 [auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a pre-installed module that is able to log query plans for queries within functions.
 
