@@ -78,7 +78,6 @@ export const OAuthServerSettingsForm = () => {
     isPending: isAuthConfigLoading,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
 
   const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({
     onSuccess: () => {
