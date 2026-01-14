@@ -33,21 +33,13 @@ Eval('Assistant', {
     // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
     const steps = await result.steps
 
-    const stepsSerialized = steps
-      .map((step) => {
-        const toolCalls = step.toolCalls
-          ?.map((call) => JSON.stringify({ tool: call.toolName, input: call.input }))
-          .join('\n')
-
-        const text = step.text
-        return toolCalls ? `${text}\n${toolCalls}` : text
-      })
-      .join('\n')
-
-    const textOnly = steps
-      .map((step) => step.text)
-      .filter((text) => text && text.trim().length > 0)
-      .join('\n')
+    const simplifiedSteps = steps.map((step) => ({
+      text: step.text,
+      toolCalls: step.toolCalls.map((call) => ({
+        toolName: call.toolName,
+        input: call.input,
+      })),
+    }))
 
     const toolNames: string[] = []
     const sqlQueries: string[] = []
@@ -75,8 +67,7 @@ Eval('Assistant', {
 
     return {
       finishReason,
-      stepsSerialized,
-      textOnly,
+      steps: simplifiedSteps,
       toolNames,
       sqlQueries,
       docs,

@@ -10,8 +10,7 @@ type Input = string
 
 type Output = {
   finishReason: FinishReason
-  stepsSerialized: string
-  textOnly: string
+  steps: Array<{ text: string; toolCalls: Array<{ toolName: string; input: unknown }> }>
   toolNames: string[]
   sqlQueries: string[]
   docs: string[]
@@ -38,6 +37,30 @@ export type AssistantEvalCaseMetadata = {
 }
 
 export type AssistantEvalCase = EvalCase<Input, Expected, AssistantEvalCaseMetadata>
+
+/**
+ * Serialize steps into a string representation including text and tool calls
+ */
+function serializeSteps(steps: Output['steps']): string {
+  return steps
+    .map((step) => {
+      const toolCalls = step.toolCalls
+        ?.map((call) => JSON.stringify({ tool: call.toolName, input: call.input }))
+        .join('\n')
+      return toolCalls ? `${step.text}\n${toolCalls}` : step.text
+    })
+    .join('\n')
+}
+
+/**
+ * Extract only the text content from steps, filtering out empty text
+ */
+function extractTextOnly(steps: Output['steps']): string {
+  return steps
+    .map((step) => step.text)
+    .filter((text) => text && text.trim().length > 0)
+    .join('\n')
+}
 
 export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
   output,
@@ -103,7 +126,7 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
   return await concisenessEvaluator({
     input,
-    output: output.stepsSerialized,
+    output: serializeSteps(output.steps),
   })
 }
 
@@ -130,7 +153,7 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
 }) => {
   return await completenessEvaluator({
     input,
-    output: output.stepsSerialized,
+    output: serializeSteps(output.steps),
   })
 }
 
@@ -158,7 +181,7 @@ export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async (
 }) => {
   return await goalCompletionEvaluator({
     input,
-    output: output.stepsSerialized,
+    output: serializeSteps(output.steps),
   })
 }
 
@@ -193,7 +216,7 @@ export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async
 
   return await docsFaithfulnessEvaluator({
     docs: docsText,
-    output: output.textOnly,
+    output: extractTextOnly(output.steps),
   })
 }
 
@@ -235,6 +258,6 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
 
   return await correctnessEvaluator({
     expected: expected.correctAnswer,
-    output: output.textOnly,
+    output: extractTextOnly(output.steps),
   })
 }
