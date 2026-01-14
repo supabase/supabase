@@ -165,11 +165,11 @@ const SSLConfiguration = () => {
                 <AlertDialogContent size="medium">
                   <AlertDialogHeader>
                     <AlertDialogTitle>
-                      Updating SSL enforcement requires a brief database reboot
+                      Updating SSL enforcement involves a brief downtime
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This restarts only the database and involves a few minutes of downtime. Would
-                      you like to proceed now?
+                      A database restart is required for SSL enforcement changes to take place, and
+                      this involves a few minutes of downtime. Confirm to proceed now?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
