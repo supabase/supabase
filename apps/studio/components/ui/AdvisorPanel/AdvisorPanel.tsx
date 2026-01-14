@@ -328,7 +328,6 @@ export const AdvisorPanel = () => {
                 .filter((status) => !notificationFilterStatuses.includes(status))
                 .forEach((status) => setNotificationFilters(status, 'status'))
             }}
-            hasProjectRef={hasProjectRef}
             onClose={handleClose}
             isPlatform={IS_PLATFORM}
           />

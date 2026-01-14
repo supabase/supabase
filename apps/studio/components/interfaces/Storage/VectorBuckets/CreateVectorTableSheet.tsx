@@ -6,13 +6,14 @@ import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
-import { DOCS_URL } from 'lib/constants'
+
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Form_Shadcn_,
@@ -33,7 +34,6 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -111,6 +111,9 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
+  const schema = wrapperInstance?.server_options
+    .find((x) => x.startsWith('supabase_target_schema'))
+    ?.split('supabase_target_schema=')[1]
 
   // [Joshen] Can remove this once this restriction is removed
   const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
@@ -143,7 +146,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
 
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
     if (!project?.ref) return console.error('Project ref is required')
-    if (!bucketName) return
+    if (!bucketName) return console.error('Bucket name is required')
 
     try {
       await createVectorBucketTable({
@@ -161,13 +164,13 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     }
 
     try {
-      if (wrapperInstance) {
+      if (wrapperInstance && !!schema) {
         await importForeignSchema({
           projectRef: project.ref,
           connectionString: project?.connectionString,
           serverName: wrapperInstance.server_name,
-          sourceSchema: getVectorBucketFDWSchemaName(bucketName),
-          targetSchema: getVectorBucketFDWSchemaName(bucketName),
+          sourceSchema: schema,
+          targetSchema: schema,
           schemaOptions: [`bucket_name '${bucketName}'`],
         })
       }

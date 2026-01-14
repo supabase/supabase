@@ -2094,6 +2094,10 @@ export interface components {
       external_workos_enabled: boolean | null
       external_workos_secret: string | null
       external_workos_url: string | null
+      external_x_client_id: string | null
+      external_x_email_optional: boolean | null
+      external_x_enabled: boolean | null
+      external_x_secret: string | null
       external_zoom_client_id: string | null
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
@@ -3676,6 +3680,10 @@ export interface components {
       external_workos_enabled?: boolean | null
       external_workos_secret?: string | null
       external_workos_url?: string | null
+      external_x_client_id?: string | null
+      external_x_email_optional?: boolean | null
+      external_x_enabled?: boolean | null
+      external_x_secret?: string | null
       external_zoom_client_id?: string | null
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null

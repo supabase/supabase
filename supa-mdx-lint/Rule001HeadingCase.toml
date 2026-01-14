@@ -254,6 +254,7 @@ may_uppercase = [
     "WorkOS",
     "Wrappers",
     "Write-Ahead Log(s|ging)?",
+    "X",
     "Zoom",
     "Zoom Developers?",
 ]

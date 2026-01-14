@@ -7,7 +7,7 @@ import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import type { ResponseError } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { getPipelineStateMessages } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 

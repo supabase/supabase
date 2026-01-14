@@ -6,6 +6,14 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
+export type DestinationConfig =
+  | {
+      bigQuery: BigQueryDestinationConfig
+    }
+  | {
+      iceberg: IcebergDestinationConfig
+    }
+
 export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
@@ -23,22 +31,18 @@ export type IcebergDestinationConfig = {
   s3Region: string
 }
 
+export type BatchConfig = {
+  maxFillMs: number
+}
+
 export type CreateDestinationPipelineParams = {
   projectRef: string
   destinationName: string
-  destinationConfig:
-    | {
-        bigQuery: BigQueryDestinationConfig
-      }
-    | {
-        iceberg: IcebergDestinationConfig
-      }
+  destinationConfig: DestinationConfig
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch?: {
-      maxFillMs: number
-    }
+    batch?: BatchConfig
   }
 }
 

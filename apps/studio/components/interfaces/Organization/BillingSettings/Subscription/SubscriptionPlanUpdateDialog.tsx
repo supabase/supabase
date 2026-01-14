@@ -12,7 +12,6 @@ import {
   getPlanChangeType,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
@@ -31,6 +30,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { PaymentMethodElementRef } from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './PaymentMethodSelection'
 

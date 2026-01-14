@@ -12,18 +12,19 @@ import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
@@ -60,6 +61,30 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   })
 
   const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
+
+  if (!ref) {
+    return (
+      <div className="h-full flex flex-col p-6">
+        <Admonition
+          type="destructive"
+          title="Invalid project reference"
+          description="Unable to load query performance data. Please ensure you have selected a valid project."
+        />
+      </div>
+    )
+  }
+
+  if (!isLoadingProject && !project) {
+    return (
+      <div className="h-full flex flex-col p-6">
+        <Admonition
+          type="destructive"
+          title="Project not found"
+          description="Unable to load project data. Please check your project reference and try again."
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="h-full flex flex-col">

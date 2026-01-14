@@ -541,34 +541,36 @@ export function ComposedChart({
         </div>
       )}
       {showLegend && (
-        <CustomLabel
-          payload={[maxAttributeData, ...chartData]}
-          attributes={attributes}
-          showMaxValue={_showMaxValue}
-          onLabelHover={setHoveredLabel}
-          onToggleAttribute={(attribute, options) => {
-            setHiddenAttributes((prev) => {
-              if (options?.exclusive) {
-                const next = new Set<string>()
-                // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
-                const allNames = chartData.map((c) => c.name)
-                const allHiddenExcept = allNames.filter((n) => n !== attribute)
-                const isAlreadyExclusive =
-                  allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
-                return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
-              }
+        <div className="relative z-0">
+          <CustomLabel
+            payload={[maxAttributeData, ...chartData]}
+            attributes={attributes}
+            showMaxValue={_showMaxValue}
+            onLabelHover={setHoveredLabel}
+            onToggleAttribute={(attribute, options) => {
+              setHiddenAttributes((prev) => {
+                if (options?.exclusive) {
+                  const next = new Set<string>()
+                  // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
+                  const allNames = chartData.map((c) => c.name)
+                  const allHiddenExcept = allNames.filter((n) => n !== attribute)
+                  const isAlreadyExclusive =
+                    allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
+                  return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
+                }
 
-              const next = new Set(prev)
-              if (next.has(attribute)) {
-                next.delete(attribute)
-              } else {
-                next.add(attribute)
-              }
-              return next
-            })
-          }}
-          hiddenAttributes={hiddenAttributes}
-        />
+                const next = new Set(prev)
+                if (next.has(attribute)) {
+                  next.delete(attribute)
+                } else {
+                  next.add(attribute)
+                }
+                return next
+              })
+            }}
+            hiddenAttributes={hiddenAttributes}
+          />
+        </div>
       )}
     </div>
   )

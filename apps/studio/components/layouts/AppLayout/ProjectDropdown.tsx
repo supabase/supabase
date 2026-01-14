@@ -6,13 +6,13 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   const queryArray = Object.entries(routerQueries)

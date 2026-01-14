@@ -24,6 +24,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -37,10 +38,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateVectorTableSheet } from '../CreateVectorTableSheet'
 import { DeleteVectorBucketModal } from '../DeleteVectorBucketModal'
 import { DeleteVectorTableModal } from '../DeleteVectorTableModal'
-import { getVectorBucketFDWSchemaName } from '../VectorBuckets.utils'
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 import { useSelectedVectorBucket } from '../useSelectedVectorBuckets'
+import { InitializeForeignSchemaDialog } from './InitializeForeignSchemaDialog'
 import {
   ExtensionNeedsUpgrade,
   ExtensionNotInstalled,
@@ -51,7 +52,6 @@ import { VectorBucketTableExamplesSheet } from './VectorBucketTableExamplesSheet
 export const VectorBucketDetails = () => {
   const router = useRouter()
   const { ref: projectRef, bucketId } = useParams()
-  // [Joshen] Use the list buckets to verify that the bucket exists first before fetching bucket details
   const { data: _bucket, isSuccess } = useSelectedVectorBucket()
 
   // Track the ID being deleted to exclude it from error checking
@@ -96,15 +96,17 @@ export const VectorBucketDetails = () => {
         )
 
   const { extension: wrappersExtension, state: extensionState } = useS3VectorsWrapperExtension()
+
   const {
     data: wrapperInstance,
     meta: wrapperMeta,
     isLoading: isLoadingWrapper,
-  } = useS3VectorsWrapperInstance({
-    bucketId,
-  })
+  } = useS3VectorsWrapperInstance({ bucketId })
 
   const isLoading = isLoadingIndexes || isLoadingWrapper
+  const hasSetUpForeignSchema = wrapperInstance?.server_options.find((x) =>
+    x.startsWith('supabase_target_schema')
+  )
 
   const state = isLoading
     ? 'loading'
@@ -140,7 +142,10 @@ export const VectorBucketDetails = () => {
                 icon={<Search />}
                 className="w-48"
               />
-              <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
+              <div className="flex items-center gap-x-2">
+                {!!wrapperInstance && !hasSetUpForeignSchema && <InitializeForeignSchemaDialog />}
+                <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
+              </div>
             </div>
 
             {state === 'not-installed' && (
@@ -210,6 +215,10 @@ export const VectorBucketDetails = () => {
                         const id = `index-${idx}`
                         const name = index.indexName
 
+                        const foreignTable = wrapperInstance?.tables?.find(
+                          (x) => x.name === index.indexName
+                        )
+
                         return (
                           <TableRow key={id}>
                             <TableCell>{name}</TableCell>
@@ -232,15 +241,14 @@ export const VectorBucketDetails = () => {
                                     />
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                    {wrapperInstance ? (
+                                    {!!foreignTable ? (
                                       <>
                                         <DropdownMenuItem
                                           className="flex items-center space-x-2"
                                           asChild
                                         >
-                                          {/* TODO: Proper URL for sql editor */}
                                           <Link
-                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${getVectorBucketFDWSchemaName(bucketId!)}"."${name}";`)}`}
+                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${foreignTable.schema}"."${foreignTable.name}";`)}`}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <SqlEditor
@@ -254,9 +262,8 @@ export const VectorBucketDetails = () => {
                                           className="flex items-center space-x-2"
                                           asChild
                                         >
-                                          {/* TODO: Proper URL for table editor */}
                                           <Link
-                                            href={`/project/${projectRef}/editor/?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                            href={`/project/${projectRef}/editor/${foreignTable.id}?schema=${foreignTable.schema}`}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <TableEditor
@@ -266,6 +273,7 @@ export const VectorBucketDetails = () => {
                                             <p>View in Table Editor</p>
                                           </Link>
                                         </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
                                       </>
                                     ) : null}
                                     <DropdownMenuItem

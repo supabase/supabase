@@ -18,7 +18,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 const RealtimeSettingsPage: NextPageWithLayout = () => {
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader>
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Realtime Settings</PageHeaderTitle>
@@ -31,7 +31,7 @@ const RealtimeSettingsPage: NextPageWithLayout = () => {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer>
         <PageSection>
           <PageSectionContent>
             <RealtimeSettings />

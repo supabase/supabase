@@ -1,5 +1,5 @@
-import { Check, Lightbulb, Table2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Check, Table2, Lightbulb } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
@@ -33,18 +33,28 @@ import {
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
+import { QueryPerformanceRow } from './QueryPerformance.types'
 import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
 import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
 interface QueryIndexesProps {
-  selectedRow: any
+  selectedRow: Pick<QueryPerformanceRow, 'query'>
+  columnName?: string
+  suggestedSelectQuery?: string
+
+  onClose?: () => void
 }
 
 // [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
 // e.g understanding "costs", what numbers of "costs" are actually considered insignificant
 
-export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
+export const QueryIndexes = ({
+  selectedRow,
+  columnName,
+  suggestedSelectQuery,
+  onClose,
+}: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const { data: project } = useSelectedProjectQuery()
@@ -142,6 +152,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       setIsExecuting(false)
     } finally {
       setIsExecuting(false)
+
+      onClose?.()
     }
   }
 
@@ -165,7 +177,36 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   }
 
   return (
-    <QueryPanelContainer className="h-full">
+    <QueryPanelContainer className="h-full overflow-y-auto py-0 pt-4">
+      {(columnName || suggestedSelectQuery) && (
+        <QueryPanelSection className="pt-2 pb-6 border-b">
+          <div className="flex flex-col gap-y-3">
+            <div>
+              <h4 className="mb-2">Recommendation reason</h4>
+              {columnName && (
+                <p className="text-sm text-foreground-light">
+                  Recommendation for column: <span className="font-mono">{columnName}</span>
+                </p>
+              )}
+            </div>
+            {suggestedSelectQuery && (
+              <div className="flex flex-col gap-y-4">
+                <p className="text-sm text-foreground-light">Based on the following query:</p>
+                <CodeBlock
+                  hideLineNumbers
+                  value={suggestedSelectQuery}
+                  language="sql"
+                  className={cn(
+                    'max-w-full max-h-[200px]',
+                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                  )}
+                />
+              </div>
+            )}
+          </div>
+        </QueryPanelSection>
+      )}
       <QueryPanelSection className="pt-2 mb-6">
         <div className="mb-4 flex flex-col gap-y-1">
           <h4 className="mb-2">Indexes in use</h4>

@@ -1,146 +1,147 @@
-import { useMemo } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
+import { AlertError } from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { NoPermission } from 'components/ui/NoPermission'
+import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
+import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import {
-  cn,
-  EyeOffIcon,
-  Input_Shadcn_,
-  Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  WarningIcon,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
-import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
-
-// to add in later with follow up PR
-// import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
-// to add in later with follow up PR
-// import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { APIKeyRow } from './APIKeyRow'
+import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
 
-  const { canReadAPIKeys, isLoading: isLoadingVisibility } = useApiKeysVisibility()
   const {
-    data: apiKeysData,
-    isPending: isLoadingApiKeys,
+    data: apiKeysData = [],
     error,
+    isPending: isLoadingApiKeys,
+    isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
+  const newApiKeys = useMemo(
+    () => apiKeysData.filter(({ type }) => type === 'publishable' || type === 'secret') ?? [],
+    [apiKeysData]
+  )
+  const hasApiKeys = newApiKeys.length > 0
+
   const publishableApiKeys = useMemo(
-    () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
+    () =>
+      apiKeysData?.filter(
+        (key): key is Extract<APIKeysData[number], { type: 'publishable' }> =>
+          key.type === 'publishable'
+      ) ?? [],
     [apiKeysData]
   )
 
-  // The default publisahble key will always be the first one
-  const apiKey = publishableApiKeys[0]
+  // Track the ID being deleted to exclude it from error checking
+  const deletingAPIKeyIdRef = useRef<string | null>(null)
+
+  const { value: apiKeyToDelete, setValue: setAPIKeyToDelete } = useQueryStateWithSelect({
+    urlKey: 'deletePublishableKey',
+    select: (id: string) => (id ? publishableApiKeys?.find((key) => key.id === id) : undefined),
+    enabled: !!publishableApiKeys?.length,
+    onError: (_error, selectedId) => {
+      handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`)
+    },
+  })
+
+  const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+    onSuccess: () => {
+      toast.success('Successfully deleted publishable key')
+      setAPIKeyToDelete(null)
+    },
+    onError: () => {
+      deletingAPIKeyIdRef.current = null
+    },
+  })
+
+  const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'publishable' }>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!apiKey.id) return console.error('API key ID is required')
+    deletingAPIKeyIdRef.current = apiKey.id
+    deleteAPIKey({ projectRef, id: apiKey.id })
+  }
 
   return (
     <div>
       <FormHeader
         title="Publishable key"
         description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
+        actions={<CreatePublishableAPIKeyDialog />}
       />
-      <div className="flex flex-col gap-8">
-        <div className="-space-y-px w-full lg:w-content lg:w-fit">
-          <div className="bg-surface-100 px-5 py-2 flex items-center gap-5 first:rounded-t-md border">
-            <span className="text-sm">Publishable key</span>
-            <div className="flex items-center gap-2">
-              <ApiKeyInput />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <CopyButton
-                    iconOnly
-                    size="tiny"
-                    type="default"
-                    className="px-2 rounded-full"
-                    disabled={isLoadingVisibility || isLoadingApiKeys || !canReadAPIKeys}
-                    text={apiKey?.api_key}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  {!canReadAPIKeys
-                    ? 'You need additional permissions to copy publishable keys'
-                    : isLoadingApiKeys
-                      ? 'Loading permissions...'
-                      : 'Copy publishable key'}
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-          {error && canReadAPIKeys ? (
-            <div className="text-xs bg-warning-200 last:rounded-b-md border border-warning-400 px-5 text-foreground-lighter py-1">
-              <div className="text-warning">Failed to load publishable key: {error?.message}</div>
-            </div>
-          ) : (
-            <div className="text-xs bg-200 last:rounded-b-md border px-5 text-foreground-lighter py-1">
-              The publishable key can be safely shared publicly
-            </div>
-          )}
-        </div>
-      </div>
+
+      {!canReadAPIKeys && !isLoadingPermissions ? (
+        <NoPermission resourceText="view API keys" />
+      ) : isLoadingApiKeys || isLoadingPermissions ? (
+        <GenericSkeletonLoader />
+      ) : isErrorApiKeys ? (
+        <AlertError error={error} subject="Failed to load API keys" />
+      ) : (
+        <Card className="bg-surface-100">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-200">
+                <TableHead>Name</TableHead>
+                <TableHead>API Key</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {hasApiKeys && publishableApiKeys.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="p-0">
+                    <Admonition showIcon={false} type="default" className="border-0 rounded-none">
+                      <p className="text-foreground-light">No publishable keys created yet</p>
+                    </Admonition>
+                  </TableCell>
+                </TableRow>
+              )}
+              {publishableApiKeys.map((apiKey) => (
+                <APIKeyRow
+                  showLastSeen={false}
+                  key={apiKey.id}
+                  apiKey={apiKey}
+                  isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
+                  isDeleteModalOpen={apiKeyToDelete?.id === apiKey.id}
+                  onDelete={() => onDeleteAPIKey(apiKey)}
+                  setKeyToDelete={setAPIKeyToDelete}
+                />
+              ))}
+            </TableBody>
+
+            <TableFooter className="border-t">
+              <TableRow className="border-b-0">
+                <TableCell colSpan={3} className="py-2">
+                  <p className="text-xs text-foreground-lighter font-normal">
+                    Publishable keys can be safely shared publicly
+                  </p>
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </Card>
+      )}
     </div>
-  )
-}
-
-const ApiKeyInput = () => {
-  const { ref: projectRef } = useParams()
-
-  const { canReadAPIKeys, isLoading: isPermissionsLoading } = useApiKeysVisibility()
-  const {
-    data: apiKeysData,
-    isPending: isApiKeysLoading,
-    error,
-  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
-
-  const publishableApiKeys = useMemo(
-    () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
-    [apiKeysData]
-  )
-  // The default publisahble key will always be the first one
-  const apiKey = publishableApiKeys[0]
-
-  const baseClasses =
-    'flex-1 grow gap-1 rounded-full min-w-0 max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:min-w-[24rem]'
-  const size = 'tiny'
-
-  if (!canReadAPIKeys && !isPermissionsLoading) {
-    return (
-      <div className={cn(InputVariants({ size }), baseClasses, 'items-center gap-2 font-normal')}>
-        <EyeOffIcon />
-        You do not have permission to read API Key
-      </div>
-    )
-  }
-
-  if (isApiKeysLoading || isPermissionsLoading) {
-    return (
-      <div className={cn(InputVariants({ size }), baseClasses, 'items-center')}>
-        <Skeleton className="h-2 w-48 rounded-full bg-foreground-muted" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className={cn(InputVariants({ size }), baseClasses, 'items-center gap-2 font-normal')}>
-        <WarningIcon />
-        Failed to load publishable key
-      </div>
-    )
-  }
-
-  return (
-    <Input_Shadcn_
-      key={apiKey?.id}
-      size={size}
-      className={cn(baseClasses, 'font-mono')}
-      value={apiKey?.api_key}
-    />
   )
 }

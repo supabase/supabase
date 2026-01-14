@@ -1,40 +1,42 @@
-import { FC, useEffect, useState, memo } from 'react'
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle } from 'lucide-react'
+import { FC, memo, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Form_Shadcn_,
-  FormField_Shadcn_,
-  FormLabel_Shadcn_,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
   FormItem_Shadcn_,
-  Input_Shadcn_,
+  FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Input_Shadcn_,
   Separator,
   TextArea_Shadcn_,
-  FormDescription_Shadcn_,
 } from 'ui'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui/src/components/shadcn/ui/alert-dialog'
 import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-  MultiSelectorItem,
-} from 'ui-patterns/multi-select'
-import { CountrySelector } from '../Supasquad/CountrySelector'
-import {
-  supaSquadApplicationSchema,
   SupaSquadApplication,
+  supaSquadApplicationSchema,
 } from '~/data/open-source/contributing/supasquad.utils'
+import { CountrySelector } from '../Supasquad/CountrySelector'
 
 interface FormItem_Shadcn_ {
   type: 'text' | 'textarea'
@@ -706,27 +708,17 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
 
       {/* Confirmation AlertDialog Overlay */}
       <AlertDialog open={showConfirmation} onOpenChange={() => {}}>
-        <AlertDialogContent className="z-[60]">
-          <AlertDialogTitle className="sr-only">Application Submitted</AlertDialogTitle>
-          <AlertDialogDescription className="sr-only">
-            Your application has been successfully submitted. Please check your email for
-            confirmation.
-          </AlertDialogDescription>
-          <div className="flex flex-col items-center gap-6 py-4">
-            <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
-            </div>
-            <div className="text-center space-y-2">
-              <h3 className="text-xl font-semibold">Application Submitted!</h3>
-              <p className="text-muted-foreground">
-                Thank you for your submission. Please check your email for a confirmation link to
-                complete your application.
-              </p>
-            </div>
-            <AlertDialogAction onClick={handleConfirmationClose} className="w-full max-w-xs">
-              Got it, thanks!
-            </AlertDialogAction>
-          </div>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Application submitted</AlertDialogTitle>
+            <AlertDialogDescription>
+              Thank you for your submission! Please check your email for a confirmation link to
+              complete your application.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleConfirmationClose}>Got it</AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
