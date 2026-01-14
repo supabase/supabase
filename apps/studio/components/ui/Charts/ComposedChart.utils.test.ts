@@ -71,7 +71,7 @@ describe('normalizeToPercentageStacking', () => {
     const data = [{ timestamp: 1, cpu_system: 0, cpu_user: 0, cpu_other: 0 }]
     const attributeKeys = ['cpu_system', 'cpu_user', 'cpu_other']
 
-    const result: typeof data = normalizeToPercentageStacking(data, attributeKeys)
+    const result = normalizeToPercentageStacking(data, attributeKeys)
 
     expect(result[0].cpu_system).toBe(0)
     expect(result[0].cpu_user).toBe(0)
