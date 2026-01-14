@@ -1,16 +1,16 @@
 ---
-title = "Troubleshoot slow queries"
+title = "Transfer edge functions from one project to another"
 topics = ["cli", "database", "functions"]
 keywords = ["functions", "typescript", "deno"]
 cli = ["supabase-functions"]
 ---
 
-This guide shows how you can tranfer your Edge Functions from one project to another using the Supabase CLI.
+This guide shows how you can transfer your Edge Functions from one project to another using the Supabase CLI.
 
 ### Pre-requisite
 To follow through this guide, you need to note the following:
-- You must have the right access priviledges to both the source and target project
-- You must have installed the [Supabase CLI tool](https://supabase.com/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli)
+- You must have the right access privileges to both the source and target project
+- You must have installed the [Supabase CLI tool](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli)
 - Both source and target projects must be active
 
 
@@ -39,7 +39,7 @@ supabase functions download function_name --project-ref your_project_ref
 
 Repeat this step to download multiple functions.
 
-This downloads the function(s) into `supabase/functions`. You can view the download function(s) by running
+This downloads the function(s) into `supabase/functions`. You can view the downloaded function(s) by running
 
 ```bash
 ls supabase/functions
