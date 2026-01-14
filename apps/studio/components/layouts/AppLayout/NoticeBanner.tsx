@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 
-import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from 'components/ui/InlineLink'
 import { TimestampInfo } from 'ui-patterns'
@@ -12,9 +13,16 @@ import { TimestampInfo } from 'ui-patterns'
  */
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { maintenanceWindowBannerAcknowledged, onUpdateAcknowledged } = useAppBannerContext()
 
-  if (router.pathname.includes('sign-in') || maintenanceWindowBannerAcknowledged) {
+  // [Joshen] Just wondering - do we even need useAppBannerContext? useLocalStorageQuery seemingly fits the use case here
+  // const { maintenanceWindowBannerAcknowledged, onUpdateAcknowledged } = useAppBannerContext()
+
+  const [bannerAcknowledged, setBannerAcknowledge, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER,
+    false
+  )
+
+  if (router.pathname.includes('sign-in') || !isSuccess || bannerAcknowledged) {
     return null
   }
 
@@ -35,7 +43,7 @@ export const NoticeBanner = () => {
           </InlineLink>
         </>
       }
-      onDismiss={() => onUpdateAcknowledged('maintenance-window-banner-2026-01-16')}
+      onDismiss={() => setBannerAcknowledge(true)}
     />
   )
 }
