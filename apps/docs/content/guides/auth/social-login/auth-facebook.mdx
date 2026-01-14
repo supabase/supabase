@@ -211,31 +211,31 @@ Make sure to configure your Facebook app properly and add the required permissio
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/swift/auth-signinwithoauth) with `facebook` as the `provider`:
 
 ```swift
-import AuthenticationServices
+import SwiftUI
 
-func signInWithFacebook() async throws {
-  try await supabase.auth.signInWithOAuth(
-    provider: .facebook,
-    redirectTo: URL(string: "my.scheme://my-host")!, // Set the redirect link to bring back the user via deeplink.
-    launchFlow: { url in
-      // Use ASWebAuthenticationSession to handle the OAuth flow
-      try await withCheckedThrowingContinuation { continuation in
-        let session = ASWebAuthenticationSession(
-          url: url,
-          callbackURLScheme: "my.scheme"
-        ) { callbackURL, error in
-          if let error = error {
-            continuation.resume(throwing: error)
-          } else if let callbackURL = callbackURL {
-            continuation.resume(returning: callbackURL)
-          }
+struct SignInWithFacebook: View {
+  @Environment(\.webAuthenticationSession) var webAuthenticationSession
+
+  var body: some View {
+    Button("Sign in with Facebook") {
+      Task {
+        do {
+          try await supabase.auth.signInWithOAuth(
+            provider: .facebook,
+            redirectTo: URL(string: "my.scheme://my-host")!,
+            launchFlow: { @MainActor url in
+              try await webAuthenticationSession.authenticate(
+                using: url,
+                callbackURLScheme: "my.scheme"
+              )
+            }
+          )
+        } catch {
+          print("Failed to sign in with Facebook: \(error)")
         }
-        session.presentationContextProvider = self
-        session.prefersEphemeralWebBrowserSession = false
-        session.start()
       }
     }
-  )
+  }
 }
 ```
 
