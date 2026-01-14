@@ -8,8 +8,6 @@ import { TimestampInfo } from 'ui-patterns'
 
 /**
  * Used to display urgent notices that apply for all users, such as maintenance windows.
- * This file, like AppBannerWrapperContext.tsx, is meant to be dynamic.
- * Update this as and when we need to use the NoticeBanner.
  */
 export const NoticeBanner = () => {
   const router = useRouter()
