@@ -81,6 +81,10 @@ export const BranchRow = ({
   const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
+  const willBeDeletedIn = branch.deletion_scheduled_at
+    ? dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
+    : null
+  const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
@@ -125,9 +129,19 @@ export const BranchRow = ({
         </Tooltip>
       </div>
       <div className="flex items-center gap-x-4">
-        <p className="text-xs text-foreground-lighter">
-          {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
-        </p>
+        {branch.deletion_scheduled_at ? (
+          <p className="text-xs text-foreground-lighter">
+            {isDeletionPending
+              ? 'Deletion pending...'
+              : `Will be deleted in ${willBeDeletedIn} minutes`}
+          </p>
+        ) : (
+          <p className="text-xs text-foreground-lighter">
+            {daysFromNow > 1
+              ? `Updated on ${formattedUpdatedAt}`
+              : `Updated ${formattedTimeFromNow}`}
+          </p>
+        )}
         <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
         {rowActions}
       </div>

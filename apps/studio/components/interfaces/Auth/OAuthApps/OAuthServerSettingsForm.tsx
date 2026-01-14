@@ -72,11 +72,13 @@ interface OAuthServerSettings {
 
 export const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
+
   const {
     data: authConfig,
     isPending: isAuthConfigLoading,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
+
   const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({
     onSuccess: () => {
       toast.success('OAuth server settings updated successfully')

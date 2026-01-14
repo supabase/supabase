@@ -95,8 +95,12 @@ const BranchesPage: NextPageWithLayout = () => {
   }
 
   const onConfirmDeleteBranch = () => {
-    if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    const { project_ref: branchRef, parent_project_ref: projectRef } = selectedBranchToDelete
+    if (selectedBranchToDelete === undefined) return console.error('No branch selected')
+    const {
+      project_ref: branchRef,
+      parent_project_ref: projectRef,
+      persistent,
+    } = selectedBranchToDelete
     deleteBranch(
       { branchRef, projectRef },
       {
@@ -108,7 +112,7 @@ const BranchesPage: NextPageWithLayout = () => {
           sendEvent({
             action: 'branch_delete_button_clicked',
             properties: {
-              branchType: selectedBranchToDelete.persistent ? 'persistent' : 'preview',
+              branchType: persistent ? 'persistent' : 'preview',
               origin: 'branches_page',
             },
             groups: {
@@ -175,7 +179,9 @@ const BranchesPage: NextPageWithLayout = () => {
         confirmLabel="Delete branch"
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
-        alert={{ title: 'You cannot recover this branch once deleted' }}
+        alert={{
+          title: 'You cannot recover this branch once deleted',
+        }}
         text={
           <>
             This will delete your database preview branch{' '}

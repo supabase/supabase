@@ -38,21 +38,11 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               <>
                 <p>
                   The size for your dedicated database. You can change this later. Learn more about{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit hover:text-foreground transition-colors"
-                    href={`${DOCS_URL}/guides/platform/compute-add-ons`}
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/compute-add-ons`}>
                     compute add-ons
                   </InlineLink>{' '}
                   and{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit hover:text-foreground transition-colors"
-                    href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
                     compute billing
                   </InlineLink>
                   .

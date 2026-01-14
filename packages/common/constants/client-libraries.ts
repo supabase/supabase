@@ -1,6 +1,6 @@
 export const CLIENT_LIBRARIES = [
   {
-    language: 'Javascript',
+    language: 'JavaScript',
     key: 'javascript',
     is_officially_supported: true,
     libraries: [

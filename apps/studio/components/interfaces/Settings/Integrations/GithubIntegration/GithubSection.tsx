@@ -14,7 +14,6 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
 
@@ -28,7 +27,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const GitHubSection = () => {
+export const GitHubSection = () => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -52,7 +51,7 @@ const GitHubSection = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={GitHubTitle}>
           <p>Connect any of your GitHub repositories to a project.</p>
           <IntegrationImageHandler title="github" />
@@ -71,20 +70,21 @@ const GitHubSection = () => {
                   branch, keep your production branch in sync, and automatically create preview
                   branches for every pull request.
                 </p>
-                {promptProPlanUpgrade ? (
+
+                {promptProPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
                       source="github-integration"
                       featureProposition="use GitHub integrations"
-                      primaryText="Upgrade to unlock GitHub integration"
+                      primaryText={`Upgrade to ${!!existingConnection ? 'manage' : 'unlock'} GitHub integration`}
                       secondaryText="Connect your GitHub repository to automatically sync preview branches and deploy changes."
                     />
                   </div>
-                ) : (
-                  <div className={cn(promptProPlanUpgrade && 'opacity-25 pointer-events-none')}>
-                    <GitHubIntegrationConnectionForm connection={existingConnection} />
-                  </div>
                 )}
+                <GitHubIntegrationConnectionForm
+                  disabled={promptProPlanUpgrade}
+                  connection={existingConnection}
+                />
               </div>
             </div>
           )}
@@ -93,5 +93,3 @@ const GitHubSection = () => {
     </ScaffoldContainer>
   )
 }
-
-export default GitHubSection
