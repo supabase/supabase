@@ -38,8 +38,7 @@ export const RpcContent = ({
   const path = paths && pathKey in paths ? paths[pathKey] : undefined
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
 
-  const { post } = path!
-  const { parameters, summary } = post || {}
+  const { parameters, summary } = path?.post || {}
   const rpcParamsObject =
     parameters && parameters[0] && parameters[0].schema && (parameters[0].schema as any).properties
       ? (parameters[0].schema as any).properties

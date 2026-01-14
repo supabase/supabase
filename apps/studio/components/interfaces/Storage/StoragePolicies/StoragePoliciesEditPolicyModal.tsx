@@ -102,9 +102,25 @@ const StoragePoliciesEditPolicyModal = ({
         allowedOperations: [operation],
       })
     }
-    const updatedAllowedOperations = policyFormFields.allowedOperations.includes(operation)
-      ? pull(policyFormFields.allowedOperations.slice(), operation)
-      : policyFormFields.allowedOperations.concat([operation])
+
+    const currentOps = policyFormFields.allowedOperations
+    const isRemoving = currentOps.includes(operation)
+    let updatedAllowedOperations = isRemoving
+      ? pull(currentOps.slice(), operation)
+      : currentOps.concat([operation])
+
+    if (!isRemoving && (operation === 'UPDATE' || operation === 'DELETE')) {
+      if (!updatedAllowedOperations.includes('SELECT')) {
+        updatedAllowedOperations = updatedAllowedOperations.concat(['SELECT'])
+      }
+    }
+
+    if (isRemoving && operation === 'SELECT') {
+      updatedAllowedOperations = updatedAllowedOperations.filter(
+        (op: string) => op !== 'UPDATE' && op !== 'DELETE'
+      )
+    }
+
     return setPolicyFormFields({
       ...policyFormFields,
       allowedOperations: updatedAllowedOperations,

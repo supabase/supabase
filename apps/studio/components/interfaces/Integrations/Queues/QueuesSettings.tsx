@@ -74,7 +74,7 @@ export const QueuesSettings = () => {
   const {
     data: isExposed,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
   } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,

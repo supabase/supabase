@@ -151,9 +151,7 @@ export const LayoutHeader = ({
                     {exceedingLimits && (
                       <div className="ml-2">
                         <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                          <Badge variant="destructive" className="whitespace-nowrap">
-                            Exceeding usage limits
-                          </Badge>
+                          <Badge variant="destructive">Exceeding usage limits</Badge>
                         </Link>
                       </div>
                     )}

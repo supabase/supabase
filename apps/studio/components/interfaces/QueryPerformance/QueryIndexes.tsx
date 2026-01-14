@@ -1,13 +1,16 @@
-import { Check, Lightbulb, Table2 } from 'lucide-react'
-import { useState } from 'react'
+import { Check, Table2, Lightbulb } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -23,37 +26,47 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
-import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
-import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
 import {
   calculateImprovement,
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
-import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
+import { QueryPerformanceRow } from './QueryPerformance.types'
+import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
+import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
+import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
 interface QueryIndexesProps {
-  selectedRow: any
+  selectedRow: Pick<QueryPerformanceRow, 'query'>
+  columnName?: string
+  suggestedSelectQuery?: string
+
+  onClose?: () => void
 }
 
 // [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
 // e.g understanding "costs", what numbers of "costs" are actually considered insignificant
 
-export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
+export const QueryIndexes = ({
+  selectedRow,
+  columnName,
+  suggestedSelectQuery,
+  onClose,
+}: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
+  const track = useTrack()
+  const [hasTrackedTabView, setHasTrackedTabView] = useState(false)
 
   const {
     data: usedIndexes,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
     isError,
     error,
   } = useGetIndexesFromSelectQuery({
@@ -62,7 +75,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     query: selectedRow?.['query'],
   })
 
-  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { data: extensions, isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -100,10 +113,27 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
   const invalidateQueries = useIndexInvalidation()
 
+  useEffect(() => {
+    if (!isLoadingIndexAdvisorResult && !hasTrackedTabView) {
+      track('index_advisor_tab_clicked', {
+        hasRecommendations: hasIndexRecommendation,
+        isIndexAdvisorEnabled: isIndexAdvisorEnabled,
+      })
+      setHasTrackedTabView(true)
+    }
+  }, [
+    isLoadingIndexAdvisorResult,
+    hasIndexRecommendation,
+    hasTrackedTabView,
+    track,
+    isIndexAdvisorEnabled,
+  ])
+
   const createIndex = async () => {
     if (index_statements.length === 0) return
 
     setIsExecuting(true)
+    track('index_advisor_create_indexes_button_clicked')
 
     try {
       await createIndexes({
@@ -122,6 +152,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       setIsExecuting(false)
     } finally {
       setIsExecuting(false)
+
+      onClose?.()
     }
   }
 
@@ -145,7 +177,36 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   }
 
   return (
-    <QueryPanelContainer className="h-full">
+    <QueryPanelContainer className="h-full overflow-y-auto py-0 pt-4">
+      {(columnName || suggestedSelectQuery) && (
+        <QueryPanelSection className="pt-2 pb-6 border-b">
+          <div className="flex flex-col gap-y-3">
+            <div>
+              <h4 className="mb-2">Recommendation reason</h4>
+              {columnName && (
+                <p className="text-sm text-foreground-light">
+                  Recommendation for column: <span className="font-mono">{columnName}</span>
+                </p>
+              )}
+            </div>
+            {suggestedSelectQuery && (
+              <div className="flex flex-col gap-y-4">
+                <p className="text-sm text-foreground-light">Based on the following query:</p>
+                <CodeBlock
+                  hideLineNumbers
+                  value={suggestedSelectQuery}
+                  language="sql"
+                  className={cn(
+                    'max-w-full max-h-[200px]',
+                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                  )}
+                />
+              </div>
+            )}
+          </div>
+        </QueryPanelSection>
+      )}
       <QueryPanelSection className="pt-2 mb-6">
         <div className="mb-4 flex flex-col gap-y-1">
           <h4 className="mb-2">Indexes in use</h4>

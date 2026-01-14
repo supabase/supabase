@@ -30,7 +30,8 @@ const RestoringState = () => {
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
@@ -40,10 +41,6 @@ const RestoringState = () => {
     if (!isProjectStatusSuccess) return
     if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
       setIsCompleted(true)
-    } else {
-      if (ref) {
-        invalidateProjectDetailsQuery(ref)
-      }
     }
   }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
 
@@ -69,7 +66,6 @@ const RestoringState = () => {
 
   const onConfirm = async () => {
     if (!project) return console.error('Project is required')
-
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(ref)
   }

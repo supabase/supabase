@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+
 import { useParams } from 'common'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   Card,
   CardContent,
@@ -198,13 +199,13 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
     authSuccessRatePrevious
   )
 
-  const { data: respErrData, isLoading: isLoadingResp } = useQuery({
+  const { data: respErrData, isPending: isLoadingResp } = useQuery({
     queryKey: ['auth-overview', ref, 'top-response-errors'],
     queryFn: () => fetchTopResponseErrors(ref as string),
     enabled: !!ref,
   })
 
-  const { data: codeErrData, isLoading: isLoadingCodes } = useQuery({
+  const { data: codeErrData, isPending: isLoadingCodes } = useQuery({
     queryKey: ['auth-overview', ref, 'top-auth-error-codes'],
     queryFn: () => fetchTopAuthErrorCodes(ref as string),
     enabled: !!ref,
