@@ -76,6 +76,7 @@ describe('normalizeToPercentageStacking', () => {
     expect(result[0].cpu_system).toBe(0)
     expect(result[0].cpu_user).toBe(0)
     expect(result[0].cpu_other).toBe(0)
+    expect(result[0].rest).toBe(100)
   })
 
   it('should handle empty data array', () => {
