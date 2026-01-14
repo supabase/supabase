@@ -419,6 +419,174 @@ describe('Query.utils', () => {
         const result = QueryUtils.selectQuery(table, '*', { filters: filters })
         expect(result).toContain("where name = 'O''Reilly'")
       })
+
+      test('should error if tuple filter value length does not match column length', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '=', value: [1] }]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError(
+          'Tuple filter value must have the same length as the column array'
+        )
+      })
+
+      test('should error if tuple filter value is not an array', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '=', value: 1 }]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError(
+          'Tuple filter value must be an array'
+        )
+      })
+
+      test('should correctly handle tuple filters with equality operator', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '=', value: [1, 2] }]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe('select * from public.users where (id, version) = (1, 2);')
+      })
+
+      test('should correctly handle tuple filters with greater than operator', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '>', value: [1, 2] }]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe('select * from public.users where (id, version) > (1, 2);')
+      })
+
+      test('should correctly handle tuple filters with greater than or equal operator', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '>=', value: [1, 2] }]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe('select * from public.users where (id, version) >= (1, 2);')
+      })
+
+      test('should correctly handle tuple filters with less than operator', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '<', value: [10, 5] }]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe('select * from public.users where (id, version) < (10, 5);')
+      })
+
+      test('should correctly handle tuple filters with less than or equal operator', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '<=', value: [10, 5] }]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe('select * from public.users where (id, version) <= (10, 5);')
+      })
+
+      test('should correctly handle tuple filters with not equal operator (<>)', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: '<>', value: [1, 2] }]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe('select * from public.users where (id, version) <> (1, 2);')
+      })
+
+      test('should correctly handle tuple filters with in operator', () => {
+        const filters: Filter[] = [
+          {
+            column: ['id', 'version'],
+            operator: 'in',
+            value: [
+              [1, 2],
+              [3, 4],
+              [5, 6],
+            ],
+          },
+        ]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe(
+          'select * from public.users where (id, version) in ((1, 2), (3, 4), (5, 6));'
+        )
+      })
+
+      test('should error if tuple filters with in operator do not have matching number of array values', () => {
+        const filters: Filter[] = [
+          {
+            column: ['id', 'version'],
+            operator: 'in',
+            value: [[1, 2], [3, 4], [5]],
+          },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
+
+      test('should correctly handle tuple filters with in operator using strings', () => {
+        const filters: Filter[] = [
+          {
+            column: ['id', 'version'],
+            operator: 'in',
+            value: ['one,two', 'three,four', 'five,six'],
+          },
+        ]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe(
+          `select * from public.users where (id, version) in (('one', 'two'), ('three', 'four'), ('five', 'six'));`
+        )
+      })
+
+      test('should error if tuple filters with in operator do not have matching number of stringified values', () => {
+        const filters: Filter[] = [
+          {
+            column: ['id', 'version'],
+            operator: 'in',
+            value: ['one,two', 'three,four', 'five'],
+          },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
+
+      test('should correctly handle tuple filters with string values', () => {
+        const filters: Filter[] = [
+          { column: ['first_name', 'last_name'], operator: '=', value: ['John', 'Doe'] },
+        ]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe(
+          "select * from public.users where (first_name, last_name) = ('John', 'Doe');"
+        )
+      })
+
+      test('should correctly handle mixed tuple and regular filters', () => {
+        const filters: Filter[] = [
+          { column: ['id', 'version'], operator: '>', value: [1, 2] },
+          { column: 'active', operator: '=', value: true },
+        ]
+        const result = QueryUtils.selectQuery(table, '*', { filters: filters })
+        expect(result).toBe(
+          'select * from public.users where (id, version) > (1, 2) and active = true;'
+        )
+      })
+
+      test('should error when trying to use "is" operator as a tuple filter', () => {
+        const filters: Filter[] = [
+          {
+            column: ['id', 'version'],
+            operator: 'is',
+            value: [null, null],
+          },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
+
+      test('should error when trying to use "~~" operator as a tuple filter', () => {
+        const filters: Filter[] = [
+          {
+            column: ['first_name', 'last_name'],
+            operator: '~~',
+            value: ['%John%', '%Doe%'],
+          },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
+
+      test('should error when trying to use "~~*" operator as a tuple filter', () => {
+        const filters: Filter[] = [
+          { column: ['first_name', 'last_name'], operator: '~~*', value: ['%john%', '%doe%'] },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
+
+      test('should error when trying to use "!~~" operator as a tuple filter', () => {
+        const filters: Filter[] = [
+          { column: ['first_name', 'last_name'], operator: '!~~', value: ['%Admin%', '%System%'] },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
+
+      test('should error when trying to use "!~~*" operator as a tuple filter', () => {
+        const filters: Filter[] = [
+          { column: ['first_name', 'last_name'], operator: '!~~*', value: ['%admin%', '%system%'] },
+        ]
+        expect(() => QueryUtils.selectQuery(table, '*', { filters: filters })).toThrowError()
+      })
     })
 
     describe('applySorts', () => {

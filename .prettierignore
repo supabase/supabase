@@ -8,6 +8,7 @@ apps/**/out
 **/supabase/migrations/*.sql
 apps/www/schema.sql
 apps/www/public/images/*
+apps/www/.generated/*
 apps/docs/**/generated/*
 apps/docs/examples/*
 examples/slack-clone/nextjs-slack-clone/full-schema.sql

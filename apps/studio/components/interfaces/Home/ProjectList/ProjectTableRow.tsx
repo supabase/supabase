@@ -4,10 +4,10 @@ import InlineSVG from 'react-inlinesvg'
 
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { OrgProject } from 'data/projects/projects-infinite-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -53,15 +53,17 @@ export const ProjectTableRow = ({
       }}
     >
       <TableCell>
-        <div className="flex flex-col gap-y-1">
+        <div className="flex flex-col gap-y-2">
+          {/* Text */}
           <div>
-            <p className="font-medium">{name}</p>
-            <p className="text-xs text-foreground-lighter">ID: {projectRef}</p>
+            <h5 className="text-sm">{name}</h5>
+            <p className="text-sm text-foreground-lighter">ID: {projectRef}</p>
           </div>
+          {/* Integrations */}
           {(isGithubIntegrated || isVercelIntegrated) && (
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-1.5">
               {isVercelIntegrated && (
-                <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
+                <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
                   <InlineSVG
                     src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                     title="Vercel Icon"
@@ -70,16 +72,14 @@ export const ProjectTableRow = ({
                 </div>
               )}
               {isGithubIntegrated && (
-                <>
-                  <div className="w-fit p-1 border rounded-md flex items-center">
+                <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
+                  <div className="w-5 h-5 p-1 flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
                   {githubRepository && (
-                    <span className="text-xs text-foreground-light truncate max-w-64">
-                      {githubRepository}
-                    </span>
+                    <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
                   )}
-                </>
+                </div>
               )}
             </div>
           )}
@@ -96,15 +96,13 @@ export const ProjectTableRow = ({
         <div className="w-fit">
           {project.status !== 'INACTIVE' ? (
             <ComputeBadgeWrapper
-              project={{
-                ref: project.ref,
-                organization_slug: organization?.slug,
-                cloud_provider: infraInformation?.cloud_provider,
-                infra_compute_size: infraInformation?.infra_compute_size,
-              }}
+              slug={organization?.slug}
+              projectRef={project.ref}
+              cloudProvider={project.cloud_provider}
+              computeSize={getComputeSize(project)}
             />
           ) : (
-            <span className="text-xs text-foreground-light">-</span>
+            <span className="text-xs text-foreground-muted">–</span>
           )}
         </div>
       </TableCell>

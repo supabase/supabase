@@ -10,6 +10,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
@@ -86,7 +87,7 @@ export const InviteMemberButton = () => {
       )
     )
 
-  const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
+  const { mutate: inviteMember, isPending: isInviting } = useOrganizationCreateInvitationMutation()
 
   const FormSchema = z.object({
     email: z.string().email('Must be a valid email address').min(1, 'Email is required'),
@@ -255,6 +256,7 @@ export const InviteMemberButton = () => {
                     >
                       <FormControl_Shadcn_>
                         <OrganizationProjectSelector
+                          fetchOnMount
                           sameWidthAsTrigger
                           checkPosition="left"
                           selectedRef={projectRef}
@@ -309,13 +311,11 @@ export const InviteMemberButton = () => {
                         </Link>
                       </Button>
                       {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                        <Button asChild type="default">
-                          <Link
-                            href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
-                          >
-                            Upgrade to Team
-                          </Link>
-                        </Button>
+                        <UpgradePlanButton
+                          plan="Team"
+                          source="inviteMemberSSO"
+                          featureProposition="enable Single Sign-on (SSO)"
+                        />
                       )}
                     </div>
                   </div>

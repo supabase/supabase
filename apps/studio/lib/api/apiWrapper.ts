@@ -40,9 +40,6 @@ export default async function apiWrapper(
             message: `Unauthorized: ${response.error.message}`,
           },
         })
-      } else {
-        // Attach user information to request parameters
-        ;(req as any).user = response
       }
     }
 

@@ -1,8 +1,9 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
+import { checkReplicationFeatureFlagRetry } from './utils'
 
 type ReplicationPipelinesParams = { projectRef?: string }
 
@@ -16,10 +17,8 @@ async function fetchReplicationPipelines(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) {
-    handleError(error)
-  }
 
+  if (error) handleError(error)
   return data
 }
 
@@ -31,10 +30,14 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationPipelinesData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPipelinesData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelinesData, ResponseError, TData>(
-    replicationKeys.pipelines(projectRef),
-    ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ReplicationPipelinesData, ResponseError, TData>({
+    queryKey: replicationKeys.pipelines(projectRef),
+    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: checkReplicationFeatureFlagRetry,
+    ...options,
+  })

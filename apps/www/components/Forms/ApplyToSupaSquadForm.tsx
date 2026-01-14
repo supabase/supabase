@@ -1,40 +1,42 @@
-import { FC, useEffect, useState, memo } from 'react'
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle } from 'lucide-react'
+import { FC, memo, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Form_Shadcn_,
-  FormField_Shadcn_,
-  FormLabel_Shadcn_,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
   FormItem_Shadcn_,
-  Input_Shadcn_,
+  FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Input_Shadcn_,
   Separator,
   TextArea_Shadcn_,
-  FormDescription_Shadcn_,
 } from 'ui'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui/src/components/shadcn/ui/alert-dialog'
 import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-  MultiSelectorItem,
-} from 'ui-patterns/multi-select'
-import { CountrySelector } from '../Supasquad/CountrySelector'
-import {
-  supaSquadApplicationSchema,
   SupaSquadApplication,
+  supaSquadApplicationSchema,
 } from '~/data/open-source/contributing/supasquad.utils'
+import { CountrySelector } from '../Supasquad/CountrySelector'
 
 interface FormItem_Shadcn_ {
   type: 'text' | 'textarea'
@@ -52,6 +54,8 @@ interface Track {
 
 interface Props {
   className?: string
+  title?: string
+  description?: string
 }
 
 const tracks: Track[] = [
@@ -111,12 +115,6 @@ const languagesSpoken: string[] = [
   'Dutch',
   'Other',
 ]
-
-const headerContent = {
-  title: 'Apply to join SupaSquad',
-  description:
-    'Join our community of passionate contributors and help shape the future of Supabase. Fill out the form below to apply.',
-}
 
 const FormContent = memo(function FormContent({
   form,
@@ -302,10 +300,17 @@ const FormContent = memo(function FormContent({
               render={({ field }) => (
                 <FormItem_Shadcn_ className="space-y-1">
                   <FormLabel_Shadcn_ className="text-foreground">
-                    Share some of your recent contributions
+                    Share some of your recent contributions *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Any relevant links to show your current engagement with the Supabase community.
+                    <p>
+                      Any relevant links to show your current engagement with the Supabase
+                      community.
+                    </p>
+                    <p>
+                      If you haven&apos;t contributed yet, spend some time engaging with the
+                      community, then reapply once you&apos;ve built up a few contributions.
+                    </p>
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative">
@@ -333,7 +338,8 @@ const FormContent = memo(function FormContent({
                     Product Areas of Interest *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    What specific areas would you like to help with? Leave blank if you're not sure.
+                    What specific areas would you like to help with? Leave blank if you&apos;re not
+                    sure.
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
@@ -375,7 +381,7 @@ const FormContent = memo(function FormContent({
                     Skills (frameworks, tools, programming languages)
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Know Postgres really well? React? Python? Rust? Terraform? Add it here!
+                    Know Postgres really well? React? Expo? Python? Rust? Terraform? Add it here!
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
@@ -589,7 +595,11 @@ const FormContent = memo(function FormContent({
   )
 })
 
-const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
+const ApplyToSupaSquadForm: FC<Props> = ({
+  className,
+  title = 'Apply to join SupaSquad',
+  description = 'Join our community of passionate contributors and help shape the future of Supabase. Fill out the form below to apply.',
+}) => {
   const [honeypot, setHoneypot] = useState<string>('') // field to prevent spam
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -677,8 +687,8 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
     <>
       <div className={className}>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">{headerContent.title}</h2>
-          <p className="text-muted-foreground">{headerContent.description}</p>
+          <h2 className="text-2xl font-semibold mb-2">{title}</h2>
+          <p className="text-muted-foreground">{description}</p>
         </div>
 
         <Separator className="my-6" />
@@ -698,27 +708,17 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
 
       {/* Confirmation AlertDialog Overlay */}
       <AlertDialog open={showConfirmation} onOpenChange={() => {}}>
-        <AlertDialogContent className="z-[60]">
-          <AlertDialogTitle className="sr-only">Application Submitted</AlertDialogTitle>
-          <AlertDialogDescription className="sr-only">
-            Your application has been successfully submitted. Please check your email for
-            confirmation.
-          </AlertDialogDescription>
-          <div className="flex flex-col items-center gap-6 py-4">
-            <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
-            </div>
-            <div className="text-center space-y-2">
-              <h3 className="text-xl font-semibold">Application Submitted!</h3>
-              <p className="text-muted-foreground">
-                Thank you for your submission. Please check your email for a confirmation link to
-                complete your application.
-              </p>
-            </div>
-            <AlertDialogAction onClick={handleConfirmationClose} className="w-full max-w-xs">
-              Got it, thanks!
-            </AlertDialogAction>
-          </div>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Application submitted</AlertDialogTitle>
+            <AlertDialogDescription>
+              Thank you for your submission! Please check your email for a confirmation link to
+              complete your application.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleConfirmationClose}>Got it</AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>

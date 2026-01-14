@@ -5,6 +5,7 @@ import {
   Lock,
   LockIcon,
   Ruler,
+  Scaling,
   Table2,
   TextSearch,
   Unlock,
@@ -164,6 +165,15 @@ export const lintInfoMap: LintInfo[] = [
     category: 'security',
   },
   {
+    name: 'auth_db_connections_absolute',
+    title: 'Auth Absolute Connection Management Strategy',
+    icon: <Scaling className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/performance`,
+    linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/platform/going-into-prod`,
+    category: 'performance',
+  },
+  {
     name: 'rls_references_user_metadata',
     title: 'RLS references user metadata',
     icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
@@ -290,6 +300,26 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: `${DOCS_URL}/guides/platform/upgrading`,
     category: 'security',
   },
+  {
+    name: 'sensitive_columns_exposed',
+    title: 'Sensitive Columns Exposed',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View table',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0023_sensitive_columns_exposed`,
+    category: 'security',
+  },
+  {
+    name: 'rls_policy_always_true',
+    title: 'RLS Policy Always True',
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View policies',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0024_permissive_rls_policy`,
+    category: 'security',
+  },
 ]
 
 export const LintCTA = ({
@@ -312,7 +342,7 @@ export const LintCTA = ({
 
   return (
     <Button asChild type="default">
-      <Link href={link} target="_blank" rel="noreferrer" className="no-underline">
+      <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>
     </Button>
@@ -343,7 +373,7 @@ export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
 
 export const LintCategoryBadge = ({ category }: { category: string }) => {
   return (
-    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
+    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'}>
       {category.toLowerCase()}
     </Badge>
   )

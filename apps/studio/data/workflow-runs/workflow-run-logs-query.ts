@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { workflowRunKeys } from './keys'
 
 export type WorkflowRunLogsVariables = {
@@ -42,10 +42,12 @@ export const useWorkflowRunLogsQuery = <TData = WorkflowRunLogsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<WorkflowRunLogsData, WorkflowRunLogsError, TData> = {}
+  }: UseCustomQueryOptions<WorkflowRunLogsData, WorkflowRunLogsError, TData> = {}
 ) =>
-  useQuery<WorkflowRunLogsData, WorkflowRunLogsError, TData>(
-    workflowRunKeys.list(workflowRunId),
-    ({ signal }) => getWorkflowRunLogs({ workflowRunId }, signal),
-    { enabled: enabled && typeof workflowRunId !== 'undefined', staleTime: 0, ...options }
-  )
+  useQuery<WorkflowRunLogsData, WorkflowRunLogsError, TData>({
+    queryKey: workflowRunKeys.list(workflowRunId),
+    queryFn: ({ signal }) => getWorkflowRunLogs({ workflowRunId }, signal),
+    enabled: enabled && typeof workflowRunId !== 'undefined',
+    staleTime: 0,
+    ...options,
+  })

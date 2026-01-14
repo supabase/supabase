@@ -19,7 +19,7 @@ interface ResourceContentProps {
   refreshDocs: () => void
 }
 
-const ResourceContent = ({
+export const ResourceContent = ({
   apiEndpoint,
   resourceId,
   resources,
@@ -327,5 +327,3 @@ const ResourceContent = ({
     </>
   )
 }
-
-export default ResourceContent

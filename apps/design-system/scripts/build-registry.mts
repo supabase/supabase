@@ -207,17 +207,29 @@ export const Index: Record<string, any> = {
       // console.log('item', item)
 
       let packagePath = ''
+      let componentImportPath = ''
       if (type === 'ui') {
         packagePath = `../../packages/ui/src/components/shadcn/ui`
+        componentImportPath = `@/${packagePath}/${item.name}`
       }
       if (type === 'fragment') {
         packagePath = `../../packages/ui-patterns/src${item.optionalPath}`
+        // Check if the file is index.tsx - if so, don't append the item name
+        const isIndexFile = item.files.some((file) => {
+          const basename = path.basename(file)
+          return basename === 'index.tsx' || basename === 'index.ts'
+        })
+        componentImportPath = isIndexFile
+          ? `@/${packagePath}`
+          : `@/${packagePath}/${item.name}`
       }
       if (type === 'example') {
         packagePath = `registry/${style.name}/${type}`
+        componentImportPath = `@/${packagePath}/${item.name}`
       }
       if (type === 'block') {
         packagePath = `registry/${style.name}/${type}`
+        componentImportPath = `@/${packagePath}/${item.name}`
       }
 
       index += `
@@ -225,7 +237,7 @@ export const Index: Record<string, any> = {
       name: "${item.name}",
       type: "${item.type}",
       registryDependencies: ${JSON.stringify(item.registryDependencies)},
-      component: React.lazy(() => import("@/${packagePath}/${item.name}")),
+      component: React.lazy(() => import("${componentImportPath}")),
       source: "${sourceFilename}",
       files: [${resolveFiles.map((file) => `"${file}"`)}],
       category: "${item.category}",

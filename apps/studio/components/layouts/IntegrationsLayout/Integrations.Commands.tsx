@@ -13,13 +13,11 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
   ref ||= '_'
 
-  const { integrationsShowStripeWrapper } = useIsFeatureEnabled([
-    'integrations:show_stripe_wrapper',
-  ])
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
-  const allIntegrations = integrationsShowStripeWrapper
+  const allIntegrations = integrationsWrappers
     ? INTEGRATIONS
-    : INTEGRATIONS.filter((x) => x.id !== 'stripe_wrapper')
+    : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper'))
 
   const getName = (integration: IntegrationDefinition) => {
     switch (integration.id) {

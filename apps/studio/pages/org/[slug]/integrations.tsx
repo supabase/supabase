@@ -1,4 +1,4 @@
-import { IntegrationSettings } from 'components/interfaces/Organization'
+import { IntegrationSettings } from 'components/interfaces/Organization/IntegrationSettings/IntegrationSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import type { NextPageWithLayout } from 'types'

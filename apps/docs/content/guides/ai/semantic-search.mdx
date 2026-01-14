@@ -48,7 +48,7 @@ To implement semantic search in Postgres we use `pgvector` - an extension that a
    create table documents (
      id bigint primary key generated always as identity,
      content text,
-     embedding vector(512)
+     embedding extensions.vector(512)
    );
    ```
 
@@ -56,7 +56,7 @@ To implement semantic search in Postgres we use `pgvector` - an extension that a
 
    ```sql
    alter table documents
-   add column embedding vector(512);
+   add column embedding extensions.vector(512);
    ```
 
    In this example, we create a column named `embedding` which uses the newly enabled `vector` data type. The size of the vector (as indicated in parentheses) represents the number of dimensions in the embedding. Here we use 512, but adjust this to match the number of dimensions produced by your embedding model.
@@ -80,7 +80,7 @@ The easiest way to perform semantic search in Postgres is by creating a function
 ```sql
 -- Match documents using cosine distance (<=>)
 create or replace function match_documents (
-  query_embedding vector(512),
+  query_embedding extensions.vector(512),
   match_threshold float,
   match_count int
 )
@@ -108,7 +108,7 @@ You'll notice we are using the cosine distance (`<=>`) operator in our query. Co
 ```sql
 -- Match documents using negative inner product (<#>)
 create or replace function match_documents (
-  query_embedding vector(512),
+  query_embedding extensions.vector(512),
   match_threshold float,
   match_count int
 )
@@ -142,7 +142,7 @@ You can also call this method directly from SQL:
 ```sql
 select *
 from match_documents(
-  '[...]'::vector(512), -- pass the query embedding
+  '[...]'::extensions.vector(512), -- pass the query embedding
   0.78, -- chose an appropriate threshold for your data
   10 -- choose the number of matches
 );

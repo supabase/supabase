@@ -16,7 +16,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 
 import dayjs from 'dayjs'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import type { ChartData } from './Charts.types'
 import { MultiAttribute } from './ComposedChart.utils'
 
@@ -26,7 +26,7 @@ export interface ComposedChartHandlerProps {
   attributes: MultiAttribute[]
   startDate: string
   endDate: string
-  interval: string
+  interval?: string
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
@@ -343,8 +343,6 @@ const useAttributeQueries = (
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )

@@ -5,6 +5,7 @@ import type {
   PostgresTable,
   PostgresView,
 } from '@supabase/postgres-meta'
+import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 interface TableRelationship extends PostgresRelationship {
@@ -12,16 +13,25 @@ interface TableRelationship extends PostgresRelationship {
   update_action: 'a' | 'r' | 'c' | 'n' | 'd'
 }
 
+interface TableUniqueIndex {
+  schema: string
+  table_name: string
+  table_id: number
+  columns: string[]
+}
+
 export interface Table extends PostgresTable {
   entity_type: ENTITY_TYPE.TABLE
   columns: PostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
 export interface PartitionedTable extends PostgresTable {
   entity_type: ENTITY_TYPE.PARTITIONED_TABLE
   columns: PostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
 export interface View extends PostgresView {
@@ -40,6 +50,9 @@ export interface ForeignTable {
   schema: string
   name: string
   comment: string | null
+  foreign_server_name: string
+  foreign_data_wrapper_name: string
+  foreign_data_wrapper_handler: string
   columns: PostgresColumn[]
 }
 
@@ -65,6 +78,10 @@ export function isTableLike(entity?: Entity): entity is TableLike {
 
 export function isForeignTable(entity?: Entity): entity is ForeignTable {
   return entity?.entity_type === ENTITY_TYPE.FOREIGN_TABLE
+}
+
+export function isMsSqlForeignTable(entity?: Entity): entity is ForeignTable {
+  return isForeignTable(entity) && entity.foreign_data_wrapper_handler === WRAPPER_HANDLERS.MSSQL
 }
 
 export function isView(entity?: Entity): entity is View {
