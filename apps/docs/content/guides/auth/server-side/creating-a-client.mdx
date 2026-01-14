@@ -303,6 +303,35 @@ language="typescript"
 />
 </$CodeTabs>
 
+### Using OAuth with SvelteKit SSR
+
+When using OAuth providers (such as GitHub or Google) in a SvelteKit app with SSR, the `signInWithOAuth` method returns a URL that the user must be redirected to in order to complete the authentication flow.
+
+In SvelteKit, this redirect must be handled on the server using the `redirect` helper.
+
+For example, using a server action:
+
+```ts
+import { redirect } from '@sveltejs/kit'
+
+export const actions = {
+  signInWithOAuth: async ({ locals }) => {
+    const { data, error } = await locals.supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: 'http://localhost:5173/auth/callback',
+      },
+    })
+
+    if (error) {
+      console.error(error)
+      throw redirect(303, '/auth/error')
+    }
+
+    throw redirect(303, data.url)
+  },
+}
+```
 ## Congratulations
 
 You're done! To recap, you've successfully:
