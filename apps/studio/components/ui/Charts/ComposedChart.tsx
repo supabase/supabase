@@ -315,7 +315,10 @@ export function ComposedChart({
   })
 
   const normalizedData = isPercentageStacking
-    ? normalizeToPercentageStacking(data, stackedAttributes.map((att) => att.name))
+    ? normalizeToPercentageStacking(
+        data,
+        stackedAttributes.map((att) => att.name)
+      )
     : data
 
   const dataForChartData = isPercentageStacking ? normalizedData : data
@@ -484,7 +487,9 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentageStacking || (isPercentage && !showMaxValue) ? yDomain : ['auto', 'auto']}
+            domain={
+              isPercentageStacking || (isPercentage && !showMaxValue) ? yDomain : ['auto', 'auto']
+            }
             key={yAxisKey}
           />
           <XAxis
