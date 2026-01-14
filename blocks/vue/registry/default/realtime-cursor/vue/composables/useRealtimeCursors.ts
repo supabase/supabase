@@ -14,7 +14,7 @@ function useThrottleCallback<Params extends unknown[]>(
   let lastCall = 0
   let timeout: ReturnType<typeof setTimeout> | null = null
 
-  return (...args: Params) => {
+  const run = (...args: Params) => {
     const now = Date.now()
     const remainingTime = delay - (now - lastCall)
 
@@ -33,6 +33,15 @@ function useThrottleCallback<Params extends unknown[]>(
       }, remainingTime)
     }
   }
+
+  const cancel = () => {
+    if (timeout) {
+      clearTimeout(timeout)
+      timeout = null
+    }
+  }
+
+  return { run, cancel }
 }
 
 const supabase = createClient()
@@ -91,12 +100,20 @@ export function useRealtimeCursors({
     })
   }
 
-  const handleMouseMove = useThrottleCallback(sendCursor, throttleMs)
+  const { run: handleMouseMove, cancel: cancelThrottle } =
+  useThrottleCallback(sendCursor, throttleMs)
 
   onMounted(() => {
     const channel = supabase.channel(roomName)
 
     channel
+      .on('system', {}, (payload: CursorEventPayload) => {
+        console.error('Realtime system error:', payload)
+
+        // Defensive cleanup
+        Object.keys(cursors).forEach((k) => delete cursors[k])
+        channelRef.value = null
+      })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
         leftPresences.forEach(({ key }) => {
           delete cursors[key]
@@ -111,17 +128,20 @@ export function useRealtimeCursors({
           payload: cursorPayload.value,
         })
       })
-      .on('broadcast', { event: EVENT_NAME }, ({ payload }) => {
+      .on('broadcast', { event: EVENT_NAME }, ({ payload }: { payload: CursorEventPayload }) => {
         if (payload.user.id === userId) return
-
-        delete cursors[userId]
 
         cursors[payload.user.id] = payload
       })
       .subscribe(async (status) => {
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
-          await channel.track({ key: userId })
-          channelRef.value = channel
+          try {
+            await channel.track({ key: userId })
+            channelRef.value = channel
+          } catch (err) {
+            console.error('Failed to track presence for current user:', err)
+            channelRef.value = null
+          }
         } else {
           Object.keys(cursors).forEach((k) => delete cursors[k])
           channelRef.value = null
@@ -129,12 +149,19 @@ export function useRealtimeCursors({
       })
 
     window.addEventListener('mousemove', handleMouseMove)
+  })
 
-    onUnmounted(() => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      channel.unsubscribe()
+  onUnmounted(() => {
+    window.removeEventListener('mousemove', handleMouseMove)
+
+    cancelThrottle()
+
+    if (channelRef.value) {
+      channelRef.value.unsubscribe()
       channelRef.value = null
-    })
+    }
+
+    Object.keys(cursors).forEach((k) => delete cursors[k])
   })
 
   return { cursors }

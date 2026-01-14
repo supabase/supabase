@@ -10,7 +10,7 @@ const { maxFiles, maxFileSize, inputRef, isSuccess } = useDropzoneContext()
 
 <template>
   <div v-if="!isSuccess" :class="cn('flex flex-col items-center gap-y-2', props.className)">
-    <Upload size="20" class="text-muted-foreground" />
+    <Upload size="20" class="text-muted-foreground" aria-hidden="true"/>
 
     <p class="text-sm">
       Upload{{ maxFiles > 1 ? ` ${maxFiles}` : '' }} file{{ maxFiles !== 1 ? 's' : '' }}
@@ -19,12 +19,13 @@ const { maxFiles, maxFileSize, inputRef, isSuccess } = useDropzoneContext()
     <div class="flex flex-col items-center gap-y-1">
       <p class="text-xs text-muted-foreground">
         Drag and drop or
-        <a
+        <button
+          type="button"
           class="underline cursor-pointer hover:text-foreground"
           @click="inputRef?.click()"
         >
           select file{{ maxFiles !== 1 ? 's' : '' }}
-        </a>
+        </button>
         to upload
       </p>
 

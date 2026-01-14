@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { useDropZone } from '@vueuse/core'
 import { createClient } from "@/lib/supabase/client"
 
@@ -19,6 +19,24 @@ export type UseSupabaseUploadOptions = {
   upsert?: boolean
 }
 
+function validateFileType(file: File, allowedTypes: string[]) {
+  if (!allowedTypes.length) return []
+  const isValid = allowedTypes.some(t =>
+    t.endsWith('/*')
+      ? file.type.startsWith(t.replace('/*', ''))
+      : file.type === t
+  )
+  return isValid
+    ? []
+    : [{ code: 'invalid-type', message: 'Invalid file type' }]
+}
+
+function validateFileSize(file: File, maxSize: number) {
+  return file.size > maxSize
+    ? [{ code: 'file-too-large', message: `File is larger than allowed size` }]
+    : []
+}
+
 export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
   const {
     bucketName,
@@ -37,10 +55,7 @@ export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
 
   const isSuccess = computed(() => {
     if (!errors.value.length && !successes.value.length) return false
-    return (
-      !errors.value.length &&
-      successes.value.length === files.value.length
-    )
+    return !errors.value.length && successes.value.length === files.value.length
   })
 
   const dropZoneRef = ref<HTMLElement | null>(null)
@@ -49,38 +64,14 @@ export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
     onDrop(droppedFiles: FileWithPreview[]) {
       if (!droppedFiles) return
 
-      const newFiles: FileWithPreview[] = []
-
-      for (const file of droppedFiles) {
-        const fileErrors: FileWithPreview['errors'] = []
-
-        if (
-          allowedMimeTypes.length &&
-          !allowedMimeTypes.some((t) =>
-            t.endsWith('/*')
-              ? file.type.startsWith(t.replace('/*', ''))
-              : file.type === t
-          )
-        ) {
-          fileErrors.push({
-            code: 'invalid-type',
-            message: `Invalid file type`,
-          })
-        }
-
-        if (file.size > maxFileSize) {
-          fileErrors.push({
-            code: 'file-too-large',
-            message: `File is larger than allowed size`,
-          })
-        }
-
-        newFiles.push({
-          ...(file as FileWithPreview),
-          preview: URL.createObjectURL(file),
-          errors: fileErrors,
-        })
-      }
+      const newFiles: FileWithPreview[] = droppedFiles.map(file => ({
+        ...(file as FileWithPreview),
+        preview: URL.createObjectURL(file),
+        errors: [
+          ...validateFileType(file, allowedMimeTypes),
+          ...validateFileSize(file, maxFileSize),
+        ],
+      }))
 
       files.value = [...files.value, ...newFiles]
     },
@@ -89,50 +80,54 @@ export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
   const onUpload = async () => {
     loading.value = true
 
-    const filesWithErrors = errors.value.map((e) => e.name)
+    try {
+      const filesWithErrors = errors.value.map(e => e.name)
 
-    const filesToUpload =
-      filesWithErrors.length > 0
-        ? files.value.filter(
-            (f) =>
-              filesWithErrors.includes(f.name) ||
-              !successes.value.includes(f.name)
-          )
-        : files.value
+      const filesToUpload =
+        filesWithErrors.length > 0
+          ? files.value.filter(
+              f =>
+                filesWithErrors.includes(f.name) ||
+                !successes.value.includes(f.name)
+            )
+          : files.value
 
-    const responses = await Promise.all(
-      filesToUpload.map(async (file) => {
-        const { error } = await supabase.storage
-          .from(bucketName)
-          .upload(
-            path ? `${path}/${file.name}` : file.name,
-            file,
-            {
+      const responses = await Promise.all(
+        filesToUpload.map(async file => {
+          const { error } = await supabase.storage
+            .from(bucketName)
+            .upload(path ? `${path}/${file.name}` : file.name, file, {
               cacheControl: cacheControl.toString(),
               upsert,
-            }
-          )
+            })
 
-        return error
-          ? { name: file.name, message: error.message }
-          : { name: file.name, message: undefined }
+          return error
+            ? { name: file.name, message: error.message }
+            : { name: file.name, message: undefined }
+        })
+      )
+
+      errors.value = responses.filter((r): r is { name: string; message: string } => r.message !== undefined)
+
+      const successful = responses
+        .filter(r => !r.message)
+        .map(r => r.name)
+
+      successes.value = Array.from(
+        new Set([...successes.value, ...successful])
+      )
+    } catch (err) {
+      console.error('Upload failed unexpectedly:', err)
+
+      errors.value.push({
+        name: 'upload',
+        message: 'An unexpected error occurred during upload.',
       })
-    )
-
-    errors.value = responses.filter(
-      (r) => r.message
-    ) as { name: string; message: string }[]
-
-    const successful = responses
-      .filter((r) => !r.message)
-      .map((r) => r.name)
-
-    successes.value = Array.from(
-      new Set([...successes.value, ...successful])
-    )
-
-    loading.value = false
+    } finally {
+      loading.value = false
+    }
   }
+
 
   watch(
     () => files.value.length,
@@ -151,6 +146,27 @@ export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
     }
   )
 
+  watch(
+    files,
+    (newFiles, oldFiles) => {
+      const newPreviews = new Set(newFiles.map(f => f.preview))
+      oldFiles.forEach(file => {
+        if (file.preview && !newPreviews.has(file.preview)) {
+          URL.revokeObjectURL(file.preview)
+        }
+      })
+    },
+    { deep: true }
+  )
+
+  onUnmounted(() => {
+    files.value.forEach(file => {
+      if (file.preview) {
+        URL.revokeObjectURL(file.preview)
+      }
+    })
+  })
+
   return {
     dropZoneRef,
     isOverDropZone,
@@ -159,8 +175,7 @@ export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
     setFiles: (v: FileWithPreview[]) => (files.value = v),
 
     errors,
-    setErrors: (v: { name: string; message: string }[]) =>
-      (errors.value = v),
+    setErrors: (v: { name: string; message: string }[]) => (errors.value = v),
 
     successes,
     isSuccess,
