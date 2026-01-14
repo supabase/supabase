@@ -357,16 +357,19 @@ Development mode is sufficient for local development and testing. You only need 
 Before your app can be used by the general public, you need to complete Facebook's App Review process:
 
 1. **Complete App Settings**: In your Facebook app's **Settings > Basic**, fill in all required fields including:
+
    - App Icon
    - Privacy Policy URL
    - Terms of Service URL (if applicable)
    - App Domain
 
 2. **Request Permissions**: Navigate to **App Review > Permissions and Features** and request the permissions you need:
+
    - `public_profile` - Usually pre-approved
    - `email` - Requires verification that your app needs email access
 
 3. **Submit for Review**: Click **Submit for Review** and provide:
+
    - Detailed instructions for how Facebook reviewers should test your login flow
    - A screencast video demonstrating the Facebook Login feature
    - Explanation of how user data will be used
@@ -392,6 +395,7 @@ This error occurs when a user without a role on your app tries to log in while t
 ### User's email not returned
 
 Facebook only returns the email address if:
+
 - The user has a confirmed email on their Facebook account
 - Your app has been granted the `email` permission
 - The `email` permission is marked as "Ready for testing" in **Use Cases > Authentication and Account Creation**
@@ -407,6 +411,7 @@ This error indicates the callback URL configured in Facebook doesn't match the o
 ### Login works in development but not production
 
 If login works locally but fails in production, check:
+
 - Your production URL is added to **Valid OAuth Redirect URIs** in Facebook
 - The App ID and Secret in your Supabase dashboard match your Facebook app
 - Your Facebook app is in **Live** mode (not Development mode)
