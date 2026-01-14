@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength } from 'lib/password-strength'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import {
   Button,
@@ -171,7 +171,7 @@ export const CreateNewProjectDialog = ({
                         }}
                         descriptionText={
                           <PasswordStrengthBar
-                            passwordStrengthScore={passwordStrengthScore}
+                            passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
                             password={field.value}
                             passwordStrengthMessage={passwordStrengthMessage}
                             generateStrongPassword={generatePassword}

@@ -22,6 +22,10 @@ export const env = {
   PASSWORD: process.env.PASSWORD,
   PROJECT_REF: process.env.PROJECT_REF || undefined,
 
+  GITHUB_USER: process.env.GITHUB_USER,
+  GITHUB_PASS: process.env.GITHUB_PASS,
+  GITHUB_TOTP: process.env.GITHUB_TOTP,
+
   VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO:
     process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',
   ORG_SLUG: process.env.ORG_SLUG || 'default',
@@ -30,7 +34,9 @@ export const env = {
 
   BRANCH_NAME: process.env.BRANCH_NAME || `e2e-test-local`,
 
-  AUTHENTICATION: Boolean(process.env.EMAIL && process.env.PASSWORD),
+  AUTHENTICATION:
+    Boolean(process.env.EMAIL && process.env.PASSWORD) ||
+    Boolean(process.env.GITHUB_USER && process.env.GITHUB_PASS && process.env.GITHUB_TOTP),
 
   IS_APP_RUNNING_ON_LOCALHOST:
     process.env.STUDIO_URL?.includes('localhost') || process.env.STUDIO_URL?.includes('127.0.0.1'),

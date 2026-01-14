@@ -2,12 +2,12 @@ import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from './ButtonTooltip'
 
 export interface ProjectClaimChooseOrgProps {

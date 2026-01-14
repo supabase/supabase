@@ -2,14 +2,13 @@ import type { OAuthClient } from '@supabase/supabase-js'
 import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
@@ -35,6 +34,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
@@ -71,12 +71,7 @@ export const OAuthAppsList = () => {
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const deletingOAuthAppIdRef = useRef<string | null>(null)
 
-  const {
-    data,
-    isPending: isLoading,
-    isError,
-    error,
-  } = useOAuthServerAppsQuery({ projectRef }, { enabled: isOAuthServerEnabled })
+  const { data, isPending: isLoading, isError, error } = useOAuthServerAppsQuery({ projectRef })
 
   const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
@@ -89,12 +84,19 @@ export const OAuthAppsList = () => {
 
   const { data: endpointData } = useProjectEndpointQuery({ projectRef })
 
-  const oAuthApps = data?.clients || []
+  const oAuthApps = useMemo(() => data?.clients || [], [data])
 
   const [showCreateSheet, setShowCreateSheet] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  // Prevent opening the create sheet if OAuth Server is disabled
+  useEffect(() => {
+    if (!isOAuthServerEnabled && showCreateSheet) {
+      setShowCreateSheet(false)
+    }
+  }, [isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
 
   const { setValue: setSelectedAppToEdit, value: appToEdit } = useQueryStateWithSelect({
     urlKey: 'edit',
@@ -187,6 +189,10 @@ export const OAuthAppsList = () => {
       setSort(`${column}:asc` as OAuthAppsSort)
     }
   }
+
+  const isCreateMode = showCreateSheet && isOAuthServerEnabled
+  const isEditMode = !!appToEdit
+  const isCreateOrUpdateSheetVisible = isCreateMode || isEditMode
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
@@ -404,7 +410,7 @@ export const OAuthAppsList = () => {
       </div>
 
       <CreateOrUpdateOAuthAppSheet
-        visible={showCreateSheet || !!appToEdit}
+        visible={isCreateOrUpdateSheetVisible}
         appToEdit={appToEdit}
         onSuccess={(app) => {
           const isCreating = !appToEdit

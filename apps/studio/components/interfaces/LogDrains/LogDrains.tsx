@@ -82,6 +82,10 @@ export function LogDrains({
     return <LogDrainsEmpty />
   }
 
+  if (isError) {
+    return <AlertError subject="Failed to load log drains" error={error}></AlertError>
+  }
+
   if (!isLoading && !hasLogDrains) {
     return (
       <>
@@ -102,10 +106,6 @@ export function LogDrains({
         <VoteLink />
       </>
     )
-  }
-
-  if (isError) {
-    return <AlertError error={error}></AlertError>
   }
 
   return (

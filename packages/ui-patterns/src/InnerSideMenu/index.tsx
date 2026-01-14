@@ -18,7 +18,7 @@ import {
   TreeViewItemVariant,
   cn,
 } from 'ui'
-import ShimmeringLoader from '../ShimmeringLoader'
+import { ShimmeringLoader } from '../ShimmeringLoader'
 
 const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<'span'>>(
   (props, ref) => {
