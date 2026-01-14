@@ -73,6 +73,8 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   sql?: string
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
+  // Controls how stacked values are displayed: 'normal' shows raw values, 'percentage' normalizes to 100%
+  // This is necessary for multi-core CPU metrics where values can exceed 100%, making them comparable across different core counts
   stackingMode?: StackingMode
 }
 
