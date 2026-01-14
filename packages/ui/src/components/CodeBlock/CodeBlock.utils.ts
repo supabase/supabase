@@ -45,7 +45,7 @@ export const monokaiCustomTheme = (isDarkMode: boolean) => {
       color: '#bf79db',
     },
     'hljs-string': {
-      color: '#3ECF8E',
+      color: isDarkMode ? '#3ECF8E' : '#0B6C50',
     },
     'hljs-bullet': {
       color: '#3ECF8E',
