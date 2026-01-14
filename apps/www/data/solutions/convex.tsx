@@ -35,17 +35,16 @@ const data = {
       '[&_h1]:text-xl [&_h1]:md:!text-2xl [&_h1]:lg:!text-4xl [&_h1]:2xl:!text-5xl',
       '[&_.image-container]:flex [&_.image-container]:items-center'
     ),
-    h1: 'Postgres-first. Zero lock-in. Ultra flexible.',
+    h1: 'Ship fast. Scale forever.',
     subheader: [
       <>
-        Supabase is built on standard Postgres—use any SQL client, ORM, or tool you prefer. No
-        proprietary APIs required. Supabase is the preferred foundation for high-performance,
-        high-scale SaaS, AI-native apps, data-intensive tools, and more.
+        Supabase gives you the speed you love with the foundation you need. Spin up a backend in
+        minutes. Get Auth, Storage, Edge Functions, Realtime, and Vector search out of the box.
+        Build with AI tools like Cursor or Claude Code that already speak fluent SQL.
       </>,
       <>
-        Perfect for teams building with AI tools like Cursor or Claude Code. Ship faster with
-        complete flexibility. Sleep easier knowing you've chosen the right foundation to help scale
-        to millions of users.
+        Build your project in a weekend. Scale it to millions of users without switching platforms,
+        rewriting queries, or learning the limits of a proprietary database.
       </>,
     ],
     ctas: [
@@ -91,23 +90,16 @@ const data = {
       {
         id: 'postgres-first',
         icon: Database,
-        heading: 'Postgres-first',
+        heading: 'A proven Postgres foundation',
         subheading:
-          'Real Postgres means you can use any SQL client, ORM, or database tool. No proprietary query language—just standard SQL that works everywhere. Connect with pgAdmin, Postico, DBeaver, or your favorite tool.',
-      },
-      {
-        id: 'zero-lock-in',
-        icon: Lock,
-        heading: 'Zero vendor lock-in',
-        subheading:
-          "Your data lives in a standard Postgres database. Export anytime, self-host if needed, or connect with any service. Open source means you're never trapped.",
+          "Real Postgres means real scale. Start small and grow to millions of users on the same database that powers the world's most demanding applications. Use any SQL client, ORM, or database tool. Connect with pgAdmin, Postico, DBeaver, or your favorite tool. Tap into the most popular Postgres extensions, including: PostGIS for geospatial, pgvector for AI, and more. No proprietary query language. No artificial limits. Just standard SQL that works everywhere.",
       },
       {
         id: 'complete-stack',
         icon: CubeIcon,
-        heading: 'Everything your application stack needs',
+        heading: 'A complete backend in the box',
         subheading:
-          'Supabase includes auth, storage, edge functions, realtime, and vector search—fully integrated and ready to use. Avoid stitching together multiple services or paying for separate tools.',
+          "Supabase includes Auth, Storage, Edge Functions, Realtime, and Vector search. Everything is fully integrated and ready to use. Stop stitching together services from different providers. Stop paying for tools that don't talk to each other. One platform, one bill, one dashboard.",
       },
       {
         id: 'ultra-flexible',
@@ -129,6 +121,13 @@ const data = {
         heading: 'Built-in ETL for analytics',
         subheading:
           'Stream changes from Postgres to BigQuery, Iceberg, or other analytical destinations in real time. No third-party tools needed—just configure a publication and start replicating. Keep your app fast while unlocking powerful analytics.',
+      },
+      {
+        id: 'predictable-pricing',
+        icon: Lock,
+        heading: 'Fair, predictable pricing',
+        subheading:
+          "Supabase charges for what you use, not how your data syncs. No surprise bandwidth bills from real-time subscriptions. No per-function-call pricing that explodes with traffic. Postgres connection pooling means efficient resource usage at any scale. Know what you'll pay before you ship.",
       },
     ],
   },
