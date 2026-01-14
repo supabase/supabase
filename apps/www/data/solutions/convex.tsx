@@ -65,8 +65,8 @@ const data = {
       <Image
         draggable={false}
         src={{
-          dark: '/images/solutions/firebase/firebase-hero-dark.svg',
-          light: '/images/solutions/firebase/firebase-hero-light.svg',
+          dark: '/images/solutions/convex/convex-hero-dark.svg',
+          light: '/images/solutions/convex/convex-hero-light.svg',
         }}
         alt="Convex to Supabase illustration"
         width={1000}
