@@ -14,9 +14,6 @@ import { TimestampInfo } from 'ui-patterns'
 export const NoticeBanner = () => {
   const router = useRouter()
 
-  // [Joshen] Just wondering - do we even need useAppBannerContext? useLocalStorageQuery seemingly fits the use case here
-  // const { maintenanceWindowBannerAcknowledged, onUpdateAcknowledged } = useAppBannerContext()
-
   const [bannerAcknowledged, setBannerAcknowledge, { isSuccess }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER,
     false
