@@ -162,6 +162,7 @@ function createStorageExplorerState({
     selectedBucket: {} as Bucket,
     setSelectedBucket: (bucket: Bucket) => {
       state.selectedBucket = bucket
+      state.columns = []
       state.setSelectedFilePreview(undefined)
       state.clearOpenedFolders()
       state.clearSelectedItems()
