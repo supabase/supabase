@@ -348,6 +348,24 @@ const data = {
       },
     ],
   },
+  uiSection: {
+    id: 'ui-components',
+    title: 'Pre-built UI components',
+    link: 'https://supabase.com/ui',
+    subheading:
+      'A collection of components and blocks built on the shadcn/ui library that connect your front-end to your Supabase back-end via a single command.',
+    content: (
+      <Image
+        draggable={false}
+        src="/images/solutions/convex/ui-components.png"
+        alt="Pre-built UI components"
+        width={600}
+        height={400}
+        quality={100}
+        containerClassName="w-full"
+      />
+    ),
+  },
   developerExperience: {
     id: 'developer-experience',
     className: '[&_h2]:!max-w-sm',
