@@ -14,12 +14,6 @@ Each Supabase project comes with configurable restrictions on the IP ranges that
 
 If direct connections to your database [resolve to a IPv6 address](/dashboard/project/_/database/settings), you need to add both IPv4 and IPv6 CIDRs to the list of allowed CIDRs. Network Restrictions will be applied to all database connection routes, whether pooled or direct. You will need to add both the IPv4 and IPv6 networks you want to allow. There are two exceptions: If you have been granted an extension on the IPv6 migration OR if you have purchased the [IPv4 add-on](/dashboard/project/_/settings/addons), you need only add IPv4 CIDRs.
 
-<Admonition type="caution">
-
-Applying or updating network restrictions triggers a fast database reboot. On small projects this usually completes in a few seconds, but larger databases may see a longer interruption.
-
-</Admonition>
-
 ## To get started via the Dashboard:
 
 Network restrictions can be configured in the [Database Settings](/dashboard/project/_/database/settings) page. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
