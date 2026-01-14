@@ -41,7 +41,7 @@ import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { hasAccess: hasReplicationAccess, isLoading: isLoadingEntitlement } =
+  const { hasAccess: hasETLReplicationAccess, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('replication.etl')
 
   const unifiedReplication = useFlag('unifiedReplication')
@@ -217,7 +217,7 @@ export const Destinations = () => {
         {isLoading ? (
           <GenericSkeletonLoader />
         ) : !unifiedReplication && replicationNotEnabled ? (
-          <EnableReplicationCallout hasAccess={hasReplicationAccess} />
+          <EnableReplicationCallout hasAccess={hasETLReplicationAccess} />
         ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
           <Card>
             <CardContent className="p-0">

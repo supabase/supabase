@@ -42,7 +42,7 @@ export const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const unifiedReplication = useFlag('unifiedReplication')
-  const { hasAccess: hasReplicationAccess } = useCheckEntitlements('replication.etl')
+  const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
   const [selectedType, setSelectedType] = useState<DestinationType>(
     type || (unifiedReplication ? 'Read Replica' : 'BigQuery')
@@ -89,7 +89,7 @@ export const DestinationPanel = ({
                 <EnableReplicationCallout
                   className="!p-6"
                   type={selectedType}
-                  hasAccess={hasReplicationAccess}
+                  hasAccess={hasETLReplicationAccess}
                 />
               </SheetSection>
             ) : (
