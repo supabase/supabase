@@ -254,9 +254,10 @@ export function ComposedChart({
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
-  const referenceLines = attributes.filter((attribute) => {
-    return attribute?.provider === 'reference-line'
-  })
+  const referenceLines = useMemo(
+    () => attributes.filter((attribute) => attribute?.provider === 'reference-line'),
+    [attributes]
+  )
 
   const resolvedHighlightedLabel = getHeaderLabel()
 
@@ -307,7 +308,10 @@ export function ComposedChart({
 
   const isChartDataReady = Boolean(data?.[0])
   const maxAttributeName = maxAttribute?.attribute
-  const referenceLineAttributes = referenceLines.map((line) => line.attribute)
+  const referenceLineAttributes = useMemo(
+    () => referenceLines.map((line) => line.attribute),
+    [referenceLines]
+  )
   const enabledAttributeNames = useMemo(
     () =>
       new Set(attributes.filter((attr) => attr.enabled !== false).map((attr) => attr.attribute)),

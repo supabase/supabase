@@ -129,8 +129,7 @@ export const getReportAttributesV2: (
           provider: 'reference-line',
           label: 'Limit',
           value: 100,
-          tooltip:
-            'Maximum CPU utilization (100%). Multi-core systems may show values exceeding this limit',
+          tooltip: 'Maximum CPU utilization (100%). Multi-core systems are normalized to 100%',
           isMaxValue: true,
         },
       ],
