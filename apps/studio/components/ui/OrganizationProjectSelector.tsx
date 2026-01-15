@@ -44,6 +44,7 @@ interface OrganizationProjectSelectorSelectorProps {
   onInitialLoad?: (projects: OrgProject[]) => void
   isOptionDisabled?: (project: OrgProject) => boolean
   fetchOnMount?: boolean
+  modal?: boolean
 }
 
 export const OrganizationProjectSelector = ({
@@ -61,6 +62,7 @@ export const OrganizationProjectSelector = ({
   onInitialLoad,
   isOptionDisabled,
   fetchOnMount = false,
+  modal = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -126,7 +128,7 @@ export const OrganizationProjectSelector = ({
   }, [isLoadingProjects, isSuccessProjects])
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger asChild>
         {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })

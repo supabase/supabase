@@ -823,83 +823,22 @@ The output should use the following instructions:
       apiExamples: [
         {
           lang: 'json',
-          title: 'macOS',
-          code: `{
-"mcpServers": {
-  "supabase": {
-    "command": "npx",
-    "args": [
-      "-y",
-      "@supabase/mcp-server-supabase@latest",
-      "--read-only",
-      "--project-ref=<project-ref>"
-    ],
-    "env": {
-      "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-    }
-  }
-}
-}`,
-        },
-        {
-          lang: 'json',
-          title: 'Windows',
-          code: `{
-"mcpServers": {
-  "supabase": {
-    "command": "cmd",
-    "args": [
-      "/c",
-      "npx",
-      "-y",
-      "@supabase/mcp-server-supabase@latest",
-      "--read-only",
-      "--project-ref=<project-ref>"
-    ],
-    "env": {
-      "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-    }
-  }
-}
-}`,
-        },
-        {
-          lang: 'json',
-          title: 'Windows (WSL)',
-          code: `{
-"mcpServers": {
-  "supabase": {
-    "command": "wsl",
-    "args": [
-      "npx",
-      "-y",
-      "@supabase/mcp-server-supabase@latest",
-      "--read-only",
-      "--project-ref=<project-ref>"
-    ],
-    "env": {
-      "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-    }
-  }
-}
-}`,
-        },
-        {
-          lang: 'json',
-          title: 'Linux',
+          title: 'Hosted',
           code: `{
   "mcpServers": {
     "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--read-only",
-        "--project-ref=<project-ref>"
-      ],
-      "env": {
-        "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-      }
+      "url": "https://mcp.supabase.com/mcp"
+    }
+  }
+}`,
+        },
+        {
+          lang: 'json',
+          title: 'CLI',
+          code: `{
+  "mcpServers": {
+    "supabase": {
+      "url": "http://localhost:54321/mcp"
     }
   }
 }`,

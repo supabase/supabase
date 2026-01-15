@@ -4,7 +4,7 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
@@ -17,6 +17,7 @@ import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
+import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
 
@@ -44,6 +45,8 @@ export const SupabaseGrid = ({
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
+
+  const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
 
   const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
@@ -90,10 +93,12 @@ export const SupabaseGrid = ({
 
   const rows = data?.rows ?? EMPTY_ARR
 
+  const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
+
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header
+        <HeaderComponent
           customHeader={customHeader}
           isRefetching={isRefetching}
           tableQueriesEnabled={tableQueriesEnabled}

@@ -727,6 +727,7 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
+            { name: 'Overview', url: '/guides/auth/server-side' },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
@@ -1482,6 +1483,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Generating Python Types',
+      url: '/guides/api/rest/generating-python-types',
+      items: [],
+    },
+    {
       name: 'Tools',
       url: '/guides/api',
       items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
@@ -1865,7 +1871,7 @@ export const realtime: NavMenuConstant = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Quotas', url: '/guides/realtime/quotas', enabled: billingEnabled },
+        { name: 'Limits', url: '/guides/realtime/limits', enabled: billingEnabled },
         {
           name: 'Pricing',
           url: '/guides/realtime/pricing' as `/${string}`,

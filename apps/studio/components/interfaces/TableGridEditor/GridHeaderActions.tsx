@@ -113,7 +113,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
 
   const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    projectInsertedAt: project?.inserted_at,
     isTable,
     isRealtimeEnabled,
   })

@@ -152,7 +152,8 @@ export const CreateFunction = ({
         config_params: convertConfigParams(func?.config_params).value,
       })
     }
-  }, [visible, func])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, func?.id])
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
