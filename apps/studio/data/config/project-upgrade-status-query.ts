@@ -1,9 +1,11 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+
 import { get, handleError } from 'data/fetchers'
 import { PROJECT_STATUS } from 'lib/constants'
-import { configKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+import { configKeys } from './keys'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
@@ -43,31 +45,36 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
 ) => {
   const client = useQueryClient()
 
-  return useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>({
+  const query = useQuery({
     queryKey: configKeys.upgradeStatus(projectRef),
     queryFn: ({ signal }) => getProjectUpgradingStatus({ projectRef, trackingId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval(data) {
-      const response = data as unknown as ProjectUpgradingStatusData
-      if (!response) return false
+    refetchInterval: (query) => {
+      const data = query.state.data
+      if (!data) return false
 
       const interval =
         // Transited to UPGRADING state via client, but job not yet picked up
         (projectStatus === PROJECT_STATUS.UPGRADING &&
-          response.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
+          data.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
         // Project currently getting upgraded
-        response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
+        data.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
           ? 5000
           : false
 
       return interval
     },
-    onSuccess(data) {
-      const response = data as unknown as ProjectUpgradingStatusData
-      if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
-        client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
-      }
-    },
+
     ...options,
   })
+
+  useEffect(() => {
+    if (!query.isSuccess) return
+    const response = query.data as ProjectUpgradingStatusData
+    if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
+      client.invalidateQueries({ queryKey: configKeys.upgradeEligibility(projectRef) })
+    }
+  }, [query.isSuccess, query.data, projectRef, client])
+
+  return query
 }

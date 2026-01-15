@@ -2,7 +2,7 @@ import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { noop } from 'lodash'
-import { AdvisorItem } from './AdvisorPanelHeader'
+import type { AdvisorItem } from './AdvisorPanel.types'
 import { NotificationDetail } from './NotificationDetail'
 
 interface AdvisorDetailProps {

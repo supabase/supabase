@@ -7,11 +7,64 @@ sidebar_label: 'Overview'
 hideToc: true
 ---
 
-Supabase Storage makes it simple to upload and serve files of any size, providing a robust framework for file access controls.
+Supabase Storage is a robust, scalable solution for managing files of any size with fine-grained access controls and optimized delivery. Whether you're storing user-generated content, analytics data, or vector embeddings, Supabase Storage provides specialized bucket types to meet your specific needs.
 
-## Features
+## Key features
 
-You can use Supabase Storage to store images, videos, documents, and any other file type. Serve your assets with a global CDN to reduce latency from over 285 cities globally. Supabase Storage includes a built-in image optimizer, so you can resize and compress your media files on the fly.
+- **Multi Protocol** - S3 compatible Storage, RESTful API, TUS resumable uploads
+- **Global CDN** - Serve your assets with lightning-fast performance from over 285 cities worldwide
+- **Image Optimization** - Resize, compress, and transform media files on the fly with built-in image processing
+- **Fine-grained Access Control** - Manage file permissions with row-level security and custom policies
+- **Multiple Bucket Types** - Specialized storage solutions for different use cases
+
+## Storage bucket types
+
+Supabase Storage offers different bucket types optimized for specific use cases:
+
+### Files buckets
+
+Store and serve traditional files including images, videos, documents, and general-purpose content. Ideal for user-generated content, media libraries, and asset management.
+
+**Use cases:** Images, videos, documents, PDFs, archives
+
+**Features:**
+
+- Global CDN delivery
+- Image optimization and transformation
+- Row-level security integration
+- Direct URL access for files
+
+[Learn more about Files Buckets](/docs/guides/storage/quickstart)
+
+### Analytics buckets
+
+Purpose-built for storing and analyzing data in open table formats like Apache Iceberg. Perfect for time-series data, logs, and large-scale analytical workloads.
+
+**Use cases:** Data lakes, analytics pipelines, ETL operations, historical data analysis
+
+**Features:**
+
+- Apache Iceberg table format support
+- SQL-accessible via Postgres foreign tables
+- Partitioned data organization
+- Efficient data querying and transformation
+
+[Learn more about Analytics Buckets](/docs/guides/storage/analytics/introduction)
+
+### Vector buckets
+
+Specialized storage for vector embeddings and similarity search operations. Designed for AI and ML applications requiring semantic search capabilities.
+
+**Use cases:** AI-powered search, semantic similarity matching, embedding storage, RAG systems
+
+**Features:**
+
+- Optimized vector indexing (HNSW, Flat)
+- Multiple distance metrics (cosine, euclidean, L2)
+- Metadata filtering for vectors
+- Similarity search queries
+
+[Learn more about Vector Buckets](/docs/guides/storage/vector/introduction)
 
 ## Examples
 

@@ -38,7 +38,7 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
   const demoData = isHoveringUpgrade ? exponentialChartData.current : demoChartData.current
 
   return (
-    <Card className={cn('h-[260px] relative')}>
+    <Card className={cn('h-[280px] relative')}>
       <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
         <h2 className="text-sm">{report.label}</h2>
         <p className="text-sm text-foreground-light">

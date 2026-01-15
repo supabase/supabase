@@ -2,6 +2,7 @@ import { forwardRef, memo, Ref, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { ref as valtioRef } from 'valtio'
 
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
@@ -14,7 +15,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import type { Filter, GridProps, SupaRow } from '../../types'
+import type { GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
@@ -30,8 +31,6 @@ interface IGrid extends GridProps {
   isLoading: boolean
   isSuccess: boolean
   isError: boolean
-  filters: Filter[]
-  onApplyFilters: (appliedFilters: Filter[]) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
@@ -50,13 +49,12 @@ export const Grid = memo(
         isLoading,
         isSuccess,
         isError,
-        filters,
-        onApplyFilters,
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
+      const { filters, onApplyFilters } = useTableFilter()
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()

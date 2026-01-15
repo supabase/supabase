@@ -5,13 +5,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useChanged } from 'hooks/misc/useChanged'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SidePanel, Tabs } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
-import { SpreadsheetImportPreview } from './SpreadsheetImportPreview'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import { EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
@@ -21,7 +21,7 @@ import {
   parseSpreadsheet,
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
-import { useChanged } from 'hooks/misc/useChanged'
+import { SpreadsheetImportPreview } from './SpreadsheetImportPreview'
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
