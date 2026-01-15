@@ -102,14 +102,14 @@ const data = {
         icon: TrendingUp,
         heading: 'Scale to millions',
         subheading:
-          "Real Postgres means real scale. Start small and grow to millions of users on the same database. Postgres handles everything from startups to enterprise workloads with proven scalability. Your database grows with you, no migrations needed.",
+          'Real Postgres means real scale. Start small and grow to millions of users on the same database. Postgres handles everything from startups to enterprise workloads with proven scalability. Your database grows with you, no migrations needed.',
       },
       {
         id: 'powerful-ecosystem',
         icon: Puzzle,
         heading: 'A powerful ecosystem',
         subheading:
-          "Connect with pgAdmin, Postico, DBeaver, or your favorite tool. Use any SQL client, ORM, or database tool. Tap into the most popular Postgres extensions, including: PostGIS for geospatial, pgvector for AI, and more. The entire Postgres ecosystem is at your fingertips.",
+          'Connect with pgAdmin, Postico, DBeaver, or your favorite tool. Use any SQL client, ORM, or database tool. Tap into the most popular Postgres extensions, including: PostGIS for geospatial, pgvector for AI, and more. The entire Postgres ecosystem is at your fingertips.',
       },
       {
         id: 'complete-stack',
