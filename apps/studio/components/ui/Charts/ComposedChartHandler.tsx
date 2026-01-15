@@ -175,7 +175,6 @@ const ComposedChartHandler = ({
           }
 
           if (attr.provider === 'reference-line') return
-          if (attr.attribute === 'rest') return
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
@@ -329,7 +328,7 @@ const useAttributeQueries = (
   isVisible: boolean
 ) => {
   const infraAttributes = attributes
-    .filter((attr) => attr?.provider === 'infra-monitoring' && attr.attribute !== 'rest')
+    .filter((attr) => attr?.provider === 'infra-monitoring')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
   const dailyStatsAttributes = attributes
     .filter((attr) => attr?.provider === 'daily-stats')
