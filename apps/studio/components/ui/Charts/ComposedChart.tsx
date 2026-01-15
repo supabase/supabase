@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
@@ -312,40 +312,57 @@ export function ComposedChart({
     return !attribute?.isMaxValue
   })
 
-  const dataForChartData = data
+  const isChartDataReady = Boolean(data?.[0])
+  const maxAttributeName = maxAttribute?.attribute
+  const referenceLineAttributes = referenceLines.map((line) => line.attribute)
+  const enabledAttributes = attributes.filter((attr) => attr.enabled !== false)
+  const isAttributeEnabled = (attribute: string) =>
+    enabledAttributes.some((attr) => attr.attribute === attribute)
 
-  const chartData =
-    dataForChartData && !!dataForChartData[0]
-      ? Object.entries(dataForChartData[0])
-          ?.map(([key, value]) => ({
-            name: key,
-            value: value,
-          }))
-          .filter(
-            (att) =>
-              att.name !== 'timestamp' &&
-              att.name !== 'period_start' &&
-              att.name !== maxAttribute?.attribute &&
-              !referenceLines.map((a) => a.attribute).includes(att.name) &&
-              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
-          )
-          .map((att, index) => {
-            const attribute = attributes.find((attr) => attr.attribute === att.name)
-            return {
-              ...att,
-              color: attribute?.color
-                ? isDarkMode
-                  ? attribute.color.dark
-                  : attribute.color.light
-                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
-              fill: attribute?.fill
-                ? isDarkMode
-                  ? attribute.fill.dark
-                  : attribute.fill.light
-                : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
-            }
-          })
-      : []
+  const chartData = useMemo(() => {
+    if (!isChartDataReady) return []
+
+    return Object.entries(data[0])
+      .map(([key, value]) => ({
+        name: key,
+        value,
+      }))
+      .filter((entry) => {
+        const isTimestamp = entry.name === 'timestamp' || entry.name === 'period_start'
+        const isMaxAttribute = entry.name === maxAttributeName
+        const isReferenceLine = referenceLineAttributes.includes(entry.name)
+        const isEnabled = isAttributeEnabled(entry.name)
+
+        return !isTimestamp && !isMaxAttribute && !isReferenceLine && isEnabled
+      })
+      .map((entry, index) => {
+        const attribute = attributes.find((attr) => attr.attribute === entry.name)
+        const color = attribute?.color
+          ? isDarkMode
+            ? attribute.color.dark
+            : attribute.color.light
+          : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length]
+        const fill = attribute?.fill
+          ? isDarkMode
+            ? attribute.fill.dark
+            : attribute.fill.light
+          : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length]
+
+        return {
+          ...entry,
+          color,
+          fill,
+        }
+      })
+  }, [
+    isChartDataReady,
+    data,
+    maxAttributeName,
+    referenceLineAttributes,
+    isAttributeEnabled,
+    attributes,
+    isDarkMode,
+  ])
 
   const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
 
