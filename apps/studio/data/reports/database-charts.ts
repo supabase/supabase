@@ -72,7 +72,7 @@ export const getReportAttributesV2: (
       hide: false,
       showTooltip: true,
       showLegend: true,
-      showMaxValue: true,
+      showMaxValue: false,
       showGrid: true,
       YAxisProps: {
         width: 45,
@@ -127,9 +127,9 @@ export const getReportAttributesV2: (
         {
           attribute: 'cpu_usage_max',
           provider: 'reference-line',
-          label: 'Limit',
+          label: 'Max',
           value: 100,
-          tooltip: 'Maximum CPU utilization (100%). Multi-core systems are normalized to 100%',
+          tooltip: 'Max CPU usage',
           isMaxValue: true,
         },
       ],
