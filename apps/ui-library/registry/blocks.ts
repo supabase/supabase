@@ -14,6 +14,11 @@ import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-r
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' with { type: 'json' }
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' with { type: 'json' }
 
+import passwordlessAuthNextjs from './default/blocks/passwordless-auth-nextjs/registry-item.json' with { type: 'json' }
+import passwordlessAuthReactRouter from './default/blocks/passwordless-auth-react-router/registry-item.json' with { type: 'json' }
+import passwordlessAuthReact from './default/blocks/passwordless-auth-react/registry-item.json' with { type: 'json' }
+import passwordlessAuthTanstack from './default/blocks/passwordless-auth-tanstack/registry-item.json' with { type: 'json' }
+
 import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' with { type: 'json' }
 import socialAuthReactRouter from './default/blocks/social-auth-react-router/registry-item.json' with { type: 'json' }
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
@@ -41,6 +46,11 @@ export const blocks = [
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
+
+  registryItemAppend(passwordlessAuthNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(passwordlessAuthReact as RegistryItem, [reactClient!]),
+  registryItemAppend(passwordlessAuthReactRouter as RegistryItem, [reactRouterClient!]),
+  registryItemAppend(passwordlessAuthTanstack as RegistryItem, [tanstackClient!]),
 
   registryItemAppend(socialAuthNextjs as RegistryItem, [nextjsClient!]),
   registryItemAppend(socialAuthReact as RegistryItem, [reactClient!]),

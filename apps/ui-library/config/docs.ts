@@ -67,6 +67,14 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Password-Based Auth',
     },
     {
+      title: 'Passwordless Auth',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/passwordless-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'Passwordless Auth',
+    },
+    {
       title: 'Social Auth',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/social-auth',

@@ -19,6 +19,18 @@ export const Index = {
       component: React.lazy(() => import("@/registry/default/examples/password-based-auth.tsx")),
     }
     ,
+    "passwordless-auth-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/passwordless-auth.tsx")),
+    }
+    ,
+    "magic-link-auth-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/magic-link-auth.tsx")),
+    }
+    ,
+    "otp-auth-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/otp-auth.tsx")),
+    }
+    ,
     "current-user-avatar-demo": {
       component: React.lazy(() => import("@/registry/default/examples/current-user-avatar-demo.tsx")),
     }
