@@ -109,6 +109,18 @@ describe('generateDynamicHelper', () => {
     expect(helper.text).toBe('Last 5 hours')
   })
 
+  test('uses singular form when value is 1', () => {
+    expect(generateDynamicHelper(1, 'minute').text).toBe('Last 1 minute')
+    expect(generateDynamicHelper(1, 'hour').text).toBe('Last 1 hour')
+    expect(generateDynamicHelper(1, 'day').text).toBe('Last 1 day')
+  })
+
+  test('uses plural form when value > 1', () => {
+    expect(generateDynamicHelper(2, 'minute').text).toBe('Last 2 minutes')
+    expect(generateDynamicHelper(2, 'hour').text).toBe('Last 2 hours')
+    expect(generateDynamicHelper(2, 'day').text).toBe('Last 2 days')
+  })
+
   test('generates helper with correct availableIn based on time range', () => {
     const minuteHelper = generateDynamicHelper(30, 'minute')
     expect(minuteHelper.availableIn).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])

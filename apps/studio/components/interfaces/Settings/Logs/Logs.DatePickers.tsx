@@ -77,7 +77,7 @@ export const convertToDays = (value: number, unit: Unit): number => {
 export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
   const days = convertToDays(value, unit)
   return {
-    text: `Last ${value} ${unit}s`,
+    text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
     calcFrom: () => dayjs().subtract(value, unit).toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: getAvailableInForDays(days),
