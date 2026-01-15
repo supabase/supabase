@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { isEqual } from 'lodash'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -6,10 +7,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { checkUnimportedFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { useParams } from 'common'
 import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -24,6 +26,14 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   cn,
   Command_Shadcn_,
@@ -99,6 +109,15 @@ const sanitizeFunctionName = (name: string): string => {
 // Type for the form values
 type FormValues = z.infer<typeof FormSchema>
 
+const INITIAL_FILES = [
+  {
+    id: 1,
+    name: 'index.ts',
+    selected: true,
+    content: EDGE_FUNCTION_TEMPLATES[0].content,
+  },
+]
+
 const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
@@ -109,17 +128,14 @@ const NewFunctionPage = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const [files, setFiles] = useState<EdgeFunctionFile[]>([
-    {
-      id: 1,
-      name: 'index.ts',
-      selected: true,
-      content: EDGE_FUNCTION_TEMPLATES[0].content,
-    },
-  ])
+  const [files, setFiles] = useState<EdgeFunctionFile[]>(INITIAL_FILES)
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
+  const [showWarning, setShowWarning] = useState(false)
+
+  const hasUnsavedChanges = !isEqual(INITIAL_FILES, files)
+  const unimportedFiles = checkUnimportedFiles(files)
 
   const templates = useMemo(() => {
     if (showStripeExample) {
@@ -265,6 +281,17 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasUnsavedChanges])
+
   return (
     <PageLayout
       size="full"
@@ -392,12 +419,34 @@ const NewFunctionPage = () => {
             loading={isDeploying}
             size="medium"
             disabled={files.length === 0 || isDeploying}
-            onClick={handleDeploy}
+            onClick={() => {
+              if (unimportedFiles.length > 0) {
+                setShowWarning(true)
+              } else {
+                handleDeploy()
+              }
+            }}
           >
             Deploy function
           </Button>
         </form>
       </Form_Shadcn_>
+
+      <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unimported files will not be deployed or saved</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ensure that all files in the edge function are imported through{' '}
+              <code className="text-code-inline">index.ts</code> or they will be omitted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Deploy function</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageLayout>
   )
 }
