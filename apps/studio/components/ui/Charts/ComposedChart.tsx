@@ -372,7 +372,6 @@ export function ComposedChart({
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
   // to vertically zoom in on the data
-  // For percentage stacking, always use [0, 100] since values are normalized
   // */
   const yMaxFromVisible = Math.max(
     0,
