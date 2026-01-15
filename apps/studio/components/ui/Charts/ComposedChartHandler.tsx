@@ -18,7 +18,7 @@ import { useChartHighlight } from './useChartHighlight'
 import dayjs from 'dayjs'
 import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import type { ChartData } from './Charts.types'
-import { MultiAttribute, StackingMode } from './ComposedChart.utils'
+import { MultiAttribute, StackingMode, transformDataForStacking } from './ComposedChart.utils'
 
 export interface ComposedChartHandlerProps {
   id?: string
@@ -207,6 +207,19 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
+  // Apply pre-render transformations (e.g., percentage normalization)
+  const processedData = useMemo(() => {
+    const dataPoints = Array.isArray(combinedData)
+      ? combinedData.map((point) => ({ ...point }))
+      : combinedData?.data?.map((point) => ({ ...point }))
+
+    return transformDataForStacking<Record<string, unknown>>(
+      dataPoints,
+      attributes,
+      otherProps.stackingMode
+    )
+  }, [combinedData, attributes, otherProps.stackingMode])
+
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   const _highlightedValue = useMemo(() => {
@@ -265,7 +278,7 @@ const ComposedChartHandler = ({
     )
   }
 
-  if (!combinedData) {
+  if (!processedData) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
         <WarningIcon />
@@ -286,7 +299,7 @@ const ComposedChartHandler = ({
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          data={combinedData as DataPoint[]}
+          data={processedData as DataPoint[]}
           format={format}
           // [Joshen] This is where it's messing up
           xAxisKey="period_start"

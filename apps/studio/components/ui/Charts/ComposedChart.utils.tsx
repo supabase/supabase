@@ -5,7 +5,7 @@ import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
-import { numberFormatter } from './Charts.utils'
+import { formatPercentage, numberFormatter } from './Charts.utils'
 
 export type StackingMode = 'normal' | 'percentage'
 
@@ -124,28 +124,37 @@ interface TooltipProps {
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
 
 /**
- * Calculate the total aggregate of the chart values
- * by summing the values of the attributes
- * that are not in the `ignoreAttributes` array
+ * Convert a data point to payload format for chart calculations.
+ * Filters out timestamp/period_start fields and only includes enabled attributes.
  */
-export const calculateTotalChartAggregate = (
-  payload: { dataKey: string; value: number }[],
-  ignoreAttributes?: string[]
-) =>
-  payload
-    ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
-    .reduce((acc, curr) => acc + curr.value, 0)
+export const convertDataPointToPayload = (
+  dataPoint: Record<string, unknown> | undefined,
+  attributes: MultiAttribute[]
+): { dataKey: string; value: number }[] | undefined => {
+  if (!dataPoint) return undefined
+
+  return Object.entries(dataPoint)
+    .map(([key, value]) => ({
+      dataKey: key,
+      value: value as number,
+    }))
+    .filter(
+      (entry) =>
+        entry.dataKey !== 'timestamp' &&
+        entry.dataKey !== 'period_start' &&
+        attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+    )
+}
 
 /**
  * Normalize data points to 100% stacking mode.
  * Only normalizes when total exceeds 100% (e.g., multi-core CPU metrics).
- * Values below 100% are kept as-is to show actual utilization.
+ * Values below or equal to 100% are kept as-is to show actual utilization.
  */
 export const normalizeToPercentageStacking = <T extends Record<string, unknown>>(
   data: T[],
-  attributeKeys: string[],
-  includeRestValue: boolean = true
-): (T & { rest?: number })[] => {
+  attributeKeys: string[]
+): T[] => {
   return data.map((point) => {
     const total = attributeKeys.reduce((sum, attr) => {
       const value = point[attr]
@@ -153,11 +162,6 @@ export const normalizeToPercentageStacking = <T extends Record<string, unknown>>
     }, 0)
 
     if (total <= 100) {
-      if (includeRestValue && total < 100) {
-        const normalized = { ...point }
-        ;(normalized as Record<string, unknown>).rest = 100 - total
-        return normalized
-      }
       return point
     }
 
@@ -171,6 +175,49 @@ export const normalizeToPercentageStacking = <T extends Record<string, unknown>>
     return normalized
   })
 }
+
+/**
+ * Select attribute keys to be included in stacking normalization.
+ * Filters out reference lines, max value lines, disabled and special attributes.
+ */
+export const selectStackedAttributeKeys = (attributes: MultiAttribute[]): string[] => {
+  return attributes
+    .filter((attr) => attr && attr.enabled !== false)
+    .filter((attr) => attr.provider !== 'reference-line')
+    .filter((attr) => !attr.isMaxValue)
+    .filter((attr) => attr.attribute !== 'rest')
+    .map((attr) => attr.attribute)
+}
+
+/**
+ * Transform chart data according to stacking mode, applying percentage normalization when needed.
+ */
+export const transformDataForStacking = <T extends Record<string, unknown>>(
+  data: T[] | undefined,
+  attributes: MultiAttribute[],
+  stackingMode?: StackingMode
+): T[] | undefined => {
+  if (!data || data.length === 0) return data
+  if (stackingMode !== 'percentage') return data
+
+  const keys = selectStackedAttributeKeys(attributes)
+  if (keys.length === 0) return data
+
+  return normalizeToPercentageStacking(data, keys)
+}
+
+/**
+ * Calculate the total aggregate of the chart values
+ * by summing the values of the attributes
+ * that are not in the `ignoreAttributes` array
+ */
+export const calculateTotalChartAggregate = (
+  payload: { dataKey: string; value: number }[],
+  ignoreAttributes?: string[]
+) =>
+  payload
+    ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
+    .reduce((acc, curr) => acc + curr.value, 0)
 
 export const CustomTooltip = ({
   active,
@@ -273,13 +320,14 @@ export const CustomTooltip = ({
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
-              <div className="flex items-end gap-1">
-                <span className="text-base">
-                  {formatNumeric(total as number) +
+            <div className="flex items-end gap-1">
+              <span className="text-base">
+                {isPercentage
+                  ? formatPercentage(total as number, valuePrecision)
+                  : formatNumeric(total as number) +
                     (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-                  {isPercentage ? '%' : ''}
-                  {format === 'ms' ? 'ms' : ''}
-                </span>
+                {format === 'ms' ? 'ms' : ''}
+              </span>
                 {maxValueAttribute &&
                   !isPercentage &&
                   !isNaN((total as number) / maxValueData?.value) &&

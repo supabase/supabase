@@ -72,13 +72,16 @@ export const getReportAttributesV2: (
       hide: false,
       showTooltip: true,
       showLegend: true,
-      showMaxValue: false,
+      showMaxValue: true,
       showGrid: true,
       stackingMode: 'percentage',
-      hideHighlightedValue: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
@@ -123,20 +126,13 @@ export const getReportAttributesV2: (
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
         },
         {
-          attribute: 'rest',
-          provider: 'infra-monitoring',
-          label: 'Idle',
-          format: '%',
-          tooltip: 'CPU time when the processor is idle and not executing any tasks',
-          omitFromTotal: true,
-          color: {
-            light: '#E5E7EB',
-            dark: '#6B7280',
-          },
-          fill: {
-            light: '#F3F4F6',
-            dark: '#4B5563',
-          },
+          attribute: 'cpu_usage_max',
+          provider: 'reference-line',
+          label: 'Limit',
+          value: 100,
+          tooltip:
+            'Maximum CPU utilization (100%). Multi-core systems may show values exceeding this limit',
+          isMaxValue: true,
         },
       ],
     },

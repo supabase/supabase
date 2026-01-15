@@ -29,13 +29,13 @@ import {
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import { formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
 import {
   calculateTotalChartAggregate,
+  convertDataPointToPayload,
   CustomLabel,
   CustomTooltip,
   MultiAttribute,
-  normalizeToPercentageStacking,
   StackingMode,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
@@ -212,24 +212,17 @@ export function ComposedChart({
       ...Array.from(hiddenAttributes),
     ]
 
-    const lastDataPoint = data[data.length - 1]
-      ? Object.entries(data[data.length - 1])
-          .map(([key, value]) => ({
-            dataKey: key,
-            value: value as number,
-          }))
-          .filter(
-            (entry) =>
-              entry.dataKey !== 'timestamp' &&
-              entry.dataKey !== 'period_start' &&
-              attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
-          )
-      : undefined
+    const lastDataPoint = convertDataPointToPayload(data[data.length - 1], attributes)
 
     if (focusDataIndex !== null) {
-      return showTotal
-        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
-        : data[focusDataIndex]?.[yAxisKey]
+      if (showTotal) {
+        const payloadToUse =
+          _activePayload || convertDataPointToPayload(data[focusDataIndex], attributes)
+        return payloadToUse
+          ? calculateTotalChartAggregate(payloadToUse, attributesToIgnoreFromTotal)
+          : data[focusDataIndex]?.[yAxisKey]
+      }
+      return data[focusDataIndex]?.[yAxisKey]
     }
 
     if (showTotal && lastDataPoint) {
@@ -254,6 +247,9 @@ export function ComposedChart({
       return '<1'
     }
 
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
     return numberFormatter(value, valuePrecision)
   }
 
@@ -316,14 +312,7 @@ export function ComposedChart({
     return !attribute?.isMaxValue
   })
 
-  const normalizedData = isPercentageStacking
-    ? normalizeToPercentageStacking(
-        data,
-        stackedAttributes.map((att) => att.name)
-      )
-    : data
-
-  const dataForChartData = isPercentageStacking ? normalizedData : data
+  const dataForChartData = data
 
   const chartData =
     dataForChartData && !!dataForChartData[0]
@@ -338,8 +327,7 @@ export function ComposedChart({
               att.name !== 'period_start' &&
               att.name !== maxAttribute?.attribute &&
               !referenceLines.map((a) => a.attribute).includes(att.name) &&
-              (attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false) ||
-                (isPercentageStacking && att.name === 'rest'))
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
           )
           .map((att, index) => {
             const attribute = attributes.find((attr) => attr.attribute === att.name)
@@ -359,12 +347,7 @@ export function ComposedChart({
           })
       : []
 
-  const visibleAttributes = [
-    ...stackedAttributes.filter((att) => !hiddenAttributes.has(att.name)),
-    ...(isPercentageStacking
-      ? chartData.filter((att) => att.name === 'rest' && !hiddenAttributes.has(att.name))
-      : []),
-  ]
+  const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
 
   const isPercentage = format === '%'
   const isRamChart =
@@ -384,13 +367,13 @@ export function ComposedChart({
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
   // to vertically zoom in on the data
-  // For percentage stacking, always use [0, 100]
+  // For percentage stacking, always use [0, 100] since values are normalized
   // */
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
   )
-  const yDomain = isPercentageStacking ? [0, 100] : [0, yMaxFromVisible]
+  const yDomain = [0, yMaxFromVisible]
 
   if (data.length === 0) {
     return (
@@ -441,7 +424,7 @@ export function ComposedChart({
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={normalizedData}
+          data={data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
           onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {

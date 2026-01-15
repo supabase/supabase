@@ -14,7 +14,7 @@ import { cn } from 'ui'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { formatBytes } from 'lib/helpers'
-import { numberFormatter } from './Charts.utils'
+import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { Badge } from 'ui'
@@ -102,6 +102,9 @@ export const ChartHeader = ({
       return formatBytes(bytesValue, valuePrecision)
     }
 
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
     return numberFormatter(value, valuePrecision)
   }
 
