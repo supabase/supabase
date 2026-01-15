@@ -31,11 +31,10 @@ import {
 import { CommonChartProps, Datum } from './Charts.types'
 import { formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
 import {
-  calculateTotalChartAggregate,
-  convertDataPointToPayload,
   CustomLabel,
   CustomTooltip,
   MultiAttribute,
+  resolveHighlightedChartValue,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
@@ -192,41 +191,6 @@ export function ComposedChart({
     )
   }
 
-  function computeHighlightedValue() {
-    const maxAttribute = attributes.find((a) => a.isMaxValue)
-    const referenceLines = attributes.filter(
-      (attribute) => attribute?.provider === 'reference-line'
-    )
-
-    const attributesToIgnore =
-      attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
-    const attributesToIgnoreFromTotal = [
-      ...attributesToIgnore,
-      ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
-      ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
-      ...Array.from(hiddenAttributes),
-    ]
-
-    const lastDataPoint = convertDataPointToPayload(data[data.length - 1], attributes)
-
-    if (focusDataIndex !== null) {
-      if (showTotal) {
-        const payloadToUse =
-          _activePayload || convertDataPointToPayload(data[focusDataIndex], attributes)
-        return payloadToUse
-          ? calculateTotalChartAggregate(payloadToUse, attributesToIgnoreFromTotal)
-          : data[focusDataIndex]?.[yAxisKey]
-      }
-      return data[focusDataIndex]?.[yAxisKey]
-    }
-
-    if (showTotal && lastDataPoint) {
-      return calculateTotalChartAggregate(lastDataPoint, attributesToIgnoreFromTotal)
-    }
-
-    return highlightedValue
-  }
-
   function formatHighlightedValue(value: any) {
     if (typeof value !== 'number') {
       return value
@@ -258,10 +222,6 @@ export function ComposedChart({
     () => attributes.filter((attribute) => attribute?.provider === 'reference-line'),
     [attributes]
   )
-
-  const resolvedHighlightedLabel = getHeaderLabel()
-
-  const resolvedHighlightedValue = computeHighlightedValue()
 
   const showHighlightActions =
     chartHighlight?.coordinates.left &&
@@ -312,11 +272,40 @@ export function ComposedChart({
     () => referenceLines.map((line) => line.attribute),
     [referenceLines]
   )
+
   const enabledAttributeNames = useMemo(
     () =>
       new Set(attributes.filter((attr) => attr.enabled !== false).map((attr) => attr.attribute)),
     [attributes]
   )
+
+  const resolvedHighlightedLabel = getHeaderLabel()
+
+  const resolvedHighlightedValue = useMemo(() => {
+    return resolveHighlightedChartValue({
+      data,
+      attributes,
+      focusDataIndex,
+      showTotal,
+      yAxisKey,
+      activePayload: _activePayload,
+      highlightedValue,
+      hiddenAttributes,
+      maxAttributeName: maxAttribute?.attribute,
+      referenceLineAttributes,
+    })
+  }, [
+    _activePayload,
+    attributes,
+    focusDataIndex,
+    showTotal,
+    yAxisKey,
+    highlightedValue,
+    hiddenAttributes,
+    maxAttribute?.attribute,
+    referenceLineAttributes,
+    data,
+  ])
 
   const chartData = useMemo(() => {
     if (!isChartDataReady) return []

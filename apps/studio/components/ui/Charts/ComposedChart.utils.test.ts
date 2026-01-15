@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { convertDataPointToPayload, type MultiAttribute } from './ComposedChart.utils'
+import {
+  convertDataPointToPayload,
+  resolveHighlightedChartValue,
+  type MultiAttribute,
+} from './ComposedChart.utils'
 
 describe('convertDataPointToPayload', () => {
   it('should convert data point to payload format', () => {
@@ -133,5 +137,70 @@ describe('convertDataPointToPayload', () => {
       { dataKey: 'cpu_system', value: 20.5 },
       { dataKey: 'cpu_user', value: 30.75 },
     ])
+  })
+})
+
+describe('resolveHighlightedChartValue', () => {
+  const attributes: MultiAttribute[] = [
+    { attribute: 'cpu_system', enabled: true },
+    { attribute: 'cpu_user', enabled: true },
+    { attribute: 'cpu_max', provider: 'reference-line', isMaxValue: true },
+  ]
+
+  const data = [
+    { timestamp: 1, cpu_system: 10, cpu_user: 20, cpu_max: 100 },
+    { timestamp: 2, cpu_system: 15, cpu_user: 25, cpu_max: 100 },
+  ]
+
+  it('returns highlightedValue when no focus and showTotal is false', () => {
+    const result = resolveHighlightedChartValue({
+      data,
+      attributes,
+      focusDataIndex: null,
+      showTotal: false,
+      yAxisKey: 'cpu_system',
+      highlightedValue: 999,
+      hiddenAttributes: new Set(),
+      maxAttributeName: 'cpu_max',
+      referenceLineAttributes: ['cpu_max'],
+    })
+
+    expect(result).toBe(999)
+  })
+
+  it('uses activePayload when focused and showTotal is true', () => {
+    const result = resolveHighlightedChartValue({
+      data,
+      attributes,
+      focusDataIndex: 0,
+      showTotal: true,
+      yAxisKey: 'cpu_system',
+      activePayload: [
+        { dataKey: 'cpu_system', value: 10 },
+        { dataKey: 'cpu_user', value: 20 },
+        { dataKey: 'cpu_max', value: 100 },
+      ],
+      hiddenAttributes: new Set(),
+      maxAttributeName: 'cpu_max',
+      referenceLineAttributes: ['cpu_max'],
+    })
+
+    expect(result).toBe(30)
+  })
+
+  it('uses computed payload when activePayload is missing', () => {
+    const result = resolveHighlightedChartValue({
+      data,
+      attributes,
+      focusDataIndex: 1,
+      showTotal: true,
+      yAxisKey: 'cpu_system',
+      activePayload: undefined,
+      hiddenAttributes: new Set(),
+      maxAttributeName: 'cpu_max',
+      referenceLineAttributes: ['cpu_max'],
+    })
+
+    expect(result).toBe(40)
   })
 })

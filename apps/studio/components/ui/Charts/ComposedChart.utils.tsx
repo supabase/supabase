@@ -143,6 +143,57 @@ export const convertDataPointToPayload = (
     )
 }
 
+export const resolveHighlightedChartValue = <D extends Record<string, unknown>>({
+  data,
+  attributes,
+  focusDataIndex,
+  showTotal,
+  yAxisKey,
+  activePayload,
+  highlightedValue,
+  hiddenAttributes,
+  maxAttributeName,
+  referenceLineAttributes,
+}: {
+  data: D[]
+  attributes: MultiAttribute[]
+  focusDataIndex: number | null
+  showTotal: boolean
+  yAxisKey: string
+  activePayload?: { dataKey: string; value: number }[] | null
+  highlightedValue?: string | number
+  hiddenAttributes: Set<string>
+  maxAttributeName?: string
+  referenceLineAttributes: string[]
+}) => {
+  const attributesToIgnore =
+    attributes?.filter((attr) => attr.omitFromTotal)?.map((attr) => attr.attribute) ?? []
+  const attributesToIgnoreFromTotal = [
+    ...attributesToIgnore,
+    ...referenceLineAttributes,
+    ...(maxAttributeName ? [maxAttributeName] : []),
+    ...Array.from(hiddenAttributes),
+  ]
+
+  const lastPayload = convertDataPointToPayload(data[data.length - 1], attributes)
+
+  if (focusDataIndex !== null) {
+    if (!showTotal) return data[focusDataIndex]?.[yAxisKey]
+
+    const payloadToUse =
+      activePayload || convertDataPointToPayload(data[focusDataIndex], attributes)
+    return payloadToUse
+      ? calculateTotalChartAggregate(payloadToUse, attributesToIgnoreFromTotal)
+      : data[focusDataIndex]?.[yAxisKey]
+  }
+
+  if (showTotal && lastPayload) {
+    return calculateTotalChartAggregate(lastPayload, attributesToIgnoreFromTotal)
+  }
+
+  return highlightedValue
+}
+
 /**
  * Calculate the total aggregate of the chart values
  * by summing the values of the attributes
