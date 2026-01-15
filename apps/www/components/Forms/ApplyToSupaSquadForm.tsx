@@ -54,6 +54,8 @@ interface Track {
 
 interface Props {
   className?: string
+  title?: string
+  description?: string
 }
 
 const tracks: Track[] = [
@@ -113,12 +115,6 @@ const languagesSpoken: string[] = [
   'Dutch',
   'Other',
 ]
-
-const headerContent = {
-  title: 'Apply to join SupaSquad',
-  description:
-    'Join our community of passionate contributors and help shape the future of Supabase. Fill out the form below to apply.',
-}
 
 const FormContent = memo(function FormContent({
   form,
@@ -599,7 +595,11 @@ const FormContent = memo(function FormContent({
   )
 })
 
-const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
+const ApplyToSupaSquadForm: FC<Props> = ({
+  className,
+  title = 'Apply to join SupaSquad',
+  description = 'Join our community of passionate contributors and help shape the future of Supabase. Fill out the form below to apply.',
+}) => {
   const [honeypot, setHoneypot] = useState<string>('') // field to prevent spam
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -687,8 +687,8 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
     <>
       <div className={className}>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">{headerContent.title}</h2>
-          <p className="text-muted-foreground">{headerContent.description}</p>
+          <h2 className="text-2xl font-semibold mb-2">{title}</h2>
+          <p className="text-muted-foreground">{description}</p>
         </div>
 
         <Separator className="my-6" />

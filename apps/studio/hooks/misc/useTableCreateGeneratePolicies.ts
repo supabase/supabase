@@ -8,6 +8,19 @@ import { useTrack } from 'lib/telemetry/track'
 
 dayjs.extend(utc)
 
+export type TableCreateGeneratePoliciesVariant = 'control' | 'variation'
+
+const VALID_VARIANTS: TableCreateGeneratePoliciesVariant[] = ['control', 'variation']
+
+export function isValidExperimentVariant(
+  value: unknown
+): value is TableCreateGeneratePoliciesVariant {
+  return (
+    typeof value === 'string' &&
+    VALID_VARIANTS.includes(value as TableCreateGeneratePoliciesVariant)
+  )
+}
+
 interface UseTableCreateGeneratePoliciesOptions {
   /**
    * Whether this is a new table being created
@@ -38,12 +51,12 @@ export function useTableCreateGeneratePolicies({
   projectInsertedAt,
 }: UseTableCreateGeneratePoliciesOptions): UseTableCreateGeneratePoliciesResult {
   const track = useTrack()
-  const tableCreateGeneratePoliciesFlag = usePHFlag<boolean>('tableCreateGeneratePolicies')
+  const tableCreateGeneratePoliciesFlag = usePHFlag<string>('tableCreateGeneratePolicies')
   const hasTrackedExposure = useRef(false)
 
   const enabled = useMemo(() => {
     if (!IS_PLATFORM) return false
-    if (!tableCreateGeneratePoliciesFlag) return false
+    if (tableCreateGeneratePoliciesFlag !== 'variation') return false
     return true
   }, [tableCreateGeneratePoliciesFlag])
 
@@ -51,7 +64,7 @@ export function useTableCreateGeneratePolicies({
     if (!IS_PLATFORM) return
     if (hasTrackedExposure.current) return
     if (!isNewRecord) return
-    if (tableCreateGeneratePoliciesFlag === undefined) return
+    if (!isValidExperimentVariant(tableCreateGeneratePoliciesFlag)) return
     if (!projectInsertedAt) return
 
     try {
@@ -61,7 +74,7 @@ export function useTableCreateGeneratePolicies({
       const daysSinceCreation = dayjs.utc().diff(insertedDate, 'day')
       track('table_create_generate_policies_experiment_exposed', {
         experiment_id: 'tableCreateGeneratePolicies',
-        variant: tableCreateGeneratePoliciesFlag ? 'treatment' : 'control',
+        variant: tableCreateGeneratePoliciesFlag,
         days_since_project_creation: daysSinceCreation,
       })
       hasTrackedExposure.current = true

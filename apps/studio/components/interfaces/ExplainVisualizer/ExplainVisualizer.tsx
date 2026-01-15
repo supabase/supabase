@@ -17,7 +17,7 @@ export function ExplainVisualizer({ rows, onShowRaw, id }: ExplainVisualizerProp
 
   if (parsedTree.length === 0) {
     return (
-      <div className="bg-studio border-t">
+      <div className="bg-studio">
         <p className="m-0 border-0 px-4 py-3 font-mono text-sm text-foreground-light">
           No execution plan data available
         </p>
@@ -26,7 +26,7 @@ export function ExplainVisualizer({ rows, onShowRaw, id }: ExplainVisualizerProp
   }
 
   return (
-    <div className="bg-studio border-t h-full flex flex-col min-h-0">
+    <div className="bg-studio h-full flex flex-col min-h-0">
       {onShowRaw && (
         <ExplainHeader
           mode="visual"
@@ -39,7 +39,7 @@ export function ExplainVisualizer({ rows, onShowRaw, id }: ExplainVisualizerProp
 
       {/* Plan nodes */}
       <div className="flex-1 overflow-auto min-h-0">
-        <div className="flex flex-col min-w-max pb-4">
+        <div className="flex flex-col min-w-max pb-1 divide-y divide-border-muted">
           {parsedTree.map((node, idx) => (
             <ExplainNodeRow key={idx} node={node} depth={0} maxDuration={maxDuration} />
           ))}
