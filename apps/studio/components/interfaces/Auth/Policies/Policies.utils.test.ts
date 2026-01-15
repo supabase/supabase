@@ -156,7 +156,7 @@ describe('Policies.utils - Policy Generation', () => {
           expect(policy).toHaveProperty('schema', 'public')
           expect(policy).toHaveProperty('action', 'PERMISSIVE')
           expect(policy).toHaveProperty('roles')
-          expect(policy.roles).toContain('public')
+          expect(policy.roles).toContain('authenticated')
         }
       })
 
