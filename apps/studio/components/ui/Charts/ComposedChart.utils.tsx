@@ -166,11 +166,21 @@ export const normalizeToPercentageStacking = <T extends Record<string, unknown>>
     }
 
     const normalized = { ...point }
-    attributeKeys.forEach((attr) => {
+    const lastAttribute = attributeKeys[attributeKeys.length - 1]
+    let accumulated = 0
+
+    attributeKeys.forEach((attr, index) => {
       const value = point[attr]
-      if (typeof value === 'number') {
-        ;(normalized as Record<string, unknown>)[attr] = (value / total) * 100
+      if (typeof value !== 'number') return
+
+      if (attr === lastAttribute && index === attributeKeys.length - 1) {
+        const remainder = 100 - accumulated
+        ;(normalized as Record<string, unknown>)[attr] = remainder
+        return
       }
+      const normalizedValue = (value / total) * 100
+      accumulated += normalizedValue
+      ;(normalized as Record<string, unknown>)[attr] = normalizedValue
     })
     return normalized
   })

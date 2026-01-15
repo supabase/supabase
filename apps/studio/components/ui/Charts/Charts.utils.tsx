@@ -68,7 +68,16 @@ export const precisionFormatter = (num: number, precision: number): string => {
 export const formatPercentage = (value: number, precision = 2) => {
   const isHundred = Math.abs(value - 100) < 1e-6
   if (isHundred) return '100%'
-  return `${numberFormatter(value, precision)}%`
+  if (Number.isInteger(value)) return `${value}%`
+  const formatted = precisionFormatter(value, precision)
+  if (formatted.startsWith('<') || formatted.startsWith('>')) {
+    return `${formatted}%`
+  }
+  if (formatted.includes('.')) {
+    const [head, tail = ''] = formatted.split('.')
+    return `${head}.${tail.padEnd(precision, '0')}%`
+  }
+  return `${formatted}%`
 }
 
 /**
