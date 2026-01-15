@@ -18,7 +18,7 @@ import { useChartHighlight } from './useChartHighlight'
 import dayjs from 'dayjs'
 import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import type { ChartData } from './Charts.types'
-import { MultiAttribute, StackingMode, transformDataForStacking } from './ComposedChart.utils'
+import { MultiAttribute } from './ComposedChart.utils'
 
 export interface ComposedChartHandlerProps {
   id?: string
@@ -45,7 +45,6 @@ export interface ComposedChartHandlerProps {
   docsUrl?: string
   hide?: boolean
   syncId?: string
-  stackingMode?: StackingMode
   hideHighlightedValue?: boolean
 }
 
@@ -207,18 +206,11 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
-  // Apply pre-render transformations (e.g., percentage normalization)
   const processedData = useMemo(() => {
-    const dataPoints = Array.isArray(combinedData)
+    return Array.isArray(combinedData)
       ? combinedData.map((point) => ({ ...point }))
       : combinedData?.data?.map((point) => ({ ...point }))
-
-    return transformDataForStacking<Record<string, unknown>>(
-      dataPoints,
-      attributes,
-      otherProps.stackingMode
-    )
-  }, [combinedData, attributes, otherProps.stackingMode])
+  }, [combinedData])
 
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 

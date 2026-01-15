@@ -7,8 +7,6 @@ import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
 
-export type StackingMode = 'normal' | 'percentage'
-
 export interface ReportAttributes {
   id?: string
   titleTooltip?: string
@@ -33,7 +31,6 @@ export interface ReportAttributes {
     tickFormatter?: (value: any) => string
   }
   hideHighlightedValue?: boolean
-  stackingMode?: StackingMode
 }
 
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
@@ -144,76 +141,6 @@ export const convertDataPointToPayload = (
         entry.dataKey !== 'period_start' &&
         attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
     )
-}
-
-/**
- * Normalize data points to 100% stacking mode.
- * Only normalizes when total exceeds 100% (e.g., multi-core CPU metrics).
- * Values below or equal to 100% are kept as-is to show actual utilization.
- */
-export const normalizeToPercentageStacking = <T extends Record<string, unknown>>(
-  data: T[],
-  attributeKeys: string[]
-): T[] => {
-  return data.map((point) => {
-    const total = attributeKeys.reduce((sum, attr) => {
-      const value = point[attr]
-      return sum + (typeof value === 'number' ? value : 0)
-    }, 0)
-
-    if (total <= 100) {
-      return point
-    }
-
-    const normalized = { ...point }
-    const lastAttribute = attributeKeys[attributeKeys.length - 1]
-    let accumulated = 0
-
-    attributeKeys.forEach((attr, index) => {
-      const value = point[attr]
-      if (typeof value !== 'number') return
-
-      if (attr === lastAttribute && index === attributeKeys.length - 1) {
-        const remainder = 100 - accumulated
-        ;(normalized as Record<string, unknown>)[attr] = remainder
-        return
-      }
-      const normalizedValue = (value / total) * 100
-      accumulated += normalizedValue
-      ;(normalized as Record<string, unknown>)[attr] = normalizedValue
-    })
-    return normalized
-  })
-}
-
-/**
- * Select attribute keys to be included in stacking normalization.
- * Filters out reference lines, max value lines, disabled and special attributes.
- */
-export const selectStackedAttributeKeys = (attributes: MultiAttribute[]): string[] => {
-  return attributes
-    .filter((attr) => attr && attr.enabled !== false)
-    .filter((attr) => attr.provider !== 'reference-line')
-    .filter((attr) => !attr.isMaxValue)
-    .filter((attr) => attr.attribute !== 'rest')
-    .map((attr) => attr.attribute)
-}
-
-/**
- * Transform chart data according to stacking mode, applying percentage normalization when needed.
- */
-export const transformDataForStacking = <T extends Record<string, unknown>>(
-  data: T[] | undefined,
-  attributes: MultiAttribute[],
-  stackingMode?: StackingMode
-): T[] | undefined => {
-  if (!data || data.length === 0) return data
-  if (stackingMode !== 'percentage') return data
-
-  const keys = selectStackedAttributeKeys(attributes)
-  if (keys.length === 0) return data
-
-  return normalizeToPercentageStacking(data, keys)
 }
 
 /**

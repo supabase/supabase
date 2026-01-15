@@ -36,7 +36,6 @@ import {
   CustomLabel,
   CustomTooltip,
   MultiAttribute,
-  StackingMode,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
@@ -73,9 +72,6 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   sql?: string
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
-  // Controls how stacked values are displayed: 'normal' shows raw values, 'percentage' normalizes to 100%
-  // This is necessary for multi-core CPU metrics where values can exceed 100%, making them comparable across different core counts
-  stackingMode?: StackingMode
 }
 
 interface CustomizedDotProps {
@@ -135,7 +131,6 @@ export function ComposedChart({
   highlightActions,
   titleTooltip,
   showNewBadge,
-  stackingMode = 'normal',
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -271,8 +266,6 @@ export function ComposedChart({
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
-
-  const isPercentageStacking = stackingMode === 'percentage'
 
   const initialChartData =
     data && !!data[0]
@@ -491,9 +484,7 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={
-              isPercentageStacking || (isPercentage && !showMaxValue) ? yDomain : ['auto', 'auto']
-            }
+            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
             key={yAxisKey}
           />
           <XAxis

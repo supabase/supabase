@@ -74,7 +74,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: true,
       showGrid: true,
-      stackingMode: 'percentage',
       YAxisProps: {
         width: 45,
         tickFormatter: (value: any) => {
