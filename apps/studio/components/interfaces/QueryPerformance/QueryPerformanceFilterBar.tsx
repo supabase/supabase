@@ -52,8 +52,8 @@ export const QueryPerformanceFilterBar = ({
 
   const debouncedInputValue = useDebouncedValue(inputValue, 300)
 
-  const onIndexAdvisorChange = (options: string[]) => {
-    setSearchParams({ indexAdvisor: options.includes('true') ? 'true' : 'false' })
+  const onIndexAdvisorToggle = () => {
+    setSearchParams({ indexAdvisor: indexAdvisor === 'true' ? 'false' : 'true' })
   }
 
   useEffect(() => {
@@ -87,8 +87,8 @@ export const QueryPerformanceFilterBar = ({
 
           {isIndexAdvisorEnabled && (
             <IndexAdvisorFilter
-              activeOptions={indexAdvisor === 'true' ? ['true'] : []}
-              onSaveFilters={onIndexAdvisorChange}
+              isActive={indexAdvisor === 'true'}
+              onToggle={onIndexAdvisorToggle}
             />
           )}
 
