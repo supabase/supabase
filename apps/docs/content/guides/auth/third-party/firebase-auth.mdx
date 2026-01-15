@@ -338,7 +338,7 @@ const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 initializeApp();
 
-async function setRoleCustomClaim() => {
+async function setRoleCustomClaim() {
   let nextPageToken = undefined
 
   do {
@@ -348,13 +348,13 @@ async function setRoleCustomClaim() => {
 
     await Promise.all(listUsersResult.users.map(async (userRecord) => {
       try {
-        await getAuth().setCustomUserClaims(userRecord.id, {
+        await getAuth().setCustomUserClaims(userRecord.uid, {
           role: 'authenticated'
         })
       } catch (error) {
-        console.error('Failed to set custom role for user', userRecord.id)
+        console.error('Failed to set custom role for user', userRecord.uid)
       }
-    })
+    }))
   } while (nextPageToken);
 };
 
