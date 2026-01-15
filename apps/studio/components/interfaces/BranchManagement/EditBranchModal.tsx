@@ -2,12 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useRef, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useDebounce } from '@uidotdev/usehooks'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
@@ -135,11 +136,17 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
+    mode: 'onChange',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
   })
+
+  const gitBranchName = useWatch({ control: form.control, name: 'gitBranchName' })
+  const debouncedGitBranchName = useDebounce(gitBranchName, 500)
+
+  const triggerRef = useRef(form.trigger)
+  triggerRef.current = form.trigger
 
   const isFormValid =
     form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
@@ -180,24 +187,22 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     }
   }, [branch, visible, form, gitlessBranching])
 
-  // Handle initial state and changes for git branch validity
+  // Keep validity state in sync with the current input
   useEffect(() => {
-    setIsGitBranchValid(
-      !form.getValues('gitBranchName') ||
-        form.getValues('gitBranchName')?.length === 0 ||
-        gitlessBranching
-    )
-    // Trigger validation if a git branch name exists initially or is entered
-    if (form.getValues('gitBranchName')) {
-      form.trigger('gitBranchName')
-    }
+    setIsGitBranchValid(!gitBranchName || gitBranchName.length === 0 || gitlessBranching)
+  }, [gitBranchName, gitlessBranching])
+
+  // Debounce validation to avoid a request per keystroke
+  useEffect(() => {
+    if (!visible || gitlessBranching || !githubConnection?.repository.id) return
+    if (!debouncedGitBranchName) return
+
+    triggerRef.current('gitBranchName')
   }, [
-    githubConnection?.id,
-    form.getValues('gitBranchName'),
-    form.trigger,
-    visible,
-    branch,
+    debouncedGitBranchName,
     gitlessBranching,
+    githubConnection?.repository.id,
+    visible,
   ])
 
   const openLinkerPanel = () => {
