@@ -202,13 +202,14 @@ export function ComposedChart({
       return format === 'bytes-per-second' ? `${formatted}/s` : formatted
     }
 
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
     if (valuePrecision === 0 && value > 0 && value < 1) {
       return '<1'
     }
 
-    if (format === '%') {
-      return formatPercentage(value, valuePrecision)
-    }
     return numberFormatter(value, valuePrecision)
   }
 
