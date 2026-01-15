@@ -31,7 +31,7 @@ Store `project_url` and `anon_key` in Supabase Vault:
 
 ```sql
 select vault.create_secret('https://project-ref.supabase.co', 'project_url');
-select vault.create_secret('YOUR_SUPABASE_PUBLISHABLE_KEY', 'publishable_key');
+select vault.create_secret('YOUR_SUPABASE_PUBLISHABLE_KEY', 'anon_key');
 ```
 
 Make a POST request to a Supabase Edge Function every minute:
