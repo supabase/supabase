@@ -315,9 +315,11 @@ export function ComposedChart({
   const isChartDataReady = Boolean(data?.[0])
   const maxAttributeName = maxAttribute?.attribute
   const referenceLineAttributes = referenceLines.map((line) => line.attribute)
-  const enabledAttributes = attributes.filter((attr) => attr.enabled !== false)
-  const isAttributeEnabled = (attribute: string) =>
-    enabledAttributes.some((attr) => attr.attribute === attribute)
+  const enabledAttributeNames = useMemo(
+    () =>
+      new Set(attributes.filter((attr) => attr.enabled !== false).map((attr) => attr.attribute)),
+    [attributes]
+  )
 
   const chartData = useMemo(() => {
     if (!isChartDataReady) return []
@@ -331,7 +333,7 @@ export function ComposedChart({
         const isTimestamp = entry.name === 'timestamp' || entry.name === 'period_start'
         const isMaxAttribute = entry.name === maxAttributeName
         const isReferenceLine = referenceLineAttributes.includes(entry.name)
-        const isEnabled = isAttributeEnabled(entry.name)
+        const isEnabled = enabledAttributeNames.has(entry.name)
 
         return !isTimestamp && !isMaxAttribute && !isReferenceLine && isEnabled
       })
@@ -359,7 +361,7 @@ export function ComposedChart({
     data,
     maxAttributeName,
     referenceLineAttributes,
-    isAttributeEnabled,
+    enabledAttributeNames,
     attributes,
     isDarkMode,
   ])
