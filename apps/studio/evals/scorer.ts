@@ -220,7 +220,7 @@ export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async
   })
 }
 
-const correctnessEvaluator = LLMClassifierFromTemplate<{ expected: string }>({
+const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected: string }>({
   name: 'Correctness',
   promptTemplate: stripIndent`
     Evaluate whether the assistant's answer is correct according to the expected answer.
@@ -248,6 +248,7 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ expected: string }>({
 })
 
 export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
+  input,
   output,
   expected,
 }) => {
@@ -257,6 +258,7 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
   }
 
   return await correctnessEvaluator({
+    input,
     expected: expected.correctAnswer,
     output: extractTextOnly(output.steps),
   })
