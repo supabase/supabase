@@ -129,8 +129,8 @@ const ComposedChartHandler = ({
   const cpuUsageAttributeNames = useMemo(
     () =>
       attributes
-        .map((attribute) => attribute.attribute)
-        .filter((attributeName) => attributeName.startsWith('cpu_usage_busy_')),
+        .map((attr) => attr.attribute)
+        .filter((name) => name?.startsWith('cpu_usage_busy_')),
     [attributes]
   )
 
