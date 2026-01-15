@@ -214,10 +214,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                               : description,
                         }
                         const isDisabledDueToPlan = properties.isPaid && isFreePlan
-
-                        const value = values[x]
-                        const valueType = properties.type
-                        const isBooleanTypeEnabled = valueType === 'boolean' && value
+                        const shouldDisable =
+                          properties.type === 'boolean'
+                            ? isDisabledDueToPlan && !values[x]
+                            : isDisabledDueToPlan
 
                         return (
                           <FormField
@@ -226,11 +226,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                             setFieldValue={setFieldValue}
                             properties={properties}
                             formValues={values}
-                            disabled={
-                              shouldDisableField(x) ||
-                              !canUpdateConfig ||
-                              (isDisabledDueToPlan && !isBooleanTypeEnabled)
-                            }
+                            disabled={shouldDisableField(x) || !canUpdateConfig || shouldDisable}
                           />
                         )
                       })}
