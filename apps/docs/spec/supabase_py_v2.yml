@@ -3717,7 +3717,7 @@ functions:
       - name: default_to_null
         isOptional: true
         type: bool
-        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts. Defaults to true.
     examples:
       - id: create-a-record
         name: Create a record
@@ -3914,7 +3914,7 @@ functions:
       - name: default_to_null
         isOptional: true
         type: bool
-        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts. Defaults to true.
     examples:
       - id: upsert-your-data
         name: Upsert your data
