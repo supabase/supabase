@@ -1,5 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { Search, X } from 'lucide-react'
+import { Lightbulb, Search, X } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
@@ -10,7 +10,7 @@ import {
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
@@ -63,6 +63,10 @@ export const QueryPerformanceFilterBar = ({
 
   const onIndexAdvisorChange = (options: string[]) => {
     setSearchParams({ indexAdvisor: options.includes('true') ? 'true' : 'false' })
+  }
+
+  const onIndexAdvisorToggle = () => {
+    setSearchParams({ indexAdvisor: indexAdvisor === 'true' ? 'false' : 'true' })
   }
 
   useEffect(() => {
@@ -123,15 +127,21 @@ export const QueryPerformanceFilterBar = ({
           )}
 
           {isIndexAdvisorEnabled && (
-            <FilterPopover
-              name="Warnings"
-              options={indexAdvisorOptions}
-              labelKey="label"
-              valueKey="value"
-              activeOptions={indexAdvisor === 'true' ? ['true'] : []}
-              onSaveFilters={onIndexAdvisorChange}
-              className="w-56"
-            />
+            <Button
+              type={indexAdvisor === 'true' ? 'default' : 'outline'}
+              size="tiny"
+              className={cn(indexAdvisor === 'true' ? 'bg-surface-300' : 'border-dashed')}
+              onClick={onIndexAdvisorToggle}
+              iconRight={indexAdvisor === 'true' ? <X size={14} /> : undefined}
+            >
+              <span className="flex items-center gap-x-2">
+                <Lightbulb
+                  size={12}
+                  className={indexAdvisor === 'true' ? 'text-warning' : 'text-foreground-lighter'}
+                />
+                <span>Index Advisor</span>
+              </span>
+            </Button>
           )}
 
           {sort && (

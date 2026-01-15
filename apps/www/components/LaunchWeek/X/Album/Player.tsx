@@ -23,7 +23,7 @@ const Player = () => {
         href="https://supabase.productions/"
         target="_blank"
         className={cn(
-          'opacity-0 outline-none group translate-x-2 !ease-[.24,0,.22,.99] duration-200 transition-all text-foreground-muted hover:text-foreground !leading-3 font-mono uppercase text-[10px] flex flex-col text-right',
+          'opacity-0 outline-none group translate-x-2 !ease-[cubic-bezier(.24,0,.22,.99)] duration-200 transition-all text-foreground-muted hover:text-foreground !leading-3 font-mono uppercase text-[10px] flex flex-col text-right',
           isPlaying && 'opacity-100 translate-x-0'
         )}
       >
