@@ -330,7 +330,7 @@ val data = supabase.postgrest.rpc(
 
 ![Searching within a bounding box of a map](/docs/img/guides/database/extensions/postgis/map.png)
 
-When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like:
+When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let's look at what the function would look like:
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
@@ -442,6 +442,48 @@ val data = supabase.postgrest.rpc(
 
 </TabPanel>
 </Tabs>
+
+## Topology Extension
+
+The PostGIS Topology extension provides functionality for creating and managing topology data structures. When enabled, it creates a `topology` schema that contains functions and types for working with topological data.
+
+### Enabling Topology
+
+To enable the topology extension, you can use SQL:
+
+```sql
+-- Enable the topology extension
+CREATE EXTENSION postgis_topology;
+```
+
+The topology extension automatically creates a `topology` schema containing functions like:
+- `CreateTopology()` - Creates a new topology
+- `AddTopoGeometryColumn()` - Adds a topological geometry column
+- `TopoGeo_AddPoint()` - Adds a point to a topology
+
+### Search Path Configuration
+
+The topology schema is automatically included in Supabase's search path, allowing you to use topology functions without schema qualification:
+
+```sql
+-- You can use topology functions directly
+SELECT CreateTopology('my_topology', 4326);
+
+-- Instead of requiring schema qualification
+SELECT topology.CreateTopology('my_topology', 4326);
+```
+
+This configuration is set in your `config.toml`:
+
+```toml
+extra_search_path = ["public", "extensions", "topology"]
+```
+
+<Admonition type="note">
+
+If you're upgrading from an older Supabase project, you may need to update your `config.toml` to include `"topology"` in the `extra_search_path` array to access topology functions without schema qualification.
+
+</Admonition>
 
 ## Troubleshooting
 
