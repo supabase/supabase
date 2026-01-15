@@ -1,0 +1,231 @@
+---
+id: 'postgrest-error-codes'
+title: 'Error Codes'
+description: 'PostgREST Error Codes'
+subtitle: 'Identify PostgREST errors and resolve them'
+sidebar_label: 'Debugging'
+---
+
+<Admonition type="note">
+
+Mirrors the error codes and information in [PostgREST's official
+docs](https://docs.postgrest.org/en/stable/).
+
+</Admonition>
+
+## PostgREST error codes
+
+Error codes from the Data API are returned as JSON objects
+
+```json
+{
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column "new_test.id",
+  "message": "column new_test.id8 does not exist"
+}
+```
+
+Here is the full list of error codes and their descriptions:
+
+## Database level errors
+
+To understand the errors reference the [Postgres Error Docs](https://www.postgresql.org/docs/current/errcodes-appendix.html).
+
+Here's the text formatted as a proper markdown table:
+
+| PostgreSQL error code(s) | HTTP status                    | Error description               |
+| ------------------------ | ------------------------------ | ------------------------------- |
+| 08\*                     | 503                            | pg connection err               |
+| 09\*                     | 500                            | triggered action exception      |
+| 0L\*                     | 403                            | invalid grantor                 |
+| 0P\*                     | 403                            | invalid role specification      |
+| 23503                    | 409                            | foreign key violation           |
+| 23505                    | 409                            | uniqueness violation            |
+| 25006                    | 405                            | read only sql transaction       |
+| 25\*                     | 500                            | invalid transaction state       |
+| 28\*                     | 403                            | invalid auth specification      |
+| 2D\*                     | 500                            | invalid transaction termination |
+| 38\*                     | 500                            | external routine exception      |
+| 39\*                     | 500                            | external routine invocation     |
+| 3B\*                     | 500                            | savepoint exception             |
+| 40\*                     | 500                            | transaction rollback            |
+| 53400                    | 500                            | config limit exceeded           |
+| 53\*                     | 503                            | insufficient resources          |
+| 54\*                     | 500                            | too complex                     |
+| 55\*                     | 500                            | obj not in prerequisite state   |
+| 57\*                     | 500                            | operator intervention           |
+| 58\*                     | 500                            | system error                    |
+| F0\*                     | 500                            | config file error               |
+| HV\*                     | 500                            | foreign data wrapper error      |
+| P0001                    | 400                            | default code for "raise"        |
+| P0\*                     | 500                            | PL/pgSQL error                  |
+| XX\*                     | 500                            | internal error                  |
+| 42883                    | 404                            | undefined function              |
+| 42P01                    | 404                            | undefined table                 |
+| 42P17                    | 500                            | infinite recursion              |
+| 42501                    | if authenticated 403, else 401 | insufficient privileges         |
+| other                    | 400                            |                                 |
+
+## API level errors
+
+### Connection errors
+
+Errors that prevent that data API from interacting with Postgres.
+
+| Code     | HTTP status | Description                                                                                                             |
+| -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| PGRST000 | 503         | Could not connect with the database due to an incorrect connection string or due to the PostgreSQL service not running. |
+| PGRST001 | 503         | Could not connect with the database due to an internal error.                                                           |
+| PGRST002 | 503         | Could not connect with the database when building the schema cache                                                      |
+| PGRST003 | 504         | The request timed out waiting for a connection from PostgREST's internal pool                                           |
+
+### API requests
+
+Errors with data structures or request formatting
+
+| Code     | HTTP status | Description                                                                                                                               |
+| -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| PGRST100 | 400         | Parsing error in the query string parameter.                                                                                              |
+| PGRST101 | 405         | For database functions only `GET`and`POST` verbs are allowed. Any other verb will throw this error.                                       |
+| PGRST102 | 400         | An invalid request body was sent(e.g. an empty body or malformed JSON).                                                                   |
+| PGRST103 | 416         | An invalid range was specified for `:ref:`limits``.                                                                                       |
+| PGRST105 | 405         | An invalid `:ref:`PUT <upsert_put>`` request was done                                                                                     |
+| PGRST106 | 406         | The schema specified when `:ref:`switching schemas <multiple-schemas>`` is not present in the `:ref:`db-schemas`` configuration variable. |
+| PGRST107 | 415         | The `Content-Type` sent in the request is invalid.                                                                                        |
+| PGRST108 | 400         | The filter is applied to a embedded resource that is not specified in the `select` part of the query string. See `:ref:`embed_filters``.  |
+| PGRST111 | 500         | An invalid `response.headers` was set. See `:ref:`guc_resp_hdrs``.                                                                        |
+| PGRST112 | 500         | The status code must be a positive integer. See `:ref:`guc_resp_status``.                                                                 |
+| PGRST114 | 400         | For an `:ref:`UPSERT using PUT <upsert_put>``, when `:ref:`limits and offsets <limits>`` are used.                                        |
+| PGRST115 | 400         | For an `:ref:`UPSERT using PUT <upsert_put>``, when the primary key in the query string and the body are different.                       |
+| PGRST116 | 406         | More than 1 or no items where returned when requesting a singular response. See `:ref:`singular_plural``.                                 |
+| PGRST117 | 405         | The HTTP verb used in the request in not supported.                                                                                       |
+| PGRST118 | 400         | Could not order the result using the related table because there is no many-to-one or one-to-one relationship between them.               |
+| PGRST120 | 400         | An embedded resource can only be filtered using the `is.null` or `not.is.null` `.                                                         |
+| PGRST121 | 500         | PostgREST can't parse the JSON objects in RAISE `PGRST` error. See `:ref:`raise headers <raise_headers>``.                                |
+| PGRST122 | 400         | Invalid preferences found in `Prefer` header with `Prefer: handling=strict`. See `:ref:`prefer_handling``.                                |
+| PGRST123 | 400         | Aggregate functions are disabled. See `:ref:`db-aggregates-enabled``.                                                                     |
+| PGRST124 | 400         | `max-affected` preference is violated. See `:ref:`prefer_max_affected``.                                                                  |
+| PGRST125 | 404         | Invalid path is specified in request URL.                                                                                                 |
+| PGRST126 | 404         | Open API config is disabled but API root path is accessed. See `:ref:`openapi-mode``.                                                     |
+| PGRST127 | 400         | The feature specified in the `details` field is not implemented.                                                                          |
+| PGRST128 | 400         | `max-affected` preference is violated with `RPC` call. See `:ref:`prefer_max_affected``.                                                  |
+
+### Schema cache errors
+
+The API is unable to identify relationships or objects within the query requests.
+
+| Code     | HTTP status | Description                                                                                                                                                                                                                                                                             |
+| -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PGRST200 | 400         | Caused by stale foreign key relationships, otherwise any of the embedding resources or the relationship itself may not exist in the database.                                                                                                                                           |
+| PGRST201 | 300         | An ambiguous embedding request was made. See `:ref:`complex_rels``.                                                                                                                                                                                                                     |
+| PGRST202 | 404         | Caused by a stale function signature, otherwise the function may not exist in the database.                                                                                                                                                                                             |
+| PGRST203 | 300         | Caused by requesting overloaded functions with the same argument names but different types, or by using a `POST` verb to request overloaded functions with a `JSON` or `JSONB` type unnamed parameter. The solution is to rename the function or add/modify the names of the arguments. |
+| PGRST204 | 400         | Caused when the `:ref:`column specified <specify_columns>`in the`columns`` query parameter is not found.                                                                                                                                                                                |
+| PGRST205 | 404         | Caused when the `:ref:`table specified <tables_views>`` in the URI is not found.                                                                                                                                                                                                        |
+
+### Authentication errors
+
+The request lacks the proper credentials to request data
+
+| Code     | HTTP status | Description                                                                                                                            |
+| -------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| PGRST300 | 500         | A `:ref:`JWT secret <jwt-secret>`` is missing from the configuration.                                                                  |
+| PGRST301 | 401         | Provided JWT couldn't be decoded or it is invalid.                                                                                     |
+| PGRST302 | 401         | Attempted to do a request without `:ref:`bearer_auth`` when the anonymous role is disabled by not setting it in `:ref:`db-anon-role``. |
+| PGRST303 | 401         | `:ref:`JWT claims validation <jwt_claims_validation>`` or parsing failed.                                                              |
+
+### Internal errors
+
+Data API error unspecified
+
+| Code     | HTTP status | Description                                                                 |
+| -------- | ----------- | --------------------------------------------------------------------------- |
+| PGRSTX00 | 500         | Internal errors related to the library used for connecting to the database. |
+
+## Viewing errors in the logs
+
+One can filter for API errors in the [log observer](https://supabase.com/dashboard/project/_/logs/explorer). Below are useful queries for filtering and analyzing API errors:
+
+#### Find all API errors that occurred at the database level
+
+```sql
+select
+  cast(postgres_logs.timestamp as datetime) as timestamp,
+  event_message,
+  parsed.error_severity,
+  parsed.user_name,
+  parsed.query,
+  parsed.detail,
+  parsed.hint,
+  parsed.sql_state_code,
+  parsed.backend_type
+from
+  postgres_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(metadata.parsed) as parsed
+where
+  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
+  and parsed.user_name = 'authenticator' -- the authenticator role represents the database API
+order by timestamp desc
+limit 100;
+```
+
+#### Find specific api error at the database level
+
+```sql
+select
+  cast(postgres_logs.timestamp as datetime) as timestamp,
+  event_message,
+  parsed.error_severity,
+  parsed.user_name,
+  parsed.query,
+  parsed.detail,
+  parsed.hint,
+  parsed.sql_state_code,
+  parsed.backend_type
+from
+  postgres_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(metadata.parsed) as parsed
+where parsed.sql_state_code like '42501' and parsed.user_name = 'authenticator' -- the authenticator role represents the database API
+order by timestamp desc
+limit 100;
+```
+
+#### Find specific API error
+
+```sql
+  cast(timestamp as datetime) as timestamp,
+  status_code,
+  event_message,
+  path
+from edge_logs
+cross join unnest(metadata) as metadata
+cross join unnest(response) AS response
+cross join unnest(request) AS request
+where
+   regexp_contains(path, '^/rest/v1/')
+```
+
+#### Find specific API error
+
+```sql
+select
+  FORMAT_TIMESTAMP(
+    "%c",
+    TIMESTAMP_TRUNC(cast(edge_logs.timestamp as timestamp), HOUR),
+    "UTC"
+  ) as hour,
+  COUNT(proxy_status) as error_count,
+  path,
+  COALESCE(proxy_status, 'not_recorded') as error_codes
+from
+  edge_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(response) as response
+  cross join unnest(response.headers) as headers
+  cross join unnest(request) as request
+where status_code >= 400 and regexp_contains(path, '^/rest/v1/')
+group by hour, proxy_status, path;
+```
