@@ -205,12 +205,6 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
-  const processedData = useMemo(() => {
-    return Array.isArray(combinedData)
-      ? combinedData.map((point) => ({ ...point }))
-      : combinedData?.data?.map((point) => ({ ...point }))
-  }, [combinedData])
-
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   const _highlightedValue = useMemo(() => {
@@ -269,7 +263,7 @@ const ComposedChartHandler = ({
     )
   }
 
-  if (!processedData) {
+  if (!combinedData) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
         <WarningIcon />
@@ -290,7 +284,7 @@ const ComposedChartHandler = ({
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          data={processedData as DataPoint[]}
+          data={combinedData as DataPoint[]}
           format={format}
           // [Joshen] This is where it's messing up
           xAxisKey="period_start"
