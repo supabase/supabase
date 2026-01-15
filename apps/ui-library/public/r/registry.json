@@ -560,6 +560,16 @@
           "type": "registry:component"
         },
         {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/__root.tsx",
+          "type": "registry:file",
+          "target": "routes/__root.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/index.tsx",
+          "type": "registry:file",
+          "target": "routes/index.tsx"
+        },
+        {
           "path": "registry/default/blocks/passwordless-auth-tanstack/routes/passwordless.tsx",
           "type": "registry:file",
           "target": "routes/passwordless.tsx"
@@ -592,6 +602,11 @@
         {
           "path": "registry/default/blocks/passwordless-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routeTree.gen.ts",
+          "type": "registry:file",
+          "target": "routeTree.gen.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",

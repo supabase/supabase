@@ -12,7 +12,7 @@ const confirmFn = createServerFn({ method: 'GET' })
       'token_hash' in searchParams &&
       'type' in searchParams
     ) {
-      return searchParams
+      return searchParams as Record<string, unknown>
     }
     throw new Error('Invalid search params')
   })
