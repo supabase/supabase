@@ -320,14 +320,14 @@ export const CustomTooltip = ({
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
-            <div className="flex items-end gap-1">
-              <span className="text-base">
-                {isPercentage
-                  ? formatPercentage(total as number, valuePrecision)
-                  : formatNumeric(total as number) +
-                    (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-                {format === 'ms' ? 'ms' : ''}
-              </span>
+              <div className="flex items-end gap-1">
+                <span className="text-base">
+                  {isPercentage
+                    ? formatPercentage(total as number, valuePrecision)
+                    : formatNumeric(total as number) +
+                      (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
+                  {format === 'ms' ? 'ms' : ''}
+                </span>
                 {maxValueAttribute &&
                   !isPercentage &&
                   !isNaN((total as number) / maxValueData?.value) &&
