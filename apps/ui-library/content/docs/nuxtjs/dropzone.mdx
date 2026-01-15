@@ -5,7 +5,7 @@ description: Displays a control for easier uploading of files directly to Supaba
 
 <ComponentPreview
   name="dropzone-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
+  description="A file upload dropzone component that allows users to drag-and-drop files or select them manually. It supports multiple files, displays upload progress, previews images, and shows validation errors."
   showCode={false}
 />
 
@@ -72,7 +72,7 @@ const upload = useSupabaseUpload({
 | `path`             | `string`   | `null`  | The path or subfolder to upload the file to          |
 | `allowedMimeTypes` | `string[]` | `[]`    | The MIME types to allow for upload                   |
 | `maxFiles`         | `number`   | `1`     | Maximum number of files to upload                    |
-| `maxFileSize`      | `number`   | `1000`  | Maximum file size in bytes                           |
+| `maxFileSize`      | `number`   | `Infinity`  | Maximum file size in bytes                           |
 
 ## Further reading
 

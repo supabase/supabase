@@ -18,7 +18,7 @@ description: Displays a control for easier uploading of files directly to Supaba
 
 ## Folder structure
 
-This block assumes that you have already installed a Supabase client for Nuxt from the previous step.
+This block assumes that you have already installed a Supabase client for Vue from the previous step.
 
 <RegistryBlock itemName="dropzone-vue" />
 
@@ -73,7 +73,7 @@ const upload = useSupabaseUpload({
 | `path`             | `string`   | `null`  | The path or subfolder to upload the file to          |
 | `allowedMimeTypes` | `string[]` | `[]`    | The MIME types to allow for upload                   |
 | `maxFiles`         | `number`   | `1`     | Maximum number of files to upload                    |
-| `maxFileSize`      | `number`   | `1000`  | Maximum file size in bytes                           |
+| `maxFileSize`      | `number`   | `Infinity`  | Maximum file size in bytes                           |
 
 ## Further reading
 

@@ -3,7 +3,6 @@
   "type": "registry:component",
   "title": "Realtime Cursor for Nuxt and Supabase",
   "description": "Component which renders realtime cursors from other users in a room.",
-  "registryDependencies": ["button"],
   "files": [
     {
       "path": "registry/default/realtime-cursor/nuxtjs/app/components/cursor.vue",
