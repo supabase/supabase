@@ -136,7 +136,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onChange',
+    mode: 'onBlur',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
@@ -198,12 +198,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     if (!debouncedGitBranchName) return
 
     triggerRef.current('gitBranchName')
-  }, [
-    debouncedGitBranchName,
-    gitlessBranching,
-    githubConnection?.repository.id,
-    visible,
-  ])
+  }, [debouncedGitBranchName, gitlessBranching, githubConnection?.repository.id, visible])
 
   const openLinkerPanel = () => {
     onClose()
