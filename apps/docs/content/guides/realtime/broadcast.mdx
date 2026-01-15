@@ -25,7 +25,7 @@ However, regardless of whether it's public or private, the Realtime service conn
 
 </Admonition>
 
-For Authorization we do insert a message and try to read it and then we it back as way to verify that the RLS policies set by the user are being respected by the user joining the channel but this messages won't be sent to the user. You can read more about it in the [Authorization](/docs/guides/realtime/authorization) docs
+For Authorization we insert a message and try to read it, and rollback the transaction to verify that the RLS policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in the [Authorization docs](/docs/guides/realtime/authorization).
 
 ## Subscribe to messages
 

@@ -7,6 +7,12 @@ title: 'Manage Log Drain usage'
 
 You can configure log drains in the [project settings](/dashboard/project/_/settings/log-drains) to send logs to one or more destinations. You are charged for each log drain that is configured (referred to as [Log Drain Hours](/docs/guides/platform/manage-your-usage/log-drains#log-drain-hours)), the log events sent (referred to as [Log Drain Events](/docs/guides/platform/manage-your-usage/log-drains#log-drain-events)), and the [Egress](/docs/guides/platform/manage-your-usage/egress) incurred by the export—across all your projects.
 
+<Admonition type="note">
+
+Log Drains are **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
+
 ## Log Drain Hours
 
 ### How charges are calculated
@@ -76,6 +82,25 @@ The project has two log drains configured throughout the entire billing cycle wi
 | **Subtotal**                  |                    | **<Price price="730.14" />** |
 | Compute Credits               |                    | -<Price price="10" />        |
 | **Total**                     |                    | **<Price price="720.14" />** |
+
+### Add-on disabled after a day
+
+Project add-ons are billed in arrears based on how many hours you used them.
+If you remove the log drain add-on, you are no longer billed from the time of removal onward.
+
+| Line Item                     | Hours    | Costs                       |
+| ----------------------------- | -------- | --------------------------- |
+| Pro Plan                      | -        | <Price price="25" />        |
+|                               |          |                             |
+| Compute Hours Micro Project 1 | 744      | <Price price="10" />        |
+|                               |          |                             |
+| Log Drain Hours Drain 1       | 24       | <Price price="1.97" />      |
+| Log Drain Events Drain 1      | 0 events | <Price price="0" />         |
+| Egress Drain 1                | 0 GB     | <Price price="0" />         |
+|                               |          |                             |
+| **Subtotal**                  |          | **<Price price="36.97" />** |
+| Compute Credits               |          | -<Price price="10" />       |
+| **Total**                     |          | **<Price price="26.97" />** |
 
 ## View usage
 
