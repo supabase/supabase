@@ -1,10 +1,11 @@
 ---
 title = "Running EXPLAIN ANALYZE on functions"
-topics = ["database", "functions"]
-keywords = [] # any strings (topics are automatically added so no need to duplicate)
+topics = [ "database", "functions" ]
+keywords = []
+database_id = "1d62cace-c0f6-47a0-8690-002a797da33b"
 
 [api]
-sdk = ["rpc"]
+sdk = [ "rpc" ]
 ---
 
 Sometimes it can help to look at Postgres query plans inside a function. The problem is that running [`EXPLAIN ANALYZE`](https://www.depesz.com/2013/04/16/explaining-the-unexplainable/) on a function usually just shows a [function scan](https://pganalyze.com/docs/explain/scan-nodes/function-scan) or result node, which gives little insight into how the queries actually perform.
