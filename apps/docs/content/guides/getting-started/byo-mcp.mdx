@@ -1,0 +1,172 @@
+---
+id: 'ai-tools-byo-mcp'
+title: 'Deploy MCP servers'
+description: 'Build and deploy remote MCP servers on Supabase Edge Functions'
+---
+
+Build and deploy [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) (MCP) servers on Supabase using [Edge Functions](/docs/guides/functions).
+
+<Admonition type="note">
+
+This guide covers MCP servers that do not require authentication. Auth support for MCP on Edge Functions is coming soon.
+
+</Admonition>
+
+## Deploy your MCP server
+
+### Prerequisites
+
+Before you begin, make sure you have:
+
+- [Docker](https://docs.docker.com/get-docker/) installed (required for local Supabase development)
+- [Deno](https://deno.land/) installed (Supabase Edge Functions runtime)
+- [Supabase CLI](/docs/guides/cli/getting-started) installed
+
+### Create a new project
+
+Start by creating a new Supabase project:
+
+```bash
+mkdir my-mcp-server
+cd my-mcp-server
+supabase init
+```
+
+### Create the MCP server function
+
+Create a new Edge Function for your MCP server:
+
+```bash
+supabase functions new mcp
+```
+
+Create a `deno.json` file in `supabase/functions/mcp/` with the required dependencies:
+
+```json
+{
+  "imports": {
+    "@hono/mcp": "npm:@hono/mcp@^0.1.1",
+    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.24.3",
+    "hono": "npm:hono@^4.9.2",
+    "zod": "npm:zod@^4.1.13"
+  }
+}
+```
+
+<Admonition type="tip">
+
+This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk), but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite), [mcp-use](https://github.com/mcp-use/mcp-use), or [mcp-handler](https://github.com/vercel/mcp-handler).
+
+</Admonition>
+
+Replace the contents of `supabase/functions/mcp/index.ts` with:
+
+```ts
+// Setup type definitions for built-in Supabase Runtime APIs
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { StreamableHTTPTransport } from '@hono/mcp'
+import { Hono } from 'hono'
+import { z } from 'zod'
+
+// Create Hono app
+const app = new Hono()
+
+// Create your MCP server
+const server = new McpServer({
+  name: 'mcp',
+  version: '0.1.0',
+})
+
+// Register a simple addition tool
+server.registerTool(
+  'add',
+  {
+    title: 'Addition Tool',
+    description: 'Add two numbers together',
+    inputSchema: { a: z.number(), b: z.number() },
+  },
+  ({ a, b }) => ({
+    content: [{ type: 'text', text: String(a + b) }],
+  })
+)
+
+// Handle MCP requests at the root path
+app.all('/', async (c) => {
+  const transport = new StreamableHTTPTransport()
+  await server.connect(transport)
+  return transport.handleRequest(c)
+})
+
+Deno.serve(app.fetch)
+```
+
+### Local development
+
+Start the Supabase local development stack:
+
+```bash
+supabase start
+```
+
+In a separate terminal, serve your function:
+
+```bash
+supabase functions serve --no-verify-jwt mcp
+```
+
+Your MCP server is now running at:
+
+```
+http://localhost:54321/functions/v1/mcp
+```
+
+<Admonition type="note">
+
+The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer so your MCP server can accept unauthenticated requests. Authenticated MCP support is coming soon.
+
+</Admonition>
+
+### Test your MCP server
+
+Test your server with the official [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
+
+```bash
+npx -y @modelcontextprotocol/inspector
+```
+
+Use the local endpoint `http://localhost:54321/functions/v1/mcp` in the inspector UI to explore available tools and test them interactively.
+
+### Deploy to production
+
+When you're ready to deploy, link your project and deploy the function:
+
+```bash
+supabase link --project-ref <your-project-ref>
+supabase functions deploy --no-verify-jwt mcp
+```
+
+Your MCP server will be available at:
+
+```
+https://<your-project-ref>.supabase.co/functions/v1/mcp
+```
+
+Update your MCP client configuration to use the production URL.
+
+## Examples
+
+You can find ready-to-use MCP server implementations here:
+
+- [MCP server examples on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/)
+
+## Resources
+
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification/2025-11-25)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- [Supabase Edge Functions](/docs/guides/functions)
+- [OAuth 2.1 Server](/docs/guides/auth/oauth-server)
+- [MCP Authentication](/docs/guides/auth/oauth-server/mcp-authentication)
+- [MCP server examples on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp)
+- [Building MCP servers with mcp-lite](/docs/guides/functions/examples/mcp-server-mcp-lite) - Alternative lightweight framework

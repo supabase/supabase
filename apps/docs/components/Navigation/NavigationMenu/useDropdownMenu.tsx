@@ -1,8 +1,8 @@
 'use client'
 
 import type { User } from '@supabase/supabase-js'
-import { LogOut, Globe, LifeBuoy, Settings, UserIcon, Database } from 'lucide-react'
-import { logOut } from 'common'
+import { isFeatureEnabled, logOut } from 'common'
+import { Database, Globe, Home, LifeBuoy, LogOut, Settings, UserIcon } from 'lucide-react'
 
 import type { menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { IconGitHub } from './MenuIcons'
@@ -27,15 +27,21 @@ const useDropdownMenu = (user: User | null) => {
       },
     ],
     [
-      {
-        label: 'Supabase.com',
-        icon: Globe,
-        href: 'https://supabase.com',
-        otherProps: {
-          target: '_blank',
-          rel: 'noreferrer noopener',
-        },
-      },
+      isFeatureEnabled('docs:navigation_dropdown_links_home')
+        ? {
+            label: 'Supabase.com',
+            icon: Globe,
+            href: 'https://supabase.com',
+            otherProps: {
+              target: '_blank',
+              rel: 'noreferrer noopener',
+            },
+          }
+        : {
+            label: 'Dashboard',
+            icon: Home,
+            href: '../dashboard',
+          },
       {
         label: 'GitHub',
         icon: IconGitHub as any,

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { User } from './users-infinite-query'
 
 export type UserSendOTPVariables = {
@@ -28,24 +28,22 @@ export const useUserSendOTPMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UserSendOTPData, ResponseError, UserSendOTPVariables>,
+  UseCustomMutationOptions<UserSendOTPData, ResponseError, UserSendOTPVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserSendOTPData, ResponseError, UserSendOTPVariables>(
-    (vars) => sendOTP(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to send magic link: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UserSendOTPData, ResponseError, UserSendOTPVariables>({
+    mutationFn: (vars) => sendOTP(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] If we need to invalidate any queries
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to send magic link: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

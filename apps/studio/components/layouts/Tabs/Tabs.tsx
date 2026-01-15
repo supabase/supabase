@@ -116,8 +116,15 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
           : tabs.openTabs.filter((x) => x.startsWith('sql'))
       const tabIdx = openedTabs.indexOf(tabId)
+      const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
       tabs.removeTabs(tabsToClose)
+
+      const isActiveTabClosed = tabIdx < activeTabIdx
+      if (isActiveTabClosed) {
+        const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
+      }
     }
   }
 

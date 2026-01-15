@@ -1,0 +1,104 @@
+---
+title: GovSignals builds the AI platform for Government Contractors on Supabase
+meta_title: GovSignals builds the AI platform for Government Contractors on Supabase
+name: GovSignals
+description: GovSignals builds AI for government contractors, helping them discover federal opportunities, automate RFP responses, and collaborate on proposals within secure, compliant environments powered by Supabase.
+author: prashant
+author_title: Prashant Sridharan
+author_url: https://github.com/CoolAssPuppy
+author_image_url: https://avatars.githubusercontent.com/u/914007?v=4
+logo: /images/customers/logos/govsignals.svg
+logo_inverse: /images/customers/logos/light/govsignals.svg
+og_image: /images/customers/og/govsignals.png
+tags:
+  - supabase
+date: '2025-12-16'
+company_url: 'https://www.govsignals.ai/'
+misc: [{ label: 'Founded', text: 'USA' }]
+about: AI platform for government contractors to discover opportunities, automate RFP responses, and collaborate on proposals.
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['ai', 'saas', 'government']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'startup'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'North America'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth', 'storage', 'realtime']
+---
+
+### Case study: GovSignals builds the AI platform for Government Contractors on Supabase
+
+<Quote img="conner-aldrich.jpg" caption="Conner Aldrich, CTO, GovSignals">
+  We're using Supabase in some of the most compliance-heavy environments there are. The fact that it
+  just works, fast, reliable, open source, has made our journey to FedRAMP and IL5 possible.
+</Quote>
+
+## Introduction
+
+[GovSignals](https://www.govsignals.ai/) builds AI for government contractors. The platform helps contractors discover new federal opportunities, automate RFP responses, and collaborate on proposals, all within secure, compliant environments.
+
+GovSignals combines deep domain expertise in government procurement with strong data engineering. The company is pioneering AI-driven business development for contractors navigating complex federal regulations.
+
+To meet strict security and compliance requirements, including **FedRAMP High** and **Impact Level 5 (IL5)** environments, GovSignals needed a backend that could handle large-scale data ingestion, real-time collaboration, and multi-tenant access control with rigorous security guarantees.
+
+## The challenge
+
+Government contractors operate under some of the most stringent data handling rules in the world. GovSignals processes sensitive information, including Controlled Unclassified Information (CUI), and serves clients who require FedRAMP and IL5 compliance.
+
+The platform needed to:
+
+- Ingest data from tens of thousands of procurement and contract sources each day. This volume demanded consistent performance and reliability.
+- Enable real-time collaboration for teams drafting proposals and managing opportunities. Users needed low-latency updates and conflict-free editing.
+- Enforce strict access controls so each organization only accesses authorized data. Security boundaries had to be clear, testable, and auditable.
+- Operate within secure cloud environments while scaling quickly. The team needed predictable growth without compromising compliance.
+
+<Quote img="conner-aldrich.jpg" caption="Conner Aldrich, CTO, GovSignals">
+  We are one of a handful of startups in the world approved by the US Federal Government for FedRAMP
+  High authorization. Supabase powers our backend even in those regulated environments.
+</Quote>
+
+GovSignals chose Supabase from day one, knowing we would one day be deploying into high compliance environments.
+
+## Choosing Supabase
+
+Supabase stood out by combining **open-source flexibility** with **enterprise-grade reliability**. For GovSignals, it delivered a trusted Postgres foundation with modern developer tooling and the option to deploy in **BYOC (Bring Your Own Cloud)** mode. That model is essential for FedRAMP-hosted environments.
+
+Key factors in the decision included:
+
+- **Security and compliance.** SOC 2 Type II certification, well-maintained open source repos, and transparent documentation gave the team confidence.
+- **Open-source architecture.** The team could deploy within audited AWS RDS and Helm chart infrastructure, with clear control over components.
+- **Developer experience.** A unified stack for database, auth, storage, and realtime reduced DevOps overhead and simplified iteration.
+- **Enterprise support.** Direct access to Supabase engineers helped with scaling, indexing, and query optimization.
+
+## The approach
+
+GovSignals implemented Supabase as the core backend across three main environments: commercial, FedRAMP, and IL5.
+
+- **Database and vector search.** Supabase Postgres and pgvector handle billions of procurement data points and power the AI recommendations engine.
+- **Storage.** The team securely stores procurement documents, contracts, and proposal files with fine-grained controls.
+- **Realtime.** Collaborative editing and live dashboards keep proposal teams aligned without manual refreshes.
+- **AuthN and Row Level Security (RLS).** Strict per-organization access isolates data across contractors and supports audit requirements.
+
+<Quote img="conner-aldrich.jpg" caption="Conner Aldrich, CTO, GovSignals">
+  We've deployed Supabase in our own AWS environment using community Helm charts and RDS under the
+  hood. It's been remarkably stable for what we're doing.
+</Quote>
+
+As data sources grew from dozens toward tens of thousands, the architecture scaled alongside them. Supabase engineers partnered with the team to tune queries, plan indexes, and complete Postgres upgrades without downtime.
+
+## The results
+
+Supabase helped GovSignals scale from a prototype to an enterprise-grade platform that operates under government compliance frameworks.
+
+- **Scalable ingestion.** The system supports tens of thousands of data sources and millions of records, with consistent query performance even under load.
+- **Secure multi-tenancy.** RLS policies and auth integrations isolate data per organization and support clear audit trails.
+- **Real-time collaboration.** The Realtime API enables live editing and shared proposal workspaces that speed decision-making.
+- **Audit-ready compliance.** SOC 2 alignment and open-source deployment flexibility accelerate FedRAMP and IL5 authorization.
+- **Faster innovation.** A unified stack lets the team iterate quickly while staying within compliance boundaries.
+
+<Quote img="conner-aldrich.jpg" caption="Conner Aldrich, CTO, GovSignals">
+  Supabase has made it possible for us to balance innovation with compliance. We're building for
+  government contractors, but with the developer velocity of a startup.
+</Quote>
+
+With continued growth and a roadmap for expanded AI capabilities, GovSignals plans to deepen its Supabase integration. The team is exploring Broadcast Realtime and additional BYOC options as Supabase's compliance roadmap evolves.

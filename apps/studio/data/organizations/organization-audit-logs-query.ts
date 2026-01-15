@@ -1,13 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type AuditLog = {
   action: {
     metadata: {
       method?: string
+      route?: string
       status?: number
     }[]
     name: string
@@ -17,13 +18,17 @@ export type AuditLog = {
     type: 'user' | string
     metadata: {
       email?: string
+      ip?: string
+      tokenType?: string
     }[]
   }
   target: {
     description: string
     metadata: {
       org_slug?: string
-      project_ref?: string
+      project_ref?: string | null
+      ref?: string | null
+      slug?: string | null
     }
   }
   occurred_at: string
@@ -64,19 +69,17 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
   const { slug, iso_timestamp_start, iso_timestamp_end } = vars
 
-  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug, {
+  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>({
+    queryKey: organizationKeys.auditLogs(slug, {
       date_start: iso_timestamp_start,
       date_end: iso_timestamp_end,
     }),
-    ({ signal }) => getOrganizationAuditLogs(vars, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getOrganizationAuditLogs(vars, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })
 }

@@ -9,6 +9,7 @@ import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/databas
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { Button, Form, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -38,7 +39,6 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
   const { ref } = useParams()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
 
   // [Joshen] There seems to be some bug between Checkbox.Group within the Form component
   // hence why this external state as a temporary workaround
@@ -133,11 +133,6 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       ? 'supabase_function'
       : 'http_request',
     timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
-  }
-
-  const onClosePanel = () => {
-    if (isEdited) setIsClosingPanel(true)
-    else onClose()
   }
 
   const onUpdateSelectedEvents = (event: string) => {
@@ -261,9 +256,16 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
   useEffect(() => {
     if (visible) {
       setIsEdited(false)
-      setIsClosingPanel(false)
     }
   }, [visible])
+
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => isEdited,
+    onClose: () => {
+      setIsEdited(false)
+      onClose()
+    },
+  })
 
   return (
     <>
@@ -281,14 +283,14 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
         }
         className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
         onConfirm={() => {}}
-        onCancel={() => onClosePanel()}
+        onCancel={confirmOnClose}
         customFooter={
           <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
             <Button
               size="tiny"
               type="default"
               htmlType="button"
-              onClick={onClosePanel}
+              onClick={confirmOnClose}
               disabled={isSubmitting}
             >
               Cancel
@@ -328,22 +330,22 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
           }}
         </Form>
       </SidePanel>
-      <ConfirmationModal
-        visible={isClosingPanel}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosingPanel(false)}
-        onConfirm={() => {
-          setIsClosingPanel(false)
-          setIsEdited(false)
-          onClose()
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)

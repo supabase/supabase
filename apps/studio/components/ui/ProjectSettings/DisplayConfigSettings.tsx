@@ -9,11 +9,11 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { Input } from 'ui'
 
-const DisplayConfigSettings = () => {
+export const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
   const {
     data: settings,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
     isError: isProjectSettingsError,
   } = useProjectSettingsV2Query({
     projectRef,
@@ -23,7 +23,7 @@ const DisplayConfigSettings = () => {
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
   const isNotUpdatingJwtSecret =
@@ -90,8 +90,6 @@ const DisplayConfigSettings = () => {
     </ConfigContentWrapper>
   )
 }
-
-export default DisplayConfigSettings
 
 const ConfigContentWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (

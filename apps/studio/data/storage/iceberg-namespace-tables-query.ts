@@ -1,60 +1,33 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespaceTablesVariables = {
-  catalogUri: string
-  warehouse: string
-  token: string
-  namespace: string
+  warehouse?: string
+  namespace?: string
+  projectRef?: string
 }
 
-async function getNamespaceTables({
-  catalogUri,
-  warehouse,
-  token,
-  namespace,
-}: GetNamespaceTablesVariables) {
-  let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      apikey: `${token}`,
-    })
-    headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
+async function getNamespaceTables(
+  { projectRef, warehouse, namespace }: GetNamespaceTablesVariables,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!namespace) throw new Error('namespace is required')
+  if (!warehouse) throw new Error('warehouse is required')
 
-  const url = `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables`.replaceAll(
-    /(?<!:)\/\//g,
-    '/'
+  const { data, error } = await get(
+    '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables',
+    {
+      params: { path: { ref: projectRef, id: warehouse, namespace } },
+      signal,
+    }
   )
 
-  try {
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'GET',
-    })
-
-    const result = await response.json()
-    if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to get iceberg namespace')
-    }
-    const r = result as { identifiers: { name: string; namespace: string[] }[] }
-    return r.identifiers.map((i) => i.name)
-  } catch (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
+  return data.data.map((x) => x.name)
 }
 
 type IcebergNamespaceTablesData = Awaited<ReturnType<typeof getNamespaceTables>>
@@ -64,12 +37,24 @@ export type IcebergNamespaceTablesError = ResponseError
 export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesData>(
   params: GetNamespaceTablesVariables,
   {
+    enabled = true,
     ...options
-  }: UseQueryOptions<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData> = {}
+  }: UseCustomQueryOptions<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData> = {}
 ) => {
-  return useQuery<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData>(
-    storageKeys.icebergNamespaceTables(params.catalogUri, params.warehouse, params.namespace),
-    () => getNamespaceTables(params),
-    { ...options }
-  )
+  const { projectRef, warehouse, namespace } = params
+
+  return useQuery<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData>({
+    queryKey: storageKeys.icebergNamespaceTables({
+      projectRef,
+      warehouse,
+      namespace,
+    }),
+    queryFn: () => getNamespaceTables({ ...params }),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof warehouse !== 'undefined' &&
+      typeof namespace !== 'undefined',
+    ...options,
+  })
 }

@@ -11,7 +11,12 @@ import { initPagesState } from '../internal/state/pagesState'
 import { initQueryState } from '../internal/state/queryState'
 import { initViewState } from '../internal/state/viewState'
 import { CrossCompatRouterContext } from './hooks/useCrossCompatRouter'
-import { useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
+import {
+  useCommandMenuTelemetry,
+  type CommandMenuTelemetryCallback,
+} from './hooks/useCommandMenuTelemetry'
+import { CommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
+import { useCommandMenuOpen, useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   const combinedState = useConstant(() => ({
@@ -25,8 +30,21 @@ const CommandProviderInternal = ({ children }: PropsWithChildren) => {
 }
 
 // This is a component not a hook so it can access the wrapping context.
-const CommandShortcut = ({ openKey }: { openKey: string }) => {
+const CommandShortcut = ({
+  openKey,
+  app,
+  onTelemetry,
+}: {
+  openKey: string
+  app?: 'studio' | 'docs' | 'www'
+  onTelemetry?: CommandMenuTelemetryCallback
+}) => {
   const toggleOpen = useToggleCommandMenu()
+  const isOpen = useCommandMenuOpen()
+  const { sendTelemetry } = useCommandMenuTelemetry({
+    app: app ?? 'studio',
+    onTelemetry,
+  })
 
   useEffect(() => {
     if (openKey === '') return
@@ -37,13 +55,14 @@ const CommandShortcut = ({ openKey }: { openKey: string }) => {
       if (evt.key === openKey && usesPrimaryModifier && !otherModifiersActive) {
         evt.preventDefault()
         toggleOpen()
+        !isOpen && sendTelemetry('keyboard_shortcut')
       }
     }
 
     document.addEventListener('keydown', handleKeydown)
 
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [openKey, toggleOpen])
+  }, [isOpen, openKey, sendTelemetry, toggleOpen])
 
   return null
 }
@@ -85,12 +104,22 @@ interface CommandProviderProps extends PropsWithChildren {
    * Defaults to `k`. Pass an empty string to disable the keyboard shortcut.
    */
   openKey?: string
+  /**
+   * The app where the command menu is being used
+   */
+  app?: 'studio' | 'docs' | 'www'
+  /**
+   * Optional callback to send telemetry events
+   */
+  onTelemetry?: CommandMenuTelemetryCallback
 }
 
-const CommandProvider = ({ children, openKey }: CommandProviderProps) => (
+const CommandProvider = ({ children, openKey, app, onTelemetry }: CommandProviderProps) => (
   <CommandProviderInternal>
-    <CommandShortcut openKey={openKey ?? 'k'} />
-    <CloseOnNavigation>{children}</CloseOnNavigation>
+    <CommandMenuTelemetryContext.Provider value={{ app: app ?? 'studio', onTelemetry }}>
+      <CommandShortcut openKey={openKey ?? 'k'} app={app} onTelemetry={onTelemetry} />
+      <CloseOnNavigation>{children}</CloseOnNavigation>
+    </CommandMenuTelemetryContext.Provider>
   </CommandProviderInternal>
 )
 

@@ -1,8 +1,8 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourcesVariables = {
@@ -26,13 +26,14 @@ export type ResourcesError = ResponseError
 
 export const useResourcesQuery = <TData = ResourcesData>(
   { projectRef }: ResourcesVariables,
-  { enabled = true, ...options }: UseQueryOptions<ResourcesData, ResourcesError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ResourcesData, ResourcesError, TData> = {}
 ) =>
-  useQuery<ResourcesData, ResourcesError, TData>(
-    resourceKeys.list(projectRef),
-    ({ signal }) => getResources({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ResourcesData, ResourcesError, TData>({
+    queryKey: resourceKeys.list(projectRef),
+    queryFn: ({ signal }) => getResources({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 /**
  * useResourcesPrefetch is used for prefetching data. For example, starting a query loading before a page is navigated to.
@@ -52,9 +53,10 @@ export const useResourcesPrefetch = ({ projectRef }: ResourcesVariables) => {
 
   return useCallback(() => {
     if (projectRef) {
-      client.prefetchQuery(resourceKeys.list(projectRef), ({ signal }) =>
-        getResources({ projectRef }, signal)
-      )
+      client.prefetchQuery({
+        queryKey: resourceKeys.list(projectRef),
+        queryFn: ({ signal }) => getResources({ projectRef }, signal),
+      })
     }
   }, [projectRef])
 }

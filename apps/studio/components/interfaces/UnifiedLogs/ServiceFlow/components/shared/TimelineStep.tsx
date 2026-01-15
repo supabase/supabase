@@ -8,13 +8,13 @@ import { getStatusLevel } from '../../../UnifiedLogs.utils'
 type IconComponent = LucideIcon | React.ComponentType<any>
 
 // Reusable styled icon component
-const StyledIcon = ({ icon: Icon, title }: { icon: IconComponent; title: string }) => (
+export const StyledIcon = ({ icon: Icon, title }: { icon: IconComponent; title: string }) => (
   <div className="flex items-center gap-2 bg-surface-300 rounded p-0.5 border justify-center border-foreground-muted">
     <Icon className="w-4 h-4 text-foreground-lighter" strokeWidth={1} />
   </div>
 )
 
-const TimelineStep = ({
+export const TimelineStep = ({
   title,
   status,
   statusText,
@@ -69,5 +69,3 @@ const TimelineStep = ({
     </div>
   </>
 )
-
-export { StyledIcon, TimelineStep }

@@ -2,9 +2,11 @@
 
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
+import yaml from 'js-yaml'
+import { stringify as stringifyToml } from '@std/toml/stringify'
 import { Button, cn } from 'ui'
-import { CodeBlock } from 'ui/src/components/CodeBlock'
-import type { McpClient, McpClientConfig } from '../types'
+import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
+import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
 
 interface McpConfigurationDisplayProps {
@@ -13,7 +15,11 @@ interface McpConfigurationDisplayProps {
   className?: string
   theme?: 'light' | 'dark'
   basePath: string
+  onCopyCallback: (type?: McpOnCopyCallback) => void
+  onInstallCallback?: () => void
 }
+
+type ConfigFormat = CodeBlockLang | 'toml'
 
 export function McpConfigurationDisplay({
   selectedClient,
@@ -21,6 +27,8 @@ export function McpConfigurationDisplay({
   className,
   theme = 'dark',
   basePath,
+  onCopyCallback,
+  onInstallCallback,
 }: McpConfigurationDisplayProps) {
   const mcpButtonData = getMcpButtonData({
     basePath,
@@ -28,6 +36,34 @@ export function McpConfigurationDisplay({
     client: selectedClient,
     clientConfig,
   })
+
+  // Extract file extension and determine format
+  const fileExtension = selectedClient.configFile?.split('.').pop()?.toLowerCase()
+  // If the file extension is not 'json', 'yaml', or 'toml', default to 'txt'
+  let configFormat: ConfigFormat | undefined
+  if (['json', 'yaml', 'toml'].includes(fileExtension ?? '')) {
+    configFormat = fileExtension as ConfigFormat
+  }
+
+  // Serialize config based on format
+  let configValue: string
+  switch (configFormat) {
+    case 'yaml':
+      configValue = yaml.dump(clientConfig, { indent: 2, lineWidth: -1 })
+      break
+    case 'toml':
+      configValue = stringifyToml(clientConfig as Record<string, any>).trim()
+      break
+    case 'json':
+      configValue = JSON.stringify(clientConfig, null, 2)
+      break
+    default:
+      configValue = String(clientConfig)
+  }
+
+  // Toml will default to undefined display language
+  const displayLanguage: CodeBlockLang | undefined =
+    configFormat === 'toml' ? undefined : configFormat
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -40,6 +76,7 @@ export function McpConfigurationDisplay({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 [&>span]:flex [&>span]:items-center [&>span]:gap-2"
+              onClick={onInstallCallback}
             >
               <Image
                 src={mcpButtonData.imageSrc}
@@ -54,21 +91,31 @@ export function McpConfigurationDisplay({
         </>
       )}
 
+      {selectedClient.primaryInstructions &&
+        selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
+
       {selectedClient.configFile && (
         <div className="text-xs text-foreground-light">
-          {mcpButtonData ? 'Or add' : 'Add'} this configuration to{' '}
+          {selectedClient.primaryInstructions
+            ? 'Alternatively, add'
+            : mcpButtonData
+              ? 'Or add'
+              : 'Add'}{' '}
+          this configuration to{' '}
           <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
         </div>
       )}
 
       <CodeBlock
-        value={JSON.stringify(clientConfig, null, 2)}
-        language="json"
+        value={configValue}
+        language={displayLanguage}
         className="max-h-64 overflow-y-auto"
         focusable={false}
+        onCopyCallback={() => onCopyCallback?.('config')}
       />
 
-      {selectedClient.alternateInstructions && selectedClient.alternateInstructions(clientConfig)}
+      {selectedClient.alternateInstructions &&
+        selectedClient.alternateInstructions(clientConfig, onCopyCallback)}
 
       {(selectedClient.docsUrl || selectedClient.externalDocsUrl) && (
         <div className="flex items-center gap-2 text-xs text-foreground-light">

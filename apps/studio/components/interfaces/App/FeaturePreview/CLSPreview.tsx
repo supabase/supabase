@@ -27,7 +27,7 @@ export const CLSPreview = () => {
           <WarningIcon />
           <AlertTitle_Shadcn_>
             Changes to column privileges will not be reflected in migrations when running{' '}
-            <code className="text-xs">supabase db diff</code>.
+            <code className="text-code-inline">supabase db diff</code>.
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             Column privileges are not supported in the current version of the Supabase CLI.

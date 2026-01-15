@@ -48,10 +48,12 @@ export const PageHeader = ({
       {(displayBreadcrumbs.length > 0 ||
         (isCompact && (title || primaryActions || secondaryActions))) && (
         <div className={cn('flex items-center gap-4', isCompact ? 'justify-between' : 'mb-4')}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             {breadcrumbs.length > 0 ? (
-              <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
-                <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
+              <Breadcrumb
+                className={cn('text-foreground-muted', isCompact && 'text-base', 'min-w-0 flex-1')}
+              >
+                <BreadcrumbList className={cn(isCompact ? 'text-base' : 'text-xs', 'min-w-0')}>
                   {breadcrumbs.map((item, index) => (
                     <Fragment key={item.label || `breadcrumb-${index}`}>
                       <BreadcrumbItem>
@@ -81,19 +83,19 @@ export const PageHeader = ({
                   {isCompact && title && (
                     <>
                       <BreadcrumbSeparator />
-                      <BreadcrumbItem>
-                        <BreadcrumbPageItem>{title}</BreadcrumbPageItem>
+                      <BreadcrumbItem className="min-w-0 flex-1">
+                        <BreadcrumbPageItem className="min-w-0">{title}</BreadcrumbPageItem>
                       </BreadcrumbItem>
                     </>
                   )}
                 </BreadcrumbList>
               </Breadcrumb>
             ) : isCompact ? (
-              title
+              <div className="min-w-0 flex-1">{title}</div>
             ) : null}
           </div>
           {isCompact && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {secondaryActions && (
                 <div className="flex items-center gap-2">{secondaryActions}</div>
               )}

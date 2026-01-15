@@ -16,11 +16,11 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
 
 **Inputs**
 
-| Field                   | Type     | Description                                                                                                                                                                                                                           |
-| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                 |
-| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                        |
-| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `anonymous`. |
+| Field                   | Type     | Description                                                                                                                                                                                                                                                                |
+| ----------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                                                      |
+| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                                                             |
+| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `oauth_provider/authorization_code`, `anonymous`. |
 
 <Tabs
   scrollable
@@ -45,7 +45,8 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
     "aal": "aal1",
     "amr": [ { "method": "anonymous", "timestamp": 1715686621 } ],
     "session_id": "4b938a09-5372-4177-a314-cfa292099ea2",
-    "is_anonymous": true
+    "is_anonymous": true,
+    "client_id": "oauth-client-id-if-oauth-flow"
   },
   "authentication_method": "anonymous"
 }
@@ -143,6 +144,10 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
         "is_anonymous": {
           "type": "boolean",
           "x-faker": "random.boolean"
+        },
+        "client_id": {
+          "type": "string",
+          "x-faker": "random.uuid"
         }
       },
       "required": [
@@ -175,6 +180,7 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
         "email/signup",
         "email_change",
         "token_refresh",
+        "oauth_provider/authorization_code",
         "anonymous"
       ]
     }

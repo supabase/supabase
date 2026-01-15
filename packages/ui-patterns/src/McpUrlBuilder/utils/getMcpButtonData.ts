@@ -17,8 +17,9 @@ export function getMcpButtonData({
     const deepLink = client.generateDeepLink(clientConfig)
     if (!deepLink) return null
 
+    // If the theme is dark, the button background will be light and vice-versa
     const imageSrc = `${basePath}/img/mcp-clients/${client.icon}${
-      theme === 'dark' ? '-dark' : ''
+      theme === 'light' ? '-dark' : ''
     }-icon.svg`
 
     return {

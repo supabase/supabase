@@ -15,7 +15,6 @@ import {
   type OrganizationMember,
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -45,14 +44,8 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
-  const { data: members } = useOrganizationMembersQuery({ slug })
-
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
-
-  // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
-  const allProjects = data?.projects ?? []
+  const { data: members } = useOrganizationMembersQuery({ slug })
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -87,7 +80,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   )
   const canRevokeInvite = canDeleteUserInvites && hasOrgRole
 
-  const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
+  const { mutate: deleteOrganizationMember, isPending: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
         toast.success(`Successfully removed ${member.primary_email}`)
@@ -95,7 +88,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: inviteMember, isLoading: isCreatingInvite } =
+  const { mutate: inviteMember, isPending: isCreatingInvite } =
     useOrganizationCreateInvitationMutation({
       onSuccess: () => {
         toast.success('Resent the invitation.')
@@ -105,7 +98,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
+  const { mutate: deleteInvitation, isPending: isDeletingInvite } =
     useOrganizationDeleteInvitationMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
@@ -128,11 +121,11 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       {
         onSuccess: () => {
           if (!member.primary_email) return toast.error('Email is required')
+
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
+
           if (projectScopedRole !== undefined) {
-            const projects = (projectScopedRole?.project_ids ?? [])
-              .map((id) => allProjects?.find((p) => p.id === id)?.ref)
-              .filter(Boolean) as string[]
+            const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
               email: member.primary_email,

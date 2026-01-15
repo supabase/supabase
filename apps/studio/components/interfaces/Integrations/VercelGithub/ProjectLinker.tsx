@@ -94,7 +94,7 @@ const ProjectLinker = ({
   )
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: orgProjects, isLoading: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
+  const { data: orgProjects, isPending: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
     slug,
   })
   const numProjects = orgProjects?.pages[0].pagination.count ?? 0
@@ -328,6 +328,7 @@ const ProjectLinker = ({
                   side="bottom"
                   align="center"
                   sameWidthAsTrigger
+                  portal
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />

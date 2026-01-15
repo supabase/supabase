@@ -11,7 +11,7 @@ interface CPUWarningsProps {
   severity?: 'warning' | 'critical' | null
 }
 
-const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => {
+export const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => {
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
@@ -62,5 +62,3 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
 
   return null
 }
-
-export default CPUWarnings

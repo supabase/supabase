@@ -10,7 +10,7 @@ interface Props {
   submitText?: string
 }
 
-const FormActions = ({
+export const FormActions = ({
   form,
   hasChanges = undefined,
   handleReset,
@@ -47,5 +47,3 @@ const FormActions = ({
     </div>
   )
 }
-
-export { FormActions }

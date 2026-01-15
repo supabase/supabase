@@ -23,7 +23,6 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  SidePanel,
   Switch,
 } from 'ui'
 import { z } from 'zod'
@@ -292,9 +291,9 @@ export const Page = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     afterLabel={
-                      <Badge variant={'destructive'} className="flex gap-1">
-                        <FileWarning size={14} strokeWidth={1.5} className="text-destructive-500" />
-                        Danger zone!
+                      <Badge variant="destructive" className="flex gap-1">
+                        <FileWarning size={12} strokeWidth={1.5} className="text-destructive-500" />
+                        Danger
                       </Badge>
                     }
                     label="Use consistent settings"

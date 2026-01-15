@@ -1,10 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
@@ -46,13 +46,11 @@ export const useEnumeratedTypesQuery = <TData = EnumeratedTypesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EnumeratedTypesData, EnumeratedTypesError, TData> = {}
+  }: UseCustomQueryOptions<EnumeratedTypesData, EnumeratedTypesError, TData> = {}
 ) =>
-  useQuery<EnumeratedTypesData, EnumeratedTypesError, TData>(
-    enumeratedTypesKeys.list(projectRef),
-    ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EnumeratedTypesData, EnumeratedTypesError, TData>({
+    queryKey: enumeratedTypesKeys.list(projectRef),
+    queryFn: ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

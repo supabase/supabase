@@ -3,7 +3,7 @@ import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -12,6 +12,7 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -26,8 +27,7 @@ import {
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { maybeShowUpgradePrompt } from './Logs.utils'
-import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
+import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
 
 /**
@@ -107,8 +107,6 @@ export const LogsPreviewer = ({
   EmptyState,
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
-  const useUniversalFilterBar = useFlag('universalFilterBar')
-
   const router = useRouter()
   const { db } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -206,6 +204,9 @@ export const LogsPreviewer = ({
     refresh()
   }
 
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
       setSearch(query || '')
@@ -213,8 +214,10 @@ export const LogsPreviewer = ({
     } else if (event === 'event-chart-bar-click') {
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', organization?.plan?.id)
-
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        from || '',
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
@@ -226,7 +229,10 @@ export const LogsPreviewer = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
@@ -284,13 +290,7 @@ export const LogsPreviewer = ({
 
   return (
     <div className="flex-1 flex flex-col h-full">
-      {useUniversalFilterBar ? (
-        // Experimental Universal Filter Bar
-        <PreviewFilterPanelWithUniversal {...filterPanelProps} />
-      ) : (
-        // Legacy Filter Panel
-        <PreviewFilterPanel {...filterPanelProps} />
-      )}
+      <PreviewFilterPanel {...filterPanelProps} />
       {children}
       <div
         className={

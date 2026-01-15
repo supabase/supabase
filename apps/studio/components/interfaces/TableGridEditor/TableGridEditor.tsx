@@ -16,6 +16,7 @@ import {
 } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
@@ -23,7 +24,7 @@ import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
-import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
+import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'
 
 export interface TableGridEditorProps {
@@ -38,6 +39,7 @@ export const TableGridEditor = ({
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
   const { setLastVisitedTable } = useDashboardHistory()
+  const { selectedSchema } = useQuerySchemaState()
 
   const tabs = useTabsStateSnapshot()
 
@@ -61,7 +63,9 @@ export const TableGridEditor = ({
 
   const onTableCreated = useCallback(
     (table: { id: number }) => {
-      router.push(`/project/${projectRef}/editor/${table.id}`)
+      router.push(
+        `/project/${projectRef}/editor/${table.id}${!!selectedSchema ? `?schema=${selectedSchema}` : ''}`
+      )
     },
     [projectRef, router]
   )

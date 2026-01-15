@@ -8,9 +8,13 @@ const MAX_PENDING_EVENTS = 20
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
+  uiHost?: string
 }
 
 class PostHogClient {
+  /** True after posthog.init() is called (prevents double-init) */
+  private initStarted = false
+  /** True after the `loaded` callback fires, meaning PostHog has fully bootstrapped */
   private initialized = false
   private pendingGroups: Record<string, string> = {}
   private pendingIdentification: { userId: string; properties?: Record<string, any> } | null = null
@@ -19,15 +23,20 @@ class PostHogClient {
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
 
   constructor(config: PostHogClientConfig = {}) {
+    const apiHost =
+      config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green'
+    const uiHost =
+      config.uiHost || process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com'
+
     this.config = {
       apiKey: config.apiKey || process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      apiHost:
-        config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green',
+      apiHost,
+      uiHost,
     }
   }
 
   init(hasConsent: boolean = true) {
-    if (this.initialized || typeof window === 'undefined' || !hasConsent) return
+    if (this.initStarted || typeof window === 'undefined' || !hasConsent) return
 
     if (!this.config.apiKey) {
       console.warn('PostHog API key not found. Skipping initialization.')
@@ -36,6 +45,7 @@ class PostHogClient {
 
     const config: Partial<PostHogConfig> = {
       api_host: this.config.apiHost,
+      ui_host: this.config.uiHost,
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
@@ -72,11 +82,13 @@ class PostHogClient {
           }
         })
         this.pendingEvents = []
+
+        this.initialized = true
       },
     }
 
+    this.initStarted = true
     posthog.init(this.config.apiKey, config)
-    this.initialized = true
   }
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
@@ -140,6 +152,35 @@ class PostHogClient {
       posthog.identify(userId, properties)
     } catch (error) {
       console.error('PostHog identify failed:', error)
+    }
+  }
+
+  reset() {
+    this.pendingIdentification = null
+    this.pendingGroups = {}
+    this.pendingEvents = []
+
+    if (!this.initStarted) return
+
+    try {
+      posthog.reset()
+    } catch (error) {
+      console.error('PostHog reset failed:', error)
+    }
+  }
+
+  /**
+   * Returns PostHog's distinct_id, which holds first-touch attribution data.
+   * Returns undefined until PostHog's `loaded` callback fires.
+   */
+  getDistinctId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.get_distinct_id()
+    } catch (error) {
+      console.error('PostHog getDistinctId failed:', error)
+      return undefined
     }
   }
 }

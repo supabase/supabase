@@ -7,7 +7,7 @@ import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref, functionSlug } = useParams()
-  const { data: selectedFunction, isLoading } = useEdgeFunctionQuery({
+  const { data: selectedFunction, isPending: isLoading } = useEdgeFunctionQuery({
     projectRef: ref,
     slug: functionSlug,
   })

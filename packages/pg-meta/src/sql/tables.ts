@@ -43,7 +43,7 @@ FROM
       join pg_class c on i.indrelid = c.oid
       join pg_namespace n on c.relnamespace = n.oid
       join pg_attribute a on a.attrelid = c.oid and a.attnum = any(i.indkey)
-	where
+    where
       i.indisprimary
     group by c.oid
   ) as pk

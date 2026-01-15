@@ -3,9 +3,8 @@ import * as Sentry from '@sentry/nextjs'
 import createClient from 'openapi-fetch'
 
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, getAccessToken } from 'common'
 import { API_URL } from 'lib/constants'
-import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
@@ -24,7 +23,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
   }
 }
 
-const client = createClient<paths>({
+export const client = createClient<paths>({
   fetch: fetchHandler,
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
@@ -105,9 +104,14 @@ client.use(
 
         // add code field to body
         body.code = response.status
+
         body.requestId = request.headers.get('X-Request-Id')
+
         const retryAfterHeader = response.headers.get('Retry-After')
         body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+
+        const requestUrl = new URL(request.url)
+        body.requestPathname = requestUrl.pathname
 
         return new Response(JSON.stringify(body), {
           headers: response.headers,
@@ -156,9 +160,13 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
       'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
     const retryAfter =
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
+    const requestPathname =
+      'requestPathname' in error && typeof error.requestPathname === 'string'
+        ? error.requestPathname
+        : undefined
 
     if (errorMessage) {
-      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
+      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter, requestPathname)
     }
   }
 

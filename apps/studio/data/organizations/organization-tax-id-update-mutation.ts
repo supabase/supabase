@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationTaxIdUpdateVariables = {
@@ -54,29 +54,31 @@ export const useOrganizationTaxIdUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationTaxIdUpdateData, ResponseError, OrganizationTaxIdUpdateVariables>,
+  UseCustomMutationOptions<
+    OrganizationTaxIdUpdateData,
+    ResponseError,
+    OrganizationTaxIdUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationTaxIdUpdateVariables>(
-    (vars) => updateOrganizationTaxId(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
+  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationTaxIdUpdateVariables>({
+    mutationFn: (vars) => updateOrganizationTaxId(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
 
-        // We already have the data, no need to refetch
-        queryClient.setQueryData(organizationKeys.taxId(slug), data.tax_id)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update tax id: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      // We already have the data, no need to refetch
+      queryClient.setQueryData(organizationKeys.taxId(slug), data.tax_id)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update tax id: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

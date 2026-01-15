@@ -34,9 +34,9 @@ export const BranchSelector = ({
   const [open, setOpen] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
 
-  // Filter out branches that are already ready for review and the main branch
+  // Filter out branches that are already ready for review or linked to a github branch
   const availableBranches = branches.filter(
-    (branch) => !branch.is_default && !branch.review_requested_at
+    (branch) => !branch.is_default && !branch.review_requested_at && !branch.git_branch
   )
 
   const handleBranchSelect = (branch: Branch) => {

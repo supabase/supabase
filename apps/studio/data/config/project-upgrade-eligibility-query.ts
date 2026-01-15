@@ -1,11 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { IS_PLATFORM } from 'common'
 import { get, handleError } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
@@ -36,20 +36,22 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData> = {}
+  }: UseCustomQueryOptions<
+    ProjectUpgradeEligibilityData,
+    ProjectUpgradeEligibilityError,
+    TData
+  > = {}
 ) => {
   const { data: project } = useProjectDetailQuery({ ref: projectRef })
-  return useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>(
-    configKeys.upgradeEligibility(projectRef),
-    ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
-    {
-      enabled:
-        enabled &&
-        project !== undefined &&
-        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-        typeof projectRef !== 'undefined' &&
-        IS_PLATFORM,
-      ...options,
-    }
-  )
+  return useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>({
+    queryKey: configKeys.upgradeEligibility(projectRef),
+    queryFn: ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
+    enabled:
+      enabled &&
+      project !== undefined &&
+      project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
+      typeof projectRef !== 'undefined' &&
+      IS_PLATFORM,
+    ...options,
+  })
 }

@@ -1,5 +1,4 @@
 import { GlobeAltIcon } from '@heroicons/react/outline'
-import { Check } from 'lucide-react'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
@@ -313,7 +312,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <SectionContainer className="!pb-0">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
-                  1,000+ Contributors building Supabase
+                  1,500+ Contributors building Supabase
                 </h2>
                 <p className="text-foreground-light text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many
@@ -471,7 +470,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
         <div className="flex items-center gap-4">
           <Badge>
             <GlobeAltIcon className="w-3 h-3" />
-            <span className="ml-1">{job.location}</span>
+            <span>{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>

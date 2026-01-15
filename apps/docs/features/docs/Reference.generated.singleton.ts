@@ -27,14 +27,19 @@ async function _typeSpecSingleton() {
   return typeSpec
 }
 
+function normalizeRefPath(path: string) {
+  return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
+}
+
 export async function getTypeSpec(ref: string) {
   const modules = await _typeSpecSingleton()
 
-  const delimiter = ref.indexOf('.')
-  const refMod = ref.substring(0, delimiter)
+  const normalizedRef = normalizeRefPath(ref)
+  const delimiter = normalizedRef.indexOf('.')
+  const refMod = normalizedRef.substring(0, delimiter)
 
   const mod = modules.find((mod) => mod.name === refMod)
-  return mod?.methods.get(ref)
+  return mod?.methods.get(normalizedRef)
 }
 
 let cliSpec: Json

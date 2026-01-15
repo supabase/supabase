@@ -9,6 +9,7 @@ export interface FormSchema {
   id?: string
   type: 'object'
   title: string
+  purpose?: string
   properties: {
     [x: string]: {
       title: string
@@ -31,5 +32,6 @@ export interface FormSchema {
       title?: string
       description?: string
     }
+    emailTemplateType?: 'authentication' | 'security'
   }
 }

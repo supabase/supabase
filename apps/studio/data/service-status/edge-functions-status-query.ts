@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type EdgeFunctionServiceStatusVariables = {
@@ -28,13 +28,15 @@ export const useEdgeFunctionServiceStatusQuery = <TData = EdgeFunctionServiceSta
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData> = {}
+  }: UseCustomQueryOptions<
+    EdgeFunctionServiceStatusData,
+    EdgeFunctionServiceStatusError,
+    TData
+  > = {}
 ) =>
-  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>(
-    serviceStatusKeys.edgeFunctions(projectRef),
-    ({ signal }) => getEdgeFunctionServiceStatus(signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>({
+    queryKey: serviceStatusKeys.edgeFunctions(projectRef),
+    queryFn: ({ signal }) => getEdgeFunctionServiceStatus(signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

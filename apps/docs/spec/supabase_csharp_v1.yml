@@ -869,7 +869,18 @@ functions:
           ```c#
           var channels = supabase.Realtime.Subscriptions;
           ```
-
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
+  # - id: analytics-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Analytics Buckets.
+  # - id: vector-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Vector Buckets.
   - id: list-buckets
     description: |
       Retrieves the details of all Storage buckets within an existing product.

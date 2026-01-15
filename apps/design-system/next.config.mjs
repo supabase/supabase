@@ -26,15 +26,26 @@ const nextConfig = {
     return [
       ...(BASE_PATH.length
         ? [
-            {
-              source: '/',
-              destination: BASE_PATH,
-              basePath: false,
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            destination: BASE_PATH,
+            basePath: false,
+            permanent: false,
+          },
+        ]
         : []),
     ]
+  },
+  // Turbopack configuration to handle .md files with raw-loader
+  // This mirrors the webpack configuration added by withContentlayer
+  // and ensures both bundlers can process content files properly
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
   },
 }
 

@@ -46,7 +46,7 @@ export interface ColumnField {
   table: string
   schema: string
   check: string | null
-  comment?: string
+  comment?: string | null
   format: string
   defaultValue: string | null
   foreignKey?: ExtendedPostgresRelationship

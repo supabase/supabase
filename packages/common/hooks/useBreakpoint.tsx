@@ -17,7 +17,7 @@ const twBreakpointMap = {
   sm: 639,
   md: 767,
   lg: 1023,
-  xl: 1027,
+  xl: 1279,
   '2xl': 1535,
 }
 

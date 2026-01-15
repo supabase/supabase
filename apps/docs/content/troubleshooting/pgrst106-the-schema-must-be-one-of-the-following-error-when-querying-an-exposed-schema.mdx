@@ -1,0 +1,25 @@
+---
+title = "PGRST106: \"The schema must be one of the following...\" error when querying an exposed schema"
+topics = [ "auth", "database" ]
+keywords = []
+[[errors]]
+code = "PGRST106"
+message = "The schema must be one of the following: public, ..."
+
+---
+
+You may encounter a `PGRST106` error, stating `{"code":"PGRST106","message":"The schema must be one of the following: public"}`, when attempting to query a schema via the PostgREST API that you've recently exposed.
+
+**Why This Happens:**
+This error occurs because the `authenticator` role's `pgrst.db_schemas` setting does not include the desired schema. This creates a conflict, as PostgREST relies on this setting to know which schemas it should expose.
+
+**How to Resolve This:**
+To fix this, you need to update the `pgrst.db_schemas` setting for the `authenticator` role. Connect to your database and execute one of the following SQL commands:
+
+- **To explicitly add your schema:**
+  If you want to add your specific schema (e.g., `your_schema_name`) alongside existing schemas (like `public`), use the following command. Remember to replace `your_schema_name` with your actual schema name and include all other necessary schemas already defined.
+  `ALTER ROLE authenticator SET pgrst.db_schemas = 'public, your_schema_name';`
+
+- **To reset to [dashboard configuration](/dashboard/project/_/settings/api):**
+  Alternatively, you can reset this setting to allow the Supabase dashboard's configuration to take effect automatically.
+  `ALTER ROLE authenticator RESET pgrst.db_schemas;`

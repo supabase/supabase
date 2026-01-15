@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMemberUpdateRoleVariables = {
@@ -41,7 +41,7 @@ export const useOrganizationMemberUpdateRoleMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberAssignData,
     ResponseError,
     OrganizationMemberUpdateRoleVariables
@@ -54,14 +54,15 @@ export const useOrganizationMemberUpdateRoleMutation = ({
     OrganizationMemberAssignData,
     ResponseError,
     OrganizationMemberUpdateRoleVariables
-  >((vars) => assignOrganizationMemberRole(vars), {
+  >({
+    mutationFn: (vars) => assignOrganizationMemberRole(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 
       if (!skipInvalidation) {
         await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-          queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
         ])
       }
 

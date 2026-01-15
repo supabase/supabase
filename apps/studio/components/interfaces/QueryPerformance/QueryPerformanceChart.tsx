@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import type { ChartDataPoint } from './WithMonitor/WithMonitor.utils'
+import { calculatePercentilesFromHistogram } from './WithMonitor/WithMonitor.utils'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
@@ -61,12 +62,38 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        const avgP95 = chartData.reduce((sum, d) => sum + d.p95_time, 0) / chartData.length
+        let trueP95: number = 0
+
+        if (parsedLogs && parsedLogs.length > 0) {
+          const bucketCount = parsedLogs[0]?.resp_calls?.length || 50
+          const combinedHistogram = new Array(bucketCount).fill(0)
+
+          parsedLogs.forEach((log) => {
+            if (log.resp_calls && Array.isArray(log.resp_calls)) {
+              log.resp_calls.forEach((count: number, index: number) => {
+                if (index < combinedHistogram.length) {
+                  combinedHistogram[index] += count
+                }
+              })
+            }
+          })
+
+          // [kemal]: this might need a revisit
+          const percentiles = calculatePercentilesFromHistogram(combinedHistogram)
+          trueP95 = percentiles.p95
+        } else {
+          // [kemal]: fallback to weighted average
+          const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
+          trueP95 =
+            totalCalls > 0
+              ? chartData.reduce((sum, d) => sum + d.p95_time * d.calls, 0) / totalCalls
+              : 0
+        }
 
         return [
           {
             label: 'Average p95',
-            value: avgP95 >= 100 ? `${(avgP95 / 1000).toFixed(2)}s` : `${Math.round(avgP95)}ms`,
+            value: `${Math.round(trueP95)}ms`,
           },
         ]
       }
@@ -308,7 +335,7 @@ export const QueryPerformanceChart = ({
         </TabsList_Shadcn_>
 
         <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-200 mt-0 h-inherit">
-          <div className="w-full flex items-center justify-center min-h-[320px]">
+          <div className="w-full flex items-center justify-center min-h-[282px]">
             {isLoading ? (
               <Loader2 size={20} className="animate-spin text-foreground-lighter" />
             ) : error ? (
@@ -348,7 +375,7 @@ export const QueryPerformanceChart = ({
                     tickFormatter: getYAxisFormatter,
                   }}
                   xAxisIsDate={true}
-                  className="mt-6"
+                  className="mt-2"
                 />
               </div>
             )}

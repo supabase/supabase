@@ -8,6 +8,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'functions-edge-first-column',
     key: 'functions-edge-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.status_code && !props.row.method) {
         return defaultRenderCell(props)

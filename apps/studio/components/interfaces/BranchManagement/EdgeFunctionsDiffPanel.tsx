@@ -14,7 +14,6 @@ import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
-  version: 0,
   files: EMPTY_ARR,
 }
 
@@ -95,8 +94,12 @@ const FunctionDiff = ({
 
   const language = useMemo(() => {
     if (!activeFileKey) return 'plaintext'
-    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) return 'typescript'
-    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) return 'javascript'
+    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) {
+      return 'typescript'
+    }
+    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) {
+      return 'javascript'
+    }
     if (activeFileKey.endsWith('.json')) return 'json'
     if (activeFileKey.endsWith('.sql')) return 'sql'
     return 'plaintext'

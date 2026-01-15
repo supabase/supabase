@@ -3,16 +3,16 @@ import {
   createLoader,
   createParser,
   createSerializer,
-  parseAsString,
   type inferParserType,
+  parseAsString,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 // End of third-party imports
 
 import {
-  DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
+  DocsSearchResultType as PageType,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
@@ -28,11 +28,13 @@ export const formatMessage = ({
   attachments = [],
   error,
   commit,
+  dashboardLogUrl,
 }: {
   message: string
   attachments?: string[]
   error: string | null | undefined
   commit: { commitSha: string; commitTime: string } | undefined
+  dashboardLogUrl?: string
 }) => {
   const errorString = error != null ? `\n\nError: ${error}` : ''
   const attachmentsString =
@@ -41,7 +43,8 @@ export const formatMessage = ({
     commit != undefined
       ? `\n\n---\nSupabase Studio version: SHA ${commit.commitSha} deployed at ${commit.commitTime === 'unknown' ? 'unknown time' : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
       : ''
-  return `${message}${errorString}${attachmentsString}${commitString}`
+  const logString = dashboardLogUrl ? `\nDashboard logs: ${dashboardLogUrl}` : ''
+  return `${message}${errorString}${attachmentsString}${commitString}${logString}`
 }
 
 export function getPageIcon(page: Page) {
@@ -119,8 +122,8 @@ const parseAsCategoryOption = createParser({
 })
 
 const supportFormUrlState = {
-  projectRef: parseAsString.withDefault(NO_PROJECT_MARKER),
-  orgSlug: parseAsString.withDefault(NO_ORG_MARKER),
+  projectRef: parseAsString.withDefault(''),
+  orgSlug: parseAsString.withDefault(''),
   category: parseAsCategoryOption,
   subject: parseAsString.withDefault(''),
   message: parseAsString.withDefault(''),
@@ -134,7 +137,7 @@ export const loadSupportFormInitialParams = createLoader(supportFormUrlState)
 
 const serializeSupportFormInitialParams = createSerializer(supportFormUrlState)
 
-export function createSupportFormUrl(initialParams: SupportFormUrlKeys) {
+export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>) {
   const serializedParams = serializeSupportFormInitialParams(initialParams)
   return `/support/new${serializedParams ?? ''}`
 }

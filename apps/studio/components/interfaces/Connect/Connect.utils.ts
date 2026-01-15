@@ -1,4 +1,4 @@
-import { ConnectionType } from './Connect.constants'
+import { ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 
 export function getProjectRef(url: string): string | null {
   const regex: RegExp = /https:\/\/([^\.]+)\./
@@ -42,4 +42,14 @@ export const getContentFilePath = ({
   }
 
   return ''
+}
+
+export function inferConnectTabFromParentKey(
+  parentKey: string | null
+): 'frameworks' | 'mobiles' | 'orms' | null {
+  if (!parentKey) return null
+  if (FRAMEWORKS.find((x: ConnectionType) => x.key === parentKey)) return 'frameworks'
+  if (MOBILES.find((x: ConnectionType) => x.key === parentKey)) return 'mobiles'
+  if (ORMS.find((x: ConnectionType) => x.key === parentKey)) return 'orms'
+  return null
 }

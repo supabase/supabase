@@ -54,7 +54,7 @@ interface GitHubDiscussionSuggestionProps {
 function GitHubDiscussionSuggestion({ subject }: GitHubDiscussionSuggestionProps) {
   return (
     <p className="flex items-center gap-x-1 text-foreground-lighter text-sm">
-      <span>Check our </span>
+      Check our
       <Link
         key="gh-discussions"
         href={`https://github.com/orgs/supabase/discussions?discussions_q=${subject}`}
@@ -65,7 +65,7 @@ function GitHubDiscussionSuggestion({ subject }: GitHubDiscussionSuggestionProps
         GitHub discussions
         <ExternalLink size={14} strokeWidth={2} />
       </Link>
-      <span> for a quick answer</span>
+      for a quick answer
     </p>
   )
 }

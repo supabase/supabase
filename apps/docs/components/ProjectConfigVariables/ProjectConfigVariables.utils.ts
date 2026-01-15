@@ -1,9 +1,8 @@
 import type { BranchesData } from '~/lib/fetch/branches'
 import type { OrganizationsData } from '~/lib/fetch/organizations'
-import type { ProjectsData } from '~/lib/fetch/projects'
+import { ProjectInfoInfinite } from '~/lib/fetch/projects-infinite'
 
 export type Org = OrganizationsData[number]
-export type Project = ProjectsData[number]
 export type Branch = BranchesData[number]
 
 export type Variable = 'url' | 'publishable' | 'anon' | 'sessionPooler'
@@ -39,11 +38,17 @@ type DeepReadonly<T> = {
   readonly [P in keyof T]: DeepReadonly<T[P]>
 }
 
-export function toDisplayNameOrgProject(org: DeepReadonly<Org>, project: DeepReadonly<Project>) {
+export function toDisplayNameOrgProject(
+  org: DeepReadonly<Org>,
+  project: DeepReadonly<ProjectInfoInfinite>
+) {
   return `${org.name} / ${project.name}`
 }
 
-export function toOrgProjectValue(org: DeepReadonly<Org>, project: DeepReadonly<Project>) {
+export function toOrgProjectValue(
+  org: DeepReadonly<Org>,
+  project: DeepReadonly<ProjectInfoInfinite>
+) {
   return escapeDoubleQuotes(
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     JSON.stringify([org.id, project.ref, removeDoubleQuotes(toDisplayNameOrgProject(org, project))])

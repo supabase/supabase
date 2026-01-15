@@ -8,11 +8,12 @@ import { Modal } from 'ui'
 interface DeleteSecretModalProps {
   selectedSecret: VaultSecret | undefined
   onClose: () => void
+  onDeleteStart?: (secretId: string) => void
 }
 
-const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
+const DeleteSecretModal = ({ selectedSecret, onClose, onDeleteStart }: DeleteSecretModalProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: deleteSecret, isLoading: isDeleting } = useVaultSecretDeleteMutation({
+  const { mutate: deleteSecret, isPending: isDeleting } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
       onClose()
@@ -26,6 +27,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
     if (!project) return console.error('Project is required')
     if (!selectedSecret) return
 
+    onDeleteStart?.(selectedSecret.id)
     deleteSecret({
       projectRef: project.ref,
       connectionString: project?.connectionString,

@@ -556,6 +556,28 @@ export function IconBranching({ width = 16, height = 16, className }: HomeMenuIc
   )
 }
 
+export function IconGitBranch({ width = 16, height = 16, className }: HomeMenuIcon) {
+  return (
+    <svg
+      className={className}
+      width={width}
+      height={height}
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4.5 2.25L4.5 11.25M15.75 4.5A2.25 2.25 0 1 1 11.25 4.5A2.25 2.25 0 1 1 15.75 4.5ZM6.75 13.5A2.25 2.25 0 1 1 2.25 13.5A2.25 2.25 0 1 1 6.75 13.5ZM13.5 6.75A6.75 6.75 0 0 1 6.75 13.5"
+        stroke="currentColor"
+        strokeMiterlimit="10"
+        strokeLinejoin="bevel"
+      />
+    </svg>
+  )
+}
+
 export function IconGitHub({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
@@ -684,7 +706,7 @@ export function IconUI({ width = 16, height = 16, className }: HomeMenuIcon) {
         height="14.72"
         rx="1.92"
         stroke="currentColor"
-        stroke-width="1.28"
+        strokeWidth="1.28"
       />
       <path
         d="M8.56519 4.69238H9.74564V8.94966C9.74564 9.41632 9.63534 9.82678 9.41473 10.181C9.19625 10.5353 8.88867 10.8121 8.492 11.0115C8.09534 11.2087 7.63185 11.3074 7.10155 11.3074C6.56913 11.3074 6.10458 11.2087 5.70791 11.0115C5.31125 10.8121 5.00367 10.5353 4.78519 10.181C4.5667 9.82678 4.45746 9.41632 4.45746 8.94966V4.69238H5.63791V8.85102C5.63791 9.12253 5.69731 9.36435 5.81609 9.57647C5.937 9.7886 6.1067 9.95511 6.32519 10.076C6.54367 10.1948 6.80246 10.2542 7.10155 10.2542C7.40064 10.2542 7.65943 10.1948 7.87791 10.076C8.09852 9.95511 8.26822 9.7886 8.387 9.57647C8.50579 9.36435 8.56519 9.12253 8.56519 8.85102V4.69238Z"

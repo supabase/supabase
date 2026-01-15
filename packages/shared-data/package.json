@@ -8,6 +8,9 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules"
   },
+  "devDependencies": {
+    "tsconfig": "workspace:"
+  },
   "author": "",
   "license": "MIT"
 }

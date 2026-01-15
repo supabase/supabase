@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { accessTokenKeys } from './keys'
 
 export type AccessTokenDeleteVariables = {
@@ -25,27 +25,25 @@ export const useAccessTokenDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>,
+  UseCustomMutationOptions<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>(
-    (vars) => deleteAccessToken(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(accessTokenKeys.list())
+  return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>({
+    mutationFn: (vars) => deleteAccessToken(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete access token: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete access token: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -50,7 +50,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          type="outline"
+          type="default"
           className="text-foreground-light"
           iconRight={<ChevronsUpDown strokeWidth={1} size={12} />}
         >

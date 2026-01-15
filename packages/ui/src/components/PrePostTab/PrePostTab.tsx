@@ -12,7 +12,7 @@ export const PrePostTab = forwardRef<HTMLDivElement, PropsWithChildren<PrePostTa
       <div ref={ref} {...props} className={cn('flex -space-x-px', className)}>
         {preTab && (
           <div className="border border-strong bg-surface-300 rounded-l-md px-3 flex items-center justify-center">
-            <span className="text-foreground-lighter text-xs font-mono">{preTab}</span>
+            <span className="text-foreground-light text-xs font-mono">{preTab}</span>
           </div>
         )}
         <div
@@ -27,7 +27,7 @@ export const PrePostTab = forwardRef<HTMLDivElement, PropsWithChildren<PrePostTa
         </div>
         {postTab && (
           <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-            <span className="text-foreground-lighter text-xs font-mono">{postTab}</span>
+            <span className="text-foreground-light text-xs font-mono">{postTab}</span>
           </div>
         )}
       </div>

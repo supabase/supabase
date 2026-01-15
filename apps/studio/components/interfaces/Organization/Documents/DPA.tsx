@@ -7,12 +7,12 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDpaRequestMutation } from 'data/documents/dpa-request-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import { Button } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export const DPA = () => {
   const { profile } = useProfile()
@@ -22,7 +22,7 @@ export const DPA = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: requestDpa, isLoading: isRequesting } = useDpaRequestMutation({
+  const { mutate: requestDpa, isPending: isRequesting } = useDpaRequestMutation({
     onSuccess: () => {
       toast.success('DPA request sent successfully')
       setIsOpen(false)

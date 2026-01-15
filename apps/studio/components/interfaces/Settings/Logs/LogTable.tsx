@@ -5,6 +5,7 @@ import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -12,8 +13,7 @@ import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
-import { toast } from 'sonner'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Button,
   ResizableHandle,

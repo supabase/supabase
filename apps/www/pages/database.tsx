@@ -11,11 +11,11 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Badge, Button, Image, Tabs } from 'ui'
 
 // data
-import MainProducts from '~/data/MainProducts'
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import MainProducts from '~/data/MainProducts'
 import HighlightsCards from '~/data/products/database/highlight-cards'
 
 import { ArrowUpRight, X } from 'lucide-react'
@@ -23,6 +23,7 @@ import { PRODUCT_NAMES } from 'shared-data/products'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductsNav from '~/components/Products/ProductsNav'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ETLVisual } from '~/data/products/database/etl-visual'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -255,6 +256,44 @@ function Database() {
           </div>
         </Swiper>
 
+        <SectionContainer>
+          <div className="grid grid-cols-12 lg:gap-16">
+            <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
+              <h2 className="h2">Supabase ETL</h2>
+              <p className="p text-lg">Stream your Postgres data to external systems.</p>
+              <p className="p">
+                Automatically replicate your database changes to external data warehouses and
+                analytics platforms in real-time, without pipelines.
+              </p>
+
+              <div className="my-8">
+                <FeatureColumn
+                  title="Offload analytics"
+                  text="Keep Postgres focused on transactional workloads."
+                />
+                <FeatureColumn
+                  title="Point and stream setup"
+                  text="Configure in the Supabase Dashboard."
+                />
+                <FeatureColumn title="Open table formats" text="For long term flexibility." />
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/docs/guides/database/etl">Read the docs</Link>
+                </Button>
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/supabase-etl">Read the blog post</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+              {/* TODO: Add ETL illustration */}
+              <ETLVisual className="w-full" />
+            </div>
+          </div>
+        </SectionContainer>
+
         <SectionContainer className="-mb-48">
           <APISection
             // @ts-ignore
@@ -268,9 +307,9 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1">
+                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1 xl:gap-2 xl:items-center">
                   <p className="text-foreground-light m-0">Available libraries:</p>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 xl:mb-0.5">
                     <Link href="/docs/reference/javascript/introduction" target="_blank">
                       <Badge>Javascript</Badge>
                     </Link>

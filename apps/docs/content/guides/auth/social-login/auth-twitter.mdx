@@ -1,31 +1,36 @@
 ---
 id: 'auth-twitter'
-title: 'Login with Twitter'
-description: 'Add Twitter OAuth to your Supabase project'
+title: 'Login with X / Twitter'
+description: 'Add X / Twitter OAuth to your Supabase project'
 ---
 
-To enable Twitter Auth for your project, you need to set up a Twitter OAuth application and add the application credentials in the Supabase Dashboard.
+To enable X / Twitter Auth for your project, you need to set up an X OAuth 2.0 application and add the application credentials in the Supabase Dashboard.
 
 ## Overview
 
-Setting up Twitter logins for your application consists of 3 parts:
+<Admonition type="caution">
 
-- Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
-- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](/dashboard).
+We recommend using the **X / Twitter (OAuth 2.0)** provider. The legacy **Twitter (OAuth 1.0a)**
+provider will be deprecated in future releases.
+
+</Admonition>
+
+Setting up X / Twitter logins for your application consists of 3 parts:
+
+- Create and configure an X Project and App on the [X Developer Dashboard](https://developer.x.com/en/portal/dashboard).
+- Add your X `API Key` and `API Secret Key` to your [Supabase Project](/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
-## Access your Twitter Developer account
+## Access your X developer account
 
-- Go to [developer.twitter.com](https://developer.twitter.com).
+- Go to [developer.x.com](https://developer.x.com).
 - Click on `Sign in` at the top right to log in.
-
-![Twitter Developer Portal.](/docs/img/guides/auth-twitter/twitter-portal.png)
 
 ## Find your callback URL
 
-<$Partial path="social_provider_setup.mdx" variables={{ "provider": "Twitter" }} />
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "X / Twitter (OAuth 2.0)" }} />
 
-## Create a Twitter OAuth app
+## Create an X OAuth app
 
 - Click `+ Create Project`.
   - Enter your project name, click `Next`.
@@ -46,25 +51,25 @@ Setting up Twitter logins for your application consists of 3 parts:
   - Enter your `Privacy policy URL`.
 - Click `Save`.
 
-## Enter your Twitter credentials into your Supabase project
+## Enter your X credentials into your Supabase project
 
-<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Twitter" }} />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "X / Twitter (OAuth 2.0)" }} />
 
-You can also configure the Twitter auth provider using the Management API:
+You can also configure the X / Twitter (OAuth 2.0) auth provider using the Management API:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
-# Configure Twitter auth provider
+# Configure X / Twitter (OAuth 2.0) auth provider
 curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "external_twitter_enabled": true,
-    "external_twitter_client_id": "your-twitter-api-key",
-    "external_twitter_secret": "your-twitter-api-secret-key"
+    "external_x_enabled": true,
+    "external_x_client_id": "your-x-api-key",
+    "external_x_secret": "your-x-api-secret-key"
   }'
 ```
 
@@ -81,7 +86,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
 <$Partial path="create_client_snippet.mdx" />
 
-When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `twitter` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `x` as the `provider`:
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -91,9 +96,9 @@ const supabase = createClient(
 )
 
 // ---cut---
-async function signInWithTwitter() {
+async function signInWithX() {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'twitter',
+    provider: 'x',
   })
 }
 ```
@@ -101,12 +106,12 @@ async function signInWithTwitter() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `twitter` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `x` as the `provider`:
 
 ```dart
-Future<void> signInWithTwitter() async {
+Future<void> signInWithX() async {
   await supabase.auth.signInWithOAuth(
-    OAuthProvider.twitter,
+    OAuthProvider.x,
     redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
     authScreenLaunchMode:
         kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
@@ -118,11 +123,11 @@ Future<void> signInWithTwitter() async {
 <$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Twitter` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `X` as the `Provider`:
 
 ```kotlin
-suspend fun signInWithTwitter() {
-	supabase.auth.signInWith(Twitter)
+suspend fun signInWithX() {
+	supabase.auth.signInWith(X)
 }
 ```
 
@@ -187,4 +192,4 @@ suspend fun signOut() {
 
 - [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard)
+- [X Developer Dashboard](https://developer.x.com/en/portal/dashboard)

@@ -8,14 +8,14 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from '@ui/components/shadcn/ui/dialog'
+import { SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button } from 'ui'
+import { useAwsManagedOrganizationCreateMutation } from '../../../../data/organizations/organization-create-mutation'
 import NewAwsMarketplaceOrgForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
   NewMarketplaceOrgForm,
 } from './NewAwsMarketplaceOrgForm'
-import { useAwsManagedOrganizationCreateMutation } from '../../../../data/organizations/organization-create-mutation'
-import { toast } from 'sonner'
-import { SubmitHandler } from 'react-hook-form'
 
 interface Props {
   buyerId: string
@@ -25,7 +25,7 @@ interface Props {
 }
 
 const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Props) => {
-  const { mutate: createOrganization, isLoading: isCreatingOrganization } =
+  const { mutate: createOrganization, isPending: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
       onSuccess: (org) => {
         //TODO(thomas): send tracking event?

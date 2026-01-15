@@ -1,9 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 
-import { InlineLink } from 'components/ui/InlineLink'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { toast } from 'sonner'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { SupportLink } from '../Support/SupportLink'
 
 interface SessionTimeoutModalProps {
   visible: boolean
@@ -60,9 +61,12 @@ export const SessionTimeoutModal = ({
         </ul>
         <p>
           If none of these steps work, please{' '}
-          <InlineLink href={`/support/new?subject=Session%20timed%20out`}>
+          <SupportLink
+            className={InlineLinkClassName}
+            queryParams={{ subject: 'Session timed out' }}
+          >
             Contact support
-          </InlineLink>
+          </SupportLink>
           .
         </p>
         <p>

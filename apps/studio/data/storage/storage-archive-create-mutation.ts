@@ -1,8 +1,8 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type StorageArchiveCreateVariables = {
@@ -27,27 +27,25 @@ export function useStorageArchiveCreateMutation({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>,
+  UseCustomMutationOptions<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>(
-    (vars) => createStorageArchive(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.archive(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create storage archive: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>({
+    mutationFn: (vars) => createStorageArchive(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: storageKeys.archive(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create storage archive: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

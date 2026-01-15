@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type EnablePhysicalBackupsVariables = {
   ref: string
@@ -23,23 +23,21 @@ export const useEnablePhysicalBackupsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>,
+  UseCustomMutationOptions<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>(
-    (vars) => enablePhysicalBackups(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to enable physical backups: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>({
+    mutationFn: (vars) => enablePhysicalBackups(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to enable physical backups: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -3,15 +3,17 @@ import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useFlag } from 'common'
+import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
+import { type OrganizationPlanID } from 'data/organizations/organization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
+import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
 import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
@@ -19,6 +21,7 @@ import {
 import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import { ClientLibraryInfo } from './ClientLibraryInfo'
+import { DashboardLogsToggle } from './DashboardLogsToggle'
 import { MessageField } from './MessageField'
 import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
@@ -33,13 +36,24 @@ import {
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
 } from './SupportForm.utils'
+import {
+  DASHBOARD_LOG_CATEGORIES,
+  getSanitizedBreadcrumbs,
+  uploadDashboardLog,
+} from './dashboard-logs'
 
-const useIsSimplifiedForm = (slug: string) => {
+const useIsSimplifiedForm = (slug: string, subscriptionPlanId?: OrganizationPlanID) => {
   const simplifiedSupportForm = useFlag('simplifiedSupportForm')
+
+  if (subscriptionPlanId === 'platform') {
+    return true
+  }
+
   if (typeof simplifiedSupportForm === 'string') {
     const slugs = (simplifiedSupportForm as string).split(',').map((x) => x.trim())
     return slugs.includes(slug)
   }
+
   return false
 }
 
@@ -55,15 +69,18 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
-  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug)
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
 
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
+  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug, subscriptionPlanId)
 
   const attachmentUpload = useAttachmentUpload()
+  const { mutateAsync: uploadDashboardLogFn } = useGenerateAttachmentURLsMutation()
+
+  const sanitizedLogSnapshot = useConstant(getSanitizedBreadcrumbs)
 
   const { data: commit } = useDeploymentCommitQuery({
     staleTime: 1000 * 60 * 10, // 10 minutes
@@ -86,9 +103,23 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     },
   })
 
-  const onSubmit: SubmitHandler<SupportFormValues> = async (values) => {
+  const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
     dispatch({ type: 'SUBMIT' })
-    const attachments = await attachmentUpload.createAttachments()
+
+    const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues
+    const attachDashboardLogs =
+      formAttachDashboardLogs && DASHBOARD_LOG_CATEGORIES.includes(values.category)
+
+    const [attachments, dashboardLogUrl] = await Promise.all([
+      attachmentUpload.createAttachments(),
+      attachDashboardLogs
+        ? uploadDashboardLog({
+            userId: profile?.gotrue_id,
+            sanitizedLogs: sanitizedLogSnapshot,
+            uploadDashboardLogFn,
+          })
+        : undefined,
+    ])
 
     const selectedLibrary = values.library
       ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
@@ -111,6 +142,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         attachments,
         error: initialError,
         commit,
+        dashboardLogUrl: dashboardLogUrl?.[0],
       }),
       verified: true,
       tags: ['dashboard-support-form'],
@@ -195,13 +227,21 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         <DialogSectionSeparator />
 
-        <div className="px-6 flex flex-col gap-y-8">
-          {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-            <>
-              <SupportAccessToggle form={form} />
-              <Separator />
-            </>
-          )}
+        {DASHBOARD_LOG_CATEGORIES.includes(category) && (
+          <>
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DialogSectionSeparator />
+          </>
+        )}
+
+        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+          <>
+            <SupportAccessToggle form={form} />
+            <DialogSectionSeparator />
+          </>
+        )}
+
+        <div className="px-6 pt-2">
           <SubmitButton
             isSubmitting={state.type === 'submitting'}
             userEmail={respondToEmail}

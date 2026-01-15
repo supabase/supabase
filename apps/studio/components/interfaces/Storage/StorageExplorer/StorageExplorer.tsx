@@ -1,11 +1,14 @@
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
+import useLatest from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
@@ -15,14 +18,11 @@ import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 
-interface StorageExplorerProps {
-  bucket: Bucket
-}
-
-export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
+export const StorageExplorer = () => {
   const { ref } = useParams()
   const storageExplorerRef = useRef(null)
   const {
+    projectRef,
     view,
     columns,
     selectedItems,
@@ -48,50 +48,69 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   } = useStorageExplorerStateSnapshot()
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { data: bucket } = useSelectedBucket()
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
+  const debouncedSearchString = useDebounce(itemSearchString, 500)
 
+  const fetchFoldersByPathRef = useLatest(fetchFoldersByPath)
+  const fetchFolderContentsRef = useLatest(fetchFolderContents)
+  const viewRef = useLatest(view)
+  const openedFoldersRef = useLatest(openedFolders)
   useEffect(() => {
-    const fetchContents = async () => {
-      if (view === STORAGE_VIEWS.LIST) {
-        const currentFolderIdx = openedFolders.length - 1
-        const currentFolder = openedFolders[currentFolderIdx]
+    const fetchContents = async (bucket: Bucket) => {
+      if (viewRef.current === STORAGE_VIEWS.LIST) {
+        const currentFolderIdx = openedFoldersRef.current.length - 1
+        const currentFolder = openedFoldersRef.current[currentFolderIdx]
 
         const folderId = !currentFolder ? bucket.id : currentFolder.id
         const folderName = !currentFolder ? bucket.name : currentFolder.name
         const index = !currentFolder ? -1 : currentFolderIdx
 
-        await fetchFolderContents({
+        await fetchFolderContentsRef.current({
           bucketId: bucket.id,
           folderId,
           folderName,
           index,
-          searchString: itemSearchString,
+          searchString: debouncedSearchString,
         })
-      } else if (view === STORAGE_VIEWS.COLUMNS) {
-        if (openedFolders.length > 0) {
-          const paths = openedFolders.map((folder) => folder.name)
-          fetchFoldersByPath({ paths, searchString: itemSearchString, showLoading: true })
+      } else if (viewRef.current === STORAGE_VIEWS.COLUMNS) {
+        if (openedFoldersRef.current.length > 0) {
+          const paths = openedFoldersRef.current.map((folder) => folder.name)
+          fetchFoldersByPathRef.current({
+            paths,
+            searchString: debouncedSearchString,
+            showLoading: true,
+          })
         } else {
-          await fetchFolderContents({
+          await fetchFolderContentsRef.current({
             bucketId: bucket.id,
             folderId: bucket.id,
             folderName: bucket.name,
             index: -1,
-            searchString: itemSearchString,
+            searchString: debouncedSearchString,
           })
         }
       }
     }
 
-    fetchContents()
-  }, [itemSearchString])
+    if (bucket && !!projectRef) fetchContents(bucket)
+  }, [
+    bucket,
+    projectRef,
+    debouncedSearchString,
+    viewRef,
+    openedFoldersRef,
+    fetchFolderContentsRef,
+    fetchFoldersByPathRef,
+  ])
 
+  const openBucketRef = useLatest(openBucket)
   useEffect(() => {
-    openBucket(bucket)
-  }, [bucket])
+    if (bucket && !!projectRef) openBucketRef.current(bucket)
+  }, [bucket, projectRef, openBucketRef])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */

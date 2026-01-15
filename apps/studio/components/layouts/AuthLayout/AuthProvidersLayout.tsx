@@ -21,7 +21,7 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
     ...(authenticationThirdPartyAuth
       ? [
           {
-            label: 'Third Party Auth',
+            label: 'Third-Party Auth',
             href: `/project/${ref}/auth/third-party`,
           },
         ]

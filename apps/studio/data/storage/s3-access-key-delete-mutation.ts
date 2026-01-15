@@ -1,8 +1,8 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
 
 type S3AccessKeyDeleteVariables = {
@@ -35,27 +35,27 @@ export function useS3AccessKeyDeleteMutation({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>,
+  UseCustomMutationOptions<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>(
-    (vars) => deleteS3AccessKeyCredential(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete S3 access key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>({
+    mutationFn: (vars) => deleteS3AccessKeyCredential(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({
+        queryKey: storageCredentialsKeys.credentials(projectRef),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete S3 access key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -94,7 +94,7 @@ A successful call to a web URL from the `http` extension returns a record with t
 select
   "status", "content"::jsonb
 from
-  http_get('https://jsonplaceholder.typicode.com/todos/1');
+  extensions.http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
 
 ### Simple `POST` example
@@ -103,7 +103,7 @@ from
 select
   "status", "content"::jsonb
 from
-  http_post(
+  extensions.http_post(
     'https://jsonplaceholder.typicode.com/posts',
     '{ "title": "foo", "body": "bar", "userId": 1 }',
     'application/json'
