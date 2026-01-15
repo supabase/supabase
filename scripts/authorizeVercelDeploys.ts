@@ -25,6 +25,7 @@ const jobInfoSchema = z.object({
     headInfo: z.object({
       sha: z.string().min(1, 'SHA is required'),
     }),
+    id: z.string().min(1, 'ID is required'),
     org: z.literal('supabase'),
     prId: z.number().int().positive('PR ID must be a positive integer'),
     repo: z.literal('supabase'),
@@ -91,9 +92,9 @@ async function authorizeVercelJob(jobInfo: JobInfo, vercelToken: string): Promis
 }
 
 async function main() {
-  const sha = process.env.GITHUB_SHA
+  const sha = process.env.HEAD_COMMIT_SHA
   if (!sha) {
-    throw new Error('GITHUB_SHA environment variable is required')
+    throw new Error('HEAD_COMMIT_SHA environment variable is required')
   }
 
   const vercelToken = process.env.VERCEL_TOKEN
