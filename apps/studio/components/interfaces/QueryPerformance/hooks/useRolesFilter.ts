@@ -34,7 +34,6 @@ export const useRolesFilter = () => {
       .map((role) => ({
         ...role,
         displayName: isKnownRole(role.name) ? ROLE_INFO[role.name].displayName : role.name,
-        description: isKnownRole(role.name) ? ROLE_INFO[role.name].description : undefined,
       }))
   }, [data])
 

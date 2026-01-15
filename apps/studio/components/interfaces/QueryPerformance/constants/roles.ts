@@ -29,21 +29,17 @@ export const SUPABASE_SYSTEM_ROLES: KnownRole[] = [
 
 export type RoleInfo = {
   displayName: string
-  description?: string
 }
 
 export const ROLE_INFO: Record<KnownRole, RoleInfo> = {
   anon: {
     displayName: 'Anonymous (Logged Out)',
-    description: 'Unauthenticated/public access - for users not logged in',
   },
   authenticated: {
     displayName: 'Authenticated (Logged In)',
-    description: 'Authenticated users - for users logged in to your app',
   },
   service_role: {
     displayName: 'Service Role',
-    description: 'Elevated server-side access - bypasses RLS policies',
   },
   postgres: {
     displayName: 'Postgres',
