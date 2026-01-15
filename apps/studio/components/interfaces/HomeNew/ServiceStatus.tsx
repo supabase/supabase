@@ -11,7 +11,7 @@ import { useProjectServiceStatusQuery } from 'data/service-status/service-status
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { InfoIcon, PopoverContent, PopoverTrigger, Popover, PopoverSeparator, cn } from 'ui'
+import { InfoIcon, PopoverContent, PopoverTrigger, Popover, cn } from 'ui'
 import {
   ProjectServiceStatus,
   StatusIcon,
