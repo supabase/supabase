@@ -303,6 +303,46 @@ to authenticated using (
 );
 ```
 
+## Securing RBAC Tables with RLS
+
+When using custom roles and permissions in your application, it's essential to secure the supporting tables using Row Level Security (RLS). Without it, unauthorized users might gain access to role or permission data, or your `authorize()` logic may break due to hidden rows.
+
+### Enable RLS on Role-Based Access Control Tables
+
+Make sure to enable RLS on your RBAC-related tables:
+
+```sql
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.role_permissions ENABLE ROW LEVEL SECURITY;
+```
+
+### Limit Role Visibility Per User
+The `auth.uid()` function can be used to restrict access to role information by ensuring users only read their own assigned roles. This is especially useful when exposing the user_roles table to clients or dashboards.
+
+For example, you can define a policy like this:
+
+```sql
+create policy "Allow user to read their own roles"
+on public.user_roles
+for select
+to authenticated
+using (
+  (select auth.uid()) = user_id
+);
+```
+
+If you are not exposing the role_permissions table to the frontend, you typically don't need a SELECT policy for it. However, you should still enable RLS to prevent unintended access via joins or helper functions.
+
+### Further Reference
+
+A complete example can be found in the [Slack Clone migration file](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone/supabase/migrations/20240214102356_init.sql), which demonstrates the full RBAC schema and a secure RLS setup.
+
+<Admonition type="caution"> 
+
+Forgetting to enable RLS on `user_roles` and `role_permissions` can introduce serious security vulnerabilities. Always verify your RLS coverage when implementing Role-Based Access Control. 
+
+</Admonition>
+
 ## Bypassing Row Level Security
 
 Supabase provides special "Service" keys, which can be used to bypass RLS. These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
