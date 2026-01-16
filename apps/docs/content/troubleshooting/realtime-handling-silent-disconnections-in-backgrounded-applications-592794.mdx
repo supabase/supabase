@@ -33,7 +33,7 @@ The core issue arises when your application, particularly if it's a web applicat
 
 When JavaScript timers are throttled, the Realtime client might be prevented from sending its heartbeats at the required intervals. If the server doesn't receive heartbeats for too long, it assumes the client has disconnected, and the WebSocket connection can **silently drop**. Your application then stops receiving events without any explicit error message, as the connection loss was not actively detected by the client's main thread. Network instability can also contribute to silent disconnections.
 
-## Solutions for Robust Realtime Connection management
+## Solutions for robust Realtime Connection management
 
 To ensure your Realtime subscriptions remain stable and resilient against silent disconnections, especially in backgrounded states, Supabase provides two recommended strategies that can be used together.
 
