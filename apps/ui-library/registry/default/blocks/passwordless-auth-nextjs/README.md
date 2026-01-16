@@ -63,6 +63,7 @@ export default function LoginPage() {
 ```
 
 **Props:**
+
 - `method?: 'magic-link' | 'otp'` - Authentication method (default: `'magic-link'`)
 
 **Examples:**

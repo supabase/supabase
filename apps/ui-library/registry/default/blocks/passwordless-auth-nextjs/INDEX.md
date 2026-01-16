@@ -7,6 +7,7 @@ This is a complete passwordless authentication solution for Next.js applications
 ## Documentation Files
 
 ### 📚 Getting Started
+
 - **[GETTING_STARTED.md](./GETTING_STARTED.md)** - Step-by-step setup guide (10 minutes)
   - Installation instructions
   - Configuration steps
@@ -14,6 +15,7 @@ This is a complete passwordless authentication solution for Next.js applications
   - Troubleshooting
 
 ### 📖 Main Documentation
+
 - **[README.md](./README.md)** - Complete feature documentation
   - Features overview
   - Components reference
@@ -22,6 +24,7 @@ This is a complete passwordless authentication solution for Next.js applications
   - Security considerations
 
 ### 🎯 Quick Reference
+
 - **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick lookup guide
   - Component comparison table
   - API reference
@@ -30,6 +33,7 @@ This is a complete passwordless authentication solution for Next.js applications
   - Error messages reference
 
 ### 📘 Usage Guide
+
 - **[USAGE.md](./USAGE.md)** - Detailed usage instructions
   - Authentication methods comparison
   - Component API
@@ -38,6 +42,7 @@ This is a complete passwordless authentication solution for Next.js applications
   - Migration guides
 
 ### 🔧 Integration Examples
+
 - **[INTEGRATION_EXAMPLES.md](./INTEGRATION_EXAMPLES.md)** - Real-world implementations
   - E-commerce application
   - SaaS dashboard
@@ -50,6 +55,7 @@ This is a complete passwordless authentication solution for Next.js applications
 ### Core Components
 
 #### 1. PasswordlessLoginForm (Recommended)
+
 A unified form supporting both Magic Link and OTP authentication via the `method` prop.
 
 **File**: `components/passwordless-login-form.tsx`
@@ -67,6 +73,7 @@ import { PasswordlessLoginForm } from '@/components/auth/passwordless-login-form
 ```
 
 #### 2. MagicLinkForm
+
 Standalone Magic Link authentication form.
 
 **File**: `components/magic-link-form.tsx`
@@ -78,6 +85,7 @@ import { MagicLinkForm } from '@/components/auth/magic-link-form'
 ```
 
 #### 3. OTPRequestForm
+
 Request a one-time password via email.
 
 **File**: `components/otp-request-form.tsx`
@@ -89,6 +97,7 @@ import { OTPRequestForm } from '@/components/auth/otp-request-form'
 ```
 
 #### 4. OTPVerifyForm
+
 Verify the OTP code received via email.
 
 **File**: `components/otp-verify-form.tsx`
@@ -117,33 +126,39 @@ import { OTPVerifyForm } from '@/components/auth/otp-verify-form'
 ## Key Features
 
 ✅ **Magic Link Authentication**
+
 - One-click email authentication
 - Automatic session creation
 - Configurable redirect URLs
 
 ✅ **OTP Authentication**
+
 - 6-digit code verification
 - Resend functionality
 - Auto-format input
 
 ✅ **Unified Form**
+
 - Prop-based method selection
 - Single integration point
 - Consistent UI/UX
 
 ✅ **Security**
+
 - Rate limiting
 - Token expiration
 - HTTPS enforcement
 - Secure session management
 
 ✅ **User Experience**
+
 - Clear error messages
 - Loading states
 - Success confirmations
 - Responsive design
 
 ✅ **TypeScript**
+
 - Full type safety
 - IntelliSense support
 - Type definitions included
@@ -151,22 +166,26 @@ import { OTPVerifyForm } from '@/components/auth/otp-verify-form'
 ## Quick Start
 
 ### 1. Install Dependencies
+
 ```bash
 npm install @supabase/supabase-js @supabase/ssr
 ```
 
 ### 2. Set Environment Variables
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ### 3. Configure Supabase
+
 - Add redirect URLs in Dashboard
 - Configure email template
 - Enable email authentication
 
 ### 4. Add Component
+
 ```tsx
 import { PasswordlessLoginForm } from '@/components/auth/passwordless-login-form'
 
@@ -223,53 +242,57 @@ Do you need passwordless auth?
 
 ## Common Use Cases
 
-| Use Case | Recommended Component | Documentation |
-|----------|----------------------|---------------|
-| Simple login | `PasswordlessLoginForm` | GETTING_STARTED.md |
-| E-commerce | `MagicLinkForm` | INTEGRATION_EXAMPLES.md |
-| Mobile app | `OTPRequestForm` + `OTPVerifyForm` | USAGE.md |
-| SaaS platform | `PasswordlessLoginForm` | INTEGRATION_EXAMPLES.md |
-| Blog comments | `MagicLinkForm` | INTEGRATION_EXAMPLES.md |
-| Admin panel | `OTPRequestForm` + `OTPVerifyForm` | USAGE.md |
+| Use Case      | Recommended Component              | Documentation           |
+| ------------- | ---------------------------------- | ----------------------- |
+| Simple login  | `PasswordlessLoginForm`            | GETTING_STARTED.md      |
+| E-commerce    | `MagicLinkForm`                    | INTEGRATION_EXAMPLES.md |
+| Mobile app    | `OTPRequestForm` + `OTPVerifyForm` | USAGE.md                |
+| SaaS platform | `PasswordlessLoginForm`            | INTEGRATION_EXAMPLES.md |
+| Blog comments | `MagicLinkForm`                    | INTEGRATION_EXAMPLES.md |
+| Admin panel   | `OTPRequestForm` + `OTPVerifyForm` | USAGE.md                |
 
 ## Configuration Matrix
 
-| Feature | MagicLinkForm | OTPRequestForm + OTPVerifyForm | PasswordlessLoginForm |
-|---------|---------------|--------------------------------|----------------------|
-| One-click login | ✅ | ❌ | ✅ (with `method="magic-link"`) |
-| Code entry | ❌ | ✅ | ✅ (with `method="otp"`) |
-| Method selection | Fixed | Fixed | Via prop |
-| Email template changes | Optional | Required | Depends on method |
-| Pages needed | 1 | 2 | 1 |
-| Complexity | Low | Medium | Low |
+| Feature                | MagicLinkForm | OTPRequestForm + OTPVerifyForm | PasswordlessLoginForm           |
+| ---------------------- | ------------- | ------------------------------ | ------------------------------- |
+| One-click login        | ✅            | ❌                             | ✅ (with `method="magic-link"`) |
+| Code entry             | ❌            | ✅                             | ✅ (with `method="otp"`)        |
+| Method selection       | Fixed         | Fixed                          | Via prop                        |
+| Email template changes | Optional      | Required                       | Depends on method               |
+| Pages needed           | 1             | 2                              | 1                               |
+| Complexity             | Low           | Medium                         | Low                             |
 
 ## Support
 
 ### Documentation
+
 - Start with **GETTING_STARTED.md** for setup
 - Use **QUICK_REFERENCE.md** for quick lookups
 - Read **USAGE.md** for detailed usage
 - Check **INTEGRATION_EXAMPLES.md** for real-world patterns
 
 ### External Resources
+
 - [Supabase Auth Docs](https://supabase.com/docs/guides/auth)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Supabase Discord](https://discord.supabase.com)
 
 ### Troubleshooting
+
 See the Troubleshooting sections in:
+
 - GETTING_STARTED.md (setup issues)
 - USAGE.md (usage issues)
 - QUICK_REFERENCE.md (error messages)
 
 ## Version Compatibility
 
-| Package | Version |
-|---------|---------|
-| Next.js | 13.x, 14.x, 15.x |
-| React | 18.x |
-| @supabase/supabase-js | 2.x |
-| @supabase/ssr | 0.x |
+| Package               | Version          |
+| --------------------- | ---------------- |
+| Next.js               | 13.x, 14.x, 15.x |
+| React                 | 18.x             |
+| @supabase/supabase-js | 2.x              |
+| @supabase/ssr         | 0.x              |
 
 ## License
 

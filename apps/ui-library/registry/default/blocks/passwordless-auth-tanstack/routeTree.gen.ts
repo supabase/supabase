@@ -172,14 +172,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/auth/error'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | ''
-    | '/passwordless'
-    | '/verify-otp'
-    | '/protected'
-    | '/auth/confirm'
-    | '/auth/error'
+  to: '/' | '' | '/passwordless' | '/verify-otp' | '/protected' | '/auth/confirm' | '/auth/error'
   id:
     | '__root__'
     | '/'
