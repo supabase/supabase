@@ -37,7 +37,7 @@ When JavaScript timers are throttled, the Realtime client might be prevented fro
 
 To ensure your Realtime subscriptions remain stable and resilient against silent disconnections, especially in backgrounded states, Supabase provides two recommended strategies that can be used together.
 
-### Step 1: Implement `heartbeatCallback` for Explicit Reconnection
+### Step 1: Implement `heartbeatCallback` for explicit Reconnection
 
 The `heartbeatCallback` option allows you to actively monitor the status of your Realtime connection and programmatically trigger a reconnection if a disconnection is detected.
 
