@@ -1,14 +1,15 @@
 import { cn } from 'ui'
+import styleHandler from 'ui/src/lib/theme/styleHandler'
 
-export default function InputIconContainer({ icon, className }: any) {
-  return (
-    <div
-      className={cn(
-        'absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-foreground-light',
-        className
-      )}
-    >
-      {icon}
-    </div>
-  )
+export default function InputIconContainer({
+  icon,
+  className,
+  size,
+}: {
+  icon: React.ReactNode
+  className?: string
+  size: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | null
+}) {
+  const __styles = styleHandler('inputIconContainer')
+  return <div className={cn(__styles.base, __styles.size[size ?? 'small'], className)}>{icon}</div>
 }

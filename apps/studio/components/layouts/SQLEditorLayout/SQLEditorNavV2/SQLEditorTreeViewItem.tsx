@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -24,7 +25,6 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -126,7 +126,7 @@ export const SQLEditorTreeViewItem = ({
     isFetchingNextPage: isFetchingNextPageInFolder,
     hasNextPage: hasNextPageInFolder,
     fetchNextPage: fetchNestPageInFolder,
-    isPreviousData,
+    isPlaceholderData,
     isFetching,
   } = useSQLSnippetFolderContentsQuery(
     {
@@ -137,7 +137,7 @@ export const SQLEditorTreeViewItem = ({
     },
     {
       enabled: isEnabled,
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   useEffect(() => {
@@ -157,11 +157,11 @@ export const SQLEditorTreeViewItem = ({
   useEffect(() => {
     if (isEnabled) {
       onFolderContentsChangeRef.current?.({
-        isLoading: isLoading || (isPreviousData && isFetching),
+        isLoading: isLoading || (isPlaceholderData && isFetching),
         snippets: data?.pages.flatMap((page) => page.contents ?? []),
       })
     }
-  }, [data?.pages, isFetching, isLoading, isPreviousData, isEnabled])
+  }, [data?.pages, isFetching, isLoading, isPlaceholderData, isEnabled])
 
   const isInFolder = parentId !== undefined
 
@@ -203,7 +203,6 @@ export const SQLEditorTreeViewItem = ({
     }
 
     const snippetCopy = createSqlSnippetSkeletonV2({
-      id: uuidv4(),
       name: `${snippet.name} (Duplicate)`,
       sql,
       owner_id: profile?.id,
@@ -353,16 +352,19 @@ export const SQLEditorTreeViewItem = ({
                   Move query
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectShare !== undefined && !isSharedSnippet && canCreateSQLSnippet && (
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onSelect={() => onSelectShare()}
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <Share size={14} />
-                  Share query with team
-                </ContextMenuItem_Shadcn_>
-              )}
+              {onSelectShare !== undefined &&
+                !isSharedSnippet &&
+                canCreateSQLSnippet &&
+                IS_PLATFORM && (
+                  <ContextMenuItem_Shadcn_
+                    className="gap-x-2"
+                    onSelect={() => onSelectShare()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <Share size={14} />
+                    Share query with team
+                  </ContextMenuItem_Shadcn_>
+                )}
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
@@ -383,19 +385,21 @@ export const SQLEditorTreeViewItem = ({
                   Duplicate query
                 </ContextMenuItem_Shadcn_>
               )}
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onSelect={() => onToggleFavorite()}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <Heart
-                  size={14}
-                  className={cn(
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-                  )}
-                />
-                {isFavorite ? 'Remove from' : 'Add to'} favorites
-              </ContextMenuItem_Shadcn_>
+              {IS_PLATFORM && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onToggleFavorite()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Heart
+                    size={14}
+                    className={cn(
+                      isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    )}
+                  />
+                  {isFavorite ? 'Remove from' : 'Add to'} favorites
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"

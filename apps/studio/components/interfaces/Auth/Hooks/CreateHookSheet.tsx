@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { X } from 'lucide-react'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -28,16 +26,15 @@ import {
   RadioGroupStackedItem,
   Separator,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 
@@ -269,28 +266,21 @@ export const CreateHookSheet = ({
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authConfig, title, visible, definition])
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent size="lg" showClose={false} className="flex flex-col gap-0">
+      <SheetContent
+        aria-describedby={undefined}
+        size="lg"
+        showClose={false}
+        className="flex flex-col gap-0"
+      >
         <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
-          <div className="flex flex-row gap-3 items-center">
-            <SheetClose
-              className={cn(
-                'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                'transition'
-              )}
-            >
-              <X className="h-3 w-3" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-            <SheetTitle className="truncate">
-              {isCreating ? `Add ${title}` : `Update ${title}`}
-            </SheetTitle>
-          </div>
+          <SheetTitle className="truncate">
+            {isCreating ? `Add ${title}` : `Update ${title}`}
+          </SheetTitle>
           <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
@@ -459,11 +449,17 @@ export const CreateHookSheet = ({
                       <FormItemLayout
                         label="Secret"
                         description={
-                          <ReactMarkdown>
-                            It should be a base64 encoded hook secret with a prefix `v1,whsec_`.
-                            `v1` denotes the signature version, and `whsec_` signifies a symmetric
-                            secret.
-                          </ReactMarkdown>
+                          <div className="flex items-center gap-x-2">
+                            <p>
+                              Should be a base64 encoded hook secret with a prefix{' '}
+                              <code className="text-code-inline">v1,whsec_</code>.
+                            </p>
+                            <InfoTooltip side="bottom" className="w-60 text-center">
+                              <code className="text-code-inline">v1</code> denotes the signature
+                              version and <code className="text-code-inline">whsec_</code> signifies
+                              a symmetric secret.
+                            </InfoTooltip>
+                          </div>
                         }
                       >
                         <FormControl_Shadcn_>
@@ -472,7 +468,7 @@ export const CreateHookSheet = ({
                             <Button
                               type="default"
                               size="small"
-                              className="rounded-l-none"
+                              className="rounded-l-none text-xs"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
                                 form.setValue('httpsValues.secret', authHookSecret)

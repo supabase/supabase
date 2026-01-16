@@ -266,7 +266,7 @@ export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   const isPlatform = selectedPlatform === 'hosted'
@@ -325,7 +325,7 @@ export function McpConfigPanel() {
           basePath="/docs"
           className="mt-6"
           projectRef={project?.ref}
-          theme={theme as 'light' | 'dark'}
+          theme={resolvedTheme as 'light' | 'dark'}
           isPlatform={isPlatform}
           onCopyCallback={handleCopy}
           onInstallCallback={handleInstall}

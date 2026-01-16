@@ -1,9 +1,10 @@
-import { Button, Card, cn } from 'ui'
-import Link from 'next/link'
-import { AnimatedLogos } from './AnimatedLogos'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { VoteLink } from './VoteLink'
 import { IS_PLATFORM } from 'common'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { Button, Card, cn } from 'ui'
+import { AnimatedLogos } from './AnimatedLogos'
+import { VoteLink } from './VoteLink'
 
 export const LogDrainsEmpty = () => {
   const items = [
@@ -13,7 +14,7 @@ export const LogDrainsEmpty = () => {
       description:
         'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $60 per month.',
       label: 'See our pricing',
-      link: 'https://supabase.com/docs/guides/platform/manage-your-usage/log-drains',
+      link: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
     },
     {
       step: 2,
@@ -21,7 +22,7 @@ export const LogDrainsEmpty = () => {
       description:
         'We offer support for multiple destinations including Datadog, Loki, Sentry or a custom endpoint.',
       label: 'Read our documentation',
-      link: 'https://supabase.com/docs/guides/telemetry/log-drains',
+      link: `${DOCS_URL}/guides/telemetry/log-drains`,
     },
   ].filter((item) => IS_PLATFORM || item.title !== 'Pricing')
 
@@ -35,9 +36,11 @@ export const LogDrainsEmpty = () => {
             <p className="text-foreground-light mb-6">
               Upgrade to a Team or Enterprise Plan to send your logs to your preferred platform
             </p>
-            <UpgradePlanButton type="primary" plan="Team" source="log-drains-empty-state">
-              Upgrade plan
-            </UpgradePlanButton>
+            <UpgradePlanButton
+              plan="Team"
+              source="log-drains-empty-state"
+              featureProposition="use Log Drains"
+            />
           </div>
           <Card
             className={cn('grid grid-cols-1 bg divide-x mb-8', IS_PLATFORM && '@xl:grid-cols-2')}

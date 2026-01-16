@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,7 +13,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -36,6 +36,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
+import Link from 'next/link'
 
 export const Connect = () => {
   const router = useRouter()
@@ -483,15 +484,35 @@ export const Connect = () => {
                   selectedFrameworkOrTool={selectedFrameworkOrTool}
                   className="rounded-b-none"
                 />
-                <Panel.Notice
-                  className="border border-t-0 rounded-lg rounded-t-none"
-                  title="New API keys coming 2025"
-                  description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
-`}
-                  href="https://github.com/orgs/supabase/discussions/29260"
-                  buttonText="Read the announcement"
-                />
+                {IS_PLATFORM && (
+                  <Panel.Notice
+                    className="border border-t-0 rounded-lg rounded-t-none"
+                    badgeLabel="Changelog"
+                    title="New publishable and secret API keys"
+                    description={
+                      <>
+                        <p>
+                          View your publishable and secret API keys from the project{' '}
+                          <Link href={`/project/${projectRef}/settings/api-keys`}>
+                            API settings page
+                          </Link>
+                        </p>
+                        <p>
+                          To learn more about the new API keys, read the{' '}
+                          <a
+                            href="https://supabase.com/docs/guides/api/api-keys"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            documentation
+                          </a>
+                        </p>
+                      </>
+                    }
+                    href={`${BASE_PATH}/project/${projectRef}/settings/api-keys`}
+                    buttonText="View API keys"
+                  />
+                )}
               </TabsContent_Shadcn_>
             )
           })}

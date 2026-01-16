@@ -1,0 +1,50 @@
+---
+title: Forms
+description: Common form patterns used in Studio settings pages and side panels.
+---
+
+Forms in Supabase Studio should follow consistent patterns to ensure a cohesive user experience across settings pages and side panels. This guide covers the most common form patterns and field types.
+
+## Page Layout
+
+Forms in page layouts typically use `PageSection` components with `Card` containers. Fields use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment.
+
+<ComponentPreview
+  name="form-patterns-pagelayout"
+  description="Complete form example with all field types in a PageLayout pattern"
+  peekCode
+  wide
+/>
+
+## Side Panel
+
+Forms in side panels (Sheets) use `FormItemLayout` with `layout="horizontal"` on wider panels and `layout="vertical"` on panels with a size of `sm` or below. The form is typically wrapped in a `Sheet` component.
+
+<ComponentPreview
+  name="form-patterns-sidepanel"
+  description="Complete form example with all field types in a SidePanel/Sheet pattern"
+  peekCode
+  wide
+/>
+
+## Best Practices
+
+1. **Always use FormItemLayout**: Use `FormItemLayout` instead of manually composing `FormItem`, `FormLabel`, `FormMessage`, and `FormDescription`.
+
+2. **Layout selection**:
+
+   - Use `layout="flex-row-reverse"` for page layouts (horizontal alignment)
+   - Use `layout="horizontal"` for side panels with more width
+   - Use `layout="vertical"` for side panels with limited width
+
+3. **Wrap inputs in FormControl*Shadcn***: Always wrap form inputs with `FormControl_Shadcn_` to ensure proper form integration.
+
+4. **Use Cards for grouping**: Wrap form sections in `Card` components with `CardContent` and `CardFooter` for actions.
+
+5. **Handle dirty state**: Show cancel buttons and disable save buttons based on `form.formState.isDirty`.
+
+6. **Error handling**: Always use mutations with `onSuccess` and `onError` callbacks that show toast notifications.
+
+7. **Loading states**: Show loading states on submit buttons using the `loading` prop.
+
+8. **Form IDs**: When submit buttons are outside the form, use a form ID and reference it with the `form` prop on the button.

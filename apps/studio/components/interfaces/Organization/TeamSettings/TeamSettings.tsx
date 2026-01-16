@@ -40,7 +40,7 @@ export const TeamSettings = () => {
             <Input
               size="tiny"
               autoComplete="off"
-              icon={<Search size={12} />}
+              icon={<Search />}
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
               name="email"
@@ -56,7 +56,6 @@ export const TeamSettings = () => {
           {hasProjectScopedRoles && totalCount > threshold && (
             <Admonition
               type="warning"
-              className="mb-0"
               title="This page may not render properly due to the number of projects your account has access to"
               description="We're actively looking into optimizing this page and will make things available as soon as we can!"
             />

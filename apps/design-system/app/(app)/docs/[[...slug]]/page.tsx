@@ -4,7 +4,7 @@ import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
 import { getTableOfContents } from '@/lib/toc'
-import { absoluteUrl, cn } from '@/lib/utils'
+import { absoluteUrl } from '@/lib/utils'
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 import { allDocs } from 'contentlayer/generated'
@@ -83,15 +83,15 @@ export default async function DocPage(props: DocPageProps) {
   const toc = await getTableOfContents(doc.body.raw)
 
   return (
-    <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] pr-6 lg:py-8">
-      <div className="mx-auto w-full min-w-0 max-w-4xl">
+    <div className="relative xl:grid xl:grid-cols-[1fr_160px] gap-4 px-6 py-6 lg:py-8">
+      <div className="mx-auto w-full min-w-0 max-w-4xl flex-1">
         <div className="mb-4 flex items-center space-x-1 text-sm text-foreground-muted">
           <div className="overflow-hidden text-ellipsis whitespace-nowrap">Docs</div>
           <ChevronRight className="h-4 w-4 text-foreground-muted" />
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
         <div className="space-y-2 mb-5">
-          <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
+          <h1 className="scroll-m-20 text-4xl tracking-tight">{doc.title}</h1>
           {doc.description && (
             <p className="text-lg text-foreground-light">
               <Balancer>{doc.description}</Balancer>
@@ -107,15 +107,15 @@ export default async function DocPage(props: DocPageProps) {
       </div>
       {doc.toc && (
         <div className="hidden text-sm xl:block">
-          <div className="sticky top-16 -mt-10 pt-4">
+          <div className="sticky top-8 -mt-10 pt-8">
             <ScrollArea className="pb-10">
-              <div className="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] py-12">
+              <div className="h-[calc(100vh-3.5rem)] py-14">
                 <DashboardTableOfContents toc={toc} />
               </div>
             </ScrollArea>
           </div>
         </div>
       )}
-    </main>
+    </div>
   )
 }

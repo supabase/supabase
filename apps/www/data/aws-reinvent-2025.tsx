@@ -4,6 +4,7 @@ import { Image } from 'ui'
 import dynamic from 'next/dynamic'
 import MainProducts from './MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -53,6 +54,7 @@ const data = {
     metaTitle: 'Supabase at AWS re:Invent 2025 | December 1-4, Las Vegas',
     metaDescription:
       'Meet Supabase at AWS re:Invent 2025. Visit us at Booth #1857, join our exclusive events, and learn how to build in a weekend and scale to millions.',
+    ogImage: `${SITE_ORIGIN}/images/og/re_invent.png`,
   },
   heroSection: {
     id: 'hero',

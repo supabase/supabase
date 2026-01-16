@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
@@ -49,7 +50,7 @@ export const HomePageActions = ({
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   return (
@@ -57,9 +58,9 @@ export const HomePageActions = ({
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"
-          icon={<Search size={12} />}
+          icon={<Search />}
           size="tiny"
-          className="w-32 md:w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[

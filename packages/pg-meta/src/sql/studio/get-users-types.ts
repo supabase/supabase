@@ -1,1 +1,1 @@
-export type OptimizedSearchColumns = 'id' | 'email' | 'phone'
+export type OptimizedSearchColumns = 'id' | 'email' | 'phone' | 'name'

@@ -6,7 +6,7 @@ import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reac
 import 'reactflow/dist/style.css'
 
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Card, CardContent } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -157,7 +157,7 @@ const ReplicaNode = ({
       <div className="flex items-start justify-between p-3" style={{ width: NODE_WIDTH / 2 - 10 }}>
         <div className="flex gap-x-3">
           <div className="flex flex-col gap-y-0.5">
-            <p className="">{data.label}</p>
+            <p>{data.label}</p>
             <p className="flex items-center gap-x-1">
               <span className="text-sm text-foreground-light">{data.details}</span>
             </p>
@@ -196,20 +196,22 @@ const BlankNode = () => {
 
 const CTANode = ({ projectRef }: { projectRef: string }) => {
   return (
-    <Card className="w-[500px] p-6">
+    <Card className="w-[570px] p-6">
       <CardContent>
-        <div className="flex items-center gap-x-2 justify-between mb-2">
-          <h2 className="text-lg">Replicate data to destinations in real-time</h2>
-          <Badge variant="warning">Early Access</Badge>
-        </div>
+        <h2 className="text-lg mb-2">Stream database changes to external destinations</h2>
+        <p className="text-foreground-light mb-2">
+          Automatically replicate your data to external data warehouses and analytics platforms in
+          real-time. No manual exports, no lag.
+        </p>
         <p className="text-foreground-light">
-          Replicate database changes to multiple destinations - no manual exports, no lag. Limited
-          rollout for external destinations has begun, read replicas available now.
+          We are currently in <span className="text-foreground">private alpha</span> and slowly
+          onboarding new customers to ensure stable data pipelines. Request access below to join the
+          waitlist. Read replicas are available now.
         </p>
         <div className="flex items-center gap-x-2 mt-6">
           <Button asChild type="secondary" iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}>
             <Link href="https://forms.supabase.com/pg_replicate" target="_blank" rel="noreferrer">
-              Request early access
+              Request alpha access
             </Link>
           </Button>
           <Button asChild type="default" iconRight={<ArrowRight size={16} strokeWidth={1.5} />}>

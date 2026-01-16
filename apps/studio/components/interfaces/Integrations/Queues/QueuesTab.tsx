@@ -6,11 +6,11 @@ import DataGrid, { Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, LoadingLine } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
 
@@ -30,7 +30,7 @@ export const QueuesTab = () => {
   const {
     data: queues,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isRefetching,
     refetch,
@@ -63,7 +63,7 @@ export const QueuesTab = () => {
               size="tiny"
               className="w-52"
               placeholder="Search for a queue"
-              icon={<Search size={14} />}
+              icon={<Search />}
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {

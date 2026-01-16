@@ -21,7 +21,7 @@ export const getStatusConfig = (state: TableState['state']) => {
       }
     case 'copying_table':
       return {
-        badge: <Badge variant="brand">Copying</Badge>,
+        badge: <Badge variant="success">Copying</Badge>,
         description: "Table's existing rows are being copied before live streaming begins.",
         tooltip: "Table's existing rows are being copied before live streaming begins.",
         color: 'text-brand-600',

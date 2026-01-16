@@ -15,10 +15,10 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
-import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { SchemaEditor } from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './AnalyticsBuckets/AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
-import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
+import { getDecryptedParameters } from './Storage.utils'
 
 export interface ImportForeignSchemaDialogProps {
   namespace: string
@@ -111,6 +111,7 @@ export const ImportForeignSchemaDialog = ({
         ref: project?.ref,
         connectionString: project?.connectionString ?? undefined,
         wrapper,
+        wrapperMeta,
       })
 
       const formValues: Record<string, string> = {
