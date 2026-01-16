@@ -105,7 +105,7 @@ export function OTPVerifyForm({ className, email, onVerified, ...props }: OTPVer
                 {isLoading ? 'Verifying...' : 'Verify Code'}
               </Button>
               <div className="text-center text-sm">
-                Didn't receive a code?{' '}
+                Didn&apos;t receive a code?{' '}
                 <button
                   type="button"
                   onClick={handleResendOTP}
