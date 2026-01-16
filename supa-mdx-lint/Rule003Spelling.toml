@@ -103,6 +103,7 @@ allow_list = [
     "[Pp]laintext",
     "[Pp]olyfill(s|ed)?",
     "[Pp]oolers?",
+    "[Pp]refetcher",
     "[Pp]resign(ed|ing)?",
     "[Pp]roxying",
     "[Pp]sycopg",
