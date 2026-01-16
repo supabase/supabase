@@ -31,7 +31,7 @@ The most common reason for OTP tokens appearing expired or invalid before a user
 - **How Security Tools Interfere:** Services such as security tools commonly used by organizations (e.g., for safe link analysis), or similar security scanners, automatically 'click' or access links within emails to analyze their content or check for threats. If your password reset email includes a confirmation URL (sometimes referred to as a "magic link" or a link that implicitly validates the token upon access), these automated prefetching services can consume the OTP token by accessing the link _before_ the legitimate user does. This makes the token appear instantly expired or invalid to the user, as it has already been used or invalidated by the prefetcher.
 - **System Clock Issues:** Less frequently, discrepancies between a user's device system clock and the server's time can lead to tokens appearing invalid due to perceived expiration, though this is less common with modern synchronized systems.
 
-### **Troubleshooting and Identifying the Problem**
+## Troubleshooting and Identifying the Problem
 
 To determine if email prefetching or another token validity issue is the root cause, you can correlate events across your logs:
 
