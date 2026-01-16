@@ -1,5 +1,5 @@
 ---
-title = "Realtime: Handling Silent Disconnections in Backgrounded Applications"
+title = "Realtime: Handling Silent Disconnections in Background Applications"
 topics = [ "cli", "database", "realtime" ]
 keywords = []
 ---
@@ -35,7 +35,7 @@ When JavaScript timers are throttled, the Realtime client might be prevented fro
 
 ## Solutions for robust Realtime connection management
 
-To ensure your Realtime subscriptions remain stable and resilient against silent disconnections, especially in backgrounded states, Supabase provides two recommended strategies that can be used together.
+To ensure your Realtime subscriptions remain stable and resilient against silent disconnections, especially in background states, Supabase provides two recommended strategies that can be used together.
 
 ### Step 1: Implement `heartbeatCallback` for explicit reconnection
 
@@ -76,5 +76,5 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 For the most robust Realtime connection management, it is strongly recommended to combine both the `heartbeatCallback` and the `worker: true` options.
 
-- The `worker: true` option acts as a primary preventative measure, largely mitigating the risk of disconnections due to browser throttling in backgrounded tabs. It ensures that the heartbeats are sent reliably.
+- The `worker: true` option acts as a primary preventative measure, largely mitigating the risk of disconnections due to browser throttling in background tabs. It ensures that the heartbeats are sent reliably.
 - The `heartbeatCallback` serves as a crucial fallback and monitoring mechanism. It allows your application to detect and react to any disconnections that might still occur due to other factors, such as network instability, ensuring that the client can always attempt to re-establish the connection.
