@@ -25,7 +25,7 @@ To understand the problem and its solutions, it's helpful to first define some c
 - **What is a Web Worker?**
   A Web Worker is a JavaScript script that runs in the background, independently of the main browser thread. This allows complex computations or long-running tasks to be executed without freezing or affecting the responsiveness of the user interface.
 
-### Understanding the Problem: Why Realtime Stops Silently
+## Understanding the Problem: Why Realtime Stops Silently
 
 Supabase Realtime relies on maintaining a persistent WebSocket connection to deliver real-time updates. To ensure this connection is active and healthy, the Realtime client periodically sends "heartbeat" signals to the server.
 
