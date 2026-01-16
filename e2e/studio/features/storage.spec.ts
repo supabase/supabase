@@ -267,16 +267,17 @@ test.describe('Storage Settings - Self Hosted', () => {
     ).toBeVisible()
 
     // Verify Buckets and Policies tabs are visible but Settings is not
+    // Use href patterns to avoid matching other "Settings" links in the sidebar
     await expect(
-      page.getByRole('link', { name: 'Buckets' }),
+      page.getByRole('link', { name: 'Buckets' }).filter({ hasText: /^Buckets$/ }),
       'Buckets tab should be visible'
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: 'Policies' }),
+      page.getByRole('link', { name: 'Policies' }).filter({ hasText: /^Policies$/ }),
       'Policies tab should be visible'
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: 'Settings' }),
+      page.locator(`a[href="/project/${ref}/storage/files/settings"]`),
       'Settings tab should NOT be visible for self-hosted'
     ).not.toBeVisible()
   })

@@ -36,6 +36,7 @@ import {
   Select_Shadcn_,
   Switch,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -244,9 +245,10 @@ export const StorageSettings = () => {
         <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
             {!IS_PLATFORM ? (
-              <AlertError
-                subject="Storage settings are not available for self-hosted projects"
-                error={{ message: 'Storage settings are only available for Supabase Platform projects.' }}
+              <Admonition
+                type="default"
+                title="Storage settings are not available for self-hosted projects"
+                description="Storage settings are only available for Supabase Platform projects."
               />
             ) : isLoading || isLoadingPermissions ? (
               <GenericSkeletonLoader />
