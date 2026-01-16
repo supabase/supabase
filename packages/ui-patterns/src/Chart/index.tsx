@@ -62,7 +62,7 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
-const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-6 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:!px-6 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-6 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-6 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
   ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {

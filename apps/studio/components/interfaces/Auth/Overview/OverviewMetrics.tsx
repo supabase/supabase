@@ -282,7 +282,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <Chart isLoading={isLoadingResp}>
               <ChartCard>
                 <ChartHeader>
@@ -313,19 +313,19 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'request',
                         header: 'Request',
-                        className: 'w-[60px]',
+                        className: 'w-auto !pr-0',
                         render: (row) => {
                           const level = getStatusLevel(row.status_code)
                           const colors = getStatusColor(level)
                           return (
                             <div className="flex items-center gap-2">
                               <span className="flex-shrink-0 flex items-center text-xs font-mono">
-                                <span className="select-text py-0.5 px-1.5 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-lighter border">
+                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-lighter border border-r-0">
                                   {row.method}
                                 </span>
                                 <span
                                   className={cn(
-                                    'py-0.5 px-1.5 border !border-l-0 rounded-l-0 rounded-r tabular-nums',
+                                    'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums',
                                     colors.text,
                                     colors.bg,
                                     colors.border
@@ -334,12 +334,19 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                                   {row.status_code}
                                 </span>
                               </span>
-                              <span className="line-clamp-1 font-mono text-foreground-light text-xs">
-                                {row.path}
-                              </span>
                             </div>
                           )
                         },
+                      },
+                      {
+                        key: 'path',
+                        header: 'Path',
+                        className: 'w-full',
+                        render: (row) => (
+                          <span className="line-clamp-1 font-mono text-foreground-light text-xs">
+                            {row.path}
+                          </span>
+                        ),
                       },
                       {
                         key: 'count',
