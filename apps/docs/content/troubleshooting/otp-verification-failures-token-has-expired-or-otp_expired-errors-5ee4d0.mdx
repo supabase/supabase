@@ -40,7 +40,7 @@ To determine if email prefetching or another token validity issue is the root ca
 3.  **Correlate by Time and IP:** Use timestamps and, if available, IP addresses from both API and authentication logs to link specific failed verification attempts to potential prefetching events. If you see rapid 403 errors or `otp_expired` messages shortly after an email is sent, but before a user could reasonably click the link, it strongly suggests prefetching.
 4.  **Confirm Verification Method:** Ensure your application uses the intended OTP verification method, such as `supabase.auth.verifyOtp` with the correct type (e.g., `recovery` for password resets). While it's understood that the 'recovery' type is correct for password resets, the issue primarily stems from the initial link access rather than the final verification call.
 
-## Resolving the Issue
+## Resolving the issue
 
 Addressing this problem typically involves adjusting how your application interacts with email and how tokens are handled:
 
