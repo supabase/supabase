@@ -59,8 +59,8 @@ export function MagicLinkForm({ className, ...props }: React.ComponentPropsWitho
             <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
               <p className="font-semibold">Check your email!</p>
               <p className="mt-1">
-                We've sent a magic link to <span className="font-medium">{email}</span>. Click the
-                link in the email to sign in.
+                We&apos;ve sent a magic link to <span className="font-medium">{email}</span>. Click
+                the link in the email to sign in.
               </p>
             </div>
           ) : (
