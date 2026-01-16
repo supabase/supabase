@@ -6,7 +6,7 @@ keywords = []
 
 If your Supabase Realtime subscriptions stop receiving events after some time without any explicit error messages, you might be experiencing a silent disconnection. This guide explains why this occurs and provides robust solutions to maintain connection stability.
 
-## Key Technical concepts
+## Key technical concepts
 
 To understand the problem and its solutions, it's helpful to first define some core technical terms:
 
@@ -16,16 +16,16 @@ To understand the problem and its solutions, it's helpful to first define some c
 - **What is a WebSocket?**
   A WebSocket is a communication protocol that provides a full-duplex, persistent communication channel over a single TCP connection. Unlike traditional HTTP requests, WebSockets allow for continuous, bi-directional communication between a client (like your application) and a server, making them ideal for real-time applications.
 
-- **What is a Heartbeat?**
+- **What is a heartbeat?**
   In the context of network connections, a heartbeat is a periodic signal sent between two connected entities (e.g., your client and the Realtime server) to confirm that the connection is still active and both ends are responsive. If a heartbeat is missed for a certain period, it can indicate a connection loss.
 
-- **What is Browser Throttling?**
+- **What is browser throttling?**
   Browser throttling is an optimization strategy employed by web browsers to conserve resources (CPU, battery) when a tab or application is running in the background or is inactive. This often involves reducing the frequency of JavaScript timers, potentially slowing down or pausing background operations.
 
 - **What is a Web Worker?**
   A Web Worker is a JavaScript script that runs in the background, independently of the main browser thread. This allows complex computations or long-running tasks to be executed without freezing or affecting the responsiveness of the user interface.
 
-## Understanding the problem: Why Realtime Stops Silently
+## Understanding the problem: why Realtime stops silently
 
 Supabase Realtime relies on maintaining a persistent WebSocket connection to deliver real-time updates. To ensure this connection is active and healthy, the Realtime client periodically sends "heartbeat" signals to the server.
 
@@ -37,7 +37,7 @@ When JavaScript timers are throttled, the Realtime client might be prevented fro
 
 To ensure your Realtime subscriptions remain stable and resilient against silent disconnections, especially in backgrounded states, Supabase provides two recommended strategies that can be used together.
 
-### Step 1: Implement `heartbeatCallback` for explicit Reconnection
+### Step 1: Implement `heartbeatCallback` for explicit reconnection
 
 The `heartbeatCallback` option allows you to actively monitor the status of your Realtime connection and programmatically trigger a reconnection if a disconnection is detected.
 
@@ -57,7 +57,7 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-### Step 2: Enable Web workers for Reliable Background Heartbeats
+### Step 2: Enable Web workers for reliable background heartbeats
 
 Enabling the Web Worker option helps prevent browser throttling from affecting your Realtime connection's heartbeat mechanism.
 
@@ -72,7 +72,7 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-### Recommendation: Combine Both solutions for Maximum Stability
+### Recommendation: Combine both solutions for maximum stability
 
 For the most robust Realtime connection management, it is strongly recommended to combine both the `heartbeatCallback` and the `worker: true` options.
 
