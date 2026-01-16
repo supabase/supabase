@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -243,7 +243,12 @@ export const StorageSettings = () => {
       <PageSection>
         <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
-            {isLoading || isLoadingPermissions ? (
+            {!IS_PLATFORM ? (
+              <AlertError
+                subject="Storage settings are not available for self-hosted projects"
+                error={{ message: 'Storage settings are only available for Supabase Platform projects.' }}
+              />
+            ) : isLoading || isLoadingPermissions ? (
               <GenericSkeletonLoader />
             ) : (
               <>
