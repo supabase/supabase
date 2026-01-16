@@ -14,7 +14,7 @@ message = "OTP expired"
 
 When users attempt to exchange One-Time Passwords (OTPs), they may encounter various errors indicating that the token is no longer valid. These include messages like "token has expired or is invalid," "Email link is invalid or has expired," or they might receive '403 Forbidden' HTTP responses on the verification endpoint. Authentication logs often show specific `otp_expired` error codes.
 
-### **What is OTP (One-Time Password) Verification?**
+## What is OTP (One-Time Password) Verification?
 
 An OTP, or One-Time Password, is a security code generated for a single use or a limited period. In authentication flows, especially for password resets, a user requests an OTP, which is then sent to their email or phone. The user must then provide this OTP back to the system within a set timeframe to verify their identity and proceed with actions like resetting a password. The system verifies this token using a function like `supabase.auth.verifyOtp({ email, token, type: 'recovery' })`.
 
