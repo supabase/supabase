@@ -2651,7 +2651,9 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.admin.getUserById(1)
+          const { data, error } = await supabase.auth.admin.getUserById(
+            '715ed5db-f090-4b8c-a067-640ecee36aa0'
+          )
           ```
         response: |
           ```json
