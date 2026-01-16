@@ -14,8 +14,8 @@ export function SettingsDatabaseEmptyStateLocal() {
         </CardHeader>
         <CardContent>
           <p className="prose [&>code]:text-xs text-sm max-w-full">
-            Change settings in <code>supabase/config.toml</code> file,
-            which is automatically loaded on <code>supabase start</code>
+            Change settings in <code>supabase/config.toml</code> file, which is automatically loaded
+            on <code>supabase start</code>
           </p>
         </CardContent>
       </Card>
@@ -24,7 +24,9 @@ export function SettingsDatabaseEmptyStateLocal() {
         <CardHeader className="flex-row items-center justify-between">
           Self-Hosted Supabase
           <div className="flex items-center gap-x-2">
-            <DocsButton href={`${DOCS_URL}/guides/self-hosting/docker#configuring-and-securing-supabase`} />
+            <DocsButton
+              href={`${DOCS_URL}/guides/self-hosting/docker#configuring-and-securing-supabase`}
+            />
           </div>
         </CardHeader>
         <CardContent>
