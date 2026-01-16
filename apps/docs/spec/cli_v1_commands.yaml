@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.67.1
+  version: 2.72.7
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1063,9 +1063,64 @@ commands:
         description: Organization ID to create the project in.
         default_value: ''
       - id: region
-        name: --region <[  ]>
+        name: --region <string>
         description: Select a region close to you for the best performance.
         default_value: ''
+        accepted_values:
+          - id: ap-east-1
+            name: ap-east-1
+            type: string
+          - id: ap-northeast-1
+            name: ap-northeast-1
+            type: string
+          - id: ap-northeast-2
+            name: ap-northeast-2
+            type: string
+          - id: ap-south-1
+            name: ap-south-1
+            type: string
+          - id: ap-southeast-1
+            name: ap-southeast-1
+            type: string
+          - id: ap-southeast-2
+            name: ap-southeast-2
+            type: string
+          - id: ca-central-1
+            name: ca-central-1
+            type: string
+          - id: eu-central-1
+            name: eu-central-1
+            type: string
+          - id: eu-central-2
+            name: eu-central-2
+            type: string
+          - id: eu-north-1
+            name: eu-north-1
+            type: string
+          - id: eu-west-1
+            name: eu-west-1
+            type: string
+          - id: eu-west-2
+            name: eu-west-2
+            type: string
+          - id: eu-west-3
+            name: eu-west-3
+            type: string
+          - id: sa-east-1
+            name: sa-east-1
+            type: string
+          - id: us-east-1
+            name: us-east-1
+            type: string
+          - id: us-east-2
+            name: us-east-2
+            type: string
+          - id: us-west-1
+            name: us-west-1
+            type: string
+          - id: us-west-2
+            name: us-west-2
+            type: string
       - id: size
         name: --size <string>
         description: Select a desired instance size for your project.
@@ -3242,6 +3297,10 @@ commands:
         name: --use-migra
         description: Use migra to generate schema diff.
         default_value: 'true'
+      - id: use-pg-delta
+        name: --use-pg-delta
+        description: Use pg-delta to generate schema diff.
+        default_value: 'false'
       - id: use-pg-schema
         name: --use-pg-schema
         description: Use pg-schema-diff to generate schema diff.
@@ -3549,9 +3608,64 @@ commands:
         description: Whether to create a persistent branch.
         default_value: 'false'
       - id: region
-        name: --region <[  ]>
+        name: --region <string>
         description: Select a region to deploy the branch database.
         default_value: ''
+        accepted_values:
+          - id: ap-east-1
+            name: ap-east-1
+            type: string
+          - id: ap-northeast-1
+            name: ap-northeast-1
+            type: string
+          - id: ap-northeast-2
+            name: ap-northeast-2
+            type: string
+          - id: ap-south-1
+            name: ap-south-1
+            type: string
+          - id: ap-southeast-1
+            name: ap-southeast-1
+            type: string
+          - id: ap-southeast-2
+            name: ap-southeast-2
+            type: string
+          - id: ca-central-1
+            name: ca-central-1
+            type: string
+          - id: eu-central-1
+            name: eu-central-1
+            type: string
+          - id: eu-central-2
+            name: eu-central-2
+            type: string
+          - id: eu-north-1
+            name: eu-north-1
+            type: string
+          - id: eu-west-1
+            name: eu-west-1
+            type: string
+          - id: eu-west-2
+            name: eu-west-2
+            type: string
+          - id: eu-west-3
+            name: eu-west-3
+            type: string
+          - id: sa-east-1
+            name: sa-east-1
+            type: string
+          - id: us-east-1
+            name: us-east-1
+            type: string
+          - id: us-east-2
+            name: us-east-2
+            type: string
+          - id: us-west-1
+            name: us-west-1
+            type: string
+          - id: us-west-2
+            name: us-west-2
+            type: string
       - id: size
         name: --size <string>
         description: Select a desired instance size for the branch database.
