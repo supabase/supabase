@@ -29,6 +29,12 @@ We actively welcome your Pull Requests! A couple of things to keep in mind befor
 
 Prior to submitting your PR, please conduct the following pre-flight checks:
 
+**Quick Start (recommended before opening a PR):**
+
+- Install dependencies: `npm install`
+- Run formatting checks: `npm run lint`
+- Build the project: `npm run build`
+
 - Run `npm run build` locally to ensure that your code builds successfully without having to wait on us to approve Vercel Preview deploys.
 - Ensure that the Prettier tests run successfully on your PR.
 
