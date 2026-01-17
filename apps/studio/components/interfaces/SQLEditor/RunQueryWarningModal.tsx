@@ -51,8 +51,8 @@ export const RunQueryWarningModal = ({
             <li className="grid pt-2 pb-3 px-4 gap-1">
               <span className="font-bold">Query uses update without a where clause</span>
               <span className="text-foreground-lighter">
-                Without a <code className="text-xs">where</code> clause, this could update all rows
-                in the table.
+                Without a <code className="text-code-inline">where</code> clause, this could update
+                all rows in the table.
               </span>
             </li>
           )}

@@ -34,7 +34,7 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 ### Developer Quickstart
 
 > [!NOTE]  
-> **Supabase internal use:** To develop on Studio locally with the backend services, see the instructions in the [internal `infrastructure` repo](https://github.com/supabase/infrastructure/blob/develop/docs/contributing.md).
+> **Supabase internal use:** To develop on Studio locally with the backend services, see the instructions in the [internal `infrastructure` repo](https://github.com/supabase/platform/blob/develop/docs/contributing.md).
 
 ```bash
 # You'll need to be on Node v20
@@ -45,8 +45,8 @@ pnpm install # install dependencies
 pnpm run dev # start dev server
 
 ## For internal contributors
-## First clone the private supabase/infrastructure repo and follow instructions for setting up mise
-mise studio  # Run from supabase/infrastructure alongside `mise infra`
+## First clone the private supabase/platform repo and follow instructions for setting up mise
+mise studio  # Run from supabase/platform alongside `mise infra`
 
 ## For all
 pnpm run test # run tests

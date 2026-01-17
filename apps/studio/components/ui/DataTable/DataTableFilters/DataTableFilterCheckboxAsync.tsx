@@ -9,6 +9,7 @@ import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export function DataTableFilterCheckboxAsync<TData>({
   value: _value,
@@ -36,7 +37,7 @@ export function DataTableFilterCheckboxAsync<TData>({
         facetSearch: debouncedSearch,
       },
       {
-        keepPreviousData: true,
+        placeholderData: keepPreviousData,
         enabled: debouncedSearch.length > 0,
         initialData: debouncedSearch.length === 0 ? options : undefined,
       }

@@ -1,5 +1,6 @@
 import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
@@ -9,6 +10,7 @@ import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
@@ -21,7 +23,11 @@ export const GraphiQLTab = () => {
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
 
-  const { data: apiKeys, isFetched } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys, isFetched } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey, secretKey } = getKeys(apiKeys)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
