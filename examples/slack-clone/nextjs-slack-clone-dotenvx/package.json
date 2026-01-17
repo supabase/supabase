@@ -21,7 +21,7 @@
     "@dotenvx/dotenvx": "^1.28.0",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
-    "supabase": "^2.7.2",
+    "supabase": "^2.72.8",
     "tailwindcss": "^3.3.2"
   }
 }
