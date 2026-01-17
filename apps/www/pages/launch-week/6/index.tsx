@@ -941,7 +941,7 @@ export default function launchweek() {
                   >
                     madewithsupabase.com
                   </a>
-                  . All submissions must be open source and publically available. Submissions close
+                  . All submissions must be open source and publicly available. Submissions close
                   Monday 19th Dec 00:01 AM PT.
                 </p>
               </div>
