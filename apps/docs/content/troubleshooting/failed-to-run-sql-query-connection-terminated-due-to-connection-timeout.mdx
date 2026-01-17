@@ -12,8 +12,9 @@ message = "Error: Failed to run sql query: Connection terminated due to connecti
 
 This error typically happens when the database is overloaded and causing an outage. As the database does not respond in a timely manner there can be a variety of symptoms such as tables not loading, error messages related to retrieving data and the dashboard seems to be unresponsive.
 
-- Check your database health in [Database reports](/dashboard/project/_/reports/database).
+- Check your database health in [Database reports](/dashboard/project/_/observability/database).
 - If needed, increase resources in [Compute and Disk](/dashboard/project/_/settings/compute-and-disk).
+- Alternatively, you can restart the database in [Project Settings](/dashboard/project/_/settings/general) but this may be only a temporary fix if the project is undersized / unoptimized.
 
 Review the appropriate guides based on your scenario:
 

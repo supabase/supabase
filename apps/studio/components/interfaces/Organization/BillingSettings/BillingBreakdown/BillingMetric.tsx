@@ -100,7 +100,10 @@ export const BillingMetric = ({
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
                 </span>
-              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+              ) : usageMeta.available_in_plan &&
+                usageMeta.pricing_free_units !== 0 &&
+                !usageMeta.unlimited &&
+                relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </Link>
@@ -112,7 +115,10 @@ export const BillingMetric = ({
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
                 </span>
-              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+              ) : usageMeta.available_in_plan &&
+                usageMeta.pricing_free_units !== 0 &&
+                !usageMeta.unlimited &&
+                relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </div>
@@ -120,7 +126,9 @@ export const BillingMetric = ({
 
           {usageMeta.available_in_plan ? (
             <div>
-              {relativeToSubscription && !usageMeta.unlimited ? (
+              {relativeToSubscription &&
+              !usageMeta.unlimited &&
+              usageMeta.pricing_free_units !== 0 ? (
                 <svg className="h-8 w-8 -rotate-90 transform">
                   <circle
                     cx={15}
@@ -157,7 +165,10 @@ export const BillingMetric = ({
             </div>
           ) : (
             <div>
-              <UpgradePlanButton source={`billingBreakdownUsage${metric.anchor}`}>
+              <UpgradePlanButton
+                source={`billingBreakdownUsage${metric.anchor}`}
+                featureProposition={`to use ${metric.name}`}
+              >
                 Upgrade
               </UpgradePlanButton>
             </div>

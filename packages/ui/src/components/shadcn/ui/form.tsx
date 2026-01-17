@@ -13,9 +13,9 @@ import {
   useWatch,
 } from 'react-hook-form'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../../../lib/utils/cn'
 import { Label } from './label'
-import { motion, AnimatePresence } from 'framer-motion'
 
 const Form = FormProvider
 
@@ -88,15 +88,17 @@ FormItem.displayName = 'FormItem'
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { enableSelection?: boolean }
+>(({ className, enableSelection = false, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
+  const Comp = enableSelection ? 'label' : Label
+
   return (
-    <Label
+    <Comp
       ref={ref}
       className={cn(
-        'text-foreground-light',
+        'text-foreground-light text-sm',
         'transition-colors',
         error && '!text-destructive',
         className,

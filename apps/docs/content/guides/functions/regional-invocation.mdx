@@ -79,6 +79,16 @@ You can verify the execution region by looking at the `x-sb-edge-region` HTTP he
 
 ---
 
+## Region runtime information
+
+Functions have access to the following environment variables:
+
+SB_REGION: The AWS region function was invoked
+
+This is useful if you have read replicate and want to Postgres connect to a different replicate according of the Region.
+
+---
+
 ## Region outages
 
 When you explicitly specify a region via the `x-region` header, requests will NOT be automatically

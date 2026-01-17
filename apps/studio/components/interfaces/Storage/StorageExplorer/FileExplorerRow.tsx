@@ -48,7 +48,7 @@ import {
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
-import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
+import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 export const RowIcon = ({
@@ -115,7 +115,7 @@ export const FileExplorerRow = ({
   selectedItems = [],
   style,
 }: FileExplorerRowProps) => {
-  const { ref: projectRef, bucketId } = useParams()
+  const { bucketId } = useParams()
 
   const {
     selectedBucket,
@@ -128,6 +128,7 @@ export const FileExplorerRow = ({
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
+    downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
     openFolder,
@@ -254,13 +255,7 @@ export const FileExplorerRow = ({
                       {
                         name: 'Download',
                         icon: <Download size={14} strokeWidth={1} />,
-                        onClick: async () => {
-                          await downloadFile({
-                            projectRef,
-                            bucketId,
-                            file: itemWithColumnIndex,
-                          })
-                        },
+                        onClick: () => downloadFile(itemWithColumnIndex),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
