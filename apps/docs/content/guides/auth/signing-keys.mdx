@@ -36,7 +36,7 @@ We've designed the Signing keys system to address many problems the legacy syste
 
 You can start migrating away from the legacy JWT secret through the Supabase dashboard. This process does not cause downtime for your application.
 
-1. Start off by clicking the _Migrate JWT secret_ button on the [JWT signing keys](/dashboard/project/_/settings/jwt/signing-keys) page. This step will import the existing legacy JWT secret into the new JWT signing keys system. Once this process completes, you will no longer be able to rotate the legacy JWT secret using the old system.
+1. Start off by clicking the _Migrate JWT secret_ button on the [JWT signing keys](/dashboard/project/_/settings/jwt) page. This step will import the existing legacy JWT secret into the new JWT signing keys system. Once this process completes, you will no longer be able to rotate the legacy JWT secret using the old system.
 2. Simultaneously, we're creating a new asymmetric JWT signing key for you to rotate to. This key starts off as standby key -- meaning it's being advertised as a key that Supabase Auth will use in the future to create JWTs.
 3. If you're not ready to switch away from the legacy JWT secret right now, you can stop here without any issue. If you wish to use a different signing key -- either to use a different signing algorithm (RSA, Elliptic Curve or shared secret) or to import a private key or shared secret you already have -- feel free to move the standby key to _Previously used_ before finally moving it to _Revoked._
 4. If you do wish to start using the standby key for all new JWT use the _Rotate keys_ button. A few important notes:
@@ -176,7 +176,7 @@ supabase gen signing-key --algorithm ES256
 
 Make sure you store this private key in a secure location, as it will not be extractable from Supabase.
 
-To import the generated private key to your project, create a [new standby key](/dashboard/project/_/settings/jwt/signing-keys) from the dashboard:
+To import the generated private key to your project, create a [new standby key](/dashboard/project/_/settings/jwt) from the dashboard:
 
 ```json
 {

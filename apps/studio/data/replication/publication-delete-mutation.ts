@@ -6,7 +6,7 @@ import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type DeletePublicationParams = {
-  projectRef: string
+  projectRef?: string
   sourceId: number
   publicationName: string
 }
@@ -50,7 +50,9 @@ export const useDeletePublicationMutation = ({
     mutationFn: (vars) => deletePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables
-      await queryClient.invalidateQueries(replicationKeys.publications(projectRef, sourceId))
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.publications(projectRef, sourceId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

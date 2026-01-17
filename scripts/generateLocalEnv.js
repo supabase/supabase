@@ -30,6 +30,7 @@ const defaultEnv = {
   NEXT_PUBLIC_GOTRUE_URL: '$SUPABASE_PUBLIC_URL/auth/v1',
   NEXT_PUBLIC_HCAPTCHA_SITE_KEY: '10000000-ffff-ffff-ffff-000000000001',
   NEXT_PUBLIC_NODE_ENV: 'test',
+  SNIPPETS_MANAGEMENT_FOLDER: '../../supabase/snippets',
 }
 
 const environment = { ...generatedEnv, ...defaultEnv }
@@ -38,5 +39,23 @@ fs.writeFileSync(
   './apps/studio/.env.test',
   Object.keys(environment)
     .map((key) => `${key}=${environment[key]}`)
+    .join('\n')
+)
+
+const STUDIO_URL = environment.NEXT_PUBLIC_SITE_URL
+const WEB_SERVER_PORT = new URL(STUDIO_URL).port ?? undefined
+const API_URL = environment.API_URL
+
+const e2eTestEnv = {
+  STUDIO_URL,
+  API_URL,
+  WEB_SERVER_PORT,
+  IS_PLATFORM: 'false',
+}
+
+fs.writeFileSync(
+  './e2e/studio/.env.local',
+  Object.keys(e2eTestEnv)
+    .map((key) => `${key}=${e2eTestEnv[key]}`)
     .join('\n')
 )

@@ -11,13 +11,13 @@ interface SchemaEditorProps {
   closePanel: () => void
 }
 
-const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
+export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })
   const [name, setName] = useState('')
 
-  const { mutateAsync: createSchema, isLoading } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isPending } = useSchemaCreateMutation()
 
   useEffect(() => {
     if (visible) {
@@ -56,7 +56,7 @@ const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => 
       className="transition-all duration-100 ease-in"
       onCancel={closePanel}
       onConfirm={onSaveChanges}
-      loading={isLoading}
+      loading={isPending}
       cancelText="Cancel"
       confirmText="Save"
     >
@@ -77,5 +77,3 @@ const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => 
     </SidePanel>
   )
 }
-
-export default SchemaEditor

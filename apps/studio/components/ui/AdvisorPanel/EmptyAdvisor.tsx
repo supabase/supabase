@@ -33,9 +33,9 @@ export const EmptyAdvisor = ({ activeTab, hasFilters, onClearFilters }: EmptyAdv
       case 'performance':
         return 'Congrats! There are no performance issues detected for this project'
       case 'messages':
-        return 'There are no messages for this project'
+        return 'Messages alert you of upcoming changes or potential issues with your project'
       default:
-        return 'Congrats! There are no issues detected for this project'
+        return 'Congrats! There are no issues detected'
     }
   }
 

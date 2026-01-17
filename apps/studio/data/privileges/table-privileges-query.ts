@@ -3,8 +3,8 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { privilegeKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+import { privilegeKeys } from './keys'
 
 export type TablePrivilegesVariables = {
   projectRef?: string
@@ -53,5 +53,5 @@ export function invalidateTablePrivilegesQuery(
   client: QueryClient,
   projectRef: string | undefined
 ) {
-  return client.invalidateQueries(privilegeKeys.tablePrivilegesList(projectRef))
+  return client.invalidateQueries({ queryKey: privilegeKeys.tablePrivilegesList(projectRef) })
 }
