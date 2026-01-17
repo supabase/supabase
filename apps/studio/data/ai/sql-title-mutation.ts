@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SqlTitleGenerateResponse = {
   title: string
@@ -45,23 +45,21 @@ export const useSqlTitleGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
+  UseCustomMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>(
-    (vars) => generateSqlTitle(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to generate title: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>({
+    mutationFn: (vars) => generateSqlTitle(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to generate title: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

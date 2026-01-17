@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
+import { Auth, Database, Realtime, Storage } from 'icons'
 import sumBy from 'lodash/sumBy'
 import { ChevronDown } from 'lucide-react'
-import { Auth, Database, Realtime, Storage } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -35,7 +35,7 @@ import {
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
 
-const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
+const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -44,7 +44,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     key: '1day',
@@ -52,7 +52,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 24,
     startUnit: 'hour',
     format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     key: '7day',
@@ -80,7 +80,7 @@ const ProjectUsage = () => {
 
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
-  const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
+  const { data, isPending: isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDateLocal = dayjs().subtract(
@@ -195,8 +195,8 @@ const ProjectUsage = () => {
           Statistics for {selectedInterval.label.toLowerCase()}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-        <Panel className="mb-0 md:mb-0">
+      <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 @2xl:grid-cols-4">
+        <Panel className="mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={

@@ -3,7 +3,7 @@ import {
   COUNT_ESTIMATE_SQL,
   THRESHOLD_COUNT,
 } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
-import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
@@ -13,6 +13,7 @@ import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import { UseCustomQueryOptions } from 'types'
 
 type GetTableRowsCountArgs = {
   table?: SupaTable
@@ -145,16 +146,14 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
+  }: UseCustomQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsCountData, TableRowsCountError, TData>(
-    tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
-    ({ signal }) =>
+  return useQuery<TableRowsCountData, TableRowsCountError, TData>({
+    queryKey: tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
+    queryFn: ({ signal }) =>
       getTableRowsCount({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }

@@ -1,23 +1,33 @@
 import { compact } from 'lodash'
 import { Plus, X } from 'lucide-react'
-import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type RefObject,
+} from 'react'
 import { toast } from 'sonner'
 // End of third-party imports
 
+import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { cn } from 'ui'
 import { createSupportStorageClient } from './support-storage-client'
 
 const MAX_ATTACHMENTS = 5
 
-const uploadAttachments = async (ref: string, files: File[]) => {
+const uploadAttachments = async ({ userId, files }: { userId: string; files: File[] }) => {
   const supportSupabaseClient = createSupportStorageClient()
 
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(
     filesToUpload.map(async (file) => {
       const suffix = file.type.split('/')[1]
-      const prefix = `${ref}/${uuidv4()}.${suffix}`
+      const prefix = `${userId}/${uuidv4()}.${suffix}`
       const options = { cacheControl: '3600' }
 
       const { data, error } = await supportSupabaseClient.storage
@@ -29,23 +39,16 @@ const uploadAttachments = async (ref: string, files: File[]) => {
     })
   )
   const keys = compact(uploadedFiles).map((file) => file.path)
-
-  if (keys.length === 0) return []
-
-  const { data, error } = await supportSupabaseClient.storage
-    .from('support-attachments')
-    .createSignedUrls(keys, 10 * 365 * 24 * 60 * 60)
-  if (error) {
-    console.error('Failed to retrieve URLs for attachments', error)
-  }
-  return data ? data.map((file) => file.signedUrl) : []
+  return keys
 }
 
 export function useAttachmentUpload() {
+  const { profile } = useProfile()
   const uploadButtonRef = useRef<HTMLInputElement>(null)
-
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
+
+  const { mutateAsync: generateAttachmentURLs } = useGenerateAttachmentURLsMutation()
 
   const isFull = uploadedFiles.length >= MAX_ATTACHMENTS
 
@@ -92,14 +95,20 @@ export function useAttachmentUpload() {
     }
   }, [uploadedFiles])
 
-  const createAttachments = useCallback(
-    async (projectRef: string) => {
-      const attachments =
-        uploadedFiles.length > 0 ? await uploadAttachments(projectRef, uploadedFiles) : []
-      return attachments
-    },
-    [uploadedFiles]
-  )
+  const createAttachments = useCallback(async () => {
+    if (!profile?.id) {
+      console.error('[Support Form > uploadAttachments] Unable to upload files, missing user ID')
+      toast.error('Unable to upload attachments')
+      return []
+    }
+
+    if (uploadedFiles.length === 0) return
+
+    const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
+    const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
+    return urls
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, uploadedFiles])
 
   return useMemo(
     () => ({
@@ -116,22 +125,36 @@ export function useAttachmentUpload() {
 }
 
 interface AttachmentUploadDisplayProps {
-  uploadButtonRef: React.RefObject<HTMLInputElement>
+  uploadButtonRef: RefObject<HTMLInputElement>
   isFull: boolean
+  uploadedDataUrls: string[]
   addFile: () => void
   handleFileUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   removeFileUpload: (idx: number) => void
-  uploadedDataUrls: Array<string>
 }
 
 export function AttachmentUploadDisplay({
   uploadButtonRef,
   isFull,
+  uploadedDataUrls,
   addFile,
   handleFileUpload,
   removeFileUpload,
-  uploadedDataUrls,
 }: AttachmentUploadDisplayProps) {
+  const { profile } = useProfile()
+
+  if (!profile) {
+    return (
+      <div>
+        <h3 className="text-sm text-foreground">Attachments</h3>
+        <p className="text-sm text-foreground-lighter mt-2">
+          Uploads are only supported when logged in. Please reply to the acknowledgement email you
+          will receive with any screenshots you'd like to upload.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col gap-y-1">

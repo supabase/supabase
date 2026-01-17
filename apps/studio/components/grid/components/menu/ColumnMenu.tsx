@@ -23,7 +23,7 @@ interface ColumnMenuProps {
   isEncrypted?: boolean
 }
 
-const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
+export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { sorts, addOrUpdateSort, removeSort } = useTableSort()
@@ -163,5 +163,3 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     </>
   )
 }
-
-export default ColumnMenu

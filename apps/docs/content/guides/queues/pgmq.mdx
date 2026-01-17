@@ -77,7 +77,7 @@ select pgmq.create_unlogged('my_unlogged');
 
 #### `detach_archive`
 
-Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being drop when `drop extension pgmq` is executed.
+Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being dropped when `drop extension pgmq` is executed.
 This does not prevent the further archives() from appending to the archive table.
 
 {/* prettier-ignore */}

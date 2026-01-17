@@ -18,7 +18,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     protected actionOptions?: { returning: boolean; enumArrayColumns?: string[] }
   ) {}
 
-  filter(column: string, operator: FilterOperator, value: any) {
+  filter(column: string | string[], operator: FilterOperator, value: any) {
     this.filters.push({ column, operator, value })
     return this
   }
@@ -42,6 +42,29 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
   range(from: number, to: number) {
     return this._getQueryModifier().range(from, to)
+  }
+
+  clone(): QueryFilter {
+    const clonedData = structuredClone({
+      table: this.table,
+      action: this.action,
+      actionValue: this.actionValue,
+      actionOptions: this.actionOptions,
+      filters: this.filters,
+      sorts: this.sorts,
+    })
+
+    const cloned = new QueryFilter(
+      clonedData.table,
+      clonedData.action,
+      clonedData.actionValue,
+      clonedData.actionOptions
+    )
+
+    cloned.filters = clonedData.filters
+    cloned.sorts = clonedData.sorts
+
+    return cloned
   }
 
   toSql(options?: { isCTE: boolean; isFinal: boolean }) {

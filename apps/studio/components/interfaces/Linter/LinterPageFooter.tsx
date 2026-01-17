@@ -12,7 +12,7 @@ interface LinterPageFooterProps {
   hideDbInspectCTA?: boolean
 }
 
-const LinterPageFooter = ({
+export const LinterPageFooter = ({
   isLoading,
   isRefetching,
   refetch,
@@ -84,5 +84,3 @@ const LinterPageFooter = ({
     </div>
   )
 }
-
-export { LinterPageFooter }

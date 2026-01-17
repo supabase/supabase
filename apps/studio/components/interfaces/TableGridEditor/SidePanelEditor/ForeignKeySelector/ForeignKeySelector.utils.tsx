@@ -33,7 +33,7 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will{' '}
+          <code className="text-code-inline">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">raise an error</span> if there are records
           existing in this table that reference it
         </>
@@ -42,7 +42,7 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will{' '}
+          <code className="text-code-inline">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">also {action}</span> any records that
           reference it in this table
         </>
@@ -60,8 +60,7 @@ export const generateCascadeActionDescription = (
               the transaction
             </TooltipContent>
           </Tooltip>
-          : {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will{' '}
+          : {actionVerb} a record from <code className="text-code-inline">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">prevent {actionVerb.toLowerCase()}</span>{' '}
           existing referencing rows from this table.
         </>
@@ -70,8 +69,8 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will set the value of
-          any existing records in this table referencing it to their{' '}
+          <code className="text-code-inline">{reference}</code> will set the value of any existing
+          records in this table referencing it to their{' '}
           <span className="text-amber-900 opacity-75">default value</span>
         </>
       )
@@ -79,8 +78,8 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will set the value of
-          any existing records in this table referencing it{' '}
+          <code className="text-code-inline">{reference}</code> will set the value of any existing
+          records in this table referencing it{' '}
           <span className="text-amber-900 opacity-75">to NULL</span>
         </>
       )

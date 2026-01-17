@@ -1,11 +1,13 @@
 import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { APIKeys } from 'components/interfaces/Home/NewProjectPanel/APIKeys'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
@@ -28,21 +30,32 @@ const BuildingState = () => {
     'project_homepage:client_libraries',
   ])
 
-  useProjectStatusQuery(
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          if (ref) await invalidateProjectDetailsQuery(ref)
-          await invalidateProjectsQuery()
-        }
+      refetchInterval: (query) => {
+        const data = query.state.data
+        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
   )
+
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData?.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+      invalidateProjectsQuery()
+    }
+  }, [
+    isProjectStatusSuccess,
+    projectStatusData,
+    ref,
+    invalidateProjectDetailsQuery,
+    invalidateProjectsQuery,
+  ])
 
   if (project === undefined) return null
 
@@ -52,7 +65,7 @@ const BuildingState = () => {
         <div className="w-full flex flex-col gap-4">
           <div className="w-full flex flex-col md:flex-row items-start md:items-center gap-3">
             <h1 className="text-3xl">{project?.name}</h1>
-            <Badge variant="default" className="bg-surface-100 bg-opacity-100">
+            <Badge>
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin" size={12} />
                 <span>
@@ -112,7 +125,7 @@ const BuildingState = () => {
                           support ticket.
                         </p>
                         <Button asChild type="default">
-                          <Link href="/support/new">Contact support team</Link>
+                          <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>
                     }
@@ -121,8 +134,7 @@ const BuildingState = () => {
               </div>
             </div>
             <div className="col-span-12  lg:col-span-8 flex flex-col gap-8">
-              <DisplayApiSettings showLegacyText={false} />
-              <DisplayConfigSettings />
+              <APIKeys />
             </div>
           </div>
         </div>

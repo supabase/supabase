@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { invoicesKeys } from './keys'
 
 export type UpcomingInvoiceVariables = {
@@ -68,13 +68,11 @@ export const useOrgUpcomingInvoiceQuery = <TData = UpcomingInvoiceData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UpcomingInvoiceData, UpcomingInvoiceError, TData> = {}
+  }: UseCustomQueryOptions<UpcomingInvoiceData, UpcomingInvoiceError, TData> = {}
 ) =>
-  useQuery<UpcomingInvoiceData, UpcomingInvoiceError, TData>(
-    invoicesKeys.orgUpcomingPreview(orgSlug),
-    ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<UpcomingInvoiceData, UpcomingInvoiceError, TData>({
+    queryKey: invoicesKeys.orgUpcomingPreview(orgSlug),
+    queryFn: ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined',
+    ...options,
+  })

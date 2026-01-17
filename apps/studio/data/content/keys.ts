@@ -37,7 +37,6 @@ export const contentKeys = {
     projectRef: string | undefined,
     type?: string,
     options?: {
-      cumulative?: boolean
       visibility?: string
       favorite?: boolean
       name?: string

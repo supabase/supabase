@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export const getDatabaseSizeSql = () => {
   const sql = /* SQL */ `
@@ -44,13 +45,14 @@ export type DatabaseSizeError = ExecuteSqlError
 
 export const useDatabaseSizeQuery = <TData = DatabaseSizeData>(
   { projectRef, connectionString }: DatabaseSizeVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseSizeData, DatabaseSizeError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseSizeData, DatabaseSizeError, TData> = {}
 ) =>
-  useQuery<DatabaseSizeData, DatabaseSizeError, TData>(
-    databaseKeys.databaseSize(projectRef),
-    ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseSizeData, DatabaseSizeError, TData>({
+    queryKey: databaseKeys.databaseSize(projectRef),
+    queryFn: ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

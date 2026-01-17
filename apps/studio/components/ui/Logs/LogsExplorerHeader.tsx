@@ -62,7 +62,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
               onClick={() => setShowReference(true)}
               icon={<BookOpen strokeWidth={1.5} />}
             >
-              Field Reference
+              <span>Field Reference</span>
             </Button>
           }
         >

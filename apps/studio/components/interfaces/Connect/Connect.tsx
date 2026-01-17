@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,7 +13,8 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { useRouter } from 'next/router'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -32,11 +33,13 @@ import {
   cn,
 } from 'ui'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
-import { getContentFilePath } from './Connect.utils'
+import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
+import Link from 'next/link'
 
 export const Connect = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -83,10 +86,13 @@ export const Connect = () => {
     }
   }
 
-  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
+  const [tab, setTab] = useQueryState('connectTab', parseAsString.withDefault('direct'))
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
+  const [_, setQueryType] = useQueryState('type', parseAsString)
+  const [__, setQuerySource] = useQueryState('source', parseAsString)
+  const [___, setQueryMethod] = useQueryState('method', parseAsString)
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -212,7 +218,7 @@ export const Connect = () => {
     return []
   }
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = canReadAPIKeys
     ? getKeys(apiKeys)
     : { anonKey: null, publishableKey: null }
@@ -242,17 +248,38 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
+  const resetQueryStates = () => {
+    setQueryFramework(null)
+    setQueryUsing(null)
+    setQueryWith(null)
+    setQueryType(null)
+    setQuerySource(null)
+    setQueryMethod(null)
+  }
+
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       setShowConnect(null)
       setTab(null)
-      setQueryFramework(null)
-      setQueryUsing(null)
-      setQueryWith(null)
+      resetQueryStates()
     } else {
       setShowConnect(open)
     }
   }
+
+  useEffect(() => {
+    if (!showConnect) return
+    const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
+    const hasQuery = queryFramework || queryUsing || queryWith
+    const inferred = inferConnectTabFromParentKey(queryFramework)
+
+    if (noConnectTabInUrl && hasQuery && inferred) {
+      setTab(inferred)
+      if (inferred === 'frameworks') setConnectionObject(FRAMEWORKS)
+      if (inferred === 'mobiles') setConnectionObject(MOBILES)
+      if (inferred === 'orms') setConnectionObject(ORMS)
+    }
+  }, [showConnect, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
 
   useEffect(() => {
     if (!showConnect) return
@@ -283,7 +310,16 @@ export const Connect = () => {
     if (queryWith) {
       if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
     }
-  }, [showConnect, tab, FRAMEWORKS, queryFramework, queryUsing, queryWith])
+  }, [
+    showConnect,
+    tab,
+    queryFramework,
+    setQueryFramework,
+    queryUsing,
+    setQueryUsing,
+    queryWith,
+    setQueryWith,
+  ])
 
   if (!isActiveHealthy) {
     return (
@@ -311,18 +347,24 @@ export const Connect = () => {
           <span>Connect</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
-        <DialogHeader className={DIALOG_PADDING_X}>
+      <DialogContent className={cn('sm:max-w-5xl p-0 rounded-lg')} centered={false}>
+        <DialogHeader className={cn('text-left', DIALOG_PADDING_X)}>
           <DialogTitle>
             Connect to your project
             {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
           </DialogTitle>
           <DialogDescription>
-            Get the connection strings and environment variables for your app
+            Get the connection strings and environment variables for your app.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
+        <Tabs_Shadcn_
+          value={tab}
+          onValueChange={(value) => {
+            resetQueryStates()
+            handleConnectionType(value)
+          }}
+        >
           {connectionTypes.length > 1 ? (
             <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
               {connectionTypes.map((type) => (
@@ -369,6 +411,18 @@ export const Connect = () => {
                 </TabsContent_Shadcn_>
               )
             }
+
+            const connectionTabMap: Record<
+              string,
+              'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+            > = {
+              frameworks: 'App Frameworks',
+              mobiles: 'Mobile Frameworks',
+              orms: 'ORMs',
+            }
+            const connectionTab = connectionTabMap[type.key] || 'App Frameworks'
+            const selectedFrameworkOrTool =
+              connectionObject.find((item) => item.key === selectedParent)?.label || ''
 
             return (
               <TabsContent_Shadcn_
@@ -426,17 +480,39 @@ export const Connect = () => {
                 <ConnectTabContent
                   projectKeys={projectKeys}
                   filePath={filePath}
+                  connectionTab={connectionTab}
+                  selectedFrameworkOrTool={selectedFrameworkOrTool}
                   className="rounded-b-none"
                 />
-                <Panel.Notice
-                  className="border border-t-0 rounded-lg rounded-t-none"
-                  title="New API keys coming 2025"
-                  description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
-`}
-                  href="https://github.com/orgs/supabase/discussions/29260"
-                  buttonText="Read the announcement"
-                />
+                {IS_PLATFORM && (
+                  <Panel.Notice
+                    className="border border-t-0 rounded-lg rounded-t-none"
+                    badgeLabel="Changelog"
+                    title="New publishable and secret API keys"
+                    description={
+                      <>
+                        <p>
+                          View your publishable and secret API keys from the project{' '}
+                          <Link href={`/project/${projectRef}/settings/api-keys`}>
+                            API settings page
+                          </Link>
+                        </p>
+                        <p>
+                          To learn more about the new API keys, read the{' '}
+                          <a
+                            href="https://supabase.com/docs/guides/api/api-keys"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            documentation
+                          </a>
+                        </p>
+                      </>
+                    }
+                    href={`${BASE_PATH}/project/${projectRef}/settings/api-keys`}
+                    buttonText="View API keys"
+                  />
+                )}
               </TabsContent_Shadcn_>
             )
           })}

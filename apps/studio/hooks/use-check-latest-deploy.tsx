@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { IS_PLATFORM, useFlag } from 'common'
@@ -40,13 +40,26 @@ export function useCheckLatestDeploy() {
   const [isToastShown, setIsToastShown] = useState(false)
 
   const { data: commit } = useDeploymentCommitQuery({
-    enabled: IS_PLATFORM && showRefreshToast,
+    enabled: IS_PLATFORM,
     staleTime: 1000 * 60 * 10, // 10 minutes
   })
 
+  const commitLoggedRef = useRef(false)
   useEffect(() => {
-    // if the fetched commit is undefined is undefined
-    if (!commit || commit.commitTime === 'unknown') {
+    if (commit && !commitLoggedRef.current) {
+      const commitTime =
+        commit.commitTime === 'unknown'
+          ? 'unknown time'
+          : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')
+      console.log(
+        `Supabase Studio is running commit ${commit.commitSha} deployed at ${commitTime}.`
+      )
+      commitLoggedRef.current = true
+    }
+  }, [commit])
+
+  useEffect(() => {
+    if (!showRefreshToast || !commit || commit.commitTime === 'unknown') {
       return
     }
 
@@ -78,5 +91,5 @@ export function useCheckLatestDeploy() {
       position: 'bottom-right',
     })
     setIsToastShown(true)
-  }, [commit, isToastShown, currentCommitTime])
+  }, [commit, showRefreshToast, isToastShown, currentCommitTime])
 }

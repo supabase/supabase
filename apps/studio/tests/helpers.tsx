@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 // End of third-party imports
 
-import type { Project } from 'data/projects/project-detail-query'
+import { ProjectInfoInfinite } from 'data/projects/projects-infinite-query'
 import type { Organization } from 'types'
 import { TooltipProvider } from 'ui'
 
@@ -63,13 +63,14 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     opt_in_tags: [],
     restriction_status: null,
     restriction_data: null,
+    organization_missing_address: false,
   }
 
   return Object.assign(base, details)
 }
 
-export const createMockProject = (details: Partial<Project>): Project => {
-  const base: Project = {
+export const createMockProject = (details: Partial<ProjectInfoInfinite>): ProjectInfoInfinite => {
+  const base: ProjectInfoInfinite = {
     id: 1,
     ref: 'abcdefghijklmnopqrst',
     name: 'Project 1',
@@ -79,10 +80,10 @@ export const createMockProject = (details: Partial<Project>): Project => {
     region: 'us-east-1',
     inserted_at: new Date().toISOString(),
     subscription_id: 'subscription-1',
-    db_host: 'db.supabase.co',
     is_branch_enabled: false,
     is_physical_backups_enabled: false,
-    restUrl: 'https://project-1.supabase.co',
+    organization_slug: 'slug',
+    preview_branch_refs: [],
   }
 
   return Object.assign(base, details)
@@ -100,12 +101,6 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
           queries: {
             retry: false,
           },
-        },
-        logger: {
-          log: console.log,
-          warn: console.warn,
-          // ✅ no more errors on the console for tests
-          error: process.env.NODE_ENV === 'test' ? () => {} : console.error,
         },
       })
   )

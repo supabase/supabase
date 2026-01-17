@@ -21,6 +21,7 @@ interface SortDropdownProps {
   showSortByEmail: boolean
   showSortByPhone: boolean
   setSortByValue: (value: string) => void
+  improvedSearchEnabled: boolean
 }
 
 export const SortDropdown = ({
@@ -31,8 +32,9 @@ export const SortDropdown = ({
   showSortByEmail,
   showSortByPhone,
   setSortByValue,
+  improvedSearchEnabled = false,
 }: SortDropdownProps) => {
-  if (specificFilterColumn !== 'freeform') {
+  if (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) {
     return (
       <ButtonTooltip
         disabled
@@ -44,9 +46,9 @@ export const SortDropdown = ({
             className: 'w-80 text-center',
             text: (
               <>
-                Sorting cannot be changed which searching on a specific column. If you'd like to
-                sort on other columns, change the search to{' '}
-                <span className="text-warning">all columns</span> from the header.
+                Sorting cannot be changed when searching on a specific column. If you'd like to sort
+                on other columns, change the search to{' '}
+                <span className="text-warning">unified search</span> from the search dropdown.
               </>
             ),
           },

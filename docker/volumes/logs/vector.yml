@@ -33,7 +33,7 @@ transforms:
       kong: '.appname == "supabase-kong"'
       auth: '.appname == "supabase-auth"'
       rest: '.appname == "supabase-rest"'
-      realtime: '.appname == "supabase-realtime"'
+      realtime: '.appname == "realtime-dev.supabase-realtime"'
       storage: '.appname == "supabase-storage"'
       functions: '.appname == "supabase-edge-functions"'
       db: '.appname == "supabase-db"'

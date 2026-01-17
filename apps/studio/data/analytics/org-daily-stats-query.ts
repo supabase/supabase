@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { analyticsKeys } from './keys'
 
 export enum EgressType {
@@ -10,7 +10,7 @@ export enum EgressType {
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
-  FUNCTIONS = 'egress_functions',
+  FUNCTIONS = 'egress_function',
   SUPAVISOR = 'egress_supavisor',
   LOGDRAIN = 'egress_logdrain',
 }
@@ -42,6 +42,10 @@ export enum PricingMetric {
   LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
   AUTH_MFA_PHONE = 'AUTH_MFA_PHONE',
   AUTH_MFA_WEB_AUTHN = 'AUTH_MFA_WEB_AUTHN',
+  ACTIVE_COMPUTE_HOURS = 'ACTIVE_COMPUTE_HOURS',
+  LOG_INGESTION = 'LOG_INGESTION',
+  LOG_QUERYING = 'LOG_QUERYING',
+  LOG_STORAGE = 'LOG_STORAGE',
 }
 
 export enum ComputeUsageMetric {
@@ -133,7 +137,7 @@ export async function getOrgDailyStats(
       query: {
         start: startDate,
         end: endDate,
-        projectRef,
+        project_ref: projectRef,
       },
     },
     signal,
@@ -149,18 +153,19 @@ export type OrgDailyStatsError = ResponseError
 
 export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrgDailyStatsData, OrgDailyStatsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<OrgDailyStatsData, OrgDailyStatsError, TData> = {}
 ) =>
-  useQuery<OrgDailyStatsData, OrgDailyStatsError, TData>(
-    analyticsKeys.orgDailyStats(orgSlug, { startDate, endDate, projectRef }),
-    ({ signal }) => getOrgDailyStats({ orgSlug, startDate, endDate, projectRef }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof orgSlug !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      staleTime: 1000 * 60 * 60, // default good for an hour for now
-      ...options,
-    }
-  )
+  useQuery<OrgDailyStatsData, OrgDailyStatsError, TData>({
+    queryKey: analyticsKeys.orgDailyStats(orgSlug, { startDate, endDate, projectRef }),
+    queryFn: ({ signal }) => getOrgDailyStats({ orgSlug, startDate, endDate, projectRef }, signal),
+    enabled:
+      enabled &&
+      typeof orgSlug !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    staleTime: 1000 * 60 * 60,
+    ...options,
+  })
