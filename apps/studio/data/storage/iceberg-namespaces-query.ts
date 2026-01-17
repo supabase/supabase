@@ -1,47 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespacesVariables = {
-  catalogUri: string
-  warehouse: string
+  warehouse?: string
   projectRef?: string
 }
 
-const errorPrefix = 'Failed to delete Iceberg namespaces'
+async function getNamespaces(
+  { projectRef, warehouse }: GetNamespacesVariables,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!warehouse) throw new Error('warehouse is required')
 
-async function getNamespaces({
-  catalogUri,
-  warehouse,
-  tempApiKey,
-}: GetNamespacesVariables & { tempApiKey?: string }) {
-  try {
-    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+  const { data, error } = await get('/platform/storage/{ref}/analytics-buckets/{id}/namespaces', {
+    params: { path: { ref: projectRef, id: warehouse } },
+    signal,
+  })
 
-    let headers = new Headers()
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      apikey: tempApiKey,
-    })
-    headers.delete('Authorization')
-
-    const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
-
-    const response = await fetchHandler(url, { headers, method: 'GET' })
-    const result = await response.json()
-    if (result.error) {
-      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
-      else throw new Error(errorPrefix)
-    }
-
-    const r = result as { namespaces: string[][] }
-    return r.namespaces.flat()
-  } catch (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
+  return data.data.map((x) => x.namespace).flat()
 }
 
 type IcebergNamespacesData = Awaited<ReturnType<typeof getNamespaces>>
@@ -55,23 +36,19 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
     ...options
   }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  const { projectRef, catalogUri, warehouse } = params
-  const { data } = useTemporaryAPIKeyQuery({ projectRef })
-  const tempApiKey = data?.api_key
+  const { projectRef, warehouse } = params
 
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
     queryKey: storageKeys.icebergNamespaces({
       projectRef,
       warehouse,
-      catalog: catalogUri,
     }),
-    queryFn: () => getNamespaces({ ...params, tempApiKey }),
+    queryFn: ({ signal }) => getNamespaces({ projectRef, warehouse }, signal),
     enabled:
       options &&
       typeof projectRef !== 'undefined' &&
-      typeof tempApiKey !== 'undefined' &&
-      typeof catalogUri !== 'undefined' &&
-      typeof warehouse !== 'undefined',
+      typeof warehouse !== 'undefined' &&
+      warehouse.length > 0,
     ...options,
   })
 }

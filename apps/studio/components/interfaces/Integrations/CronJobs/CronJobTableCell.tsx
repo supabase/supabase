@@ -103,13 +103,13 @@ export const CronJobTableCell = ({
           ? getNextRun(schedule, latest_run)
           : value
 
-  const { mutate: runCronJob, isLoading: isRunning } = useDatabaseCronJobRunCommandMutation({
+  const { mutate: runCronJob, isPending: isRunning } = useDatabaseCronJobRunCommandMutation({
     onSuccess: () => {
       toast.success(`Command from "${jobname}" ran successfully`)
     },
   })
 
-  const { mutate: toggleDatabaseCronJob, isLoading: isToggling } = useDatabaseCronJobToggleMutation(
+  const { mutate: toggleDatabaseCronJob, isPending: isToggling } = useDatabaseCronJobToggleMutation(
     {
       onSuccess: (_, vars) => {
         toast.success(`Successfully ${vars.active ? 'enabled' : 'disabled'} "${jobname}"`)

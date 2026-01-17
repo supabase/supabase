@@ -52,6 +52,22 @@ interface PolicyEditorPanelProps {
   authContext: 'database' | 'realtime'
 }
 
+const FORM_ID = 'rls-editor'
+const FormSchema = z.object({
+  name: z.string().min(1, 'Please provide a name'),
+  table: z.string(),
+  behavior: z.string(),
+  command: z.string(),
+  roles: z.string(),
+})
+const defaultValues = {
+  name: '',
+  table: '',
+  behavior: 'permissive',
+  command: 'select',
+  roles: '',
+}
+
 /**
  * Using memo for this component because everything rerenders on window focus because of outside fetches
  */
@@ -96,21 +112,6 @@ export const PolicyEditorPanel = memo(function ({
 
   const [showTools, setShowTools] = useState<boolean>(false)
 
-  const formId = 'rls-editor'
-  const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name'),
-    table: z.string(),
-    behavior: z.string(),
-    command: z.string(),
-    roles: z.string(),
-  })
-  const defaultValues = {
-    name: '',
-    table: '',
-    behavior: 'permissive',
-    command: 'select',
-    roles: '',
-  }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -122,7 +123,7 @@ export const PolicyEditorPanel = memo(function ({
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
-  const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: executeMutation, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
       // refresh all policies
       await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
@@ -132,7 +133,7 @@ export const PolicyEditorPanel = memo(function ({
     onError: (error) => setError(error),
   })
 
-  const { mutate: updatePolicy, isLoading: isUpdating } = useDatabasePolicyUpdateMutation({
+  const { mutate: updatePolicy, isPending: isUpdating } = useDatabasePolicyUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully updated policy')
       onSelectCancel()
@@ -290,7 +291,7 @@ export const PolicyEditorPanel = memo(function ({
   return (
     <>
       <Form_Shadcn_ {...form}>
-        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+        <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={confirmOnClose}>
             <SheetContent
               showClose={false}
@@ -490,7 +491,7 @@ export const PolicyEditorPanel = memo(function ({
                       </Button>
 
                       <ButtonTooltip
-                        form={formId}
+                        form={FORM_ID}
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
                         disabled={!canUpdatePolicies || isExecuting || isUpdating}

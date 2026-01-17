@@ -6,7 +6,7 @@ import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useTrack } from 'lib/telemetry/track'
 import {
   Button,
@@ -37,22 +37,22 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
-  const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('log_drains')
   const track = useTrack()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
   const {
     data: logDrains,
-    isLoading,
+    isPending: isLoading,
     refetch,
     error,
     isError,
   } = useLogDrainsQuery(
     { ref },
     {
-      enabled: logDrainsEnabled,
+      enabled: hasAccessToLogDrains,
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
@@ -70,16 +70,20 @@ export function LogDrains({
     },
   })
 
-  if (!orgPlanLoading && !logDrainsEnabled) {
-    return <LogDrainsEmpty />
-  }
-
-  if (isLoading || orgPlanLoading) {
+  if (isLoading || isLoadingEntitlement) {
     return (
       <div>
         <GenericSkeletonLoader />
       </div>
     )
+  }
+
+  if (!isLoadingEntitlement && !hasAccessToLogDrains) {
+    return <LogDrainsEmpty />
+  }
+
+  if (isError) {
+    return <AlertError subject="Failed to load log drains" error={error}></AlertError>
   }
 
   if (!isLoading && !hasLogDrains) {
@@ -102,10 +106,6 @@ export function LogDrains({
         <VoteLink />
       </>
     )
-  }
-
-  if (isError) {
-    return <AlertError error={error}></AlertError>
   }
 
   return (

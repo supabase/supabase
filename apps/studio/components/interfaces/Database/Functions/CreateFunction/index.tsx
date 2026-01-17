@@ -92,9 +92,9 @@ export const CreateFunction = ({
     onClose,
   })
 
-  const { mutate: createDatabaseFunction, isLoading: isCreating } =
+  const { mutate: createDatabaseFunction, isPending: isCreating } =
     useDatabaseFunctionCreateMutation()
-  const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
+  const { mutate: updateDatabaseFunction, isPending: isUpdating } =
     useDatabaseFunctionUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
@@ -152,7 +152,8 @@ export const CreateFunction = ({
         config_params: convertConfigParams(func?.config_params).value,
       })
     }
-  }, [visible, func])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, func?.id])
 
   const { data: protectedSchemas } = useProtectedSchemas()
 

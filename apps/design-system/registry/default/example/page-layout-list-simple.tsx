@@ -34,7 +34,7 @@ export default function PageLayoutListSimple() {
   return (
     <div className="w-full">
       <PageHeader size="large">
-        <PageHeaderMeta size="large">
+        <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Projects</PageHeaderTitle>
             <PageHeaderDescription>

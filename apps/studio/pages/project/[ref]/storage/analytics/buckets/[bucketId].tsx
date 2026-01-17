@@ -11,7 +11,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Bucket as BucketIcon } from 'icons'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import type { NextPageWithLayout } from 'types'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
@@ -34,7 +34,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
       title={bucketId}
       icon={
         <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
-          <BucketIcon size={20} className="text-foreground-light" />
+          <AnalyticsBucketIcon size={20} className="text-foreground-light" />
         </div>
       }
       breadcrumbs={[

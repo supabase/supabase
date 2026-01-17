@@ -1,5 +1,6 @@
-import { GridForeignKey } from './base'
+import type { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Dictionary } from 'types'
+import { GridForeignKey } from './base'
 
 export interface SupaColumn {
   readonly dataType: string
@@ -20,11 +21,14 @@ export interface SupaColumn {
 
 export interface SupaTable {
   readonly id: number
+  readonly type: ENTITY_TYPE
   readonly columns: SupaColumn[]
   readonly name: string
   readonly schema?: string | null
   readonly comment?: string | null
   readonly estimateRowCount: number
+  readonly primaryKey?: string[]
+  readonly uniqueIndexes?: string[][]
 }
 
 export interface SupaRow extends Dictionary<any> {

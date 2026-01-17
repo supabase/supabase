@@ -35,15 +35,16 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
   }
 
   // For static posts, look up author info from authors.json
-  const authorArray = blog.author?.split(',') || []
+  const authorArray = blog.author?.split(',').map((a) => a.trim()) || []
   const author = []
 
   for (let i = 0; i < authorArray.length; i++) {
-    author.push(
-      authors.find((authors: any) => {
-        return authors.author_id === authorArray[i]
-      })
-    )
+    const foundAuthor = authors.find((authors: any) => {
+      return authors.author_id === authorArray[i]
+    })
+    if (foundAuthor) {
+      author.push(foundAuthor)
+    }
   }
 
   return renderFeaturedThumb(blog, author)

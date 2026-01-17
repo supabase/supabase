@@ -6,6 +6,8 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { useParams } from 'common'
+import { usePathname } from 'next/navigation'
+import { IS_PLATFORM } from 'common'
 
 import {
   Button,
@@ -40,6 +42,8 @@ export const DownloadResultsButton = ({
   onCopyAsJSON,
 }: DownloadResultsButtonProps) => {
   const { ref } = useParams()
+  const pathname = usePathname()
+  const isLogs = pathname?.includes?.('/logs') ?? false
   // [Joshen] Ensure JSON values are stringified for CSV and Markdown
   const formattedResults = results.map((row) => {
     const r = { ...row }
@@ -109,12 +113,14 @@ export const DownloadResultsButton = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className="w-44">
-        <DropdownMenuItem asChild className="gap-x-2">
-          <Link href={`/project/${ref}/settings/log-drains`}>
-            <Settings size={14} />
-            <p>Add a Log Drain</p>
-          </Link>
-        </DropdownMenuItem>
+        {isLogs && IS_PLATFORM && (
+          <DropdownMenuItem asChild className="gap-x-2">
+            <Link href={`/project/${ref}/settings/log-drains`}>
+              <Settings size={14} />
+              <p>Add a Log Drain</p>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
           <Copy size={14} />
           <p>Copy as markdown</p>

@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
@@ -12,29 +12,36 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
   const { profile } = useProfile()
-  const [showCreateReportModal, setShowCreateReportModal] = useState(false)
-
-  const { isLoading } = useContentQuery(
-    {
-      projectRef: ref,
-      type: 'report',
-    },
-    {
-      onSuccess: (data) => {
-        const reports = data.content
-          .filter((x) => x.type === 'report')
-          .sort((a, b) => a.name.localeCompare(b.name))
-        if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
-        if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
-      },
-    }
+  const [showCreateReportModal, setShowCreateReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  const {
+    isPending: isLoading,
+    isSuccess,
+    data,
+  } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
+
+  useEffect(() => {
+    if (!isSuccess) return
+
+    const reports = data.content
+      .filter((x) => x.type === 'report')
+      .sort((a, b) => a.name.localeCompare(b.name))
+    if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
+    if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
+  }, [isSuccess, data, router, ref])
 
   const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
