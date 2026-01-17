@@ -11,6 +11,7 @@ import {
   CollapsibleTrigger_Shadcn_,
   Heading,
   Image,
+  Mermaid,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import type { PropsWithChildren } from 'react'
@@ -105,7 +106,12 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     },
     pre: (props: any) => {
       if (props.className !== ignoreClass) {
-        return <CodeBlock {...props.children.props} />
+        const childProps = props.children?.props
+        // Detect mermaid code blocks and render with Mermaid component
+        if (childProps?.className === 'language-mermaid') {
+          return <Mermaid chart={childProps.children} />
+        }
+        return <CodeBlock {...childProps} />
       } else {
         return <code {...props} />
       }
@@ -146,6 +152,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
     ),
     Admonition,
+    Mermaid,
   }
 
   return components as any

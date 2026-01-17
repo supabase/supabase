@@ -1,7 +1,7 @@
-import React, { FC, useMemo, useEffect, useState } from 'react'
-import { cn, Badge, AnimatedCounter } from 'ui'
 import { motion } from 'framer-motion'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { useMedia } from 'react-use'
+import { AnimatedCounter, Badge, cn } from 'ui'
 
 import { companyStats } from '~/data/company-stats'
 
@@ -102,7 +102,7 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
               companyStats.developersRegistered.text
             )}
           </span>
-          <Badge variant="success" size="small" className="h-[24px] px-2">
+          <Badge variant="success">
             {shouldShowAnimated ? (
               <AnimatedCounter
                 value={companyStats.developersRegisteredChange.number}

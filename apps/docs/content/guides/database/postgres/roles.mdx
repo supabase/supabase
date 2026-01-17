@@ -111,6 +111,10 @@ Used by the Auth middleware to connect to the database and run migration. Access
 
 Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
 
+### `supabase_etl_admin`
+
+Used by [Replication powered by Supabase ETL](/docs/guides/database/replication) to replicate database changes to external destinations. Has read-all access and replication privileges for change data capture, bypasses Row Level Security, and can write to the `etl` schema.
+
 ### `dashboard_user`
 
 For running commands via the Supabase UI.

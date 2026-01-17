@@ -5,27 +5,23 @@ import {
   getWrapperMetaForWrapper,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { type FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
 
 export const useAnalyticsBucketWrapperInstance = (
   { bucketId }: { bucketId?: string },
-  options?: { enabled?: boolean; refetchInterval?: (data: FDW[] | undefined) => number | false }
+  options?: { enabled?: boolean }
 ) => {
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const defaultEnabled = options?.enabled ?? true
-  const { data, isLoading: isLoadingFDWs } = useFDWsQuery(
+  const { data, isPending: isLoadingFDWs } = useFDWsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    {
-      enabled: defaultEnabled && !!bucketId,
-      refetchInterval: (data) =>
-        !!options?.refetchInterval ? options.refetchInterval(data) : false,
-    }
+    { enabled: defaultEnabled && !!bucketId }
   )
 
   const icebergWrapper = useMemo(() => {

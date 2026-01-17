@@ -1,14 +1,14 @@
-import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import { useCallback, useMemo, useEffect } from 'react'
-import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
+import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { Badge, Button, Separator } from 'ui'
 import { LogTypeIcon } from '../../components/LogTypeIcon'
+import { ColumnSchema } from '../../UnifiedLogs.schema'
 import { getStatusLevel } from '../../UnifiedLogs.utils'
 import { TruncatedTextWithPopover } from './shared/TruncatedTextWithPopover'
-import { Badge, Button, Separator } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
-import { ColumnSchema } from '../../UnifiedLogs.schema'
 
 interface ServiceFlowHeaderProps {
   selectedRow: ColumnSchema
@@ -101,11 +101,7 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
     <div className="flex items-center justify-between px-4 py-3">
       <div className="flex items-center gap-3 min-w-0 flex-1 mr-6">
         {logType && <LogTypeIcon type={logType} size={16} className="text-foreground/70" />}
-        {method && (
-          <Badge variant="default" className="font-mono text-xs rounded px-1">
-            {method}
-          </Badge>
-        )}
+        {method && <Badge variant="default">{method}</Badge>}
         {displayPath.isTruncatable ? (
           <TruncatedTextWithPopover
             text={displayPath.text}

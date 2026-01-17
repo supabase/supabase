@@ -30,6 +30,7 @@ export type QueryPerformanceQueryOpts = {
   roles?: string[]
   runIndexAdvisor?: boolean
   minCalls?: number
+  filterIndexAdvisor?: boolean
 }
 
 export const useQueryPerformanceQuery = ({
@@ -39,6 +40,7 @@ export const useQueryPerformanceQuery = ({
   roles,
   runIndexAdvisor = false,
   minCalls,
+  filterIndexAdvisor = false,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
@@ -58,7 +60,8 @@ export const useQueryPerformanceQuery = ({
     [],
     whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
     orderBySql,
-    runIndexAdvisor
+    runIndexAdvisor,
+    filterIndexAdvisor
   )
   return useDbQuery({
     sql,

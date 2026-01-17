@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,12 +6,10 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
@@ -25,7 +21,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -84,33 +79,23 @@ const formId = 'create-storage-bucket-form'
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
 interface CreateBucketModalProps {
-  buttonSize?: 'tiny' | 'small'
-  buttonType?: 'default' | 'primary'
-  buttonClassName?: string
-  label?: string
+  open: boolean
+  onOpenChange: (value: boolean) => void
 }
 
-export const CreateBucketModal = ({
-  buttonSize = 'tiny',
-  buttonType = 'default',
-  buttonClassName,
-  label = 'New bucket',
-}: CreateBucketModalProps) => {
+export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const [visible, setVisible] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
-
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
+  const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
@@ -168,7 +153,7 @@ export const CreateBucketModal = ({
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
       setSelectedUnit(StorageSizeUnits.MB)
-      setVisible(false)
+      onOpenChange(false)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
@@ -192,42 +177,18 @@ export const CreateBucketModal = ({
   const handleClose = () => {
     form.reset()
     setSelectedUnit(StorageSizeUnits.MB)
-    setVisible(false)
+    onOpenChange(false)
   }
 
   return (
     <Dialog
-      open={visible}
+      open={open}
       onOpenChange={(open) => {
         if (!open) {
           handleClose()
         }
       }}
     >
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          size={buttonSize}
-          type={buttonType}
-          className={buttonClassName}
-          icon={<Plus size={14} />}
-          disabled={!canCreateBuckets}
-          style={{ justifyContent: 'start' }}
-          onClick={() => setVisible(true)}
-          tabIndex={!canCreateBuckets ? -1 : 0}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canCreateBuckets
-                ? 'You need additional permissions to create buckets'
-                : undefined,
-            },
-          }}
-        >
-          {label}
-        </ButtonTooltip>
-      </DialogTrigger>
-
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create file bucket</DialogTitle>
@@ -374,7 +335,7 @@ export const CreateBucketModal = ({
                       <InlineLink
                         className="text-destructive decoration-destructive-500 hover:decoration-destructive"
                         href={`/project/${ref}/storage/settings`}
-                        onClick={() => setVisible(false)}
+                        onClick={() => onOpenChange(false)}
                       >
                         Storage Settings
                       </InlineLink>{' '}
@@ -388,7 +349,7 @@ export const CreateBucketModal = ({
                       <InlineLink
                         className="text-foreground-light hover:text-foreground"
                         href={`/project/${ref}/storage/settings`}
-                        onClick={() => setVisible(false)}
+                        onClick={() => onOpenChange(false)}
                       >
                         global file size limit
                       </InlineLink>{' '}
@@ -445,7 +406,7 @@ export const CreateBucketModal = ({
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreatingBucket} onClick={() => setVisible(false)}>
+          <Button type="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

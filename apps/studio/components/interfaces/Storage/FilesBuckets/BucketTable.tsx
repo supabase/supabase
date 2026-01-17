@@ -1,3 +1,4 @@
+import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -5,11 +6,11 @@ import {
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
+import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import type React from 'react'
 import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
@@ -72,7 +73,6 @@ type BucketTableRowProps = {
   bucket: Bucket
   projectRef: string
   formattedGlobalUploadLimit: string
-  getPolicyCount: (bucketName: string) => number
 }
 
 export const BucketTableRow = ({
@@ -80,40 +80,30 @@ export const BucketTableRow = ({
   bucket,
   projectRef,
   formattedGlobalUploadLimit,
-  getPolicyCount,
 }: BucketTableRowProps) => {
+  const router = useRouter()
+  const { getPolicyCount } = useBucketPolicyCount()
+
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 
-  const router = useRouter()
-
-  const handleBucketNavigation = (
-    bucketId: string,
-    event: React.MouseEvent | React.KeyboardEvent
-  ) => {
-    const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
-    if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
-    } else {
-      router.push(url)
-    }
-  }
+  const handleBucketNavigation = createNavigationHandler(
+    `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`,
+    router
+  )
 
   return (
     <BucketTableRow
       key={bucket.id}
+      data-bucket-id={bucket.id}
       className="relative cursor-pointer h-16 group inset-focus"
-      onClick={(event) => handleBucketNavigation(bucket.id, event)}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          handleBucketNavigation(bucket.id, event)
-        }
-      }}
+      onClick={handleBucketNavigation}
+      onAuxClick={handleBucketNavigation}
+      onKeyDown={handleBucketNavigation}
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
-        <BucketIcon size={16} className="text-foreground-muted" />
+        <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
       </BucketTableCell>
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">
@@ -146,8 +136,11 @@ export const BucketTableRow = ({
 
       <BucketTableCell>
         <div className="flex justify-end items-center h-full">
-          <ChevronRight size={14} className="text-foreground-muted/60" />
+          <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
         </div>
+        <button tabIndex={-1} className="sr-only">
+          Go to bucket details
+        </button>
       </BucketTableCell>
     </BucketTableRow>
   )

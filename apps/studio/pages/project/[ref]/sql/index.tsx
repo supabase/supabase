@@ -22,12 +22,13 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
       // Handle redirect to last opened snippet tab, or last snippet tab
       const lastOpenedTab = history.sql
       const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
-
       if (lastOpenedTab !== undefined) {
         router.push(`/project/${projectRef}/sql/${history.sql}`)
       } else if (lastTabId) {
         const lastTab = store.tabsMap[lastTabId]
-        if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+        if (lastTab) {
+          router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+        }
       } else {
         router.push(`/project/${projectRef}/sql/new`)
       }

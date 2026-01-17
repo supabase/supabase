@@ -4,7 +4,7 @@ import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-use
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
-export type SpecificFilterColumn = OptimizedSearchColumns | 'freeform'
+export type SpecificFilterColumn = OptimizedSearchColumns | 'name' | 'freeform'
 
 export const UUIDV4_LEFT_PREFIX_REGEX =
   /^(?:[0-9a-f]{1,8}|[0-9a-f]{8}-|[0-9a-f]{8}-[0-9a-f]{1,4}|[0-9a-f]{8}-[0-9a-f]{4}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{0,3}|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{0,3}|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{0,12})$/i

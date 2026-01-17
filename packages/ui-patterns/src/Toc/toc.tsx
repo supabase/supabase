@@ -1,11 +1,11 @@
 'use client'
 
-import type { TOCItemType } from './server/get-toc'
-import * as Primitive from './toc-primitive'
 import { type ComponentProps, Fragment, type HTMLAttributes, type ReactNode, useRef } from 'react'
-import { TocThumb } from './toc-thumb'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
 import { removeAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+import type { TOCItemType } from './server/get-toc'
+import * as Primitive from './toc-primitive'
+import { TocThumb } from './toc-thumb'
 
 export interface TOCProps {
   /**
@@ -139,11 +139,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
     >
       {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
         <Fragment key={index}>
-          {x.type === 'code' ? (
-            <code className="text-xs border rounded bg-muted">{x.value}</code>
-          ) : (
-            x.value
-          )}
+          {x.type === 'code' ? <code className="text-code-inline">{x.value}</code> : x.value}
         </Fragment>
       ))}
     </Primitive.TOCItem>

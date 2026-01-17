@@ -1,23 +1,24 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useMemo, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
-  useInfraMonitoringQuery,
+  useInfraMonitoringAttributesQuery,
 } from 'data/analytics/infra-monitoring-query'
 import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from 'data/analytics/project-daily-stats-query'
+import dayjs from 'dayjs'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
-import dayjs from 'dayjs'
 
 interface ChartHandlerProps {
   id?: string
@@ -72,7 +73,7 @@ const ChartHandler = ({
 
   const databaseIdentifier = state.selectedDatabaseId
 
-  const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
+  const { data: dailyStatsData, isPending: isFetchingDailyStats } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
@@ -82,11 +83,11 @@ const ChartHandler = ({
     { enabled: provider === 'daily-stats' && data === undefined }
   )
 
-  const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
-    useInfraMonitoringQuery(
+  const { data: infraMonitoringData, isPending: isFetchingInfraMonitoring } =
+    useInfraMonitoringAttributesQuery(
       {
         projectRef: ref as string,
-        attribute: attribute as InfraMonitoringAttribute,
+        attributes: [attribute as InfraMonitoringAttribute],
         startDate,
         endDate,
         interval: interval as AnalyticsInterval,
@@ -95,10 +96,18 @@ const ChartHandler = ({
       { enabled: provider === 'infra-monitoring' && data === undefined }
     )
 
+  const transformedInfraData = useMemo(() => {
+    if (!infraMonitoringData) return undefined
+    const mapped = mapMultiResponseToAnalyticsData(infraMonitoringData, [
+      attribute as InfraMonitoringAttribute,
+    ])
+    return mapped[attribute]
+  }, [infraMonitoringData, attribute])
+
   const chartData =
     data ||
     (provider === 'infra-monitoring'
-      ? infraMonitoringData
+      ? transformedInfraData
       : provider === 'daily-stats'
         ? dailyStatsData
         : undefined)

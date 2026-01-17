@@ -1,8 +1,8 @@
+import pgMeta from '@supabase/pg-meta'
+import { PostgresView } from '@supabase/postgres-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { PostgresView } from '@supabase/postgres-meta'
-import { get, handleError } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { foreignTableKeys } from './keys'
 
@@ -16,29 +16,17 @@ export async function getForeignTables(
   { projectRef, connectionString, schema }: ForeignTablesVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) throw new Error('projectRef is required')
-
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/foreign-tables', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-        include_columns: true,
-      } as any,
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql: pgMeta.foreignTables.list(schema ? { includedSchemas: [schema] } : undefined).sql,
+      queryKey: ['foreign-tables', schema],
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data as PostgresView[]
+  return result as PostgresView[]
 }
 
 export type ForeignTablesData = Awaited<ReturnType<typeof getForeignTables>>

@@ -66,7 +66,9 @@ hideToc: true
 
     Create a helper file `lib/supabase.ts` that exports a Supabase client using your Project URL and key.
 
-    <$Partial path="api_settings_steps.mdx" />
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -106,6 +108,7 @@ hideToc: true
         })
       }
       ```
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "exporeactnative", "tab": "mobiles" }} />
 
     </StepHikeCompact.Code>
 
