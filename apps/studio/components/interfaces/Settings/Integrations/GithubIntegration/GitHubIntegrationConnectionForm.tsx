@@ -448,7 +448,7 @@ const GitHubIntegrationConnectionForm = ({
                           <Button
                             type="default"
                             className="justify-start h-[34px] w-full"
-                            disabled={isLoadingGitHubRepos}
+                            disabled={disabled || isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
                               <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -704,7 +704,7 @@ const GitHubIntegrationConnectionForm = ({
                   <Button
                     type="outline"
                     onClick={handleRemoveIntegration}
-                    disabled={disabled || isDeletingConnection}
+                    disabled={isDeletingConnection}
                     loading={isDeletingConnection}
                   >
                     Disable integration

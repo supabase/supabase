@@ -370,7 +370,6 @@ export const PerformanceSettingsForm = () => {
                           <div className="relative">
                             <PrePostTab postTab={chosenUnit === 'percent' ? '%' : 'connections'}>
                               <Input_Shadcn_
-                                className="w-20"
                                 type="number"
                                 {...field}
                                 min={3}

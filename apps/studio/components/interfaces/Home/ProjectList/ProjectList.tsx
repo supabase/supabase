@@ -1,4 +1,4 @@
-import { UIEvent, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
@@ -13,30 +13,13 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
-import {
-  Card,
-  cn,
-  LoadingLine,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
-import {
-  LoadingCardView,
-  LoadingTableRow,
-  LoadingTableView,
-  NoFilterResults,
-  NoProjectsState,
-} from './EmptyStates'
+import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { LoadingCardView, LoadingTableView, NoProjectsState } from './EmptyStates'
+import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
-import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
@@ -65,7 +48,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
-    isFetching,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -106,6 +88,8 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   const noResultsFromStatusFilter =
     filterStatus.length > 0 && isSuccessProjects && orgProjects.length === 0
 
+  const noResults = noResultsFromStatusFilter || noResultsFromSearch
+
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
     added_by: {
@@ -125,11 +109,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   const vercelConnections = integrations
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
-
-  const handleScroll = (event: UIEvent<HTMLDivElement | HTMLUListElement>) => {
-    if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
-    fetchNextPage()
-  }
 
   if (isErrorPermissions) {
     return (
@@ -159,38 +138,38 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   if (viewMode === 'table') {
     return (
-      <Card className="flex-1 min-h-0 overflow-y-auto mb-8" onScroll={handleScroll}>
+      <Card className="flex-1 min-h-0 overflow-y-auto mb-8">
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
-          <TableHeader className="[&>tr>th]:sticky [&>tr>th]:top-0">
+          <TableHeader>
             <TableRow>
-              <TableHead>Project</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Compute</TableHead>
-              <TableHead>Region</TableHead>
-              <TableHead>Created</TableHead>
-            </TableRow>
-            <TableRow className="!border-b-0">
-              <TableCell colSpan={5} className="p-0">
-                <LoadingLine loading={isFetching} />
-              </TableCell>
+              <TableHead className={cn(noResults && 'text-foreground-muted')}>Project</TableHead>
+              <TableHead className={cn(noResults && 'text-foreground-muted')}>Status</TableHead>
+              <TableHead className={cn(noResults && 'text-foreground-muted')}>Compute</TableHead>
+              <TableHead className={cn(noResults && 'text-foreground-muted')}>Region</TableHead>
+              <TableHead className={cn(noResults && 'text-foreground-muted')}>Created</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {noResultsFromStatusFilter ? (
-              <TableRow>
-                <TableCell colSpan={5} className="p-0">
-                  <NoFilterResults
-                    filterStatus={filterStatus}
-                    resetFilterStatus={() => setFilterStatus([])}
-                    className="border-0"
+              <TableRow className="[&>td]:hover:bg-inherit">
+                <TableCell colSpan={5}>
+                  <NoSearchResults
+                    withinTableCell
+                    label={
+                      filterStatus.length === 0
+                        ? `No projects found`
+                        : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`
+                    }
+                    description="Your search for projects with the specified status did not return any results"
+                    onResetFilter={() => setFilterStatus([])}
                   />
                 </TableCell>
               </TableRow>
             ) : noResultsFromSearch ? (
-              <TableRow>
-                <TableCell colSpan={5} className="p-0">
-                  <NoSearchResults searchString={search} className="border-0" />
+              <TableRow className="[&>td]:hover:bg-inherit">
+                <TableCell colSpan={5}>
+                  <NoSearchResults searchString={search} withinTableCell />
                 </TableCell>
               </TableRow>
             ) : (
@@ -212,7 +191,13 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
                     )}
                   />
                 ))}
-                {hasNextPage && <LoadingTableRow />}
+                {hasNextPage && (
+                  <LoadMoreRows
+                    type="table"
+                    isFetchingNextPage={isFetchingNextPage}
+                    fetchNextPage={fetchNextPage}
+                  />
+                )}
               </>
             )}
           </TableBody>
@@ -224,40 +209,52 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   return (
     <>
       {noResultsFromStatusFilter ? (
-        <NoFilterResults
-          filterStatus={filterStatus}
-          resetFilterStatus={() => setFilterStatus([])}
+        <NoSearchResults
+          label={
+            filterStatus.length === 0
+              ? `No projects found`
+              : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`
+          }
+          description="Your search for projects with the specified status did not return any results"
+          onResetFilter={() => setFilterStatus([])}
         />
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <ul
-          onScroll={handleScroll}
-          className={cn(
-            'min-h-0 w-full mx-auto overflow-y-auto',
-            'grid grid-cols-1 gap-2 md:gap-4',
-            'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
-          )}
-        >
-          {sortedProjects?.map((project) => (
-            <ProjectCard
-              key={project.ref}
-              slug={slug}
-              project={project}
-              rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-              resourceWarnings={resourceWarnings?.find(
-                (resourceWarning) => resourceWarning.project === project.ref
-              )}
-              githubIntegration={githubConnections?.find(
-                (connection) => connection.supabase_project_ref === project.ref
-              )}
-              vercelIntegration={vercelConnections?.find(
-                (connection) => connection.supabase_project_ref === project.ref
-              )}
+        <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
+          <ul
+            className={cn(
+              'min-h-0 w-full mx-auto',
+              'grid grid-cols-1 gap-2 md:gap-4',
+              'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
+            )}
+          >
+            {sortedProjects?.map((project) => (
+              <ProjectCard
+                key={project.ref}
+                slug={slug}
+                project={project}
+                rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                resourceWarnings={resourceWarnings?.find(
+                  (resourceWarning) => resourceWarning.project === project.ref
+                )}
+                githubIntegration={githubConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+                vercelIntegration={vercelConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+              />
+            ))}
+          </ul>
+          {hasNextPage && (
+            <LoadMoreRows
+              type="card"
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
             />
-          ))}
-          {hasNextPage && [...Array(2)].map((_, i) => <ShimmeringCard key={i} />)}
-        </ul>
+          )}
+        </div>
       )}
     </>
   )

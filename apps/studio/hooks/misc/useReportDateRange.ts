@@ -46,7 +46,8 @@ export const useReportDateRange = (
   defaultHelper:
     | REPORT_DATERANGE_HELPER_LABELS
     | string
-    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
+    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
+  useV2Granularity = false
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
@@ -175,9 +176,15 @@ export const useReportDateRange = (
     return getDefaultHelper().helper.text
   }, [timestampStartValue, timestampEndValue, helperTextValue, getDefaultHelper])
 
-  const handleIntervalGranularity = useCallback((from: string, to: string) => {
+  const handleIntervalGranularity = (from: string, to: string) => {
     const diffInDays = dayjs(to).diff(from, 'day', true)
     const diffInHours = dayjs(to).diff(from, 'hour', true)
+
+    if (useV2Granularity) {
+      if (diffInHours <= 24) return '1m'
+      if (diffInDays <= 7) return '10m'
+    }
+
     const conditions = {
       '1m': diffInHours < 1.1, // less than 1.1 hours
       '5m': diffInHours < 3.1, // less than 3.1 hours
@@ -199,7 +206,7 @@ export const useReportDateRange = (
       default:
         return '1h'
     }
-  }, [])
+  }
 
   // Derive selectedDateRange from current values
   const selectedDateRange: ReportDateRange = useMemo(
@@ -208,7 +215,7 @@ export const useReportDateRange = (
       period_end: { date: timestampEnd, time_period: 'today' },
       interval: handleIntervalGranularity(timestampStart, timestampEnd),
     }),
-    [timestampStart, timestampEnd, handleIntervalGranularity]
+    [timestampStart, timestampEnd, useV2Granularity]
   )
 
   const updateDateRange = useCallback(

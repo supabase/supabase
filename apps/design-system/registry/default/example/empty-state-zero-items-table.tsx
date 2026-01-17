@@ -6,9 +6,9 @@ export default function EmptyStateZeroItemsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-foreground-muted">Table name</TableHead>
-            <TableHead className="text-foreground-muted">Date created</TableHead>
-            <TableHead />
+            <TableHead className="text-foreground-muted">Name</TableHead>
+            <TableHead className="text-foreground-muted">Created</TableHead>
+            <TableHead className="text-foreground-muted">Updated</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

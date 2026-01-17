@@ -36,7 +36,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const Home = () => {
   const { data: project } = useSelectedProjectQuery()

@@ -10,7 +10,6 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
@@ -38,6 +37,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -147,7 +147,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!ref) return console.error('Branch ref is required')
+    if (!branch?.project_ref) return console.error('Branch ref is required')
 
     const payload: {
       branchRef: string
@@ -155,7 +155,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
       branchName: string
       gitBranch?: string
     } = {
-      branchRef: ref,
+      branchRef: branch.project_ref,
       projectRef,
       branchName: data.branchName,
     }

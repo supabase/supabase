@@ -1,10 +1,14 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { ArrowRight, Key, Link, Lock, Lightbulb } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import {
+  useColumnHasIndexSuggestion,
+  useTableIndexAdvisor,
+} from '../../context/TableIndexAdvisorContext'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
@@ -24,6 +28,8 @@ export function ColumnHeader<R>({
   const columnFormat = getColumnFormat(columnType, format)
   const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
+  const hasIndexSuggestion = useColumnHasIndexSuggestion(column.name as string)
+  const { openSheet } = useTableIndexAdvisor()
 
   // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
@@ -141,6 +147,21 @@ export function ColumnHeader<R>({
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {hasIndexSuggestion && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="flex items-center"
+                  onClick={() => openSheet(column.name as string)}
+                >
+                  <Lightbulb size={14} strokeWidth={2} className="!text-warning" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                Index might improve performance. Click for details.
               </TooltipContent>
             </Tooltip>
           )}

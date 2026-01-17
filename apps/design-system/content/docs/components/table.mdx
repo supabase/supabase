@@ -1,64 +1,134 @@
 ---
 title: Table
-description: A responsive table component for basic data.
+description: A responsive table component for presenting data inline.
 component: true
+source:
+  shadcn: true
 ---
 
-Table presents basic tabular data presentation within a [Card](/docs/components/card).
+Table is an opinionated `<table>` element for basic tabular data presentation. It is usually presented within a [Card](../components/card).
 
 <ComponentPreview name="table-demo" peekCode wide />
-
-Columns will naturally take the width of their content. Width specification is therefore not required unless you require columns to span a specific width. An example use-case may be when placing multiple Table instances on the one page, where columns on each table should optically align.
-
-`TableHead` includes a `whitespace-nowrap` utility class to prevent its text from wrapping. `TableCell` must have any custom width specified, as there are legitimate use cases for both wrapping (or truncated) text.
 
 ## Usage
 
 ```tsx
 import {
+  Card,
   Table,
   TableBody,
-  TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from 'ui'
 ```
 
 ```tsx
-<Table>
-  <TableCaption>A list of your recent invoices.</TableCaption>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Invoice</TableHead>
-      <TableHead>Status</TableHead>
-      <TableHead>Method</TableHead>
-      <TableHead className="text-right">Amount</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    <TableRow>
-      <TableCell className="font-medium">INV001</TableCell>
-      <TableCell>Paid</TableCell>
-      <TableCell>Credit Card</TableCell>
-      <TableCell className="text-right">$250.00</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
+<Card>
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Column 1</TableHead>
+        <TableHead>Column 2</TableHead>
+        <TableHead>Column 3</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell>Value 1</TableCell>
+        <TableCell>Value 2</TableCell>
+        <TableCell>Value 3</TableCell>
+      </TableRow>
+    </TableBody>
+    <TableFooter>
+      <TableRow>
+        <TableCell colSpan={2}>Total</TableCell>
+        <TableCell>Value</TableCell>
+      </TableRow>
+    </TableFooter>
+  </Table>
+</Card>
 ```
 
-## Sortable Columns
+## Layout
 
-Use `TableHeadSort` inside `TableHead` to enable column sorting.
+Columns will naturally take the width of their content unless otherwise specified. Specific column widths may be useful for controlling layout shift or for aligning multiple Table instances vertically.
+
+Table Head includes a `whitespace-nowrap` utility class to prevent its text from wrapping. Table Cell must have any custom width specified, as there are legitimate use cases for both wrapping (or truncated) text.
+
+The Table component is wrapped in a `ShadowScrollArea` by default, which provides horizontal scrolling on smaller screens when the table content exceeds the viewport width.
+
+## Structure
+
+Table is comprised of the following [Shadcn primitives](https://ui.shadcn.com/docs/components/table) which map directly to their HTML counterparts:
+
+| Component     | HTML element                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| Table         | [`<table>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table)     |
+| Table Body    | [`<tbody>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tbody)     |
+| Table Caption | [`<caption>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/caption) |
+| Table Cell    | [`<td>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/td)           |
+| Table Footer  | [`<tfoot>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tfoot)     |
+| Table Head    | [`<th>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/th)           |
+| Table Header  | [`<thead>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/thead)     |
+| Table Row     | [`<tr>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tr)           |
+
+Table and its child components follow their HTML element counterparts for semantics, accessibility, and best practices.
+
+### Table Caption
+
+Table Caption describes a table’s purpose or content. Think of it like the label of a diagram. It should only contain a single text node.
+
+Just like its `<caption>` counterpart, Table Caption should be the first child of a Table element (before a Table Body) irrespective of its final visual positioning.
+
+### Table Footer
+
+Table Footer is a semantic grouping for the final rows of a table, typically used for column summaries, totals, or footnotes that relate to the data in the body of the table.
+
+Table Footer typically contains the same child elements as a Table Body, such as Table Row and Table Cell, and is a sibling of Table Body.
+
+## Examples
+
+### Empty state
+
+When displaying an empty state within a table, dim the Table Head text to indicate that no data is present. Use consistent zero results presentation across your application to maintain a cohesive user experience.
+
+<ComponentPreview name="empty-state-zero-items-table" />
+
+To prevent the empty state row from being highlighted on hover, apply the `[&>td]:hover:bg-inherit` class to the Table Row containing the empty state message.
+
+```tsx showLineNumbers {1}
+<TableRow className="[&>td]:hover:bg-inherit">
+  <TableCell colSpan={3}>
+    <p className="text-sm text-foreground">No results found</p>
+    <p className="text-sm text-foreground-lighter">
+      Your search for “test” did not return any results
+    </p>
+  </TableCell>
+</TableRow>
+```
+
+See [Empty States](../ui-patterns/empty-states) for more information.
+
+### Sortable columns
+
+Use `TableHeadSort` inside Table Head to enable column sorting. This component provides visual indicators for sort state (ascending, descending, or unsorted) and handles click interactions.
+
+```tsx
+import { TableHeadSort } from 'ui'
+```
 
 | Prop           | Type                       | Description                                                        |
 | -------------- | -------------------------- | ------------------------------------------------------------------ |
 | `column`       | `string`                   | Unique identifier for the column                                   |
 | `currentSort`  | `string`                   | Current sort state in format `"column:order"` (e.g., `"name:asc"`) |
 | `onSortChange` | `(column: string) => void` | Callback fired when column header is clicked                       |
+| `children`     | `ReactNode`                | The label text for the column header                               |
+| `className`    | `string`                   | Optional additional CSS classes                                    |
 
-```tsx
+```tsx showLineNumbers {2}
 <TableHead>
   <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
     Name
@@ -66,10 +136,85 @@ Use `TableHeadSort` inside `TableHead` to enable column sorting.
 </TableHead>
 ```
 
-## Data Table
+The component displays:
 
-You can use the `<Table />` component to build more complex data tables. Combine it with [@tanstack/react-table](https://tanstack.com/table/v8) to create tables with sorting, filtering and pagination.
+- An up arrow when the column is sorted ascending
+- A down arrow when the column is sorted descending
+- A chevrons icon when the column is not currently sorted (visible on hover)
 
-See the [Data Table](/docs/components/data-table) documentation for more information.
+<ComponentPreview name="table-sort" />
 
-You can also see an example of a data table in the [Tasks](/examples/tasks) demo.
+### Row icons
+
+When adding icon columns to your table, use [Accessibility](../accessibility) markup by including a screen reader-only label in the corresponding Table Head using the `sr-only` class. This ensures that assistive technologies can properly identify the column's purpose. Remove these icon cells when loading or displaying zero results to maintain a clean and consistent table structure.
+
+<ComponentPreview name="table-icons" />
+
+```tsx showLineNumbers {4, 5, 13, 14}
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead className="w-1">
+        <span className="sr-only">Icon</span>
+      </TableHead>
+      <TableHead>Name</TableHead>
+      <TableHead>Email</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell className="w-1">
+        <IconName size={16} className="text-foreground-muted" />
+      </TableCell>
+      <TableCell>Value</TableCell>
+      <TableCell>Value</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+### Actions
+
+Action should be placed in the last column of each Table Row to maintain a logical reading flow. Users scan table data from left to right, so positioning actions on the right ensures they encounter the primary information first before reaching interactive controls.
+
+#### Multiple actions
+
+When multiple actions are available for a row, display one primary action as a button and place additional options in an overflow menu. This keeps the table clean and scannable while providing access to all necessary actions without overwhelming the user.
+
+<ComponentPreview name="table-actions" />
+
+#### Cross-links
+
+You may need to link to related resources from within table cells. In these cases, use the `text-link-table-cell` CSS class to provide a visual hint that the text is interactive while maintaining its appearance as tertiary content.
+
+<ComponentPreview name="table-cross-link" />
+
+Avoid making the entire row interactive when using cross-links. Multiple interactive areas within a single row increases the chance of mis-taps and creates ambiguity about which action will be triggered. Keep cross-links as discrete, scannable elements within their respective cells, and maintain a dedicated action column for primary row-level actions.
+
+#### Row-level navigation
+
+The entire Table Row may be tappable. This pattern is most effective when navigation is the sole or primary action for each row, as it provides a large, easy-to-target interaction area.
+
+Avoid adding other actions when using row-level navigation, as multiple interactive areas within a single row create competing affordances and increase interaction complexity.
+
+<ComponentPreview name="table-row-link" />
+
+When implementing row-level navigation, pay close attention to [Accessibility](/accessibility#focus-management) requirements. The row must be keyboard accessible with proper focus management, including:
+
+- Handling `Enter` and `Space` key presses for activation
+- Providing visual focus indicators using classes like `inset-focus`
+- Supporting modifier keys (`Ctrl`/`Cmd`) for opening links in new tabs
+
+#### Row navigation with actions
+
+If you must combine row-level navigation with additional actions, nest all secondary actions in an overflow menu and maintain a [ChevronRight](https://lucide.dev/icons/chevron-right) visual indicator to signal that the row is navigable. This pattern preserves the primary navigation affordance while keeping secondary actions accessible but unobtrusive.
+
+<ComponentPreview name="table-row-link-actions" />
+
+This hybrid approach requires careful attention to event handling. Ensure that taps on action buttons stop event propagation to prevent triggering row navigation, and maintain clear visual separation between the navigable row area and the action controls.
+
+## Related
+
+Use the Table component for simple, static tabular data presentation with a fixed number of rows. Consider using [Data Table](../ui-patterns/tables#data-table) for more complex cases as it provides built-in sorting, filtering, and pagination capabilities.
+
+Refer to [Tables](../ui-patterns/tables) for broader guidance and best practices on presenting tabular data.

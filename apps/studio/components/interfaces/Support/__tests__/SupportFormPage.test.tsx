@@ -771,7 +771,7 @@ describe('SupportFormPage', () => {
 
     await selectLibraryOption(screen, 'JavaScript')
     await waitFor(() => {
-      expect(getLibrarySelector(screen)).toHaveTextContent('Javascript')
+      expect(getLibrarySelector(screen)).toHaveTextContent('JavaScript')
     })
 
     const summaryField = getSummaryField(screen)
@@ -816,7 +816,7 @@ describe('SupportFormPage', () => {
     expect(payload.message).toBe(expectedMessage)
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
   }, 10_000)
 
@@ -906,7 +906,7 @@ describe('SupportFormPage', () => {
     expect(payload.message).toBe(expectedMessage)
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
   }, 10_000)
 
@@ -1009,7 +1009,7 @@ describe('SupportFormPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
   }, 10_000)
 
@@ -1147,7 +1147,7 @@ describe('SupportFormPage', () => {
         expect(submitSpy).toHaveBeenCalledTimes(1)
       })
       await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+        expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
       })
     }
   }, 10_000)
@@ -1464,7 +1464,7 @@ describe('SupportFormPage', () => {
       expect(toastSuccessSpy).toHaveBeenCalledWith('Support request sent. Thank you!')
     })
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
   }, 10_000)
 
@@ -1610,7 +1610,7 @@ describe('SupportFormPage', () => {
       expect(payload.message).toContain(signedUrls[1])
 
       await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+        expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
       })
     } finally {
       unmount?.()
@@ -1689,7 +1689,7 @@ describe('SupportFormPage', () => {
     expect(payload.message).toBe(expectedMessage)
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
   }, 10_000)
 })

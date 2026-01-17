@@ -42,7 +42,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { getQueueFunctionsMapping } from './Queue.utils'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
