@@ -1,4 +1,5 @@
 import '@/styles/globals.css'
+import '../../studio/styles/typography.scss'
 import type { Metadata } from 'next'
 import { ThemeProvider } from './Providers'
 import { SonnerToaster } from './SonnerToast'

@@ -57,7 +57,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
       setIsOpen(false)
     }, [])
 
-    const { mutate: syncEnvs, isLoading: isSyncEnvLoading } =
+    const { mutate: syncEnvs, isPending: isSyncEnvLoading } =
       useIntegrationsVercelConnectionSyncEnvsMutation({
         onSuccess: () => {
           toast.success('Successfully synced environment variables')

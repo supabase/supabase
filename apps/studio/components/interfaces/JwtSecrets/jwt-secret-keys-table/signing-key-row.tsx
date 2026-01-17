@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { motion } from 'framer-motion'
 import {
   CircleArrowDown,
@@ -14,6 +13,7 @@ import {
 import { components } from 'api-types'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import dayjs from 'dayjs'
 import {
   Badge,
   Button,
@@ -25,6 +25,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
 
@@ -77,15 +78,15 @@ export const SigningKeyRow = ({
           )}
         >
           {signingKey.status === 'standby' ? (
-            <Timer className="size-4 flex-shrink-0" />
+            <Timer className="flex-shrink-0" size={14} />
           ) : (
-            <Key className="size-4 flex-shrink-0" />
+            <Key className="flex-shrink-0" size={14} />
           )}
-          <span className="truncate">{statusLabels[signingKey.status]}</span>
+          <span className="truncate text-xs">{statusLabels[signingKey.status]}</span>
         </Badge>
       </div>
     </TableCell>
-    <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
+    <TableCell className="font-mono truncate w-[315px] pl-0 py-2">
       <div className="min-w-0 flex">
         <Badge
           className={cn(
@@ -94,22 +95,28 @@ export const SigningKeyRow = ({
             'gap-2 py-2 h-6 min-w-0 overflow-hidden flex items-center flex-1'
           )}
         >
-          <span className="truncate flex-1" title={signingKey.id}>
+          <span className="truncate flex-1 text-xs" title={signingKey.id}>
             {signingKey.id}
           </span>
         </Badge>
       </div>
     </TableCell>
-    <TableCell className="truncate max-w-[100px] py-2">
+    <TableCell className="truncate py-2">
       <AlgorithmHoverCard
         algorithm={signingKey.algorithm}
         legacy={signingKey.id === legacyKey?.id}
       />
     </TableCell>
-    {(signingKey.status === 'previously_used' || signingKey.status === 'revoked') && (
-      <TableCell className="text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
-        {dayjs(signingKey.updated_at).fromNow()}
+    {signingKey.status === 'previously_used' || signingKey.status === 'revoked' ? (
+      <TableCell className="max-w-[100px] text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
+        <TimestampInfo
+          className="text-sm"
+          utcTimestamp={signingKey.updated_at}
+          label={dayjs(signingKey.updated_at).fromNow()}
+        />
       </TableCell>
+    ) : (
+      <TableCell />
     )}
     <TableCell className="text-right py-2">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (

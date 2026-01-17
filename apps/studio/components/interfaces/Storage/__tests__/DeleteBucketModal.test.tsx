@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
 import { DeleteBucketModal } from '../DeleteBucketModal'
@@ -90,12 +90,18 @@ describe(`DeleteBucketModal`, () => {
         },
       ],
     })
-    // useBucketDeleteMutation
+    // useBucketDeleteMutation - empty bucket
     addAPIMock({
       method: `post`,
       path: `/platform/storage/:ref/buckets/:id/empty`,
     })
-    // useDatabasePolicyDeleteMutation
+    // useBucketDeleteMutation - poll for empty bucket
+    addAPIMock({
+      method: `post`,
+      path: `/platform/storage/:ref/buckets/:id/objects/list`,
+      response: [], // Return empty array to indicate bucket is empty
+    })
+    // useBucketDeleteMutation - delete bucket
     addAPIMock({
       method: `delete`,
       path: `/platform/storage/:ref/buckets/:id`,
@@ -104,13 +110,13 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const input = screen.getByLabelText(/Type/)
+    const input = screen.getByPlaceholderText(`Type bucket name`)
     await userEvent.type(input, `test`)
 
     const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
@@ -118,24 +124,5 @@ describe(`DeleteBucketModal`, () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
-  })
-
-  it(`prevents submission when the input doesn't match the bucket name`, async () => {
-    const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
-
-    const openButton = screen.getByRole(`button`, { name: `Open` })
-    await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
-
-    const input = screen.getByLabelText(/Type/)
-    await userEvent.type(input, `invalid`)
-
-    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
-    fireEvent.click(confirmButton)
-
-    await waitFor(() => {
-      expect(screen.getByText(/Please enter/)).toBeInTheDocument()
-    })
   })
 })

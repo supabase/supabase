@@ -3,6 +3,7 @@ import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -52,19 +53,26 @@ const UserImpersonationSelector = () => {
 
   const { data: project } = useSelectedProjectQuery()
 
-  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } =
-    useUsersInfiniteQuery(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        keywords: debouncedSearchText.trim().toLocaleLowerCase(),
-      },
-      {
-        keepPreviousData: true,
-      }
-    )
+  const {
+    data,
+    isSuccess,
+    isPending: isLoading,
+    isError,
+    error,
+    isFetching,
+    isPlaceholderData,
+  } = useUsersInfiniteQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      keywords: debouncedSearchText.trim().toLocaleLowerCase(),
+    },
+    {
+      placeholderData: keepPreviousData,
+    }
+  )
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
-  const isSearching = isPreviousData && isFetching
+  const isSearching = isPlaceholderData && isFetching
   const impersonatingUser =
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&

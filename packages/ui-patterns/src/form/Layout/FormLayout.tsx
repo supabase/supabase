@@ -82,7 +82,7 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
       flex: 'flex flex-col gap-0 min-w-0',
-      'flex-row-reverse': 'flex flex-col min-w-0',
+      'flex-row-reverse': 'flex flex-col min-w-0 flex-grow',
     },
     labelLayout: {
       horizontal: '',
@@ -233,7 +233,8 @@ const FlexContainer = cva('', {
     },
     {
       layout: 'flex-row-reverse',
-      className: 'flex flex-col justify-center items-start md:items-end shrink-0',
+      className:
+        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 md:min-w-100 [&>div]:md:w-full',
     },
   ],
 })

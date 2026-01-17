@@ -41,7 +41,7 @@ function useSingleLog({
   const {
     data,
     error: rcError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
   } = useQuery({
@@ -73,7 +73,7 @@ function useSingleLog({
     data: !!result
       ? { ...result, metadata: logsMetadata ? result?.metadata : undefined }
       : undefined,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (enabled && isPending) || isRefetching,
     error,
     refresh: () => refetch(),
   }

@@ -10,7 +10,7 @@ export async function getGitHubRepositories(signal?: AbortSignal) {
   })
 
   if (error) handleError(error)
-  return data.repositories
+  return data
 }
 
 export type GitHubRepositoriesData = Awaited<ReturnType<typeof getGitHubRepositories>>

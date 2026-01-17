@@ -12,7 +12,7 @@ const InlineEditorKeyboardTooltip = () => {
     true
   )
 
-  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'e']} /> : null
+  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
 }
 
 export const InlineEditorButton = () => {
@@ -35,8 +35,9 @@ export const InlineEditorButton = () => {
       onClick={handleClick}
       tooltip={{
         content: {
+          className: 'p-1 pl-2.5',
           text: (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2.5">
               <span>SQL Editor</span>
               <InlineEditorKeyboardTooltip />
             </div>
