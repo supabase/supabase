@@ -23,7 +23,7 @@ export const QueryError = ({
   setOpen: Dispatch<SetStateAction<boolean>>
 }) => {
   const formattedError =
-    (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
+    (error?.message?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
   return (
     <div className="flex flex-col gap-y-3 px-5">

@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.10.27-sha-85b84e0
+    image: supabase/studio:2025.12.17-sha-43f4f7f
     restart: unless-stopped
     healthcheck:
       test:
@@ -32,6 +32,9 @@ services:
       HOSTNAME: "::"
 
       STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
 
@@ -87,7 +90,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.180.0
+    image: supabase/gotrue:v2.184.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -170,7 +173,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v13.0.7
+    image: postgrest/postgrest:v14.1
     restart: unless-stopped
     depends_on:
       db:
@@ -194,7 +197,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.57.2
+    image: supabase/realtime:v2.68.0
     restart: unless-stopped
     depends_on:
       db:
@@ -205,15 +208,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "-sSfL",
-          "--head",
-          "-o",
-          "/dev/null",
-          "-H",
-          "Authorization: Bearer ${ANON_KEY}",
-          "http://localhost:4000/api/tenants/realtime-dev/health"
+          "CMD-SHELL",
+          "curl -sSfL --head -o /dev/null -H \"Authorization: Bearer ${ANON_KEY}\" http://localhost:4000/api/tenants/realtime-dev/health"
         ]
       timeout: 5s
       interval: 5s
@@ -233,13 +229,13 @@ services:
       DNS_NODES: "''"
       RLIMIT_NOFILE: "10000"
       APP_NAME: realtime
-      SEED_SELF_HOST: true
-      RUN_JANITOR: true
+      SEED_SELF_HOST: "true"
+      RUN_JANITOR: "true"
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.28.2
+    image: supabase/storage-api:v1.33.0
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -270,6 +266,7 @@ services:
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
@@ -304,7 +301,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.93.1
+    image: supabase/postgres-meta:v0.95.1
     restart: unless-stopped
     depends_on:
       db:
@@ -323,7 +320,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.69.15
+    image: supabase/edge-runtime:v1.69.28
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
@@ -347,7 +344,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.22.6
+    image: supabase/logflare:1.27.0
     restart: unless-stopped
     ports:
       - 4000:4000
@@ -383,7 +380,6 @@ services:
       LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
-      LOGFLARE_MIN_CLUSTER_SIZE: 1
 
       # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
@@ -484,7 +480,7 @@ services:
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
-    image: supabase/supavisor:2.7.3
+    image: supabase/supavisor:2.7.4
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432

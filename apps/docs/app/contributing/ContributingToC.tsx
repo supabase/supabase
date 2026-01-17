@@ -14,7 +14,7 @@ interface TocItem extends HTMLAttributes<HTMLElement> {
 }
 
 export function ContributingToc({ className }: { className?: string }) {
-  const mobileToc = useBreakpoint('xl')
+  const mobileToc = useBreakpoint('lg')
   const [tocItems, setTocItems] = useState<Array<TocItem>>([])
 
   useEffect(() => {

@@ -21,7 +21,7 @@ async function fetchReplicationTables(
     handleError(error)
   }
 
-  return data
+  return data.tables
 }
 
 export type ReplicationTablesData = Awaited<ReturnType<typeof fetchReplicationTables>>

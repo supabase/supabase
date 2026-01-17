@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
 import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { WorkflowLogs } from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
@@ -62,6 +62,7 @@ interface BranchRowProps {
   repo: string
   label?: string | ReactNode
   branch: Branch
+  isGithubConnected: boolean
   rowLink?: string
   external?: boolean
   rowActions?: ReactNode
@@ -69,6 +70,7 @@ interface BranchRowProps {
 
 export const BranchRow = ({
   branch,
+  isGithubConnected,
   label,
   repo,
   rowLink,
@@ -79,6 +81,10 @@ export const BranchRow = ({
   const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
+  const willBeDeletedIn = branch.deletion_scheduled_at
+    ? dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
+    : null
+  const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
@@ -87,7 +93,7 @@ export const BranchRow = ({
   return (
     <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3">
-        {branch.git_branch && (
+        {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
             type="default"
@@ -123,9 +129,19 @@ export const BranchRow = ({
         </Tooltip>
       </div>
       <div className="flex items-center gap-x-4">
-        <p className="text-xs text-foreground-lighter">
-          {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
-        </p>
+        {branch.deletion_scheduled_at ? (
+          <p className="text-xs text-foreground-lighter">
+            {isDeletionPending
+              ? 'Deletion pending...'
+              : `Will be deleted in ${willBeDeletedIn} minutes`}
+          </p>
+        ) : (
+          <p className="text-xs text-foreground-lighter">
+            {daysFromNow > 1
+              ? `Updated on ${formattedUpdatedAt}`
+              : `Updated ${formattedTimeFromNow}`}
+          </p>
+        )}
         <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
         {rowActions}
       </div>

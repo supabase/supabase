@@ -132,13 +132,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                     className="rounded-full"
                     icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                   >
-                    <Link
-                      href={doc.links.api}
-                      target="_blank"
-                      rel="noreferrer"
-
-                      // className={cn(badgeVariants({ variant: 'default' }), 'gap-1')}
-                    >
+                    <Link href={doc.links.api} target="_blank" rel="noreferrer">
                       API Reference
                     </Link>
                   </Button>
@@ -215,13 +209,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
-                      <Link
-                        href={doc.links.doc}
-                        target="_blank"
-                        rel="noreferrer"
-
-                        // className={cn(buttonVariants({ variant: 'default' }), 'gap-1')}
-                      >
+                      <Link href={doc.links.doc} target="_blank" rel="noreferrer">
                         Docs
                       </Link>
                     </Button>
@@ -232,13 +220,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
-                      <Link
-                        href={doc.links.api}
-                        target="_blank"
-                        rel="noreferrer"
-
-                        // className={cn(badgeVariants({ variant: 'default' }), 'gap-1')}
-                      >
+                      <Link href={doc.links.api} target="_blank" rel="noreferrer">
                         API Reference
                       </Link>
                     </Button>
