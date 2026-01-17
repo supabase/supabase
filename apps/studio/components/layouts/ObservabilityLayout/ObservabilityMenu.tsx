@@ -25,7 +25,8 @@ const ObservabilityMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, id } = useParams()
-  const pageKey = (id || router.pathname.split('/')[4]) as string
+  const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
+  const showOverview = useFlag('observabilityOverview')
   const authEnabled = useFlag('authreportv2')
   const edgeFnEnabled = useFlag('edgefunctionreport')
   const realtimeEnabled = useFlag('realtimeReport')
@@ -120,34 +121,18 @@ const ObservabilityMenu = () => {
 
   const menuItems = [
     {
-      title: 'Performance Reports',
-      key: 'performance-reports',
+      title: 'Observability',
+      key: 'observability-section',
       items: [
-        {
-          name: 'API Gateway',
-          key: 'api-overview',
-          url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
-        },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-        },
-        ...(postgrestReportEnabled
+        ...(showOverview
           ? [
               {
-                name: 'Data API',
-                key: 'postgrest',
-                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+                name: 'Overview',
+                key: 'observability',
+                url: `/project/${ref}/observability${preservedQueryParams}`,
               },
             ]
           : []),
-      ],
-    },
-    {
-      title: 'Product Reports',
-      key: 'product-reports',
-      items: [
         ...(authEnabled
           ? [
               {
@@ -189,6 +174,25 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
+        {
+          name: 'API Gateway',
+          key: 'api-overview',
+          url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
+        },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+        },
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'Data API',
+                key: 'postgrest',
+                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
       ],
     },
   ]
@@ -203,81 +207,6 @@ const ObservabilityMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-y-6">
-          <div className="mx-2">
-            <Menu.Group
-              title={
-                <span className="flex w-full items-center justify-between relative h-6">
-                  <span className="uppercase font-mono">Custom Reports</span>
-                  {reportMenuItems.length > 0 && (
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      icon={<Plus />}
-                      disabled={!canCreateCustomReport}
-                      className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
-                      onClick={() => {
-                        setShowNewReportModal(true)
-                      }}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateCustomReport
-                            ? 'You need additional permissions to create custom reports'
-                            : undefined,
-                        },
-                      }}
-                    />
-                  )}
-                </span>
-              }
-            />
-            {reportMenuItems.length === 0 ? (
-              <div className="px-2">
-                <InnerSideBarEmptyPanel
-                  title="No custom reports yet"
-                  description="Create and save custom reports to track your project metrics"
-                  actions={
-                    <ButtonTooltip
-                      type="default"
-                      icon={<Plus />}
-                      disabled={!canCreateCustomReport}
-                      onClick={() => {
-                        setShowNewReportModal(true)
-                      }}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateCustomReport
-                            ? 'You need additional permissions to create custom reports'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      New custom report
-                    </ButtonTooltip>
-                  }
-                />
-              </div>
-            ) : (
-              <>
-                {reportMenuItems.map((item) => (
-                  <ObservabilityMenuItem
-                    key={item.id}
-                    item={item as any}
-                    pageKey={pageKey}
-                    onSelectEdit={() => {
-                      setSelectedReportToUpdate(item.report)
-                    }}
-                    onSelectDelete={() => {
-                      setSelectedReportToDelete(item.report)
-                      setDeleteModalOpen(true)
-                    }}
-                  />
-                ))}
-              </>
-            )}
-          </div>
-
           {menuItems.map((item, idx) => (
             <Fragment key={idx}>
               <div className="h-px w-full bg-border-overlay first:hidden" />
@@ -311,6 +240,84 @@ const ObservabilityMenu = () => {
               </div>
             </Fragment>
           ))}
+
+          <Fragment>
+            <div className="h-px w-full bg-border-overlay" />
+            <div className="mx-2">
+              <Menu.Group
+                title={
+                  <span className="flex w-full items-center justify-between relative h-6">
+                    <span className="uppercase font-mono">Custom Reports</span>
+                    {reportMenuItems.length > 0 && (
+                      <ButtonTooltip
+                        type="default"
+                        size="tiny"
+                        icon={<Plus />}
+                        disabled={!canCreateCustomReport}
+                        className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
+                        onClick={() => {
+                          setShowNewReportModal(true)
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canCreateCustomReport
+                              ? 'You need additional permissions to create custom reports'
+                              : undefined,
+                          },
+                        }}
+                      />
+                    )}
+                  </span>
+                }
+              />
+              {reportMenuItems.length === 0 ? (
+                <div className="px-2">
+                  <InnerSideBarEmptyPanel
+                    title="No custom reports yet"
+                    description="Create and save custom reports to track your project metrics"
+                    actions={
+                      <ButtonTooltip
+                        type="default"
+                        icon={<Plus />}
+                        disabled={!canCreateCustomReport}
+                        onClick={() => {
+                          setShowNewReportModal(true)
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canCreateCustomReport
+                              ? 'You need additional permissions to create custom reports'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        New custom report
+                      </ButtonTooltip>
+                    }
+                  />
+                </div>
+              ) : (
+                <>
+                  {reportMenuItems.map((item) => (
+                    <ObservabilityMenuItem
+                      key={item.id}
+                      item={item as any}
+                      pageKey={pageKey}
+                      onSelectEdit={() => {
+                        setSelectedReportToUpdate(item.report)
+                      }}
+                      onSelectDelete={() => {
+                        setSelectedReportToDelete(item.report)
+                        setDeleteModalOpen(true)
+                      }}
+                    />
+                  ))}
+                </>
+              )}
+            </div>
+          </Fragment>
 
           <UpdateCustomReportModal
             onCancel={() => setSelectedReportToUpdate(undefined)}
