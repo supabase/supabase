@@ -287,7 +287,7 @@ const ObservabilityMenu = () => {
             <Fragment key={idx}>
               <div className="h-px w-full bg-border-overlay first:hidden" />
               <div>
-                {item.items ? (
+                {item.items && item.items.length > 0 ? (
                   <div className="px-2">
                     <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
                     <div key={item.key} className="flex flex-col">
