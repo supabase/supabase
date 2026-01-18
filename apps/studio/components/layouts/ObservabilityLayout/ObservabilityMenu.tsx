@@ -124,11 +124,15 @@ const ObservabilityMenu = () => {
       title: 'Performance Reports',
       key: 'performance-reports',
       items: [
-        {
-          name: 'API Gateway',
-          key: 'api-overview',
-          url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'API Gateway',
+                key: 'api-overview',
+                url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
+              },
+            ]
+          : []),
         {
           name: 'Query Performance',
           key: 'query-performance',
@@ -208,7 +212,7 @@ const ObservabilityMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-y-6">
-          <div className="mx-2">
+          {IS_PLATFORM && <div className="mx-2">
             <Menu.Group
               title={
                 <span className="flex w-full items-center justify-between relative h-6">
@@ -281,7 +285,7 @@ const ObservabilityMenu = () => {
                 ))}
               </>
             )}
-          </div>
+          </div>}
 
           {menuItems.map((item, idx) => (
             <Fragment key={idx}>
