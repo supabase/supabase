@@ -79,11 +79,13 @@ export const ProjectCard = ({
                 </div>
               )}
               {isGithubIntegrated && (
-                <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
-                  <div className="w-5 h-5 p-1 flex items-center justify-center">
+                <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md overflow-hidden">
+                  <div className="w-5 h-5 p-1 flex items-center justify-center flex-shrink-0">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
+                  <p className="text-xs text-foreground-light truncate flex-1 min-w-0">
+                    {githubRepository}
+                  </p>
                 </div>
               )}
             </div>
