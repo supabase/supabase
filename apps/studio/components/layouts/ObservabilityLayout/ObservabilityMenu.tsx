@@ -212,80 +212,82 @@ const ObservabilityMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-y-6">
-          {IS_PLATFORM && <div className="mx-2">
-            <Menu.Group
-              title={
-                <span className="flex w-full items-center justify-between relative h-6">
-                  <span className="uppercase font-mono">Custom Reports</span>
-                  {reportMenuItems.length > 0 && (
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      icon={<Plus />}
-                      disabled={!canCreateCustomReport}
-                      className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
-                      onClick={() => {
-                        setShowNewReportModal(true)
+          {IS_PLATFORM && (
+            <div className="mx-2">
+              <Menu.Group
+                title={
+                  <span className="flex w-full items-center justify-between relative h-6">
+                    <span className="uppercase font-mono">Custom Reports</span>
+                    {reportMenuItems.length > 0 && (
+                      <ButtonTooltip
+                        type="default"
+                        size="tiny"
+                        icon={<Plus />}
+                        disabled={!canCreateCustomReport}
+                        className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
+                        onClick={() => {
+                          setShowNewReportModal(true)
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canCreateCustomReport
+                              ? 'You need additional permissions to create custom reports'
+                              : undefined,
+                          },
+                        }}
+                      />
+                    )}
+                  </span>
+                }
+              />
+              {reportMenuItems.length === 0 ? (
+                <div className="px-2">
+                  <InnerSideBarEmptyPanel
+                    title="No custom reports yet"
+                    description="Create and save custom reports to track your project metrics"
+                    actions={
+                      <ButtonTooltip
+                        type="default"
+                        icon={<Plus />}
+                        disabled={!canCreateCustomReport}
+                        onClick={() => {
+                          setShowNewReportModal(true)
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canCreateCustomReport
+                              ? 'You need additional permissions to create custom reports'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        New custom report
+                      </ButtonTooltip>
+                    }
+                  />
+                </div>
+              ) : (
+                <>
+                  {reportMenuItems.map((item) => (
+                    <ObservabilityMenuItem
+                      key={item.id}
+                      item={item as any}
+                      pageKey={pageKey}
+                      onSelectEdit={() => {
+                        setSelectedReportToUpdate(item.report)
                       }}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateCustomReport
-                            ? 'You need additional permissions to create custom reports'
-                            : undefined,
-                        },
+                      onSelectDelete={() => {
+                        setSelectedReportToDelete(item.report)
+                        setDeleteModalOpen(true)
                       }}
                     />
-                  )}
-                </span>
-              }
-            />
-            {reportMenuItems.length === 0 ? (
-              <div className="px-2">
-                <InnerSideBarEmptyPanel
-                  title="No custom reports yet"
-                  description="Create and save custom reports to track your project metrics"
-                  actions={
-                    <ButtonTooltip
-                      type="default"
-                      icon={<Plus />}
-                      disabled={!canCreateCustomReport}
-                      onClick={() => {
-                        setShowNewReportModal(true)
-                      }}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateCustomReport
-                            ? 'You need additional permissions to create custom reports'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      New custom report
-                    </ButtonTooltip>
-                  }
-                />
-              </div>
-            ) : (
-              <>
-                {reportMenuItems.map((item) => (
-                  <ObservabilityMenuItem
-                    key={item.id}
-                    item={item as any}
-                    pageKey={pageKey}
-                    onSelectEdit={() => {
-                      setSelectedReportToUpdate(item.report)
-                    }}
-                    onSelectDelete={() => {
-                      setSelectedReportToDelete(item.report)
-                      setDeleteModalOpen(true)
-                    }}
-                  />
-                ))}
-              </>
-            )}
-          </div>}
+                  ))}
+                </>
+              )}
+            </div>
+          )}
 
           {menuItems.map((item, idx) => (
             <Fragment key={idx}>
