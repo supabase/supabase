@@ -28,8 +28,7 @@ export const HomeV2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isNewHomepageMetricsV2Enabled = useFlag('newHomepageMetricsV2')
-  const shouldShowNewHomepageMetrics = isNewHomepageMetricsV2Enabled === true
+  const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -47,7 +46,7 @@ export const HomeV2 = () => {
     'empty'
   )
 
-  const UsageSection = shouldShowNewHomepageMetrics
+  const UsageSection = showHomepageUsageV2
     ? ProjectUsageSectionV2
     : ProjectUsageSectionV1
 
