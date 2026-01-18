@@ -6,6 +6,7 @@ import { Fragment, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
+import { IS_PLATFORM } from 'lib/constants'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -157,11 +158,15 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/observability/database${preservedQueryParams}`,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Database',
+                key: 'database',
+                url: `/project/${ref}/observability/database${preservedQueryParams}`,
+              },
+            ]
+          : []),
         ...(edgeFnEnabled
           ? [
               {
