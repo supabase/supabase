@@ -7,6 +7,7 @@ import {
   PROJECT_ENDPOINT_PROTOCOL,
   PROJECT_REST_URL,
 } from 'lib/constants/api'
+import { POSTGRES_PORT } from 'lib/api/self-hosted/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -30,7 +31,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       api_key_supabase_encrypted: '',
       db_host: 'localhost',
       db_name: 'postgres',
-      db_port: 5432,
+      db_port: POSTGRES_PORT,
       db_ssl: false,
       db_user: 'postgres',
       services: [
