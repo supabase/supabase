@@ -110,7 +110,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
+    mode: 'onChange',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
@@ -197,10 +197,15 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   }, [branch, visible, form, gitlessBranching])
 
   useEffect(() => {
-    if (!debouncedGitBranchName) return
+    if (!githubConnection || !debouncedGitBranchName) {
+      setIsGitBranchValid(gitlessBranching)
+      form.clearErrors('gitBranchName')
+      return
+    }
+
     form.clearErrors('gitBranchName')
     validateGitBranchName(debouncedGitBranchName)
-  }, [debouncedGitBranchName, validateGitBranchName, form])
+  }, [debouncedGitBranchName, validateGitBranchName, form, githubConnection, gitlessBranching])
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
@@ -325,7 +330,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   isChecking ||
                   (!gitlessBranching && !githubConnection)
                 }
-                loading={isUpdating}
+                loading={isUpdating || isChecking}
                 type="primary"
                 htmlType="submit"
               >
