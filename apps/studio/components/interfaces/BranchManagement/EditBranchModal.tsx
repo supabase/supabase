@@ -156,7 +156,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   }
 
   const validateGitBranchName = (branchName: string) => {
-    if (!githubConnection) return console.error('GitHub Connection is missing')
+    if (!githubConnection) return console.error(('[EditBranchModal > validateGitBranchName] GitHub Connection is missing'))
 
     const repositoryId = githubConnection.repository.id
     const requested = branchName
