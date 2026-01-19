@@ -41,6 +41,16 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should default to public schema when function has no schema prefix', () => {
+    const command = 'SELECT truncate_uploaded_images()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'truncate_uploaded_images',
+      snippet: command,
+    })
+  })
+
   it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
     const command = 'SELECT public.test_fn(1, 2)'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({

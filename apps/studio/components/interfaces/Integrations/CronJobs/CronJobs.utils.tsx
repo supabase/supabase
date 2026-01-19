@@ -129,17 +129,19 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
 
   const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
-    const [schemaName, functionName] = command
+    const parts = command
       .replace('SELECT ', '')
       .replace(/\(.*\);*/, '')
-
       .trim()
       .split('.')
 
+    const [schema, functionName] =
+      parts.length > 1 ? [parts[0], parts[1]] : ['public', parts[0]]
+
     return {
       type: 'sql_function',
-      schema: schemaName,
-      functionName: functionName,
+      schema,
+      functionName,
       snippet: originalCommand,
     }
   }
@@ -230,7 +232,7 @@ export const formatCronJobColumns = ({
   onSelectDelete: (job: CronJob) => void
 }) => {
   return CRON_TABLE_COLUMNS.map((col) => {
-    const res: Column<any> = {
+    const res: Column<unknown> = {
       key: col.id,
       name: col.name,
       minWidth: col.minWidth ?? 100,
