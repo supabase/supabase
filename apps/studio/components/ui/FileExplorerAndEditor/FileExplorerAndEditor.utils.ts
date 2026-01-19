@@ -118,6 +118,13 @@ export const extractZipFile = async (
 
     // Check individual file size
     const uncompressedSize = entry.uncompressedSize
+
+    // Guard against undefined/NaN uncompressedSize to prevent bypass of size validation
+    if (uncompressedSize === undefined || Number.isNaN(uncompressedSize)) {
+      oversizedFiles.push(`${fileName} (unknown size - metadata unavailable)`)
+      continue
+    }
+
     if (uncompressedSize > ZIP_EXTRACTION_CONFIG.MAX_INDIVIDUAL_FILE_SIZE) {
       oversizedFiles.push(`${fileName} (${formatBytes(uncompressedSize)})`)
       continue
