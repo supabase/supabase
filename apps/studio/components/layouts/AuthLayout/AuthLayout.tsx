@@ -22,14 +22,14 @@ const AuthProductMenu = () => {
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
+    authenticationPerformance,
   } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:rate_limits',
     'authentication:emails',
     'authentication:multi_factor',
     'authentication:attack_protection',
-    'authentication:advanced',
+    'authentication:performance',
   ])
 
   useAuthConfigPrefetch({ projectRef })
@@ -44,9 +44,9 @@ const AuthProductMenu = () => {
         authenticationEmails,
         authenticationMultiFactor,
         authenticationAttackProtection,
-        authenticationAdvanced,
         authenticationShowOverview,
         authenticationOauth21,
+        authenticationPerformance,
       })}
     />
   )

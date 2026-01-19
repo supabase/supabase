@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
@@ -49,7 +50,7 @@ export const HomePageActions = ({
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   return (

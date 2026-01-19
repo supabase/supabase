@@ -1853,22 +1853,99 @@
       "files": [
         {
           "path": "registry/default/password-based-auth/vue/components/login-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/login-form.vue"
         },
         {
           "path": "registry/default/password-based-auth/vue/components/sign-up-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/sign-up-form.vue"
         },
         {
           "path": "registry/default/password-based-auth/vue/components/forgot-password-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/forgot-password-form.vue"
         },
         {
           "path": "registry/default/password-based-auth/vue/components/update-password-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/update-password-form.vue"
         }
       ],
       "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "social-auth-vue",
+      "type": "registry:block",
+      "title": "Social Auth flow for Vue and Supabase",
+      "description": "Social Auth flow for Vue and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "registry/default/social-auth/vue/components/login-form.vue",
+          "type": "registry:component",
+          "target": "components/login-form.vue"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "social-auth-nuxtjs",
+      "type": "registry:block",
+      "title": "Social Auth flow for Nuxt and Supabase",
+      "description": "Social Auth flow for Nuxt and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/components/login-form.vue",
+          "type": "registry:file",
+          "target": "app/components/login-form.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/components/logout-button.vue",
+          "type": "registry:file",
+          "target": "app/components/logout-button.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/pages/auth/login.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/login.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/pages/auth/error.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/error.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/pages/protected/index.vue",
+          "type": "registry:file",
+          "target": "app/pages/protected/index.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/server/middleware/auth.ts",
+          "type": "registry:file",
+          "target": "server/middleware/auth.ts"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/server/routes/auth/oauth.ts",
+          "type": "registry:file",
+          "target": "server/routes/auth/oauth.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
       ]
     },

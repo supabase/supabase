@@ -6,7 +6,6 @@ import { useState, type KeyboardEvent, type MouseEvent } from 'react'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { VectorBucket as VectorBucketIcon } from 'icons'
 import { BASE_PATH } from 'lib/constants'
@@ -14,6 +13,7 @@ import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } f
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
@@ -38,7 +38,7 @@ export const VectorsBuckets = () => {
     data,
     error: bucketsError,
     isError: isErrorBuckets,
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
   } = useVectorBucketsQuery({ projectRef })
   const bucketsList = data?.vectorBuckets ?? []
@@ -63,7 +63,7 @@ export const VectorsBuckets = () => {
     <>
       <PageContainer>
         <PageSection>
-          <PageSectionContent>
+          <PageSectionContent className="flex flex-col gap-y-8">
             <AlphaNotice
               entity="Vector buckets"
               feedbackUrl="https://github.com/orgs/supabase/discussions/40815"

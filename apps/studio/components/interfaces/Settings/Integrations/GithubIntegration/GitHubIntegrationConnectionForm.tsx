@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Info, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
+import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -88,7 +88,7 @@ const GitHubIntegrationConnectionForm = ({
 
   const {
     data: githubReposData,
-    isLoading: isLoadingGitHubRepos,
+    isPending: isLoadingGitHubRepos,
     refetch: refetchGitHubRepositories,
   } = useGitHubRepositoriesQuery({
     enabled: Boolean(gitHubAuthorization),
@@ -448,7 +448,7 @@ const GitHubIntegrationConnectionForm = ({
                           <Button
                             type="default"
                             className="justify-start h-[34px] w-full"
-                            disabled={isLoadingGitHubRepos}
+                            disabled={disabled || isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
                               <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -704,7 +704,7 @@ const GitHubIntegrationConnectionForm = ({
                   <Button
                     type="outline"
                     onClick={handleRemoveIntegration}
-                    disabled={disabled || isDeletingConnection}
+                    disabled={isDeletingConnection}
                     loading={isDeletingConnection}
                   >
                     Disable integration

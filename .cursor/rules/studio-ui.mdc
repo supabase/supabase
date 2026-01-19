@@ -125,63 +125,106 @@ export const MyPageComponent = () => (
 
 ## Forms
 
-- Build forms with `react-hook-form` + `zod`.
-- Use our `_Shadcn_` form primitives from `ui` and prefer `FormItemLayout` with layout="flex-row-reverse" for most controls (see `apps/studio/components/interfaces/Settings/Integrations/GithubIntegration/GitHubIntegrationConnectionForm.tsx`).
-- Keep imports from `ui` with `_Shadcn_` suffixes.
-- Forms should generally be wrapped in a Card unless specified
-- If the submit button is outside the form, add a new variable named formId outside the component, and set it as property id on the form element and formId on the button.
+Forms in Supabase Studio should follow consistent patterns to ensure a cohesive user experience across settings pages and side panels.
 
-### Example (single field)
+### Core Principles
+
+- Build forms with `react-hook-form` + `zod`
+- Always use `FormItemLayout` instead of manually composing `FormItem`, `FormLabel`, `FormMessage`, and `FormDescription`
+- Always wrap form inputs with `FormControl_Shadcn_` to ensure proper form integration
+- Keep imports from `ui` with `_Shadcn_` suffixes
+- Handle dirty state: Show cancel buttons and disable save buttons based on `form.formState.isDirty`
+- Show loading states on submit buttons using the `loading` prop
+- If the submit button is outside the form, add a `formId` variable outside the component, set it as `id` on the form element and `form` prop on the button
+
+### Layout Selection
+
+- **Page layouts**: Use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment. Forms should be wrapped in a `Card` with each form field in its own `CardContent`, and `CardFooter` for actions. The layout automatically handles consistent input widths (50% on md, 40% on xl, min-w-100).
+- **Side panels (wide)**: Use `FormItemLayout` with `layout="horizontal"`. Use `SheetSection` to wrap each field group.
+- **Side panels (narrow, size="sm" or below)**: Use `FormItemLayout` with `layout="vertical"`
+
+### Page Layout Form Example
 
 ```tsx
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { Button, Form_Shadcn_, FormField_Shadcn_, FormControl_Shadcn_, Input_Shadcn_ } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form_Shadcn_,
+  FormField_Shadcn_,
+  FormControl_Shadcn_,
+  Input_Shadcn_,
+  Switch,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const profileSchema = z.object({
-  username: z.string().min(2, 'Username must be at least 2 characters'),
+const formSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  enableFeature: z.boolean(),
 })
 
-const formId = `profile-form`
-
-export function ProfileForm() {
-  const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: { username: '' },
+export function SettingsForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: '', enableFeature: false },
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
   })
 
-  function onSubmit(values: z.infer<typeof profileSchema>) {
-    // handle values
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // handle mutation with onSuccess/onError toast
   }
 
   return (
     <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card>
-          <CardContent className="space-y-6">
+          <CardContent>
             <FormField_Shadcn_
               control={form.control}
-              name="username"
+              name="name"
               render={({ field }) => (
                 <FormItemLayout
                   layout="flex-row-reverse"
-                  label="Username"
-                  description="This is your public display name."
+                  label="Name"
+                  description="A descriptive name for this resource"
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ placeholder="shadcn" autoComplete="off" {...field} />
+                    <Input_Shadcn_ {...field} placeholder="Enter name" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
           </CardContent>
-          <CardFooter className="justify-end">
-            <Button type="primary" htmlType="submit">
+          <CardContent>
+            <FormField_Shadcn_
+              control={form.control}
+              name="enableFeature"
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="flex-row-reverse"
+                  label="Enable Feature"
+                  description="Toggle this feature on or off"
+                >
+                  <FormControl_Shadcn_>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </CardContent>
+          <CardFooter className="justify-end space-x-2">
+            {form.formState.isDirty && (
+              <Button type="default" onClick={() => form.reset()}>
+                Cancel
+              </Button>
+            )}
+            <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
               Submit
             </Button>
           </CardFooter>
@@ -191,6 +234,106 @@ export function ProfileForm() {
   )
 }
 ```
+
+### Side Panel Form Example
+
+```tsx
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import {
+  Button,
+  Form_Shadcn_,
+  FormField_Shadcn_,
+  FormControl_Shadcn_,
+  Input_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+})
+
+const formId = 'sidepanel-form'
+
+export function CreateResourcePanel() {
+  const [open, setOpen] = useState(false)
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: '' },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // handle mutation
+    setOpen(false)
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent size="lg" className="flex flex-col gap-0">
+        <SheetHeader>
+          <SheetTitle>Create Resource</SheetTitle>
+        </SheetHeader>
+        <Form_Shadcn_ {...form}>
+          <form
+            id={formId}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="overflow-auto flex-grow px-0"
+          >
+            <SheetSection>
+              <FormField_Shadcn_
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout layout="horizontal" label="Name" description="A descriptive name">
+                    <FormControl_Shadcn_ className="col-span-6 min-w-100">
+                      <Input_Shadcn_ {...field} placeholder="Enter name" />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </SheetSection>
+          </form>
+        </Form_Shadcn_>
+        <SheetFooter>
+          <Button type="default" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button type="primary" form={formId} htmlType="submit">
+            Create
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
+}
+```
+
+### Common Form Field Types
+
+- **Text Input**: `Input_Shadcn_` with `placeholder`
+- **Password Input**: `Input_Shadcn_` with `type="password"`
+- **Number Input**: `Input_Shadcn_` with `type="number"` and `onChange={(e) => field.onChange(Number(e.target.value))}`
+- **Input with Units**: Wrap `Input_Shadcn_` with `PrePostTab` component: `<PrePostTab postTab="MB"><Input_Shadcn_ /></PrePostTab>`
+- **Textarea**: `Textarea` component with `rows` and `className="resize-none"`
+- **Switch**: `Switch` with `checked={field.value} onCheckedChange={field.onChange}`
+- **Checkbox**: `Checkbox_Shadcn_` with label, use multiple for checkbox groups
+- **Select**: `Select_Shadcn_` with `SelectTrigger_Shadcn_`, `SelectContent_Shadcn_`, `SelectItem_Shadcn_`
+- **Multi-Select**: Use `MultiSelector` from `ui-patterns/multi-select`
+- **Radio Group**: `RadioGroupStacked` with `RadioGroupStackedItem` for stacked options with descriptions
+- **Date Picker**: `Calendar` inside `Popover_Shadcn_` with a trigger button
+- **Copyable Input**: Use `Input` from `ui-patterns/DataInputs/Input` with `copy` and `readOnly` props
+- **Field Array**: Use `useFieldArray` from `react-hook-form` for dynamic add/remove fields
+- **Action Field**: Use `FormItemLayout` without form control, just buttons for navigation or performable actions. Wrap buttons in a div with `justify-end` to align them to the right
 
 ## Cards
 
@@ -203,6 +346,11 @@ export function ProfileForm() {
 ## Sheets
 
 - Use a sheet when needing to reveal more complicated forms or information relating to an object and context switching away to a new page would be disruptive e.g. we list auth providers, clicking an auth provider opens a sheet with information about that provider and a form to enable, user can close sheet to go back to providers list
+- Use `SheetContent` with `size="lg"` for forms that need horizontal layout
+- Use `SheetHeader`, `SheetTitle`, `SheetSection`, and `SheetFooter` for consistent structure
+- Place submit/cancel buttons in `SheetFooter`
+- For forms in sheets, use `FormItemLayout` with `layout="horizontal"` for wider panels or `layout="vertical"` for narrow panels (size="sm" or below)
+- See the Forms section for a complete side panel form example
 
 ## React Query
 
@@ -223,7 +371,6 @@ export function ProfileForm() {
 
 ```jsx
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-
 ;<Table>
   <TableCaption>A list of your recent invoices.</TableCaption>
   <TableHeader>
