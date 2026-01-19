@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -38,7 +38,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -71,7 +70,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
-    { onError: () => { } }
+    { onError: () => {} }
   )
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
@@ -155,30 +154,36 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     updateBranch(payload)
   }
 
-  const validateGitBranchName = (branchName: string) => {
-    if (!githubConnection) return console.error(('[EditBranchModal > validateGitBranchName] GitHub Connection is missing'))
+  const validateGitBranchName = useCallback(
+    (branchName: string) => {
+      if (!githubConnection)
+        return console.error(
+          '[EditBranchModal > validateGitBranchName] GitHub Connection is missing'
+        )
 
-    const repositoryId = githubConnection.repository.id
-    const requested = branchName
-    checkGithubBranchValidity(
-      { repositoryId, branchName },
-      {
-        onSuccess: () => {
-          if (form.getValues('gitBranchName') !== requested) return
-          setIsGitBranchValid(true)
-          form.clearErrors('gitBranchName')
-        },
-        onError: (error) => {
-          if (form.getValues('gitBranchName') !== requested) return
-          setIsGitBranchValid(false)
-          form.setError('gitBranchName', {
-            ...error,
-            message: `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
-          })
-        },
-      }
-    )
-  }
+      const repositoryId = githubConnection.repository.id
+      const requested = branchName
+      checkGithubBranchValidity(
+        { repositoryId, branchName },
+        {
+          onSuccess: () => {
+            if (form.getValues('gitBranchName') !== requested) return
+            setIsGitBranchValid(true)
+            form.clearErrors('gitBranchName')
+          },
+          onError: (error) => {
+            if (form.getValues('gitBranchName') !== requested) return
+            setIsGitBranchValid(false)
+            form.setError('gitBranchName', {
+              ...error,
+              message: `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
+            })
+          },
+        }
+      )
+    },
+    [githubConnection, form, checkGithubBranchValidity, repoOwner, repoName]
+  )
 
   // Pre-fill form when the modal becomes visible and branch data is available
   useEffect(() => {
@@ -191,11 +196,11 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     }
   }, [branch, visible, form, gitlessBranching])
 
-  useStaticEffectEvent(() => {
+  useEffect(() => {
     if (!debouncedGitBranchName) return
     form.clearErrors('gitBranchName')
     validateGitBranchName(debouncedGitBranchName)
-  })
+  }, [debouncedGitBranchName, validateGitBranchName, form])
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
