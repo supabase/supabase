@@ -3,7 +3,7 @@ import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -115,11 +115,10 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
   })
-  const { gitBranchName } = form.watch()
+  const gitBranchName = useWatch({ control: form.control, name: 'gitBranchName' })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
-  const isFormValid =
-    form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
+  const isFormValid = form.formState.isValid && (!gitBranchName || isGitBranchValid)
   const canSubmit = isFormValid && !isUpdating && !isChecking
 
   const openLinkerPanel = () => {
