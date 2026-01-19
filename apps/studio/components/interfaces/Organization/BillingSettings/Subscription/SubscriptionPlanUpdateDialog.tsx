@@ -38,7 +38,7 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const PLAN_HEADINGS = {
   tier_pro:
-    'the Pro plan to unlock unlimited projects, daily backups, and email support whenever you need it',
+    'the Pro plan to unlock more compute resources, daily backups, no project pausing, and email support whenever you need it',
   tier_team: 'the Team plan for SOC2, SSO, priority support and greater data and log retention',
   default: 'to a new plan',
 } as const

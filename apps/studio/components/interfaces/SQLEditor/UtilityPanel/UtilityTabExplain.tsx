@@ -35,7 +35,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
-        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
+        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4 pb-9">
           <div className="flex flex-col gap-y-1">
             {formattedError.length > 0 ? (
               formattedError.map((x: string, i: number) => (
@@ -92,7 +92,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
   const toggleMode = () => setMode(mode === 'visual' ? 'raw' : 'visual')
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col pb-9">
       {mode === 'visual' ? (
         <ExplainVisualizer rows={explainResult.rows} onShowRaw={toggleMode} id={id} />
       ) : (

@@ -4,9 +4,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 19 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Thu, 08 Jan 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-trae-solo-integration</guid>
+  <title>Introducing TRAE SOLO integration with Supabase</title>
+  <link>https://supabase.com/blog/introducing-trae-solo-integration</link>
+  <description>TRAE IDE now integrates with Supabase, enabling developers to manage their entire backend infrastructure without leaving the IDE. Browse databases, manage storage, configure auth, and more.</description>
+  <pubDate>Thu, 08 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-security-2025-retro</guid>
+  <title>Supabase Security Retro: 2025</title>
+  <link>https://supabase.com/blog/supabase-security-2025-retro</link>
+  <description>A summary of Supabase platform security changes made in 2025 and the security defaults planned for 2026.</description>
+  <pubDate>Wed, 07 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/stripe-sync-engine-integration</guid>
   <title>Sync Stripe Data to Your Supabase Database in One Click</title>
   <link>https://supabase.com/blog/stripe-sync-engine-integration</link>

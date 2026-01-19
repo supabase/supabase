@@ -16,7 +16,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"], // handle ui package paths

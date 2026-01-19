@@ -16,6 +16,7 @@ import {
   FunctionsEmptyState,
   FunctionsEmptyStateLocal,
 } from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructionsDialog } from 'components/interfaces/Functions/TerminalInstructionsDialog'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import AlertError from 'components/ui/AlertError'
@@ -199,6 +200,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
           {page}
         </div>
       </EdgeFunctionsLayout>
+      <TerminalInstructionsDialog />
     </DefaultLayout>
   )
 }
