@@ -1,7 +1,7 @@
 services:
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2024-07-16T23-46-41Z
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -10,7 +10,7 @@ services:
       MINIO_ROOT_PASSWORD: secret1234
     command: server --console-address ":9001" /data
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://minio:9000/minio/health/live" ]
+      test: mc ready local || exit 1
       interval: 2s
       timeout: 10s
       retries: 5
@@ -18,7 +18,7 @@ services:
       - ./volumes/storage:/data:z
 
   minio-createbucket:
-    image: minio/mc
+    image: minio/mc:RELEASE.2024-07-15T17-46-06Z
     depends_on:
       minio:
         condition: service_healthy
