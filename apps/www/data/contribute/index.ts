@@ -65,7 +65,9 @@ export async function getChannelCounts(
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 30)
   const since = sevenDaysAgo.toISOString()
 
-  let query = supabase.from('contribute_threads').select('source', { count: 'exact', head: false })
+  let query = supabase
+    .from('v_contribute_threads')
+    .select('source', { count: 'exact', head: false })
 
   // When searching, don't apply time/status filters to allow finding any matching threads
   if (!search || !search.trim()) {
@@ -123,7 +125,7 @@ export async function getUnansweredThreads(
   const since = sevenDaysAgo.toISOString()
 
   let query = supabase
-    .from('contribute_threads')
+    .from('v_contribute_threads')
     .select(
       'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count'
     )
@@ -174,7 +176,7 @@ export async function getThreadById(id: string): Promise<ThreadRow | null> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
-    .from('contribute_threads')
+    .from('v_contribute_threads')
     .select(
       'thread_id, subject, status, author, conversation, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
     )
@@ -222,7 +224,7 @@ export async function getAllProductAreas(): Promise<string[]> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
-    .from('contribute_threads')
+    .from('v_contribute_threads')
     .select('product_areas')
     .in('status', ['unanswered', 'unresolved'])
 
@@ -245,7 +247,7 @@ export async function getAllStacks(): Promise<string[]> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
-    .from('contribute_threads')
+    .from('v_contribute_threads')
     .select('stack')
     .in('status', ['unanswered', 'unresolved'])
 
@@ -283,7 +285,7 @@ export async function getUserActivity(author: string) {
 
   // Get user's threads
   const { data: threads, error: threadsError } = await supabase
-    .from('contribute_threads')
+    .from('v_contribute_threads')
     .select(
       'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
     )
@@ -314,7 +316,7 @@ export async function getUserActivity(author: string) {
 
   if (threadKeys.length > 0) {
     const { data: replyThreadsData, error: replyThreadsError } = await supabase
-      .from('contribute_threads')
+      .from('v_contribute_threads')
       .select(
         'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
       )

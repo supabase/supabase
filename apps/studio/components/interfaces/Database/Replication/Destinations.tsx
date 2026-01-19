@@ -15,6 +15,7 @@ import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
@@ -40,6 +41,9 @@ import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
+  const { hasAccess: hasETLReplicationAccess, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('replication.etl')
+
   const unifiedReplication = useFlag('unifiedReplication')
 
   const prefetchedRef = useRef(false)
@@ -89,7 +93,7 @@ export const Destinations = () => {
     projectRef,
   })
   const destinations = destinationsData?.destinations ?? []
-  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
       ? destinations ?? []
@@ -107,7 +111,8 @@ export const Destinations = () => {
     projectRef,
   })
 
-  const isLoading = isSourcesLoading || isDestinationsLoading || isDatabasesLoading
+  const isLoading =
+    isSourcesLoading || isDestinationsLoading || isDatabasesLoading || isLoadingEntitlement
   const hasErrorsFetchingData = isSourcesError || isDestinationsError || isDatabasesError
 
   useEffect(() => {
@@ -212,7 +217,7 @@ export const Destinations = () => {
         {isLoading ? (
           <GenericSkeletonLoader />
         ) : !unifiedReplication && replicationNotEnabled ? (
-          <EnableReplicationCallout />
+          <EnableReplicationCallout hasAccess={hasETLReplicationAccess} />
         ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
           <Card>
             <CardContent className="p-0">

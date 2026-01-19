@@ -133,6 +133,17 @@ export interface GeminiMcpConfig {
   }
 }
 
+export interface OpenCodeMcpConfig {
+  $schema: string
+  mcp: {
+    supabase: {
+      type: 'remote'
+      url: string
+      enabled?: boolean
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | ClaudeCodeMcpConfig
@@ -143,6 +154,7 @@ export type McpClientConfig =
   | GeminiMcpConfig
   | GooseMcpConfig
   | McpClientBaseConfig
+  | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
   | WindsurfMcpConfig
@@ -168,6 +180,10 @@ export function isGeminiMcpConfig(config: McpClientConfig): config is GeminiMcpC
   )
 }
 
+export function isOpenCodeMcpConfig(config: McpClientConfig): config is OpenCodeMcpConfig {
+  return '$schema' in config && 'mcp' in config && 'supabase' in config.mcp
+}
+
 export function isMcpServersConfig(
   config: McpClientConfig
 ): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
@@ -187,6 +203,9 @@ export function getMcpUrl(config: McpClientConfig): string {
   }
   if (isGeminiMcpConfig(config)) {
     return config.mcpServers.supabase.httpUrl
+  }
+  if (isOpenCodeMcpConfig(config)) {
+    return config.mcp.supabase.url
   }
   if (isMcpServersConfig(config)) {
     return config.mcpServers.supabase.url
