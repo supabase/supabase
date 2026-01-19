@@ -42,6 +42,35 @@ interface FileExplorerAndEditorProps {
 
 const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
 
+enum FileAction {
+  CREATE_NEW = 'CREATE_NEW',
+  REPLACE_EXISTING = 'REPLACE_EXISTING',
+  REPLACE_NEW = 'REPLACE_NEW',
+}
+
+type FileActionResult =
+  | { action: FileAction.CREATE_NEW }
+  | { action: FileAction.REPLACE_EXISTING; index: number }
+  | { action: FileAction.REPLACE_NEW; index: number }
+
+const getFileAction = (
+  fileName: string,
+  existingFiles: FileData[],
+  newFiles: FileData[]
+): FileActionResult => {
+  const existingIndex = existingFiles.findIndex((f) => f.name === fileName)
+  if (existingIndex !== -1) {
+    return { action: FileAction.REPLACE_EXISTING, index: existingIndex }
+  }
+
+  const newIndex = newFiles.findIndex((f) => f.name === fileName)
+  if (newIndex !== -1) {
+    return { action: FileAction.REPLACE_NEW, index: newIndex }
+  }
+
+  return { action: FileAction.CREATE_NEW }
+}
+
 export const FileExplorerAndEditor = ({
   files,
   onFilesChange,
@@ -149,43 +178,43 @@ export const FileExplorerAndEditor = ({
         let replacedCount = 0
 
         for (const extractedFile of extractedFiles) {
-          // Check if file with same name already exists
-          const existingFileIndex = updatedFiles.findIndex((f) => f.name === extractedFile.name)
-          const newFileIndex = newFiles.findIndex((f) => f.name === extractedFile.name)
+          const actionResult = getFileAction(extractedFile.name, updatedFiles, newFiles)
 
-          if (existingFileIndex !== -1) {
-            // Replace existing file in the original files array
-            updatedFiles[existingFileIndex] = {
-              ...updatedFiles[existingFileIndex],
-              content: extractedFile.content,
-              selected: false,
-            }
-            replacedCount++
-            hasReplacedFiles = true
-          } else if (newFileIndex !== -1) {
-            // Replace file in the newFiles array (from earlier in this operation)
-            newFiles[newFileIndex] = {
-              ...newFiles[newFileIndex],
-              content: extractedFile.content,
-              selected: false,
-            }
-            replacedCount++
-          } else {
-            // Add as new file
-            const newId =
-              Math.max(
+          switch (actionResult.action) {
+            case FileAction.REPLACE_EXISTING:
+              updatedFiles[actionResult.index] = {
+                ...updatedFiles[actionResult.index],
+                content: extractedFile.content,
+                selected: false,
+              }
+              replacedCount++
+              hasReplacedFiles = true
+              break
+
+            case FileAction.REPLACE_NEW:
+              newFiles[actionResult.index] = {
+                ...newFiles[actionResult.index],
+                content: extractedFile.content,
+                selected: false,
+              }
+              replacedCount++
+              break
+
+            case FileAction.CREATE_NEW:
+              const newId = Math.max(
                 0,
                 ...files.map((f) => f.id),
                 ...updatedFiles.map((f) => f.id),
                 ...newFiles.map((f) => f.id)
               ) + 1
-            newFiles.push({
-              id: newId,
-              name: extractedFile.name,
-              content: extractedFile.content,
-              selected: false,
-            })
-            extractedCount++
+              newFiles.push({
+                id: newId,
+                name: extractedFile.name,
+                content: extractedFile.content,
+                selected: false,
+              })
+              extractedCount++
+              break
           }
         }
 
