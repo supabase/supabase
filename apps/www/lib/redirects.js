@@ -2649,7 +2649,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/server-side/advanced-guide',
   },
   {
     permanent: true,
@@ -2664,7 +2664,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/passwords',
+    destination: '/docs/guides/auth/social-login',
   },
   {
     permanent: true,
