@@ -1010,7 +1010,6 @@ The output should use the following instructions:
   }
 }
 
-
 const ControlledSwitch = () => {
   const [isOn, setIsOn] = useState(true)
   return <Switch checked={isOn} onCheckedChange={() => setIsOn(!isOn)} />

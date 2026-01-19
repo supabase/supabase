@@ -750,5 +750,4 @@ The output should use the following instructions:
   }
 }
 
-
 export default data
