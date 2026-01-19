@@ -557,12 +557,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={
-              !isApiKeySet ||
-              disablePrompts ||
-              isLoadingOrganization ||
-              (isChatLoading && !editingMessageId)
-            }
+            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'
