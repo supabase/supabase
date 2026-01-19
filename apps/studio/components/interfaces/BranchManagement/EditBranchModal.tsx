@@ -124,7 +124,10 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const openLinkerPanel = () => {
     onClose()
-    router.push(`/project/${projectRef}/settings/integrations`)
+    
+    if (projectRef) {
+      router.push(`/project/${projectRef}/settings/integrations`)
+    }
   }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
