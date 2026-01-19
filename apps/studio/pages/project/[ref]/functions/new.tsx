@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { checkUnimportedFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import useLatest from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
@@ -281,16 +282,18 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
+  const hasUnsavedChangesRef = useLatest(hasUnsavedChanges)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
+      if (hasUnsavedChangesRef.current) {
         e.preventDefault()
         e.returnValue = '' // deprecated, but older browsers still require this
       }
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [hasUnsavedChanges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <PageLayout
