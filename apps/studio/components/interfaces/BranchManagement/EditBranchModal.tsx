@@ -124,7 +124,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const openLinkerPanel = () => {
     onClose()
-    
+
     if (projectRef) {
       router.push(`/project/${projectRef}/settings/integrations`)
     }
@@ -158,11 +158,17 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     if (!githubConnection) return console.error('GitHub Connection is missing')
 
     const repositoryId = githubConnection.repository.id
+    const requested = branchName
     checkGithubBranchValidity(
       { repositoryId, branchName },
       {
-        onSuccess: () => setIsGitBranchValid(true),
+        onSuccess: () => {
+          if (form.getValues('gitBranchName') !== requested) return
+          setIsGitBranchValid(true)
+          form.clearErrors('gitBranchName')
+        },
         onError: (error) => {
+          if (form.getValues('gitBranchName') !== requested) return
           setIsGitBranchValid(false)
           form.setError('gitBranchName', {
             ...error,
