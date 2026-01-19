@@ -154,7 +154,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!ref) return console.error('Branch ref is required')
+    if (!branch?.project_ref) return console.error('Branch ref is required')
 
     const payload: {
       branchRef: string
@@ -162,7 +162,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
       branchName: string
       gitBranch?: string
     } = {
-      branchRef: ref,
+      branchRef: branch.project_ref,
       projectRef,
       branchName: data.branchName,
     }

@@ -11,6 +11,9 @@ import {
   Code2,
   Check,
   InfoIcon,
+  TrendingUp,
+  Puzzle,
+  DollarSign,
 } from 'lucide-react'
 import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
 
@@ -90,9 +93,23 @@ const data = {
       {
         id: 'postgres-first',
         icon: Database,
-        heading: 'A proven Postgres foundation',
+        heading: "It's just Postgres",
         subheading:
-          "Real Postgres means real scale. Start small and grow to millions of users on the same database that powers the world's most demanding applications. Use any SQL client, ORM, or database tool. Connect with pgAdmin, Postico, DBeaver, or your favorite tool. Tap into the most popular Postgres extensions, including: PostGIS for geospatial, pgvector for AI, and more. No proprietary query language. No artificial limits. Just standard SQL that works everywhere.",
+          "Familiar SQL, familiar model, proven platform. No proprietary query language. No artificial limits. Just standard SQL that works everywhere. Postgres powers the world's most demanding applications, and you get the same battle-tested database.",
+      },
+      {
+        id: 'scale-to-millions',
+        icon: TrendingUp,
+        heading: 'Scale to millions',
+        subheading:
+          'Real Postgres means real scale. Start small and grow to millions of users on the same database. Postgres handles everything from startups to enterprise workloads with proven scalability. Your database grows with you, no migrations needed.',
+      },
+      {
+        id: 'powerful-ecosystem',
+        icon: Puzzle,
+        heading: 'A powerful ecosystem',
+        subheading:
+          'Connect with pgAdmin, Postico, DBeaver, or your favorite tool. Use any SQL client, ORM, or database tool. Tap into the most popular Postgres extensions, including: PostGIS for geospatial, pgvector for AI, and more. The entire Postgres ecosystem is at your fingertips.',
       },
       {
         id: 'complete-stack',
@@ -124,7 +141,7 @@ const data = {
       },
       {
         id: 'predictable-pricing',
-        icon: Lock,
+        icon: DollarSign,
         heading: 'Fair, predictable pricing',
         subheading:
           "Supabase charges for what you use, not how your data syncs. No surprise bandwidth bills from real-time subscriptions. No per-function-call pricing that explodes with traffic. Postgres connection pooling means efficient resource usage at any scale. Know what you'll pay before you ship.",
