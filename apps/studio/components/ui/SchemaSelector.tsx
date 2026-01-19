@@ -17,9 +17,9 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
   Skeleton,
 } from 'ui'
@@ -103,8 +103,8 @@ export const SchemaSelector = ({
       )}
 
       {isSchemasSuccess && (
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>
             <Button
               size={size}
               disabled={disabled}
@@ -128,8 +128,8 @@ export const SchemaSelector = ({
                 </div>
               )}
             </Button>
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_
+          </PopoverTrigger>
+          <PopoverContent
             className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
             align={align}
@@ -205,8 +205,8 @@ export const SchemaSelector = ({
                 )}
               </CommandList_Shadcn_>
             </Command_Shadcn_>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       )}
     </div>
   )

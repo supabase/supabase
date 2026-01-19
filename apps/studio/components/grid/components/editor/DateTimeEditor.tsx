@@ -10,9 +10,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -70,13 +70,14 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   }, [])
 
   return (
-    <Popover_Shadcn_ open>
-      <PopoverTrigger_Shadcn_>
+    <Popover open>
+      <PopoverTrigger>
         <div className={cn('px-[8px]', value === null ? 'text-foreground-lighter' : '')}>
           {value === null ? 'NULL' : value}
         </div>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal align="start" className="p-0 rounded-none w-64">
+      </PopoverTrigger>
+      <PopoverContent portal align="start" className="p-0 rounded-none w-64">
+
         <BlockKeys
           ignoreOutsideClicks
           value={inputValue}
@@ -159,8 +160,8 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             )}
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

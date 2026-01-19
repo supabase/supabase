@@ -4,9 +4,9 @@ import { AlertCircle, Check, ChevronDown, Plus, Search } from 'lucide-react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   Input,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
 } from 'ui'
 
@@ -131,8 +131,8 @@ export default function MultiSelect({
         ].join(' ')}
         ref={ref}
       >
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>
             <div
               className={[
                 'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-pointer',
@@ -169,8 +169,8 @@ export default function MultiSelect({
                 <ChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
               </div>
             </div>
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_
+          </PopoverTrigger>
+          <PopoverContent
             className="p-0"
             side="bottom"
             align="start"
@@ -265,8 +265,8 @@ export default function MultiSelect({
                 </div>
               )}
             </ScrollArea>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {descriptionText && (

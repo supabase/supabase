@@ -18,9 +18,9 @@ import {
   Label_Shadcn_,
   Listbox,
   Modal,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   SidePanel,
 } from 'ui'
@@ -96,8 +96,8 @@ const WrapperTableEditor = ({
             <Label_Shadcn_ className="text-foreground-light">
               Select a target the table will point to
             </Label_Shadcn_>
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   type="default"
                   role="combobox"
@@ -112,8 +112,8 @@ const WrapperTableEditor = ({
                 >
                   {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" sameWidthAsTrigger>
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Find a table..." />
                   <CommandList_Shadcn_>
@@ -146,8 +146,8 @@ const WrapperTableEditor = ({
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {selectedTable && (

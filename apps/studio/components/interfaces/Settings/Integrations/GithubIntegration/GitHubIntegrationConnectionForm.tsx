@@ -38,9 +38,9 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -442,8 +442,8 @@ const GitHubIntegrationConnectionForm = ({
                         : 'Select the repository to connect to your project'
                     }
                   >
-                    <Popover_Shadcn_ open={repoComboBoxOpen} onOpenChange={setRepoComboboxOpen}>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover open={repoComboBoxOpen} onOpenChange={setRepoComboboxOpen}>
+                      <PopoverTrigger asChild>
                         <FormControl_Shadcn_>
                           <Button
                             type="default"
@@ -466,13 +466,8 @@ const GitHubIntegrationConnectionForm = ({
                               : 'Choose GitHub Repository'}
                           </Button>
                         </FormControl_Shadcn_>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_
-                        portal
-                        className="p-0 w-80"
-                        side="bottom"
-                        align="start"
-                      >
+                      </PopoverTrigger>
+                      <PopoverContent portal className="p-0 w-80" side="bottom" align="start">
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
                           <CommandList_Shadcn_ className="!max-h-[200px]">
@@ -540,8 +535,8 @@ const GitHubIntegrationConnectionForm = ({
                             )}
                           </CommandList_Shadcn_>
                         </Command_Shadcn_>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
                   </FormItemLayout>
                 )}
               />

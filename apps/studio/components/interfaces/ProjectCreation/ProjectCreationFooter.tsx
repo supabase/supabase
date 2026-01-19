@@ -11,7 +11,7 @@ import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
-  PopoverSeparator_Shadcn_,
+  PopoverSeparator,
   Table,
   TableBody,
   TableCell,
@@ -135,7 +135,7 @@ export const ProjectCreationFooter = ({
                       </TableRow>
                     </TableBody>
                   </Table>
-                  <PopoverSeparator_Shadcn_ />
+                  <PopoverSeparator />
                   <Table>
                     <TableHeader className="[&_th]:h-7">
                       <TableRow>

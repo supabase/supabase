@@ -7,9 +7,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   cn,
 } from 'ui'
 import { Box, Check, ChevronDown } from 'lucide-react'
@@ -39,9 +39,9 @@ export const FrameworkSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className={cn('flex', className)}>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size="tiny"
             type="default"
@@ -53,10 +53,10 @@ export const FrameworkSelector = ({
               {selectedItem?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
       {/* Render in a portal to avoid layout/stacking shifts; prevent auto-focus to stop scroll jump */}
-      <PopoverContent_Shadcn_
+      <PopoverContent
         className="p-0 max-w-48"
         side="bottom"
         align="start"
@@ -86,7 +86,7 @@ export const FrameworkSelector = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

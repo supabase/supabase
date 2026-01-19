@@ -3,13 +3,7 @@ import { Check, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
-import {
-  CodeBlock,
-  Heading,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+import { CodeBlock, Heading, PopoverContent, PopoverTrigger, Popover } from 'ui'
 
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
@@ -147,14 +141,14 @@ function Resources({ schema }: { schema: any }) {
                     </td>
                     <td>
                       {schema[resource].block.attributes[attribute].type ?? (
-                        <Popover_Shadcn_>
-                          <PopoverTrigger_Shadcn_ asChild>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <button className="flex items-center justify-between gap-2">
                               Nested type
                               <PlusCircle size={14} className="shrink-0" />
                             </button>
-                          </PopoverTrigger_Shadcn_>
-                          <PopoverContent_Shadcn_ className="max-h-[50vh] overflow-auto">
+                          </PopoverTrigger>
+                          <PopoverContent className="max-h-[50vh] overflow-auto">
                             <ul>
                               {Object.keys(
                                 schema[resource].block.attributes[attribute].nested_type.attributes
@@ -184,8 +178,8 @@ function Resources({ schema }: { schema: any }) {
                                 </li>
                               ))}
                             </ul>
-                          </PopoverContent_Shadcn_>
-                        </Popover_Shadcn_>
+                          </PopoverContent>
+                        </Popover>
                       )}
                     </td>
                     <td className="align-middle">
@@ -273,14 +267,14 @@ function DataSources({ schema }: { schema: any }) {
                     </td>
                     <td>
                       {schema[dataSource].block.attributes[attribute].type ?? (
-                        <Popover_Shadcn_>
-                          <PopoverTrigger_Shadcn_ asChild>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <button className="flex items-center justify-between gap-2">
                               Nested type
                               <PlusCircle size={14} />
                             </button>
-                          </PopoverTrigger_Shadcn_>
-                          <PopoverContent_Shadcn_ className="max-h-[50vh] overflow-auto">
+                          </PopoverTrigger>
+                          <PopoverContent className="max-h-[50vh] overflow-auto">
                             {schema[dataSource].block.attributes[attribute].nested_type
                               .nesting_mode === 'set' && 'Array of:'}
                             <ul>
@@ -313,8 +307,8 @@ function DataSources({ schema }: { schema: any }) {
                                 </li>
                               ))}
                             </ul>
-                          </PopoverContent_Shadcn_>
-                        </Popover_Shadcn_>
+                          </PopoverContent>
+                        </Popover>
                       )}
                     </td>
                     <td className="align-middle">

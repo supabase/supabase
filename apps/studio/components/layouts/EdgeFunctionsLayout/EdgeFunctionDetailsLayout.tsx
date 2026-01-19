@@ -27,9 +27,9 @@ import {
   Button,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -260,13 +260,13 @@ const EdgeFunctionDetailsLayout = ({
                   />
                 )}
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover_Shadcn_>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button type="default" icon={<Download />}>
                       Download
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" portal className="p-0">
+                  </PopoverTrigger>
+                  <PopoverContent align="end" portal className="p-0">
                     <div className="p-3 flex flex-col gap-y-2">
                       <p className="text-xs text-foreground-light">Download via CLI</p>
                       <Input
@@ -289,8 +289,8 @@ const EdgeFunctionDetailsLayout = ({
                         Download as ZIP
                       </Button>
                     </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
                 {!!functionSlug && (
                   <Button
                     type="default"

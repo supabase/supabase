@@ -35,9 +35,9 @@ import {
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
   KeyboardShortcut,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SQL_ICON,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -158,8 +158,8 @@ export const EditorPanel = () => {
         <div className="text-xs">{label}</div>
         <div className="flex items-center">
           {templates.length > 0 && (
-            <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   size="tiny"
                   type="default"
@@ -170,8 +170,8 @@ export const EditorPanel = () => {
                 >
                   Templates
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[300px] p-0">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search templates..." />
                   <CommandList_Shadcn_>
@@ -214,8 +214,8 @@ export const EditorPanel = () => {
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
           <ButtonTooltip
             type="text"

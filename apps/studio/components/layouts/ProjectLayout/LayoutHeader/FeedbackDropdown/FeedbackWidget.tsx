@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  PopoverSeparator_Shadcn_,
+  PopoverSeparator,
   TextArea_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -206,7 +206,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
         )}
       </AnimatePresence>
 
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
 
       <div className="p-4 flex flex-row justify-end items-start">
         <div className="flex items-center gap-2 flex-row">
@@ -308,7 +308,7 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
             </p>
           </div>
         </div>
-        <PopoverSeparator_Shadcn_ />
+        <PopoverSeparator />
         <div className="flex items-center justify-end px-4">
           <Button type="default" onClick={onClose}>
             Close

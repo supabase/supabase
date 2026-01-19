@@ -8,9 +8,9 @@ import {
   Checkbox_Shadcn_,
   cn,
   Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -177,8 +177,8 @@ export const FilterPopover = <T extends Record<string, any>>({
   ])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           asChild
           disabled={disabled}
@@ -204,8 +204,8 @@ export const FilterPopover = <T extends Record<string, any>>({
             )}
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className={cn('p-0', search !== undefined ? 'w-64' : 'w-44', className)}
         align="start"
         portal={true}
@@ -293,7 +293,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             Save
           </Button>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -15,13 +15,7 @@ import {
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import {
-  Button,
-  InfoIcon,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+import { Button, InfoIcon, PopoverContent, PopoverTrigger, Popover, PopoverSeparator } from 'ui'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -306,8 +300,8 @@ export const ServiceStatus = () => {
   }, [isProjectNew])
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal={false} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="default"
           icon={
@@ -324,8 +318,8 @@ export const ServiceStatus = () => {
         >
           {isBranch ? 'Branch' : 'Project'} Status
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
+      </PopoverTrigger>
+      <PopoverContent portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -377,7 +371,7 @@ export const ServiceStatus = () => {
             </div>
           </div>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

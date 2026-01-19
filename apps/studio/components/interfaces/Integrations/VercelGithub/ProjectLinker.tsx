@@ -27,9 +27,9 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   cn,
 } from 'ui'
 
@@ -296,11 +296,11 @@ const ProjectLinker = ({
                 {integrationIcon}
               </div>
 
-              <Popover_Shadcn_
+              <Popover
                 open={openForeignProjectsComboBox}
                 onOpenChange={setOpenForeignProjectsComboBox}
               >
-                <PopoverTrigger_Shadcn_ asChild>
+                <PopoverTrigger asChild>
                   <Button
                     type="default"
                     block
@@ -322,8 +322,8 @@ const ProjectLinker = ({
                   >
                     {(selectedForeignProject && selectedForeignProject.name) ?? choosePrompt}
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
+                </PopoverTrigger>
+                <PopoverContent
                   className="p-0"
                   side="bottom"
                   align="center"
@@ -373,8 +373,8 @@ const ProjectLinker = ({
                       )}
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
             </Panel>
           </div>
         )}

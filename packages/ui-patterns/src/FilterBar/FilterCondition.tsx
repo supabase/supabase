@@ -6,9 +6,9 @@ import {
   Button,
   cn,
   Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
 } from 'ui'
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -203,8 +203,8 @@ export function FilterCondition({
       >
         {property.label}
       </span>
-      <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
-        <PopoverAnchor_Shadcn_ asChild>
+      <Popover open={isOperatorActive && !isLoading && operatorItems.length > 0}>
+        <PopoverAnchor asChild>
           <div className="relative inline-block">
             <Input_Shadcn_
               ref={operatorRef}
@@ -222,8 +222,8 @@ export function FilterCondition({
               {condition.operator || ' '}
             </span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
@@ -243,10 +243,10 @@ export function FilterCondition({
             onSelect={handleSelectMenuItem}
             includeIcon={false}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-      <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
-        <PopoverAnchor_Shadcn_ asChild>
+        </PopoverContent>
+      </Popover>
+      <Popover open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
+        <PopoverAnchor asChild>
           <div className="relative inline-block max-w-[150px]">
             <Input_Shadcn_
               ref={valueRef}
@@ -264,8 +264,8 @@ export function FilterCondition({
               {(condition.value ?? '').toString() || ' '}
             </span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] w-fit p-0"
           align="start"
           side="bottom"
@@ -304,8 +304,8 @@ export function FilterCondition({
               includeIcon
             />
           )}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <Button
         type="text"
         size="tiny"

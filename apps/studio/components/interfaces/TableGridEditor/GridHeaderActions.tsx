@@ -35,9 +35,9 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -309,13 +309,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 )}
               </>
             ) : tableHasLints ? (
-              <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+                <PopoverTrigger asChild>
                   <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
+                </PopoverTrigger>
+                <PopoverContent
                   // using `portal` for a safari fix. issue with rendering outside of body element
                   portal
                   className="w-80 text-sm"
@@ -343,19 +343,19 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       </Button>
                     )}
                   </div>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
             ) : null
           ) : null}
 
           {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
-            <Popover_Shadcn_ modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false}>
+              <PopoverTrigger asChild>
                 <Button type="default" icon={<Lightbulb strokeWidth={1.5} />}>
                   Index Advisor
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ portal className="w-80 text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent portal className="w-80 text-sm" align="end">
                 <h4 className="flex items-center gap-2">
                   <Lightbulb size={16} /> Index Advisor
                 </h4>
@@ -370,8 +370,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <EnableIndexAdvisorButton />
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           {isTable && activeRealtimeVariant === RealtimeButtonVariant.TRIGGERS ? (
@@ -425,13 +425,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           )}
 
           {isView && viewHasLints && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+              <PopoverTrigger asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Security Definer view
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 // using `portal` for a safari fix. issue with rendering outside of body element
                 portal
                 className="min-w-[395px] text-sm"
@@ -471,18 +471,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </Button>
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           {isMaterializedView && materializedViewHasLints && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+              <PopoverTrigger asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Security Definer view
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 // using `portal` for a safari fix. issue with rendering outside of body element
                 portal
                 className="min-w-[395px] text-sm"
@@ -514,18 +514,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </Button>
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           {isForeignTable && table.schema === 'public' && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+              <PopoverTrigger asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Unprotected Data API access
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 // using `portal` for a safari fix. issue with rendering outside of body element
                 portal
                 className="min-w-[395px] text-sm"
@@ -552,8 +552,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </Button>
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           <RoleImpersonationPopover serviceRoleLabel="postgres" />

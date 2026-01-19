@@ -8,9 +8,9 @@ import { cn } from '@/lib/utils'
 import {
   Button,
   Calendar,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -22,8 +22,8 @@ export default function DatePickerWithPresets() {
   const [date, setDate] = React.useState<Date>()
 
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <Button
           type={'outline'}
           className={cn(
@@ -34,8 +34,8 @@ export default function DatePickerWithPresets() {
         >
           {date ? format(date, 'PPP') : <span>Pick a date</span>}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="flex w-auto flex-col space-y-2 p-2">
+      </PopoverTrigger>
+      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
         <Select_Shadcn_ onValueChange={(value) => setDate(addDays(new Date(), parseInt(value)))}>
           <SelectTrigger_Shadcn_>
             <SelectValue_Shadcn_ placeholder="Select" />
@@ -50,7 +50,7 @@ export default function DatePickerWithPresets() {
         <div className="rounded-md border">
           <Calendar mode="single" selected={date} onSelect={setDate} />
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

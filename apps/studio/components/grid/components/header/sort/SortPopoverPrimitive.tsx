@@ -15,13 +15,7 @@ import {
   useRoleImpersonationStateSnapshot,
 } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  Button,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+import { Button, PopoverContent, PopoverSeparator, PopoverTrigger, Popover } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
@@ -219,13 +213,13 @@ export const SortPopoverPrimitive = ({
 
   return (
     <>
-      <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover modal={false} open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
             {displayButtonText}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-96" side="bottom" align="start" portal={portal}>
           <div className="space-y-2 py-2">
             {localSorts.map((sort, index) => (
               <SortRow
@@ -247,7 +241,7 @@ export const SortPopoverPrimitive = ({
               </div>
             )}
 
-            <PopoverSeparator_Shadcn_ />
+            <PopoverSeparator />
             <div className="px-3 flex flex-row justify-between">
               {dropdownOptions && dropdownOptions.length > 0 ? (
                 <DropdownControl
@@ -289,8 +283,8 @@ export const SortPopoverPrimitive = ({
               </div>
             </div>
           </div>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       <ConfirmationModal
         size="medium"
