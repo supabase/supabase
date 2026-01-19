@@ -71,7 +71,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
-    { onError: () => {} }
+    { onError: () => { } }
   )
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
