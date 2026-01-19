@@ -1,0 +1,27 @@
+{
+  "name": "ur-life",
+  "version": "2.0.0",
+  "description": "University of Rochester Campus Life Assistant - Powered by Supabase",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset",
+    "supabase:migrate": "supabase migration up",
+    "supabase:gen-types": "supabase gen types typescript --local > src/types/database.types.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3"
+  },
+  "devDependencies": {
+    "vite": "^5.0.11",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.0"
+  },
+  "author": "UR Students",
+  "license": "MIT"
+}

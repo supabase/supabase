@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UR Life - Campus Assistant</title>
+    <link rel="stylesheet" href="/src/styles/dashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <img src="/src/assets/symbol_only.svg" alt="UR Logo" class="header-logo">
+            <h1 class="header-title">UR Life</h1>
+        </div>
+
+        <div class="header-center">
+            <div class="quick-links">
+                <a href="https://mail.google.com" target="_blank" class="quick-link">📧 Gmail</a>
+                <a href="https://www.gradescope.com" target="_blank" class="quick-link">📝 Gradescope</a>
+                <a href="https://blackboard.rochester.edu" target="_blank" class="quick-link">📚 Blackboard</a>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="user-profile" id="userProfileBtn">
+                <span class="user-avatar" id="headerAvatar">🦊</span>
+                <span class="user-name" id="headerName">Loading...</span>
+            </div>
+            <button class="btn-logout" id="logoutBtn">Sign Out</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-page="home">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Home</span>
+                </button>
+
+                <button class="nav-item" data-page="profile">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Profile</span>
+                </button>
+
+                <button class="nav-item" data-page="degree">
+                    <span class="nav-icon">🎓</span>
+                    <span class="nav-text">Degree Tracker</span>
+                </button>
+
+                <div class="nav-divider"></div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Campus Resources</div>
+
+                    <button class="nav-item">
+                        <span class="nav-icon">🗺️</span>
+                        <span class="nav-text">Campus Map</span>
+                    </button>
+
+                    <button class="nav-item">
+                        <span class="nav-icon">🚌</span>
+                        <span class="nav-text">Shuttles</span>
+                    </button>
+
+                    <button class="nav-item">
+                        <span class="nav-icon">🍽️</span>
+                        <span class="nav-text">Dining</span>
+                    </button>
+
+                    <button class="nav-item">
+                        <span class="nav-icon">📖</span>
+                        <span class="nav-text">Libraries</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Home Page -->
+            <div id="homePage" class="page active">
+                <div class="page-header">
+                    <h2 class="page-title">My Tasks</h2>
+                    <p class="page-subtitle">Manage your daily tasks and stay organized</p>
+                </div>
+
+                <!-- Tasks Section -->
+                <div class="tasks-container">
+                    <div class="task-input-group">
+                        <input
+                            type="text"
+                            id="taskInput"
+                            class="task-input"
+                            placeholder="Add a new task..."
+                        >
+                        <button id="addTaskBtn" class="btn-add-task">Add Task</button>
+                    </div>
+
+                    <div id="tasksList" class="tasks-list">
+                        <!-- Tasks will be loaded here -->
+                    </div>
+
+                    <!-- Task History -->
+                    <div class="task-history-section">
+                        <button class="history-toggle" id="historyToggle">
+                            <span class="history-icon">📜</span>
+                            <span>Task History</span>
+                            <span class="history-count" id="historyCount">0</span>
+                        </button>
+
+                        <div id="taskHistory" class="task-history" style="display: none;">
+                            <!-- History items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profilePage" class="page">
+                <div class="page-header">
+                    <h2 class="page-title">My Profile</h2>
+                    <p class="page-subtitle">Manage your personal information</p>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="profile-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-large" id="profileAvatar">🦊</div>
+                        <button class="btn-change-avatar" id="changeAvatarBtn">Change Avatar</button>
+                    </div>
+
+                    <div class="profile-info">
+                        <div class="profile-field">
+                            <label>Name</label>
+                            <div class="profile-value" id="profileName">Loading...</div>
+                        </div>
+
+                        <div class="profile-field">
+                            <label>Net ID</label>
+                            <div class="profile-value" id="profileNetId">Loading...</div>
+                        </div>
+
+                        <div class="profile-field">
+                            <label>Email</label>
+                            <div class="profile-value" id="profileEmail">Loading...</div>
+                        </div>
+
+                        <div class="profile-field">
+                            <label>Major</label>
+                            <div class="profile-value" id="profileMajor">Loading...</div>
+                        </div>
+
+                        <div class="profile-field">
+                            <label>Year</label>
+                            <div class="profile-value" id="profileYear">Loading...</div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="btn-primary" id="editProfileBtn">Edit Profile</button>
+                            <button class="btn-secondary" id="changePasswordBtn">Change Password</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Calendar -->
+                <div class="calendar-section">
+                    <div class="section-header">
+                        <h3>Course Calendar</h3>
+                        <button class="btn-add" id="addCourseBtn">+ Add Course</button>
+                    </div>
+
+                    <div class="course-calendar" id="courseCalendar">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Mailing List -->
+                <div class="mailing-list-section">
+                    <div class="section-header">
+                        <h3>Mailing List</h3>
+                        <button class="btn-add" id="addContactBtn">+ Add Contact</button>
+                    </div>
+
+                    <div class="mailing-list" id="mailingList">
+                        <!-- Contacts will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Degree Tracker Page -->
+            <div id="degreePage" class="page">
+                <div class="page-header">
+                    <h2 class="page-title">Degree Progress</h2>
+                    <p class="page-subtitle">Track your major requirements</p>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="progress-overview">
+                    <div class="progress-card">
+                        <div class="progress-label">Overall Progress</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="overallProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="overallProgressText">0%</div>
+                    </div>
+                </div>
+
+                <!-- Degree Requirements -->
+                <div class="degree-requirements" id="degreeRequirements">
+                    <!-- Requirements will be loaded here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Avatar Selection Modal -->
+    <div id="avatarModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Choose Your Avatar</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="avatar-grid" id="avatarGrid">
+                    <div class="avatar-option" data-avatar="🦊">🦊</div>
+                    <div class="avatar-option" data-avatar="🐻">🐻</div>
+                    <div class="avatar-option" data-avatar="🐱">🐱</div>
+                    <div class="avatar-option" data-avatar="🐶">🐶</div>
+                    <div class="avatar-option" data-avatar="🦁">🦁</div>
+                    <div class="avatar-option" data-avatar="🐼">🐼</div>
+                    <div class="avatar-option" data-avatar="🐨">🐨</div>
+                    <div class="avatar-option" data-avatar="🐯">🐯</div>
+                    <div class="avatar-option" data-avatar="🦝">🦝</div>
+                    <div class="avatar-option" data-avatar="🦊">🦊</div>
+                    <div class="avatar-option" data-avatar="🐰">🐰</div>
+                    <div class="avatar-option" data-avatar="🦄">🦄</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Profile</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Major</label>
+                        <input type="text" id="editMajor" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select id="editYear" required>
+                            <option value="Freshman">Freshman</option>
+                            <option value="Sophomore">Sophomore</option>
+                            <option value="Junior">Junior</option>
+                            <option value="Senior">Senior</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                        <button type="button" class="btn-secondary modal-close">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Course Modal -->
+    <div id="addCourseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Course</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addCourseForm">
+                    <div class="form-group">
+                        <label>Course Name</label>
+                        <input type="text" id="courseName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Day</label>
+                        <select id="courseDay" required>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="time" id="courseStartTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Time</label>
+                            <input type="time" id="courseEndTime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="courseLocation">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary">Add Course</button>
+                        <button type="button" class="btn-secondary modal-close">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div id="addContactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Contact</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addContactForm">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="contactCategory" required>
+                            <option value="professors">Professors</option>
+                            <option value="tas">Teaching Assistants</option>
+                            <option value="classmates">Classmates</option>
+                            <option value="friends">Friends</option>
+                            <option value="clubs">Clubs</option>
+                            <option value="research">Research Groups</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="contactName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="contactEmail" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary">Add Contact</button>
+                        <button type="button" class="btn-secondary modal-close">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/js/dashboard.js"></script>
+</body>
+</html>
