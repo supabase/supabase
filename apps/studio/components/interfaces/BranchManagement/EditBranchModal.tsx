@@ -38,6 +38,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -190,12 +191,11 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     }
   }, [branch, visible, form, gitlessBranching])
 
-  useEffect(() => {
+  useStaticEffectEvent(() => {
     if (!debouncedGitBranchName) return
     form.clearErrors('gitBranchName')
     validateGitBranchName(debouncedGitBranchName)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedGitBranchName])
+  })
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
