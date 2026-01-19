@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Clock, HistoryIcon } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Badge } from '@ui/components/shadcn/ui/badge'
 import { Label } from '@ui/components/shadcn/ui/label'
@@ -13,6 +13,7 @@ import {
   Button,
   ButtonProps,
   Calendar,
+  Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -21,6 +22,85 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
+import type { PlanId } from 'data/subscriptions/types'
+
+type Unit = 'minute' | 'hour' | 'day'
+
+export type ParsedCustomInput =
+  | { type: 'number'; value: number }
+  | { type: 'unit'; value: number; unit: Unit }
+  | { type: 'invalid' }
+
+export const parseCustomInput = (input: string): ParsedCustomInput => {
+  const trimmed = input.trim().toLowerCase()
+  if (!trimmed) return { type: 'invalid' }
+
+  // Try to match "number + optional space + unit prefix"
+  const match = trimmed.match(/^(\d+)\s*([a-z]*)$/)
+  if (!match) return { type: 'invalid' }
+
+  const [, numStr, unitStr] = match
+  const value = parseInt(numStr, 10)
+
+  if (isNaN(value) || value <= 0) return { type: 'invalid' }
+
+  if (!unitStr) {
+    return { type: 'number', value }
+  }
+
+  // Match if unitStr is a prefix of any unit name or its first letter
+  const units: Unit[] = ['minute', 'hour', 'day']
+  const matchedUnit = units.find((u) => u.startsWith(unitStr) || u[0] === unitStr)
+
+  if (!matchedUnit) return { type: 'invalid' }
+
+  return { type: 'unit', value, unit: matchedUnit }
+}
+
+export const getAvailableInForDays = (days: number): PlanId[] => {
+  if (days <= 1) return ['free', 'pro', 'team', 'enterprise', 'platform']
+  if (days <= 7) return ['pro', 'team', 'enterprise', 'platform']
+  return ['team', 'enterprise', 'platform']
+}
+
+export const convertToDays = (value: number, unit: Unit): number => {
+  switch (unit) {
+    case 'minute':
+      return value / (60 * 24)
+    case 'hour':
+      return value / 24
+    case 'day':
+      return value
+  }
+}
+
+export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
+  const days = convertToDays(value, unit)
+  return {
+    text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
+    calcFrom: () => dayjs().subtract(value, unit).toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: getAvailableInForDays(days),
+  }
+}
+
+export const generateDynamicHelpers = (value: number): DatetimeHelper[] => {
+  const units: Unit[] = ['minute', 'hour', 'day']
+  return units.map((unit) => generateDynamicHelper(value, unit))
+}
+
+export const generateHelpersFromInput = (input: string): DatetimeHelper[] | null => {
+  const parsed = parseCustomInput(input)
+
+  switch (parsed.type) {
+    case 'number':
+      return generateDynamicHelpers(parsed.value)
+    case 'unit':
+      return [generateDynamicHelper(parsed.value, parsed.unit)]
+    case 'invalid':
+      return null
+  }
+}
 
 export type DatePickerValue = {
   to: string
@@ -49,10 +129,18 @@ export const LogsDatePicker = ({
   align = 'end',
 }: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
+  const [customValue, setCustomValue] = useState('')
+
+  const displayedHelpers = useMemo(() => {
+    if (!customValue.trim()) return helpers
+    const generated = generateHelpersFromInput(customValue)
+    return generated ?? []
+  }, [customValue, helpers])
 
   // Reset the state when the popover closes
   useEffect(() => {
     if (!open) {
+      setCustomValue('')
       setStartDate(value.from ? new Date(value.from) : null)
       const defaultEndDate = value.to ? new Date(value.to) : new Date()
       setEndDate(defaultEndDate)
@@ -81,7 +169,7 @@ export const LogsDatePicker = ({
   }, [open, value])
 
   const handleHelperChange = (newValue: string) => {
-    const selectedHelper = helpers.find((h) => h.text === newValue)
+    const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
     if (onSubmit && selectedHelper) {
       onSubmit({
         to: selectedHelper.calcTo(),
@@ -266,33 +354,42 @@ export const LogsDatePicker = ({
         portal={true}
         {...popoverContentProps}
       >
-        <RadioGroup
-          onValueChange={handleHelperChange}
-          value={value.isHelper ? value.text : ''}
-          className="border-r p-2 flex flex-col gap-px"
-        >
-          {helpers.map((helper) => (
-            <Label
-              key={helper.text}
-              className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
-                {
-                  'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
-                }
-              )}
-            >
-              <RadioGroupItem
-                hidden
+        <div className="border-r p-2 flex flex-col gap-px">
+          <Input_Shadcn_
+            type="text"
+            placeholder="e.g. 2h, 30m, 7d"
+            value={customValue}
+            onChange={(e) => setCustomValue(e.target.value)}
+            className="mb-2 text-xs h-7 rounded-sm"
+          />
+          <RadioGroup
+            onValueChange={handleHelperChange}
+            value={value.isHelper ? value.text : ''}
+            className="flex flex-col gap-px"
+          >
+            {displayedHelpers.map((helper) => (
+              <Label
                 key={helper.text}
-                value={helper.text}
-                disabled={helper.disabled}
-                aria-disabled={helper.disabled}
-              ></RadioGroupItem>
-              {helper.text}
-              {showHelperBadge(helper) ? <Badge>{helper.availableIn?.[0] || ''}</Badge> : null}
-            </Label>
-          ))}
-        </RadioGroup>
+                className={cn(
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+                  {
+                    'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+                  }
+                )}
+              >
+                <RadioGroupItem
+                  hidden
+                  key={helper.text}
+                  value={helper.text}
+                  disabled={helper.disabled}
+                  aria-disabled={helper.disabled}
+                ></RadioGroupItem>
+                {helper.text}
+                {showHelperBadge(helper) ? <Badge>{helper.availableIn?.[0] || ''}</Badge> : null}
+              </Label>
+            ))}
+          </RadioGroup>
+        </div>
 
         <div>
           <div className="flex p-2 gap-2 items-center">
