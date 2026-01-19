@@ -226,6 +226,8 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
+
   const {
     mutate: createProject,
     isPending: isCreatingNewProject,
@@ -442,6 +444,23 @@ const Wizard: NextPageWithLayout = () => {
                     {showAdvancedConfig && !!availableOrioleVersion && (
                       <AdvancedConfiguration form={form} />
                     )}
+
+                    {shouldShowFreeProjectInfo ? (
+                      <Admonition
+                        className="rounded-none border-0"
+                        type="note"
+                        title="Need a free project?"
+                        description={
+                          <p>
+                            Supabase billing is organization-based. Get 2 free projects by{' '}
+                            <Link className="underline text-foreground" href="/new">
+                              creating a free organization
+                            </Link>
+                            .
+                          </p>
+                        }
+                      />
+                    ) : null}
                   </>
                 )}
 
