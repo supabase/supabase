@@ -92,6 +92,7 @@ export const extractZipFile = async (
   const extractedFiles: { name: string; content: string; size: number }[] = []
   const skippedFiles: string[] = []
   const oversizedFiles: string[] = []
+  const failedFiles: string[] = []
 
   let totalExtractedSize = 0
 
@@ -132,25 +133,37 @@ export const extractZipFile = async (
     }
 
     // Extract file content
-    let content: string
-    if (isBinaryFile(fileName)) {
-      // For binary files, read as blob and convert to binary string
-      const blob = await entry.getData!(new BlobWriter())
-      const arrayBuffer = await blob.arrayBuffer()
-      const bytes = new Uint8Array(arrayBuffer)
-      content = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
-    } else {
-      // For text files, read as text
-      content = await entry.getData!(new TextWriter())
+    try {
+      // Skip if entry is a directory or doesn't have getData method
+      if (entry.directory || !entry.getData) {
+        console.warn(`Entry ${fileName} is a directory or has no getData method, skipping`)
+        failedFiles.push(fileName)
+        continue
+      }
+
+      let content: string
+      if (isBinaryFile(fileName)) {
+        // For binary files, read as blob and convert to binary string
+        const blob = await entry.getData(new BlobWriter())
+        const arrayBuffer = await blob.arrayBuffer()
+        const bytes = new Uint8Array(arrayBuffer)
+        content = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
+      } else {
+        // For text files, read as text
+        content = await entry.getData(new TextWriter())
+      }
+
+      extractedFiles.push({
+        name: fileName, // Keep full path as file name (flat structure)
+        content,
+        size: uncompressedSize,
+      })
+
+      totalExtractedSize += uncompressedSize
+    } catch (error) {
+      console.error(`Failed to extract file ${fileName}:`, error)
+      failedFiles.push(fileName)
     }
-
-    extractedFiles.push({
-      name: fileName, // Keep full path as file name (flat structure)
-      content,
-      size: uncompressedSize,
-    })
-
-    totalExtractedSize += uncompressedSize
   }
 
   await zipReader.close()
@@ -163,6 +176,9 @@ export const extractZipFile = async (
     }
     if (oversizedFiles.length > 0) {
       reasons.push(`${oversizedFiles.length} oversized files`)
+    }
+    if (failedFiles.length > 0) {
+      reasons.push(`${failedFiles.length} files failed to extract`)
     }
     throw new Error(
       `No valid files found in zip archive. ${reasons.length > 0 ? 'Skipped: ' + reasons.join(', ') : ''}`
