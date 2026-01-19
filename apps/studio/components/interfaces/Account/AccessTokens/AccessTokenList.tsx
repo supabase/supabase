@@ -245,23 +245,29 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   <TimestampInfo
                     utcTimestamp={x.last_used_at}
                     label={dayjs(x.last_used_at).fromNow()}
+                    className="text-sm"
                   />
                 ) : (
-                  'Never used'
+                  <p className="text-foreground-light text-sm">Never used</p>
                 )}
               </TableCell>
               <TableCell className="min-w-28 text-foreground-light">
                 {x.expires_at ? (
                   dayjs(x.expires_at).isBefore(dayjs()) ? (
-                    <TimestampInfo utcTimestamp={x.expires_at} label="Expired" />
+                    <TimestampInfo
+                      utcTimestamp={x.expires_at}
+                      label="Expired"
+                      className="text-sm"
+                    />
                   ) : (
                     <TimestampInfo
                       utcTimestamp={x.expires_at}
                       label={dayjs(x.expires_at).format('DD MMM YYYY')}
+                      className="text-sm"
                     />
                   )
                 ) : (
-                  <p className="text-foreground-light">Never</p>
+                  <p className="text-foreground-light text-sm">Never</p>
                 )}
               </TableCell>
               <TableCell>
