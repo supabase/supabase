@@ -43,12 +43,14 @@ Update remote migration history table? [Y/n]
 
 Type `Y` to update your remote project’s migration history and ensure it matches your new local migrations.
 
-- If the CLI suggests repairing migration history due to mismatches, you might see:
-  ```
-  Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table:
-  supabase migration repair --status applied <timestamp>
-  ```
-  Run the exact repair command provided, replacing the timestamp as instructed (example timestamp: 20251006141726). This synchronizes the migration state between local and remote.
+If the CLI suggests repairing migration history due to mismatches, you might see:
+
+```
+Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table:
+supabase migration repair --status applied TIMESTAMP_OF_MIGRATION_TO_REPAIR
+```
+
+Run the exact repair command provided, replacing the timestamp as instructed (example timestamp: 20251006141726). This synchronizes the migration state between local and remote.
 
 ---
 
@@ -60,4 +62,4 @@ Once your migration history is up to date, continue to use branching features as
 
 #### Additional tips
 
-- If further issues arise (such as schema drift or migration mismatches), review the [troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues), and consider manual repair with `supabase migration repair`(https://supabase.com/docs/reference/cli/supabase-migration-repair).
+If further issues arise (such as schema drift or migration mismatches), review the [troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues), and consider manual repair with [`supabase migration repair`](/docs/reference/cli/supabase-migration-repair).
