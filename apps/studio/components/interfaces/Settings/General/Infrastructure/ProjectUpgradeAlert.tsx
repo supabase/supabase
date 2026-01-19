@@ -262,9 +262,7 @@ export const ProjectUpgradeAlert = () => {
                                     <div className="flex items-center gap-3">
                                       <span className="text-foreground">{postgresVersion}</span>
                                       {value.release_channel !== 'ga' && (
-                                        <Badge variant="warning" className="mr-1 capitalize">
-                                          {value.release_channel}
-                                        </Badge>
+                                        <Badge variant="warning">{value.release_channel}</Badge>
                                       )}
                                     </div>
                                   </SelectItem_Shadcn_>

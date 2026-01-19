@@ -47,7 +47,7 @@ const EventListItem = ({ event }: Props) => {
             {event.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <Badge key={category} className="group-hover:border-foreground-muted capitalize">
+                  <Badge key={category} className="group-hover:border-foreground-muted">
                     {category}
                   </Badge>
                 )

@@ -2,6 +2,7 @@ import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-esti
 import { ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
@@ -79,7 +80,14 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
 
-  const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isFetching,
+    error,
+  } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -89,7 +97,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled: !isForeignTableSelected,
     }
   )
@@ -100,7 +108,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
 
   // [Joshen] This is only applicable for foreign tables, as we use the number of rows on the page to determine
   // if we've reached the last page (and hence disable the next button)
-  const { data: rowsData, isLoading: isLoadingRows } = useTableRowsQuery(
+  const { data: rowsData, isPending: isLoadingRows } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

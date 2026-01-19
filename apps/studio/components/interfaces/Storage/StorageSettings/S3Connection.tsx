@@ -29,6 +29,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
+  Separator,
   Switch,
   Table,
   TableBody,
@@ -59,7 +60,7 @@ import { getConnectionURL } from './StorageSettings.utils'
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
-  const { data: project, isLoading: projectIsLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: projectIsLoading } = useSelectedProjectQuery()
 
   const [openCreateCred, setOpenCreateCred] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
@@ -81,7 +82,7 @@ export const S3Connection = () => {
     isSuccess: isSuccessStorageConfig,
     isError: isErrorStorageConfig,
   } = useProjectStorageConfigQuery({ projectRef })
-  const { data: storageCreds, isLoading: isLoadingStorageCreds } = useStorageCredentialsQuery(
+  const { data: storageCreds, isPending: isLoadingStorageCreds } = useStorageCredentialsQuery(
     { projectRef },
     { enabled: canReadS3Credentials }
   )
@@ -89,7 +90,9 @@ export const S3Connection = () => {
   const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: (_, vars) => {
-        if (vars.features) form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        if (vars.features?.s3Protocol) {
+          form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        }
         toast.success('Successfully updated storage settings')
       },
     })
@@ -154,13 +157,13 @@ export const S3Connection = () => {
                   <GenericSkeletonLoader />
                 ) : isProjectActive ? (
                   <Card>
-                    <CardContent className="pt-6">
+                    <CardContent>
                       <FormField_Shadcn_
                         name="s3ConnectionEnabled"
                         control={form.control}
                         render={({ field }) => (
                           <FormItemLayout
-                            layout="horizontal"
+                            layout="flex-row-reverse"
                             className="[&>*>label]:text-foreground"
                             label="S3 protocol connection"
                             description="Allow clients to connect to Supabase Storage via the S3 protocol"
@@ -178,23 +181,34 @@ export const S3Connection = () => {
                       />
                     </CardContent>
 
-                    <CardContent className="py-6">
-                      <div className="flex flex-col gap-y-4">
-                        <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-                          <Input readOnly copy value={s3connectionUrl} />
-                        </FormItemLayout>
-                        <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                          <Input
-                            readOnly
-                            copy
-                            value={project?.region}
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                          />
-                        </FormItemLayout>
-                      </div>
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
+                        label="Endpoint"
+                        isReactForm={false}
+                      >
+                        <Input readOnly copy value={s3connectionUrl} />
+                      </FormItemLayout>
+                    </CardContent>
+
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
+                        label="Region"
+                        isReactForm={false}
+                      >
+                        <Input
+                          readOnly
+                          copy
+                          value={project?.region}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
+                      </FormItemLayout>
                     </CardContent>
 
                     {!isLoadingPermissions && !canUpdateStorageSettings && (

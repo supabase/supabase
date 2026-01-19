@@ -33,7 +33,16 @@ Think of an index as a table in a traditional database. It has a schema (dimensi
 5. Select the distance metric (`cosine`, `euclidean`, or `l2`).
 6. Click **Create**.
 
-### Via JavaScript SDK
+### Via SDK
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
@@ -57,6 +66,32 @@ if (error) {
 }
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+
+bucket = supabase.storage.vectors().from_('embeddings')
+
+# Create an index
+bucket.create_index(
+    index_name='documents-openai',
+    dimension=1536,
+    distance_metric='cosine',
+    data_type='float32'
+)
+
+print('✓ Index created: documents-openai')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ### Choosing the right metric
 
 Most modern embedding models work best with **cosine** distance:
@@ -74,6 +109,15 @@ Most modern embedding models work best with **cosine** distance:
 ## Managing multiple indexes
 
 Create multiple indexes for different use cases or embedding models:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 const bucket = supabase.storage.vectors.from('embeddings')
@@ -107,6 +151,46 @@ const { data: indexes } = await bucket.listIndexes()
 console.log('All indexes:', indexes)
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+bucket = supabase.storage.vectors().from_('embeddings')
+
+# Index for OpenAI embeddings
+bucket.create_index(
+    index_name='documents-openai',
+    dimension=1536,
+    distance_metric='cosine',
+    data_type='float32'
+)
+
+# Index for Cohere embeddings
+bucket.create_index(
+    index_name='documents-cohere',
+    dimension=1024,
+    distance_metric='cosine',
+    data_type='float32'
+)
+
+# Index for different use case
+bucket.create_index(
+    index_name='images-openai',
+    dimension=1536,
+    distance_metric='cosine',
+    data_type='float32'
+)
+
+# List all indexes
+indexes = bucket.list_indexes()
+print('All indexes:', indexes)
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ### Use cases for multiple indexes
 
 - **Different embedding models** - Store vectors from OpenAI, Cohere, and local models separately
@@ -117,6 +201,15 @@ console.log('All indexes:', indexes)
 ## Listing and inspecting indexes
 
 ### List all indexes in a bucket
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 const bucket = supabase.storage.vectors.from('embeddings')
@@ -132,7 +225,34 @@ if (!error) {
 }
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+bucket = supabase.storage.vectors().from_('embeddings')
+
+indexes = bucket.list_indexes()
+
+if indexes:
+    for index in indexes.indexes:
+        print(f'Index: {index.indexName}')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ### Get index details
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 const { data: indexDetails, error } = await bucket.getIndex('documents-openai')
@@ -145,9 +265,35 @@ if (!error && indexDetails) {
 }
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+index_details = bucket.get_index('documents-openai')
+
+if index_details:
+    print(f'Index: {index_details.index.index_name}')
+    print(f'Dimension: {index_details.index.dimension}')
+    print(f'Distance metric: {index_details.index.distance_metric}')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ## Deleting indexes
 
 Delete an index to free storage space:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 const bucket = supabase.storage.vectors.from('embeddings')
@@ -160,6 +306,22 @@ if (error) {
   console.log('Index deleted successfully')
 }
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+bucket = supabase.storage.vectors().from_('embeddings')
+
+bucket.delete_index('documents-openai')
+
+print('✓ Index deleted successfully')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ### Before deleting an index
 
@@ -179,6 +341,15 @@ Once created, these properties **cannot be changed**:
 - **Data type** - Currently only `float32` supported
 
 ### Optimizing index performance
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 // Good - Appropriate batch size
@@ -204,6 +375,38 @@ const { data } = await index.queryVectors({
   returnData: true, // Include large embeddings
 })
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+# Good - Appropriate batch size
+batch = vectors[:250]
+index.put(batch)
+
+# Good - Filter metadata before query
+results = index.query(
+    query_vector=query_vector,
+    topK=5,
+    filter={'category': 'electronics'}
+)
+
+# Avoid - Single vector inserts
+for vector in vectors:
+    index.put([vector])
+
+# Avoid - Returning unnecessary data
+results = index.query(
+    query_vector=query_vector,
+    topK=1000,  # Too many results
+    return_data=True  # Include large embeddings
+)
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ## Next steps
 

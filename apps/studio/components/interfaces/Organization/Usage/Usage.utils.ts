@@ -23,7 +23,7 @@ export function useGetUpgradeUrl(slug: string, subscription?: OrgSubscription, s
 
   if (!billingAll) {
     const subject = `Enquiry to upgrade plan for organization`
-    const message = `Organization Slug: ${slug}\nRequested plan: <Specify which plan to upgrade to: Pro | Team | Enterprise>`
+    const message = `Organization Slug: ${slug}\nRequested plan: <Specify which plan to upgrade to: Pro | Team | Enterprise | Platform>`
 
     return `/support/new?orgSlug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${subject}&message=${encodeURIComponent(message)}`
   }

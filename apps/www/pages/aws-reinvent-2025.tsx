@@ -107,7 +107,9 @@ const AWSReInvent2025: NextPage = () => {
                                   <Clock className="w-4 h-4" />
                                   <span className="font-mono">{event.time}</span>
                                 </div>
-                                {event.type === 'keynote' && <Badge variant="brand">Keynote</Badge>}
+                                {event.type === 'keynote' && (
+                                  <Badge variant="success">Keynote</Badge>
+                                )}
                                 {event.type === 'networking' && (
                                   <Badge variant="default">Networking</Badge>
                                 )}

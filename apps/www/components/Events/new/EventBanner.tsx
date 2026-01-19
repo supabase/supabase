@@ -144,7 +144,7 @@ const CoverImage = ({ url }: { url?: string }) => {
     return (
       <div className="w-full bg-surface-100 aspect-square border rounded-lg hidden md:grid place-items-center relative">
         <Logo />
-        <Badge variant="brand" className="absolute bottom-4 right-4">
+        <Badge variant="success" className="absolute bottom-4 right-4">
           Upcoming
         </Badge>
       </div>
@@ -153,7 +153,7 @@ const CoverImage = ({ url }: { url?: string }) => {
   return (
     <div className="w-full bg-surface-100 hidden md:block aspect-square border rounded-lg overflow-hidden relative">
       <img src={url} alt="Event Cover" className="object-cover object-center w-full" />
-      <Badge variant="brand" className="absolute bottom-4 right-4">
+      <Badge variant="success" className="absolute bottom-4 right-4">
         Upcoming
       </Badge>
     </div>
