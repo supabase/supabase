@@ -13,7 +13,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@shopify/flash-list": "1.6.4",
     "@supabase/supabase-js": "^2.38.2",
-    "expo": "~51.0.8",
+    "expo": "~54.0.31",
     "expo-constants": "~16.0.1",
     "expo-dev-client": "~4.0.14",
     "expo-device": "~6.0.2",
