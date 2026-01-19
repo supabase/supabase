@@ -9,21 +9,21 @@ import { cn } from '../../lib/utils/cn'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
-  `relative 
+  `relative
   flex items-center justify-center
-  cursor-pointer 
-  inline-flex 
-  items-center 
-  space-x-2 
-  text-center 
-  font-regular 
-  ease-out 
-  duration-200 
+  cursor-pointer
+  inline-flex
+  items-center
+  space-x-2
+  text-center
+  font-regular
+  ease-out
+  duration-200
   rounded-md
-  outline-none 
-  transition-all 
-  outline-0 
-  focus-visible:outline-4 
+  outline-none
+  transition-all
+  outline-0
+  focus-visible:outline-4
   focus-visible:outline-offset-1
   border
   `,
@@ -31,7 +31,7 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-          bg-brand-400 dark:bg-brand-500 
+          bg-brand-400 dark:bg-brand-500
           hover:bg-brand/80 dark:hover:bg-brand/50
           text-foreground
           border-brand-500/75 dark:border-brand/30
@@ -239,12 +239,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : 'button'
-    const { className } = props
+    const { className, tabIndex } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
     // if loading, button is disabled
     const disabled = loading === true || props.disabled
+
+    // Set default tabIndex for proper Safari focus handling
+    // - Explicit tabIndex prop takes precedence
+    // - If disabled, default to -1 (unless explicitly set)
+    // - Otherwise, default to 0 for keyboard accessibility
+    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     return (
       <Comp
@@ -253,6 +259,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={htmlType}
         {...props}
         disabled={disabled}
+        tabIndex={computedTabIndex}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element

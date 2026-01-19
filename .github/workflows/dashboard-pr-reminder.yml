@@ -1,0 +1,46 @@
+name: Dashboard PR Reminder
+
+on:
+  schedule:
+    # Run at 10am Singapore Time (2am UTC)
+    - cron: '0 2 * * *'
+    # Run at 10am US Eastern Time (2pm UTC = 10am EDT / 9am EST)
+    - cron: '0 14 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  check-dashboard-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Find Dashboard PRs older than 24 hours
+        id: find-prs
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const findStalePRs = require('./scripts/actions/find-stale-dashboard-prs.js');
+            return await findStalePRs({ github, context, core });
+
+      - name: Send Slack notification
+        if: fromJSON(steps.find-prs.outputs.count) > 0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
+          STALE_PRS_JSON: ${{ steps.find-prs.outputs.stale_prs }}
+        with:
+          script: |
+            const sendSlackNotification = require('./scripts/actions/send-slack-pr-notification.js');
+            const stalePRs = JSON.parse(process.env.STALE_PRS_JSON);
+            const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+            await sendSlackNotification(stalePRs, webhookUrl);
+
+      - name: No stale PRs found
+        if: fromJSON(steps.find-prs.outputs.count) == 0
+        run: |
+          echo "✓ No Dashboard PRs older than 24 hours found"

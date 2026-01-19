@@ -1,17 +1,9 @@
-import * as Sentry from '@sentry/nextjs'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
+import { captureCriticalError } from 'lib/error-reporting'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-
-const WHITELIST_ERRORS = [
-  'A user with this email already exists',
-  'Password should contain at least one character of each',
-  'You attempted to send email to an inactive recipient',
-  'email must be an email',
-  'Password is known to be weak and easy to guess, please choose a different one',
-]
 
 export type SignUpVariables = {
   email: string
@@ -51,9 +43,7 @@ export const useSignUpMutation = ({
       } else {
         onError(data, variables, context)
       }
-      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-        Sentry.captureMessage('[CRITICAL] Failed to sign up: ' + data.message)
-      }
+      captureCriticalError(data, 'sign up')
     },
     ...options,
   })

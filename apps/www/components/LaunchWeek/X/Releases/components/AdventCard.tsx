@@ -71,7 +71,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
           </div>
           <div
             className={cn(
-              'relative group-hover:!bottom-0 !ease-[.25,.25,0,1] duration-300 transition-all flex flex-col gap-1'
+              'relative group-hover:!bottom-0 !ease-[cubic-bezier(.25,.25,0,1)] duration-300 transition-all flex flex-col gap-1'
             )}
             style={{
               bottom: isTablet ? 0 : -hiddenHeight + 'px',
@@ -80,7 +80,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
             <h4 className="text-foreground text-lg leading-6">{day.title}</h4>
             <div
               ref={hiddenRef}
-              className="relative z-10 !ease-[.25,.25,0,1] duration-300 transition-opacity opacity-100 lg:opacity-0 group-hover:opacity-100"
+              className="relative z-10 !ease-[cubic-bezier(.25,.25,0,1)] duration-300 transition-opacity opacity-100 lg:opacity-0 group-hover:opacity-100"
               style={{
                 backfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',

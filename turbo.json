@@ -73,6 +73,7 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
@@ -83,12 +84,16 @@
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "NEXT_PUBLIC_MCP_URL",
+        "NEXT_PUBLIC_IS_NIMBUS",
+        "NEXT_PUBLIC_ONGOING_INCIDENT",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
+        "POSTGRES_USER_READ_WRITE",
+        "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
         "POSTGRES_PORT",
         "READ_ONLY_URL",
@@ -99,6 +104,8 @@
         "DEFAULT_PROJECT_NAME",
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
+        "BRAINTRUST_API_KEY",
+        "BRAINTRUST_PROJECT_ID",
         "AUTH_JWT_SECRET",
         "LOGFLARE_API_KEY",
         "LOGFLARE_PUBLIC_ACCESS_TOKEN",
@@ -120,9 +127,14 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
-        "NEXT_PUBLIC_IS_NIMBUS"
+        "STATUSPAGE_API_KEY",
+        "STATUSPAGE_PAGE_ID"
       ],
-      "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
+      "passThroughEnv": [
+        "CURRENT_CLI_VERSION",
+        "VERCEL_GIT_COMMIT_SHA",
+        "SNIPPETS_MANAGEMENT_FOLDER"
+      ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "www#build": {
@@ -188,10 +200,12 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "LUMA_API_KEY",
+        "NEXT_RUNTIME",
         // These env vars are used by some community and marketing integrations
         "SENTRY_DSN_COMMUNITY",
         "NOTION_SUPASQUAD_API_KEY",
         "NOTION_SUPASQUAD_APPLICATIONS_DB_ID",
+        "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY"
@@ -217,7 +231,9 @@
         "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID"
+        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "SUPABASE_MANAGEMENT_API_TOKEN",
+        "OPENAI_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

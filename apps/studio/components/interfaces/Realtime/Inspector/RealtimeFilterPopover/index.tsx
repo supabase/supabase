@@ -1,6 +1,6 @@
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState, useEffect } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -62,13 +62,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <Button
             icon={<PlusCircle size="16" />}
             type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1.5 text-xs', isFiltered ? '!py-0.5' : '!py-1')}
+            className={cn('rounded-full px-1 text-xs h-[26px]')}
             size="small"
           >
             {isFiltered ? (
               <>
                 <span className="mr-1">Filtered by </span>
-                <Badge variant="brand">table: {config.table}</Badge>
+                <Badge variant="success">table: {config.table}</Badge>
               </>
             ) : (
               <span className="mr-1">Filter messages</span>

@@ -6,7 +6,7 @@ import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type DeleteDestinationPipelineParams = {
-  projectRef: string
+  projectRef?: string
   destinationId: number
   pipelineId: number
 }
