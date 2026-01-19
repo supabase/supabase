@@ -11,7 +11,7 @@ How you connect to your database depends on where you're connecting from:
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
   - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6
-  - For persistent clients, and support for both IPv4 and IPv6, use [pooler session mode](#pooler-session-mode)
+  For persistent clients (VMs, Containers) requiring IPv4 support, use the Direct Connection (which operates in Session Mode)
   - For temporary clients (for example, serverless or edge functions) use [pooler transaction mode](#pooler-transaction-mode)
 
 ## Quickstarts
@@ -71,10 +71,8 @@ Direct connections use IPv6 by default. If your environment doesn't support IPv6
 
 </Admonition>
 
-The connection string looks like this:
+The connection string uses port `5432`: ``` postgresql://postgres:[YOUR-PASSWORD]@db.abcdefghijklmnopqrst.supabase.co:5432/postgres 
 
-```
-postgresql://postgres:[YOUR-PASSWORD]@db.abcdefghijklmnopqrst.supabase.co:5432/postgres
 ```
 
 Get your project's direct connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
