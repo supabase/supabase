@@ -69,7 +69,7 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "^5.90.16",
-    "@tanstack/react-query-devtools": "^5.90.16",
+    "@tanstack/react-query-devtools": "^5.91.2",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",
     "@types/d3-geo": "^3.1.0",
