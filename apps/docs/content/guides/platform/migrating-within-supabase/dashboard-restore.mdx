@@ -71,6 +71,17 @@ Here are some things that are not stored directly in your database and will requ
         Use the [Session pooler](/dashboard/project/_?showConnect=true&method=session) connection string by default. If your ISP supports IPv6 or you have the IPv4 add-on enabled, use the direct connection string.
 
       </Admonition>
+      <Admonition type="warning">
+        
+        **Important: Connection String Variation**
+
+        The host name and domain in the examples below (`aws-0-us-east-1` and `.com`) are specific to the default US East 1 region.
+
+        If your project is hosted in a **different region** (e.g., Europe, Asia-Pacific), your actual connection string will have a **different host and domain structure**           (e.g., `.co` or a different regional prefix).
+
+        **Always copy the exact connection string from your active project's dashboard** instead of manually editing the template below.
+
+      </Admonition>
 
       Session pooler connection string:
       ```bash
