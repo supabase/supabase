@@ -1,0 +1,184 @@
+{
+  "sdks": {
+    "javascript": {
+      "name": "JavaScript",
+      "language": "javascript",
+      "versions": {
+        "v2": {
+          "displayName": "Supabase JavaScript Client v2",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_js_v2.yml",
+            "localPath": "../../spec/supabase_js_v2.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "javascript",
+            "filenamePrefix": "supabase-js-v2"
+          }
+        },
+        "v1": {
+          "displayName": "Supabase JavaScript Client v1",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_js_v1.yml",
+            "localPath": "../../spec/supabase_js_v1.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "javascript",
+            "filenamePrefix": "supabase-js-v1"
+          }
+        }
+      }
+    },
+    "kotlin": {
+      "name": "Kotlin",
+      "language": "kotlin",
+      "versions": {
+        "v3": {
+          "displayName": "Supabase Kotlin Client v3",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_kt_v3.yml",
+            "localPath": "../../spec/supabase_kt_v3.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "kotlin",
+            "filenamePrefix": "supabase-kt-v3"
+          }
+        },
+        "v2": {
+          "displayName": "Supabase Kotlin Client v2",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_kt_v2.yml",
+            "localPath": "../../spec/supabase_kt_v2.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "kotlin",
+            "filenamePrefix": "supabase-kt-v2"
+          }
+        },
+        "v1": {
+          "displayName": "Supabase Kotlin Client v1",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_kt_v1.yml",
+            "localPath": "../../spec/supabase_kt_v1.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "kotlin",
+            "filenamePrefix": "supabase-kt-v1"
+          }
+        }
+      }
+    },
+    "dart": {
+      "name": "Dart",
+      "language": "dart",
+      "versions": {
+        "v2": {
+          "displayName": "Supabase Dart/Flutter SDK v2",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_dart_v2.yml",
+            "localPath": "../../spec/supabase_dart_v2.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "dart",
+            "filenamePrefix": "supabase-dart-v2"
+          }
+        },
+        "v1": {
+          "displayName": "Supabase Dart/Flutter SDK v1",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_dart_v1.yml",
+            "localPath": "../../spec/supabase_dart_v1.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "dart",
+            "filenamePrefix": "supabase-dart-v1"
+          }
+        }
+      }
+    },
+    "csharp": {
+      "name": "C#",
+      "language": "csharp",
+      "versions": {
+        "v1": {
+          "displayName": "Supabase C# Client v1",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_csharp_v1.yml",
+            "localPath": "../../spec/supabase_csharp_v1.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "csharp",
+            "filenamePrefix": "supabase-csharp-v1"
+          }
+        },
+        "v0": {
+          "displayName": "Supabase C# Client v0",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_csharp_v0.yml",
+            "localPath": "../../spec/supabase_csharp_v0.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "csharp",
+            "filenamePrefix": "supabase-csharp-v0"
+          }
+        }
+      }
+    },
+    "python": {
+      "name": "Python",
+      "language": "python",
+      "versions": {
+        "v2": {
+          "displayName": "Supabase Python Client v2",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_py_v2.yml",
+            "localPath": "../../spec/supabase_py_v2.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "python",
+            "filenamePrefix": "supabase-py-v2"
+          }
+        }
+      }
+    },
+    "swift": {
+      "name": "Swift",
+      "language": "swift",
+      "versions": {
+        "v2": {
+          "displayName": "Supabase Swift SDK v2",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_swift_v2.yml",
+            "localPath": "../../spec/supabase_swift_v2.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "swift",
+            "filenamePrefix": "supabase-swift-v2"
+          }
+        },
+        "v1": {
+          "displayName": "Supabase Swift SDK v1",
+          "spec": {
+            "url": "https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/supabase_swift_v1.yml",
+            "localPath": "../../spec/supabase_swift_v1.yml",
+            "format": "openref-0.1"
+          },
+          "output": {
+            "baseDir": "swift",
+            "filenamePrefix": "supabase-swift-v1"
+          }
+        }
+      }
+    }
+  }
+}
