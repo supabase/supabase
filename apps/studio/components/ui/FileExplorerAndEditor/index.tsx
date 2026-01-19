@@ -201,12 +201,13 @@ export const FileExplorerAndEditor = ({
               break
 
             case FileAction.CREATE_NEW:
-              const newId = Math.max(
-                0,
-                ...files.map((f) => f.id),
-                ...updatedFiles.map((f) => f.id),
-                ...newFiles.map((f) => f.id)
-              ) + 1
+              const newId =
+                Math.max(
+                  0,
+                  ...files.map((f) => f.id),
+                  ...updatedFiles.map((f) => f.id),
+                  ...newFiles.map((f) => f.id)
+                ) + 1
               newFiles.push({
                 id: newId,
                 name: extractedFile.name,
