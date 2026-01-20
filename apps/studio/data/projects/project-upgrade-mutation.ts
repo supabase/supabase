@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type ProjectUpgradeVariables = components['schemas']['UpgradeDatabaseBody'] & {
   ref: string
@@ -29,7 +29,7 @@ export const useProjectUpgradeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>,
+  UseCustomMutationOptions<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>({

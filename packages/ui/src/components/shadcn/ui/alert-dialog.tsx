@@ -3,10 +3,9 @@
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 import * as React from 'react'
 
+import { cva, VariantProps } from 'class-variance-authority'
 import { cn } from '../../../lib/utils/cn'
-import { buttonVariants } from './../../Button'
-import { VariantProps } from 'class-variance-authority'
-import { cva } from 'class-variance-authority'
+import { ButtonVariantProps, buttonVariants } from './../../Button'
 
 const AlertDialog = AlertDialogPrimitive.Root
 
@@ -61,7 +60,7 @@ const AlertDialogContentVariants = cva(
       },
     },
     defaultVariants: {
-      size: 'medium',
+      size: 'small',
     },
   }
 )
@@ -90,7 +89,7 @@ const AlertDialogContent = React.forwardRef<
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
 const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />
+  <div className={cn('flex flex-col text-left', className)} {...props} />
 )
 AlertDialogHeader.displayName = 'AlertDialogHeader'
 
@@ -123,19 +122,29 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-foreground-light px-5 py-3', className)}
+    className={cn(
+      'text-sm text-foreground-light px-5',
+      // Optically align text vertically
+      ' pt-3.5 pb-4',
+      className
+    )}
     {...props}
   />
 ))
 AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName
 
+type AlertDialogActionProps = React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> & {
+  variant?: NonNullable<ButtonVariantProps['type']>
+}
+
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
->(({ className, ...props }, ref) => (
+  AlertDialogActionProps
+>(({ className, variant = 'primary', type = 'button', ...props }, ref) => (
   <AlertDialogPrimitive.Action
     ref={ref}
-    className={cn(buttonVariants({ type: 'primary', size: 'tiny' }), className)}
+    type={type}
+    className={cn(buttonVariants({ type: variant, size: 'tiny' }), className)}
     {...props}
   />
 ))

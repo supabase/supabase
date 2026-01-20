@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
 
 export type HooksEnableVariables = {
@@ -24,7 +24,7 @@ export const useHooksEnableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<HooksEnableData, ResponseError, HooksEnableVariables>,
+  UseCustomMutationOptions<HooksEnableData, ResponseError, HooksEnableVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

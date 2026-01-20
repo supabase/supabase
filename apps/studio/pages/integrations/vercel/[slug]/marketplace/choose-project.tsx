@@ -46,7 +46,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       x.metadata?.configuration_id === configurationId
   )
 
-  const { data: vercelProjectsData, isLoading: isLoadingVercelProjectsData } =
+  const { data: vercelProjectsData, isPending: isLoadingVercelProjectsData } =
     useVercelProjectsQuery(
       {
         organization_integration_id: integration?.id,
@@ -77,7 +77,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutate: createConnections, isLoading: isCreatingConnection } =
+  const { mutate: createConnections, isPending: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       onSuccess() {
         if (next && isVercelUrl(next)) {

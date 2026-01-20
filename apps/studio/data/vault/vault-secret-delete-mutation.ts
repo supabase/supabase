@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretDeleteVariables = {
@@ -29,7 +29,7 @@ export const useVaultSecretDeleteMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>,
+  UseCustomMutationOptions<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -38,7 +38,7 @@ export const useVaultSecretDeleteMutation = ({
     mutationFn: (vars) => deleteVaultSecret(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -1,18 +1,16 @@
 import pgMeta from '@supabase/pg-meta'
 import { PGColumn } from '@supabase/pg-meta/src/pg-meta-columns'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { CreateColumnBody } from './database-column-create-mutation'
 
-export type UpdateColumnBody = Omit<
-  components['schemas']['UpdateColumnBody'],
-  'check' | 'comment'
+export type UpdateColumnBody = Partial<
+  Omit<CreateColumnBody, 'schema' | 'table' | 'isPrimaryKey'>
 > & {
-  check?: string | null
-  comment?: string | null
+  dropDefault?: boolean
 }
 
 export type DatabaseColumnUpdateVariables = {
@@ -69,7 +67,7 @@ export const useDatabaseColumnUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
+  UseCustomMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>({

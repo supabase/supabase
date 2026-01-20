@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { organizationKeys } from './keys'
 import { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationInviteTokenVariables = { slug?: string; token?: string }
 
@@ -33,7 +33,7 @@ export const useOrganizationInvitationTokenQuery = <TData = OrganizationInviteTo
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
 ) => {
   return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>({
     queryKey: organizationKeys.token(slug, token),

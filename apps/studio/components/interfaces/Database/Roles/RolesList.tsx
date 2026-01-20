@@ -1,14 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 
+import type { PostgresRole } from '@supabase/postgres-meta'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
@@ -19,13 +22,12 @@ import { SUPABASE_ROLES } from './Roles.constants'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
-const RolesList = () => {
+export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const [isCreatingRole, setIsCreatingRole] = useState(false)
-  const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
+  const deletingRoleIdRef = useRef<string | null>(null)
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -38,10 +40,24 @@ const RolesList = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections
 
-  const { data, isLoading } = useDatabaseRolesQuery({
+  const { data, isPending: isLoading } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`),
+  })
+
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
   const filteredRoles = (
@@ -68,7 +84,7 @@ const RolesList = () => {
             size="tiny"
             className="w-52"
             placeholder="Search for a role"
-            icon={<Search size={12} />}
+            icon={<Search />}
             value={filterString}
             onChange={(event: any) => setFilterString(event.target.value)}
             actions={
@@ -170,9 +186,9 @@ const RolesList = () => {
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
-            <Badge variant="brand">Protected</Badge>
+            <Badge variant="success">Protected</Badge>
           </div>
 
           {isLoading
@@ -182,13 +198,13 @@ const RolesList = () => {
                   disabled
                   key={role.id}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 
@@ -199,7 +215,7 @@ const RolesList = () => {
                   key={role.id}
                   disabled={!canUpdateRoles}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
@@ -212,12 +228,15 @@ const RolesList = () => {
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
       <DeleteRoleModal
-        role={selectedRoleToDelete}
-        visible={selectedRoleToDelete !== undefined}
-        onClose={() => setSelectedRoleToDelete(undefined)}
+        role={roleToDelete as unknown as PostgresRole}
+        visible={!!roleToDelete}
+        onClose={() => setSelectedRoleIdToDelete(null)}
+        onDelete={() => {
+          if (roleToDelete) {
+            deletingRoleIdRef.current = roleToDelete.id.toString()
+          }
+        }}
       />
     </>
   )
 }
-
-export default RolesList

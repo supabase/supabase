@@ -1,27 +1,35 @@
-import { useState } from 'react'
 import dayjs from 'dayjs'
+import { useState } from 'react'
+
+type ChartHighlightMouseEvent = {
+  activeLabel?: string
+  coordinates?: string
+}
 
 export interface ChartHighlight {
   left: string | undefined
   right: string | undefined
-  coordinates: { left: any; right: any }
+  coordinates: { left?: string; right?: string }
   isSelecting: boolean
   popoverPosition: { x: number; y: number } | null
-  handleMouseDown: (e: { activeLabel?: string; coordinates?: any }) => void
-  handleMouseMove: (e: { activeLabel?: string; coordinates?: any }) => void
-  handleMouseUp: (e: any) => void
+  handleMouseDown: (e: ChartHighlightMouseEvent) => void
+  handleMouseMove: (e: ChartHighlightMouseEvent) => void
+  handleMouseUp: (e: { chartX?: number; chartY?: number }) => void
   clearHighlight: () => void
 }
 
 export function useChartHighlight(): ChartHighlight {
   const [left, setLeft] = useState<string | undefined>(undefined)
   const [right, setRight] = useState<string | undefined>(undefined)
-  const [coordinates, setCoordinates] = useState<any>({ left: undefined, right: undefined })
+  const [coordinates, setCoordinates] = useState<{ left?: string; right?: string }>({
+    left: undefined,
+    right: undefined,
+  })
   const [isSelecting, setIsSelecting] = useState(false)
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number } | null>(null)
   const [initialPoint, setInitialPoint] = useState<string | undefined>(undefined)
 
-  const handleMouseDown = (e: any) => {
+  const handleMouseDown = (e: ChartHighlightMouseEvent) => {
     clearHighlight()
     if (!e || !e.activeLabel) return
     setIsSelecting(true)
@@ -31,7 +39,7 @@ export function useChartHighlight(): ChartHighlight {
     setCoordinates({ left: e.coordinates, right: e.coordinates })
   }
 
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: ChartHighlightMouseEvent) => {
     if (!isSelecting || !e || !e.activeLabel) return
 
     const currentTimestamp = dayjs(e.activeLabel)
@@ -56,11 +64,21 @@ export function useChartHighlight(): ChartHighlight {
     }
   }
 
-  const handleMouseUp = (e: any) => {
+  const handleMouseUp = (e: unknown) => {
     if (!isSelecting) return
     setIsSelecting(false)
-    setPopoverPosition({ x: e.chartX, y: e.chartY })
     setInitialPoint(undefined)
+
+    if (
+      typeof e === 'object' &&
+      e !== null &&
+      'chartX' in e &&
+      'chartY' in e &&
+      typeof e.chartX === 'number' &&
+      typeof e.chartY === 'number'
+    ) {
+      setPopoverPosition({ x: e.chartX, y: e.chartY })
+    }
   }
 
   const clearHighlight = () => {

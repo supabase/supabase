@@ -37,7 +37,7 @@ export function DataTableViewOptions() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <ButtonTooltip
-          type="outline"
+          type="default"
           size="tiny"
           role="combobox"
           aria-expanded={open}
@@ -46,7 +46,7 @@ export function DataTableViewOptions() {
           tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
         />
       </PopoverTrigger>
-      <PopoverContent portal side="bottom" align="end" className="w-[200px] p-0">
+      <PopoverContent side="bottom" align="end" className="w-[200px] p-0">
         <Command>
           <CommandInput value={search} onValueChange={setSearch} placeholder="Search columns..." />
           <CommandList>

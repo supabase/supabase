@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationUpdateVariables = {
@@ -44,7 +44,7 @@ export const useOrganizationUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>,
+  UseCustomMutationOptions<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

@@ -1,10 +1,12 @@
-import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { last } from 'lodash'
+
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
-import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
-import { last } from 'lodash'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueVariables = {
@@ -31,8 +33,13 @@ export async function getDatabaseQueue({
   queueName,
   afterTimestamp,
   status,
-}: DatabaseQueueVariables & { afterTimestamp: string }) {
+}: DatabaseQueueVariables & { afterTimestamp: string | undefined }) {
   if (!projectRef) throw new Error('Project ref is required')
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   if (status.length === 0) {
     return []
@@ -79,11 +86,17 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    DatabaseQueueData,
+    DatabaseQueueError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.getMessagesInfinite(projectRef, queueName, { status }),
-    ({ pageParam }) => {
+  useInfiniteQuery({
+    queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName, { status }),
+    queryFn: ({ pageParam }) => {
       return getDatabaseQueue({
         projectRef,
         connectionString,
@@ -92,15 +105,13 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
         status,
       })
     },
-    {
-      staleTime: 0,
-      enabled: enabled && typeof projectRef !== 'undefined',
-
-      getNextPageParam(lastPage) {
-        const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
-        if (!hasNextPage) return undefined
-        return last(lastPage)?.enqueued_at
-      },
-      ...options,
-    }
-  )
+    staleTime: 0,
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
+    getNextPageParam(lastPage) {
+      const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
+      if (!hasNextPage) return undefined
+      return last(lastPage)?.enqueued_at
+    },
+    ...options,
+  })

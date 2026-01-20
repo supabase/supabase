@@ -1,9 +1,10 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
 import { getTableEditorSql } from './table-editor-query-sql'
 import { Entity } from './table-editor-types'
+import { UseCustomQueryOptions } from 'types'
 
 type TableEditorArgs = {
   id?: number
@@ -41,7 +42,10 @@ export type TableEditorError = ExecuteSqlError
 
 export const useTableEditorQuery = <TData = TableEditorData>(
   { projectRef, connectionString, id }: TableEditorVariables,
-  { enabled = true, ...options }: UseQueryOptions<TableEditorData, TableEditorError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
 ) =>
   useQuery<TableEditorData, TableEditorError, TData>({
     queryKey: tableEditorKeys.tableEditor(projectRef, id),
@@ -58,14 +62,16 @@ export function prefetchTableEditor(
   client: QueryClient,
   { projectRef, connectionString, id }: TableEditorVariables
 ) {
-  return client.fetchQuery(tableEditorKeys.tableEditor(projectRef, id), ({ signal }) =>
-    getTableEditor(
-      {
-        projectRef,
-        connectionString,
-        id,
-      },
-      signal
-    )
-  )
+  return client.fetchQuery({
+    queryKey: tableEditorKeys.tableEditor(projectRef, id),
+    queryFn: ({ signal }) =>
+      getTableEditor(
+        {
+          projectRef,
+          connectionString,
+          id,
+        },
+        signal
+      ),
+  })
 }

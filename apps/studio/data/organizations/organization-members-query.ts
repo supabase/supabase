@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMembersVariables = {
@@ -58,7 +58,7 @@ export const useOrganizationMembersQuery = <TData = OrganizationMembersData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationMembersData, OrganizationMembersError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationMembersData, OrganizationMembersError, TData> = {}
 ) =>
   useQuery<OrganizationMembersData, OrganizationMembersError, TData>({
     queryKey: organizationKeys.members(slug),

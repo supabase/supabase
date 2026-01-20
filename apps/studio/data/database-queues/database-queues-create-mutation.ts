@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
-import { databaseQueuesKeys } from './keys'
 import { tableKeys } from 'data/tables/keys'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
@@ -52,7 +52,7 @@ export const useDatabaseQueueCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>,
+  UseCustomMutationOptions<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -61,8 +61,8 @@ export const useDatabaseQueueCreateMutation = ({
     mutationFn: (vars) => createDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
-      queryClient.invalidateQueries(tableKeys.list(projectRef, 'pgmq'))
+      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
+      queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, 'pgmq') })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
