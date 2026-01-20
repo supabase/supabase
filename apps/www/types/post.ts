@@ -18,6 +18,7 @@ export interface PostTypes {
   imgThumb?: string // Used by blog posts and case studies
   imgSocial?: string // Used by blog posts
   thumb?: string // Used by events
+  thumb_light?: string // Used by events (light mode variant)
   readingTime?: string
   description: string
   url: string
