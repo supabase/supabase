@@ -3451,6 +3451,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/destinations/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Validate destination configuration
+     * @description Validates that the destination is accessible and properly configured. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationDestinationsController_validateDestination']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/pipelines': {
     parameters: {
       query?: never
@@ -3533,10 +3553,31 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * Rollback pipeline table state
-     * @description Rollback a table state for the pipeline. Requires bearer auth and an active, healthy project.
+     * Rollback pipeline table state (deprecated)
+     * @deprecated
+     * @description Deprecated: Use POST /pipelines/{pipeline_id}/rollback-tables instead. Rollback a table state for the pipeline. Requires bearer auth and an active, healthy project.
      */
     post: operations['ReplicationPipelinesController_rollbackTableState']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Rollback pipeline tables
+     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationPipelinesController_rollbackTables']
     delete?: never
     options?: never
     head?: never
@@ -3621,6 +3662,26 @@ export interface paths {
      * @description Update the pipeline to a new version. Requires bearer auth and an active, healthy project.
      */
     post: operations['ReplicationPipelinesController_updatePipelineVersion']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Validate pipeline configuration
+     * @description Validates pipeline prerequisites against the source database. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationPipelinesController_validatePipeline']
     delete?: never
     options?: never
     head?: never
@@ -5322,11 +5383,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -5350,11 +5413,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -5410,7 +5475,11 @@ export interface components {
         | 'organization_projects_create'
         | 'project_admin_read'
         | 'project_admin_write'
+        | 'action_runs_read'
+        | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_logs_read'
+        | 'analytics_usage_read'
         | 'api_gateway_keys_read'
         | 'api_gateway_keys_write'
         | 'auth_config_read'
@@ -5431,6 +5500,8 @@ export interface components {
         | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
+        | 'database_jit_read'
+        | 'database_jit_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
@@ -5459,8 +5530,8 @@ export interface components {
         | 'storage_write'
         | 'storage_config_read'
         | 'storage_config_write'
-        | 'telemetry_logs_read'
-        | 'telemetry_usage_read'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
       )[]
       project_refs?: string[]
     }
@@ -6945,7 +7016,12 @@ export interface components {
           key:
             | 'instances.compute_update_available_sizes'
             | 'instances.read_replicas'
+            | 'instances.disk_modifications'
+            | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.image_transformations'
+            | 'storage.vector_buckets'
+            | 'storage.iceberg_catalog'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
@@ -8538,11 +8614,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -8598,11 +8676,13 @@ export interface components {
              */
             max_fill_ms?: number
             /**
-             * @description Maximum batch size
+             * @description Maximum size of the batch
              * @example 200
              */
             max_size?: number
           }
+          /** @description Maximum number of table sync workers */
+          max_table_sync_workers?: number
           /**
            * @description Publication name
            * @example pub_orders
@@ -8831,6 +8911,90 @@ export interface components {
       id: string
       name: string
       website: string
+    }
+    RollbackTablesBody: {
+      /**
+       * @description Rollback type
+       * @example individual
+       * @enum {string}
+       */
+      rollback_type: 'individual' | 'full'
+      /** @description Rollback target */
+      target:
+        | {
+            /**
+             * @description Table id (Postgres OID)
+             * @example 16408
+             */
+            table_id: number
+            /** @enum {string} */
+            type: 'single_table'
+          }
+        | {
+            /** @enum {string} */
+            type: 'all_errored_tables'
+          }
+        | {
+            /** @enum {string} */
+            type: 'all_tables'
+          }
+    }
+    RollbackTablesResponse: {
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
+      pipeline_id: number
+      /** @description Rolled back tables */
+      tables: {
+        /** @description Table replication state */
+        new_state:
+          | {
+              /** @enum {string} */
+              name: 'queued'
+            }
+          | {
+              /** @enum {string} */
+              name: 'copying_table'
+            }
+          | {
+              /** @enum {string} */
+              name: 'copied_table'
+            }
+          | {
+              /** @enum {string} */
+              name: 'following_wal'
+            }
+          | {
+              /** @enum {string} */
+              name: 'error'
+              reason: string
+              retry_policy:
+                | {
+                    /** @enum {string} */
+                    policy: 'no_retry'
+                  }
+                | {
+                    /** @enum {string} */
+                    policy: 'manual_retry'
+                  }
+                | {
+                    /**
+                     * @description Next retry time (RFC 3339 timestamp)
+                     * @example 2025-01-02T03:04:05Z
+                     */
+                    next_retry: string
+                    /** @enum {string} */
+                    policy: 'timed_retry'
+                  }
+              solution?: string
+            }
+        /**
+         * @description Table id (Postgres OID)
+         * @example 16408
+         */
+        table_id: number
+      }[]
     }
     RollbackTableStateBody: {
       /**
@@ -10111,11 +10275,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -10139,11 +10305,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -10423,6 +10591,149 @@ export interface components {
       recovery_token?: string
       role?: string
       updated_at?: string
+    }
+    ValidateDestinationResponse: {
+      /** @description List of validation failures */
+      validation_failures: {
+        /**
+         * @description Failure type
+         * @example critical
+         * @enum {string}
+         */
+        failure_type: 'critical' | 'warning'
+        /**
+         * @description Validation failure name
+         * @example Validation Failed
+         */
+        name: string
+        /**
+         * @description Validation failure reason
+         * @example The configuration is invalid
+         */
+        reason: string
+      }[]
+    }
+    ValidatePipelineResponse: {
+      /** @description List of validation failures */
+      validation_failures: {
+        /**
+         * @description Failure type
+         * @example critical
+         * @enum {string}
+         */
+        failure_type: 'critical' | 'warning'
+        /**
+         * @description Validation failure name
+         * @example Validation Failed
+         */
+        name: string
+        /**
+         * @description Validation failure reason
+         * @example The configuration is invalid
+         */
+        reason: string
+      }[]
+    }
+    ValidateReplicationDestinationBody: {
+      /** @description Destination configuration */
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace?: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
+    }
+    ValidateReplicationPipelineBody: {
+      /** @description Pipeline configuration */
+      config: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+          /**
+           * @description Maximum size of the batch
+           * @example 200
+           */
+          max_size?: number
+        }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 3001
+       */
+      source_id: number
     }
     ValidateSpamBody: {
       content: string
@@ -22584,6 +22895,61 @@ export interface operations {
       }
     }
   }
+  ReplicationDestinationsController_validateDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateReplicationDestinationBody']
+      }
+    }
+    responses: {
+      /** @description Validation completed. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidateDestinationResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while validating destination. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationPipelinesController_getPipelines: {
     parameters: {
       query?: never
@@ -22959,6 +23325,63 @@ export interface operations {
       }
     }
   }
+  ReplicationPipelinesController_rollbackTables: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RollbackTablesBody']
+      }
+    }
+    responses: {
+      /** @description New table states after rollback. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RollbackTablesResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while rolling back tables. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationPipelinesController_startPipeline: {
     parameters: {
       query?: never
@@ -23214,6 +23637,61 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while updating pipeline version. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_validatePipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      /** @description Validation completed. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidatePipelineResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while validating pipeline. */
       500: {
         headers: {
           [name: string]: unknown
