@@ -34,7 +34,6 @@ interface SchemaSelectorProps {
   excludedSchemas?: string[]
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
-  portal?: boolean
   align?: 'start' | 'end'
 }
 
@@ -48,7 +47,6 @@ export const SchemaSelector = ({
   excludedSchemas = [],
   onSelectSchema,
   onSelectCreateSchema,
-  portal = true,
   align = 'start',
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
@@ -133,11 +131,10 @@ export const SchemaSelector = ({
             className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
             align={align}
-            portal={portal}
             sameWidthAsTrigger
           >
             <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Find schema..." />
+              <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
               <CommandList_Shadcn_>
                 <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
