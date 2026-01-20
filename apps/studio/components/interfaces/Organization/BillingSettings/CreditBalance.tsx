@@ -13,6 +13,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { CreditTopUp } from './CreditTopUp'
+import { CreditCodeRedemption } from './CreditCodeRedemption'
 
 const CreditBalance = () => {
   const { slug } = useParams()
@@ -56,7 +57,14 @@ const CreditBalance = () => {
           <NoPermission resourceText="view this organization's credits" />
         ) : (
           <FormPanel
-            footer={subscription?.billing_via_partner ? undefined : <CreditTopUp slug={slug} />}
+            footer={
+              subscription?.billing_via_partner ? undefined : (
+                <div className='flex justify-end'>
+                  <CreditCodeRedemption slug={slug} />
+                  <CreditTopUp slug={slug} />
+                </div>
+              )
+            }
           >
             <FormSection>
               <FormSectionContent fullWidth loading={isLoading}>
