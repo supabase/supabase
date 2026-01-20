@@ -320,6 +320,7 @@ allow_list = [
     "Thanos",
     "TimescaleDB",
     "tmux",
+    "TooManyChannels",
     "Transformers.js",
     "tsquery",
     "Twilio",
