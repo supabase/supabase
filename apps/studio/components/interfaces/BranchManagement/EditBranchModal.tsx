@@ -329,7 +329,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   isChecking ||
                   (!gitlessBranching && !githubConnection)
                 }
-                loading={isUpdating || isChecking}
+                loading={isUpdating}
                 type="primary"
                 htmlType="submit"
               >
