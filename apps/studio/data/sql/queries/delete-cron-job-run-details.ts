@@ -15,7 +15,7 @@ export const CTID_BATCH_PAGE_SIZE = 5_000
  */
 export const getJobRunDetailsPageCountSql = () =>
   `
-SELECT relpages
+SELECT pg_relation_size(oid) / current_setting('block_size')::int8 AS num_pages
 FROM pg_class
 WHERE relname = 'job_run_details'
   AND relnamespace = 'cron'::regnamespace;
@@ -23,6 +23,15 @@ WHERE relname = 'job_run_details'
 
 export const getJobRunDetailsPageCountKey = (projectRef: string | undefined) =>
   sqlKeys.query(projectRef, ['cron-job-run-details', 'page-count'])
+
+/**
+ * Validates that a value is a finite non-negative integer.
+ */
+function validatePageNumber(value: number, name: string): void {
+  if (!Number.isFinite(value) || !Number.isInteger(value) || value < 0) {
+    throw new Error(`${name} must be a finite non-negative integer, got: ${value}`)
+  }
+}
 
 /**
  * Delete old cron job run details using ctid range filtering.
@@ -40,17 +49,26 @@ export const getDeleteOldCronJobRunDetailsByCtidSql = (
   interval: string,
   startPage: number,
   endPage: number
-) =>
-  `
+) => {
+  validatePageNumber(startPage, 'startPage')
+  validatePageNumber(endPage, 'endPage')
+
+  // After validation, these are guaranteed to be safe integers
+  // Using literal() on the string representation ensures proper escaping
+  const safeCtidStart = literal(`(${startPage},0)`)
+  const safeCtidEnd = literal(`(${endPage},0)`)
+
+  return `
 WITH deleted AS (
   DELETE FROM cron.job_run_details
-  WHERE ctid >= '(${startPage},0)'::tid
-    AND ctid < '(${endPage},0)'::tid
+  WHERE ctid >= ${safeCtidStart}::tid
+    AND ctid < ${safeCtidEnd}::tid
     AND end_time < now() - interval ${literal(interval)}
   RETURNING 1
 )
 SELECT count(*) as deleted_count FROM deleted;
 `.trim()
+}
 
 export const getDeleteOldCronJobRunDetailsByCtidKey = (
   projectRef: string | undefined,

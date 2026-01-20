@@ -79,7 +79,7 @@ export const useCronJobsCleanupActions = ({
           queryKey: getJobRunDetailsPageCountKey(projectRef),
         })
 
-        const totalPages = pageCountResult.result?.[0]?.relpages ?? 0
+        const totalPages = pageCountResult.result?.[0]?.num_pages ?? 0
 
         if (totalPages === 0) {
           setCleanupState({ status: 'delete-success', totalRowsDeleted: 0 })

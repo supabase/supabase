@@ -83,8 +83,7 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
     enabled: enabled && typeof projectRef !== 'undefined',
     initialPageParam: undefined,
     getNextPageParam(lastPage) {
-      const hasNextPage = lastPage.length <= CRON_JOB_RUNS_PAGE_SIZE
-      if (!hasNextPage) return undefined
+      if (lastPage.length < CRON_JOB_RUNS_PAGE_SIZE) return undefined
       return last(lastPage)?.runid
     },
     ...options,

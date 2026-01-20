@@ -155,7 +155,7 @@ interface DeletionProgressProps {
 const DeletionProgress = ({ progress, onCancel }: DeletionProgressProps) => {
   const { currentBatch, totalBatches, totalRowsDeleted } = progress
   const percentComplete =
-    totalBatches > 0 ? Math.max(Math.round((currentBatch / totalBatches) * 100), 100) : 0
+    totalBatches > 0 ? Math.min(Math.round((currentBatch / totalBatches) * 100), 100) : 0
 
   return (
     <div className="space-y-2">
