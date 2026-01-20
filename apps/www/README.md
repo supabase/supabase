@@ -128,7 +128,7 @@ If you need a custom OG image that differs from the auto-generated one, you can 
 title: 'Supabase Meetup'
 thumb: /images/events/2025-01-meetup/thumbnail.png
 cover_url: https://external-cdn.com/event-banner.jpg
-og_image: /images/events/2025-01-meetup/custom-og.png  # Optional override
+og_image: /images/events/2025-01-meetup/custom-og.png # Optional override
 ---
 ```
 
