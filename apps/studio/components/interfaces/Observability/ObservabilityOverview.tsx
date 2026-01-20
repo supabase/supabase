@@ -22,7 +22,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { InlineLink } from 'components/ui/InlineLink'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { ServiceHealthCard } from './ServiceHealthCard'
+import { ServiceHealthTable } from './ServiceHealthTable'
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import type { ChartIntervals } from 'types'
@@ -95,7 +95,7 @@ export const ObservabilityOverview = () => {
   useEffect(() => {
     if (!isLiveMode) return
 
-    const pollInterval = setInterval(() => {
+    const pollInterval = setTimeout(() => {
       // Invalidate all queries to trigger refetch
       queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
       queryClient.invalidateQueries({ queryKey: ['postgrest-overview-metrics'] })
@@ -103,12 +103,20 @@ export const ObservabilityOverview = () => {
       queryClient.invalidateQueries({ queryKey: ['max-connections'] })
     }, 10000)
 
-    return () => clearInterval(pollInterval)
+    return () => clearTimeout(pollInterval)
   }, [isLiveMode, queryClient])
 
-  // Service configuration (excluding database which has its own section)
+  // Service configuration
   const serviceBase = useMemo(
     () => [
+      {
+        key: 'db' as const,
+        name: 'Database',
+        reportUrl: `/project/${projectRef}/observability/database`,
+        logsUrl: `/project/${projectRef}/logs/postgres-logs`,
+        enabled: true,
+        hasReport: true,
+      },
       {
         key: 'auth' as const,
         name: 'Auth',
@@ -181,20 +189,6 @@ export const ObservabilityOverview = () => {
       })
 
       router.push(`${logsUrl}?${queryParams.toString()}`)
-
-      if (projectRef && organization?.slug) {
-        sendEvent({
-          action: 'observability_overview_chart_clicked',
-          properties: {
-            service_type: serviceKey,
-            bar_timestamp: datum.timestamp,
-          },
-          groups: {
-            project: projectRef,
-            organization: organization.slug,
-          },
-        })
-      }
     },
     [router, projectRef, organization, sendEvent]
   )
@@ -275,6 +269,8 @@ export const ObservabilityOverview = () => {
         </div>
       </div>
 
+<div className='space-y-12 mt-8'>
+
       <DatabaseInfrastructureSection
         interval={interval}
         selectedInterval={selectedInterval}
@@ -288,31 +284,20 @@ export const ObservabilityOverview = () => {
         datetimeFormat={datetimeFormat}
       />
 
-      <div>
-        <h2 className="mb-4">Services Health</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {enabledServices.map((service) => {
-          const serviceData = overviewData.services[service.key]
-          return (
-            <ServiceHealthCard
-              key={service.key}
-              serviceName={service.name}
-              serviceKey={service.key}
-              total={serviceData.total}
-              errorRate={serviceData.errorRate}
-              errorCount={serviceData.errorCount}
-              warningCount={serviceData.warningCount}
-              chartData={serviceData.eventChartData}
-              reportUrl={service.hasReport ? service.reportUrl : undefined}
-              logsUrl={service.logsUrl}
-              isLoading={serviceData.isLoading}
-              onBarClick={handleBarClick(service.key, service.logsUrl)}
-              datetimeFormat={datetimeFormat}
-            />
-          )
-        })}
-        </div>
-      </div>
+      <ServiceHealthTable
+        services={enabledServices.map((service) => ({
+          key: service.key,
+          name: service.name,
+          description: '',
+          reportUrl: service.hasReport ? service.reportUrl : undefined,
+          logsUrl: service.logsUrl,
+        }))}
+        serviceData={overviewData.services}
+        onBarClick={handleBarClick}
+        interval={interval}
+      />
+</div>
+
     </ReportPadding>
   )
 }
