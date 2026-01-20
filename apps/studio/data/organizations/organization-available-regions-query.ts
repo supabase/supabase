@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type DesiredInstanceSizeForAvailableRegions =
@@ -44,7 +44,7 @@ export const useOrganizationAvailableRegionsQuery = <TData = OrganizationAvailab
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     OrganizationAvailableRegionsData,
     OrganizationAvailableRegionsError,
     TData

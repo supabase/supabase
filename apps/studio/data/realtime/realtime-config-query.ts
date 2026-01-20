@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { realtimeKeys } from './keys'
 
 export type RealtimeConfigurationVariables = {
@@ -50,7 +50,7 @@ export const useRealtimeConfigurationQuery = <TData = RealtimeConfigurationData>
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<RealtimeConfigurationData, RealtimeConfigurationError, TData> = {}
+  }: UseCustomQueryOptions<RealtimeConfigurationData, RealtimeConfigurationError, TData> = {}
 ) =>
   useQuery<RealtimeConfigurationData, RealtimeConfigurationError, TData>({
     queryKey: realtimeKeys.configuration(projectRef),

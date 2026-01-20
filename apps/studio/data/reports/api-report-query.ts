@@ -26,6 +26,7 @@ export const useApiReport = () => {
   const responseSpeed = queryHooks.responseSpeed()
   const topSlowRoutes = queryHooks.topSlowRoutes()
   const networkTraffic = queryHooks.networkTraffic()
+  const requestsByCountry = queryHooks.requestsByCountry()
   const activeHooks = [
     totalRequests,
     topRoutes,
@@ -34,6 +35,7 @@ export const useApiReport = () => {
     responseSpeed,
     topSlowRoutes,
     networkTraffic,
+    requestsByCountry,
   ]
 
   const addFilter = (filter: ReportFilterItem) => {
@@ -94,6 +96,11 @@ export const useApiReport = () => {
     if (networkTraffic.changeQuery) {
       networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(formattedFilters))
     }
+    if (requestsByCountry.changeQuery) {
+      requestsByCountry.changeQuery(
+        PRESET_CONFIG.api.queries.requestsByCountry.sql(formattedFilters)
+      )
+    }
   }, [JSON.stringify(formattedFilters)])
 
   const handleRefresh = async () => {
@@ -117,6 +124,7 @@ export const useApiReport = () => {
       topErrorRoutes: topErrorRoutes.logData,
       topSlowRoutes: topSlowRoutes.logData,
       networkTraffic: networkTraffic.logData,
+      requestsByCountry: requestsByCountry.logData,
     },
     params: {
       totalRequests: totalRequests.params,
@@ -126,6 +134,7 @@ export const useApiReport = () => {
       topErrorRoutes: topErrorRoutes.params,
       topSlowRoutes: topSlowRoutes.params,
       networkTraffic: networkTraffic.params,
+      requestsByCountry: requestsByCountry.params,
     },
     error: {
       totalRequest: totalRequests.error,
@@ -135,6 +144,7 @@ export const useApiReport = () => {
       topErrorRoute: topErrorRoutes.error,
       topSlowRoutes: topSlowRoutes.error,
       networkTraffic: networkTraffic.error,
+      requestsByCountry: requestsByCountry.error,
     },
     mergeParams: handleSetParams,
     filters,

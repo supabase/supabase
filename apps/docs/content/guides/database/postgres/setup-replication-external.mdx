@@ -23,11 +23,11 @@ CREATE PUBLICATION example_pub;
 select pg_create_logical_replication_slot('example_slot', 'pgoutput');
 ```
 
-3. Now we will connect to our **external database** and subscribe to our `publication` Note: ):
+3. Now connect to your **external database** and subscribe to the `publication`
 
-<Admonition type="note">
+<Admonition type="caution">
 
-This will need a **direct** connection (not a Connection Pooler) to your database and you can find the connection info in the [**Connect** panel](/dashboard/project/_?showConnect=true) in the `Direct connection` section.
+This needs a **direct** connection (not a Connection Pooler) to your database and you can find the connection info in the [**Connect** panel](/dashboard/project/_?showConnect=true) in the `Direct connection` section.
 
 You will also need to ensure that IPv6 is supported by your replication destination (or you can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address))
 
@@ -41,6 +41,13 @@ CONNECTION 'host=db.oaguxblfdassqxvvwtfe.supabase.co user=postgres password=YOUR
 PUBLICATION example_pub
 WITH (copy_data = true, create_slot=false, slot_name=example_slot);
 ```
+
+<Admonition type="tip">
+
+For projects running Postgres 17+, it is possible to subscribe to a [Read
+Replica](/docs/guides/platform/read-replicas) by using your Read Replica's connection string.
+
+</Admonition>
 
 <Admonition type="note">
 

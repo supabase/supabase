@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
@@ -35,7 +35,7 @@ export type ContentIdError = ResponseError
 
 export const useContentIdQuery = <TData = ContentIdData>(
   { projectRef, id }: { projectRef?: string; id?: string },
-  { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
   useQuery<ContentIdData, ContentIdError, TData>({
     queryKey: contentKeys.resource(projectRef, id),

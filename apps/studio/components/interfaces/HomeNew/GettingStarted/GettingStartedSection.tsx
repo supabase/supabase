@@ -4,11 +4,13 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
 import { FrameworkSelector } from './FrameworkSelector'
 import { GettingStarted } from './GettingStarted'
@@ -36,6 +38,7 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
   const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [selectedFramework, setSelectedFramework] = useState<string>(DEFAULT_FRAMEWORK_KEY)
   const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null
@@ -44,8 +47,11 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
   const statuses = useGettingStartedProgress()
 
   const openAiChat = useCallback(
-    (name: string, initialInput: string) => aiSnap.newChat({ name, open: true, initialInput }),
-    [aiSnap]
+    (name: string, initialInput: string) => {
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      aiSnap.newChat({ name, initialInput })
+    },
+    [aiSnap, openSidebar]
   )
 
   const connectPresetLinks = useMemo(() => {

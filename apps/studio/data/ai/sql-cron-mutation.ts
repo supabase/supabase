@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SqlCronGenerateResponse = string
 
@@ -41,7 +41,7 @@ export const useSqlCronGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
+  UseCustomMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>({

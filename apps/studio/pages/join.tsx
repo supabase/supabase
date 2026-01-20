@@ -4,7 +4,7 @@ import { OrganizationInvite } from 'components/interfaces/OrganizationInvite/Org
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
 
 const JoinOrganizationPage: NextPageWithLayout = () => {

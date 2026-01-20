@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicaKeys } from './keys'
 
 export type Region =
@@ -47,7 +47,7 @@ export const useReadReplicaSetUpMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>,
+  UseCustomMutationOptions<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -55,7 +55,7 @@ export const useReadReplicaSetUpMutation = ({
     mutationFn: (vars) => setUpReadReplica(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: replicaKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -1,6 +1,7 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
+import { UseCustomQueryOptions } from 'types'
 
 export type FeedbackCategoryVariables = {
   prompt: string
@@ -47,7 +48,7 @@ export const useFeedbackCategoryQuery = <TData = FeedbackCategory>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<FeedbackCategory, FeedbackCategoryError, TData> = {}
+  }: UseCustomQueryOptions<FeedbackCategory, FeedbackCategoryError, TData> = {}
 ) =>
   useQuery<FeedbackCategory, FeedbackCategoryError, TData>({
     queryKey: ['feedback-category', prompt],

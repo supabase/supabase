@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type FunctionsResourceUsageVariables = {
   projectRef?: string
@@ -54,7 +55,7 @@ export const useFunctionsResourceUsageQuery = <TData = FunctionsResourceUsageDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<FunctionsResourceUsageData, FunctionsResourceUsageError, TData> = {}
+  }: UseCustomQueryOptions<FunctionsResourceUsageData, FunctionsResourceUsageError, TData> = {}
 ) =>
   useQuery<FunctionsResourceUsageData, FunctionsResourceUsageError, TData>({
     queryKey: analyticsKeys.functionsResourceUsage(projectRef, { functionId, interval }),

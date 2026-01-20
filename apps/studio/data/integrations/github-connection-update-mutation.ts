@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
 
 type GitHubConnectionUpdateVariables = {
@@ -33,7 +33,7 @@ export const useGitHubConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateContentData, ResponseError, GitHubConnectionUpdateVariables>,
+  UseCustomMutationOptions<UpdateContentData, ResponseError, GitHubConnectionUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -41,9 +41,9 @@ export const useGitHubConnectionUpdateMutation = ({
     mutationFn: (args) => updateConnection(args),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(
-          integrationKeys.githubConnectionsList(variables.organizationId)
-        ),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

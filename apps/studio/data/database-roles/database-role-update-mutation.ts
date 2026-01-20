@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
@@ -38,7 +38,7 @@ export const useDatabaseRoleUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseRoleUpdateData, ResponseError, DatabaseRoleUpdateVariables>,
+  UseCustomMutationOptions<DatabaseRoleUpdateData, ResponseError, DatabaseRoleUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

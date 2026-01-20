@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type DpaRequestVariables = {
   recipient_email: string
@@ -25,7 +25,7 @@ export const useDpaRequestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DpaRequestData, ResponseError, DpaRequestVariables>,
+  UseCustomMutationOptions<DpaRequestData, ResponseError, DpaRequestVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<DpaRequestData, ResponseError, DpaRequestVariables>({

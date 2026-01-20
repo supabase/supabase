@@ -71,7 +71,7 @@ const RevVersionDropdown = ({
             <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
               Version {version}.0
             </span>
-            {index === 0 && <Badge size="small">Latest</Badge>}
+            {index === 0 && <Badge>Latest</Badge>}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

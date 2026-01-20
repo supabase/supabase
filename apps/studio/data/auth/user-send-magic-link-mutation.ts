@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { User } from './users-infinite-query'
 
 export type UserSendMagicLinkVariables = {
@@ -28,7 +28,7 @@ export const useUserSendMagicLinkMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>,
+  UseCustomMutationOptions<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>({

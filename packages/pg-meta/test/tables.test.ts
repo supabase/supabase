@@ -1,6 +1,6 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -1427,7 +1427,6 @@ for (const testCase of tableCreationTests) {
       await testCase.beforeTest(executeQuery)
     }
 
-    //@ts-expect-error
     const { sql } = pgMeta.tables.create(testCase.input)
     await executeQuery(sql)
 

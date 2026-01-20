@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { integrationKeys } from './keys'
 
 export type VercelRedirectVariables = {
@@ -30,7 +30,7 @@ export const useVercelRedirectQuery = <TData = VercelRedirectData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<VercelRedirectData, VercelRedirectError, TData> = {}
+  }: UseCustomQueryOptions<VercelRedirectData, VercelRedirectError, TData> = {}
 ) =>
   useQuery<VercelRedirectData, VercelRedirectError, TData>({
     queryKey: integrationKeys.vercelRedirect(installationId),

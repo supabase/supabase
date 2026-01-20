@@ -8,6 +8,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'functions-logs-first-column',
     key: 'functions-logs-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.event_type && !props.row.level) {
         return defaultRenderCell(props)

@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -20,12 +21,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string
   open?: boolean
-  selectedRef?: string
+  selectedRef?: string | null
   searchPlaceholder?: string
   sameWidthAsTrigger?: boolean
   checkPosition?: 'right' | 'left'
@@ -41,7 +42,9 @@ interface OrganizationProjectSelectorSelectorProps {
   renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
   onInitialLoad?: (projects: OrgProject[]) => void
+  isOptionDisabled?: (project: OrgProject) => boolean
   fetchOnMount?: boolean
+  modal?: boolean
 }
 
 export const OrganizationProjectSelector = ({
@@ -57,7 +60,9 @@ export const OrganizationProjectSelector = ({
   renderActions,
   onSelect,
   onInitialLoad,
+  isOptionDisabled,
   fetchOnMount = false,
+  modal = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -88,7 +93,7 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { enabled: fetchOnMount || open, keepPreviousData: true }
+    { enabled: fetchOnMount || open, placeholderData: keepPreviousData }
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
@@ -123,7 +128,7 @@ export const OrganizationProjectSelector = ({
   }, [isLoadingProjects, isSuccessProjects])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger_Shadcn_ asChild>
         {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
@@ -197,6 +202,7 @@ export const OrganizationProjectSelector = ({
                           setOpen(false)
                         }}
                         onClick={() => setOpen(false)}
+                        disabled={!!isOptionDisabled ? isOptionDisabled(project) : false}
                       >
                         {!!renderRow ? (
                           renderRow(project)

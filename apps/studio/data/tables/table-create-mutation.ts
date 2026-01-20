@@ -1,13 +1,17 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import { privilegeKeys } from 'data/privileges/keys'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableKeys } from './keys'
 
-export type CreateTableBody = components['schemas']['CreateTableBody']
+export type CreateTableBody = {
+  name: string
+  schema?: string
+  comment?: string | null
+}
 
 export type TableCreateVariables = {
   projectRef: string
@@ -36,7 +40,7 @@ export const useTableCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
+  UseCustomMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -47,8 +51,15 @@ export const useTableCreateMutation = ({
       const { projectRef, payload } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema, true)),
-        queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema, false)),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.list(projectRef, payload.schema, true),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.list(projectRef, payload.schema, false),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.tablePrivilegesList(projectRef),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },
