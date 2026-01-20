@@ -178,7 +178,7 @@ export const CreditCodeRedemption = ({ slug }: { slug: string | undefined }) => 
                   name="code"
                   render={({ field }) => (
                     <FormItemLayout label="Code" className="gap-1">
-                      <Input_Shadcn_ {...field} placeholder="100" />
+                      <Input_Shadcn_ {...field} className="uppercase" />
                     </FormItemLayout>
                   )}
                 />
