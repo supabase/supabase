@@ -4,7 +4,7 @@ import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-
 import { useFlag, useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { Badge, Button } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
@@ -124,21 +124,13 @@ const ValidationErrorItem = ({
   }
 
   const manageLink = getManageLink()
-  const showDeprecatedBadge = error.type === 'unsupported_extension'
 
   return (
     <li className="py-3 last:pb-0 flex flex-row gap-x-3 justify-between items-center">
       <div className="flex flex-col gap-y-0.5 flex-1 min-w-0">
-        <div className="flex flex-row gap-x-2 items-center">
           <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
             {title}
           </h6>
-          {showDeprecatedBadge && (
-            <Badge variant="warning" className="flex-shrink-0">
-              Deprecated
-            </Badge>
-          )}
-        </div>
         <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
