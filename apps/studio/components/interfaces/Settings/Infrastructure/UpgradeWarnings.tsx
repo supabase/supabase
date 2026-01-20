@@ -73,21 +73,21 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
 const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
-      return 'Objects depending on pg_cron must be removed'
+      return 'Remove objects that depend on pg_cron'
     case 'indexes_referencing_ll_to_earth':
-      return `Index on table ${error.schema_name}.${error.table_name} references ll_to_earth()`
+      return `Drop or recreate the index on table ${error.schema_name}.${error.table_name} that references ll_to_earth()`
     case 'function_using_obsolete_lang':
-      return `Function uses obsolete language: ${error.lang_name}`
+      return `Update the function to use a supported language instead of ${error.lang_name}`
     case 'unsupported_extension':
-      return 'Extension not supported in newer Postgres versions'
+      return 'Remove the unsupported extension'
     case 'unsupported_fdw_handler':
-      return `FDW using obsolete handler: ${error.fdw_handler_name}`
+      return `Update or remove the FDW using the obsolete handler ${error.fdw_handler_name}`
     case 'unlogged_table_with_persistent_sequence':
-      return `Unlogged table has persistent sequence: ${error.sequence_name}`
+      return `Convert the sequence ${error.sequence_name} to unlogged or convert the table to logged`
     case 'user_defined_objects_in_internal_schemas':
-      return `User-defined ${error.obj_type} in Supabase-managed schema`
+      return `Remove the user-defined ${error.obj_type} from the Supabase-managed schema`
     case 'active_replication_slot':
-      return 'Active replication slot must be dropped'
+      return 'Drop the active replication slot'
   }
 }
 
@@ -139,7 +139,7 @@ const ValidationErrorItem = ({
             </Badge>
           )}
         </div>
-        <p className="text-foreground-lighter text-xs mt-1">{description}</p>
+        <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
         <Button size="tiny" type="default" asChild>
