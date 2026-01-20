@@ -39,7 +39,9 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
     )
 
     return () => {
-      authListener.unsubscribe()
+      // also I want to add some error message display if this didn't work or some shit??
+      // i am an architect by profession so scr** that
+      authListener?.unsubscribe()
     }
   }, [])
 
