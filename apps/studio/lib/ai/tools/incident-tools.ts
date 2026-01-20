@@ -17,7 +17,10 @@ export const getIncidentTools = ({ baseUrl }: { baseUrl: string }) => ({
     inputSchema: z.object({}),
     execute: async () => {
       if (!IS_PLATFORM) {
-        return { incidents: [], message: 'Incident checking is only available on Supabase platform.' }
+        return {
+          incidents: [],
+          message: 'Incident checking is only available on Supabase platform.',
+        }
       }
 
       try {
@@ -35,7 +38,8 @@ export const getIncidentTools = ({ baseUrl }: { baseUrl: string }) => ({
         if (incidents.length === 0) {
           return {
             incidents: [],
-            message: 'No active incidents. The issue the user is experiencing is likely not related to a Supabase infrastructure problem.',
+            message:
+              'No active incidents. The issue the user is experiencing is likely not related to a Supabase infrastructure problem.',
           }
         }
 
