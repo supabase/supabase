@@ -951,6 +951,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/redeem': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Redeems a credit code */
+    post: operations['OrgCreditsController_redeemCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/top-up': {
     parameters: {
       query?: never
@@ -5475,7 +5492,11 @@ export interface components {
         | 'organization_projects_create'
         | 'project_admin_read'
         | 'project_admin_write'
+        | 'action_runs_read'
+        | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_logs_read'
+        | 'analytics_usage_read'
         | 'api_gateway_keys_read'
         | 'api_gateway_keys_write'
         | 'auth_config_read'
@@ -5496,6 +5517,8 @@ export interface components {
         | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
+        | 'database_jit_read'
+        | 'database_jit_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
@@ -5524,8 +5547,8 @@ export interface components {
         | 'storage_write'
         | 'storage_config_read'
         | 'storage_config_write'
-        | 'telemetry_logs_read'
-        | 'telemetry_usage_read'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
       )[]
       project_refs?: string[]
     }
@@ -5721,6 +5744,10 @@ export interface components {
       organization_slug: string
       source: string
       teamId?: string
+    }
+    CreditRedemptionRequest: {
+      code: string
+      hcaptcha_token?: string
     }
     CreditsTopUpRequest: {
       address?: {
@@ -7010,8 +7037,12 @@ export interface components {
           key:
             | 'instances.compute_update_available_sizes'
             | 'instances.read_replicas'
+            | 'instances.disk_modifications'
             | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.image_transformations'
+            | 'storage.vector_buckets'
+            | 'storage.iceberg_catalog'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
@@ -13370,6 +13401,59 @@ export interface operations {
         content?: never
       }
       /** @description Failed to determine available Postgres versions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_redeemCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditRedemptionRequest']
+      }
+    }
+    responses: {
+      /** @description Credit code redeemed successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to redeem credit code */
       500: {
         headers: {
           [name: string]: unknown
