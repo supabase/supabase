@@ -226,6 +226,8 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
+
   const {
     mutate: createProject,
     isPending: isCreatingNewProject,
@@ -442,6 +444,23 @@ const Wizard: NextPageWithLayout = () => {
                     {showAdvancedConfig && !!availableOrioleVersion && (
                       <AdvancedConfiguration form={form} />
                     )}
+
+                    {shouldShowFreeProjectInfo ? (
+                      <Admonition
+                        className="rounded-none border-0"
+                        type="note"
+                        title="Need a free project?"
+                        description={
+                          <p>
+                            You can have up to 2 free projects across all organizations.{' '}
+                            <Link className="underline text-foreground" href="/new">
+                              Create a free organization
+                            </Link>{' '}
+                            to use them.
+                          </p>
+                        }
+                      />
+                    ) : null}
                   </>
                 )}
 
