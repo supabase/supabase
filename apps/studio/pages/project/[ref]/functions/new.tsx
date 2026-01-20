@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -26,14 +26,6 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   Button,
   cn,
   Command_Shadcn_,
@@ -133,7 +125,6 @@ const NewFunctionPage = () => {
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
-  const [showWarning, setShowWarning] = useState(false)
 
   const hasUnsavedChanges = !isEqual(INITIAL_FILES, files)
 
@@ -429,22 +420,6 @@ const NewFunctionPage = () => {
           </Button>
         </form>
       </Form_Shadcn_>
-
-      <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Unimported files will not be deployed or saved</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ensure that all files in the edge function are imported through{' '}
-              <code className="text-code-inline">index.ts</code> or they will be omitted.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Deploy function</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </PageLayout>
   )
 }
