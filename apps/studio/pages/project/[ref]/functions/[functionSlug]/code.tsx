@@ -20,6 +20,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { useLatest } from 'react-use'
 import { LogoLoader } from 'ui'
 
 const CodePage = () => {
@@ -72,6 +73,7 @@ const CodePage = () => {
       : []
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessLoadingFiles])
+
   const hasUnsavedChanges = !isEqual(initialFiles, files)
 
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
@@ -143,16 +145,19 @@ const CodePage = () => {
     setFiles(initialFiles)
   }, [initialFiles])
 
+  // [Joshen] Probably a candidate for useStaticEffectEvent
+  const hasUnsavedChangesRef = useLatest(hasUnsavedChanges)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
+      if (hasUnsavedChangesRef.current) {
         e.preventDefault()
         e.returnValue = '' // deprecated, but older browsers still require this
       }
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [hasUnsavedChanges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="flex flex-col h-full">

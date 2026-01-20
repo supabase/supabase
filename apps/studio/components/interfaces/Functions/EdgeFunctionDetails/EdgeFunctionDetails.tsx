@@ -244,7 +244,7 @@ export const EdgeFunctionDetails = () => {
         </PageSectionSummary>
         <PageSectionContent>
           <PageSection className="pt-0">
-            <PageSectionSummary>
+            <PageSectionSummary className="!self-start">
               <PageSectionTitle>Function Configuration</PageSectionTitle>
             </PageSectionSummary>
             <PageSectionContent>
@@ -326,7 +326,7 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
+            <PageSectionSummary className="!self-start">
               <PageSectionTitle>Invoke function</PageSectionTitle>
             </PageSectionSummary>
             <PageSectionContent>
@@ -394,7 +394,7 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
+            <PageSectionSummary className="!self-start">
               <PageSectionTitle>Develop locally</PageSectionTitle>
             </PageSectionSummary>
             <PageSectionContent>
@@ -422,7 +422,7 @@ export const EdgeFunctionDetails = () => {
             </PageSectionContent>
           </PageSection>
           <PageSection>
-            <PageSectionSummary>
+            <PageSectionSummary className="!self-start">
               <PageSectionTitle>Delete function</PageSectionTitle>
             </PageSectionSummary>
             <PageSectionContent>

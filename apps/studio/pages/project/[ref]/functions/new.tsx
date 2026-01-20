@@ -282,6 +282,7 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
+  // [Joshen] Probably a candidate for useStaticEffectEvent
   const hasUnsavedChangesRef = useLatest(hasUnsavedChanges)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
