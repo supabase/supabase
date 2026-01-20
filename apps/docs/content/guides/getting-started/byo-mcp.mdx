@@ -92,8 +92,9 @@ server.registerTool(
   })
 )
 
-// Handle MCP requests at the root path
-app.all('/', async (c) => {
+// Handle MCP requests at the root path of the edge function.
+// Due to how edge functions work, the edge function name should be always provided. 
+app.all('/mcp', async (c) => {
   const transport = new StreamableHTTPTransport()
   await server.connect(transport)
   return transport.handleRequest(c)
@@ -170,3 +171,4 @@ You can find ready-to-use MCP server implementations here:
 - [MCP Authentication](/docs/guides/auth/oauth-server/mcp-authentication)
 - [MCP server examples on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp)
 - [Building MCP servers with mcp-lite](/docs/guides/functions/examples/mcp-server-mcp-lite) - Alternative lightweight framework
+- [Why to use Hono function name for edge function](https://github.com/supabase/supabase/issues/12629) 
