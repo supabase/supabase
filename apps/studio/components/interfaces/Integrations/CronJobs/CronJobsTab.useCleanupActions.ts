@@ -79,7 +79,13 @@ export const useCronJobsCleanupActions = ({
           queryKey: getJobRunDetailsPageCountKey(projectRef),
         })
 
-        const totalPages = pageCountResult.result?.[0]?.num_pages ?? 0
+        const rawTotalPages = pageCountResult.result?.[0]?.num_pages ?? 0
+        const totalPages = Number(rawTotalPages)
+        if (!Number.isFinite(totalPages) || totalPages < 0) {
+          throw new Error(
+            `[CronJobs > cleanup actions] Invalid page count returned: ${rawTotalPages}`
+          )
+        }
 
         if (totalPages === 0) {
           setCleanupState({ status: 'delete-success', totalRowsDeleted: 0 })
@@ -120,6 +126,12 @@ export const useCronJobsCleanupActions = ({
 
           const deletedCount = deleteResult.result?.[0]?.deleted_count ?? 0
           totalRowsDeleted += deletedCount
+
+          if (cancelledRef.current) {
+            setCleanupState({ status: 'idle' })
+            toast.info('Deletion cancelled.')
+            return
+          }
 
           if (batch < totalBatches - 1) {
             await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS))

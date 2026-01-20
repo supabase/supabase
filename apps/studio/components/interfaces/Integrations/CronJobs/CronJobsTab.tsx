@@ -13,7 +13,8 @@ import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQuer
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { BASE_PATH } from 'lib/constants'
+import { createNavigationHandler } from 'lib/navigation'
+import { isGreaterThanOrEqual } from 'lib/semver'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { LoadingLine, Sheet, SheetContent } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -27,29 +28,6 @@ import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
 
 const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
-
-/**
- * Compare two semantic version strings.
- * Returns true if version >= minVersion.
- */
-function semverGte(version: string, minVersion: string): boolean {
-  const vParts = version.split('.').map((p) => parseInt(p, 10))
-  const mParts = minVersion.split('.').map((p) => parseInt(p, 10))
-
-  // If any part is NaN, version is invalid
-  if (vParts.some(isNaN) || mParts.some(isNaN)) {
-    return false
-  }
-
-  const maxLen = Math.max(vParts.length, mParts.length)
-  for (let i = 0; i < maxLen; i++) {
-    const v = vParts[i] ?? 0
-    const m = mParts[i] ?? 0
-    if (v > m) return true
-    if (v < m) return false
-  }
-  return true // versions are equal
-}
 
 export const CronjobsTab = () => {
   const router = useRouter()
@@ -177,7 +155,7 @@ export const CronjobsTab = () => {
 
   const pgCronExtension = extensions.find((ext) => ext.name === 'pg_cron')
   const supportsSeconds = pgCronExtension?.installed_version
-    ? semverGte(pgCronExtension.installed_version, '1.5')
+    ? isGreaterThanOrEqual(pgCronExtension.installed_version, '1.5')
     : false
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -250,11 +228,7 @@ export const CronjobsTab = () => {
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
 
-    if (event.metaKey) {
-      window.open(`${BASE_PATH}/${url}`, '_blank')
-    } else {
-      router.push(url)
-    }
+    createNavigationHandler(url, router)(event)
   }
 
   const [isDirty, setIsDirty] = useState(false)
