@@ -37,6 +37,7 @@ import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organization
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -49,9 +50,11 @@ type CreditCodeRedemptionForm = z.infer<typeof FormSchema>
 export const CreditCodeRedemption = ({
   slug,
   modalVisible = false,
+  onClose
 }: {
   slug: string | undefined
   modalVisible?: boolean
+  onClose?: () => void
 }) => {
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -60,7 +63,7 @@ export const CreditCodeRedemption = ({
 
   const redeemCodeEnabled = useFlag('redeemCodeEnabled')
 
-  const { data: org, isLoading: isOrgLoading } = useSelectedOrganizationQuery({})
+  const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
 
   const router = useRouter()
 
@@ -151,6 +154,7 @@ export const CreditCodeRedemption = ({
     if (!visible) {
       resetCodeRedemption()
       resetCaptcha()
+      onClose?.()
     }
   }
 
