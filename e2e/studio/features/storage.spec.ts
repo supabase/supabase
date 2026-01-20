@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 import path from 'path'
+import { env } from '../env.config.js'
 import { test } from '../utils/test.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
 import {
@@ -249,5 +250,46 @@ test.describe.serial('Storage', () => {
 
     // Download the file
     await downloadFile(page, fileName)
+  })
+})
+
+test.describe('Storage Settings - Self Hosted', () => {
+  test.skip(env.IS_PLATFORM, 'Storage settings are only disabled on self-hosted')
+
+  test('settings tab should not be visible in navigation', async ({ page, ref }) => {
+    // Navigate to storage files page
+    await page.goto(`/project/${ref}/storage/files`)
+
+    // Wait for the page to load
+    await expect(
+      page.getByRole('button', { name: 'New bucket' }),
+      'New bucket button should be visible'
+    ).toBeVisible()
+
+    // Verify Buckets and Policies tabs are visible but Settings is not
+    // Use href patterns to avoid matching other "Settings" links in the sidebar
+    await expect(
+      page.getByRole('link', { name: 'Buckets' }).filter({ hasText: /^Buckets$/ }),
+      'Buckets tab should be visible'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'Policies' }).filter({ hasText: /^Policies$/ }),
+      'Policies tab should be visible'
+    ).toBeVisible()
+    await expect(
+      page.locator(`a[href="/project/${ref}/storage/files/settings"]`),
+      'Settings tab should NOT be visible for self-hosted'
+    ).not.toBeVisible()
+  })
+
+  test('direct navigation to settings page should show error', async ({ page, ref }) => {
+    // Navigate directly to the settings page
+    await page.goto(`/project/${ref}/storage/files/settings`)
+
+    // Should show an error message indicating settings are not available
+    await expect(
+      page.getByText('Storage settings are not available for self-hosted projects'),
+      'Error message should be visible'
+    ).toBeVisible()
   })
 })

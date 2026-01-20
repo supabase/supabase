@@ -566,6 +566,15 @@ const nextConfig = {
         loaders: ['raw-loader'],
         as: '*.js',
       },
+      // special case for Deno libs to be loaded as a raw text. They're passed as raw text to the Monaco editor.
+      'edge-runtime.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      'lib.deno.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
     },
   },
   onDemandEntries: {

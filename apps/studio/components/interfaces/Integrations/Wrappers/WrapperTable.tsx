@@ -17,7 +17,7 @@ import {
   TableRow,
 } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
-import WrapperRow from './WrapperRow'
+import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
 
 interface WrapperTableProps {
@@ -91,7 +91,6 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               <WrapperRow
                 key={x.id}
                 wrapper={x}
-                wrappers={wrappers}
                 selectedWrapperToEdit={selectedWrapperToEdit}
                 selectedWrapperToDelete={selectedWrapperToDelete}
                 setSelectedWrapperToEdit={setSelectedWrapperToEdit}

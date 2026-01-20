@@ -334,8 +334,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
-              name: 'Realtime Quotas',
-              url: `${DOCS_URL}/guides/realtime/quotas`,
+              name: 'Realtime Limits',
+              url: `${DOCS_URL}/guides/realtime/limits`,
             },
           ],
         },
@@ -353,8 +353,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
-              name: 'Realtime Quotas',
-              url: `${DOCS_URL}/guides/realtime/quotas`,
+              name: 'Realtime Limits',
+              url: `${DOCS_URL}/guides/realtime/limits`,
             },
           ],
         },
