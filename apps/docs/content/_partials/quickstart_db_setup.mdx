@@ -2,33 +2,7 @@
 
 Go to [database.new](https://database.new) and create a new Supabase project.
 
-Alternatively, you can create a project using the Management API:
-
 </StepHikeCompact.Details>
-
-<StepHikeCompact.Code>
-
-```bash
-# First, get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_ACCESS_TOKEN="your-access-token"
-
-# List your organizations to get the organization ID
-curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  https://api.supabase.com/v1/organizations
-
-# Create a new project (replace <org-id> with your organization ID)
-curl -X POST https://api.supabase.com/v1/projects \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "organization_id": "<org-id>",
-    "name": "My Project",
-    "region": "us-east-1",
-    "db_pass": "<your-secure-password>"
-  }'
-```
-
-</StepHikeCompact.Code>
 
 <StepHikeCompact.Details>
 
@@ -37,6 +11,7 @@ When your project is up and running, go to the [Table Editor](/dashboard/project
 Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create an `instruments` table with some sample data.
 
 </StepHikeCompact.Details>
+
 
 <StepHikeCompact.Code>
 
