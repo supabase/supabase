@@ -160,9 +160,9 @@ const BlogPostRenderer = ({
   )
 
   const imageUrl = isCMS
-    ? blogMetaData.imgSite ?? ''
-    : blogMetaData.imgSite
-      ? `/images/blog/${blogMetaData.imgSite}`
+    ? blogMetaData.imgThumb ?? ''
+    : blogMetaData.imgThumb
+      ? `/images/blog/${blogMetaData.imgThumb}`
       : ''
 
   return (
@@ -263,7 +263,7 @@ const BlogPostRenderer = ({
                           allowFullScreen={true}
                         />
                       ) : (
-                        blogMetaData.imgSite && (
+                        blogMetaData.imgThumb && (
                           <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
                             <Image
                               src={imageUrl}

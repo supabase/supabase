@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { draftMode } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 import { CMS_SITE_ORIGIN } from '~/lib/constants'
 import { generateReadingTime } from '~/lib/helpers'
 
@@ -211,8 +211,8 @@ export async function GET(request: NextRequest) {
                       username: a?.username || '',
                     }))
                   : [],
-                imgSite: latestVersion.imgSite?.url
-                  ? `${baseUrl}${latestVersion.imgSite.url}`
+                imgThumb: latestVersion.imgThumb?.url
+                  ? `${baseUrl}${latestVersion.imgThumb.url}`
                   : undefined,
                 imgSocial: latestVersion.imgSocial?.url
                   ? `${baseUrl}${latestVersion.imgSocial.url}`
@@ -296,7 +296,7 @@ export async function GET(request: NextRequest) {
                     username: a?.username || '',
                   }))
                 : [],
-              imgSite: post.imgSite?.url ? `${baseUrl}${post.imgSite.url}` : undefined,
+              imgThumb: post.imgThumb?.url ? `${baseUrl}${post.imgThumb.url}` : undefined,
               imgSocial: post.imgSocial?.url ? `${baseUrl}${post.imgSocial.url}` : undefined,
               meta: post.meta || null,
               url: `/blog/${post.slug}`,
@@ -375,7 +375,7 @@ export async function GET(request: NextRequest) {
                     username: a?.username || '',
                   }))
                 : [],
-              imgSite: post.imgSite?.url ? `${baseUrl}${post.imgSite.url}` : undefined,
+              imgThumb: post.imgThumb?.url ? `${baseUrl}${post.imgThumb.url}` : undefined,
               imgSocial: post.imgSocial?.url ? `${baseUrl}${post.imgSocial.url}` : undefined,
               meta: post.meta || null,
               url: `/blog/${post.slug}`,
@@ -461,10 +461,10 @@ export async function GET(request: NextRequest) {
                     username: a?.username || '',
                   }))
                 : [],
-              imgSite: post.imgSite?.url
-                ? typeof post.imgSite.url === 'string' && post.imgSite.url.includes('http')
-                  ? post.imgSite.url
-                  : `${baseUrl}${post.imgSite.url}`
+              imgThumb: post.imgThumb?.url
+                ? typeof post.imgThumb.url === 'string' && post.imgThumb.url.includes('http')
+                  ? post.imgThumb.url
+                  : `${baseUrl}${post.imgThumb.url}`
                 : '',
               imgSocial: post.imgSocial?.url
                 ? typeof post.imgSocial.url === 'string' && post.imgSocial.url.includes('http')
@@ -575,10 +575,10 @@ export async function GET(request: NextRequest) {
                         username: a?.username || '',
                       }))
                     : [],
-                  imgSite: post.imgSite?.url
-                    ? typeof post.imgSite.url === 'string' && post.imgSite.url.includes('http')
-                      ? post.imgSite.url
-                      : `${baseUrl}${post.imgSite.url}`
+                  imgThumb: post.imgThumb?.url
+                    ? typeof post.imgThumb.url === 'string' && post.imgThumb.url.includes('http')
+                      ? post.imgThumb.url
+                      : `${baseUrl}${post.imgThumb.url}`
                     : '',
                   imgSocial: post.imgSocial?.url
                     ? typeof post.imgSocial.url === 'string' && post.imgSocial.url.includes('http')
@@ -672,10 +672,10 @@ export async function GET(request: NextRequest) {
     const posts = docs
       .filter((p: any) => !!p?.slug)
       .map((p: any) => {
-        const imgSiteUrl = p?.imgSite?.url
-          ? typeof p.imgSite.url === 'string' && p.imgSite.url.includes('http')
-            ? p.imgSite.url
-            : `${baseUrl}${p.imgSite.url}`
+        const imgThumbUrl = p?.imgThumb?.url
+          ? typeof p.imgThumb.url === 'string' && p.imgThumb.url.includes('http')
+            ? p.imgThumb.url
+            : `${baseUrl}${p.imgThumb.url}`
           : ''
         const imgSocialUrl = p?.imgSocial?.url
           ? typeof p.imgSocial.url === 'string' && p.imgSocial.url.includes('http')
@@ -713,7 +713,7 @@ export async function GET(request: NextRequest) {
           formattedDate,
           readingTime,
           authors,
-          imgSite: imgSiteUrl || imgSocialUrl || '',
+          imgThumb: imgThumbUrl || imgSocialUrl || '',
           imgSocial: imgSocialUrl || undefined,
           meta: p.meta || null,
           url: `/blog/${p.slug}`,

@@ -1,7 +1,7 @@
+import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
 import { generateTocFromMarkdown } from './toc'
-import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
@@ -37,7 +37,7 @@ type CMSBlogPost = {
   region?: string
   logo?: string
   logo_inverse?: string
-  imgSite?: {
+  imgThumb?: {
     url: string
   }
   createdAt: string
@@ -175,7 +175,7 @@ type ProcessedPost = {
     username: string
   }>
   toc_depth: number
-  imgSite: string | null
+  imgThumb: string | null
   url: string
   path: string
   isCMS: boolean
@@ -413,17 +413,17 @@ async function processPostData(post: any) {
       post.toc_depth ? post.toc_depth : 3
     )
 
-    // Extract imgSite and imgSocial URLs from the nested structure
-    const imgSiteUrl = post.imgSite?.url
-      ? typeof post.imgSite.url === 'string' && post.imgSite.url.includes('http')
-        ? post.imgSite.url
-        : `${PAYLOAD_URL}${post.imgSite.url}`
+    // Extract imgThumb and imgSocial URLs from the nested structure
+    const imgThumbUrl = post.imgThumb?.url
+      ? typeof post.imgThumb.url === 'string' && post.imgThumb.url.includes('http')
+        ? post.imgThumb.url
+        : `${PAYLOAD_URL}${post.imgThumb.url}`
       : null
     const imgSocialUrl = post.meta?.imgSocial
       ? typeof post.meta?.imgSocial === 'string' && post.meta?.imgSocial.includes('http')
         ? post.meta?.imgSocial
         : `${PAYLOAD_URL}${post.meta?.imgSocial}`
-      : imgSiteUrl
+      : imgThumbUrl
 
     const processedData = {
       slug: post.slug,
@@ -448,7 +448,7 @@ async function processPostData(post: any) {
           username: author.username || '',
         })) || [],
       toc_depth: post.toc_depth || 3,
-      imgSite: imgSiteUrl,
+      imgThumb: imgThumbUrl,
       imgSocial: imgSocialUrl,
       url: `/blog/${post.slug}`,
       path: `/blog/${post.slug}`,
@@ -524,17 +524,17 @@ export async function getAllCMSPosts({
         const markdownContent = convertRichTextToMarkdown(post.content)
         const readingTime = post.readingTime || generateReadingTime(markdownContent)
 
-        // Extract imgSite and imgSocial URLs from the nested structure (handle absolute and relative)
-        const imgSiteUrl = post.imgSite?.url
-          ? typeof post.imgSite.url === 'string' && post.imgSite.url.includes('http')
-            ? post.imgSite.url
-            : `${PAYLOAD_URL}${post.imgSite.url}`
+        // Extract imgThumb and imgSocial URLs from the nested structure (handle absolute and relative)
+        const imgThumbUrl = post.imgThumb?.url
+          ? typeof post.imgThumb.url === 'string' && post.imgThumb.url.includes('http')
+            ? post.imgThumb.url
+            : `${PAYLOAD_URL}${post.imgThumb.url}`
           : null
         const imgSocialUrl = post.meta?.imgSocial
           ? typeof post.meta?.imgSocial === 'string' && post.meta?.imgSocial.includes('http')
             ? post.meta?.imgSocial
             : `${PAYLOAD_URL}${post.meta?.imgSocial}`
-          : imgSiteUrl
+          : imgThumbUrl
 
         return {
           slug: post.slug || '',
@@ -558,7 +558,7 @@ export async function getAllCMSPosts({
               username: author.username || '',
             })) || [],
           toc_depth: post.toc_depth || 3,
-          imgSite: imgSiteUrl,
+          imgThumb: imgThumbUrl,
           imgSocial: imgSocialUrl,
           url: `/blog/${post.slug || ''}`,
           path: `/blog/${post.slug || ''}`,

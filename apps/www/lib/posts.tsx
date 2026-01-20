@@ -1,6 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import matter from 'gray-matter'
+import path from 'path'
 import { generateReadingTime } from './helpers'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
@@ -15,7 +15,7 @@ export type Post = {
   description?: string
   author?: string
   imgSocial?: string
-  imgSite?: string
+  imgThumb?: string
   categories?: string[]
   tags?: string[]
   date?: string

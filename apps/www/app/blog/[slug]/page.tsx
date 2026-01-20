@@ -1,12 +1,12 @@
-import BlogPostClient from './BlogPostClient'
-import { draftMode } from 'next/headers'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
+import { draftMode } from 'next/headers'
 import { processCMSContent } from '~/lib/cms/processCMSContent'
+import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
+import BlogPostClient from './BlogPostClient'
 
-import type { Blog, BlogData, PostReturnType } from 'types/post'
 import type { Metadata } from 'next'
+import type { Blog, BlogData, PostReturnType } from 'types/post'
 
 export const revalidate = 30
 
@@ -93,7 +93,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const imageField = blogPost.imgSocial ? blogPost.imgSocial : blogPost.imgSite
+    const imageField = blogPost.imgSocial ? blogPost.imgSocial : blogPost.imgThumb
     const metaImageUrl = imageField ? `/images/blog/${imageField}` : undefined
 
     return {
@@ -148,9 +148,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  // Fallback to imgSite or imgSocial if no meta image
+  // Fallback to imgThumb or imgSocial if no meta image
   if (!metaImageUrl) {
-    metaImageUrl = cmsPost.imgSite || cmsPost.imgSocial
+    metaImageUrl = cmsPost.imgThumb || cmsPost.imgSocial
   }
 
   // Ensure image URLs are absolute
@@ -278,11 +278,11 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
           content: mdxSource,
           toc: tocResult,
           imgSocial: publishedPost.imgSocial ?? undefined,
-          imgSite: publishedPost.imgSite ?? undefined,
+          imgThumb: publishedPost.imgThumb ?? undefined,
           // Extract meta fields from CMS
           meta_title: publishedPost.meta?.title ?? undefined,
           meta_description: publishedPost.meta?.description ?? undefined,
-          meta_image: publishedPost.meta?.image ?? publishedPost.imgSite ?? undefined,
+          meta_image: publishedPost.meta?.image ?? publishedPost.imgThumb ?? undefined,
         } as any,
         isDraftMode: isDraft,
       }
@@ -324,11 +324,11 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       toc: processedContent.toc,
       toc_depth: cmsPost.toc_depth || 3,
       imgSocial: cmsPost.imgSocial ?? undefined,
-      imgSite: cmsPost.imgSite ?? undefined,
+      imgThumb: cmsPost.imgThumb ?? undefined,
       // Extract meta fields from CMS
       meta_title: cmsPost.meta?.title ?? undefined,
       meta_description: cmsPost.meta?.description ?? undefined,
-      meta_image: cmsPost.meta?.image ?? cmsPost.imgSite ?? undefined,
+      meta_image: cmsPost.meta?.image ?? cmsPost.imgThumb ?? undefined,
     } as any,
     isDraftMode: isDraft,
   }

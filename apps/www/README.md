@@ -18,7 +18,7 @@ To get started copy the example env file using `cp .env.local.example .env.local
 
 Open Graph (OG) images for social sharing are handled differently across content types:
 
-- **Blog posts**: Use static images via `imgSocial` and `imgSite` fields (see _Blog posts_ section below)
+- **Blog posts**: Use static images via `imgSocial` and `imgThumb` fields (see _Blog posts_ section below)
 - **Events**: Use dynamic generation via Edge Function (with optional `og_image` override)
 - **Customer stories**: Use dynamic generation via Edge Function (no static option)
 
@@ -35,12 +35,12 @@ Different content types use different image field conventions:
 Blog posts support two image fields in their frontmatter:
 
 - **`imgSocial`**: Used for Open Graph and social media sharing (X, LinkedIn, etc.). These images should include text overlays since they appear standalone in social feeds without accompanying text.
-- **`imgSite`**: Used for internal thumbnails displayed on the blog listing pages and featured posts. These images don't need text overlays since they're always displayed alongside the post title and description.
+- **`imgThumb`**: Used for internal thumbnails displayed on the blog listing pages and featured posts. These images don't need text overlays since they're always displayed alongside the post title and description.
 
 This naming convention was introduced to replace the previously confusing `thumb` and `og` fields, which were often mixed up. The new names clearly indicate:
 
 - **`imgSocial`**: Purpose-built for social media sharing (needs text overlays)
-- **`imgSite`**: Optimized for site display (clean, no text overlays)
+- **`imgThumb`**: Optimized for site display (clean, no text overlays)
 
 This separation allows you to optimize images for their specific use case while maintaining a clear, unambiguous naming convention.
 
@@ -55,14 +55,14 @@ Always use **relative paths** (just the filename or subfolder/filename). The `/i
 
 For site display (what visitors see):
 
-- Priority 1: `imgSite`
-- Priority 2: `imgSocial` (if `imgSite` is missing)
+- Priority 1: `imgThumb`
+- Priority 2: `imgSocial` (if `imgThumb` is missing)
 - Priority 3: `/images/blog/blog-placeholder.png` (if both missing)
 
 For social sharing (Open Graph meta tags):
 
 - Priority 1: `imgSocial`
-- Priority 2: `imgSite` (if `imgSocial` is missing)
+- Priority 2: `imgThumb` (if `imgSocial` is missing)
 - Priority 3: No fallback (undefined)
 
 Special case for CMS posts:
@@ -71,7 +71,7 @@ Special case for CMS posts:
 
 What happens if fields are not provided?
 
-- If only `imgSite` is provided: Site displays the image correctly, social sharing uses `imgSite` as fallback
+- If only `imgThumb` is provided: Site displays the image correctly, social sharing uses `imgThumb` as fallback
 - If only `imgSocial` is provided: Social sharing uses it, site display uses it as fallback
 - If neither is provided: Site shows placeholder image, social sharing has no image
 - Best practice: Provide both fields for optimal display and social sharing
@@ -82,7 +82,7 @@ What happens if fields are not provided?
 ---
 title: 'My Blog Post'
 imgSocial: 2025-01-01-my-post/og.png # Relative path - with text overlay for social sharing
-imgSite: 2025-01-01-my-post/thumb.png # Relative path - without text, clean image
+imgThumb: 2025-01-01-my-post/thumb.png # Relative path - without text, clean image
 ---
 ```
 
@@ -97,7 +97,7 @@ Or if using the same image for both:
 ---
 title: 'My Blog Post'
 imgSocial: my-image.png # Stored at: apps/www/public/images/blog/my-image.png
-imgSite: my-image.png
+imgThumb: my-image.png
 ---
 ```
 
@@ -158,7 +158,7 @@ logo: /images/customers/logos/company-abc.png
 **Legacy Case Studies** (in `data/CustomerStories.ts`):
 
 - **`imgUrl`**: Path to the case study image in the source data
-- This gets mapped to `imgSite` when rendered via `BlogGridItem` component
+- This gets mapped to `imgThumb` when rendered via `BlogGridItem` component
 - Case studies only need one image for site display (no separate social sharing image)
 
 **Example** (in `data/CustomerStories.ts`):
