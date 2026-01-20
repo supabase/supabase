@@ -15,19 +15,14 @@ import {
   TreeView,
   TreeViewItem,
 } from 'ui'
+import { FileAction, type FileData } from './FileExplorerAndEditor.types'
 import {
   extractZipFile,
+  getFileAction,
   getLanguageFromFileName,
   isBinaryFile,
   isZipFile,
 } from './FileExplorerAndEditor.utils'
-
-interface FileData {
-  id: number
-  name: string
-  content: string
-  selected?: boolean
-}
 
 interface FileExplorerAndEditorProps {
   files: FileData[]
@@ -42,48 +37,20 @@ interface FileExplorerAndEditorProps {
 
 const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
 
-enum FileAction {
-  CREATE_NEW = 'CREATE_NEW',
-  REPLACE_EXISTING = 'REPLACE_EXISTING',
-  REPLACE_NEW = 'REPLACE_NEW',
-}
-
-type FileActionResult =
-  | { action: FileAction.CREATE_NEW }
-  | { action: FileAction.REPLACE_EXISTING; index: number }
-  | { action: FileAction.REPLACE_NEW; index: number }
-
-const getFileAction = (
-  fileName: string,
-  existingFiles: FileData[],
-  newFiles: FileData[]
-): FileActionResult => {
-  const existingIndex = existingFiles.findIndex((f) => f.name === fileName)
-  if (existingIndex !== -1) {
-    return { action: FileAction.REPLACE_EXISTING, index: existingIndex }
-  }
-
-  const newIndex = newFiles.findIndex((f) => f.name === fileName)
-  if (newIndex !== -1) {
-    return { action: FileAction.REPLACE_NEW, index: newIndex }
-  }
-
-  return { action: FileAction.CREATE_NEW }
-}
-
 export const FileExplorerAndEditor = ({
   files,
   onFilesChange,
   aiEndpoint,
   aiMetadata,
 }: FileExplorerAndEditorProps) => {
-  const selectedFile = files.find((f) => f.selected) ?? files[0]
   const [isDragOver, setIsDragOver] = useState(false)
-  const [isExtractingZip, setIsExtractingZip] = useState(false)
   const [extractionProgress, setExtractionProgress] = useState<{
     current: number
     total: number
   } | null>(null)
+
+  const selectedFile = files.find((f) => f.selected) ?? files[0]
+  const isExtractingZip = extractionProgress !== null
 
   const [treeData, setTreeData] = useState({
     name: '',
@@ -121,139 +88,108 @@ export const FileExplorerAndEditor = ({
   const addDroppedFiles = async (droppedFiles: FileList) => {
     const newFiles: FileData[] = []
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
+    const allFiles: { name: string; content: string; size: number }[] = []
+
+    let extractedCount = 0
+    let replacedCount = 0
     let hasReplacedFiles = false // Track if any existing files were replaced
 
-    // Separate zip files from regular files
-    const zipFiles: File[] = []
-    const regularFiles: File[] = []
-
-    for (let i = 0; i < droppedFiles.length; i++) {
-      const file = droppedFiles[i]
+    for (const file of droppedFiles) {
       if (isZipFile(file.name)) {
-        zipFiles.push(file)
+        try {
+          setExtractionProgress({ current: 0, total: 0 })
+          const extractedFiles = await extractZipFile(file, (current, total) => {
+            setExtractionProgress({ current, total })
+          })
+          setExtractionProgress(null)
+          allFiles.push(...extractedFiles)
+        } catch (error) {
+          toast.error(
+            <div className="flex flex-col gap-y-1">
+              <p className="text-foreground">Failed to extract {file.name}</p>
+              <p className="text-foreground-light">
+                {error instanceof Error ? error.message : 'Unknown error occurred'}
+              </p>
+            </div>,
+            { duration: 8000 }
+          )
+        }
       } else {
-        regularFiles.push(file)
-      }
-    }
-
-    // Process regular files first
-    for (let i = 0; i < regularFiles.length; i++) {
-      const file = regularFiles[i]
-      const newId = Math.max(0, ...files.map((f) => f.id), ...newFiles.map((f) => f.id)) + 1
-
-      try {
-        let content: string
-        if (isBinaryFile(file.name)) {
-          // For binary files, read as ArrayBuffer and convert to base64 or keep as binary data
-          const arrayBuffer = await file.arrayBuffer()
-          const bytes = new Uint8Array(arrayBuffer)
-          content = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
-        } else {
-          content = await file.text()
-        }
-
-        newFiles.push({
-          id: newId,
-          name: file.name,
-          content,
-          selected: false, // Will select last file at the end
-        })
-      } catch (error) {
-        console.error(`Failed to read file ${file.name}:`, error)
-        toast.error(`Failed to read file: ${file.name}`)
-      }
-    }
-
-    // Process zip files
-    for (const zipFile of zipFiles) {
-      try {
-        setIsExtractingZip(true)
-        setExtractionProgress({ current: 0, total: 0 })
-
-        const extractedFiles = await extractZipFile(zipFile, (current, total) => {
-          setExtractionProgress({ current, total })
-        })
-
-        let extractedCount = 0
-        let replacedCount = 0
-
-        for (const extractedFile of extractedFiles) {
-          const actionResult = getFileAction(extractedFile.name, updatedFiles, newFiles)
-
-          switch (actionResult.action) {
-            case FileAction.REPLACE_EXISTING:
-              updatedFiles[actionResult.index] = {
-                ...updatedFiles[actionResult.index],
-                content: extractedFile.content,
-                selected: false,
-              }
-              replacedCount++
-              hasReplacedFiles = true
-              break
-
-            case FileAction.REPLACE_NEW:
-              newFiles[actionResult.index] = {
-                ...newFiles[actionResult.index],
-                content: extractedFile.content,
-                selected: false,
-              }
-              replacedCount++
-              break
-
-            case FileAction.CREATE_NEW:
-              const newId =
-                Math.max(
-                  0,
-                  ...files.map((f) => f.id),
-                  ...updatedFiles.map((f) => f.id),
-                  ...newFiles.map((f) => f.id)
-                ) + 1
-              newFiles.push({
-                id: newId,
-                name: extractedFile.name,
-                content: extractedFile.content,
-                selected: false,
-              })
-              extractedCount++
-              break
+        try {
+          let content: string
+          if (isBinaryFile(file.name)) {
+            // For binary files, read as ArrayBuffer and convert to base64 or keep as binary data
+            const arrayBuffer = await file.arrayBuffer()
+            const bytes = new Uint8Array(arrayBuffer)
+            content = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
+          } else {
+            content = await file.text()
           }
+          allFiles.push({ name: file.name, size: file.size, content })
+        } catch (error) {
+          toast.error(`Failed to read file: ${file.name}: ${error}`)
         }
-
-        setIsExtractingZip(false)
-        setExtractionProgress(null)
-
-        // Show success message
-        const messages: string[] = []
-        if (extractedCount > 0) {
-          messages.push(`Added ${extractedCount} new file${extractedCount > 1 ? 's' : ''}`)
-        }
-        if (replacedCount > 0) {
-          messages.push(`Replaced ${replacedCount} existing file${replacedCount > 1 ? 's' : ''}`)
-        }
-
-        toast.success(
-          <div className="flex flex-col gap-y-1">
-            <p className="text-foreground">Successfully extracted {zipFile.name}</p>
-            <p className="text-foreground-light">{messages.join(' • ')}</p>
-          </div>,
-          { duration: 5000 }
-        )
-      } catch (error) {
-        console.error(`Failed to extract zip file ${zipFile.name}:`, error)
-        setIsExtractingZip(false)
-        setExtractionProgress(null)
-
-        toast.error(
-          <div className="flex flex-col gap-y-1">
-            <p className="text-foreground">Failed to extract {zipFile.name}</p>
-            <p className="text-foreground-light">
-              {error instanceof Error ? error.message : 'Unknown error occurred'}
-            </p>
-          </div>,
-          { duration: 8000 }
-        )
       }
     }
+
+    for (const file of allFiles) {
+      const actionResult = getFileAction(file.name, updatedFiles, newFiles)
+
+      switch (actionResult.action) {
+        case FileAction.REPLACE_EXISTING:
+          updatedFiles[actionResult.index] = {
+            ...updatedFiles[actionResult.index],
+            content: file.content,
+            selected: false,
+          }
+          replacedCount++
+          hasReplacedFiles = true
+          break
+
+        case FileAction.REPLACE_NEW:
+          newFiles[actionResult.index] = {
+            ...newFiles[actionResult.index],
+            content: file.content,
+            selected: false,
+          }
+          replacedCount++
+          break
+
+        case FileAction.CREATE_NEW:
+          const newId =
+            Math.max(
+              0,
+              ...files.map((f) => f.id),
+              ...updatedFiles.map((f) => f.id),
+              ...newFiles.map((f) => f.id)
+            ) + 1
+          newFiles.push({
+            id: newId,
+            name: file.name,
+            content: file.content,
+            selected: false,
+          })
+          extractedCount++
+          break
+      }
+    }
+
+    // Show success message
+    const messages: string[] = []
+    if (extractedCount > 0) {
+      messages.push(`Added ${extractedCount} new file${extractedCount > 1 ? 's' : ''}`)
+    }
+    if (replacedCount > 0) {
+      messages.push(`Replaced ${replacedCount} existing file${replacedCount > 1 ? 's' : ''}`)
+    }
+
+    toast.success(
+      <div className="flex flex-col gap-y-1">
+        <p className="text-foreground">Successfully added dropped file(s)</p>
+        <p className="text-foreground-light">{messages.join(' • ')}</p>
+      </div>,
+      { duration: 5000 }
+    )
 
     // Select the last added/modified file
     if (newFiles.length > 0) {

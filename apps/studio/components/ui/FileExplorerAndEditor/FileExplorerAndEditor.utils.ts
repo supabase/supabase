@@ -1,4 +1,6 @@
-import { BlobReader, BlobWriter, Entry, TextWriter, ZipReader } from '@zip.js/zip.js'
+import { formatBytes } from '@/lib/helpers'
+import { BlobReader, BlobWriter, TextWriter, ZipReader } from '@zip.js/zip.js'
+import { FileAction, type FileActionResult, type FileData } from './FileExplorerAndEditor.types'
 
 // Configuration for zip file extraction
 export const ZIP_EXTRACTION_CONFIG = {
@@ -65,17 +67,6 @@ export const getLanguageFromFileName = (fileName: string): string => {
 export const isZipFile = (fileName: string): boolean => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   return extension === 'zip'
-}
-
-/**
- * Format bytes to human readable string
- */
-export const formatBytes = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
 }
 
 /**
@@ -193,4 +184,22 @@ export const extractZipFile = async (
   }
 
   return extractedFiles
+}
+
+export const getFileAction = (
+  fileName: string,
+  existingFiles: FileData[],
+  newFiles: FileData[]
+): FileActionResult => {
+  const existingIndex = existingFiles.findIndex((f) => f.name === fileName)
+  if (existingIndex !== -1) {
+    return { action: FileAction.REPLACE_EXISTING, index: existingIndex }
+  }
+
+  const newIndex = newFiles.findIndex((f) => f.name === fileName)
+  if (newIndex !== -1) {
+    return { action: FileAction.REPLACE_NEW, index: newIndex }
+  }
+
+  return { action: FileAction.CREATE_NEW }
 }
