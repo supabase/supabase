@@ -1,15 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
@@ -17,7 +19,6 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { useRouter } from 'next/router'
 import {
   Badge,
   Button,
@@ -30,7 +31,6 @@ import {
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
@@ -69,10 +69,9 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { mutateAsync: checkGithubBranchValidity, isPending: isChecking } =
-    useCheckGithubBranchValidity({
-      onError: () => {},
-    })
+  const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
+    { onError: () => {} }
+  )
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
@@ -88,62 +87,47 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
   const formId = 'edit-branch-form'
-  const FormSchema = z
-    .object({
-      branchName: z
-        .string()
-        .min(1, 'Branch name cannot be empty')
-        .refine(
-          (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
-          'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
-        )
-        .refine(
-          (val) =>
-            // Allow the current branch name during edit
-            val === branch?.name || (branches ?? []).every((b) => b.name !== val),
-          'A branch with this name already exists'
-        ),
-      gitBranchName: z
-        .string()
-        .refine(
-          (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
-          'Git branch name is required when GitHub is connected'
-        ),
-    })
-    .superRefine(async (val, ctx) => {
-      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
-        try {
-          await checkGithubBranchValidity({
-            repositoryId: githubConnection.repository.id,
-            branchName: val.gitBranchName,
-          })
-          setIsGitBranchValid(true)
-        } catch (error) {
-          setIsGitBranchValid(false)
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
-            path: ['gitBranchName'],
-          })
-        }
-      } else {
-        // If git branch is empty or removed, it's valid for gitless branching
-        setIsGitBranchValid(
-          !val.gitBranchName || val.gitBranchName.length === 0 || gitlessBranching
-        )
-      }
-    })
+  const FormSchema = z.object({
+    branchName: z
+      .string()
+      .min(1, 'Branch name cannot be empty')
+      .refine(
+        (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
+        'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
+      )
+      .refine(
+        (val) =>
+          // Allow the current branch name during edit
+          val === branch?.name || (branches ?? []).every((b) => b.name !== val),
+        'A branch with this name already exists'
+      ),
+    gitBranchName: z
+      .string()
+      .refine(
+        (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
+        'Git branch name is required when GitHub is connected'
+      ),
+  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
+    mode: 'onChange',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
   })
+  const gitBranchName = useWatch({ control: form.control, name: 'gitBranchName' })
+  const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
-  const isFormValid =
-    form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
+  const isFormValid = form.formState.isValid && (!gitBranchName || isGitBranchValid)
   const canSubmit = isFormValid && !isUpdating && !isChecking
+
+  const openLinkerPanel = () => {
+    onClose()
+
+    if (projectRef) {
+      router.push(`/project/${projectRef}/settings/integrations`)
+    }
+  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -169,6 +153,37 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     updateBranch(payload)
   }
 
+  const validateGitBranchName = useCallback(
+    (branchName: string) => {
+      if (!githubConnection)
+        return console.error(
+          '[EditBranchModal > validateGitBranchName] GitHub Connection is missing'
+        )
+
+      const repositoryId = githubConnection.repository.id
+      const requested = branchName
+      checkGithubBranchValidity(
+        { repositoryId, branchName },
+        {
+          onSuccess: () => {
+            if (form.getValues('gitBranchName') !== requested) return
+            setIsGitBranchValid(true)
+            form.clearErrors('gitBranchName')
+          },
+          onError: (error) => {
+            if (form.getValues('gitBranchName') !== requested) return
+            setIsGitBranchValid(false)
+            form.setError('gitBranchName', {
+              ...error,
+              message: `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
+            })
+          },
+        }
+      )
+    },
+    [githubConnection, form, checkGithubBranchValidity, repoOwner, repoName]
+  )
+
   // Pre-fill form when the modal becomes visible and branch data is available
   useEffect(() => {
     if (visible && branch) {
@@ -180,30 +195,16 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     }
   }, [branch, visible, form, gitlessBranching])
 
-  // Handle initial state and changes for git branch validity
   useEffect(() => {
-    setIsGitBranchValid(
-      !form.getValues('gitBranchName') ||
-        form.getValues('gitBranchName')?.length === 0 ||
-        gitlessBranching
-    )
-    // Trigger validation if a git branch name exists initially or is entered
-    if (form.getValues('gitBranchName')) {
-      form.trigger('gitBranchName')
+    if (!githubConnection || !debouncedGitBranchName) {
+      setIsGitBranchValid(gitlessBranching)
+      form.clearErrors('gitBranchName')
+      return
     }
-  }, [
-    githubConnection?.id,
-    form.getValues('gitBranchName'),
-    form.trigger,
-    visible,
-    branch,
-    gitlessBranching,
-  ])
 
-  const openLinkerPanel = () => {
-    onClose()
-    router.push(`/project/${projectRef}/settings/integrations`)
-  }
+    form.clearErrors('gitBranchName')
+    validateGitBranchName(debouncedGitBranchName)
+  }, [debouncedGitBranchName, validateGitBranchName, form, githubConnection, gitlessBranching])
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
@@ -250,14 +251,9 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                               height={16}
                               alt={`GitHub icon`}
                             />
-                            <Link
-                              href={`https://github.com/${repoOwner}/${repoName}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-foreground hover:underline"
-                            >
+                            <InlineLink href={`https://github.com/${repoOwner}/${repoName}`}>
                               {repoOwner}/{repoName}
-                            </Link>
+                            </InlineLink>
                           </div>
                         </div>
                       }
@@ -273,16 +269,22 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                             {...field}
                             placeholder="e.g. main, feat/some-feature"
                             autoComplete="off"
+                            onChange={(e) => {
+                              field.onChange(e)
+                              setIsGitBranchValid(false)
+                            }}
                           />
                         </FormControl_Shadcn_>
-                        <div className="absolute top-2 right-3 flex items-center gap-2">
-                          {isChecking && <Loader2 size={14} className="animate-spin" />}
-                          {field.value && !isChecking && isGitBranchValid && (
-                            <Check size={14} className="text-brand" strokeWidth={2} />
-                          )}
+                        <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                          {field.value ? (
+                            isChecking ? (
+                              <Loader2 size={14} className="animate-spin" />
+                            ) : isGitBranchValid ? (
+                              <Check size={14} className="text-brand" strokeWidth={2} />
+                            ) : null
+                          ) : null}
                         </div>
                       </div>
-                      <FormMessage_Shadcn_ />
                     </FormItemLayout>
                   )}
                 />
