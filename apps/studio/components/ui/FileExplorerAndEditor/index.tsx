@@ -101,7 +101,6 @@ export const FileExplorerAndEditor = ({
           const extractedFiles = await extractZipFile(file, (current, total) => {
             setExtractionProgress({ current, total })
           })
-          setExtractionProgress(null)
           allFiles.push(...extractedFiles)
         } catch (error) {
           toast.error(
@@ -113,6 +112,8 @@ export const FileExplorerAndEditor = ({
             </div>,
             { duration: 8000 }
           )
+        } finally {
+          setExtractionProgress(null)
         }
       } else {
         try {
