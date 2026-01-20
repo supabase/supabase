@@ -3,6 +3,8 @@ import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -31,6 +33,7 @@ import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.util
 import type { SaveTableParams } from '../SidePanelEditor'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
+import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './ApiAccessToggle'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
@@ -61,6 +64,7 @@ export interface TableEditorProps {
   closePanel: () => void
   saveChanges: (params: SaveTableParams) => void
   updateEditorDirty: () => void
+  apiAccessToggleHandler: TableApiAccessHandlerWithHistoryReturn
 }
 
 export const TableEditor = ({
@@ -71,12 +75,15 @@ export const TableEditor = ({
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
+  apiAccessToggleHandler,
 }: TableEditorProps) => {
   const track = useTrack()
   const snap = useTableEditorStateSnapshot()
   const tableEditorApi = useContext(TableEditorStateContext)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
+
+  const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
 
   const [params, setParams] = useUrlState()
   const { data: project } = useSelectedProjectQuery()
@@ -123,7 +130,6 @@ export const TableEditor = ({
     : realtimeEnabledTables.some((t) => t.id === table?.id)
 
   const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    projectInsertedAt: project?.inserted_at,
     isTable: !isNewRecord,
     isRealtimeEnabled,
   })
@@ -339,6 +345,12 @@ export const TableEditor = ({
 
   if (!tableFields) return null
 
+  const isApiAccessAndPoliciesSectionShown = isApiGrantTogglesEnabled || generatePoliciesEnabled
+  const isExposed = isApiGrantTogglesEnabled
+    ? !!apiAccessToggleHandler.data?.schemaExposed &&
+      checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data.privileges)
+    : undefined
+
   return (
     <SidePanel
       data-testid="table-editor-side-panel"
@@ -542,22 +554,36 @@ export const TableEditor = ({
         </>
       )}
 
-      {/* [Joshen] Temporarily hide this section if duplicating, as we aren't duplicating policies atm when duplicating tables */}
-      {/* We should do this thought, but let's do this in another PR as the current one is already quite big */}
-      {generatePoliciesEnabled && !isDuplicating && (
+      {isApiAccessAndPoliciesSectionShown && (
         <>
           <SidePanel.Separator />
-          <SidePanel.Content className="space-y-10 py-6">
-            <RLSManagement
-              table={table}
-              tableFields={tableFields}
-              foreignKeyRelations={isNewRecord ? fkRelations : undefined}
-              isNewRecord={isNewRecord}
-              isDuplicating={isDuplicating}
-              generatedPolicies={generatedPolicies}
-              onGeneratedPoliciesChange={setGeneratedPolicies}
-              onRLSUpdate={(value) => onUpdateField({ isRLSEnabled: value })}
-            />
+          <SidePanel.Content className="py-6 space-y-6">
+            {isApiGrantTogglesEnabled && (
+              <ApiAccessToggle
+                projectRef={project?.ref}
+                schemaName={isNewRecord ? selectedSchema : table?.schema}
+                tableName={
+                  isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+                }
+                handler={apiAccessToggleHandler}
+              />
+            )}
+
+            {/* [Joshen] Temporarily hide this section if duplicating, as we aren't duplicating policies atm when duplicating tables */}
+            {/* We should do this thought, but let's do this in another PR as the current one is already quite big */}
+            {generatePoliciesEnabled && !isDuplicating && (
+              <RLSManagement
+                table={table}
+                tableFields={tableFields}
+                foreignKeyRelations={isNewRecord ? fkRelations : undefined}
+                isNewRecord={isNewRecord}
+                isDuplicating={isDuplicating}
+                isExposed={isExposed}
+                generatedPolicies={generatedPolicies}
+                onGeneratedPoliciesChange={setGeneratedPolicies}
+                onRLSUpdate={(value) => onUpdateField({ isRLSEnabled: value })}
+              />
+            )}
           </SidePanel.Content>
         </>
       )}

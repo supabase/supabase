@@ -68,7 +68,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2025-11-21',
+  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2026-01-16',
   REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys
@@ -89,6 +89,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
+  // RLS event trigger banner dismissed
+  RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
@@ -114,8 +117,9 @@ export const LOCAL_STORAGE_KEYS = {
    */
   BLOG_VIEW: 'supabase-blog-view',
 
-  // Used to track if user has dismissed table editor quickstart prompt
-  TABLE_QUICKSTART_DISMISSED: 'table-quickstart-dismissed',
+  // Used to track if user has been exposed to table quickstart experiment (prevents duplicate exposure events)
+  TABLE_QUICKSTART_EXPOSURE_TRACKED: (userId: string) =>
+    `table-quickstart-exposure-tracked-${userId}`,
 } as const
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
@@ -137,7 +141,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
-  LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
+  LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
 ]
 
 export function clearLocalStorage() {
