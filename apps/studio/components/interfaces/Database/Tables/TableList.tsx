@@ -235,7 +235,7 @@ export const TableList = ({
                 icon={<Filter />}
               />
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={true}>
+            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                 <p className="text-xs">Show entity types</p>
                 <div className="flex flex-col">
