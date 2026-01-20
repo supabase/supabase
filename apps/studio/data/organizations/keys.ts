@@ -1,3 +1,5 @@
+import { previewCreditCode } from './organization-credit-code-preview-query'
+
 export const organizationKeys = {
   list: () => ['organizations'] as const,
   detail: (slug?: string) => ['organizations', slug] as const,
@@ -23,4 +25,6 @@ export const organizationKeys = {
     ['organizations', slug, 'project-claim', token] as const,
   availableRegions: (slug: string | undefined, cloudProvider: string, size?: string) =>
     ['organizations', slug, 'available-regions', cloudProvider, size] as const,
+  previewCreditCode: (slug: string | undefined, code: string) =>
+    ['organizations', slug, 'preview-credit-code', code] as const,
 }

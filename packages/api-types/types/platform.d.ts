@@ -951,6 +951,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/preview-code': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Previews a code redemption */
+    post: operations['OrgCreditsController_previewCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/redeem': {
     parameters: {
       query?: never
@@ -5745,9 +5762,20 @@ export interface components {
       source: string
       teamId?: string
     }
+    CreditRedemptionPreviewResponse: {
+      amount_cents: number
+      /** Format: date-time */
+      credits_expire_at: string | null
+      validity_days: number | null
+    }
     CreditRedemptionRequest: {
       code: string
-      hcaptcha_token?: string
+    }
+    CreditRedemptionResponse: {
+      amount_cents: number
+      /** Format: date-time */
+      credits_expire_at: string | null
+      validity_days: number | null
     }
     CreditsTopUpRequest: {
       address?: {
@@ -13409,6 +13437,61 @@ export interface operations {
       }
     }
   }
+  OrgCreditsController_previewCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditRedemptionRequest']
+      }
+    }
+    responses: {
+      /** @description Credit code details. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreditRedemptionPreviewResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to preview redemption code */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgCreditsController_redeemCode: {
     parameters: {
       query?: never
@@ -13430,7 +13513,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['CreditRedemptionResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
