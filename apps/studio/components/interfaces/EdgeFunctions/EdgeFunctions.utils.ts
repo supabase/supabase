@@ -3,13 +3,13 @@ import { common, dirname, relative } from '@std/path/posix'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
 
-export const getFallbackImportMapPath = (files: Omit<FileData, 'id' | 'content'>[]) => {
+export const getFallbackImportMapPath = (files: Omit<FileData, 'id' | 'content' | 'state'>[]) => {
   // try to find a deno.json or import_map.json file
   const regex = /^.*?(deno|import_map).json*$/i
   return files.find(({ name }) => regex.test(name))?.name
 }
 
-export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content'>[]) => {
+export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content' | 'state'>[]) => {
   // when there's no matching entrypoint path is set,
   // we use few heuristics to find an entrypoint file
   // 1. If the function has only a single TS / JS file, if so set it as entrypoint
@@ -31,7 +31,7 @@ export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content'
   }
 }
 
-export const getStaticPatterns = (files: Omit<FileData, 'id' | 'content'>[]) => {
+export const getStaticPatterns = (files: Omit<FileData, 'id' | 'content' | 'state'>[]) => {
   return files
     .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json|wasm)$/i))
     .map(({ name }) => name)
