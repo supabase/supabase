@@ -11,9 +11,9 @@ import type { IncidentInfo } from 'lib/api/incident-status'
  *                  This should be the public URL to leverage CDN caching.
  */
 export const getIncidentTools = ({ baseUrl }: { baseUrl: string }) => ({
-  getActiveIncidents: tool({
+  get_active_incidents: tool({
     description:
-      'Check for active Supabase infrastructure incidents. Use this tool when the user reports issues that might be caused by Supabase infrastructure problems, such as connection issues, timeouts, service unavailability, authentication failures, or unexpected errors.',
+      'Check for active incidents. Use this tool when the user reports issues with any Supabase service, including the database, authentication, realtime, storage, and functions. Possible problems include, but are not limited to, connection issues, timeouts, service unavailability, authentication failures, or unexpected errors.',
     inputSchema: z.object({}),
     execute: async () => {
       if (!IS_PLATFORM) {
