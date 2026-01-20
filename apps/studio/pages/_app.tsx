@@ -42,7 +42,6 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -58,6 +57,7 @@ import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
+import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 
@@ -159,7 +159,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         enableSystem
                         disableTransitionOnChange
                       >
-                        <AppBannerContextProvider>
+                        <AiAssistantStateContextProvider>
                           <CommandProvider>
                             <FeaturePreviewContextProvider>
                               <MainScrollContainerProvider>
@@ -171,7 +171,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             <SonnerToaster position="top-right" />
                             <MonacoThemeProvider />
                           </CommandProvider>
-                        </AppBannerContextProvider>
+                        </AiAssistantStateContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

@@ -10,7 +10,7 @@ import { Separator } from 'ui'
 
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))
 const Benefits = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const ApplicationFormSection = dynamic(() => import('components/Supasquad/ApplicationFormSection'))
+const CtaSection = dynamic(() => import('components/Supasquad/CtaSection'))
 
 const BeginnersPage: NextPage = () => {
   return (
@@ -21,7 +21,7 @@ const BeginnersPage: NextPage = () => {
         openGraph={{
           title: content.metadata.metaTitle,
           description: content.metadata.metaDescription,
-          url: `https://supabase.com/solutions/beginners`,
+          url: `https://supabase.com/supasquad`,
         }}
       />
       <Layout className="overflow-visible">
@@ -35,11 +35,7 @@ const BeginnersPage: NextPage = () => {
         <WhySupaSquad {...content.why} />
         <Separator />
         <Benefits {...content.benefits} />
-        <ApplicationFormSection
-          id={content.ctaSection.id}
-          title={content.ctaSection.title}
-          cta={content.ctaSection.primaryCta}
-        />
+        <CtaSection {...content.ctaSection} />
       </Layout>
     </>
   )

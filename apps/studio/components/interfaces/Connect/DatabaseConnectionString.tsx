@@ -300,7 +300,7 @@ export const DatabaseConnectionString = () => {
             </Select_Shadcn_>
           </div>
           <DatabaseSelector
-            portal={false}
+            align="start"
             buttonProps={{
               size: 'small',
               className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
