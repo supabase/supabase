@@ -71,12 +71,7 @@ export const OAuthAppsList = () => {
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const deletingOAuthAppIdRef = useRef<string | null>(null)
 
-  const {
-    data,
-    isPending: isLoading,
-    isError,
-    error,
-  } = useOAuthServerAppsQuery({ projectRef }, { enabled: isOAuthServerEnabled })
+  const { data, isPending: isLoading, isError, error } = useOAuthServerAppsQuery({ projectRef })
 
   const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
@@ -89,7 +84,7 @@ export const OAuthAppsList = () => {
 
   const { data: endpointData } = useProjectEndpointQuery({ projectRef })
 
-  const oAuthApps = data?.clients || []
+  const oAuthApps = useMemo(() => data?.clients || [], [data])
 
   const [showCreateSheet, setShowCreateSheet] = useQueryState(
     'new',

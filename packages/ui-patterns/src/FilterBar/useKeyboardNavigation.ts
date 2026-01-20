@@ -246,7 +246,13 @@ export function useKeyboardNavigation({
         }
       }
     },
-    [activeInput, activeFilters, findFirstConditionInGroup, findNextConditionFromGroup, setActiveInput]
+    [
+      activeInput,
+      activeFilters,
+      findFirstConditionInGroup,
+      findNextConditionFromGroup,
+      setActiveInput,
+    ]
   )
 
   const handleKeyDown = useCallback(

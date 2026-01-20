@@ -6083,7 +6083,7 @@ functions:
               (2, 'Leia'),
               (3, 'Han');
             ```
-        reponse: |
+        response: |
           ```json
           {
             "data": [

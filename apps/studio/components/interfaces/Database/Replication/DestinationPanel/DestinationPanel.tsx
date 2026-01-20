@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useFlag, useParams } from 'common'
 import {
   cn,
@@ -41,6 +42,7 @@ export const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const unifiedReplication = useFlag('unifiedReplication')
+  const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
   const [selectedType, setSelectedType] = useState<DestinationType>(
     type || (unifiedReplication ? 'Read Replica' : 'BigQuery')
@@ -84,7 +86,11 @@ export const DestinationPanel = ({
               <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
             ) : unifiedReplication && replicationNotEnabled ? (
               <SheetSection>
-                <EnableReplicationCallout className="!p-6" type={selectedType} />
+                <EnableReplicationCallout
+                  className="!p-6"
+                  type={selectedType}
+                  hasAccess={hasETLReplicationAccess}
+                />
               </SheetSection>
             ) : (
               <DestinationForm

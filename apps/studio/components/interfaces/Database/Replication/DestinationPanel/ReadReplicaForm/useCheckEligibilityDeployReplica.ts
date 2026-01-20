@@ -8,6 +8,7 @@ import {
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
@@ -16,8 +17,7 @@ export const useCheckEligibilityDeployReplica = () => {
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-
-  const isFreePlan = org?.plan.id === 'free'
+  const { hasAccess: hasReadReplicaAccess } = useCheckEntitlements('instances.read_replicas')
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const isNotOnHigherPlan = useMemo(
@@ -60,7 +60,7 @@ export const useCheckEligibilityDeployReplica = () => {
     !isReachedMaxReplicas &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
-    !isFreePlan &&
+    hasReadReplicaAccess &&
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
