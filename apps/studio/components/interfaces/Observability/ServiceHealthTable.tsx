@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import dayjs from 'dayjs'
 import { HelpCircle } from 'lucide-react'
 import {
   cn,
@@ -33,6 +34,7 @@ export type ServiceHealthTableProps = {
   serviceData: Record<string, ServiceData>
   onBarClick: (serviceKey: string, logsUrl: string) => (datum: LogsBarChartDatum) => void
   interval: IntervalKey
+  datetimeFormat: string
 }
 
 const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
@@ -105,15 +107,26 @@ type ServiceRowProps = {
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
   interval: IntervalKey
+  datetimeFormat: string
 }
 
-const ServiceRow = ({ service, data, onBarClick, interval }: ServiceRowProps) => {
+const ServiceRow = ({ service, data, onBarClick, interval, datetimeFormat }: ServiceRowProps) => {
   const { status } = getHealthStatus(data.errorRate, data.total)
   const statusLabel = getStatusLabel(status)
   const statusColor = getStatusColor(status)
   const { startLabel, endLabel } = getIntervalLabels(interval)
 
   const successRate = data.total > 0 ? ((data.total - data.errorCount - data.warningCount) / data.total) * 100 : 100
+
+  // Calculate max requests for opacity scaling
+  const maxRequests = Math.max(...data.eventChartData.map(getBarTotal), 1)
+
+  const getBarOpacity = (datum: LogsBarChartDatum): number => {
+    const barTotal = getBarTotal(datum)
+    if (barTotal === 0) return 0.3
+    // Scale opacity from 0.4 to 1.0 based on request count
+    return 0.4 + (barTotal / maxRequests) * 0.6
+  }
 
   return (
     <div className="py-6 border-b border-default last:border-b-0">
@@ -161,28 +174,30 @@ const ServiceRow = ({ service, data, onBarClick, interval }: ServiceRowProps) =>
         ) : (
           data.eventChartData.map((datum, i) => {
             const barColor = getBarColor(datum, data.total)
+            const opacity = getBarOpacity(datum)
             return (
               <Tooltip key={datum.timestamp || i}>
                 <TooltipTrigger asChild>
                   <button
                     className={cn(
-                      'flex-1 h-full rounded-sm transition-opacity hover:opacity-80',
+                      'flex-1 h-full rounded-sm transition-opacity hover:brightness-110',
                       barColor
                     )}
+                    style={{ opacity }}
                     onClick={() => onBarClick(datum)}
                   />
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-xs">
                   <div className="flex flex-col gap-1">
                     <span className="text-foreground-light">
-                      {datum.timestamp ? new Date(datum.timestamp).toLocaleString() : 'Unknown'}
+                      {datum.timestamp ? dayjs(datum.timestamp).format(datetimeFormat) : 'Unknown'}
                     </span>
                     <span>
                       {getBarTotal(datum).toLocaleString()} requests
                     </span>
                     {datum.error_count > 0 && (
                       <span className="text-destructive">
-                        {datum.error_count.toLocaleString()} errors
+                        {((datum.error_count / getBarTotal(datum)) * 100).toFixed(2)}% error rate ({datum.error_count.toLocaleString()} errors)
                       </span>
                     )}
                     {datum.warning_count > 0 && (
@@ -212,6 +227,7 @@ export const ServiceHealthTable = ({
   serviceData,
   onBarClick,
   interval,
+  datetimeFormat,
 }: ServiceHealthTableProps) => {
   return (
     <div>
@@ -228,6 +244,7 @@ export const ServiceHealthTable = ({
               data={data}
               onBarClick={onBarClick(service.key, service.logsUrl)}
               interval={interval}
+              datetimeFormat={datetimeFormat}
             />
           )
         })}

@@ -1,8 +1,8 @@
 import { useParams, useFlag } from 'common'
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import dayjs from 'dayjs'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, RefreshCw } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -18,7 +18,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { InlineLink } from 'components/ui/InlineLink'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -62,7 +61,6 @@ export const ObservabilityOverview = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
   const { plan } = useCurrentOrgPlan()
   const queryClient = useQueryClient()
 
@@ -78,9 +76,6 @@ export const ObservabilityOverview = () => {
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
-  // Live mode polling
-  const [isLiveMode, setIsLiveMode] = useState(false)
-
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
   const { datetimeFormat } = useMemo(() => {
@@ -91,20 +86,12 @@ export const ObservabilityOverview = () => {
   // Data fetching
   const overviewData = useObservabilityOverviewData(projectRef!, interval)
 
-  // Live mode polling - refetch all queries every 10 seconds when enabled
-  useEffect(() => {
-    if (!isLiveMode) return
-
-    const pollInterval = setTimeout(() => {
-      // Invalidate all queries to trigger refetch
-      queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
-      queryClient.invalidateQueries({ queryKey: ['postgrest-overview-metrics'] })
-      queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
-      queryClient.invalidateQueries({ queryKey: ['max-connections'] })
-    }, 10000)
-
-    return () => clearTimeout(pollInterval)
-  }, [isLiveMode, queryClient])
+  const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
+    queryClient.invalidateQueries({ queryKey: ['postgrest-overview-metrics'] })
+    queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
+    queryClient.invalidateQueries({ queryKey: ['max-connections'] })
+  }, [queryClient])
 
   // Service configuration
   const serviceBase = useMemo(
@@ -190,7 +177,7 @@ export const ObservabilityOverview = () => {
 
       router.push(`${logsUrl}?${queryParams.toString()}`)
     },
-    [router, projectRef, organization, sendEvent]
+    [router]
   )
 
   // Database bar click handler
@@ -205,10 +192,11 @@ export const ObservabilityOverview = () => {
         <ReportHeader title="Overview" />
         <div className="flex items-center gap-3">
           <Button
-            type={isLiveMode ? 'default' : 'outline'}
-            onClick={() => setIsLiveMode(!isLiveMode)}
+            type="outline"
+            icon={<RefreshCw size={14} />}
+            onClick={handleRefresh}
           >
-            {isLiveMode ? 'Live mode: On' : 'Live mode'}
+            Refresh
           </Button>
           <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -295,6 +283,7 @@ export const ObservabilityOverview = () => {
         serviceData={overviewData.services}
         onBarClick={handleBarClick}
         interval={interval}
+        datetimeFormat={datetimeFormat}
       />
 </div>
 
