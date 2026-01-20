@@ -127,8 +127,8 @@ const ValidationErrorItem = ({
   const showDeprecatedBadge = error.type === 'unsupported_extension'
 
   return (
-    <li className="py-3 last:pb-0 flex flex-row justify-between items-center">
-      <div className="flex flex-col gap-y-1 flex-1 min-w-0">
+    <li className="py-3 last:pb-0 flex flex-row gap-x-3 justify-between items-center">
+      <div className="flex flex-col gap-y-0.5 flex-1 min-w-0">
         <div className="flex flex-row gap-x-2 items-center">
           <h6 className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 text-sm font-normal text-foreground">
             {title}
