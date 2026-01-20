@@ -54,6 +54,9 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -148,6 +151,11 @@ export const UsersV2 = () => {
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [improvedSearchDismissed, setImprovedSearchDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AUTH_USERS_IMPROVED_SEARCH_DISMISSED(projectRef ?? ''),
+    false
   )
 
   // [Joshen] Opting to store filter column, into local storage for now, which will initialize
@@ -255,13 +263,15 @@ export const UsersV2 = () => {
    * 1. The feature flag is enabled for them
    * 2. They have not opted in yet (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is false)
    * 3. They have < threshold number of users
+   * 4. They have not dismissed the alert
    */
   const isCountWithinThresholdForOptIn =
     isCountLoaded && totalUsers <= IMPROVED_SEARCH_COUNT_THRESHOLD
   const showImprovedSearchOptIn =
     isImprovedUserSearchFlagEnabled &&
     authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === false &&
-    isCountWithinThresholdForOptIn
+    isCountWithinThresholdForOptIn &&
+    !improvedSearchDismissed
 
   /**
    * We want to show an "in progress" state when:
@@ -488,13 +498,21 @@ export const UsersV2 = () => {
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t relative">
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => setImprovedSearchDismissed(true)}
+                className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
+              >
+                <X size={14} className="text-foreground-light" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Dismiss</TooltipContent>
+            </Tooltip>
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Opt-in to an improved search experience</AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_>Upgrade to an improved search experience</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="flex justify-between items-center">
               <div>
-                Creating the necessary indexes will provide a safer and more performant search
-                experience.
+                Enable faster and more reliable searching, sorting, and filtering of your users.
               </div>
               <Button
                 icon={<WandSparklesIcon />}
@@ -502,7 +520,7 @@ export const UsersV2 = () => {
                 loading={isUpdatingAuthConfig}
                 type="default"
               >
-                Create indexes
+                Upgrade search
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -907,17 +925,17 @@ export const UsersV2 = () => {
       <ConfirmationModal
         size="medium"
         visible={showCreateIndexesModal}
-        confirmLabel="Create indexes"
-        title="Create user search indexes"
+        confirmLabel="Upgrade search"
+        title="Upgrade to improved search"
         onConfirm={() => {
           handleEnableUserSearchIndexes()
           setShowCreateIndexesModal(false)
         }}
         onCancel={() => setShowCreateIndexesModal(false)}
         alert={{
-          title: 'Create user search indexes',
+          title: 'Improved search experience',
           description:
-            'This process will create indexes on the auth.users table to improve search performance and enable better sorting and filtering capabilities.',
+            'This will create indexes to enable faster and more reliable searching, sorting, and filtering of your users.',
         }}
       >
         <ul className="text-sm list-disc pl-4 my-3 flex flex-col gap-2">
@@ -925,12 +943,11 @@ export const UsersV2 = () => {
             Creating these indexes may temporarily impact database performance.
           </li>
           <li className="marker:text-foreground-light">
-            Depending on the size of your `auth.users` table, this operation may take some time to
-            complete.
+            Depending on the number of users, this may take some time to complete.
           </li>
           <li className="marker:text-foreground-light">
-            You may continue to use the Auth Users page while the indexes are being created, but
-            search performance improvements will only take effect once the process is complete.
+            You can continue using the Auth Users page while the indexes are being created, but
+            improvements will only take effect once complete.
           </li>
           <li className="marker:text-foreground-light">
             You can monitor the progress in the{' '}

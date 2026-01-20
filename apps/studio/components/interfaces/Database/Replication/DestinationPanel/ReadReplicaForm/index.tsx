@@ -25,8 +25,7 @@ import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployRep
 import { useGetReplicaCost } from './useGetReplicaCost'
 
 interface ReadReplicaFormProps {
-  // [Joshen] Need to refetch replicas on the parent since they're created async
-  onSuccess?: () => void
+  onSuccess: () => void
   onClose: () => void
 }
 

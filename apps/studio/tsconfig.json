@@ -13,10 +13,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    // @deprecated: use @/ instead of importing from root
     "baseUrl": ".",
     "downlevelIteration": true,
     "incremental": true,
     "paths": {
+      "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "useDefineForClassFields": true,

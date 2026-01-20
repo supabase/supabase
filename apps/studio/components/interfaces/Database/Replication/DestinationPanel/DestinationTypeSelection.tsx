@@ -1,6 +1,6 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 import { DestinationType } from './DestinationPanel.types'
 
 type DestinationTypeSelectionProps = {
@@ -66,7 +66,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <BigQuery size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>BigQuery</p>
+                <div className="flex items-center gap-x-2">
+                  <p>BigQuery</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Google Cloud's data warehouse for analytics and business intelligence
                 </p>
@@ -85,7 +88,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <AnalyticsBucket size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>Analytics Bucket</p>
+                <div className="flex items-center gap-x-2">
+                  <p>Analytics Bucket</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics
                   workflows

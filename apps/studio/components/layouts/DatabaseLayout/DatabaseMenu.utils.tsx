@@ -47,7 +47,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Triggers',
           key: 'triggers',
-          url: `/project/${ref}/database/triggers`,
+          url: `/project/${ref}/database/triggers/data`,
           items: [],
         },
         {
