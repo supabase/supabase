@@ -30,33 +30,12 @@ Following the [upcoming API key changes](https://github.com/orgs/supabase/discus
 
 </Admonition>
 
-## Verifying JWT
+## Integrating with Supabase Auth
 
-### Using Supabase template
+Important notes to consider:
 
-You can see [a custom JWT verification example on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) and a variety of [auth function templates](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt) also on GitHub.
-
-To verify incoming requests, you can download the specified template and start using it:
-
-```bash
-curl -O https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/default.ts
-```
-
-```ts
-import { AuthMiddleware } from '../_shared/jwt/default.ts'
-
-Deno.serve((r) =>
-  AuthMiddleware(r, async (req) => {
-    const { name } = await req.json()
-
-    return Response.json({ message: `hello ${name}` })
-  })
-)
-```
-
-### Integrating with Supabase Auth
-
-You can also use the Supabase Auth to verify users
+- This is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+- Use `Deno.env.get('SUPABASE_URL')` to get the URL associated with your project. Using a value such as `http://localhost:54321` for local development will fail due to Docker containerization.
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
@@ -94,66 +73,28 @@ Deno.serve(async (req) => {
 })
 ```
 
-### Using JWT library
+## Verifying JWT
 
-You can use the popular [`jose`](https://www.npmjs.com/package/jose/v/4.10.0) library can be used to verify received JWTs, like the following example:
+### Using Supabase template
 
-```ts
-import { createRemoteJWKSet, jwtVerify } from 'https://deno.land/x/jose@v4.14.4/index.ts'
+You can see [a custom JWT verification example on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) and a variety of [auth function templates](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt) also on GitHub.
 
-// While developing you may populate the 'SB_JWT_ISSUER' to match the same issuer from your local environment
-// The issuer can also be customised from [auth.jwt_issuer] property
-const SUPABASE_JWT_ISSUER =
-  Deno.env.get('SB_JWT_ISSUER') ?? Deno.env.get('SUPABASE_URL') + '/auth/v1'
+To verify incoming requests, you can copy/download the specified template and start using it:
 
-const SUPABASE_JWT_KEYS = createRemoteJWKSet(
-  new URL(Deno.env.get('SUPABASE_URL')! + '/auth/v1/.well-known/jwks.json')
-)
+<Admonition type="tip">
 
-function getAuthToken(req: Request) {
-  const authHeader = req.headers.get('authorization')
-  if (!authHeader) {
-    throw new Error('Missing authorization header')
-  }
-  const [bearer, token] = authHeader.split(' ')
-  if (bearer !== 'Bearer') {
-    throw new Error(`Auth header is not 'Bearer {token}'`)
-  }
-  return token
-}
+The following example uses [`jose`](https://jsr.io/@panva/jose) library to verify received JWTs.
 
-function verifySupabaseJWT(jwt: string) {
-  return jwtVerify(jwt, SUPABASE_JWT_KEYS, {
-    issuer: SUPABASE_JWT_ISSUER,
-  })
-}
+</Admonition>
+{/* prettier-ignore */}
+<$CodeSample
+path="/edge-functions/supabase/functions/_shared/jwt/default.ts"
+meta="name=_shared/jwt/default.ts"
+lines={[[3, -1]]}
+/>
 
-Deno.serve(async (req: Request) => {
-  if (req.method !== 'OPTIONS') {
-    try {
-      const token = getAuthToken(req)
-      const isValidJWT = await verifySupabaseJWT(token)
-
-      if (!isValidJWT) {
-        return Response.json(
-          { msg: 'Invalid JWT' },
-          {
-            status: 401,
-          }
-        )
-      }
-    } catch (e) {
-      console.error(e)
-      return Response.json(
-        { msg: e.toString() },
-        {
-          status: 401,
-        }
-      )
-    }
-  }
-
-  const { name } = await req.json()
-  return Response.json({ message: `hello ${name}` })
-})
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/custom-jwt-validation/index.ts"
+meta="name=hello/index.ts"
+lines={[[4, -1]]}
+/>

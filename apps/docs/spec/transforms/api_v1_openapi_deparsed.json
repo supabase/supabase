@@ -182,7 +182,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "patch": {
@@ -384,7 +384,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -459,7 +459,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -544,7 +544,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -629,7 +629,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -714,7 +714,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -781,7 +781,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -849,13 +849,13 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.",
+        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -980,7 +980,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -1244,7 +1244,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["project_admin_write"]
+            "fga_permissions": ["organization_projects_create"]
           }
         ],
         "summary": "Create a project",
@@ -1255,7 +1255,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1437,14 +1437,18 @@
         "security": [
           {
             "bearer": []
-          },
-          {
-            "fga_permissions": ["available_regions_read"]
           }
         ],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"]
+        "x-badges": [
+          {
+            "name": "OAuth scope: organizations:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations": {
@@ -1502,7 +1506,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       },
       "post": {
@@ -1516,7 +1520,8 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                   }
                 },
                 "required": ["name"],
@@ -1561,12 +1566,12 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["organizations_write"]
+            "fga_permissions": ["organizations_create"]
           }
         ],
         "summary": "Create an organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api", "billing"]
       }
     },
     "/v1/oauth/authorize": {
@@ -1673,7 +1678,7 @@
         ],
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/token": {
@@ -1760,7 +1765,7 @@
         ],
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/revoke": {
@@ -1803,7 +1808,7 @@
         ],
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -1891,11 +1896,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Authorize user through oauth and claim a project",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api"]
       }
     },
     "/v1/snippets": {
@@ -2072,7 +2080,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2217,7 +2225,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2360,6 +2368,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["action_runs_read"]
           }
         ],
         "summary": "List all action runs",
@@ -2370,7 +2381,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "head": {
@@ -2420,6 +2431,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["action_runs_read"]
           }
         ],
         "summary": "Count the number of action runs",
@@ -2560,6 +2574,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["action_runs_read"]
           }
         ],
         "summary": "Get the status of an action run",
@@ -2570,7 +2587,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -2731,6 +2748,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["action_runs_write"]
           }
         ],
         "summary": "Update the status of an action run",
@@ -2741,7 +2761,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -2799,6 +2819,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["action_runs_read"]
           }
         ],
         "summary": "Get the logs of an action run",
@@ -2809,7 +2832,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -2912,6 +2935,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Get project api keys",
@@ -2922,7 +2948,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -3052,6 +3078,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Creates a new API key for the project",
@@ -3062,7 +3091,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -3113,6 +3142,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -3123,7 +3155,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -3181,6 +3213,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -3191,7 +3226,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -3327,6 +3362,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Updates an API key for the project",
@@ -3337,7 +3375,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -3444,6 +3482,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_read"]
           }
         ],
         "summary": "Get API key",
@@ -3454,7 +3495,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -3578,6 +3619,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["api_gateway_keys_write"]
           }
         ],
         "summary": "Deletes an API key for the project",
@@ -3588,7 +3632,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -3739,6 +3783,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_development_read"]
           }
         ],
         "summary": "List all database branches",
@@ -3749,7 +3796,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "post": {
@@ -3973,6 +4020,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Create a database branch",
@@ -3983,7 +4033,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -4023,6 +4073,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Disables preview branching",
@@ -4033,7 +4086,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -4189,6 +4242,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_development_read"]
           }
         ],
         "summary": "Get a database branch",
@@ -4199,7 +4255,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -4366,6 +4422,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["custom_domain_read"]
           }
         ],
         "summary": "[Beta] Gets project's custom hostname config",
@@ -4376,7 +4435,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -4415,6 +4474,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["custom_domain_write"]
           }
         ],
         "summary": "[Beta] Deletes a project's custom hostname configuration",
@@ -4425,7 +4487,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4609,6 +4671,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["custom_domain_write"]
           }
         ],
         "summary": "[Beta] Updates project's custom hostname configuration",
@@ -4619,7 +4684,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4786,6 +4851,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["custom_domain_write"]
           }
         ],
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
@@ -4796,7 +4864,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -4963,6 +5031,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["custom_domain_write"]
           }
         ],
         "summary": "[Beta] Activates a custom hostname for a project.",
@@ -4973,7 +5044,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -5030,6 +5101,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_read"]
           }
         ],
         "summary": "[Beta] Gets project's network bans",
@@ -5040,7 +5114,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -5109,6 +5183,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_read"]
           }
         ],
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
@@ -5119,7 +5196,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -5188,6 +5265,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_bans_write"]
           }
         ],
         "summary": "[Beta] Remove network bans.",
@@ -5198,7 +5278,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5301,6 +5381,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_restrictions_read"]
           }
         ],
         "summary": "[Beta] Gets project's network restrictions",
@@ -5311,7 +5394,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:read"
       },
       "patch": {
@@ -5466,6 +5549,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_restrictions_write"]
           }
         ],
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
@@ -5476,7 +5562,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5603,6 +5689,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_network_restrictions_write"]
           }
         ],
         "summary": "[Beta] Updates project's network restrictions",
@@ -5613,7 +5702,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -5667,6 +5756,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "[Beta] Gets project's pgsodium config",
@@ -5677,7 +5769,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -5745,6 +5837,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
@@ -5755,7 +5850,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -5823,6 +5918,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["data_api_config_read"]
           }
         ],
         "summary": "Gets project's postgrest config",
@@ -5833,7 +5931,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -5924,6 +6022,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["data_api_config_write"]
           }
         ],
         "summary": "Updates project's postgrest config",
@@ -5934,7 +6035,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "rest:write"
       }
     },
@@ -6073,6 +6174,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets a specific project that belongs to the authenticated user",
@@ -6083,7 +6187,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       },
       "delete": {
@@ -6138,6 +6242,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Deletes the given project",
@@ -6148,7 +6255,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
         "x-oauth-scope": "projects:write"
       },
       "patch": {
@@ -6224,6 +6331,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Updates the given project",
@@ -6234,7 +6344,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -6298,6 +6408,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_secrets_read"]
           }
         ],
         "summary": "List all secrets",
@@ -6308,7 +6421,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -6375,6 +6488,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_secrets_write"]
           }
         ],
         "summary": "Bulk create secrets",
@@ -6385,7 +6501,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:write"
       },
       "delete": {
@@ -6438,6 +6554,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_secrets_write"]
           }
         ],
         "summary": "Bulk delete secrets",
@@ -6448,7 +6567,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -6511,6 +6630,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_ssl_config_read"]
           }
         ],
         "summary": "[Beta] Get project's SSL enforcement configuration.",
@@ -6521,7 +6643,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -6604,6 +6726,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_ssl_config_write"]
           }
         ],
         "summary": "[Beta] Update project's SSL enforcement configuration.",
@@ -6614,7 +6739,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -6678,6 +6803,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_read"]
           }
         ],
         "summary": "Generate TypeScript types",
@@ -6688,7 +6816,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -6747,6 +6875,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["vanity_subdomain_read"]
           }
         ],
         "summary": "[Beta] Gets current vanity subdomain config",
@@ -6757,7 +6888,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -6796,6 +6927,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["vanity_subdomain_write"]
           }
         ],
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
@@ -6806,7 +6940,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -6876,6 +7010,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["vanity_subdomain_write"]
           }
         ],
         "summary": "[Beta] Checks vanity subdomain availability",
@@ -6886,7 +7023,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -6956,6 +7093,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["vanity_subdomain_write"]
           }
         ],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
@@ -6966,7 +7106,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -7040,6 +7180,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write", "database_write"]
           }
         ],
         "summary": "[Beta] Upgrades the project's Postgres version",
@@ -7050,7 +7193,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -7125,18 +7268,166 @@
                       "type": "array",
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "deprecated": true,
+                      "description": "Use validation_errors instead."
                     },
                     "unsupported_extensions": {
                       "type": "array",
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "deprecated": true,
+                      "description": "Use validation_errors instead."
                     },
                     "user_defined_objects_in_internal_schemas": {
                       "type": "array",
                       "items": {
                         "type": "string"
+                      },
+                      "deprecated": true,
+                      "description": "Use validation_errors instead."
+                    },
+                    "validation_errors": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["objects_depending_on_pg_cron"]
+                              },
+                              "dependents": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": ["type", "dependents"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["indexes_referencing_ll_to_earth"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "table_name": {
+                                "type": "string"
+                              },
+                              "index_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "schema_name", "table_name", "index_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["function_using_obsolete_lang"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "function_name": {
+                                "type": "string"
+                              },
+                              "lang_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "schema_name", "function_name", "lang_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["unsupported_extension"]
+                              },
+                              "extension_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "extension_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["unsupported_fdw_handler"]
+                              },
+                              "fdw_name": {
+                                "type": "string"
+                              },
+                              "fdw_handler_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "fdw_name", "fdw_handler_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["unlogged_table_with_persistent_sequence"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "table_name": {
+                                "type": "string"
+                              },
+                              "sequence_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "schema_name", "table_name", "sequence_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["user_defined_objects_in_internal_schemas"]
+                              },
+                              "obj_type": {
+                                "type": "string",
+                                "enum": ["table", "function"]
+                              },
+                              "schema_name": {
+                                "type": "string"
+                              },
+                              "obj_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "obj_type", "schema_name", "obj_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["active_replication_slot"]
+                              },
+                              "slot_name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["type", "slot_name"]
+                          }
+                        ]
                       }
                     }
                   },
@@ -7150,7 +7441,8 @@
                     "legacy_auth_custom_roles",
                     "objects_to_be_dropped",
                     "unsupported_extensions",
-                    "user_defined_objects_in_internal_schemas"
+                    "user_defined_objects_in_internal_schemas",
+                    "validation_errors"
                   ]
                 }
               }
@@ -7172,6 +7464,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read", "database_read"]
           }
         ],
         "summary": "[Beta] Returns the project's eligibility for upgrades",
@@ -7182,7 +7477,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -7290,6 +7585,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read", "database_read"]
           }
         ],
         "summary": "[Beta] Gets the latest status of the project's upgrade",
@@ -7300,7 +7598,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -7360,6 +7658,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_readonly_config_read"]
           }
         ],
         "summary": "Returns project's readonly mode status",
@@ -7370,7 +7671,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -7411,6 +7712,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_readonly_config_write"]
           }
         ],
         "summary": "Disables project's readonly mode for the next 15 minutes",
@@ -7421,7 +7725,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -7500,11 +7804,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_read_replicas_write"]
           }
         ],
         "summary": "[Beta] Set up a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api", "infra"]
       }
     },
     "/v1/projects/{ref}/read-replicas/remove": {
@@ -7560,11 +7867,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_read_replicas_write"]
           }
         ],
         "summary": "[Beta] Remove a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api", "infra"]
       }
     },
     "/v1/projects/{ref}/health": {
@@ -7639,7 +7949,9 @@
                         ]
                       },
                       "healthy": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "deprecated": true,
+                        "description": "Deprecated. Use `status` instead."
                       },
                       "status": {
                         "type": "string",
@@ -7667,7 +7979,9 @@
                             "type": "object",
                             "properties": {
                               "healthy": {
-                                "type": "boolean"
+                                "type": "boolean",
+                                "deprecated": true,
+                                "description": "Deprecated. Use `status` instead."
                               },
                               "db_connected": {
                                 "type": "boolean"
@@ -7715,6 +8029,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets project's service health status",
@@ -7725,7 +8042,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -7797,6 +8114,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_write"]
           }
         ],
         "summary": "Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found.",
@@ -7807,7 +8127,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -7877,6 +8197,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_read"]
           }
         ],
         "summary": "Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -7887,7 +8210,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -8184,6 +8507,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_write"]
           }
         ],
         "summary": "Create a new signing key for the project in standby status",
@@ -8194,7 +8520,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -8274,6 +8600,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_read"]
           }
         ],
         "summary": "List all signing keys for the project",
@@ -8284,7 +8613,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -8365,11 +8694,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_read"]
           }
         ],
         "summary": "Get information about a signing key",
         "tags": ["Auth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth"]
       },
       "delete": {
         "operationId": "v1-remove-project-signing-key",
@@ -8447,6 +8779,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_write"]
           }
         ],
         "summary": "Remove a signing key from a project. Only possible if the key has been in revoked status for a while.",
@@ -8457,7 +8792,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "patch": {
@@ -8554,6 +8889,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_signing_keys_write"]
           }
         ],
         "summary": "Update a signing key, mainly its status",
@@ -8564,7 +8902,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -8721,11 +9059,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["storage_config_read"]
           }
         ],
         "summary": "Gets project's storage config",
         "tags": ["Storage"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["storage"]
       },
       "patch": {
         "operationId": "v1-update-storage-config",
@@ -8853,11 +9194,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["storage_config_write"]
           }
         ],
         "summary": "Updates project's storage config",
         "tags": ["Storage"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["storage"]
       }
     },
     "/v1/projects/{ref}/config/database/postgres": {
@@ -9000,6 +9344,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_config_read"]
           }
         ],
         "summary": "Gets project's Postgres config",
@@ -9010,7 +9357,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -9262,6 +9609,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_config_write"]
           }
         ],
         "summary": "Updates project's Postgres config",
@@ -9272,7 +9622,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -9347,6 +9697,11 @@
             "description": "Failed to retrieve project's pgbouncer config"
           }
         },
+        "security": [
+          {
+            "fga_permissions": ["database_read"]
+          }
+        ],
         "summary": "Get project's pgbouncer config",
         "tags": ["Database"],
         "x-badges": [
@@ -9355,7 +9710,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -9463,6 +9818,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_pooling_config_read"]
           }
         ],
         "summary": "Gets project's supavisor config",
@@ -9473,7 +9831,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "patch": {
@@ -9552,6 +9910,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_pooling_config_write"]
           }
         ],
         "summary": "Updates project's supavisor config",
@@ -9562,7 +9923,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -10506,6 +10867,16 @@
                     "uri_allow_list": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "oauth_server_enabled": {
+                      "type": "boolean"
+                    },
+                    "oauth_server_allow_dynamic_registration": {
+                      "type": "boolean"
+                    },
+                    "oauth_server_authorization_path": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -10735,7 +11106,10 @@
                     "smtp_port",
                     "smtp_sender_name",
                     "smtp_user",
-                    "uri_allow_list"
+                    "uri_allow_list",
+                    "oauth_server_enabled",
+                    "oauth_server_allow_dynamic_registration",
+                    "oauth_server_authorization_path"
                   ]
                 }
               }
@@ -10757,6 +11131,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_read"]
           }
         ],
         "summary": "Gets project's auth config",
@@ -10767,7 +11144,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       },
       "patch": {
@@ -11745,6 +12122,18 @@
                   "nimbus_oauth_client_secret": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "oauth_server_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "oauth_server_allow_dynamic_registration": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "oauth_server_authorization_path": {
+                    "type": "string",
+                    "nullable": true
                   }
                 }
               }
@@ -12674,6 +13063,16 @@
                     "uri_allow_list": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "oauth_server_enabled": {
+                      "type": "boolean"
+                    },
+                    "oauth_server_allow_dynamic_registration": {
+                      "type": "boolean"
+                    },
+                    "oauth_server_authorization_path": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -12903,7 +13302,10 @@
                     "smtp_port",
                     "smtp_sender_name",
                     "smtp_user",
-                    "uri_allow_list"
+                    "uri_allow_list",
+                    "oauth_server_enabled",
+                    "oauth_server_allow_dynamic_registration",
+                    "oauth_server_authorization_path"
                   ]
                 }
               }
@@ -12925,6 +13327,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_write", "project_admin_write"]
           }
         ],
         "summary": "Updates a project's auth config",
@@ -12935,7 +13340,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       }
     },
@@ -13064,7 +13469,7 @@
         ],
         "summary": "Gets realtime configuration",
         "tags": ["Realtime"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["realtime"]
       },
       "patch": {
         "operationId": "v1-update-realtime-config",
@@ -13172,7 +13577,7 @@
         ],
         "summary": "Updates realtime configuration",
         "tags": ["Realtime"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["realtime"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -13269,6 +13674,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_write"]
           }
         ],
         "summary": "Creates a new third-party auth integration",
@@ -13279,7 +13687,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -13359,6 +13767,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_read"]
           }
         ],
         "summary": "Lists all third-party auth integrations",
@@ -13369,7 +13780,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -13457,6 +13868,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_write"]
           }
         ],
         "summary": "Removes a third-party auth integration",
@@ -13467,7 +13881,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -13553,6 +13967,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_read"]
           }
         ],
         "summary": "Get a third-party integration",
@@ -13563,7 +13980,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -13601,6 +14018,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Pauses the given project",
@@ -13611,7 +14031,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -13679,6 +14099,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Lists available restore versions for the given project",
@@ -13689,7 +14112,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -13725,6 +14148,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Restores the given project",
@@ -13735,7 +14161,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -13773,6 +14199,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Cancels the given project restoration",
@@ -13783,7 +14212,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -14049,11 +14478,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_add_ons_read"]
           }
         ],
         "summary": "List billing addons and compute instance selections",
         "tags": ["Billing"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["billing"]
       },
       "patch": {
         "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
@@ -14156,11 +14588,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_add_ons_write"]
           }
         ],
         "summary": "Apply or update billing addons, including compute instance size",
         "tags": ["Billing"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["billing"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
@@ -14245,11 +14680,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_add_ons_write"]
           }
         ],
         "summary": "Remove billing addons or revert compute instance sizing",
         "tags": ["Billing"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["billing"]
       }
     },
     "/v1/projects/{ref}/claim-token": {
@@ -14309,11 +14747,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
           }
         ],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "post": {
@@ -14375,11 +14816,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "delete": {
@@ -14415,11 +14859,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write", "project_admin_write"]
           }
         ],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       }
     },
@@ -14586,6 +15033,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["advisors_read"]
           }
         ],
         "summary": "Gets project performance advisors.",
@@ -14596,7 +15046,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -14772,6 +15222,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["advisors_read"]
           }
         ],
         "summary": "Gets project security advisors.",
@@ -14782,7 +15235,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -14913,6 +15366,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["analytics_logs_read"]
           }
         ],
         "summary": "Gets project's logs",
@@ -14923,7 +15379,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["analytics"],
         "x-oauth-scope": "analytics:read"
       }
     },
@@ -15065,11 +15521,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["analytics_usage_read"]
           }
         ],
         "summary": "Gets project's usage api counts",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/usage.api-requests-count": {
@@ -15182,11 +15641,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["analytics_usage_read"]
           }
         ],
         "summary": "Gets project's usage api requests count",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/functions.combined-stats": {
@@ -15308,11 +15770,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["analytics_usage_read"]
           }
         ],
         "summary": "Gets a project's function combined statistics",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/cli/login-role": {
@@ -15391,6 +15856,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_write"]
           }
         ],
         "summary": "[Beta] Create a login role for CLI with temporary password",
@@ -15401,7 +15869,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -15454,6 +15922,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_write"]
           }
         ],
         "summary": "[Beta] Delete existing login roles used by CLI",
@@ -15464,7 +15935,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -15526,6 +15997,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_migrations_read"]
           }
         ],
         "summary": "[Beta] List applied migration versions",
@@ -15536,7 +16010,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -15608,6 +16082,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_migrations_write"]
           }
         ],
         "summary": "[Beta] Apply a database migration",
@@ -15618,7 +16095,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       },
       "put": {
@@ -15690,6 +16167,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_migrations_write"]
           }
         ],
         "summary": "[Beta] Upsert a database migration without applying",
@@ -15700,7 +16180,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -15750,6 +16230,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_migrations_write"]
           }
         ],
         "summary": "[Beta] Rollback database migrations and remove them from history table",
@@ -15760,7 +16243,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -15846,6 +16329,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_migrations_read"]
           }
         ],
         "summary": "[Beta] Fetch an existing entry from migration history",
@@ -15856,7 +16342,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "patch": {
@@ -15923,6 +16409,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_migrations_write"]
           }
         ],
         "summary": "[Beta] Patch an existing entry in migration history",
@@ -15933,7 +16422,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -15998,6 +16487,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_write"]
           }
         ],
         "summary": "[Beta] Run sql query",
@@ -16008,7 +16500,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -16071,6 +16563,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_read"]
           }
         ],
         "summary": "[Beta] Run a sql query as supabase_read_only_user",
@@ -16081,7 +16576,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -16122,6 +16617,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_webhooks_config_write"]
           }
         ],
         "summary": "[Beta] Enables Database Webhooks on the project",
@@ -16132,7 +16630,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -16208,6 +16706,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_read"]
           }
         ],
         "summary": "Gets database metadata for the given project.",
@@ -16218,7 +16719,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -16289,6 +16790,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_write"]
           }
         ],
         "summary": "Updates the database password",
@@ -16299,7 +16803,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -16400,6 +16904,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_jit_read"]
           }
         ],
         "summary": "Get user-id to role mappings for JIT access",
@@ -16410,7 +16917,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["security"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -16527,6 +17034,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_jit_read"]
           }
         ],
         "summary": "Authorize user-id to role mappings for JIT access",
@@ -16537,7 +17047,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["security"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -16699,11 +17209,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_jit_write"]
           }
         ],
         "summary": "Updates a user mapping for JIT access",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/database/jit/list": {
@@ -16812,11 +17325,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_jit_read"]
           }
         ],
         "summary": "List all user-id to role mappings for JIT access",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/database/jit/{user_id}": {
@@ -16866,11 +17382,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_jit_write"]
           }
         ],
         "summary": "Delete JIT access by user-id",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/functions": {
@@ -16971,6 +17490,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_read"]
           }
         ],
         "summary": "List all functions",
@@ -16981,7 +17503,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       },
       "post": {
@@ -17173,6 +17695,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_write"]
           }
         ],
         "summary": "Create a function",
@@ -17183,7 +17708,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       },
       "put": {
@@ -17344,6 +17869,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_write"]
           }
         ],
         "summary": "Bulk update functions",
@@ -17354,7 +17882,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -17510,6 +18038,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_write"]
           }
         ],
         "summary": "Deploy a function",
@@ -17520,7 +18051,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -17629,6 +18160,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_read"]
           }
         ],
         "summary": "Retrieve a function",
@@ -17639,7 +18173,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       },
       "patch": {
@@ -17832,6 +18366,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_write"]
           }
         ],
         "summary": "Update a function",
@@ -17842,7 +18379,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       },
       "delete": {
@@ -17892,6 +18429,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_write"]
           }
         ],
         "summary": "Delete a function",
@@ -17902,7 +18442,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -17962,6 +18502,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["edge_functions_read"]
           }
         ],
         "summary": "Retrieve a function body",
@@ -17972,7 +18515,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       }
     },
@@ -18044,6 +18587,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["storage_read"]
           }
         ],
         "summary": "Lists all buckets",
@@ -18054,7 +18600,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["storage"],
         "x-oauth-scope": "storage:read"
       }
     },
@@ -18287,6 +18833,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_write"]
           }
         ],
         "summary": "Creates a new SSO provider",
@@ -18297,7 +18846,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -18455,6 +19004,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_read"]
           }
         ],
         "summary": "Lists all SSO providers",
@@ -18465,7 +19017,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -18625,6 +19177,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_read"]
           }
         ],
         "summary": "Gets a SSO provider by its UUID",
@@ -18635,7 +19190,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       },
       "put": {
@@ -18869,6 +19424,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_write"]
           }
         ],
         "summary": "Updates a SSO provider by its UUID",
@@ -18879,7 +19437,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "delete": {
@@ -19037,6 +19595,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["auth_config_write"]
           }
         ],
         "summary": "Removes a SSO provider by its UUID",
@@ -19047,7 +19608,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       }
     },
@@ -19150,6 +19711,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_read"]
           }
         ],
         "summary": "Lists all backups",
@@ -19160,7 +19724,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -19216,6 +19780,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_write"]
           }
         ],
         "summary": "Restores a PITR backup for a database",
@@ -19226,7 +19793,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -19298,6 +19865,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_write"]
           }
         ],
         "summary": "Initiates a creation of a restore point for a database",
@@ -19308,7 +19878,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       },
@@ -19374,6 +19944,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_read"]
           }
         ],
         "summary": "Get restore points for project",
@@ -19384,7 +19957,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:read"
       }
@@ -19440,6 +20013,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_write"]
           }
         ],
         "summary": "Initiates an undo to a given restore point",
@@ -19450,7 +20026,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       }
@@ -19515,6 +20091,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["members_read"]
           }
         ],
         "summary": "List members of an organization",
@@ -19525,7 +20104,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -19599,6 +20178,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_read"]
           }
         ],
         "summary": "Gets information about the organization",
@@ -19609,7 +20191,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -19771,11 +20353,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write"]
           }
         ],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "post": {
@@ -19817,17 +20402,20 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_admin_write"]
           }
         ],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       }
     },
     "/v1/organizations/{slug}/projects": {
       "get": {
-        "description": "Returns a paginated list of projects for the specified organization.\n\n    This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
+        "description": "Returns a paginated list of projects for the specified organization.\n\nThis endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
         "operationId": "v1-get-all-projects-for-organization",
         "parameters": [
           {
@@ -20072,11 +20660,14 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_projects_read"]
           }
         ],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api"]
       }
     }
   },
@@ -20916,7 +21507,8 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 256
           }
         },
         "required": ["name"],
@@ -22216,18 +22808,166 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
           },
           "unsupported_extensions": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
           },
           "user_defined_objects_in_internal_schemas": {
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["objects_depending_on_pg_cron"]
+                    },
+                    "dependents": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": ["type", "dependents"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["indexes_referencing_ll_to_earth"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "table_name": {
+                      "type": "string"
+                    },
+                    "index_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "table_name", "index_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["function_using_obsolete_lang"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "function_name": {
+                      "type": "string"
+                    },
+                    "lang_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "function_name", "lang_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unsupported_extension"]
+                    },
+                    "extension_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "extension_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unsupported_fdw_handler"]
+                    },
+                    "fdw_name": {
+                      "type": "string"
+                    },
+                    "fdw_handler_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "fdw_name", "fdw_handler_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unlogged_table_with_persistent_sequence"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "table_name": {
+                      "type": "string"
+                    },
+                    "sequence_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "table_name", "sequence_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["user_defined_objects_in_internal_schemas"]
+                    },
+                    "obj_type": {
+                      "type": "string",
+                      "enum": ["table", "function"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "obj_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "obj_type", "schema_name", "obj_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["active_replication_slot"]
+                    },
+                    "slot_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "slot_name"]
+                }
+              ]
             }
           }
         },
@@ -22241,7 +22981,8 @@
           "legacy_auth_custom_roles",
           "objects_to_be_dropped",
           "unsupported_extensions",
-          "user_defined_objects_in_internal_schemas"
+          "user_defined_objects_in_internal_schemas",
+          "validation_errors"
         ]
       },
       "DatabaseUpgradeStatusResponse": {
@@ -22371,7 +23112,9 @@
             ]
           },
           "healthy": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true,
+            "description": "Deprecated. Use `status` instead."
           },
           "status": {
             "type": "string",
@@ -22399,7 +23142,9 @@
                 "type": "object",
                 "properties": {
                   "healthy": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "deprecated": true,
+                    "description": "Deprecated. Use `status` instead."
                   },
                   "db_connected": {
                     "type": "boolean"
@@ -24158,6 +24903,16 @@
           "uri_allow_list": {
             "type": "string",
             "nullable": true
+          },
+          "oauth_server_enabled": {
+            "type": "boolean"
+          },
+          "oauth_server_allow_dynamic_registration": {
+            "type": "boolean"
+          },
+          "oauth_server_authorization_path": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -24387,7 +25142,10 @@
           "smtp_port",
           "smtp_sender_name",
           "smtp_user",
-          "uri_allow_list"
+          "uri_allow_list",
+          "oauth_server_enabled",
+          "oauth_server_allow_dynamic_registration",
+          "oauth_server_authorization_path"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -25343,6 +26101,18 @@
             "nullable": true
           },
           "nimbus_oauth_client_secret": {
+            "type": "string",
+            "nullable": true
+          },
+          "oauth_server_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "oauth_server_allow_dynamic_registration": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
           }

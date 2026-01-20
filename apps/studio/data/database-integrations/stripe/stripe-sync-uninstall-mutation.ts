@@ -60,7 +60,7 @@ export const useStripeSyncUninstallMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      track('integration_uninstall_started', {
+      track('integration_uninstall_submitted', {
         integrationName: 'stripe_sync_engine',
       })
 

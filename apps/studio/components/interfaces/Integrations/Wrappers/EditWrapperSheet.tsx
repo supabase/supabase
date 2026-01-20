@@ -62,6 +62,8 @@ export const EditWrapperSheet = ({
     undefined
   )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
+  const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
+  const [pendingFormState, setPendingFormState] = useState<Record<string, string> | null>(null)
   const hasChangesRef = useRef(false)
 
   const initialValues = {
@@ -94,16 +96,14 @@ export const EditWrapperSheet = ({
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
     if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
       errors.tables = 'Please add at least one table'
-    if (!isEmpty(errors)) return setFormErrors(errors)
+    if (!isEmpty(errors)) {
+      setFormErrors(errors)
+      return
+    }
 
-    updateFDW({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      wrapper,
-      wrapperMeta,
-      formState: { ...values, server_name: `${wrapper_name}_server` },
-      tables: wrapperTables,
-    })
+    setFormErrors({})
+    setPendingFormState({ ...values, server_name: `${wrapper_name}_server` })
+    setIsUpdateConfirmationOpen(true)
   }
 
   const checkIsDirty = useCallback(() => hasChangesRef.current, [])
@@ -361,6 +361,41 @@ export const EditWrapperSheet = ({
           }}
         </Form>
       </div>
+
+      <ConfirmationModal
+        visible={isUpdateConfirmationOpen}
+        title="Recreate wrapper?"
+        size="medium"
+        variant="warning"
+        confirmLabel="Recreate wrapper"
+        confirmLabelLoading="Recreating wrapper"
+        loading={isSaving}
+        onCancel={() => {
+          setIsUpdateConfirmationOpen(false)
+          setPendingFormState(null)
+          onClose()
+        }}
+        onConfirm={() => {
+          if (pendingFormState === null) return
+          updateFDW({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            wrapper,
+            wrapperMeta,
+            formState: pendingFormState,
+            tables: wrapperTables,
+          })
+          setIsUpdateConfirmationOpen(false)
+          setPendingFormState(null)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Saving changes will drop the existing wrapper and recreate it. Foreign servers and tables
+          will be recreated, and dependent objects like functions or views that reference those
+          tables may need to be updated manually afterwards.
+        </p>
+        <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
+      </ConfirmationModal>
 
       <CloseConfirmationModal {...closeConfirmationModalProps} />
 
