@@ -46,9 +46,7 @@ export const HomeV2 = () => {
     'empty'
   )
 
-  const UsageSection = showHomepageUsageV2
-    ? ProjectUsageSectionV2
-    : ProjectUsageSectionV1
+  const UsageSection = showHomepageUsageV2 ? ProjectUsageSectionV2 : ProjectUsageSectionV1
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
