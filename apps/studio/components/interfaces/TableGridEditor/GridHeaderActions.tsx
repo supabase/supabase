@@ -45,6 +45,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
+import { ColumnVisibilityDropdown } from 'components/grid/components/header/ColumnVisibilityDropdown'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
@@ -555,6 +556,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
+          <ColumnVisibilityDropdown />
 
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
 

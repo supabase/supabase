@@ -181,12 +181,14 @@ export function saveTableEditorStateToLocalStorage({
   gridColumns,
   sorts,
   filters,
+  columnVisibility,
 }: {
   projectRef: string
   tableId: number
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
+  columnVisibility?: Record<string, boolean>
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
@@ -195,6 +197,7 @@ export function saveTableEditorStateToLocalStorage({
     ...(gridColumns !== undefined && { gridColumns }),
     ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
     ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
+    ...(columnVisibility !== undefined && { columnVisibility }),
   }
 
   let savedJson

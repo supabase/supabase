@@ -121,6 +121,10 @@ export const createTableEditorTableState = ({
       }
       state.gridColumns.sort((a, b) => a.idx - b.idx)
     },
+    columnVisibility: (savedState?.columnVisibility ?? {}) as Record<string, boolean>,
+    setColumnVisibility: (visibility: Record<string, boolean>) => {
+      state.columnVisibility = visibility
+    },
 
     /* Cells */
     selectedCellPosition: null as { idx: number; rowIdx: number } | null,
@@ -204,6 +208,7 @@ export const TableEditorTableStateContextProvider = ({
       return subscribe(state, () => {
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
+          columnVisibility: state.columnVisibility,
           projectRef,
           tableId: state.table.id,
         })

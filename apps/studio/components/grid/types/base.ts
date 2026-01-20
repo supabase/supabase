@@ -5,6 +5,7 @@ export interface SavedState {
   filters?: string[]
   sorts?: string[]
   gridColumns: CalculatedColumn<any, any>[]
+  columnVisibility?: Record<string, boolean>
 }
 
 export interface DragItem {

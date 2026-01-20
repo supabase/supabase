@@ -78,6 +78,16 @@ export const Grid = memo(
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
 
+      // Filter columns based on visibility
+      const visibleColumns = snap.gridColumns.filter((col) => {
+        // Always show select column and add column
+        if (col.key === 'supabase-grid-select-row' || col.key === 'supabase-grid-add-column') {
+          return true
+        }
+        // Show column if visibility is not explicitly set to false
+        return snap.columnVisibility?.[col.key as string] !== false
+      })
+
       const { mutate: sendEvent } = useSendEventMutation()
 
       const {
@@ -245,7 +255,7 @@ export const Grid = memo(
             ref={ref}
             className={`${gridClass} flex-grow`}
             rowClass={rowClass}
-            columns={snap.gridColumns as CalculatedColumn<any, any>[]}
+            columns={visibleColumns as CalculatedColumn<any, any>[]}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
             rowKeyGetter={rowKeyGetter}
