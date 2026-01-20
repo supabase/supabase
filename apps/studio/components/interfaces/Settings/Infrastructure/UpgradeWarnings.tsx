@@ -114,9 +114,11 @@ const ValidationErrorItem = ({
         return error.obj_type === 'function'
           ? `/project/${projectRef}/database/functions?schema=${error.schema_name}&search=${error.obj_name}`
           : `/project/${projectRef}/editor?schema=${error.schema_name}`
-      case 'objects_depending_on_pg_cron':
-      case 'unsupported_fdw_handler':
       case 'active_replication_slot':
+        return `/project/${projectRef}/database/replication`
+      case 'unsupported_fdw_handler':
+        return `/project/${projectRef}/integrations`
+      case 'objects_depending_on_pg_cron':
         return null
       default:
         return null
