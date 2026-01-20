@@ -171,7 +171,7 @@ export const EdgeFunctionDetails = () => {
   return (
     <PageContainer size="full">
       <PageSection orientation="horizontal">
-        <PageSectionSummary className="gap-6">
+        <PageSectionSummary className="gap-6 !self-start">
           <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (

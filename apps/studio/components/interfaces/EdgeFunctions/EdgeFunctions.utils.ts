@@ -1,15 +1,15 @@
 import { common, dirname, relative } from '@std/path/posix'
 
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
-import { EdgeFunctionFile } from './EdgeFunction.types'
 
-export const getFallbackImportMapPath = (files: Omit<EdgeFunctionFile, 'id' | 'content'>[]) => {
+export const getFallbackImportMapPath = (files: Omit<FileData, 'id' | 'content'>[]) => {
   // try to find a deno.json or import_map.json file
   const regex = /^.*?(deno|import_map).json*$/i
   return files.find(({ name }) => regex.test(name))?.name
 }
 
-export const getFallbackEntrypointPath = (files: Omit<EdgeFunctionFile, 'id' | 'content'>[]) => {
+export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content'>[]) => {
   // when there's no matching entrypoint path is set,
   // we use few heuristics to find an entrypoint file
   // 1. If the function has only a single TS / JS file, if so set it as entrypoint
@@ -31,7 +31,7 @@ export const getFallbackEntrypointPath = (files: Omit<EdgeFunctionFile, 'id' | '
   }
 }
 
-export const getStaticPatterns = (files: Omit<EdgeFunctionFile, 'id' | 'content'>[]) => {
+export const getStaticPatterns = (files: Omit<FileData, 'id' | 'content'>[]) => {
   return files
     .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json|wasm)$/i))
     .map(({ name }) => name)
@@ -63,7 +63,7 @@ export const formatFunctionBodyToFiles = ({
 }: {
   functionBody: EdgeFunctionBodyData
   entrypointPath?: string
-  files: EdgeFunctionFile[]
+  files: FileData[]
 }) => {
   const entrypoint_path = functionBody.metadata?.deno2_entrypoint_path ?? entrypointPath
 
@@ -101,41 +101,10 @@ export const formatFunctionBodyToFiles = ({
         name: file.name,
         content: file.content,
         selected: prevState?.selected ?? index === 0,
-      }
+        state: 'unchanged',
+      } as FileData
     })
   }
 
   return []
-}
-
-/**
- * Checks up to 2 levels deep (as a best check, not perfect) if
- * 1. Mentioned in index.ts
- * 2. Any file that's imported by index.ts imports this file
- */
-export const checkUnimportedFiles = (files: EdgeFunctionFile[]): string[] => {
-  const indexFile = files.find((file) => file.name === 'index.ts')
-  if (!indexFile || files.length <= 1) {
-    return []
-  }
-
-  const unimportedFiles: string[] = []
-
-  files.forEach((file) => {
-    if (file.name === 'index.ts') return
-
-    const fileNameWithoutExt = file.name.replace('.ts', '')
-    if (indexFile.content.includes(fileNameWithoutExt)) return
-
-    const level1Files = files.filter((f) => {
-      if (f.name === 'index.ts' || f.name === file.name) return false
-      return indexFile.content.includes(f.name.replace('.ts', ''))
-    })
-
-    const isImportedAtLevel2 = level1Files.some((f) => f.content.includes(fileNameWithoutExt))
-
-    if (!isImportedAtLevel2) unimportedFiles.push(file.name)
-  })
-
-  return unimportedFiles
 }

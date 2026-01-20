@@ -6,16 +6,20 @@ import { toast } from 'sonner'
 import { AIEditor } from 'components/ui/AIEditor'
 import {
   Button,
+  cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
   flattenTree,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   TreeView,
   TreeViewItem,
 } from 'ui'
-import { FileAction, type FileData } from './FileExplorerAndEditor.types'
+import { FileAction, TreeChildData, type FileData } from './FileExplorerAndEditor.types'
 import {
   extractZipFile,
   getFileAction,
@@ -52,7 +56,7 @@ export const FileExplorerAndEditor = ({
   const selectedFile = files.find((f) => f.selected) ?? files[0]
   const isExtractingZip = extractionProgress !== null
 
-  const [treeData, setTreeData] = useState({
+  const [treeData, setTreeData] = useState<{ name: string; children: TreeChildData[] }>({
     name: '',
     children: files.map((file) => ({
       id: file.id.toString(),
@@ -60,6 +64,7 @@ export const FileExplorerAndEditor = ({
       metadata: {
         isEditing: false,
         originalId: file.id,
+        state: file.state,
       },
     })),
   })
@@ -81,6 +86,7 @@ export const FileExplorerAndEditor = ({
         name: `file${newId}.ts`,
         content: '',
         selected: true,
+        state: 'new',
       },
     ])
   }
@@ -169,6 +175,7 @@ export const FileExplorerAndEditor = ({
             name: file.name,
             content: file.content,
             selected: false,
+            state: 'new',
           })
           extractedCount++
           break
@@ -218,6 +225,7 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: file.id === id,
           originalId: file.id,
+          state: 'new',
         },
       })),
     })
@@ -233,6 +241,7 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: false,
           originalId: file.id,
+          state: file.state,
         },
       })),
     })
@@ -326,6 +335,7 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: false,
           originalId: file.id,
+          state: file.state,
         },
       })),
     })
@@ -381,6 +391,8 @@ export const FileExplorerAndEditor = ({
                 typeof element.metadata?.originalId === 'number'
                   ? element.metadata.originalId
                   : null
+              const state = element.metadata?.state as FileData['state']
+              const isEditing = Boolean(element.metadata?.isEditing)
 
               return (
                 <ContextMenu_Shadcn_ modal={false}>
@@ -394,15 +406,24 @@ export const FileExplorerAndEditor = ({
                         level={level}
                         xPadding={16}
                         name={element.name}
+                        className={cn(
+                          isEditing
+                            ? ''
+                            : state === 'new'
+                              ? 'text-brand-600'
+                              : state === 'modified'
+                                ? 'text-code_block-2'
+                                : ''
+                        )}
                         icon={<File size={14} className="text-foreground-light shrink-0" />}
-                        isEditing={Boolean(element.metadata?.isEditing)}
+                        isEditing={isEditing}
                         onEditSubmit={(value) => {
                           if (originalId !== null) {
                             handleFileNameChange(originalId, value)
                           }
                         }}
                         onClick={() => {
-                          if (originalId !== null && !element.metadata?.isEditing) {
+                          if (originalId !== null && !isEditing) {
                             handleFileSelect(originalId)
                           }
                         }}
@@ -411,6 +432,18 @@ export const FileExplorerAndEditor = ({
                             handleStartRename(originalId)
                           }
                         }}
+                        actions={
+                          state !== 'unchanged' && (
+                            <div className="flex items-center justify-center w-3">
+                              <Tooltip>
+                                <TooltipTrigger>{state === 'new' ? 'U' : 'M'}</TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  {state === 'new' ? 'Unsaved' : 'Modified'}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          )
+                        }
                       />
                     </div>
                   </ContextMenuTrigger_Shadcn_>

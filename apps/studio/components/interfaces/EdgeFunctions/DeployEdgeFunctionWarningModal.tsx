@@ -5,7 +5,6 @@ interface DeployEdgeFunctionWarningModalProps {
   onCancel: () => void
   onConfirm: () => void
   isDeploying: boolean
-  unimportedFiles: string[]
 }
 
 export const DeployEdgeFunctionWarningModal = ({
@@ -13,7 +12,6 @@ export const DeployEdgeFunctionWarningModal = ({
   onCancel,
   onConfirm,
   isDeploying,
-  unimportedFiles,
 }: DeployEdgeFunctionWarningModalProps) => {
   return (
     <ConfirmationModal
@@ -26,19 +24,6 @@ export const DeployEdgeFunctionWarningModal = ({
       loading={isDeploying}
       onCancel={onCancel}
       onConfirm={onConfirm}
-      alert={
-        unimportedFiles.length > 0
-          ? {
-              title: 'Unimported files will not be deployed or saved',
-              description: (
-                <>
-                  Ensure that all files are imported through{' '}
-                  <code className="text-code-inline">index.ts</code>
-                </>
-              ),
-            }
-          : undefined
-      }
     >
       <p className="text-sm text-foreground-light">
         Deploying will immediately update your live Edge Function for this project and cannot be

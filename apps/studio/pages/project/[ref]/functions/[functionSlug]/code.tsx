@@ -4,13 +4,10 @@ import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import {
-  checkUnimportedFiles,
-  formatFunctionBodyToFiles,
-} from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -63,9 +60,8 @@ const CodePage = () => {
       refetchIntervalInBackground: false,
     }
   )
-  const [files, setFiles] = useState<EdgeFunctionFile[]>([])
+  const [files, setFiles] = useState<FileData[]>([])
 
-  const unimportedFiles = checkUnimportedFiles(files)
   const initialFiles = useMemo(() => {
     return !!functionBody
       ? formatFunctionBodyToFiles({
@@ -183,7 +179,18 @@ const CodePage = () => {
         <>
           <FileExplorerAndEditor
             files={files}
-            onFilesChange={setFiles}
+            onFilesChange={(files) => {
+              const formattedFiles: FileData[] = files.map((f) => {
+                const originalFile = initialFiles.find((x) => x.id === f.id)
+                if (!originalFile) {
+                  return f
+                } else if (originalFile.content !== f.content) {
+                  return { ...f, state: 'modified' }
+                }
+                return { ...f, state: 'unchanged' }
+              })
+              setFiles(formattedFiles)
+            }}
             aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
@@ -226,7 +233,6 @@ const CodePage = () => {
         onCancel={() => setShowDeployWarning(false)}
         onConfirm={handleDeployConfirm}
         isDeploying={isDeploying}
-        unimportedFiles={unimportedFiles}
       />
     </div>
   )

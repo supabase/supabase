@@ -7,10 +7,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { checkUnimportedFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import useLatest from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
-import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
@@ -110,12 +109,13 @@ const sanitizeFunctionName = (name: string): string => {
 // Type for the form values
 type FormValues = z.infer<typeof FormSchema>
 
-const INITIAL_FILES = [
+const INITIAL_FILES: FileData[] = [
   {
     id: 1,
     name: 'index.ts',
     selected: true,
     content: EDGE_FUNCTION_TEMPLATES[0].content,
+    state: 'new',
   },
 ]
 
@@ -129,14 +129,13 @@ const NewFunctionPage = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const [files, setFiles] = useState<EdgeFunctionFile[]>(INITIAL_FILES)
+  const [files, setFiles] = useState<FileData[]>(INITIAL_FILES)
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
   const [showWarning, setShowWarning] = useState(false)
 
   const hasUnsavedChanges = !isEqual(INITIAL_FILES, files)
-  const unimportedFiles = checkUnimportedFiles(files)
 
   const templates = useMemo(() => {
     if (showStripeExample) {
@@ -275,6 +274,7 @@ const NewFunctionPage = () => {
             name: 'index.ts',
             selected: true,
             content: templateMeta.content,
+            state: 'new',
           },
         ])
       }
@@ -422,13 +422,7 @@ const NewFunctionPage = () => {
             loading={isDeploying}
             size="medium"
             disabled={files.length === 0 || isDeploying}
-            onClick={() => {
-              if (unimportedFiles.length > 0) {
-                setShowWarning(true)
-              } else {
-                handleDeploy()
-              }
-            }}
+            onClick={handleDeploy}
           >
             Deploy function
           </Button>
