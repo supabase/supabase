@@ -183,14 +183,19 @@ export const FileExplorerAndEditor = ({
     if (replacedCount > 0) {
       messages.push(`Replaced ${replacedCount} existing file${replacedCount > 1 ? 's' : ''}`)
     }
+    const totalFilesProcessed = extractedCount + replacedCount
 
-    toast.success(
-      <div className="flex flex-col gap-y-1">
-        <p className="text-foreground">Successfully added dropped file(s)</p>
-        <p className="text-foreground-light">{messages.join(' • ')}</p>
-      </div>,
-      { duration: 5000 }
-    )
+    if (totalFilesProcessed > 0) {
+      toast.success(
+        <div className="flex flex-col gap-y-1">
+          <p className="text-foreground">
+            Successfully added dropped file{totalFilesProcessed > 1 ? 's' : ''}
+          </p>
+          <p className="text-foreground-light">{messages.join(', ')}.</p>
+        </div>,
+        { duration: 5000 }
+      )
+    }
 
     // Select the last added/modified file
     if (newFiles.length > 0) {
