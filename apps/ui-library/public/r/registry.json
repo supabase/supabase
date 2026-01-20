@@ -328,8 +328,7 @@
         "button",
         "card",
         "input",
-        "label",
-        "link"
+        "label"
       ],
       "dependencies": [
         "@supabase/ssr@latest",

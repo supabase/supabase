@@ -3,7 +3,7 @@
   "type": "registry:block",
   "title": "Passwordless Auth for Next.js and Supabase",
   "description": "Passwordless authentication for Next.js using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods.",
-  "registryDependencies": ["button", "card", "input", "label", "link"],
+  "registryDependencies": ["button", "card", "input", "label"],
   "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
   "files": [
     {
