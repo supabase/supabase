@@ -159,7 +159,6 @@ allow_list = [
     "CAPTCHA",
     "Cartes Bancaires",
     "ChatGPT",
-    "checkmark",
     "Citus",
     "ClickHouse",
     "Clippy",
