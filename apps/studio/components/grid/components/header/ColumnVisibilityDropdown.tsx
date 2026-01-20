@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import type { XYCoord } from 'dnd-core'
 import { Eye, EyeOff, GripVertical, Search } from 'lucide-react'
@@ -11,7 +11,7 @@ import {
   cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { useTableEditorTableStateSnapshot, TableEditorTableStateContext } from 'state/table-editor-table'
 
 interface DragItem {
   key: string
@@ -106,6 +106,7 @@ const ColumnItem = ({ column, index, moveColumn, toggleVisibility }: ColumnItemP
 }
 
 export const ColumnVisibilityDropdown = () => {
+  const state = useContext(TableEditorTableStateContext)
   const snap = useTableEditorTableStateSnapshot()
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -157,27 +158,35 @@ export const ColumnVisibilityDropdown = () => {
   }
 
   const handleApply = () => {
-    // Update column order
-    const orderedKeys = localColumns.map((col) => col.key)
-    orderedKeys.forEach((key, index) => {
-      const gridColumnIndex = snap.gridColumns.findIndex((col) => col.key === key)
-      if (gridColumnIndex !== -1) {
-        const targetIndex = index + 1 // +1 to account for select column
-        if (gridColumnIndex !== targetIndex) {
-          const toKey = snap.gridColumns[targetIndex]?.key
-          if (toKey) {
-            snap.moveColumn(key, toKey as string)
-          }
-        }
-      }
-    })
-
     // Update visibility
     const visibility: Record<string, boolean> = {}
     localColumns.forEach((col) => {
       visibility[col.key] = col.visible
     })
-    snap.setColumnVisibility(visibility)
+    state.setColumnVisibility(visibility)
+
+    // Update column order by reconstructing the gridColumns array
+    const selectColumn = state.gridColumns.find(col => col.key === 'supabase-grid-select-row')
+    const addColumn = state.gridColumns.find(col => col.key === 'supabase-grid-add-column')
+
+    // Create a map of key to column for quick lookup
+    const columnMap = new Map(
+      state.gridColumns.map(col => [col.key, col])
+    )
+
+    // Reorder: [selectColumn, ...ordered data columns, addColumn (if exists)]
+    const orderedColumns = localColumns
+      .map(col => columnMap.get(col.key))
+      .filter(Boolean)
+
+    const newGridColumns = [
+      ...(selectColumn ? [selectColumn] : []),
+      ...orderedColumns,
+      ...(addColumn ? [addColumn] : [])
+    ]
+
+    // Replace the entire array
+    state.gridColumns.splice(0, state.gridColumns.length, ...newGridColumns as any)
 
     setOpen(false)
   }
@@ -190,7 +199,6 @@ export const ColumnVisibilityDropdown = () => {
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
-        portal
         className="w-[320px] p-0"
         align="end"
         side="bottom"
