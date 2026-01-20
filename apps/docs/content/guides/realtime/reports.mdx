@@ -5,28 +5,37 @@ description: 'Reports to help debug Realtime issues'
 
 {/* supa-mdx-lint-disable Rule001HeadingCase */}
 
-{/* Introduction. What does this collection of reports show people? */}
+Realtime reports give insights into how your application uses Supabase Realtime, including connections, broadcast and change events, execution times, and lag.
 
-The Realtime reports show….
+These reports help you:
 
-{/* Overview. For reports section with multiple reports, provide an internally linked overview of each report, plus the price tiers it's available on. */}
+- Monitor connection counts and message volumes against your plan's quotas
+- Identify performance bottlenecks in RLS policies or database replication
+- Troubleshoot errors and connection issues
+- Plan capacity upgrades based on usage trends
+
+<Admonition type="tip">
+
+Access Realtime reports from **[Project Settings > Product Reports > Realtime](/dashboard/project/_/observability/realtime)** in your project dashboard.
+
+</Admonition>
 
 ## Realtime reports overview
 
-| Report                                                 | Available Plans       | Description                                                                          | Key Insights                                                                  |
-| ------------------------------------------------------ | --------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| Connected Clients                                      | All                   | Number of connected clients                                                          | Total number of connected clients                                             |
-| Broadcast Events                                       | All                   | Number of broadcast events                                                           | Broadcast events sent by clients                                              |
-| Presence Events                                        | All                   | Number of presence events                                                            | Presence events sent by clients                                               |
-| Postgres Changes Events                                | All                   | Number of Postgres changes events                                                    | Postgres changes events received by clients                                   |
-| Rate of Channel Joins                                  | All                   | Rate of channel joins                                                                | Rate of change of users joining channels                                      |
-| Message Payload Size                                   | All                   | Median size of message payloads sent                                                 | Understand the payload sizes sent and received by clients                     |
-| Broadcast from Database Replication Lag                | Pro, Team, Enterprise | Median time between database commit and broadcast when using broadcast from database | Time taken from database change received and when it was broadcast to clients |
-| (Read)Private Channel Subscription RLS Execution Time  | Pro, Team, Enterprise | Execution median time of RLS (Row Level Security) to subscribe to a private channel  | RLS policy impact on time to validate if user can join private channel        |
-| (Write)Private Channel Subscription RLS Execution Time | Pro, Team, Enterprise | Execution median time of RLS (Row Level Security) to publish to a private channel    | RLS policy impact on time to validate if user can write to private channel    |
-| Total Requests                                         | All                   | Total requests                                                                       | Total requests made to the Realtime API                                       |
-| Response Errors                                        | All                   | Response errors                                                                      | Response errors from the Realtime API                                         |
-| Response Speed                                         | All                   | Response speed                                                                       | Average response time from the Realtime API                                   |
+| Report                                                                                        | Available Plans       | Description                                                                          | Key Insights                                                                  |
+| --------------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| [Connected Clients](#connected-clients)                                                       | All                   | Number of connected clients                                                          | Total number of connected clients                                             |
+| [Broadcast Events](#broadcast-events)                                                         | All                   | Number of broadcast events                                                           | Broadcast events sent by clients                                              |
+| [Presence Events](#presence-events)                                                           | All                   | Number of presence events                                                            | Presence events sent by clients                                               |
+| [Postgres Changes Events](#postgres-changes-events)                                           | All                   | Number of Postgres changes events                                                    | Postgres changes events received by clients                                   |
+| [Rate of Channel Joins](#rate-of-channel-joins)                                               | All                   | Rate of channel joins                                                                | Rate of change of users joining channels                                      |
+| [Message Payload Size](#message-payload-size)                                                 | All                   | Median size of message payloads sent                                                 | Understand the payload sizes sent and received by clients                     |
+| [Broadcast from Database Replication Lag](#broadcast-from-database-replication-lag)           | Pro, Team, Enterprise | Median time between database commit and broadcast when using broadcast from database | Time taken from database change received and when it was broadcast to clients |
+| [(Read) Private Channel Subscription RLS Execution Time](#read-private-channel-subscription-rls-execution-time)   | Pro, Team, Enterprise | Execution median time of RLS (Row Level Security) to subscribe to a private channel  | RLS policy impact on time to validate if user can join private channel        |
+| [(Write) Private Channel Subscription RLS Execution Time](#write-private-channel-subscription-rls-execution-time) | Pro, Team, Enterprise | Execution median time of RLS (Row Level Security) to publish to a private channel    | RLS policy impact on time to validate if user can write to private channel    |
+| [Total Requests](#total-requests)                                                             | All                   | Total requests                                                                       | Total requests made to the Realtime API                                       |
+| [Response Errors](#response-errors)                                                           | All                   | Response errors                                                                      | Response errors from the Realtime API                                         |
+| [Response Speed](#response-speed)                                                             | All                   | Response speed                                                                       | Average response time from the Realtime API                                   |
 
 ## Connected Clients
 
