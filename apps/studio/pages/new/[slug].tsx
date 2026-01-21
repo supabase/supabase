@@ -139,10 +139,9 @@ const Wizard: NextPageWithLayout = () => {
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
 
-  const shouldCheckFreeProjectLimit = !!currentOrg && !!slug
   const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
     { slug },
-    { enabled: shouldCheckFreeProjectLimit }
+    { enabled: isFreePlan }
   )
   const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
   const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
@@ -309,11 +308,11 @@ const Wizard: NextPageWithLayout = () => {
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
+      dataApiUseApiSchema: false,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(enableRlsEventTrigger ? { dbSql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } : {}),
-      ...(dataApi ? { dataApiUseApiSchema: false } : {}),
     }
 
     if (postgresVersion) {
