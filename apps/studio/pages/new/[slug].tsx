@@ -452,11 +452,11 @@ const Wizard: NextPageWithLayout = () => {
                         title="Need a free project?"
                         description={
                           <p>
-                            Supabase billing is organization-based. Get 2 free projects by{' '}
+                            You can have up to 2 free projects across all organizations.{' '}
                             <Link className="underline text-foreground" href="/new">
-                              creating a free organization
-                            </Link>
-                            .
+                              Create a free organization
+                            </Link>{' '}
+                            to use them.
                           </p>
                         }
                       />
