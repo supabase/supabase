@@ -24,6 +24,8 @@ export type InfraMonitoringAttribute =
   | 'realtime_sum_connections_connected'
   | 'realtime_replication_connection_lag'
   | 'physical_replication_lag_physical_replica_lag_seconds'
+  | 'disk_fs_used'
+  | 'disk_fs_size'
 
 export type InfraMonitoringSeriesMetadata = {
   yAxisLimit: number

@@ -193,6 +193,24 @@ const ComposedChartHandler = ({
           point[attr] = value
         })
 
+        // Calculate disk usage percentage for disk-usage-percent chart
+        // Only apply if format is '%' and both attributes are present
+        const hasDiskUsageAttrs =
+          attributes.some((attr) => attr?.attribute === 'disk_fs_used') &&
+          attributes.some((attr) => attr?.attribute === 'disk_fs_size')
+        if (
+          format === '%' &&
+          hasDiskUsageAttrs &&
+          typeof point.disk_fs_used === 'number' &&
+          typeof point.disk_fs_size === 'number'
+        ) {
+          if (point.disk_fs_size > 0) {
+            point.disk_fs_used = (point.disk_fs_used / point.disk_fs_size) * 100
+          } else {
+            point.disk_fs_used = 0
+          }
+        }
+
         const formattedDataPoint: DataPoint =
           !('period_start' in point) && 'timestamp' in point
             ? { ...point, period_start: dayjs.utc(point.timestamp).unix() * 1000 }
