@@ -8,6 +8,7 @@ import {
   ReportsNumericFilter,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { FilterInput } from './components/FilterInput'
+import { FilterPill } from './components/FilterPill'
 import { IndexAdvisorFilter } from './components/IndexAdvisorFilter'
 import { RolesFilterDropdown } from './components/RolesFilterDropdown'
 import { SortIndicator } from './components/SortIndicator'
@@ -83,40 +84,83 @@ export const QueryPerformanceFilterBar = ({
     setFilters({ roles: [] })
   }
 
+  const getCallsFilterDisplay = () => {
+    if (!callsFilter) return null
+    return `${callsFilter.operator} ${callsFilter.value}`
+  }
+
+  const getTotalTimeFilterDisplay = () => {
+    if (!totalTimeFilter) return null
+    return `${totalTimeFilter.operator} ${totalTimeFilter.value}`
+  }
+
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <FilterInput value={inputValue} onChange={setInputValue} />
 
-          <ReportsNumericFilter
-            label="Calls"
-            value={callsFilter}
-            onChange={(value) => setSearchParams({ callsFilter: value })}
-            operators={['=', '>=', '<=', '>', '<', '!=']}
-            defaultOperator=">="
-            placeholder="e.g. 100"
-            min={0}
-            className="w-auto"
-          />
-
-          <ReportsNumericFilter
-            label="Total Time"
-            value={totalTimeFilter}
-            onChange={(value) => setSearchParams({ totalTimeFilter: value })}
-            operators={['=', '>=', '<=', '>', '<', '!=']}
-            defaultOperator=">"
-            placeholder="e.g. 1000"
-            min={0}
-            className="w-auto"
-          />
-
-          {showRolesFilter && (
-            <RolesFilterDropdown
-              activeOptions={filters.roles}
-              onSaveFilters={onFilterRolesChange}
+          {callsFilter ? (
+            <FilterPill
+              label="Calls"
+              value={getCallsFilterDisplay() || ''}
+              onClear={(e) => {
+                e.stopPropagation()
+                setSearchParams({ callsFilter: null })
+              }}
+            />
+          ) : (
+            <ReportsNumericFilter
+              label="Calls"
+              value={callsFilter}
+              onChange={(value) => setSearchParams({ callsFilter: value })}
+              operators={['=', '>=', '<=', '>', '<', '!=']}
+              defaultOperator=">="
+              placeholder="e.g. 100"
+              min={0}
+              className="w-auto"
             />
           )}
+
+          {totalTimeFilter ? (
+            <FilterPill
+              label="Total Time"
+              value={getTotalTimeFilterDisplay() || ''}
+              onClear={(e) => {
+                e.stopPropagation()
+                setSearchParams({ totalTimeFilter: null })
+              }}
+            />
+          ) : (
+            <ReportsNumericFilter
+              label="Total Time"
+              value={totalTimeFilter}
+              onChange={(value) => setSearchParams({ totalTimeFilter: value })}
+              operators={['=', '>=', '<=', '>', '<', '!=']}
+              defaultOperator=">"
+              placeholder="e.g. 1000"
+              min={0}
+              className="w-auto"
+            />
+          )}
+
+          {showRolesFilter &&
+            (filters.roles && filters.roles.length > 0 ? (
+              <FilterPill
+                label="Roles"
+                value={filters.roles.join(', ')}
+                onClear={(e) => {
+                  e.stopPropagation()
+                  setFilters({ roles: [] })
+                  setSearchParams({ roles: [] })
+                }}
+              />
+            ) : (
+              <RolesFilterDropdown
+                activeOptions={filters.roles}
+                onSaveFilters={onFilterRolesChange}
+              />
+            ))}
 
           {isIndexAdvisorEnabled && (
             <IndexAdvisorFilter
@@ -124,8 +168,6 @@ export const QueryPerformanceFilterBar = ({
               onToggle={onIndexAdvisorToggle}
             />
           )}
-
-          {sort && <SortIndicator sort={sort} onClearSort={clearSort} />}
 
           {hasActiveFilters && (
             <ButtonTooltip
@@ -142,6 +184,8 @@ export const QueryPerformanceFilterBar = ({
               }}
             />
           )}
+
+          {sort && <SortIndicator sort={sort} onClearSort={clearSort} />}
         </div>
       </div>
       <div className="flex gap-2 items-center pl-2">{actions}</div>
