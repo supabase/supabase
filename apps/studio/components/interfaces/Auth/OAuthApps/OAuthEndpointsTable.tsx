@@ -23,11 +23,13 @@ interface OAuthEndpointsTableProps {
    * External loading state passed from parent (e.g., when auth config is still loading)
    */
   isLoading?: boolean
+  className?: string
 }
 
 export const OAuthEndpointsTable = ({
   isPreview = false,
   isLoading: isLoadingProp = false,
+  className,
 }: OAuthEndpointsTableProps) => {
   const { ref: projectRef } = useParams()
 
@@ -60,7 +62,7 @@ export const OAuthEndpointsTable = ({
   ]
 
   return (
-    <PageSection className={cn(isPreview && 'opacity-60 pointer-events-none')}>
+    <PageSection className={cn(isPreview && 'opacity-60 pointer-events-none', className)}>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>OAuth Endpoints</PageSectionTitle>

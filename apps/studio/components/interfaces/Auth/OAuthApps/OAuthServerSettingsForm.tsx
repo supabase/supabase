@@ -20,6 +20,7 @@ import {
   Card,
   CardContent,
   CardFooter,
+  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -357,7 +358,13 @@ export const OAuthServerSettingsForm = () => {
         </PageSectionContent>
       </PageSection>
       {(form.watch('OAUTH_SERVER_ENABLED') || authConfig?.OAUTH_SERVER_ENABLED) && (
-        <OAuthEndpointsTable isPreview={!authConfig?.OAUTH_SERVER_ENABLED} isLoading={isPending} />
+        <OAuthEndpointsTable
+          isPreview={!authConfig?.OAUTH_SERVER_ENABLED}
+          isLoading={isPending}
+          className={cn(
+            !form.watch('OAUTH_SERVER_ENABLED') && authConfig?.OAUTH_SERVER_ENABLED && 'opacity-60'
+          )}
+        />
       )}
 
       {/* Dynamic Apps Confirmation Modal */}
