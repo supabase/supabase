@@ -108,12 +108,15 @@ const ValidationErrorItem = ({
       case 'unsupported_extension':
         return `/project/${projectRef}/database/extensions?filter=${error.extension_name}`
       case 'indexes_referencing_ll_to_earth':
+        return `/project/${projectRef}/database/indexes?search=${error.index_name}&schema=${error.schema_name}`
       case 'unlogged_table_with_persistent_sequence':
-        return `/project/${projectRef}/editor?schema=${error.schema_name}`
+        return `/project/${projectRef}/database/tables?schema=${error.schema_name}`
       case 'user_defined_objects_in_internal_schemas':
         return error.obj_type === 'function'
           ? `/project/${projectRef}/database/functions?schema=${error.schema_name}&search=${error.obj_name}`
-          : `/project/${projectRef}/editor?schema=${error.schema_name}`
+          : error.obj_type === 'table'
+            ? `/project/${projectRef}/database/tables?schema=${error.schema_name}`
+            : `/project/${projectRef}/editor?schema=${error.schema_name}`
       case 'active_replication_slot':
         return `/project/${projectRef}/database/replication`
       case 'unsupported_fdw_handler':
