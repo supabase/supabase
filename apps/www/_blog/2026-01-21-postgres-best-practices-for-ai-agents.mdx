@@ -14,7 +14,7 @@ date: '2026-01-21'
 toc_depth: 2
 ---
 
-Today, we are releasing a series of Agent Skills for [Postgres Best Practices](https://github.com/supabase/agent-skills) to teach AI agents how to write better Postgres code. AI coding agents are good at writing code. They struggle with writing *correct* code for systems they don't understand.
+Today, we are releasing a series of Agent Skills for [Postgres Best Practices](https://github.com/supabase/agent-skills) to teach AI agents how to write better Postgres code. AI coding agents are good at writing code. They struggle with writing _correct_ code for systems they don't understand.
 
 Postgres is one of those systems. It has decades of features, edge cases, and performance characteristics that matter in production. An agent might generate a query that works but creates a full table scan. It might suggest an index that makes writes slower. It might miss Row Level Security entirely.
 
@@ -114,7 +114,7 @@ Our support team, database advisors, and documentation already contain this know
 
 If you've used the [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp), you know it lets AI agents connect directly to your Supabase project. Agents can create tables, run queries, manage schemas, and configure settings through natural language.
 
-The MCP server gives agents the *ability* to work with your database. These best practices teach them to do it *correctly*.
+The MCP server gives agents the _ability_ to work with your database. These best practices teach them to do it _correctly_.
 
 Think of it this way: the MCP server is the steering wheel, and the best practices are the driving lessons. An agent with MCP access can execute any query you ask for. An agent with both MCP access and these rules will warn you before creating an index that locks your table, suggest RLS policies before you ship insecure code, and structure queries to avoid performance problems.
 
