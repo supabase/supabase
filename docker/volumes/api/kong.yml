@@ -62,6 +62,33 @@ services:
           - /auth/v1/authorize
     plugins:
       - name: cors
+  - name: auth-v1-open-token
+    url: http://auth:9999/token
+    routes:
+      - name: auth-v1-open-token
+        strip_path: true
+        paths:
+          - /auth/v1/token
+    plugins:
+      - name: cors
+  - name: auth-v1-open-user
+    url: http://auth:9999/user
+    routes:
+      - name: auth-v1-open-user
+        strip_path: true
+        paths:
+          - /auth/v1/user
+    plugins:
+      - name: cors
+  - name: auth-v1-open-logout
+    url: http://auth:9999/logout
+    routes:
+      - name: auth-v1-open-logout
+        strip_path: true
+        paths:
+          - /auth/v1/logout
+    plugins:
+      - name: cors
 
   ## Secure Auth routes
   - name: auth-v1
@@ -278,6 +305,7 @@ services:
           - /
     plugins:
       - name: cors
-      - name: basic-auth
-        config:
-          hide_credentials: true
+      # Uncomment to use Kong basic-auth instead of Supabase Auth (GoTrue)
+      # - name: basic-auth
+      #   config:
+      #     hide_credentials: true

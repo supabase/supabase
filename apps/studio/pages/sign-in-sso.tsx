@@ -1,11 +1,23 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import { SignInSSOForm } from 'components/interfaces/SignIn/SignInSSOForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const SignInSSOPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const signInWithSSOEnabled = useIsFeatureEnabled('dashboard_auth:sign_in_with_sso')
+
+  useEffect(() => {
+    // SSO is platform-only feature
+    if (!IS_PLATFORM) {
+      router.replace('/project/default')
+    }
+  }, [router])
 
   if (!signInWithSSOEnabled) {
     return <UnknownInterface fullHeight={false} urlBack="/sign-in" />

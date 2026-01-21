@@ -1,10 +1,12 @@
 import type { JwtPayload } from '@supabase/supabase-js'
 import { type User } from 'common/auth'
 import { gotrueClient } from 'common/gotrue'
+import { IS_PLATFORM } from './constants'
 
 export const auth = gotrueClient
 
-export const DEFAULT_FALLBACK_PATH = '/organizations'
+// Use /project/default for self-hosted, /organizations for platform
+export const DEFAULT_FALLBACK_PATH = IS_PLATFORM ? '/organizations' : '/project/default'
 
 export const validateReturnTo = (
   returnTo: string,

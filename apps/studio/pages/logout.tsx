@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { useSignOut } from 'lib/auth'
+import { IS_PLATFORM, STUDIO_AUTH_ENABLED } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 
@@ -14,7 +15,9 @@ const LogoutPage: NextPageWithLayout = () => {
     const logout = async () => {
       await signOut()
       toast('Successfully logged out')
-      await router.push('/sign-in')
+      // Redirect to sign-in if using real auth, otherwise to project page
+      const redirectPath = IS_PLATFORM || STUDIO_AUTH_ENABLED ? '/sign-in' : '/project/default'
+      await router.push(redirectPath)
     }
     logout()
   }, [])

@@ -10,7 +10,7 @@ import {
   useAuthError,
 } from 'common'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
+import { GOTRUE_ERRORS, IS_PLATFORM, STUDIO_AUTH_ENABLED } from './constants'
 
 const AuthErrorToaster = ({ children }: PropsWithChildren) => {
   const error = useAuthError()
@@ -33,8 +33,11 @@ const AuthErrorToaster = ({ children }: PropsWithChildren) => {
 }
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
+  // Use real auth if platform OR if studio auth mode is enabled for self-hosted
+  const useRealAuth = IS_PLATFORM || STUDIO_AUTH_ENABLED
+
   return (
-    <AuthProviderInternal alwaysLoggedIn={!IS_PLATFORM}>
+    <AuthProviderInternal alwaysLoggedIn={!useRealAuth}>
       <AuthErrorToaster>{children}</AuthErrorToaster>
     </AuthProviderInternal>
   )

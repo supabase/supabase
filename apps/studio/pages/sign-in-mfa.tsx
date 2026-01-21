@@ -10,6 +10,7 @@ import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
+import { IS_PLATFORM } from 'lib/constants'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
@@ -54,14 +55,16 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({
-              action: 'sign_in',
-              properties: {
-                category: 'account',
-                method: signInMethodRef.current,
-              },
-            })
-            addLoginEvent({})
+            if (IS_PLATFORM) {
+              sendEvent({
+                action: 'sign_in',
+                properties: {
+                  category: 'account',
+                  method: signInMethodRef.current,
+                },
+              })
+              addLoginEvent({})
+            }
 
             await queryClient.resetQueries()
             router.push(getReturnToPath())

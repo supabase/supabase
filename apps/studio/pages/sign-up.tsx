@@ -1,17 +1,29 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import { SignInWithGitHub } from 'components/interfaces/SignIn/SignInWithGitHub'
 import { SignUpForm } from 'components/interfaces/SignIn/SignUpForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const SignUpPage: NextPageWithLayout = () => {
+  const router = useRouter()
+
   const {
     dashboardAuthSignUp: signUpEnabled,
     dashboardAuthSignInWithGithub: signInWithGithubEnabled,
   } = useIsFeatureEnabled(['dashboard_auth:sign_up', 'dashboard_auth:sign_in_with_github'])
+
+  useEffect(() => {
+    // No self-service signup for self-hosted - users must be added manually
+    if (!IS_PLATFORM) {
+      router.replace('/project/default')
+    }
+  }, [router])
 
   if (!signUpEnabled) {
     return <UnknownInterface fullHeight={false} urlBack="/sign-in" />

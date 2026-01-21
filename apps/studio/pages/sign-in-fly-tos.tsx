@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { useIsLoggedIn } from 'common'
 import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
 import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
-import { API_URL, BASE_PATH } from 'lib/constants'
+import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { Button } from 'ui'
 
 const SignInFlyTos = () => {
@@ -18,6 +18,13 @@ const SignInFlyTos = () => {
     isReady,
     query: { fly_extension_id, fly_organization_id },
   } = router
+
+  useEffect(() => {
+    // Fly.io integration is platform-only feature
+    if (!IS_PLATFORM) {
+      router.replace('/project/default')
+    }
+  }, [router])
   const { resolvedTheme } = useTheme()
   const { mutateAsync: getProjectByFlyExtensionId } = useProjectByFlyExtensionIdMutation({
     onSuccess: (res) => {

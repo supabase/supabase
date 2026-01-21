@@ -11,7 +11,7 @@ import { AuthenticationLayout } from 'components/layouts/AuthenticationLayout'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, STUDIO_AUTH_ENABLED } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
@@ -38,8 +38,8 @@ const SignInPage: NextPageWithLayout = () => {
     (signInWithGithubEnabled || signInWithSsoEnabled || customProvider) && signInWithEmailEnabled
 
   useEffect(() => {
-    if (!IS_PLATFORM) {
-      // on selfhosted instance just redirect to projects page
+    // Redirect to projects page on self-hosted unless studio auth mode is enabled
+    if (!IS_PLATFORM && !STUDIO_AUTH_ENABLED) {
       router.replace('/project/default')
     }
   }, [router])
@@ -83,10 +83,11 @@ const SignInPage: NextPageWithLayout = () => {
         {signInWithEmailEnabled && <SignInForm />}
       </div>
 
-      {signUpEnabled && (
+      {/* Hide signup link for self-hosted - users must be added manually */}
+      {IS_PLATFORM && signUpEnabled && (
         <div className="self-center my-8 text-sm">
           <div>
-            <span className="text-foreground-light">Don’t have an account?</span>{' '}
+            <span className="text-foreground-light">Don't have an account?</span>{' '}
             <Link
               href={{
                 pathname: '/sign-up',

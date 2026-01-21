@@ -51,6 +51,9 @@ CMD ["pnpm", "dev:studio"]
 # Compile Next.js
 FROM dev AS builder
 
+ARG NEXT_PUBLIC_STUDIO_AUTH_MODE
+ENV NEXT_PUBLIC_STUDIO_AUTH_MODE=$NEXT_PUBLIC_STUDIO_AUTH_MODE
+
 RUN pnpm --filter studio exec next build
 
 # Copy only compiled code and dependencies

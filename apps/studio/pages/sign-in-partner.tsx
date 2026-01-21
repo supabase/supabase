@@ -1,9 +1,22 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import { SignInPartner } from 'components/interfaces/SignIn/SignInPartner'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
 
 const SignInPartnerPage: NextPageWithLayout = () => {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Partner sign-in is platform-only feature
+    if (!IS_PLATFORM) {
+      router.replace('/project/default')
+    }
+  }, [router])
+
   return <SignInPartner />
 }
 

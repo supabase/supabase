@@ -13,6 +13,7 @@ import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { IS_PLATFORM } from 'lib/constants'
 import { captureCriticalError } from 'lib/error-reporting'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
@@ -86,15 +87,18 @@ export const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({
-          action: 'sign_in',
-          properties: { category: 'account', method: 'email' },
-        })
-        addLoginEvent({})
+        if (IS_PLATFORM) {
+          sendEvent({
+            action: 'sign_in',
+            properties: { category: 'account', method: 'email' },
+          })
+          addLoginEvent({})
+        }
 
         await queryClient.resetQueries()
         // since we're already on the /sign-in page, prevent redirect loops
-        let redirectPath = '/organizations'
+        // Use /project/default for self-hosted, /organizations for platform
+        let redirectPath = IS_PLATFORM ? '/organizations' : '/project/default'
         if (returnTo && returnTo !== '/sign-in') {
           redirectPath = returnTo
         }
@@ -175,12 +179,15 @@ export const SignInForm = () => {
           />
 
           {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
-          <Link
-            href={forgotPasswordUrl}
-            className="absolute top-0 right-0 text-sm text-foreground-lighter"
-          >
-            Forgot password?
-          </Link>
+          {/* Hide forgot password link for self-hosted - users must be managed manually */}
+          {IS_PLATFORM && (
+            <Link
+              href={forgotPasswordUrl}
+              className="absolute top-0 right-0 text-sm text-foreground-lighter"
+            >
+              Forgot password?
+            </Link>
+          )}
         </div>
 
         <div className="self-center">

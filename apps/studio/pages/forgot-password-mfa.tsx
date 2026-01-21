@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { getAccessToken } from 'common'
 import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
+import { IS_PLATFORM } from 'lib/constants'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
@@ -16,6 +17,13 @@ const ForgotPasswordMfa: NextPageWithLayout = () => {
   const queryClient = useQueryClient()
 
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Forgot password flow is disabled for self-hosted
+    if (!IS_PLATFORM) {
+      router.replace('/project/default')
+    }
+  }, [router])
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {

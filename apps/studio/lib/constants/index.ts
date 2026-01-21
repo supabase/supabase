@@ -3,6 +3,7 @@
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+export const STUDIO_AUTH_ENABLED = process.env.NEXT_PUBLIC_STUDIO_AUTH_MODE === 'supabase'
 
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
