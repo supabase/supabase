@@ -47,8 +47,10 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     return (
       <Button
         ref={ref}
-        onClick={async (e) => {
-          const textToCopy = asyncText ? await asyncText() : text
+        onClick={(e) => {
+          // [Joshen] Don't await asyncText - pass the promise directly to copyToClipboard
+          // so Safari can create the ClipboardItem synchronously in the user gesture context
+          const textToCopy = asyncText ? asyncText() : text
           setShowCopied(true)
           copyToClipboard(textToCopy)
           onClick?.(e)
