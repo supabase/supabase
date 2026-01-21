@@ -45,12 +45,12 @@ const ReplicationDiagramContent = () => {
               data: {},
               position: { x: 0, y: 0 },
             })),
-            // ...destinations.map((x) => ({
-            //   id: x.id.toString(),
-            //   type: 'replication',
-            //   data: {},
-            //   position: { x: 0, y: 0 },
-            // })),
+            ...destinations.map((x) => ({
+              id: x.id.toString(),
+              type: 'replication',
+              data: {},
+              position: { x: 0, y: 0 },
+            })),
           ]
         : []),
     ],
@@ -99,8 +99,6 @@ const ReplicationDiagramContent = () => {
     reactFlow.setNodes(graph.nodes)
     reactFlow.setEdges(graph.edges)
 
-    console.log(graph.nodes)
-
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
     reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
   }
@@ -110,7 +108,7 @@ const ReplicationDiagramContent = () => {
   }, [isDataLoaded])
 
   return (
-    <div className="nowheel relative min-h-[300px]">
+    <div className="nowheel relative min-h-[350px]">
       <ReactFlow
         fitView
         fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}

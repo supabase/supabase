@@ -3,7 +3,7 @@ import { Edge, Node, Position } from 'reactflow'
 import { NODE_WIDTH } from './Nodes'
 
 const NODE_SEP = 0
-const NODE_ROW_HEIGHT = 200
+const NODE_ROW_HEIGHT = 160
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
