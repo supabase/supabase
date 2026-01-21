@@ -109,7 +109,7 @@ const ValidationErrorItem = ({
       case 'unsupported_extension':
         return `/project/${projectRef}/database/extensions?filter=${encode(error.extension_name)}`
       case 'indexes_referencing_ll_to_earth':
-        return `/project/${projectRef}/database/indexes?search=${encode(error.index_name)}&schema=${encode(error.schema_name)}`
+        return `/project/${projectRef}/database/indexes?schema=${encode(error.schema_name)}&search=${encode(error.index_name)}`
       case 'unlogged_table_with_persistent_sequence':
         return `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.table_name)}`
       case 'user_defined_objects_in_internal_schemas':
