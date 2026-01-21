@@ -86,8 +86,16 @@ export const OAuthServerSettingsForm = () => {
   } = useAuthConfigQuery({ projectRef })
 
   const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success('OAuth server settings updated successfully')
+      form.reset({
+        OAUTH_SERVER_ENABLED: variables.config.OAUTH_SERVER_ENABLED ?? false,
+        OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:
+          variables.config.OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION ?? false,
+        OAUTH_SERVER_AUTHORIZATION_PATH:
+          variables.config.OAUTH_SERVER_AUTHORIZATION_PATH ?? '/oauth/consent',
+        availableScopes: ['openid', 'email', 'profile'],
+      })
     },
     onError: (error) => {
       toast.error(`Failed to update OAuth server settings: ${error?.message}`)
