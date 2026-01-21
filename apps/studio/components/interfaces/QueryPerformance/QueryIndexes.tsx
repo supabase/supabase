@@ -1,4 +1,4 @@
-import { Check, Table2, Lightbulb } from 'lucide-react'
+import { Check, Table2, Lightbulb, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
@@ -273,7 +273,17 @@ export const QueryIndexes = ({
               )}
               {isSuccessIndexAdvisorResult && (
                 <>
-                  {(index_statements ?? []).length === 0 ? (
+                  {indexAdvisorResult === null ? (
+                    <Alert_Shadcn_ className="[&>svg]:rounded-full">
+                      <X />
+                      <AlertTitle_Shadcn_>Index recommendations not available</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Index advisor could not analyze this query. This can happen if the query
+                        references tables, functions, or extensions that no longer exist or were
+                        deleted.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  ) : (index_statements ?? []).length === 0 ? (
                     <Alert_Shadcn_ className="[&>svg]:rounded-full">
                       <Check />
                       <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>
