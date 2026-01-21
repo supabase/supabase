@@ -1,8 +1,5 @@
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
-import { X } from 'lucide-react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ReactNode, useEffect, useState } from 'react'
 import {
   NumericFilter,
   ReportsNumericFilter,
@@ -75,27 +72,6 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInputValue])
 
-  const hasActiveFilters = useMemo(() => {
-    return (
-      (searchQuery && searchQuery.length > 0) ||
-      (defaultFilterRoles && defaultFilterRoles.length > 0) ||
-      callsFilter !== null ||
-      totalTimeFilter !== null ||
-      indexAdvisor === 'true'
-    )
-  }, [searchQuery, defaultFilterRoles, callsFilter, totalTimeFilter, indexAdvisor])
-
-  const handleClearAllFilters = () => {
-    setSearchParams({
-      search: '',
-      roles: [],
-      callsFilter: null,
-      totalTimeFilter: null,
-      indexAdvisor: 'false',
-    })
-    setInputValue('')
-    setFilters({ roles: [] })
-  }
 
   const getCallsFilterDisplay = () => {
     if (!callsFilter) return null
@@ -179,22 +155,6 @@ export const QueryPerformanceFilterBar = ({
             <IndexAdvisorFilter
               isActive={indexAdvisor === 'true'}
               onToggle={onIndexAdvisorToggle}
-            />
-          )}
-
-          {hasActiveFilters && (
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              icon={<X />}
-              onClick={handleClearAllFilters}
-              className="px-1"
-              tooltip={{
-                content: {
-                  side: 'top',
-                  text: 'Clear all filters',
-                },
-              }}
             />
           )}
 
