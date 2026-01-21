@@ -59,11 +59,9 @@ function getBasePath(entrypoint: string | undefined, fileNames: string[]): strin
 export const formatFunctionBodyToFiles = ({
   functionBody,
   entrypointPath,
-  files,
 }: {
   functionBody: EdgeFunctionBodyData
   entrypointPath?: string
-  files: FileData[]
 }) => {
   const entrypoint_path = functionBody.metadata?.deno2_entrypoint_path ?? entrypointPath
 
@@ -95,12 +93,10 @@ export const formatFunctionBodyToFiles = ({
       })
 
     return filesWithRelPath.map((file: { name: string; content: string }, index: number) => {
-      const prevState = files.find((x) => x.name === file.name)
       return {
         id: index + 1,
         name: file.name,
         content: file.content,
-        selected: prevState?.selected ?? index === 0,
         state: 'unchanged',
       } as FileData
     })

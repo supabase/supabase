@@ -105,7 +105,6 @@ const INITIAL_FILES: FileData[] = [
   {
     id: 1,
     name: 'index.ts',
-    selected: true,
     content: EDGE_FUNCTION_TEMPLATES[0].content,
     state: 'new',
   },
@@ -122,6 +121,7 @@ const NewFunctionPage = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const [files, setFiles] = useState<FileData[]>(INITIAL_FILES)
+  const [selectedFileId, setSelectedFileId] = useState<number>(INITIAL_FILES[0].id)
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
@@ -172,11 +172,12 @@ const NewFunctionPage = () => {
   }
 
   const handleChat = () => {
-    const selectedFile = files.find((f) => f.selected) ?? files[0]
+    const selectedFile = files.find((f) => f.id === selectedFileId)
+
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Explain edge function',
-      sqlSnippets: [selectedFile.content],
+      sqlSnippets: [selectedFile?.content ?? ''],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {
         title:
@@ -212,7 +213,9 @@ const NewFunctionPage = () => {
     const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.value === templateValue)
     if (template) {
       setFiles((prev) =>
-        prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
+        prev.map((file) =>
+          file.id === selectedFileId ? { ...file, content: template.content } : file
+        )
       )
       setOpen(false)
       sendEvent({
@@ -221,22 +224,23 @@ const NewFunctionPage = () => {
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
+    setIsPreviewingTemplate(false)
   }
 
   const handleTemplateMouseEnter = (content: string) => {
     if (!isPreviewingTemplate) {
-      const selectedFile = files.find((f) => f.selected) ?? files[0]
+      const selectedFile = files.find((f) => f.id === selectedFileId) ?? files[0]
       setSavedCode(selectedFile.content)
     }
     setIsPreviewingTemplate(true)
-    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content } : file)))
+    setFiles((prev) => prev.map((f) => (f.id === selectedFileId ? { ...f, content } : f)))
   }
 
   const handleTemplateMouseLeave = () => {
     if (isPreviewingTemplate) {
       setIsPreviewingTemplate(false)
       setFiles((prev) =>
-        prev.map((file) => (file.selected ? { ...file, content: savedCode } : file))
+        prev.map((f) => (f.id === selectedFileId ? { ...f, content: savedCode } : f))
       )
     }
   }
@@ -259,11 +263,11 @@ const NewFunctionPage = () => {
       const templateMeta = EDGE_FUNCTION_TEMPLATES.find((x) => x.value === template)
       if (templateMeta) {
         form.reset({ functionName: template })
+        setSelectedFileId(1)
         setFiles([
           {
             id: 1,
             name: 'index.ts',
-            selected: true,
             content: templateMeta.content,
             state: 'new',
           },
@@ -332,7 +336,7 @@ const NewFunctionPage = () => {
                             <Check
                               className={cn(
                                 'mr-2 h-4 w-4',
-                                files.some((f) => f.selected && f.content === template.content)
+                                files.some((f) => f.content === template.content)
                                   ? 'opacity-100'
                                   : 'opacity-0'
                               )}
@@ -370,6 +374,8 @@ const NewFunctionPage = () => {
           connectionString: project?.connectionString,
           orgSlug: org?.slug,
         }}
+        selectedFileId={selectedFileId}
+        setSelectedFileId={setSelectedFileId}
       />
 
       <Form_Shadcn_ {...form}>

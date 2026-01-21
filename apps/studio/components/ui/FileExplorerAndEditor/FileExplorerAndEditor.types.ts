@@ -2,7 +2,6 @@ export type FileData = {
   id: number
   name: string
   content: string
-  selected?: boolean
   state: 'new' | 'modified' | 'unchanged'
 }
 

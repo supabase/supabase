@@ -62,18 +62,15 @@ const CodePage = () => {
     }
   )
   const [files, setFiles] = useState<FileData[]>([])
-  console.log(files)
 
   const initialFiles = useMemo(() => {
     return !!functionBody
       ? formatFunctionBodyToFiles({
           functionBody,
           entrypointPath: selectedFunction?.entrypoint_path,
-          files,
         })
       : []
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessLoadingFiles])
+  }, [functionBody, selectedFunction?.entrypoint_path])
 
   const hasUnsavedChanges = !isEqual(initialFiles, files)
 
@@ -195,8 +192,9 @@ const CodePage = () => {
                 const originalFile = initialFiles.find((x) => x.id === f.id)
                 if (!originalFile) {
                   return f
+                } else if (originalFile.name !== f.name) {
+                  return { ...f, state: 'new' }
                 } else if (originalFile.content !== f.content) {
-                  console.log('checkss')
                   return { ...f, state: 'modified' }
                 }
                 return { ...f, state: 'unchanged' }
