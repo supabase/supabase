@@ -118,8 +118,8 @@ const ReplicationDiagramContent = () => {
   }
 
   useEffect(() => {
-    if (readReplicas.length > 0 || destinations.length > 0) setReactFlow()
-  }, [readReplicas, destinations])
+    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) setReactFlow()
+  }, [nodes, isSuccessDestinations, isSuccessReplicas])
 
   return (
     <div className="nowheel relative min-h-[350px]">
