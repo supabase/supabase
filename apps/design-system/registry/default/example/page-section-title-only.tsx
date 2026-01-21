@@ -20,7 +20,8 @@ export default function PageSectionTitleOnly() {
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-foreground-light">
-              PageSectionSummary should still be wrapped in PageSectionMeta, as the latter is a flex container that will allow the former to span its full width.
+                PageSectionSummary should still be wrapped in PageSectionMeta, as the latter is a
+                flex container that will allow the former to span its full width.
               </p>
             </CardContent>
           </Card>
