@@ -1647,8 +1647,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       cobe:
-        specifier: ^0.6.2
-        version: 0.6.3
+        specifier: ^0.6.5
+        version: 0.6.5
       common:
         specifier: workspace:*
         version: link:../../packages/common
@@ -10922,8 +10922,8 @@ packages:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  cobe@0.6.3:
-    resolution: {integrity: sha512-WHr7X4o1ym94GZ96h7b1pNemZJacbOzd02dZtnVwuC4oWBaLg96PBmp2rIS1SAhUDhhC/QyS9WEqkpZIs/ZBTg==}
+  cobe@0.6.5:
+    resolution: {integrity: sha512-MA8bu81EFY6JjQpj+FovEuhyJ25khx2Q7Lh+ot/UkCJe5yKyDgzdc6u2lGZIOmsZTXK6Itg1i4lQZIJZbPWnAg==}
 
   code-block-writer@13.0.1:
     resolution: {integrity: sha512-c5or4P6erEA69TxaxTNcHUNcIn+oyxSRTOWV+pSYF+z4epXqNvwvJ70XPGjPNgue83oAFAPBRQYwpAJ/Hpe/Sg==}
@@ -30894,7 +30894,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  cobe@0.6.3:
+  cobe@0.6.5:
     dependencies:
       phenomenon: 1.6.0
 

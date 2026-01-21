@@ -30,7 +30,6 @@ export interface SortPopoverPrimitiveProps {
   buttonText?: string
   sorts: Sort[]
   onApplySorts: (sorts: Sort[]) => void
-  portal?: boolean
   defaultOpen?: boolean
   tableQueriesEnabled?: boolean
 }
@@ -48,7 +47,6 @@ export const SortPopoverPrimitive = ({
   buttonText,
   sorts,
   onApplySorts,
-  portal = true,
   defaultOpen = false,
   tableQueriesEnabled = true,
 }: SortPopoverPrimitiveProps) => {
@@ -225,7 +223,7 @@ export const SortPopoverPrimitive = ({
             {displayButtonText}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
+        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
           <div className="space-y-2 py-2">
             {localSorts.map((sort, index) => (
               <SortRow

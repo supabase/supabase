@@ -235,7 +235,8 @@ export function MessagePartSwitcher({
       return <MessagePart.Dynamic toolPart={part} />
     }
     case 'tool-list_policies':
-    case 'tool-search_docs': {
+    case 'tool-search_docs':
+    case 'tool-get_active_incidents': {
       return <MessagePart.Tool toolPart={part} />
     }
     case 'reasoning':

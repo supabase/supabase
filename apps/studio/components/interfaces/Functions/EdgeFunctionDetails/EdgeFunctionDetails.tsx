@@ -50,6 +50,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
@@ -175,7 +176,11 @@ export const EdgeFunctionDetails = () => {
           <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
-            <AlertError error={error} subject="Failed to retrieve edge function details" />
+            <AlertError
+              error={error}
+              subject="Failed to retrieve edge function details"
+              layout="vertical"
+            />
           )}
           {isSuccess && (
             <dl className="grid grid-cols-1 @xl:grid-cols-[auto_1fr] gap-y-2 [&>dd]:mb-3 @xl:[&>dd]:mb-0 @xl:gap-y-4 gap-x-10">
@@ -244,9 +249,11 @@ export const EdgeFunctionDetails = () => {
         </PageSectionSummary>
         <PageSectionContent>
           <PageSection className="pt-0">
-            <PageSectionSummary>
-              <PageSectionTitle>Function Configuration</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Function configuration</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onUpdateFunction)}>
@@ -326,9 +333,11 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Invoke function</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Invoke function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Card>
                 <CardContent className="px-0">
@@ -394,9 +403,11 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Develop locally</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Develop locally</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
                 <div className="space-y-6">
@@ -422,9 +433,11 @@ export const EdgeFunctionDetails = () => {
             </PageSectionContent>
           </PageSection>
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Delete function</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Delete function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Alert_Shadcn_ variant="destructive">
                 <CriticalIcon />

@@ -1,22 +1,22 @@
-import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
-import { type PropsWithChildren, useState, useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
+import { type PropsWithChildren, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { ButtonTooltip } from '../ButtonTooltip'
 import {
-  cn,
   Button,
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  PopoverContent_Shadcn_,
+  cn,
   Form_Shadcn_,
-  FormField_Shadcn_,
   FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
   TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ButtonTooltip } from '../ButtonTooltip'
 
 export function MessageActions({
   children,
@@ -172,7 +172,7 @@ function MessageActionsThumbsDown({
           />
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="w-80" align="start">
+      <PopoverContent_Shadcn_ className="w-80" align="start">
         {form.formState.isSubmitSuccessful ? (
           <p className="text-sm">We appreciate your feedback!</p>
         ) : (
