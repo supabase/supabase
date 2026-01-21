@@ -1,4 +1,5 @@
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
@@ -36,12 +37,15 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const [{ search: searchQuery, roles, minCalls, indexAdvisor }] = useQueryStates({
+  const [{ search: searchQuery, roles, minCalls, totalTimeFilter, indexAdvisor }] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     minCalls: parseAsInteger,
+    totalTimeFilter: parseAsJson<NumericFilter | null>(
+      (value) => value as NumericFilter | null
+    ).withDefault(null),
     indexAdvisor: parseAsString.withDefault('false'),
   })
 
@@ -50,6 +54,13 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryHitRate = hooks.queryHitRate()
   const queryMetrics = hooks.queryMetrics()
 
+  const minTotalTime =
+    totalTimeFilter && totalTimeFilter.operator === '>'
+      ? totalTimeFilter.value
+      : totalTimeFilter && totalTimeFilter.operator === '>='
+        ? totalTimeFilter.value
+        : undefined
+
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
     orderBy: sortConfig || undefined,
@@ -57,6 +68,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
     minCalls: minCalls ?? undefined,
+    minTotalTime,
     filterIndexAdvisor: indexAdvisor === 'true',
   })
 

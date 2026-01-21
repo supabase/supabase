@@ -1,6 +1,8 @@
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { X } from 'lucide-react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   NumericFilter,
   ReportsNumericFilter,
@@ -24,15 +26,13 @@ export const QueryPerformanceFilterBar = ({
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [
-    { search: searchQuery, roles: defaultFilterRoles, callsFilter, indexAdvisor },
+    { search: searchQuery, roles: defaultFilterRoles, callsFilter, totalTimeFilter, indexAdvisor },
     setSearchParams,
   ] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
-    callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault({
-      operator: '>=',
-      value: 0,
-    } as NumericFilter),
+    callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault(null),
+    totalTimeFilter: parseAsJson((value) => value as NumericFilter | null).withDefault(null),
     indexAdvisor: parseAsString.withDefault('false'),
   })
 
@@ -61,6 +61,28 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInputValue])
 
+  const hasActiveFilters = useMemo(() => {
+    return (
+      (searchQuery && searchQuery.length > 0) ||
+      (defaultFilterRoles && defaultFilterRoles.length > 0) ||
+      callsFilter !== null ||
+      totalTimeFilter !== null ||
+      indexAdvisor === 'true'
+    )
+  }, [searchQuery, defaultFilterRoles, callsFilter, totalTimeFilter, indexAdvisor])
+
+  const handleClearAllFilters = () => {
+    setSearchParams({
+      search: '',
+      roles: [],
+      callsFilter: null,
+      totalTimeFilter: null,
+      indexAdvisor: 'false',
+    })
+    setInputValue('')
+    setFilters({ roles: [] })
+  }
+
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
       <div className="flex items-center gap-x-4">
@@ -74,6 +96,17 @@ export const QueryPerformanceFilterBar = ({
             operators={['=', '>=', '<=', '>', '<', '!=']}
             defaultOperator=">="
             placeholder="e.g. 100"
+            min={0}
+            className="w-auto"
+          />
+
+          <ReportsNumericFilter
+            label="Total Time"
+            value={totalTimeFilter}
+            onChange={(value) => setSearchParams({ totalTimeFilter: value })}
+            operators={['=', '>=', '<=', '>', '<', '!=']}
+            defaultOperator=">"
+            placeholder="e.g. 1000"
             min={0}
             className="w-auto"
           />
@@ -93,6 +126,22 @@ export const QueryPerformanceFilterBar = ({
           )}
 
           {sort && <SortIndicator sort={sort} onClearSort={clearSort} />}
+
+          {hasActiveFilters && (
+            <ButtonTooltip
+              type="text"
+              size="tiny"
+              icon={<X />}
+              onClick={handleClearAllFilters}
+              className="px-1"
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: 'Clear all filters',
+                },
+              }}
+            />
+          )}
         </div>
       </div>
       <div className="flex gap-2 items-center pl-2">{actions}</div>
