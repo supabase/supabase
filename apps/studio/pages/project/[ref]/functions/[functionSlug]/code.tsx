@@ -62,6 +62,7 @@ const CodePage = () => {
     }
   )
   const [files, setFiles] = useState<FileData[]>([])
+  console.log(files)
 
   const initialFiles = useMemo(() => {
     return !!functionBody
@@ -80,6 +81,11 @@ const CodePage = () => {
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
+      setFiles(
+        files.map((f) => {
+          return { ...f, state: 'unchanged' }
+        })
+      )
     },
   })
 
@@ -190,6 +196,7 @@ const CodePage = () => {
                 if (!originalFile) {
                   return f
                 } else if (originalFile.content !== f.content) {
+                  console.log('checkss')
                   return { ...f, state: 'modified' }
                 }
                 return { ...f, state: 'unchanged' }

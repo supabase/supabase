@@ -73,6 +73,7 @@ export const FileExplorerAndEditor = ({
     const updatedFiles = files.map((file) =>
       file.id === selectedFile.id ? { ...file, content: value } : file
     )
+
     onFilesChange(updatedFiles)
   }
 
@@ -225,7 +226,7 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: file.id === id,
           originalId: file.id,
-          state: 'new',
+          state: file.state,
         },
       })),
     })
@@ -436,7 +437,9 @@ export const FileExplorerAndEditor = ({
                           state !== 'unchanged' && (
                             <div className="flex items-center justify-center w-3">
                               <Tooltip>
-                                <TooltipTrigger className="text-xs">{state === 'new' ? 'U' : 'M'}</TooltipTrigger>
+                                <TooltipTrigger className="text-xs">
+                                  {state === 'new' ? 'U' : 'M'}
+                                </TooltipTrigger>
                                 <TooltipContent side="bottom">
                                   {state === 'new' ? 'Unsaved' : 'Modified'}
                                 </TooltipContent>

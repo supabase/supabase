@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -45,7 +46,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -60,6 +60,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
@@ -85,7 +86,7 @@ export const TableList = ({
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
-  const [filterString, setFilterString] = useState<string>('')
+  const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
 
   const { can: canUpdateTables } = useAsyncCheckPermissions(

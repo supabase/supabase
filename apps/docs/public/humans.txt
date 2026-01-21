@@ -124,6 +124,7 @@ Luca Forstner
 Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
+Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Marouane Souda
@@ -131,6 +132,7 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -183,6 +185,7 @@ Thor Schaeff
 Tim Frietas
 Tim Palmer
 Timothy Lim
+Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo
