@@ -217,6 +217,5 @@ export {
   PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
-  PageSectionTitle
+  PageSectionTitle,
 }
-

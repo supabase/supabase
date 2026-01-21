@@ -176,7 +176,11 @@ export const EdgeFunctionDetails = () => {
           <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
-            <AlertError error={error} subject="Failed to retrieve edge function details" layout="vertical" />
+            <AlertError
+              error={error}
+              subject="Failed to retrieve edge function details"
+              layout="vertical"
+            />
           )}
           {isSuccess && (
             <dl className="grid grid-cols-1 @xl:grid-cols-[auto_1fr] gap-y-2 [&>dd]:mb-3 @xl:[&>dd]:mb-0 @xl:gap-y-4 gap-x-10">
@@ -245,10 +249,10 @@ export const EdgeFunctionDetails = () => {
         </PageSectionSummary>
         <PageSectionContent>
           <PageSection className="pt-0">
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Function configuration</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Function configuration</PageSectionTitle>
+              </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
               <Form_Shadcn_ {...form}>
@@ -330,7 +334,7 @@ export const EdgeFunctionDetails = () => {
 
           <PageSection>
             <PageSectionMeta>
-            <PageSectionSummary>
+              <PageSectionSummary>
                 <PageSectionTitle>Invoke function</PageSectionTitle>
               </PageSectionSummary>
             </PageSectionMeta>
@@ -430,7 +434,7 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
           <PageSection>
             <PageSectionMeta>
-            <PageSectionSummary>
+              <PageSectionSummary>
                 <PageSectionTitle>Delete function</PageSectionTitle>
               </PageSectionSummary>
             </PageSectionMeta>
