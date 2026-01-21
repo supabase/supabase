@@ -118,8 +118,10 @@ next-env.d.ts
 
 # AI assistant local files
 .claude/*
+.claude/skills/me-*
 !.claude/settings.json
 !.claude/scripts/
+!.claude/skills/
 CLAUDE.md
 
 #include template .env file for docker-compose
