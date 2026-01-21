@@ -72,7 +72,9 @@ const CodePage = () => {
       : []
   }, [functionBody, selectedFunction?.entrypoint_path])
 
-  const hasUnsavedChanges = !isEqual(initialFiles, files)
+  const normalizeFiles = (list: FileData[]) =>
+    list.map(({ id, name, content }) => ({ id, name, content }))
+  const hasUnsavedChanges = !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
 
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
