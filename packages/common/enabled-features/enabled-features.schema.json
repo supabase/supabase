@@ -254,7 +254,7 @@
     },
     "integrations:aws_private_link": {
       "type": "boolean",
-      "description": "Enable the AWS PrivateLink integration section in the project settings pages"
+      "description": "Enable the Private Connectivity (AWS PrivateLink) section in the project settings pages"
     },
 
     "infrastructure:read_replicas": {

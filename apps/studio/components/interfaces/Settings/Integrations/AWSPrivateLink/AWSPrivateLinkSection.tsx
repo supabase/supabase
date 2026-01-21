@@ -64,7 +64,7 @@ export const AWSPrivateLinkSection = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldSection className="py-12">
-          <ScaffoldSectionDetail title="AWS PrivateLink">
+          <ScaffoldSectionDetail title="Private Connectivity">
             <p>Connect to your Supabase project from your AWS VPC using AWS PrivateLink.</p>
             <IntegrationImageHandler title="aws" />
           </ScaffoldSectionDetail>
@@ -72,7 +72,7 @@ export const AWSPrivateLinkSection = () => {
             <div className="space-y-6">
               <div>
                 <h5 className="text-foreground mb-2">
-                  How does the AWS PrivateLink integration work?
+                  How does Private Connectivity work?
                 </h5>
                 <p className="text-foreground-light text-sm mb-6">
                   Connecting to AWS PrivateLink allows you to create a private connection between
@@ -81,7 +81,7 @@ export const AWSPrivateLinkSection = () => {
                 {promptPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
-                      primaryText="Upgrade to Team or Enterprise to use AWS PrivateLink"
+                      primaryText="Upgrade to Team or Enterprise to use Private Connectivity"
                       secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
                       buttonText="Upgrade to Team"
                       source="aws-privatelink-integration"

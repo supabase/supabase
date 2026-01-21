@@ -95,8 +95,8 @@ export const pricingTooltips: PricingTooltips = {
   'security.privateLink': {
     main: (
       <span className="prose text-xs">
-        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
-        traffic within the AWS network. Read more in our{' '}
+        Private Connectivity enables secure connections between your cloud VPC and Supabase,
+        keeping traffic within the cloud provider's network. Read more in our{' '}
         <Link href="/docs/guides/platform/privatelink" target="_blank">
           docs
         </Link>
