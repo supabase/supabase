@@ -331,7 +331,7 @@ By implementing Network Restrictions, you create a more secure environment for y
     slug: 'network-restrictions',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
@@ -370,7 +370,7 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     slug: 'ssl-enforcement',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
@@ -529,6 +529,48 @@ By leveraging these extensions, you can implement complex features more easily, 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Dedicated Poolers',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Foreign Data Wrappers',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Supabase ETL',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -776,6 +818,34 @@ This feature is particularly useful for collaborative applications where knowing
       availableOnSelfHosted: true,
     },
   },
+  {
+    title: 'Realtime - Broadcast from the Database',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.REALTIME],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-the-database',
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Broadcast Replay',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.REALTIME],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay',
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
   // Auth
   {
     title: 'Email login',
@@ -930,6 +1000,104 @@ Supabase's Magic Links feature offers a secure and user-friendly authentication 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'SSO with SAML',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Third-Party Authentication',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: '', //ToDo
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Auth Hooks',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/auth-hooks',
+    slug: 'auth-hooks',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'JWT Signing Keys',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: 'jwt-signing-keys',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false, //ToDo
+    },
+  },
+  {
+    title: 'OAuth2.1 Server',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/oauth-server',
+    slug: 'oauth2-1-server',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false, //ToDo
+    },
+  },
+  {
+    title: 'Web3 Authentication',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/auth-web3',
+    slug: 'web3-authentication',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false, //ToDo
+    },
+  },
+  {
+    title: 'Email Templates',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: '  https://supabase.com/docs/guides/auth/auth-email-templates',
+    slug: 'email-templates',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false, //ToDo
     },
   },
   {
@@ -1126,6 +1294,34 @@ Supabase Storage simplifies adding robust file management to your applications, 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Analytics Buckets (with Iceberg)',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.STORAGE],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'analytics-buckets-with-iceberg',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Vector Buckets',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.STORAGE],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'vector-buckets',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -1417,6 +1613,20 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     },
   },
   {
+    title: 'Persistent Storage',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: 'persistent-storage',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
     title: 'Regional invocations',
     subtitle: 'Execute an Edge Function in a region close to your database.',
     description: `
@@ -1448,7 +1658,7 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     slug: 'regional-invocations',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   // Vector
@@ -1485,6 +1695,20 @@ By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sop
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Automatic Embeddings',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'automatic-embeddings',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
     },
   },
   // Platform
@@ -1557,7 +1781,7 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     slug: 'management-api',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -2195,6 +2419,20 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Replication',
+    subtitle: '', //ToDo
+    description: ``, //ToDo
+    icon: Lock, //ToDo
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: '', //ToDo
+    slug: 'replication',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   {
