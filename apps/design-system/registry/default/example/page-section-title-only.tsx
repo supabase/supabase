@@ -20,7 +20,7 @@ export default function PageSectionTitleOnly() {
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-foreground-light">
-                Note how the PageSectionSummary is aligned center, not to the bottom.
+              PageSectionSummary should still be wrapped in PageSectionMeta, as the latter is a flex container that will allow the former to span its full width.
               </p>
             </CardContent>
           </Card>
