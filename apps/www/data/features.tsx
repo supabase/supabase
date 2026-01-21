@@ -1383,10 +1383,11 @@ Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript fun
 1. Global distribution: Edge Functions run close to users, reducing latency.
 2. TypeScript support: Leverage TypeScript's type safety and modern language features.
 3. Deno runtime: Benefit from Deno's security-first approach and modern JavaScript APIs.
-4. Seamless integration: Easy integration with other Supabase services like Auth and Database.
-5. Versatile use cases: Support for webhooks, third-party integrations, and custom API endpoints.
-6. Open-source and portable: Run locally or on any Deno-compatible platform.
-7. Rich ecosystem: Wide range of examples and integrations available.
+4. NPM + Node compatibility: Use NPM modules and Node.js built-in APIs when you need them.
+5. Seamless integration: Easy integration with other Supabase services like Auth and Database.
+6. Versatile use cases: Support for webhooks, third-party integrations, and custom API endpoints.
+7. Open-source and portable: Run locally or on any Deno-compatible platform.
+8. Rich ecosystem: Wide range of examples and integrations available.
 
 ## Benefits:
 - Low-latency responses: Ideal for globally distributed applications.
@@ -1403,7 +1404,7 @@ Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript fun
 - Integration with various services (e.g., Stripe, OpenAI, Hugging Face)
 - Building bots for platforms like Discord and Telegram
 
-Supabase's Deno Edge Functions enable you to build responsive, globally distributed applications with custom server-side logic, supporting a wide range of use cases and integrations.
+Supabase's Deno Edge Functions enable you to build responsive, globally distributed applications with custom server-side logic, supporting a wide range of use cases and integrations. You can also tap into the Node and NPM ecosystem when needed.
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
@@ -1445,41 +1446,6 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
-    status: {
-      stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'NPM compatibility',
-    subtitle: 'Edge Functions natively support NPM modules and Node built-in APIs.',
-    description: `
-Supabase's NPM Compatibility feature for Edge Functions allows you to use NPM modules and Node.js built-in APIs directly in your Deno-based Edge Functions. This powerful capability bridges the gap between Deno and the vast Node.js ecosystem, giving you access to a wide range of libraries and familiar APIs.
-
-## Key benefits
-1. Extensive library access: Leverage the vast NPM ecosystem in your Edge Functions.
-2. Familiar Node.js APIs: Use built-in Node.js modules you're already familiar with.
-3. Code reusability: Easily port existing Node.js code to Supabase Edge Functions.
-4. Ecosystem compatibility: Integrate with services and tools designed for Node.js environments.
-5. Simplified development: Reduce the learning curve for developers coming from a Node.js background.
-6. Flexibility: Choose between Deno-native and Node-compatible libraries as needed.
-7. Future-proofing: Adapt existing codebases to edge computing without major rewrites.
-
-## NPM compatibility is particularly valuable for:
-- Projects migrating from Node.js-based serverless platforms to Supabase
-- Developers looking to leverage specific NPM packages in edge computing scenarios
-- Applications requiring Node.js-specific libraries not available in Deno
-- Teams with existing Node.js codebases wanting to adopt edge computing
-- Rapid prototyping using familiar Node.js modules and APIs
-- Any project aiming to balance the benefits of Deno with Node.js ecosystem access
-
-By leveraging NPM Compatibility in Supabase Edge Functions, you can take advantage of the best of both worlds: the modern, secure runtime of Deno and the rich ecosystem of Node.js. This feature allows you to build powerful, efficient edge computing solutions while maintaining access to the tools and libraries you're familiar with, accelerating development and enabling more complex use cases at the edge.
-`,
-    icon: FileCode2,
-    products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: 'https://www.youtube-nocookie.com/embed/eCbiywoDORw',
-    docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
-    slug: 'npm-compatibility',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
