@@ -329,9 +329,11 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
+            <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle>Invoke function</PageSectionTitle>
-            </PageSectionSummary>
+                <PageSectionTitle>Invoke function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Card>
                 <CardContent className="px-0">
@@ -397,9 +399,11 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Develop locally</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Develop locally</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
                 <div className="space-y-6">
@@ -425,9 +429,11 @@ export const EdgeFunctionDetails = () => {
             </PageSectionContent>
           </PageSection>
           <PageSection>
+            <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle>Delete function</PageSectionTitle>
-            </PageSectionSummary>
+                <PageSectionTitle>Delete function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Alert_Shadcn_ variant="destructive">
                 <CriticalIcon />
