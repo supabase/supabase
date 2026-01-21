@@ -54,12 +54,9 @@ export const QueryPerformanceMetrics = () => {
       {stats.map((card, i) => (
         <React.Fragment key={i}>
           <div
-            className={cn(
-              'flex items-baseline gap-2 heading-subSection text-foreground-light',
-              {
-                'cursor-pointer hover:text-foreground transition-colors': card.onClick,
-              }
-            )}
+            className={cn('flex items-baseline gap-2 heading-subSection text-foreground-light', {
+              'cursor-pointer hover:text-foreground transition-colors': card.onClick,
+            })}
             onClick={card.onClick}
           >
             {isLoading ? (
