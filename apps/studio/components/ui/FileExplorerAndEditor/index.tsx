@@ -436,7 +436,7 @@ export const FileExplorerAndEditor = ({
                           state !== 'unchanged' && (
                             <div className="flex items-center justify-center w-3">
                               <Tooltip>
-                                <TooltipTrigger>{state === 'new' ? 'U' : 'M'}</TooltipTrigger>
+                                <TooltipTrigger className="text-xs">{state === 'new' ? 'U' : 'M'}</TooltipTrigger>
                                 <TooltipContent side="bottom">
                                   {state === 'new' ? 'Unsaved' : 'Modified'}
                                 </TooltipContent>
