@@ -24,7 +24,8 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {enablePgReplicate ? (
+      {/* enablePgReplicate */}
+      {true ? (
         <PipelineRequestStatusProvider>
           <ScaffoldContainer>
             <ScaffoldSection isFullWidth>
@@ -37,18 +38,17 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
                   analytics platforms in real-time
                 </p>
               </div>
+              <AlphaNotice
+                entity="Replication"
+                feedbackUrl="https://github.com/orgs/supabase/discussions/39416"
+              />
             </ScaffoldSection>
           </ScaffoldContainer>
 
           <ReplicationDiagram />
 
           <ScaffoldContainer>
-            <ScaffoldSection isFullWidth>
-              <AlphaNotice
-                entity="Replication"
-                feedbackUrl="https://github.com/orgs/supabase/discussions/39416"
-                className="mb-8"
-              />
+            <ScaffoldSection isFullWidth className="!pt-6">
               <Destinations />
             </ScaffoldSection>
           </ScaffoldContainer>
@@ -56,10 +56,12 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       ) : (
         <>
           <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader title="Replication" description="Send data to other destinations" />
-              </div>
+            <ScaffoldSection isFullWidth>
+              <FormHeader
+                className="[&>div>p]:max-w-full"
+                title="Replication"
+                description=" Automatically replicate your database changes to external data warehouses and analytics platforms in real-time"
+              />
             </ScaffoldSection>
           </ScaffoldContainer>
           <ReplicationComingSoon projectRef={ref || '_'} />
