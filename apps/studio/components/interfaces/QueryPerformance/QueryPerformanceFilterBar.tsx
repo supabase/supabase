@@ -72,7 +72,6 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInputValue])
 
-
   const getCallsFilterDisplay = () => {
     if (!callsFilter) return null
     return `${callsFilter.operator} ${callsFilter.value}`
