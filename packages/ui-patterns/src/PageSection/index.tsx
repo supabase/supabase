@@ -68,7 +68,7 @@ const PageSectionSummary = ({ className, children, ...props }: PageSectionSummar
       data-slot="page-section-summary"
       className={cn(
         'flex flex-col gap-1',
-        // Center alignment with PageSection Aside in case no PageSectionDescription present
+        // Center alignment with PageSectionAside in case no PageSectionDescription present
         '@xl:self-center',
         className
       )}
@@ -220,5 +220,6 @@ export {
   PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
-  PageSectionTitle,
+  PageSectionTitle
 }
+

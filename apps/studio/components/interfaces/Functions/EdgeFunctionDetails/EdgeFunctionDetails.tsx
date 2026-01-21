@@ -50,6 +50,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
@@ -244,9 +245,11 @@ export const EdgeFunctionDetails = () => {
         </PageSectionSummary>
         <PageSectionContent>
           <PageSection className="pt-0">
+          <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle>Function Configuration</PageSectionTitle>
+              <PageSectionTitle>Function configuration</PageSectionTitle>
             </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onUpdateFunction)}>
