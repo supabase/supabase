@@ -71,9 +71,7 @@ export const AWSPrivateLinkSection = () => {
           <ScaffoldSectionContent>
             <div className="space-y-6">
               <div>
-                <h5 className="text-foreground mb-2">
-                  How does Private Connectivity work?
-                </h5>
+                <h5 className="text-foreground mb-2">How does Private Connectivity work?</h5>
                 <p className="text-foreground-light text-sm mb-6">
                   Connecting to AWS PrivateLink allows you to create a private connection between
                   your AWS VPC and your Supabase project.
