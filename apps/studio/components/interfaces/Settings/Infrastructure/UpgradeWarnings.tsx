@@ -113,11 +113,13 @@ const ValidationErrorItem = ({
       case 'unlogged_table_with_persistent_sequence':
         return `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.table_name)}`
       case 'user_defined_objects_in_internal_schemas':
-        return error.obj_type === 'function'
-          ? `/project/${projectRef}/database/functions?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
-          : error.obj_type === 'table'
-            ? `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
-            : null
+        if (error.obj_type === 'function') {
+          return `/project/${projectRef}/database/functions?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
+        }
+        if (error.obj_type === 'table') {
+          return `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
+        }
+        return null
       case 'active_replication_slot':
         return null
       case 'unsupported_fdw_handler':
@@ -155,7 +157,6 @@ export const ValidationErrorsWarning = ({
 }) => {
   const { ref } = useParams()
   if (!ref) return null
-  const projectRef: string = ref
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
       <div className="flex flex-col gap-3">
@@ -168,7 +169,7 @@ export const ValidationErrorsWarning = ({
             <ValidationErrorItem
               key={getValidationErrorKey(error)}
               error={error}
-              projectRef={projectRef}
+              projectRef={ref}
             />
           ))}
         </ul>
