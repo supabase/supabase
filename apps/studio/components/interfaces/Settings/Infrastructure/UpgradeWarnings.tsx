@@ -119,7 +119,7 @@ const ValidationErrorItem = ({
             ? `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
             : null
       case 'active_replication_slot':
-        return `/project/${projectRef}/database/replication`
+        return null
       case 'unsupported_fdw_handler':
         return `/project/${projectRef}/integrations`
       case 'objects_depending_on_pg_cron':
