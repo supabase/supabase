@@ -66,12 +66,7 @@ const PageSectionSummary = ({ className, children, ...props }: PageSectionSummar
   return (
     <div
       data-slot="page-section-summary"
-      className={cn(
-        'flex flex-col gap-1',
-        // Center alignment with PageSection Aside in case no PageSectionDescription present
-        '@xl:self-center',
-        className
-      )}
+      className={cn('flex flex-col gap-1', className)}
       {...props}
     >
       {children}
@@ -176,6 +171,8 @@ const PageSectionMeta = ({ className, children, ...props }: PageSectionMetaProps
         className={cn(
           'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
           '[&>[data-slot="page-section-summary"]]:flex-1',
+          // Center alignment with PageSectionAside in case no PageSectionDescription present
+          '[&>[data-slot="page-section-summary"]]:@xl:self-center',
           '[&>[data-slot="page-section-aside"]]:shrink-0',
           className
         )}

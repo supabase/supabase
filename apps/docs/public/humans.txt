@@ -17,6 +17,7 @@ Andrew Valleteau
 Andrey A
 Angelico de los Reyes
 Anna Weihl
+Ant Evans
 Ant Wilson
 Ariuna K
 Artur Zakirov
@@ -121,6 +122,7 @@ Leonardo Santiago
 Liam Cloud Hogan
 Long Hoang
 Luca Forstner
+Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
@@ -132,6 +134,7 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -184,6 +187,7 @@ Thor Schaeff
 Tim Frietas
 Tim Palmer
 Timothy Lim
+Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo
