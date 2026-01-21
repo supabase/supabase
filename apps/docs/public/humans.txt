@@ -41,6 +41,7 @@ Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
+Clayton Kast
 Craig Cannon
 Cuong Do
 Danny White
@@ -67,6 +68,8 @@ Fady A
 Fatuma Abdullahi
 Felipe Stival
 Francesco Sansalvadore
+Garrett Crowell
+Gerardo Estaba
 Greg Kress
 Greg P
 Greg Richardson
@@ -121,6 +124,7 @@ Luca Forstner
 Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
+Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Marouane Souda
@@ -169,14 +173,18 @@ Stephen Morgan
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
+Szymon Mentel
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Taha Le Bras
 Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
 Tim Frietas
+Tim Palmer
 Timothy Lim
+Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo

@@ -152,7 +152,8 @@ export const CreateFunction = ({
         config_params: convertConfigParams(func?.config_params).value,
       })
     }
-  }, [visible, func])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, func?.id])
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
@@ -202,7 +203,6 @@ export const CreateFunction = ({
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
-                          portal={false}
                           selectedSchemaName={field.value}
                           excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"

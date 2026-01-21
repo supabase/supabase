@@ -6109,7 +6109,7 @@ functions:
               (2, 'Earth'),
               (3, 'Mars');
             ```
-        reponse: |
+        response: |
           ```json
           {
             "data": [
