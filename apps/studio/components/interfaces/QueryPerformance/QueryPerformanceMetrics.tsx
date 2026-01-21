@@ -37,10 +37,14 @@ export const QueryPerformanceMetrics = () => {
       {
         title: 'Cache Hit Rate',
         value: queryMetrics?.[0]?.cache_hit_rate || '0%',
+        tooltip:
+          'Percentage of data read from cache vs disk. Higher is better - it means faster queries and less database load.',
       },
       {
         title: 'Avg. Rows Per Call',
         value: queryMetrics?.[0]?.avg_rows_per_call || '0',
+        tooltip:
+          'Average number of rows returned per query execution. Helps identify queries that return too much or too little data.',
       },
     ]
   }, [queryMetrics, setSearchParams])
@@ -65,7 +69,7 @@ export const QueryPerformanceMetrics = () => {
                 <span className="text-foreground">{card.value}</span>
                 <span className="flex items-center gap-1">
                   {card.title}
-                  {card.title === 'Slow Queries' || card.title === 'Slow Query' ? (
+                  {(card.title === 'Slow Queries' || card.title === 'Slow Query') && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -84,7 +88,26 @@ export const QueryPerformanceMetrics = () => {
                         time) greater than 1000ms.
                       </TooltipContent>
                     </Tooltip>
-                  ) : null}
+                  )}
+                  {card.tooltip && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label={`What is ${card.title}?`}
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                          }}
+                        >
+                          <Info size={12} />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" align="start" className="max-w-xs text-xs">
+                        {card.tooltip}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </span>
               </>
             )}
