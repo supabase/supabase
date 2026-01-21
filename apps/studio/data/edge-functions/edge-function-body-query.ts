@@ -55,7 +55,7 @@ export async function getEdgeFunctionBody(
 
   return {
     metadata,
-    files: files as Omit<FileData, 'id' | 'selected'>[],
+    files: files as Omit<FileData, 'id' | 'selected' | 'state'>[],
   }
 }
 
