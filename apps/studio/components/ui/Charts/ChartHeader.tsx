@@ -103,7 +103,7 @@ export const ChartHeader = ({
     }
 
     const formattedValue = numberFormatter(value, valuePrecision)
-    
+
     if (typeof format === 'string' && format) {
       return `${formattedValue}${format}`
     }
