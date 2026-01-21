@@ -196,7 +196,18 @@ export const OAuthServerSettingsForm = () => {
   }
 
   if (isAuthConfigLoading || isLoadingPermissions) {
-    return <GenericSkeletonLoader />
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <Card>
+            <CardContent>
+              <GenericSkeletonLoader />
+            </CardContent>
+          </Card>
+          <OAuthEndpointsTable isLoading />
+        </PageSectionContent>
+      </PageSection>
+    )
   }
 
   return (
@@ -345,8 +356,8 @@ export const OAuthServerSettingsForm = () => {
           </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
-      {form.watch('OAUTH_SERVER_ENABLED') && (
-        <OAuthEndpointsTable isPreview={!authConfig?.OAUTH_SERVER_ENABLED} />
+      {(form.watch('OAUTH_SERVER_ENABLED') || authConfig?.OAUTH_SERVER_ENABLED) && (
+        <OAuthEndpointsTable isPreview={!authConfig?.OAUTH_SERVER_ENABLED} isLoading={isPending} />
       )}
 
       {/* Dynamic Apps Confirmation Modal */}

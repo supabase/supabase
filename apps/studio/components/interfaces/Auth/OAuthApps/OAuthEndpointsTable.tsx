@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
+import { useOpenIDConfigurationQuery } from 'data/oauth-server-apps/oauth-openid-configuration-query'
 import { Card, CardContent, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
@@ -11,6 +11,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface OAuthEndpointsTableProps {
   /**
@@ -18,31 +19,43 @@ interface OAuthEndpointsTableProps {
    * This is used when the OAuth server is toggled on but not yet saved.
    */
   isPreview?: boolean
+  /**
+   * External loading state passed from parent (e.g., when auth config is still loading)
+   */
+  isLoading?: boolean
 }
 
-export const OAuthEndpointsTable = ({ isPreview = false }: OAuthEndpointsTableProps) => {
+export const OAuthEndpointsTable = ({
+  isPreview = false,
+  isLoading: isLoadingProp = false,
+}: OAuthEndpointsTableProps) => {
   const { ref: projectRef } = useParams()
-  const baseUrl = IS_PLATFORM ? `https://${projectRef}.supabase.co` : 'http://localhost:54321'
+
+  const { data: openidConfig, isLoading: isEndpointsLoading } = useOpenIDConfigurationQuery(
+    { projectRef },
+    { enabled: !isPreview && !isLoadingProp }
+  )
+
+  const isLoading = isLoadingProp || isEndpointsLoading
+
   const endpoints = [
     {
       name: 'Authorization endpoint',
-      path: '/auth/v1/oauth/authorize',
+      value: openidConfig?.authorization_endpoint,
     },
     {
       name: 'Token endpoint',
-      path: '/auth/v1/oauth/token',
+      value: openidConfig?.token_endpoint,
     },
     {
       name: 'JWKS endpoint',
-      path: '/auth/v1/.well-known/jwks.json',
-    },
-    {
-      name: 'Discovery endpoint',
-      path: '/.well-known/oauth-authorization-server/auth/v1',
+      value: openidConfig?.jwks_uri,
     },
     {
       name: 'OIDC discovery',
-      path: '/auth/v1/.well-known/openid-configuration',
+      value: openidConfig?.issuer
+        ? `${openidConfig.issuer}/.well-known/openid-configuration`
+        : undefined,
     },
   ]
 
@@ -61,23 +74,27 @@ export const OAuthEndpointsTable = ({ isPreview = false }: OAuthEndpointsTablePr
       <PageSectionContent>
         <Card>
           <CardContent className="flex flex-col gap-4 pt-0 divide-y">
-            {endpoints.map((endpoint) => (
-              <FormItemLayout
-                key={endpoint.name}
-                layout="horizontal"
-                isReactForm={false}
-                label={endpoint.name}
-                className="mt-4"
-              >
-                <Input
-                  readOnly
-                  copy={!isPreview}
-                  disabled={isPreview}
-                  value={isPreview ? '••••••••••••••••••••••••' : `${baseUrl}${endpoint.path}`}
-                  className={cn(isPreview && 'select-none')}
-                />
-              </FormItemLayout>
-            ))}
+            {isLoading ? (
+              <GenericSkeletonLoader className="mt-4" />
+            ) : (
+              endpoints.map((endpoint) => (
+                <FormItemLayout
+                  key={endpoint.name}
+                  layout="horizontal"
+                  isReactForm={false}
+                  label={endpoint.name}
+                  className="mt-4"
+                >
+                  <Input
+                    readOnly
+                    copy={!isPreview}
+                    disabled={isPreview}
+                    value={isPreview ? '••••••••••••••••••••••••' : endpoint.value ?? ''}
+                    className={cn(isPreview && 'select-none')}
+                  />
+                </FormItemLayout>
+              ))
+            )}
           </CardContent>
         </Card>
       </PageSectionContent>
