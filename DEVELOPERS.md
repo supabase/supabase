@@ -151,7 +151,7 @@ First, make sure you have the Docker installed on your device. You can download 
    docker compose up
    ```
 
-This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
+This command initializes the containers specified in the `compose.yaml` file. It might take a few moments to complete, depending on your computer and internet connection.
 
 Once the `docker compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access it at `http://localhost:8082`.
 

@@ -48,7 +48,7 @@ Minimum requirements for running all Supabase components, suitable for developme
 | CPU | 2 cores | 4 cores+ |
 | Disk | 50 GB SSD | 80 GB+ SSD |
 
-If you don't need specific services, such as Logflare (Analytics), Realtime, Storage, imgproxy, or Edge Runtime (Functions), you can remove the corresponding sections and dependencies from `docker-compose.yml` to reduce resource requirements.
+If you don't need specific services, such as Logflare (Analytics), Realtime, Storage, imgproxy, or Edge Runtime (Functions), you can remove the corresponding sections and dependencies from `compose.yaml` to reduce resource requirements.
 
 ## Installing Supabase
 
@@ -217,7 +217,7 @@ Optionally change the user:
 
 ## Starting and stopping
 
-You can start all services by using the following command in the same directory as your `docker-compose.yml` file:
+You can start all services by using the following command in the same directory as your `compose.yaml` file:
 
 ```sh
 # Start the services (in detached mode)
@@ -319,7 +319,7 @@ You'd like to update or rollback the Studio image. Follow the steps below:
 
 </Admonition>
 
-To uninstall, stop Supabase (while in the same directory as your `docker-compose.yml` file):
+To uninstall, stop Supabase (while in the same directory as your `compose.yaml` file):
 
 ```sh
 # Stop docker and remove volumes:
@@ -380,11 +380,11 @@ You can find all the default extensions inside the [schema migration scripts rep
 
 Each service has a number of configuration options you can find in the related documentation.
 
-Configuration options are generally added to the `.env` file and referenced in `docker-compose.yml` service definitions, e.g.,
+Configuration options are generally added to the `.env` file and referenced in `compose.yaml` service definitions, e.g.,
 
 <$CodeTabs>
 
-```yml name=docker-compose.yml
+```yml name=compose.yaml
 services:
   rest:
     image: postgrest/postgrest
@@ -422,7 +422,7 @@ We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap 
 
 By default all files are stored locally on the server. You can configure the Storage service to use S3 by updating the following environment variables:
 
-```yaml docker-compose.yml
+```yaml compose.yaml
 storage:
   environment: STORAGE_BACKEND=s3
     GLOBAL_S3_BUCKET=name-of-your-s3-bucket
@@ -437,7 +437,7 @@ Configuring the Supabase AI Assistant is optional. By adding your own `OPENAI_AP
 
 <$CodeTabs>
 
-```yaml name=docker-compose.yml
+```yaml name=compose.yaml
 services:
   studio:
     image: supabase/studio
@@ -475,12 +475,12 @@ By default, Postgres is only accessible through Supavisor. If you need direct ac
 
 </Admonition>
 
-Edit `docker-compose.yml`:
+Edit `compose.yaml`:
 
 1. **Disable Supavisor** - Comment out or remove the entire `supavisor` service section
 2. **Expose Postgres port** - Add the port mapping to the `db` service, it should look like the example below:
 
-```yaml docker-compose.yml
+```yaml compose.yaml
 db:
   ports:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}

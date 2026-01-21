@@ -34,7 +34,7 @@ supabase stop && supabase start
 
 ## Expose queues with Docker compose
 
-When running Supabase with Docker Compose, locate the `PGRST_DB_SCHEMAS` variable inside your `.env` file and add `pgmq_public` to it. This environment variable is passed to the `rest` service inside `docker-compose.yml`.
+When running Supabase with Docker Compose, locate the `PGRST_DB_SCHEMAS` variable inside your `.env` file and add `pgmq_public` to it. This environment variable is passed to the `rest` service inside `compose.yaml`.
 
 ```
 PGRST_DB_SCHEMAS=public,graphql_public,pgmq_public

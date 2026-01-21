@@ -12,8 +12,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case 'GET':
       /**
-       * [Joshen] JFYI technically the exposed schemas is being set here via docker-compose.yml
-       * https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml#L183
+       * [Joshen] JFYI technically the exposed schemas is being set here via compose.yaml
+       * https://github.com/supabase/supabase/blob/master/docker/compose.yaml#L183
        * https://github.com/supabase/supabase/blob/474a78721e510301d15ca9dbd41f05ce10fa29e5/docker/.env.example#L55
        *
        * But i noticed that the local API route on config/postgrest.ts has currently hardcoded db_schema to `public, storage`
