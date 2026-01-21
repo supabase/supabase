@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from 'components/interfaces/ProjectCreation/ComputeSizeSelector'
@@ -54,6 +55,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { isHomeNewVariant, type HomeNewFlagValue } from 'lib/featureFlags/homeNew'
+import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
@@ -68,6 +70,7 @@ const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
   const defaultProvider = useDefaultProvider()
+  const { profile } = useProfile()
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
@@ -117,7 +120,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: undefined,
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
-      useApiSchema: false,
+      enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
     },
@@ -136,9 +139,10 @@ const Wizard: NextPageWithLayout = () => {
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
 
+  const shouldCheckFreeProjectLimit = !!currentOrg && !!slug
   const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
     { slug },
-    { enabled: isFreePlan }
+    { enabled: shouldCheckFreeProjectLimit }
   )
   const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
   const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
@@ -226,7 +230,11 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
-  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
+  const userPrimaryEmail = profile?.primary_email?.toLowerCase()
+  const isUserAtFreeProjectLimit = membersExceededLimit.some(
+    (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
+  )
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
 
   const {
     mutate: createProject,
@@ -274,7 +282,7 @@ const Wizard: NextPageWithLayout = () => {
       postgresVersion,
       instanceSize,
       dataApi,
-      useApiSchema,
+      enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
     } = values
@@ -301,10 +309,11 @@ const Wizard: NextPageWithLayout = () => {
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
-      dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
+      ...(enableRlsEventTrigger ? { dbSql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } : {}),
+      ...(dataApi ? { dataApiUseApiSchema: false } : {}),
     }
 
     if (postgresVersion) {
@@ -447,7 +456,7 @@ const Wizard: NextPageWithLayout = () => {
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
-                        className="rounded-none border-0"
+                        className="rounded-none border-0 border-t"
                         type="note"
                         title="Need a free project?"
                         description={
