@@ -4,7 +4,7 @@ import { ReplicationComingSoon } from 'components/interfaces/Database/Replicatio
 import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
 import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -24,8 +24,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {/* enablePgReplicate */}
-      {true ? (
+      {enablePgReplicate ? (
         <PipelineRequestStatusProvider>
           <ScaffoldContainer>
             <ScaffoldSection isFullWidth>

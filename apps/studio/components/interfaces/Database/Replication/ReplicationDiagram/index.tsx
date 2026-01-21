@@ -7,6 +7,7 @@ import { useReplicationDestinationsQuery } from '@/data/replication/destinations
 import { replicationKeys } from '@/data/replication/keys'
 import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { timeout } from '@/lib/helpers'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { getStatusName } from '../Pipeline.utils'
@@ -37,79 +38,62 @@ const ReplicationDiagramContent = () => {
   })
   const destinations = data?.destinations ?? []
 
-  const isDataLoaded = isSuccessReplicas && isSuccessDestinations
-
   const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
 
-  const nodes = useMemo(
-    () => [
-      { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
-      ...(isDataLoaded
-        ? [
-            ...readReplicas.map((x) => ({
-              id: x.identifier,
-              type: 'readReplica',
-              data: {},
-              position: { x: 0, y: 0 },
-            })),
-            ...destinations.map((x) => ({
-              id: x.id.toString(),
-              type: 'replication',
-              data: {},
-              position: { x: 0, y: 0 },
-            })),
-          ]
-        : []),
-    ],
-    [isDataLoaded]
-  )
-  const edges = useMemo(
-    () =>
-      isDataLoaded
-        ? [
-            ...readReplicas.map((x) => {
-              const isReplicating = x.status === 'ACTIVE_HEALTHY'
+  const nodes = [
+    { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
+    ...readReplicas.map((x) => ({
+      id: x.identifier,
+      type: 'readReplica',
+      data: {},
+      position: { x: 0, y: 0 },
+    })),
+    ...destinations.map((x) => ({
+      id: x.id.toString(),
+      type: 'replication',
+      data: {},
+      position: { x: 0, y: 0 },
+    })),
+  ]
+  const edges = [
+    ...readReplicas.map((x) => {
+      const isReplicating = x.status === 'ACTIVE_HEALTHY'
 
-              return {
-                id: `${projectRef}-${x.identifier}`,
-                source: projectRef,
-                target: x.identifier,
-                type: 'smoothstep',
-                className: '!cursor-default',
-                animated: isReplicating ? true : false,
-                style: {
-                  opacity: isReplicating ? 1 : 0.4,
-                  strokeDasharray: isReplicating ? undefined : '5 5',
-                },
-              }
-            }),
-            ...destinations.map((x) => {
-              const pipeline = (pipelinesData?.pipelines ?? []).find(
-                (x) => x.destination_id === x.id
-              )
-              const pipelineStatus = queryClient.getQueryData(
-                replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
-              ) as ReplicationPipelineStatusResponse
-              const statusName = getStatusName(pipelineStatus?.status)
-              const isReplicating = statusName === 'started'
+      return {
+        id: `${projectRef}-${x.identifier}`,
+        source: projectRef,
+        target: x.identifier,
+        type: 'smoothstep',
+        className: '!cursor-default',
+        animated: isReplicating ? true : false,
+        style: {
+          opacity: isReplicating ? 1 : 0.4,
+          strokeDasharray: isReplicating ? undefined : '5 5',
+        },
+      }
+    }),
+    ...destinations.map((x) => {
+      const pipeline = (pipelinesData?.pipelines ?? []).find((x) => x.destination_id === x.id)
+      const pipelineStatus = queryClient.getQueryData(
+        replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
+      ) as ReplicationPipelineStatusResponse
+      const statusName = getStatusName(pipelineStatus?.status)
+      const isReplicating = statusName === 'started'
 
-              return {
-                id: `${projectRef}-${x.id}`,
-                source: projectRef,
-                target: x.id.toString(),
-                type: 'smoothstep',
-                className: '!cursor-default',
-                animated: isReplicating ? true : false,
-                style: {
-                  opacity: isReplicating ? 1 : 0.4,
-                  strokeDasharray: isReplicating ? undefined : '5 5',
-                },
-              }
-            }),
-          ]
-        : [],
-    [isDataLoaded]
-  )
+      return {
+        id: `${projectRef}-${x.id}`,
+        source: projectRef,
+        target: x.id.toString(),
+        type: 'smoothstep',
+        className: '!cursor-default',
+        animated: isReplicating ? true : false,
+        style: {
+          opacity: isReplicating ? 1 : 0.4,
+          strokeDasharray: isReplicating ? undefined : '5 5',
+        },
+      }
+    }),
+  ]
 
   const nodeTypes = useMemo(
     () => ({
@@ -129,12 +113,13 @@ const ReplicationDiagramContent = () => {
     reactFlow.setEdges(graph.edges)
 
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
+    await timeout(1)
     reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
   }
 
   useEffect(() => {
-    if (isDataLoaded) setReactFlow()
-  }, [isDataLoaded])
+    if (readReplicas.length > 0 || destinations.length > 0) setReactFlow()
+  }, [readReplicas, destinations])
 
   return (
     <div className="nowheel relative min-h-[350px]">

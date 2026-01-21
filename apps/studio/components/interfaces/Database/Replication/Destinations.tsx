@@ -58,9 +58,7 @@ export const Destinations = () => {
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
     refetch: refetchDatabases,
-  } = useReadReplicasQuery({
-    projectRef,
-  })
+  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
   const readReplicas = databases.filter((x) => x.identifier !== projectRef)
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
