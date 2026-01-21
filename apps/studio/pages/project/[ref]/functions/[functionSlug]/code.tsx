@@ -77,7 +77,7 @@ const CodePage = () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
       setFiles(
-        files.map((f) => {
+        files => files.map((f) => {
           return { ...f, state: 'unchanged' }
         })
       )
