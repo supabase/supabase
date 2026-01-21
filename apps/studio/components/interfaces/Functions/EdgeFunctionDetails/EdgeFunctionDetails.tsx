@@ -176,7 +176,7 @@ export const EdgeFunctionDetails = () => {
           <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
-            <AlertError error={error} subject="Failed to retrieve edge function details" />
+            <AlertError error={error} subject="Failed to retrieve edge function details" layout="vertical" />
           )}
           {isSuccess && (
             <dl className="grid grid-cols-1 @xl:grid-cols-[auto_1fr] gap-y-2 [&>dd]:mb-3 @xl:[&>dd]:mb-0 @xl:gap-y-4 gap-x-10">
