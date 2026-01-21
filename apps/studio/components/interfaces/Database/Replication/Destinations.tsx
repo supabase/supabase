@@ -206,7 +206,7 @@ export const Destinations = () => {
         </div>
       </div>
 
-      <div className="w-full overflow-hidden overflow-x-auto">
+      <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (
           <AlertError
             error={sourcesError || destinationsError || databasesError}
