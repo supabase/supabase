@@ -72,10 +72,6 @@ const CodePage = () => {
       : []
   }, [functionBody, selectedFunction?.entrypoint_path])
 
-  const normalizeFiles = (list: FileData[]) =>
-    list.map(({ id, name, content }) => ({ id, name, content }))
-  const hasUnsavedChanges = !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
-
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
@@ -151,10 +147,18 @@ const CodePage = () => {
   }, [initialFiles])
 
   // [Joshen] Probably a candidate for useStaticEffectEvent
-  const hasUnsavedChangesRef = useLatest(hasUnsavedChanges)
+  const filesRef = useLatest(files)
+  const initialFilesRef = useLatest(initialFiles)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChangesRef.current) {
+      const normalizeFiles = (list: FileData[]) =>
+        list.map(({ id, name, content }) => ({ id, name, content }))
+      const hasUnsavedChanges = !isEqual(
+        normalizeFiles(initialFilesRef.current),
+        normalizeFiles(filesRef.current)
+      )
+
+      if (hasUnsavedChanges) {
         e.preventDefault()
         e.returnValue = '' // deprecated, but older browsers still require this
       }

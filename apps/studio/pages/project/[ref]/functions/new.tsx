@@ -126,8 +126,6 @@ const NewFunctionPage = () => {
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
-  const hasUnsavedChanges = !isEqual(INITIAL_FILES, files)
-
   const templates = useMemo(() => {
     if (showStripeExample) {
       return EDGE_FUNCTION_TEMPLATES
@@ -278,10 +276,12 @@ const NewFunctionPage = () => {
   }, [template])
 
   // [Joshen] Probably a candidate for useStaticEffectEvent
-  const hasUnsavedChangesRef = useLatest(hasUnsavedChanges)
+  const filesRef = useLatest(files)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChangesRef.current) {
+      const hasUnsavedChanges = !isEqual(INITIAL_FILES, filesRef.current)
+
+      if (hasUnsavedChanges) {
         e.preventDefault()
         e.returnValue = '' // deprecated, but older browsers still require this
       }
