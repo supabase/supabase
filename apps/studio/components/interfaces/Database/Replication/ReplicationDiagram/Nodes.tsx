@@ -1,3 +1,4 @@
+import { PropsWithChildren, useMemo } from 'react'
 import { Handle, Position } from 'reactflow'
 
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -9,7 +10,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { PropsWithChildren, useMemo } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { getStatusName } from '../Pipeline.utils'
