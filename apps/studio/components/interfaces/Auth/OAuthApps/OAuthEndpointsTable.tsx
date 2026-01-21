@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { IS_PLATFORM } from 'lib/constants'
-import { Card, CardContent } from 'ui'
+import { Card, CardContent, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -12,7 +12,15 @@ import {
 } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-export const OAuthEndpointsTable = () => {
+interface OAuthEndpointsTableProps {
+  /**
+   * When true, the component is shown in a preview/disabled state with blurred values.
+   * This is used when the OAuth server is toggled on but not yet saved.
+   */
+  isPreview?: boolean
+}
+
+export const OAuthEndpointsTable = ({ isPreview = false }: OAuthEndpointsTableProps) => {
   const { ref: projectRef } = useParams()
   const baseUrl = IS_PLATFORM ? `https://${projectRef}.supabase.co` : 'http://localhost:54321'
   const endpoints = [
@@ -39,13 +47,14 @@ export const OAuthEndpointsTable = () => {
   ]
 
   return (
-    <PageSection>
+    <PageSection className={cn(isPreview && 'opacity-60 pointer-events-none')}>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>OAuth Endpoints</PageSectionTitle>
           <PageSectionDescription>
-            Share these endpoints with third-party applications that need to integrate with your
-            OAuth 2.1 server.
+            {isPreview
+              ? 'Save changes to enable OAuth endpoints.'
+              : 'Share these endpoints with third-party applications that need to integrate with your OAuth 2.1 server.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -60,7 +69,13 @@ export const OAuthEndpointsTable = () => {
                 label={endpoint.name}
                 className="mt-4"
               >
-                <Input readOnly copy value={`${baseUrl}${endpoint.path}`} />
+                <Input
+                  readOnly
+                  copy={!isPreview}
+                  disabled={isPreview}
+                  value={isPreview ? '••••••••••••••••••••••••' : `${baseUrl}${endpoint.path}`}
+                  className={cn(isPreview && 'select-none')}
+                />
               </FormItemLayout>
             ))}
           </CardContent>

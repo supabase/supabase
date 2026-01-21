@@ -337,7 +337,9 @@ export const OAuthServerSettingsForm = () => {
           </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
-      {form.watch('OAUTH_SERVER_ENABLED') && <OAuthEndpointsTable />}
+      {form.watch('OAUTH_SERVER_ENABLED') && (
+        <OAuthEndpointsTable isPreview={!authConfig?.OAUTH_SERVER_ENABLED} />
+      )}
 
       {/* Dynamic Apps Confirmation Modal */}
       <ConfirmationModal
