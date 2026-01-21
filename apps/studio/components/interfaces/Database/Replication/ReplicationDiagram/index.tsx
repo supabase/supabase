@@ -4,8 +4,12 @@ import ReactFlow, { Background, ReactFlowProvider, useReactFlow } from 'reactflo
 
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { SmoothstepEdge } from './Edge'
+import { getStatusName } from '../Pipeline.utils'
 import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
 import { getDagreGraphLayout } from './ReplicationDiagram.utils'
 
@@ -18,9 +22,10 @@ export const ReplicationDiagram = () => {
 }
 
 const ReplicationDiagramContent = () => {
-  const { ref: projectRef = 'default' } = useParams()
-  const { resolvedTheme } = useTheme()
   const reactFlow = useReactFlow()
+  const { resolvedTheme } = useTheme()
+  const queryClient = useQueryClient()
+  const { ref: projectRef = 'default' } = useParams()
 
   const { data: databases = [], isSuccess: isSuccessReplicas } = useReadReplicasQuery({
     projectRef,
@@ -33,6 +38,8 @@ const ReplicationDiagramContent = () => {
   const destinations = data?.destinations ?? []
 
   const isDataLoaded = isSuccessReplicas && isSuccessDestinations
+
+  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
 
   const nodes = useMemo(
     () => [
@@ -60,22 +67,45 @@ const ReplicationDiagramContent = () => {
     () =>
       isDataLoaded
         ? [
-            ...readReplicas.map((x) => ({
-              id: `${projectRef}-${x.identifier}`,
-              source: projectRef,
-              target: x.identifier,
-              type: 'smoothstep',
-              animated: true,
-              className: '!cursor-default',
-            })),
-            ...destinations.map((x) => ({
-              id: `${projectRef}-${x.id}`,
-              source: projectRef,
-              target: x.id.toString(),
-              type: 'smoothstep',
-              animated: true,
-              className: '!cursor-default',
-            })),
+            ...readReplicas.map((x) => {
+              const isReplicating = x.status === 'ACTIVE_HEALTHY'
+
+              return {
+                id: `${projectRef}-${x.identifier}`,
+                source: projectRef,
+                target: x.identifier,
+                type: 'smoothstep',
+                className: '!cursor-default',
+                animated: isReplicating ? true : false,
+                style: {
+                  opacity: isReplicating ? 1 : 0.4,
+                  strokeDasharray: isReplicating ? undefined : '5 5',
+                },
+              }
+            }),
+            ...destinations.map((x) => {
+              const pipeline = (pipelinesData?.pipelines ?? []).find(
+                (x) => x.destination_id === x.id
+              )
+              const pipelineStatus = queryClient.getQueryData(
+                replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
+              ) as ReplicationPipelineStatusResponse
+              const statusName = getStatusName(pipelineStatus?.status)
+              const isReplicating = statusName === 'started'
+
+              return {
+                id: `${projectRef}-${x.id}`,
+                source: projectRef,
+                target: x.id.toString(),
+                type: 'smoothstep',
+                className: '!cursor-default',
+                animated: isReplicating ? true : false,
+                style: {
+                  opacity: isReplicating ? 1 : 0.4,
+                  strokeDasharray: isReplicating ? undefined : '5 5',
+                },
+              }
+            }),
           ]
         : [],
     [isDataLoaded]
@@ -89,7 +119,6 @@ const ReplicationDiagramContent = () => {
     }),
     []
   )
-  const edgeTypes = useMemo(() => ({ smoothstep: SmoothstepEdge }), [])
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
@@ -123,7 +152,6 @@ const ReplicationDiagramContent = () => {
         defaultNodes={[]}
         defaultEdges={[]}
         nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
         proOptions={{ hideAttribution: true }}
       >
         <Background color={backgroundPatternColor} />
