@@ -27,15 +27,28 @@ export const QueryPerformanceFilterBar = ({
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [
-    { search: searchQuery, roles: defaultFilterRoles, callsFilter, totalTimeFilter, indexAdvisor },
+    {
+      search: searchQuery,
+      roles: defaultFilterRoles,
+      callsFilter: callsFilterRaw,
+      totalTimeFilter: totalTimeFilterRaw,
+      indexAdvisor,
+    },
     setSearchParams,
   ] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
-    callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault(null),
-    totalTimeFilter: parseAsJson((value) => value as NumericFilter | null).withDefault(null),
+    callsFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
     indexAdvisor: parseAsString.withDefault('false'),
   })
+
+  const callsFilter = callsFilterRaw ?? null
+  const totalTimeFilter = totalTimeFilterRaw ?? null
 
   const [filters, setFilters] = useState<{ roles: string[] }>({
     roles: defaultFilterRoles,

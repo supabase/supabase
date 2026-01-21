@@ -37,17 +37,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const [{ search: searchQuery, roles, minCalls, totalTimeFilter, indexAdvisor }] = useQueryStates({
+  const [
+    { search: searchQuery, roles, minCalls, totalTimeFilter: totalTimeFilterRaw, indexAdvisor },
+  ] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     minCalls: parseAsInteger,
-    totalTimeFilter: parseAsJson<NumericFilter | null>(
-      (value) => value as NumericFilter | null
-    ).withDefault(null),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
     indexAdvisor: parseAsString.withDefault('false'),
   })
+
+  const totalTimeFilter = totalTimeFilterRaw ?? null
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')

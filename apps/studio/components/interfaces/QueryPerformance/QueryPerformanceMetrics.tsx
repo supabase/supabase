@@ -12,9 +12,9 @@ export const QueryPerformanceMetrics = () => {
   })
 
   const [, setSearchParams] = useQueryStates({
-    totalTimeFilter: parseAsJson<NumericFilter | null>(
-      (value) => value as NumericFilter | null
-    ).withDefault(null),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
   })
 
   const stats = useMemo(() => {
