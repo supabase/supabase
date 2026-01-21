@@ -312,14 +312,14 @@ import { redirect } from '@sveltejs/kit'
 import type { Actions } from './$types'
 
 export const actions: Actions = {
-  oauth: async ({ request, locals: { supabase } }) => {
+  oauth: async ({ request, url, locals: { supabase } }) => {
     const formData = await request.formData()
     const provider = formData.get('provider') as 'google' | 'github'
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${request.url.origin}/auth/callback`,
+        redirectTo: `${url.origin}/auth/callback`,
       },
     })
 
@@ -346,7 +346,9 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    if (error) {
+      console.error('OAuth callback error:', error)
+    } else {
       redirect(303, next)
     }
   }
