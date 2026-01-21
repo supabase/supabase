@@ -85,7 +85,7 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
     case 'unlogged_table_with_persistent_sequence':
       return `Convert the sequence ${error.sequence_name} to unlogged or convert the table to logged`
     case 'user_defined_objects_in_internal_schemas':
-      return `Remove the user-defined ${error.obj_type} from the Supabase-managed schema`
+      return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
   }
@@ -102,21 +102,22 @@ const ValidationErrorItem = ({
   const description = getValidationErrorDescription(error)
 
   const getManageLink = (): string | null => {
+    const encode = encodeURIComponent
     switch (error.type) {
       case 'function_using_obsolete_lang':
-        return `/project/${projectRef}/database/functions?schema=${error.schema_name}&search=${error.function_name}`
+        return `/project/${projectRef}/database/functions?schema=${encode(error.schema_name)}&search=${encode(error.function_name)}`
       case 'unsupported_extension':
-        return `/project/${projectRef}/database/extensions?filter=${error.extension_name}`
+        return `/project/${projectRef}/database/extensions?filter=${encode(error.extension_name)}`
       case 'indexes_referencing_ll_to_earth':
-        return `/project/${projectRef}/database/indexes?search=${error.index_name}&schema=${error.schema_name}`
+        return `/project/${projectRef}/database/indexes?search=${encode(error.index_name)}&schema=${encode(error.schema_name)}`
       case 'unlogged_table_with_persistent_sequence':
-        return `/project/${projectRef}/database/tables?schema=${error.schema_name}`
+        return `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.table_name)}`
       case 'user_defined_objects_in_internal_schemas':
         return error.obj_type === 'function'
-          ? `/project/${projectRef}/database/functions?schema=${error.schema_name}&search=${error.obj_name}`
+          ? `/project/${projectRef}/database/functions?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
           : error.obj_type === 'table'
-            ? `/project/${projectRef}/database/tables?schema=${error.schema_name}`
-            : `/project/${projectRef}/editor?schema=${error.schema_name}`
+            ? `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.obj_name)}`
+            : null
       case 'active_replication_slot':
         return `/project/${projectRef}/database/replication`
       case 'unsupported_fdw_handler':
