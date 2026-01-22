@@ -360,7 +360,11 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const isMergeDisabled =
-    !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
+    !combinedHasChanges ||
+    isCombinedDiffLoading ||
+    isBranchOutOfDateOverall ||
+    isWorkflowRunning ||
+    Boolean(mainBranch?.git_branch)
 
   const primaryActions = (
     <div className="flex items-end gap-2">
@@ -379,7 +383,9 @@ const MergePage: NextPageWithLayout = () => {
                 ? 'No changes to merge'
                 : isWorkflowRunning
                   ? 'Workflow is currently running'
-                  : 'Unable to merge at this time',
+                  : Boolean(mainBranch?.git_branch)
+                    ? 'Deploy to production from GitHub is enabled'
+                    : 'Unable to merge at this time',
             },
           }}
           type="primary"
@@ -395,7 +401,6 @@ const MergePage: NextPageWithLayout = () => {
           type="primary"
           loading={isMerging || isSubmitting}
           onClick={() => setShowConfirmDialog(true)}
-          disabled={isBranchOutOfDateOverall}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
           Merge branch

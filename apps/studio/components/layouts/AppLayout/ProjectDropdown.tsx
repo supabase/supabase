@@ -11,7 +11,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
+import { Badge, Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
@@ -87,11 +87,13 @@ export const ProjectDropdown = () => {
           const sanitizedRoute = sanitizeRoute(router.route, router.query)
           const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
           const isSelected = project.ref === ref
+          const isPaused = project.status === 'INACTIVE'
 
           return (
             <Link href={href} className="w-full flex items-center justify-between">
               <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
                 {project.name}
+                {isPaused && <Badge className="ml-2">Paused</Badge>}
               </span>
               {isSelected && <Check size={16} />}
             </Link>
