@@ -442,7 +442,6 @@ export function ComposedChart({
             key={xAxisKey}
           />
 
-          {/* Add gradient definitions */}
           <defs>
             {visibleAttributes.map((attribute) => (
               <linearGradient
@@ -453,8 +452,8 @@ export function ComposedChart({
                 x2="0"
                 y2="1"
               >
-                <stop offset="3%" stopColor={attribute.color} stopOpacity={0.2} />
-                <stop offset="90%" stopColor="#131313" stopOpacity={0} />
+                <stop offset="5%" stopColor={attribute.color} stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#131313" stopOpacity={0} />
               </linearGradient>
             ))}
           </defs>
