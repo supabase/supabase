@@ -1,4 +1,4 @@
-import { forwardRef, memo, Ref, useRef } from 'react'
+import { forwardRef, memo, Ref, useEffect, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { ref as valtioRef } from 'valtio'
 
@@ -59,7 +59,32 @@ export const Grid = memo(
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
 
-      const onRowsChange = useOnRowsChange(rows)
+      const { onRowsChange, undoCellEdit } = useOnRowsChange(rows)
+
+      // Handle keyboard shortcuts for undo (Ctrl+Z / Cmd+Z)
+      useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          // Check if Ctrl+Z (Windows/Linux) or Cmd+Z (Mac) is pressed
+          if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+            // Only trigger undo if there's history and we're not in an input/textarea
+            const activeElement = document.activeElement
+            const isInEditor =
+              activeElement?.tagName === 'INPUT' ||
+              activeElement?.tagName === 'TEXTAREA' ||
+              activeElement?.closest('.monaco-editor')
+
+            if (!isInEditor && snap.cellEditHistory.length > 0) {
+              e.preventDefault()
+              e.stopPropagation()
+              undoCellEdit()
+            }
+          }
+        }
+
+        // Use capture phase to handle the event before other handlers
+        window.addEventListener('keydown', handleKeyDown, true)
+        return () => window.removeEventListener('keydown', handleKeyDown, true)
+      }, [undoCellEdit, snap.cellEditHistory.length])
 
       function onSelectedRowsChange(selectedRows: Set<number>) {
         snap.setSelectedRows(selectedRows)

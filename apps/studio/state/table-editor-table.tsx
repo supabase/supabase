@@ -14,7 +14,16 @@ import { SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
+import type { Dictionary } from 'types'
 import { useTableEditorStateSnapshot } from './table-editor'
+
+export type CellEditHistoryItem = {
+  rowIdx: number
+  columnName: string
+  previousValue: any
+  newValue: any
+  identifiers: Dictionary<any>
+}
 
 export const createTableEditorTableState = ({
   projectRef,
@@ -126,6 +135,18 @@ export const createTableEditorTableState = ({
     selectedCellPosition: null as { idx: number; rowIdx: number } | null,
     setSelectedCellPosition: (position: { idx: number; rowIdx: number } | null) => {
       state.selectedCellPosition = position
+    },
+
+    /* Undo History */
+    cellEditHistory: [] as CellEditHistoryItem[],
+    pushCellEdit: (edit: CellEditHistoryItem) => {
+      state.cellEditHistory.push(edit)
+    },
+    popCellEdit: () => {
+      return state.cellEditHistory.pop()
+    },
+    clearCellEditHistory: () => {
+      state.cellEditHistory = []
     },
 
     /* Misc */
