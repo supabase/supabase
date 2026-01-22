@@ -13,36 +13,36 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
     case '1':
     case 'info':
       return {
-        text: 'text-blue-500',
-        bg: '',
-        border: 'border-blue-200 dark:border-blue-800',
+        text: 'text-blue-900',
+        bg: 'bg-blue-300',
+        border: 'border-blue-500',
       }
     case '2':
     case 'success':
       return {
-        text: 'text-foreground-lighter',
-        bg: 'bg-brand-300 text-brand-600',
-        border: 'border-brand-400/50 dark:border-green-800',
+        text: 'text-brand-600',
+        bg: 'bg-brand-300',
+        border: 'border-brand-500/50',
       }
     case '4':
     case 'warning':
     case 'redirect':
       return {
         text: 'text-warning',
-        bg: 'bg-warning-300 dark:bg-warning-200',
-        border: 'border-warning-400/50 dark:border-warning-400/50',
+        bg: 'bg-warning-300',
+        border: 'border-warning-500/50',
       }
     case '5':
     case 'error':
       return {
         text: 'text-destructive',
-        bg: 'bg-destructive-300 dark:bg-destructive-300/50',
-        border: 'border-destructive-400/50 dark:border-destructive-400/50',
+        bg: 'bg-destructive-300',
+        border: 'border-destructive-500/50',
       }
     default:
       return {
         text: 'text-foreground-lighter',
-        bg: '',
+        bg: 'bg-surface-200',
         border: '',
       }
   }
