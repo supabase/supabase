@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
@@ -35,8 +35,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input,
-  Input_Shadcn_,
   Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
@@ -44,6 +42,7 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -172,7 +171,7 @@ export const EdgeFunctionDetails = () => {
   return (
     <PageContainer size="full">
       <PageSection orientation="horizontal">
-        <PageSectionSummary className="gap-6">
+        <PageSectionSummary className="gap-6 !self-start">
           <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
@@ -190,10 +189,10 @@ export const EdgeFunctionDetails = () => {
               <dt className="text-sm text-foreground-light">Endpoint URL</dt>
               <dd className="text-sm @lg:text-left">
                 <Input
-                  className="font-mono input-mono"
-                  disabled
                   copy
+                  readOnly
                   size="small"
+                  className="font-mono input-mono"
                   value={functionUrl}
                 />
               </dd>
@@ -269,7 +268,7 @@ export const EdgeFunctionDetails = () => {
                             description="Your slug and endpoint URL will remain the same"
                           >
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                              <Input
                                 {...field}
                                 className="w-64"
                                 disabled={!canUpdateEdgeFunction}
