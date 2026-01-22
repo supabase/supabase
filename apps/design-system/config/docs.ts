@@ -100,6 +100,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/tables',
           items: [],
         },
+        {
+          title: 'Status Codes',
+          href: '/docs/ui-patterns/status-codes',
+          items: [],
+        },
       ],
     },
     {

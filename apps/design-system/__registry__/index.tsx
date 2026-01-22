@@ -2887,6 +2887,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "status-code-demo": {
+      name: "status-code-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/status-code-demo")),
+      source: "",
+      files: ["registry/default/example/status-code-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-bar-interactive": {
       name: "chart-bar-interactive",
       type: "components:block",
