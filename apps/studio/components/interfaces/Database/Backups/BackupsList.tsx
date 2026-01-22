@@ -108,17 +108,26 @@ export const BackupsList = () => {
           if (selectedBackup === undefined) return console.error('Backup required')
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
-        alert={{
-          title: 'This action cannot be undone',
-          description:
-            'Your project will be offline during restoration. Any new data since this backup will be lost.',
-        }}
       >
-        <p className="text-sm">
-          This will restore your database to the backup made on{' '}
-          {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')} at{' '}
-          {dayjs(selectedBackup?.inserted_at).format('HH:mm:ss')} UTC.
-        </p>
+        <div className="space-y-3">
+          <p className="text-sm">
+            This will restore your database to the backup made on{' '}
+            {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')} at{' '}
+            {dayjs(selectedBackup?.inserted_at).format('HH:mm:ss')} UTC.
+          </p>
+
+          <Admonition
+            showIcon={false}
+            type="warning"
+            title="This action cannot be undone"
+            description={
+              <ul className="list-disc list-inside">
+                <li>Your project will be offline during restoration</li>
+                <li>Any new data since this backup will be lost</li>
+              </ul>
+            }
+          />
+        </div>
       </ConfirmationModal>
     </>
   )
