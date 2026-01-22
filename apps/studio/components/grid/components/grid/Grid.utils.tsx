@@ -146,9 +146,11 @@ export function useOnRowsChange(rows: SupaRow[]) {
     const { columnName, previousValue, identifiers } = lastEdit
     const table = snap.originalTable
 
-    showUndoToast('Cell edit undone', snap.cellEditHistory.length, 'success')
+    // Optimistically show the remaining edit count assuming its complete
+    showUndoToast('Cell edit undone', snap.cellEditHistory.length - 1, 'success')
 
-    // Defer mutation to avoid conflicts with React's rendering cycle
+    // [Ali] Defer mutation to avoid conflicts with React's rendering cycle
+    // If I left it the same way the cancelled and rendering logic throws errors
     const roleState = getImpersonatedRoleState()
     setTimeout(() => {
       mutateUndoTableRow({
