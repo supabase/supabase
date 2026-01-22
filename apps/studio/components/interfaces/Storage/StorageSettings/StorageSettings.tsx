@@ -404,7 +404,7 @@ export const StorageSettings = () => {
                             buttonVariant="default"
                             source="storageSizeLimit"
                             featureProposition="configure upload file size limits in Storage"
-                            primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                            primaryText="Free Plan has a fixed upload file size limit of 50 MB"
                             secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )} and unlock image transformations.`}
