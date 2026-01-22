@@ -83,7 +83,7 @@ function createOptimisticUpdateHandlers(queryClient: ReturnType<typeof useQueryC
         })
       }
 
-      toast.error(error?.message ?? 'A unknown error occurred')
+      toast.error(error?.message ?? 'An unknown error occurred')
     },
   }
 }
