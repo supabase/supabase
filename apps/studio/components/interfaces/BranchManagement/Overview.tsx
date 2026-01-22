@@ -196,7 +196,7 @@ export const Overview = ({
         {isLoading && <BranchLoader />}
         {isSuccess && scheduledForDeletionBranches.length === 0 && (
           <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
-            <p>No branches scheduled for deletion</p>
+            <p className="text-foreground-lighter">No branches scheduled for deletion</p>
           </div>
         )}
         {isSuccess &&

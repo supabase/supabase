@@ -29,7 +29,7 @@ export const PullRequestsEmptyState = ({
   return (
     <div className={EMPTY_STATE_CONTAINER}>
       <p>No merge requests</p>
-      <p className="text-foreground-light text-center">
+      <p className="text-foreground-lighter text-center text-balance">
         Create your first merge request to merge changes back to the main branch
       </p>
       <div className="flex items-center space-x-2 mt-4">
@@ -72,7 +72,7 @@ export const PreviewBranchesEmptyState = ({
       <div className="flex items-center space-x-2">
         <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
         <Button type="primary" onClick={() => onSelectCreateBranch()}>
-          Create your first branch
+          Create branch
         </Button>
       </div>
     </div>
