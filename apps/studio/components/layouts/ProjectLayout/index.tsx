@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
-import { mergeRefs, useFlag, useParams } from 'common'
+import { mergeRefs, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -11,6 +11,7 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -275,7 +276,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isHomeNewFlag = useFlag('homeNew')
+  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
@@ -302,11 +303,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   // handle redirect to home for building state
   const shouldRedirectToHomeForBuilding =
-    isHomeNewFlag && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+    isHomeNew && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
 
   // We won't be showing the building state with the new home page
   const shouldShowBuildingState =
-    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNewFlag && isHomePage)
+    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNew && isHomePage)
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {

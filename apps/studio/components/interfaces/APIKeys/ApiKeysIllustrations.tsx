@@ -153,8 +153,6 @@ export const ApiKeysFeedbackBanner = () => {
             queryParams={{
               category: SupportCategories.PROBLEM,
               subject: 'Help with API keys',
-              message:
-                "I'm experiencing problems with the new API keys feature. Please describe your specific issue here.",
             }}
           >
             Contact support

@@ -1,7 +1,6 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 import { DestinationType } from './DestinationPanel.types'
 
 type DestinationTypeSelectionProps = {
@@ -25,14 +24,11 @@ export const DestinationTypeSelection = ({
 
   return (
     <div className="px-5 py-5">
-      <div className="flex flex-col gap-y-2 mb-4">
+      <div className="flex flex-col gap-y-1 mb-4">
         <p className="text-sm font-medium text-foreground">Type</p>
-        {editMode && (
-          <Admonition
-            type="default"
-            title="The destination type cannot be changed after creation"
-          />
-        )}
+        <p className="text-foreground-light text-sm">
+          The destination type cannot be changed after creation
+        </p>
       </div>
       <RadioGroupStacked
         disabled={editMode}
@@ -70,7 +66,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <BigQuery size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>BigQuery</p>
+                <div className="flex items-center gap-x-2">
+                  <p>BigQuery</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Google Cloud's data warehouse for analytics and business intelligence
                 </p>
@@ -89,7 +88,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <AnalyticsBucket size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>Analytics Bucket</p>
+                <div className="flex items-center gap-x-2">
+                  <p>Analytics Bucket</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics
                   workflows

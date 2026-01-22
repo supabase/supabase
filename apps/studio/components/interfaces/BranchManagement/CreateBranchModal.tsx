@@ -19,7 +19,7 @@ import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { DiskAttributesData, useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
@@ -172,7 +172,7 @@ export const CreateBranchModal = () => {
     ...projectDiskAttributes,
     // [Joshen] JFYI for Qiao - this multiplier may eventually be dropped
     size_gb: Math.round(projectDiskAttributes.size_gb * 1.5),
-  }
+  } as DiskAttributesData['attributes']
   const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
   const estimatedDiskCost = estimateDiskCost(branchDiskAttributes)
 
@@ -273,7 +273,8 @@ export const CreateBranchModal = () => {
                 source="create-branch"
                 featureProposition="enable branching"
                 primaryText="Upgrade to unlock branching"
-                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production."
+                className="pb-5"
               />
             )}
 

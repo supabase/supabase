@@ -3,7 +3,7 @@ import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -12,6 +12,7 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -27,9 +28,7 @@ import {
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
-import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
 import UpgradePrompt from './UpgradePrompt'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 /**
  * Calculates the appropriate time range for bar click filtering based on the current time range duration.
@@ -108,8 +107,6 @@ export const LogsPreviewer = ({
   EmptyState,
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
-  const useUniversalFilterBar = useFlag('universalFilterBar')
-
   const router = useRouter()
   const { db } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -293,13 +290,7 @@ export const LogsPreviewer = ({
 
   return (
     <div className="flex-1 flex flex-col h-full">
-      {useUniversalFilterBar ? (
-        // Experimental Universal Filter Bar
-        <PreviewFilterPanelWithUniversal {...filterPanelProps} />
-      ) : (
-        // Legacy Filter Panel
-        <PreviewFilterPanel {...filterPanelProps} />
-      )}
+      <PreviewFilterPanel {...filterPanelProps} />
       {children}
       <div
         className={

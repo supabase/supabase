@@ -316,7 +316,7 @@ const buildPoliciesForPath = (
 
   return (['SELECT', 'INSERT', 'UPDATE', 'DELETE'] as const).map((command) => {
     const name = `Enable ${command.toLowerCase()} access for users based on ${ident(targetCol)}`
-    const base = `CREATE POLICY "${name}" ON ${ident(table.schema)}.${ident(table.name)} AS PERMISSIVE FOR ${command} TO public`
+    const base = `CREATE POLICY "${name}" ON ${ident(table.schema)}.${ident(table.name)} AS PERMISSIVE FOR ${command} TO authenticated`
 
     const sql =
       command === 'INSERT'
@@ -338,7 +338,7 @@ const buildPoliciesForPath = (
       definition,
       check,
       action: 'PERMISSIVE' as const,
-      roles: ['public'],
+      roles: ['authenticated'],
     }
   })
 }

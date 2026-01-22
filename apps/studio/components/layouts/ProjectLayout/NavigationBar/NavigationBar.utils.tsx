@@ -26,9 +26,7 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
       key: 'sql',
       label: 'SQL Editor',
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: !IS_PLATFORM
-        ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
