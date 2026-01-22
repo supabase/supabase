@@ -78,7 +78,7 @@ const StatCard = ({
     {
       label: 'Go to Auth Report',
       icon: <ExternalLink size={12} />,
-      onClick: () => router.push(href || ''),
+      onClick: href ? () => router.push(href) : undefined,
     },
   ]
 
