@@ -58,7 +58,7 @@ export const UpgradeToPro = ({
           source={source}
           featureProposition={featureProposition}
           disabled={disabled}
-          type={buttonVariant}
+          variant={buttonVariant}
         >
           {buttonText}
         </UpgradePlanButton>
