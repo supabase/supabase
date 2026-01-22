@@ -51,21 +51,21 @@ Row Level Security (RLS) enforces data access at the database level, ensuring us
 
 ```sql
 -- Relying only on application to filter
-select * 
-from orders 
+select *
+from orders
 where user_id = $current_user_id;
 
 -- Bug or bypass means all data is exposed!
 -- Returns ALL orders:
-select * 
-from orders;  
+select *
+from orders;
 ```
 
 **Correct (database-enforced RLS):**
 
 ```sql
 -- Enable RLS on the table
-alter table orders 
+alter table orders
 enable row level security;
 
 -- Create policy for users to see only their orders
@@ -76,7 +76,7 @@ create policy orders_user_policy on orders
   );
 
 -- Force RLS even for table owners
-alter table orders 
+alter table orders
 force row level security;
 
 -- Set user context and query
