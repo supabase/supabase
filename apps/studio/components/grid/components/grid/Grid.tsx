@@ -64,7 +64,6 @@ export const Grid = memo(
       // Handle keyboard shortcuts for undo (Ctrl+Z / Cmd+Z)
       useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-          // Check if Ctrl+Z (Windows/Linux) or Cmd+Z (Mac) is pressed
           if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
             // Only trigger undo if there's history and we're not in an input/textarea
             const activeElement = document.activeElement
