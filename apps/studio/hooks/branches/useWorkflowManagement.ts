@@ -30,7 +30,7 @@ export const useWorkflowManagement = ({
     if (!workflowRun || !workflowRunId) return
 
     // Only refetch once per workflow completion
-    if (workflowRun.status !== 'RUNNING' && !hasRefetched) {
+    if (!!workflowRun.status && workflowRun.status !== 'RUNNING' && !hasRefetched) {
       setHasRefetched(true)
       onWorkflowComplete?.(workflowRun.status)
     }
