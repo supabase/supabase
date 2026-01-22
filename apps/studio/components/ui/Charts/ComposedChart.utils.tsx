@@ -5,7 +5,7 @@ import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
-import { numberFormatter } from './Charts.utils'
+import { formatPercentage, numberFormatter } from './Charts.utils'
 
 export interface ReportAttributes {
   id?: string
@@ -119,6 +119,80 @@ interface TooltipProps {
 }
 
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
+
+/**
+ * Convert a data point to payload format for chart calculations.
+ * Filters out timestamp/period_start fields and only includes enabled attributes.
+ */
+export const convertDataPointToPayload = (
+  dataPoint: Record<string, unknown> | undefined,
+  attributes: MultiAttribute[]
+): { dataKey: string; value: number }[] | undefined => {
+  if (!dataPoint) return undefined
+
+  return Object.entries(dataPoint)
+    .map(([key, value]) => ({
+      dataKey: key,
+      value: value as number,
+    }))
+    .filter(
+      (entry) =>
+        entry.dataKey !== 'timestamp' &&
+        entry.dataKey !== 'period_start' &&
+        attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+    )
+}
+
+export const resolveHighlightedChartValue = <D extends Record<string, unknown>>({
+  data,
+  attributes,
+  focusDataIndex,
+  showTotal,
+  yAxisKey,
+  activePayload,
+  highlightedValue,
+  hiddenAttributes,
+  maxAttributeName,
+  referenceLineAttributes,
+}: {
+  data: D[]
+  attributes: MultiAttribute[]
+  focusDataIndex: number | null
+  showTotal: boolean
+  yAxisKey: string
+  activePayload?: { dataKey: string; value: number }[] | null
+  highlightedValue?: string | number
+  hiddenAttributes: Set<string>
+  maxAttributeName?: string
+  referenceLineAttributes: string[]
+}) => {
+  const attributesToIgnore =
+    attributes?.filter((attr) => attr.omitFromTotal)?.map((attr) => attr.attribute) ?? []
+  const attributesToIgnoreFromTotal = [
+    ...attributesToIgnore,
+    ...referenceLineAttributes,
+    ...(maxAttributeName ? [maxAttributeName] : []),
+    ...Array.from(hiddenAttributes),
+  ]
+
+  const lastPayload = convertDataPointToPayload(data[data.length - 1], attributes)
+
+  if (focusDataIndex !== null) {
+    if (!showTotal) return data[focusDataIndex]?.[yAxisKey]
+
+    const payloadToUse =
+      activePayload || convertDataPointToPayload(data[focusDataIndex], attributes)
+    return payloadToUse
+      ? calculateTotalChartAggregate(payloadToUse, attributesToIgnoreFromTotal)
+      : data[focusDataIndex]?.[yAxisKey]
+  }
+
+  if (showTotal && lastPayload) {
+    return calculateTotalChartAggregate(lastPayload, attributesToIgnoreFromTotal)
+  }
+
+  return highlightedValue
+}
 
 /**
  * Calculate the total aggregate of the chart values
@@ -236,9 +310,10 @@ export const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {formatNumeric(total as number) +
-                    (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-                  {isPercentage ? '%' : ''}
+                  {isPercentage
+                    ? formatPercentage(total as number, valuePrecision)
+                    : formatNumeric(total as number) +
+                      (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
                   {format === 'ms' ? 'ms' : ''}
                 </span>
                 {maxValueAttribute &&

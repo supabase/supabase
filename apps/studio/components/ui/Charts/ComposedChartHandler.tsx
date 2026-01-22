@@ -45,6 +45,7 @@ export interface ComposedChartHandlerProps {
   docsUrl?: string
   hide?: boolean
   syncId?: string
+  hideHighlightedValue?: boolean
 }
 
 /**

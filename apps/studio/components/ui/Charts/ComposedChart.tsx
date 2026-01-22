@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
@@ -29,12 +29,12 @@ import {
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import { formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
 import {
-  calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
   MultiAttribute,
+  resolveHighlightedChartValue,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
@@ -191,48 +191,6 @@ export function ComposedChart({
     )
   }
 
-  function computeHighlightedValue() {
-    const maxAttribute = attributes.find((a) => a.isMaxValue)
-    const referenceLines = attributes.filter(
-      (attribute) => attribute?.provider === 'reference-line'
-    )
-
-    const attributesToIgnore =
-      attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
-    const attributesToIgnoreFromTotal = [
-      ...attributesToIgnore,
-      ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
-      ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
-      ...Array.from(hiddenAttributes),
-    ]
-
-    const lastDataPoint = data[data.length - 1]
-      ? Object.entries(data[data.length - 1])
-          .map(([key, value]) => ({
-            dataKey: key,
-            value: value as number,
-          }))
-          .filter(
-            (entry) =>
-              entry.dataKey !== 'timestamp' &&
-              entry.dataKey !== 'period_start' &&
-              attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
-          )
-      : undefined
-
-    if (focusDataIndex !== null) {
-      return showTotal
-        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
-        : data[focusDataIndex]?.[yAxisKey]
-    }
-
-    if (showTotal && lastDataPoint) {
-      return calculateTotalChartAggregate(lastDataPoint, attributesToIgnoreFromTotal)
-    }
-
-    return highlightedValue
-  }
-
   function formatHighlightedValue(value: any) {
     if (typeof value !== 'number') {
       return value
@@ -248,6 +206,9 @@ export function ComposedChart({
       return '<1'
     }
 
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
     return numberFormatter(value, valuePrecision)
   }
 
@@ -257,20 +218,17 @@ export function ComposedChart({
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
-  const referenceLines = attributes.filter((attribute) => {
-    return attribute?.provider === 'reference-line'
-  })
-
-  const resolvedHighlightedLabel = getHeaderLabel()
-
-  const resolvedHighlightedValue = computeHighlightedValue()
+  const referenceLines = useMemo(
+    () => attributes.filter((attribute) => attribute?.provider === 'reference-line'),
+    [attributes]
+  )
 
   const showHighlightActions =
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  const chartData =
+  const initialChartData =
     data && !!data[0]
       ? Object.entries(data[0])
           ?.map(([key, value]) => ({
@@ -303,11 +261,99 @@ export function ComposedChart({
           })
       : []
 
-  const stackedAttributes = chartData.filter((att) => {
+  const stackedAttributes = initialChartData.filter((att) => {
     const attribute = attributes.find((attr) => attr.attribute === att.name)
     return !attribute?.isMaxValue
   })
+
+  const isChartDataReady = Boolean(data?.[0])
+  const maxAttributeName = maxAttribute?.attribute
+  const referenceLineAttributes = useMemo(
+    () => referenceLines.map((line) => line.attribute),
+    [referenceLines]
+  )
+
+  const enabledAttributeNames = useMemo(
+    () =>
+      new Set(attributes.filter((attr) => attr.enabled !== false).map((attr) => attr.attribute)),
+    [attributes]
+  )
+
+  const resolvedHighlightedLabel = getHeaderLabel()
+
+  const resolvedHighlightedValue = useMemo(() => {
+    return resolveHighlightedChartValue({
+      data,
+      attributes,
+      focusDataIndex,
+      showTotal,
+      yAxisKey,
+      activePayload: _activePayload,
+      highlightedValue,
+      hiddenAttributes,
+      maxAttributeName: maxAttribute?.attribute,
+      referenceLineAttributes,
+    })
+  }, [
+    _activePayload,
+    attributes,
+    focusDataIndex,
+    showTotal,
+    yAxisKey,
+    highlightedValue,
+    hiddenAttributes,
+    maxAttribute?.attribute,
+    referenceLineAttributes,
+    data,
+  ])
+
+  const chartData = useMemo(() => {
+    if (!isChartDataReady) return []
+
+    return Object.entries(data[0])
+      .map(([key, value]) => ({
+        name: key,
+        value,
+      }))
+      .filter((entry) => {
+        const isTimestamp = entry.name === 'timestamp' || entry.name === 'period_start'
+        const isMaxAttribute = entry.name === maxAttributeName
+        const isReferenceLine = referenceLineAttributes.includes(entry.name)
+        const isEnabled = enabledAttributeNames.has(entry.name)
+
+        return !isTimestamp && !isMaxAttribute && !isReferenceLine && isEnabled
+      })
+      .map((entry, index) => {
+        const attribute = attributes.find((attr) => attr.attribute === entry.name)
+        const color = attribute?.color
+          ? isDarkMode
+            ? attribute.color.dark
+            : attribute.color.light
+          : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length]
+        const fill = attribute?.fill
+          ? isDarkMode
+            ? attribute.fill.dark
+            : attribute.fill.light
+          : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length]
+
+        return {
+          ...entry,
+          color,
+          fill,
+        }
+      })
+  }, [
+    isChartDataReady,
+    data,
+    maxAttributeName,
+    referenceLineAttributes,
+    enabledAttributeNames,
+    attributes,
+    isDarkMode,
+  ])
+
   const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
+
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&

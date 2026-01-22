@@ -72,11 +72,15 @@ export const getReportAttributesV2: (
       hide: false,
       showTooltip: true,
       showLegend: true,
-      showMaxValue: false,
+      showMaxValue: true,
       showGrid: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
@@ -123,9 +127,9 @@ export const getReportAttributesV2: (
         {
           attribute: 'cpu_usage_max',
           provider: 'reference-line',
-          label: 'Max',
+          label: 'Limit',
           value: 100,
-          tooltip: 'Max CPU usage',
+          tooltip: 'Maximum CPU utilization (100%). Multi-core systems are normalized to 100%',
           isMaxValue: true,
         },
       ],
