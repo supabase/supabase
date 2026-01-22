@@ -17,54 +17,53 @@ import { CellEditHistoryItem, useTableEditorTableStateSnapshot } from 'state/tab
 import type { Dictionary } from 'types'
 
 /**
- * Helper to optimistically update the query cache for a row mutation
+ * Creates optimistic update handlers for table row mutations.
+ * These handlers update the UI immediately while the API call is in progress,
+ * and rollback if the API call fails.
  */
-function optimisticallyUpdateRow(
-  queryClient: ReturnType<typeof useQueryClient>,
-  { projectRef, table, configuration, payload }: any
-) {
-  const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
-  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
+function createOptimisticUpdateHandlers(queryClient: ReturnType<typeof useQueryClient>) {
+  return {
+    async onMutate({ projectRef, table, configuration, payload }: any) {
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
+      const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
-  const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
+      await queryClient.cancelQueries({ queryKey })
 
-  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
-    return {
-      rows:
-        old?.rows.map((row) => {
-          if (
-            Object.entries(row)
-              .filter(([key]) => primaryKeyColumns.has(key))
-              .every(([key, value]) => value === configuration.identifiers[key])
-          ) {
-            return { ...row, ...payload }
-          }
-          return row
-        }) ?? [],
-    }
-  })
+      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
 
-  return { previousRowsQueries, queryKey }
-}
+      queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+        return {
+          rows:
+            old?.rows.map((row) => {
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+              return row
+            }) ?? [],
+        }
+      })
 
-/**
- * Helper to rollback optimistic update on error
- */
-function rollbackOptimisticUpdate(
-  queryClient: ReturnType<typeof useQueryClient>,
-  context: unknown
-) {
-  const ctx = context as
-    | { previousRowsQueries: [QueryKey, { result: any[] } | undefined][] }
-    | undefined
-  if (!ctx) return
+      return { previousRowsQueries }
+    },
+    onError(error: any, _variables: any, context: any) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [QueryKey, { result: any[] } | undefined][]
+      }
 
-  ctx.previousRowsQueries.forEach(([queryKey, previousRows]) => {
-    if (previousRows) {
-      queryClient.setQueriesData({ queryKey }, previousRows)
-    }
-    queryClient.invalidateQueries({ queryKey })
-  })
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData({ queryKey }, previousRows)
+        }
+        queryClient.invalidateQueries({ queryKey })
+      })
+
+      toast.error(error?.message ?? error)
+    },
+  }
 }
 
 export function useOnRowsChange(rows: SupaRow[]) {
@@ -79,27 +78,13 @@ export function useOnRowsChange(rows: SupaRow[]) {
   // Use a ref to hold the undo function to avoid circular dependency
   const undoCellEditRef = useRef<() => void>(() => {})
 
+  const optimisticHandlers = createOptimisticUpdateHandlers(queryClient)
+
   // Mutation for undo operations (toast is shown optimistically in undoCellEdit)
-  const { mutate: mutateUndoTableRow } = useTableRowUpdateMutation({
-    onMutate(variables) {
-      return optimisticallyUpdateRow(queryClient, variables)
-    },
-    onError(error, _variables, context) {
-      rollbackOptimisticUpdate(queryClient, context)
-      toast.error(error?.message ?? error)
-    },
-  })
+  const { mutate: mutateUndoTableRow } = useTableRowUpdateMutation(optimisticHandlers)
 
   // Mutation for regular updates (toast is shown optimistically in onRowsChange)
-  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
-    onMutate(variables) {
-      return optimisticallyUpdateRow(queryClient, variables)
-    },
-    onError(error, _variables, context) {
-      rollbackOptimisticUpdate(queryClient, context)
-      toast.error(error?.message ?? error)
-    },
-  })
+  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation(optimisticHandlers)
 
   // Undo function that reverts the most recent cell edit from the history stack
   const undoCellEdit = useCallback(() => {
