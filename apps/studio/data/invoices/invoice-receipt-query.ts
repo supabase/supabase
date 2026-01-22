@@ -23,5 +23,3 @@ export async function getInvoiceReceipt(
   if (error) handleError(error)
   return data
 }
-
-export type InvoiceReceiptData = Awaited<ReturnType<typeof getInvoiceReceipt>>
