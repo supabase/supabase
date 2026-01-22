@@ -80,6 +80,11 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
 
+      // Clear undo history when switching to a different table to avoid cross-table undos
+      if (state.originalTable.id !== table.id) {
+        state.cellEditHistory = []
+      }
+
       state.table = supaTable
       state.gridColumns = gridColumns
       state.originalTable = table
