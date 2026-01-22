@@ -42,19 +42,18 @@ The File Upload component makes it easy to add file uploads to your app, with bu
 
 - Simply add this `<Dropzone />` component to your page and it will handle the rest.
 
-
 ```html
 <script setup>
-import { Dropzone, DropzoneEmptyState, DropzoneContent } from '@/components/dropzone'
-import { useSupabaseUpload } from '@/composables/use-supabase-upload'
+  import { Dropzone, DropzoneEmptyState, DropzoneContent } from '@/components/dropzone'
+  import { useSupabaseUpload } from '@/composables/use-supabase-upload'
 
-const upload = useSupabaseUpload({
-  bucketName: 'test',
-  path: 'test',
-  allowedMimeTypes: ['image/*'],
-  maxFiles: 2,
-  maxFileSize: 1000 * 1000 * 10, // 10MB,
-})
+  const upload = useSupabaseUpload({
+    bucketName: 'test',
+    path: 'test',
+    allowedMimeTypes: ['image/*'],
+    maxFiles: 2,
+    maxFileSize: 1000 * 1000 * 10, // 10MB,
+  })
 </script>
 
 <template>
@@ -67,13 +66,13 @@ const upload = useSupabaseUpload({
 
 ## Props
 
-| Prop               | Type       | Default | Description                                          |
-| ------------------ | ---------- | ------- | ---------------------------------------------------- |
-| `bucketName`       | `string`   | `null`  | The name of the Supabase Storage bucket to upload to |
-| `path`             | `string`   | `null`  | The path or subfolder to upload the file to          |
-| `allowedMimeTypes` | `string[]` | `[]`    | The MIME types to allow for upload                   |
-| `maxFiles`         | `number`   | `1`     | Maximum number of files to upload                    |
-| `maxFileSize`      | `number`   | `Infinity`  | Maximum file size in bytes                           |
+| Prop               | Type       | Default    | Description                                          |
+| ------------------ | ---------- | ---------- | ---------------------------------------------------- |
+| `bucketName`       | `string`   | `null`     | The name of the Supabase Storage bucket to upload to |
+| `path`             | `string`   | `null`     | The path or subfolder to upload the file to          |
+| `allowedMimeTypes` | `string[]` | `[]`       | The MIME types to allow for upload                   |
+| `maxFiles`         | `number`   | `1`        | Maximum number of files to upload                    |
+| `maxFileSize`      | `number`   | `Infinity` | Maximum file size in bytes                           |
 
 ## Further reading
 
