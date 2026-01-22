@@ -7,8 +7,8 @@ import { toast } from 'sonner'
 
 import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 import { useParams } from 'common'
-import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
-import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
+import { DatabaseDiffPanel } from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
+import { EdgeFunctionsDiffPanel } from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
 import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
 import { WorkflowLogsCard } from 'components/interfaces/BranchManagement/WorkflowLogsCard'
@@ -549,11 +549,7 @@ const MergePage: NextPageWithLayout = () => {
             currentBranchRef={ref}
           />
         ) : (
-          <EdgeFunctionsDiffPanel
-            diffResults={edgeFunctionsDiff}
-            currentBranchRef={ref}
-            mainBranchRef={parentProjectRef}
-          />
+          <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
         )}
       </ScaffoldContainer>
 

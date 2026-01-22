@@ -1,4 +1,4 @@
-import { DiffEditor } from '@monaco-editor/react'
+import { DiffEditor as BaseDiffEditor } from '@monaco-editor/react'
 import type { editor as monacoEditor } from 'monaco-editor'
 
 interface DiffViewerProps {
@@ -7,42 +7,47 @@ interface DiffViewerProps {
   /** Modified/right hand side content */
   modified: string | undefined
   /** Language identifier understood by Monaco */
-  language: string
+  language?: string
   /** Height for the editor container */
   height?: string | number
-  /** Whether to render diffs side-by-side */
-  sideBySide?: boolean
+  /** Diff Editor Options */
+  options?: monacoEditor.IStandaloneDiffEditorConstructionOptions
+  onMount?: (editor: monacoEditor.IStandaloneDiffEditor) => void
 }
 
 // Centralised set of options so all diff editors look the same
 const DEFAULT_OPTIONS: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
-  readOnly: true,
-  renderSideBySide: false,
+  fontSize: 13,
   minimap: { enabled: false },
   wordWrap: 'on',
   lineNumbers: 'on',
   folding: false,
-  padding: { top: 16, bottom: 16 },
   lineNumbersMinChars: 3,
-  fontSize: 13,
   scrollBeyondLastLine: false,
+  renderSideBySide: false,
+  padding: { top: 4 },
 }
 
-export const DiffViewer = ({
+export const DiffEditor = ({
   original = '',
   modified = '',
-  language,
+  language = 'pgsql',
   height = '100%',
-  sideBySide = false,
+  options,
+  onMount,
 }: DiffViewerProps) => (
-  <DiffEditor
+  <BaseDiffEditor
+    // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
+    // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
+    // Error: TextModel got disposed before DiffEditorWidget model got reset
+    keepCurrentOriginalModel
+    keepCurrentModifiedModel
     theme="supabase"
     language={language}
     height={height}
     original={original}
     modified={modified}
-    options={{ ...DEFAULT_OPTIONS, renderSideBySide: sideBySide }}
+    options={{ ...DEFAULT_OPTIONS, ...options }}
+    onMount={onMount}
   />
 )
-
-export default DiffViewer
