@@ -100,11 +100,6 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/tables',
           items: [],
         },
-        {
-          title: 'Status Codes',
-          href: '/docs/ui-patterns/status-codes',
-          items: [],
-        },
       ],
     },
     {
@@ -205,6 +200,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Confirmation Modal',
           href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
           items: [],
         },
       ],
