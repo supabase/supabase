@@ -51,7 +51,9 @@ Row Level Security (RLS) enforces data access at the database level, ensuring us
 
 ```sql
 -- Relying only on application to filter
-select * from orders where user_id = $current_user_id;
+select * 
+from orders 
+where user_id = $current_user_id;
 
 -- Bug or bypass means all data is exposed!
 select * from orders;  -- Returns ALL orders
