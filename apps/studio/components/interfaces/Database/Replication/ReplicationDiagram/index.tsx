@@ -73,7 +73,7 @@ const ReplicationDiagramContent = () => {
       }
     }),
     ...destinations.map((x) => {
-      const pipeline = (pipelinesData?.pipelines ?? []).find((x) => x.destination_id === x.id)
+      const pipeline = (pipelinesData?.pipelines ?? []).find((p) => p.destination_id === x.id)
       const pipelineStatus = queryClient.getQueryData(
         replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
       ) as ReplicationPipelineStatusResponse
