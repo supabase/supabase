@@ -109,7 +109,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
     }
 
     const remainingEdits = snap.cellEditHistory.length
-    if (remainingEdits > 0) {
+    if (remainingEdits > 1) {
       toastIdRef.current = toast.success('Cell edit undone', {
         description: `${remainingEdits} more edit${remainingEdits > 1 ? 's' : ''} can be undone`,
         action: {
@@ -122,7 +122,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
       toast.success('Cell edit undone')
     }
 
-    // Defer the mutation to avoid conflicts with React's rendering cycle
+    // [Ali] Defer the mutation to avoid conflicts with React's rendering cycle
     // This prevents "Canceled" errors when undo is triggered during other state updates
     const tableRef = snap.originalTable
     const roleState = getImpersonatedRoleState()
