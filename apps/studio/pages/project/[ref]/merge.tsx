@@ -41,11 +41,11 @@ import {
   NavMenu,
   NavMenuItem,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, workflow_run_id: currentWorkflowRunId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
@@ -91,7 +91,7 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchRef: ref,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
-    parentBranchConnectionString: (parentProject as any)?.connectionString || undefined,
+    parentBranchConnectionString: parentProject?.connectionString || undefined,
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
@@ -102,8 +102,6 @@ const MergePage: NextPageWithLayout = () => {
   })
 
   const clearDiffsOptimistically = edgeFunctionsDiff.clearDiffsOptimistically
-
-  const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
 
   const handleCurrentBranchWorkflowComplete = useCallback(
     (status: 'SUCCESS' | 'FAILED') => {
