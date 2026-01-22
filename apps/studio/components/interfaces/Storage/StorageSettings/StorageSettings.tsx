@@ -401,7 +401,7 @@ export const StorageSettings = () => {
                         {isFreeTier && (
                           <UpgradeToPro
                             fullWidth
-                            buttonVariant="default"
+                            buttonVariant="primary"
                             source="storageSizeLimit"
                             featureProposition="configure upload file size limits in Storage"
                             primaryText="Free Plan has a fixed upload file size limit of 50 MB"
@@ -447,7 +447,7 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type="primary"
+                            type={isFreeTier ? 'default' : 'primary'}
                             htmlType="submit"
                             loading={isUpdating}
                             disabled={

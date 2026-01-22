@@ -45,12 +45,7 @@ export const UpgradeToPro = ({
       layout={layout}
       title={primaryText}
       description={secondaryText}
-      className={cn(
-        'mb-0',
-        fullWidth &&
-          'border-0 rounded-none border-b',
-        className
-      )}
+      className={cn(fullWidth && 'border-0 rounded-none border-b', className)}
       actions={
         <UpgradePlanButton
           plan={planToUpgrade}
