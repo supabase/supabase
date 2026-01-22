@@ -14,15 +14,15 @@ import { SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
-import type { Dictionary } from 'types'
 import { useTableEditorStateSnapshot } from './table-editor'
+import { RowIdentifiers } from '@/components/grid/components/grid/Grid.types'
 
 export type CellEditHistoryItem = {
   rowIdx: number
   columnName: string
   previousValue: unknown
   newValue: unknown
-  identifiers: Dictionary<unknown>
+  identifiers: RowIdentifiers
 }
 
 export const createTableEditorTableState = ({

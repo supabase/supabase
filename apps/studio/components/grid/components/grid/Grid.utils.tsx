@@ -17,12 +17,10 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { CellEditHistoryItem, useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import type { Dictionary, ResponseError } from 'types'
+import type { ResponseError } from 'types'
+import { OptimisticUpdateContext, RowIdentifiers } from './Grid.types'
 
 const UNDO_TOAST_DURATION = 5000
-
-/** Row identifier values used to locate a specific row for updates */
-type RowIdentifiers = Dictionary<string | number | boolean | null>
 
 /** Gets enum array column names from a table (needed for proper SQL generation) */
 function getEnumArrayColumns(table: Entity): string[] {
@@ -48,12 +46,6 @@ function buildRowIdentifiers(table: Entity, row: SupaRow): RowIdentifiers {
   return identifiers
 }
 
-/** Context returned from onMutate for potential rollback */
-type OptimisticUpdateContext = {
-  previousRowsQueries: [QueryKey, TableRowsData | undefined][]
-}
-
-/** Creates optimistic update handlers for React Query mutations */
 function createOptimisticUpdateHandlers(queryClient: ReturnType<typeof useQueryClient>) {
   return {
     async onMutate({
