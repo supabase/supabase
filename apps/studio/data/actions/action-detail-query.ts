@@ -11,7 +11,7 @@ type ActionRunVariables = {
 }
 
 export type ActionRun = components['schemas']['ActionRunResponse'] & {
-  status: 'SUCCESS' | 'FAILED' | 'RUNNING'
+  status?: 'SUCCESS' | 'FAILED' | 'RUNNING'
 }
 
 export async function getActionRun(
