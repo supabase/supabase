@@ -196,8 +196,8 @@ export const PerformanceSettingsForm = () => {
           <UpgradeToPro
             source="authPerformance"
             featureProposition="configure advanced Auth server settings"
-            primaryText="Configuring Auth server performance is only available on the Pro plan and above"
-            secondaryText="Upgrade to the Pro plan to configure settings for your Auth server"
+            primaryText="Only available on the Pro Plan and above"
+            secondaryText="Upgrade to the Pro Plan to configure Auth server performance settings."
           />
         )}
       </ScaffoldSection>
