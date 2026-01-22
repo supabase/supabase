@@ -3,10 +3,6 @@ import { Plus, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import {
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from '@/data/read-replicas/replicas-status-query'
 import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -57,7 +53,6 @@ export const Destinations = () => {
     isPending: isDatabasesLoading,
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
-    refetch: refetchDatabases,
   } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
   const readReplicas = databases.filter((x) => x.identifier !== projectRef)
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
@@ -65,9 +60,6 @@ export const Destinations = () => {
     filterString.length === 0
       ? readReplicas
       : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
-
-  const { data: statuses = [], isSuccess: isSuccessReplicasStatuses } =
-    useReadReplicasStatusesQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
 
   const {
     data: sourcesData,
@@ -135,7 +127,7 @@ export const Destinations = () => {
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   useEffect(() => {
-    if (!isSuccessReplicasStatuses) return
+    if (!isDatabasesSuccess) return
 
     const pollReplicas = async () => {
       const fixedStatuses = [
@@ -143,27 +135,16 @@ export const Destinations = () => {
         REPLICA_STATUS.ACTIVE_UNHEALTHY,
         REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
       ]
-      const replicasInTransition = statuses.filter((db) => {
-        const { status } = db.replicaInitializationStatus || {}
-        return (
-          !fixedStatuses.includes(db.status) || status === ReplicaInitializationStatus.InProgress
-        )
-      })
+
+      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
       const hasTransientStatus = replicasInTransition.length > 0
 
-      // If any replica's status has changed, refetch databases
-      if (statuses.length !== databases.length) {
-        await refetchDatabases()
-      }
-
       // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus && statuses.length === databases.length) {
-        setStatusRefetchInterval(false)
-      }
+      if (!hasTransientStatus) setStatusRefetchInterval(false)
     }
 
     pollReplicas()
-  }, [databases.length, isSuccessReplicasStatuses, refetchDatabases, statuses])
+  }, [isDatabasesSuccess, readReplicas])
 
   return (
     <>
@@ -239,12 +220,10 @@ export const Destinations = () => {
                 <TableBody>
                   {unifiedReplication &&
                     filteredReplicas.map((replica) => {
-                      const status = statuses.find((x) => x.identifier === replica.identifier)
                       return (
                         <ReadReplicaRow
                           key={replica.identifier}
                           replica={replica}
-                          replicaStatus={status}
                           onUpdateReplica={() => setStatusRefetchInterval(5000)}
                         />
                       )
