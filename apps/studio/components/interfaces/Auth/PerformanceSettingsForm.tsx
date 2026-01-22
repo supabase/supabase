@@ -218,7 +218,8 @@ export const PerformanceSettingsForm = () => {
                       label="Maximum allowed duration for an Auth request"
                       description={
                         <p className="text-balance">
-                          Requests that exceed this time limit are terminated to help manage server load.
+                          Requests that exceed this time limit are terminated to help manage server
+                          load.
                         </p>
                       }
                     >
@@ -236,10 +237,11 @@ export const PerformanceSettingsForm = () => {
                             </PrePostTab>
                           </div>
                         </FormControl_Shadcn_>
-                
-                          <p className="text-xs text-right text-foreground-muted">10+ seconds recommended</p>
-                        </div>
-                
+
+                        <p className="text-xs text-right text-foreground-muted">
+                          10+ seconds recommended
+                        </p>
+                      </div>
                     </FormItemLayout>
                   )}
                 />
@@ -286,7 +288,9 @@ export const PerformanceSettingsForm = () => {
                       label="Allocation strategy"
                       description={
                         <p className="text-balance">
-                          Choose whether to allocate a percentage or a fixed number of connections to the Auth server. We recommend a percentage, as it scales automatically with your instance size.
+                          Choose whether to allocate a percentage or a fixed number of connections
+                          to the Auth server. We recommend a percentage, as it scales automatically
+                          with your instance size.
                         </p>
                       }
                     >
@@ -340,8 +344,8 @@ export const PerformanceSettingsForm = () => {
                     </FormItemLayout>
                   )}
                 />
-                </CardContent>
-                <CardContent>
+              </CardContent>
+              <CardContent>
                 <FormField_Shadcn_
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
@@ -379,7 +383,6 @@ export const PerformanceSettingsForm = () => {
                           {isLoadingMaxConns ? (
                             <ShimmeringLoader className="py-2 w-16 ml-auto" />
                           ) : (
-            
                             <p className="text-xs text-right text-foreground-muted">
                               <span className="text-foreground-light">
                                 {chosenUnit === 'percent'
