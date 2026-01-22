@@ -23,16 +23,16 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
     case '1':
     case 'info':
       return {
-        text: 'text-blue-900',
-        bg: 'bg-blue-300',
-        border: 'border-blue-500',
+        text: 'text-foreground-lighter',
+        bg: 'bg-surface-200',
+        border: '',
       }
     case '2':
     case 'success':
       return {
-        text: 'text-brand-600',
-        bg: 'bg-brand-300',
-        border: 'border-brand-500/50',
+        text: 'text-foreground-lighter',
+        bg: 'bg-surface-200',
+        border: '',
       }
     case '4':
     case 'warning':
