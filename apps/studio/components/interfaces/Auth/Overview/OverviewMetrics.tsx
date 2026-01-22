@@ -109,7 +109,7 @@ const LogsLink = ({ href }: { href: string }) => (
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild
       >
-        <Link href={href}>
+        <Link href={href} aria-label="Go to Logs">
           <ChevronRight size={12} />
         </Link>
       </Button>
