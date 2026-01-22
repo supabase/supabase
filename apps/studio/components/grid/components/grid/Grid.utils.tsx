@@ -194,9 +194,10 @@ export function useOnRowsChange(rows: SupaRow[]) {
         newValue: rowData[changedColumn],
         identifiers,
       }
+      const editCountBeforePush = snap.cellEditHistory.length
       snap.pushCellEdit(editHistoryItem)
 
-      showUndoToast('Cell updated', snap.cellEditHistory.length)
+      showUndoToast('Cell updated', editCountBeforePush)
 
       mutateUpdateTableRow({
         projectRef: project.ref,
