@@ -74,6 +74,7 @@ export const GitHubSection = () => {
                 {promptProPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
+                      layout="vertical"
                       source="github-integration"
                       featureProposition="use GitHub integrations"
                       primaryText={`Upgrade to ${!!existingConnection ? 'manage' : 'unlock'} GitHub integration`}

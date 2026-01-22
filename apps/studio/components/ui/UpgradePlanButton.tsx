@@ -17,7 +17,7 @@ export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
 interface UpgradePlanButtonProps {
   /** Stick to camel case for consistency */
   source: string
-  type?: 'default' | 'primary'
+  variant?: 'default' | 'primary'
   plan?: 'Pro' | 'Team' | 'Enterprise'
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
@@ -33,7 +33,7 @@ interface UpgradePlanButtonProps {
  */
 export const UpgradePlanButton = ({
   source,
-  type = 'primary',
+  variant = 'primary',
   plan = 'Pro',
   addon,
   featureProposition,
@@ -95,7 +95,7 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={variant}
         className={className}
         tooltip={{
           content: {
@@ -110,7 +110,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={type} disabled={disabled} className={className}>
+    <Button asChild type={variant} disabled={disabled} className={className}>
       {link}
     </Button>
   )
