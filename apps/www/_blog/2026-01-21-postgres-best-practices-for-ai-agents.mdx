@@ -56,7 +56,9 @@ from orders
 where user_id = $current_user_id;
 
 -- Bug or bypass means all data is exposed!
-select * from orders;  -- Returns ALL orders
+-- Returns ALL orders:
+select * 
+from orders;  
 ```
 
 **Correct (database-enforced RLS):**
