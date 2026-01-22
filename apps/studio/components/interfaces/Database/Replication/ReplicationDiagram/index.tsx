@@ -40,60 +40,64 @@ const ReplicationDiagramContent = () => {
 
   const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
 
-  const nodes = [
-    { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
-    ...readReplicas.map((x) => ({
-      id: x.identifier,
-      type: 'readReplica',
-      data: {},
-      position: { x: 0, y: 0 },
-    })),
-    ...destinations.map((x) => ({
-      id: x.id.toString(),
-      type: 'replication',
-      data: {},
-      position: { x: 0, y: 0 },
-    })),
-  ]
-  const edges = [
-    ...readReplicas.map((x) => {
-      const isReplicating = x.status === 'ACTIVE_HEALTHY'
+  const nodes = useMemo(() => {
+    return [
+      { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
+      ...readReplicas.map((x) => ({
+        id: x.identifier,
+        type: 'readReplica',
+        data: {},
+        position: { x: 0, y: 0 },
+      })),
+      ...destinations.map((x) => ({
+        id: x.id.toString(),
+        type: 'replication',
+        data: {},
+        position: { x: 0, y: 0 },
+      })),
+    ]
+  }, [destinations, projectRef, readReplicas])
+  const edges = useMemo(() => {
+    return [
+      ...readReplicas.map((x) => {
+        const isReplicating = x.status === 'ACTIVE_HEALTHY'
 
-      return {
-        id: `${projectRef}-${x.identifier}`,
-        source: projectRef,
-        target: x.identifier,
-        type: 'smoothstep',
-        className: '!cursor-default',
-        animated: isReplicating ? true : false,
-        style: {
-          opacity: isReplicating ? 1 : 0.4,
-          strokeDasharray: isReplicating ? undefined : '5 5',
-        },
-      }
-    }),
-    ...destinations.map((x) => {
-      const pipeline = (pipelinesData?.pipelines ?? []).find((p) => p.destination_id === x.id)
-      const pipelineStatus = queryClient.getQueryData(
-        replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
-      ) as ReplicationPipelineStatusResponse
-      const statusName = getStatusName(pipelineStatus?.status)
-      const isReplicating = statusName === 'started'
+        return {
+          id: `${projectRef}-${x.identifier}`,
+          source: projectRef,
+          target: x.identifier,
+          type: 'smoothstep',
+          className: '!cursor-default',
+          animated: isReplicating,
+          style: {
+            opacity: isReplicating ? 1 : 0.4,
+            strokeDasharray: isReplicating ? undefined : '5 5',
+          },
+        }
+      }),
+      ...destinations.map((x) => {
+        const pipeline = (pipelinesData?.pipelines ?? []).find((p) => p.destination_id === x.id)
+        const pipelineStatus = queryClient.getQueryData(
+          replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
+        ) as ReplicationPipelineStatusResponse
+        const statusName = getStatusName(pipelineStatus?.status)
+        const isReplicating = statusName === 'started'
 
-      return {
-        id: `${projectRef}-${x.id}`,
-        source: projectRef,
-        target: x.id.toString(),
-        type: 'smoothstep',
-        className: '!cursor-default',
-        animated: isReplicating ? true : false,
-        style: {
-          opacity: isReplicating ? 1 : 0.4,
-          strokeDasharray: isReplicating ? undefined : '5 5',
-        },
-      }
-    }),
-  ]
+        return {
+          id: `${projectRef}-${x.id}`,
+          source: projectRef,
+          target: x.id.toString(),
+          type: 'smoothstep',
+          className: '!cursor-default',
+          animated: isReplicating,
+          style: {
+            opacity: isReplicating ? 1 : 0.4,
+            strokeDasharray: isReplicating ? undefined : '5 5',
+          },
+        }
+      }),
+    ]
+  }, [destinations, pipelinesData?.pipelines, projectRef, queryClient, readReplicas])
 
   const nodeTypes = useMemo(
     () => ({
