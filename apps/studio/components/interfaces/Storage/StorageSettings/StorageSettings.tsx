@@ -401,9 +401,10 @@ export const StorageSettings = () => {
                         {isFreeTier && (
                           <UpgradeToPro
                             fullWidth
+                            variant="primary"
                             source="storageSizeLimit"
                             featureProposition="configure upload file size limits in Storage"
-                            primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                            primaryText="Free Plan has a fixed upload file size limit of 50 MB"
                             secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )} and unlock image transformations.`}
@@ -413,11 +414,12 @@ export const StorageSettings = () => {
                           <UpgradeToPro
                             fullWidth
                             addon="spendCap"
+                            variant="default"
                             source="storageSizeLimit"
                             featureProposition="increase the file upload size limits in Storage"
-                            buttonText="Disable Spend Cap"
-                            primaryText="Reduced max upload file size limit due to Spend Cap"
-                            secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                            buttonText="Disable spend cap"
+                            primaryText="Reduced max upload file size limit due to spend cap"
+                            secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )}.`}
                           />
@@ -445,7 +447,7 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type="primary"
+                            type={isFreeTier ? 'default' : 'primary'}
                             htmlType="submit"
                             loading={isUpdating}
                             disabled={
