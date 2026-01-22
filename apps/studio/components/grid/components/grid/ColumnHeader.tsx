@@ -21,6 +21,7 @@ export function ColumnHeader<R>({
   isEncrypted,
   format,
   foreignKey,
+  comment,
 }: ColumnHeaderProps<R>) {
   const ref = useRef<HTMLDivElement>(null)
   const columnIdx = column.idx
@@ -133,9 +134,20 @@ export function ColumnHeader<R>({
               </TooltipContent>
             </Tooltip>
           )}
-          <span className="sb-grid-column-header__inner__name" title={hoverValue}>
-            {column.name}
-          </span>
+          {comment ? (
+            <Tooltip>
+              <TooltipTrigger>
+                <span className="sb-grid-column-header__inner__name">{column.name}</span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs">
+                {comment}
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <span className="sb-grid-column-header__inner__name" title={hoverValue}>
+              {column.name}
+            </span>
+          )}
           <span className="sb-grid-column-header__inner__format">
             {columnFormat}
             {columnFormat === 'bytea' ? ` (hex)` : ''}
