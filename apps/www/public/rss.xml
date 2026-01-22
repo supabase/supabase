@@ -8,7 +8,7 @@
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/postgres-best-practices-for-ai-agents</guid>
-  <title>Postgres Best Practices for AI Agents</title>
+  <title>Introducing: Postgres Best Practices</title>
   <link>https://supabase.com/blog/postgres-best-practices-for-ai-agents</link>
   <description>We are releasing Agent Skills for Postgres Best Practices to help AI coding agents write high quality, correct Postgres code.</description>
   <pubDate>Wed, 21 Jan 2026 00:00:00 -0700</pubDate>

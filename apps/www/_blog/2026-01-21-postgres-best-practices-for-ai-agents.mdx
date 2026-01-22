@@ -9,7 +9,7 @@ categories:
 tags:
   - ai
   - postgres
-  - mcp
+  - skills
 date: '2026-01-21'
 toc_depth: 2
 ---
@@ -26,9 +26,9 @@ The repository contains rules across 8 categories, prioritized by impact:
 
 - **Query Performance (Critical):** Rules for writing efficient queries and avoiding full table scans
 - **Connection Management (Critical):** Connection pooling, client lifecycle, and resource limits
+- **Security and RLS (Critical):** Row Level Security policies and access control patterns
 - **Schema Design (High):** Table structure, data types, and normalization decisions
 - **Concurrency and Locking (Medium-High):** Transaction isolation, deadlock prevention, and lock management
-- **Security and RLS (Medium-High):** Row Level Security policies and access control patterns
 - **Data Access Patterns (Medium):** Pagination, bulk operations, and query design
 - **Monitoring and Diagnostics (Low-Medium):** Query analysis, performance tracking, and debugging
 - **Advanced Features (Low):** Postgres-specific capabilities like CTEs, window functions, and extensions
@@ -145,4 +145,17 @@ The `CONTRIBUTING.md` file has the full template.
 
 The repo is live at [github.com/supabase/agent-skills](https://github.com/supabase/agent-skills).
 
-Install the skill, try it on your next Postgres project, and let us know what rules are missing.
+To install a skill, you can use [Vercel’s skills npm package](https://www.npmjs.com/package/skills) to interactively install this skill on your agent.
+
+```
+npx skills add supabase/agent-skills
+```
+
+If you’re using Claude Code, you can also install this skill as a plugin.
+
+```
+/plugin marketplace add supabase/agent-skills
+/plugin install postgres-best-practices@supabase-agent-skills
+```
+
+Try it on your next Postgres project, and let us know what rules are missing.
