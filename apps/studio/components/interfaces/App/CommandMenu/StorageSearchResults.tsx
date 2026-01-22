@@ -1,23 +1,29 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
-import { Storage, FilesBucket, AnalyticsBucket as AnalyticsBucketIcon, VectorBucket } from 'icons'
+import { useDebounce } from '@uidotdev/usehooks'
 import { Loader2 } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+
 import { useParams } from 'common'
-import { useBucketsQuery, type Bucket } from 'data/storage/buckets-query'
-import {
-  useAnalyticsBucketsQuery,
-  type AnalyticsBucket,
-} from 'data/storage/analytics-buckets-query'
-import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from 'data/config/project-storage-config-query'
 import {
-  SkeletonResults,
+  useAnalyticsBucketsQuery,
+  type AnalyticsBucket,
+} from 'data/storage/analytics-buckets-query'
+import {
+  useBucketNumberEstimateQuery,
+  usePaginatedBucketsQuery,
+  type Bucket,
+} from 'data/storage/buckets-query'
+import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
+import { AnalyticsBucket as AnalyticsBucketIcon, FilesBucket, Storage, VectorBucket } from 'icons'
+import {
   EmptyState,
   ResultsList,
+  SkeletonResults,
   type SearchResult,
 } from './ContextSearchResults.shared'
 
@@ -52,17 +58,26 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
   const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef })
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef })
 
+  // Debounce the search query to avoid excessive API calls
+  const debouncedQuery = useDebounce(query.trim(), 300)
+
   const {
-    data: fileBuckets,
+    data: fileBucketsData,
     isLoading: isLoadingFileBuckets,
     isError: isErrorFileBuckets,
-  } = useBucketsQuery(
+  } = usePaginatedBucketsQuery(
     {
       projectRef: projectRef ?? undefined,
+      limit: 10,
+      search: debouncedQuery.length > 0 ? debouncedQuery : undefined,
     },
     {
       enabled: !!projectRef,
     }
+  )
+  const fileBuckets = useMemo(
+    () => fileBucketsData?.pages.flatMap((page) => page) ?? [],
+    [fileBucketsData]
   )
 
   const {
@@ -93,6 +108,10 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
 
   const vectorBuckets = useMemo(() => vectorBucketsData?.vectorBuckets ?? [], [vectorBucketsData])
 
+  const { data: fileBucketsEstimate } = useBucketNumberEstimateQuery({
+    projectRef,
+  })
+
   const isLoading =
     isLoadingFileBuckets ||
     (isAnalyticsBucketsEnabled && isLoadingAnalyticsBuckets) ||
@@ -103,34 +122,28 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     (isVectorBucketsEnabled && isErrorVectorBuckets)
 
   const fileBucketResults: ExtendedSearchResult[] = useMemo(() => {
-    return filterBuckets(
-      fileBuckets,
-      query,
-      (bucket, searchLower) => {
-        const bucketName = bucket.name?.toLowerCase() || ''
-        const bucketId = bucket.id?.toLowerCase() || ''
-        return bucketName.includes(searchLower) || bucketId.includes(searchLower)
-      },
-      (bucket) => {
-        const displayName = bucket.name || bucket.id || 'Untitled Bucket'
-        const visibility = bucket.public ? 'Public' : 'Private'
-        const description = `File bucket • ${visibility}`
+    // Server-side search is already applied, no need for client-side filtering
+    if (!fileBuckets) return []
 
-        return {
-          id: `file-bucket-${bucket.id || bucket.name}`,
-          name: displayName,
-          description,
-          bucketType: 'file' as const,
-          bucket,
-        }
+    return fileBuckets.map((bucket) => {
+      const displayName = bucket.name || bucket.id || 'Untitled Bucket'
+      const visibility = bucket.public ? 'Public' : 'Private'
+      const description = `File bucket • ${visibility}`
+
+      return {
+        id: `file-bucket-${bucket.id || bucket.name}`,
+        name: displayName,
+        description,
+        bucketType: 'file' as const,
+        bucket,
       }
-    )
-  }, [fileBuckets, query])
+    })
+  }, [fileBuckets])
 
   const analyticsBucketResults: ExtendedSearchResult[] = useMemo(() => {
     return filterBuckets(
       analyticsBuckets,
-      query,
+      debouncedQuery, // Use debounced query for consistency
       (bucket, searchLower) => {
         const bucketName = bucket.name?.toLowerCase() || ''
         return bucketName.includes(searchLower)
@@ -148,12 +161,12 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
         }
       }
     )
-  }, [analyticsBuckets, query])
+  }, [analyticsBuckets, debouncedQuery])
 
   const vectorBucketResults: ExtendedSearchResult[] = useMemo(() => {
     return filterBuckets(
       vectorBuckets,
-      query,
+      debouncedQuery, // Use debounced query for consistency
       (bucket, searchLower) => {
         const bucketName = bucket.vectorBucketName?.toLowerCase() || ''
         return bucketName.includes(searchLower)
@@ -171,7 +184,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
         }
       }
     )
-  }, [vectorBuckets, query])
+  }, [vectorBuckets, debouncedQuery])
 
   const allResults: ExtendedSearchResult[] = useMemo(() => {
     const results = [fileBucketResults]
@@ -220,17 +233,14 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     [projectRef]
   )
 
-  const totalBuckets = useMemo(() => {
-    let total = fileBuckets?.length ?? 0
-    if (isAnalyticsBucketsEnabled) {
-      total += analyticsBuckets?.length ?? 0
-    }
-    if (isVectorBucketsEnabled) {
-      total += vectorBuckets?.length ?? 0
-    }
-    return total
+  const totalBucketsEstimate = useMemo(() => {
+    const fileBucketCount = fileBucketsEstimate ?? 0
+    const analyticsBucketCount = isAnalyticsBucketsEnabled ? analyticsBuckets?.length ?? 0 : 0
+    const vectorBucketCount = isVectorBucketsEnabled ? vectorBuckets?.length ?? 0 : 0
+
+    return fileBucketCount + analyticsBucketCount + vectorBucketCount
   }, [
-    fileBuckets?.length,
+    fileBucketsEstimate,
     analyticsBuckets?.length,
     vectorBuckets?.length,
     isAnalyticsBucketsEnabled,
@@ -254,7 +264,8 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
           </span>
         ) : (
           <span>
-            Total: {totalBuckets.toLocaleString()} bucket{totalBuckets !== 1 ? 's' : ''}
+            Total: {totalBucketsEstimate.toLocaleString()} bucket
+            {totalBucketsEstimate !== 1 ? 's' : ''} (estimate)
           </span>
         )}
       </div>
@@ -290,7 +301,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
     return (
       <div className="relative h-full flex flex-col">
         <div className="flex-1 min-h-0 overflow-hidden">
-          <EmptyState icon={Storage} label="Storage" query={query} />
+          <EmptyState icon={Storage} label="Storage" query={debouncedQuery} />
         </div>
         {renderFooter()}
       </div>
