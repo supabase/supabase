@@ -273,7 +273,8 @@ export const CreateBranchModal = () => {
                 source="create-branch"
                 featureProposition="enable branching"
                 primaryText="Upgrade to unlock branching"
-                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production."
+                className="pb-5"
               />
             )}
 

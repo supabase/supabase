@@ -6,16 +6,20 @@ import { toast } from 'sonner'
 import { AIEditor } from 'components/ui/AIEditor'
 import {
   Button,
+  cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
   flattenTree,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   TreeView,
   TreeViewItem,
 } from 'ui'
-import { FileAction, type FileData } from './FileExplorerAndEditor.types'
+import { FileAction, TreeChildData, type FileData } from './FileExplorerAndEditor.types'
 import {
   extractZipFile,
   getFileAction,
@@ -33,6 +37,9 @@ interface FileExplorerAndEditorProps {
     connectionString?: string | null
     orgSlug?: string
   }
+
+  selectedFileId?: number
+  setSelectedFileId?: (id: number) => void
 }
 
 const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
@@ -42,17 +49,23 @@ export const FileExplorerAndEditor = ({
   onFilesChange,
   aiEndpoint,
   aiMetadata,
+  selectedFileId: extSelectedFileId,
+  setSelectedFileId: extSetSelectedFileId,
 }: FileExplorerAndEditorProps) => {
   const [isDragOver, setIsDragOver] = useState(false)
+  const [_selectedFileId, _setSelectedFileId] = useState<number>(files[0]?.id)
   const [extractionProgress, setExtractionProgress] = useState<{
     current: number
     total: number
   } | null>(null)
 
-  const selectedFile = files.find((f) => f.selected) ?? files[0]
+  const selectedFileId = extSelectedFileId ?? _selectedFileId
+  const setSelectedFileId = extSetSelectedFileId ?? _setSelectedFileId
+
+  const selectedFile = files.find((f) => f.id === selectedFileId)
   const isExtractingZip = extractionProgress !== null
 
-  const [treeData, setTreeData] = useState({
+  const [treeData, setTreeData] = useState<{ name: string; children: TreeChildData[] }>({
     name: '',
     children: files.map((file) => ({
       id: file.id.toString(),
@@ -60,28 +73,27 @@ export const FileExplorerAndEditor = ({
       metadata: {
         isEditing: false,
         originalId: file.id,
+        state: file.state,
       },
     })),
   })
 
   const handleChange = (value: string) => {
     const updatedFiles = files.map((file) =>
-      file.id === selectedFile.id ? { ...file, content: value } : file
+      file.id === selectedFileId ? { ...file, content: value } : file
     )
+
     onFilesChange(updatedFiles)
   }
 
   const addNewFile = () => {
     const newId = Math.max(0, ...files.map((f) => f.id)) + 1
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
+
+    setSelectedFileId(newId)
     onFilesChange([
       ...updatedFiles,
-      {
-        id: newId,
-        name: `file${newId}.ts`,
-        content: '',
-        selected: true,
-      },
+      { id: newId, name: `file${newId}.ts`, content: '', state: 'new' },
     ])
   }
 
@@ -141,7 +153,6 @@ export const FileExplorerAndEditor = ({
           updatedFiles[actionResult.index] = {
             ...updatedFiles[actionResult.index],
             content: file.content,
-            selected: false,
           }
           replacedCount++
           hasReplacedFiles = true
@@ -151,7 +162,6 @@ export const FileExplorerAndEditor = ({
           newFiles[actionResult.index] = {
             ...newFiles[actionResult.index],
             content: file.content,
-            selected: false,
           }
           replacedCount++
           break
@@ -168,7 +178,7 @@ export const FileExplorerAndEditor = ({
             id: newId,
             name: file.name,
             content: file.content,
-            selected: false,
+            state: 'new',
           })
           extractedCount++
           break
@@ -199,11 +209,11 @@ export const FileExplorerAndEditor = ({
 
     // Select the last added/modified file
     if (newFiles.length > 0) {
-      newFiles[newFiles.length - 1].selected = true
+      setSelectedFileId(newFiles[newFiles.length - 1].id)
       onFilesChange([...updatedFiles, ...newFiles])
     } else if (hasReplacedFiles) {
       // If we only replaced files, select the first one
-      updatedFiles[0].selected = true
+      setSelectedFileId(updatedFiles[0].id)
       onFilesChange(updatedFiles)
     }
   }
@@ -218,6 +228,7 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: file.id === id,
           originalId: file.id,
+          state: file.state,
         },
       })),
     })
@@ -233,6 +244,7 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: false,
           originalId: file.id,
+          state: file.state,
         },
       })),
     })
@@ -254,8 +266,8 @@ export const FileExplorerAndEditor = ({
       return exitEditMode()
     }
 
-    const updatedFiles = files.map((file) =>
-      file.id === id
+    const updatedFiles = files.map((file) => {
+      return file.id === id
         ? {
             ...file,
             name: newName,
@@ -265,7 +277,7 @@ export const FileExplorerAndEditor = ({
                 : file.content,
           }
         : file
-    )
+    })
     onFilesChange(updatedFiles)
   }
 
@@ -276,23 +288,14 @@ export const FileExplorerAndEditor = ({
     }
 
     const fileToDelete = files.find((f) => f.id === id)
-    const isSelected = fileToDelete?.selected
-
+    const isSelected = fileToDelete?.id === selectedFileId
     const updatedFiles = files.filter((file) => file.id !== id)
 
     // If the deleted file was selected, select another file
     if (isSelected && updatedFiles.length > 0) {
-      updatedFiles[0].selected = true
+      setSelectedFileId(updatedFiles[0].id)
     }
 
-    onFilesChange(updatedFiles)
-  }
-
-  const handleFileSelect = (id: number) => {
-    const updatedFiles = files.map((file) => ({
-      ...file,
-      selected: file.id === id,
-    }))
     onFilesChange(updatedFiles)
   }
 
@@ -326,9 +329,12 @@ export const FileExplorerAndEditor = ({
         metadata: {
           isEditing: false,
           originalId: file.id,
+          state: file.state,
         },
       })),
     })
+
+    if (!selectedFileId && files.length > 0) setSelectedFileId(files[0].id)
   }, [files])
 
   return (
@@ -381,6 +387,8 @@ export const FileExplorerAndEditor = ({
                 typeof element.metadata?.originalId === 'number'
                   ? element.metadata.originalId
                   : null
+              const state = element.metadata?.state as FileData['state']
+              const isEditing = Boolean(element.metadata?.isEditing)
 
               return (
                 <ContextMenu_Shadcn_ modal={false}>
@@ -390,20 +398,29 @@ export const FileExplorerAndEditor = ({
                         {...nodeProps}
                         isExpanded={isExpanded}
                         isBranch={isBranch}
-                        isSelected={files.find((f) => f.id === originalId)?.selected}
+                        isSelected={files.find((f) => f.id === originalId)?.id === selectedFileId}
                         level={level}
                         xPadding={16}
                         name={element.name}
+                        className={cn(
+                          isEditing
+                            ? ''
+                            : state === 'new'
+                              ? 'text-brand-600'
+                              : state === 'modified'
+                                ? 'text-code_block-2'
+                                : ''
+                        )}
                         icon={<File size={14} className="text-foreground-light shrink-0" />}
-                        isEditing={Boolean(element.metadata?.isEditing)}
+                        isEditing={isEditing}
                         onEditSubmit={(value) => {
                           if (originalId !== null) {
                             handleFileNameChange(originalId, value)
                           }
                         }}
                         onClick={() => {
-                          if (originalId !== null && !element.metadata?.isEditing) {
-                            handleFileSelect(originalId)
+                          if (originalId !== null && !isEditing) {
+                            setSelectedFileId(originalId)
                           }
                         }}
                         onDoubleClick={() => {
@@ -411,6 +428,20 @@ export const FileExplorerAndEditor = ({
                             handleStartRename(originalId)
                           }
                         }}
+                        actions={
+                          state !== 'unchanged' && (
+                            <div className="flex items-center justify-center w-3">
+                              <Tooltip>
+                                <TooltipTrigger className="text-xs">
+                                  {state === 'new' ? 'U' : 'M'}
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  {state === 'new' ? 'Unsaved' : 'Modified'}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          )
+                        }
                       />
                     </div>
                   </ContextMenuTrigger_Shadcn_>
