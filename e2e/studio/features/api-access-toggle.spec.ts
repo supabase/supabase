@@ -7,6 +7,8 @@ import {
   waitForApiResponse,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
+import { openTableContextMenu, deleteTable } from '../utils/table-helpers.js'
 
 const TABLE_NAME_PREFIX = 'pw_api_access'
 
@@ -20,13 +22,25 @@ const API_PRIVILEGE_TYPES = ['SELECT', 'INSERT', 'UPDATE', 'DELETE']
  * Executes a SQL query via the SQL Editor and returns the result.
  * This is used to verify database state directly.
  */
-const executeSql = async (
+async function executeSql(
   page: Page,
   ref: string,
   sql: string
-): Promise<Array<Record<string, unknown>>> => {
+): Promise<Array<Record<string, unknown>>> {
+  // Create API response waiter for content/count which indicates project is loaded
+  const contentCountWaiter = createApiResponseWaiter(
+    page,
+    'platform/projects',
+    ref,
+    'content/count'
+  )
+
   // Navigate to SQL editor
   await page.goto(toUrl(`/project/${ref}/sql/new?skip=true`))
+
+  // Wait for content/count API response to ensure project is fully loaded
+  await contentCountWaiter
+
   await expect(page.getByText('Loading...')).not.toBeVisible({ timeout: 10000 })
 
   // Clear and type the SQL
@@ -91,7 +105,7 @@ const executeSql = async (
   return results
 }
 
-const verifyTablePrivileges = async (
+async function verifyTablePrivileges(
   page: Page,
   ref: string,
   schemaName: string,
@@ -100,7 +114,7 @@ const verifyTablePrivileges = async (
     anon: Array<string>
     authenticated: Array<string>
   }
-) => {
+) {
   const sql = `
     SELECT grantee, privilege_type
     FROM information_schema.role_table_grants
@@ -144,19 +158,11 @@ const verifyTablePrivileges = async (
   expect(actualPrivileges.authenticated).toEqual(sortedExpected.authenticated)
 }
 
-const dismissToastsIfAny = async (page: Page) => {
-  const closeButtons = page.getByRole('button', { name: 'Close toast' })
-  const count = await closeButtons.count()
-  for (let i = 0; i < count; i++) {
-    await closeButtons.nth(i).click()
-  }
-}
-
 /**
  * Locates the API access toggle switch for Data API Access.
  * The switch is labeled by the nearby "Data API Access" text.
  */
-const getApiAccessToggle = (page: Page) => {
+function getApiAccessToggle(page: Page) {
   const sidePanel = page.getByTestId('table-editor-side-panel')
   // The switch is near the "Data API Access" label - get the section first, then find the switch
   const dataApiSection = sidePanel
@@ -169,7 +175,7 @@ const getApiAccessToggle = (page: Page) => {
 /**
  * Locates the settings button for granular privilege settings.
  */
-const getPrivilegeSettingsButton = (page: Page) => {
+function getPrivilegeSettingsButton(page: Page) {
   const sidePanel = page.getByTestId('table-editor-side-panel')
   return sidePanel.getByRole('button', { name: 'Configure API privileges' })
 }
@@ -178,43 +184,12 @@ const getPrivilegeSettingsButton = (page: Page) => {
  * Gets the privilege selector combobox for a specific role in the privileges popover.
  * The popover must already be open.
  */
-const getRolePrivilegeSelector = (page: Page, roleLabel: 'Anonymous (anon)' | 'Authenticated') => {
+function getRolePrivilegeSelector(page: Page, roleLabel: 'Anonymous (anon)' | 'Authenticated') {
   // The popover is a dialog with structure: paragraph (role label) followed by combobox
   // We find the paragraph with the role text, then get the adjacent combobox
   const popoverContent = page.locator('[data-radix-popper-content-wrapper]')
   // Get the paragraph containing the role label, then navigate to the sibling combobox
   return popoverContent.getByText(roleLabel, { exact: true }).locator('..').getByRole('combobox')
-}
-
-/**
- * Opens the context menu for a table in the sidebar.
- * Hovers over the table button first to reveal the menu button, then clicks it.
- */
-const openTableContextMenu = async (page: Page, tableName: string) => {
-  const tableButton = page.getByRole('button', { name: `View ${tableName}`, exact: true })
-  await tableButton.hover()
-  // The menu button appears on hover - wait for it to be visible before clicking
-  const menuButton = tableButton.locator('button[aria-haspopup="menu"]')
-  await expect(menuButton).toBeVisible()
-  await menuButton.click()
-}
-
-const deleteTable = async (page: Page, ref: string, tableName: string) => {
-  const viewLocator = page.getByRole('button', { name: `View ${tableName}`, exact: true })
-  if ((await viewLocator.count()) === 0) return
-  await viewLocator.click()
-  await openTableContextMenu(page, tableName)
-
-  await page.getByRole('menuitem', { name: 'Delete table' }).click()
-  await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
-  const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete-', {
-    method: 'POST',
-  })
-  const revalidatePromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=entity-types-`)
-  await page.getByRole('button', { name: 'Delete' }).click()
-  await Promise.all([apiPromise, revalidatePromise])
-
-  await expect(page.getByTestId('confirm-delete-table-modal')).not.toBeVisible()
 }
 
 test.describe('API Access Toggle', () => {
@@ -253,6 +228,9 @@ test.describe('API Access Toggle', () => {
       page.getByText(`Table ${tableName} is good to go!`),
       'Success toast should appear after table creation'
     ).toBeVisible({ timeout: 15000 })
+
+    // Dismiss toast to prevent it from blocking subsequent interactions
+    await dismissToastsIfAny(page)
 
     await page.waitForSelector('[data-testid="table-editor-side-panel"]', { state: 'detached' })
 
@@ -301,6 +279,9 @@ test.describe('API Access Toggle', () => {
       'Success toast should appear after table creation'
     ).toBeVisible({ timeout: 15000 })
 
+    // Dismiss toast to prevent it from blocking subsequent interactions
+    await dismissToastsIfAny(page)
+
     await page.waitForSelector('[data-testid="table-editor-side-panel"]', { state: 'detached' })
 
     // Verify table was created
@@ -333,6 +314,9 @@ test.describe('API Access Toggle', () => {
       page.getByText(`Table ${tableName} is good to go!`),
       'Success toast should appear after table creation'
     ).toBeVisible({ timeout: 15000 })
+
+    // Dismiss toast to prevent it from blocking subsequent interactions
+    await dismissToastsIfAny(page)
 
     await page.waitForSelector('[data-testid="table-editor-side-panel"]', { state: 'detached' })
 
@@ -395,7 +379,7 @@ test.describe('API Access Toggle', () => {
 
     await expect(page.getByText('Adjust API privileges per role')).toBeVisible()
 
-    // Modify anon privileges - remove DELETE and UPDATE
+    // Modify anon privileges - leave only SELECT
     const anonSelector = getRolePrivilegeSelector(page, 'Anonymous (anon)')
     await anonSelector.click()
 
@@ -411,7 +395,7 @@ test.describe('API Access Toggle', () => {
     // Wait for dropdown to close
     await expect(page.getByRole('option', { name: 'DELETE' })).not.toBeVisible({ timeout: 2000 })
 
-    // Modify authenticated privileges - only allow SELECT
+    // Modify authenticated privileges - remove DELETE and UPDATE (leave SELECT + INSERT)
     const authSelector = getRolePrivilegeSelector(page, 'Authenticated')
     await authSelector.click()
 
@@ -452,7 +436,7 @@ test.describe('API Access Toggle', () => {
       'Table should be visible after creation'
     ).toBeVisible()
 
-    // Verify partial grants - anon: SELECT, INSERT; authenticated: SELECT only
+    // Verify partial grants - anon: SELECT; authenticated: SELECT, INSERT
     await verifyTablePrivileges(page, ref, 'public', tableName, {
       anon: ['SELECT'],
       authenticated: ['SELECT', 'INSERT'],
