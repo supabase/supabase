@@ -8,15 +8,21 @@ import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePan
 import { DocsButton } from 'components/ui/DocsButton'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import {
+  TableRowUpdateVariables,
+  useTableRowUpdateMutation,
+} from 'data/table-rows/table-row-update-mutation'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { CellEditHistoryItem, useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import type { Dictionary } from 'types'
+import type { Dictionary, ResponseError } from 'types'
 
 const UNDO_TOAST_DURATION = 5000
+
+/** Row identifier values used to locate a specific row for updates */
+type RowIdentifiers = Dictionary<string | number | boolean | null>
 
 /** Gets enum array column names from a table (needed for proper SQL generation) */
 function getEnumArrayColumns(table: Entity): string[] {
@@ -28,8 +34,8 @@ function getEnumArrayColumns(table: Entity): string[] {
 }
 
 /** Builds primary key identifiers for a row */
-function buildRowIdentifiers(table: Entity, row: SupaRow): Dictionary<any> {
-  const identifiers: Dictionary<any> = {}
+function buildRowIdentifiers(table: Entity, row: SupaRow): RowIdentifiers {
+  const identifiers: RowIdentifiers = {}
 
   if (isTableLike(table)) {
     table.primary_keys.forEach((pk) => {
@@ -42,10 +48,20 @@ function buildRowIdentifiers(table: Entity, row: SupaRow): Dictionary<any> {
   return identifiers
 }
 
+/** Context returned from onMutate for potential rollback */
+type OptimisticUpdateContext = {
+  previousRowsQueries: [QueryKey, TableRowsData | undefined][]
+}
+
 /** Creates optimistic update handlers for React Query mutations */
 function createOptimisticUpdateHandlers(queryClient: ReturnType<typeof useQueryClient>) {
   return {
-    async onMutate({ projectRef, table, configuration, payload }: any) {
+    async onMutate({
+      projectRef,
+      table,
+      configuration,
+      payload,
+    }: TableRowUpdateVariables): Promise<OptimisticUpdateContext> {
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
       const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
@@ -64,19 +80,18 @@ function createOptimisticUpdateHandlers(queryClient: ReturnType<typeof useQueryC
 
       return { previousRowsQueries }
     },
-    onError(error: any, _variables: any, context: any) {
-      const { previousRowsQueries } = context as {
-        previousRowsQueries: [QueryKey, { result: any[] } | undefined][]
+    onError(error: ResponseError, _variables: TableRowUpdateVariables, context: unknown) {
+      const ctx = context as OptimisticUpdateContext | undefined
+      if (ctx?.previousRowsQueries) {
+        ctx.previousRowsQueries.forEach(([queryKey, previousRows]) => {
+          if (previousRows) {
+            queryClient.setQueriesData({ queryKey }, previousRows)
+          }
+          queryClient.invalidateQueries({ queryKey })
+        })
       }
 
-      previousRowsQueries.forEach(([queryKey, previousRows]) => {
-        if (previousRows) {
-          queryClient.setQueriesData({ queryKey }, previousRows)
-        }
-        queryClient.invalidateQueries({ queryKey })
-      })
-
-      toast.error(error?.message ?? error)
+      toast.error(error?.message ?? 'A unknown error occurred')
     },
   }
 }

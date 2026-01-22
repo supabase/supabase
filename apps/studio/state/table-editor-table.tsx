@@ -20,9 +20,9 @@ import { useTableEditorStateSnapshot } from './table-editor'
 export type CellEditHistoryItem = {
   rowIdx: number
   columnName: string
-  previousValue: any
-  newValue: any
-  identifiers: Dictionary<any>
+  previousValue: unknown
+  newValue: unknown
+  identifiers: Dictionary<unknown>
 }
 
 export const createTableEditorTableState = ({
