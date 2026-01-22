@@ -55,6 +55,11 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
 
+      - name: Drop unnecessary migrations
+        run: |
+          rm -rf supabase
+          pnpm supabase init
+
       - name: 🚀 Run Playwright tests against Vercel Preview
         if: steps.filter.outputs.studio == 'true'
         id: playwright
