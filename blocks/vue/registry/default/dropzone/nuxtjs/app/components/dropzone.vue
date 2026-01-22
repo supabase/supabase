@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { provide, inject } from 'vue'
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
 interface File {
   name: string
@@ -47,7 +47,6 @@ export const formatBytes = (
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-
 const DropzoneContext = Symbol('DropzoneContext')
 
 export function useDropzoneContext() {
@@ -63,18 +62,20 @@ provide(DropzoneContext, props)
 
 <template>
   <div
-    v-bind="props.getRootProps({
-      class: cn(
-        'border-2 border-gray-300 rounded-lg p-6 text-center bg-card transition-colors duration-300 text-foreground',
-        props.className,
-        props.isSuccess ? 'border-solid' : 'border-dashed',
-        props.isDragActive && 'border-primary bg-primary/10',
-        ((props.isDragActive && props.isDragReject) ||
-          (props.errors.length > 0 && !props.isSuccess) ||
-          props.files.some(f => f.errors.length !== 0))
-          && 'border-destructive bg-destructive/10'
-      )
-    })"
+    v-bind="
+      props.getRootProps({
+        class: cn(
+          'border-2 border-gray-300 rounded-lg p-6 text-center bg-card transition-colors duration-300 text-foreground',
+          props.className,
+          props.isSuccess ? 'border-solid' : 'border-dashed',
+          props.isDragActive && 'border-primary bg-primary/10',
+          ((props.isDragActive && props.isDragReject) ||
+            (props.errors.length > 0 && !props.isSuccess) ||
+            props.files.some((f) => f.errors.length !== 0)) &&
+            'border-destructive bg-destructive/10'
+        ),
+      })
+    "
   >
     <input v-bind="props.getInputProps()" />
     <slot />
