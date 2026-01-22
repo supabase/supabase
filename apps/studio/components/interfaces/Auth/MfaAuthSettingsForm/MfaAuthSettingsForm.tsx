@@ -506,7 +506,7 @@ export const MfaAuthSettingsForm = () => {
                     source="authSmsMfa"
                     featureProposition="configure settings for SMS MFA"
                     primaryText="SMS MFA is only available on the Pro Plan and above"
-                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
+                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA."
                   />
                 )}
 
