@@ -61,7 +61,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
   } = useActionRunLogsQuery(
-    { ref: projectRef, run_id: selectedWorkflowRun?.id ?? '' },
+    { projectRef, runId: selectedWorkflowRun?.id },
     { enabled: isOpen && Boolean(selectedWorkflowRun) }
   )
 

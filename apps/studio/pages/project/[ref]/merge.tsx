@@ -5,13 +5,14 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 import { useParams } from 'common'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
 import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
-import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { WorkflowLogsCard } from 'components/interfaces/BranchManagement/WorkflowLogsCard'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -113,54 +114,20 @@ const MergePage: NextPageWithLayout = () => {
     [refetchDiff, clearDiffsOptimistically]
   )
 
-  const handleParentBranchWorkflowComplete = useCallback(
-    (status: 'SUCCESS' | 'FAILED') => {
-      setWorkflowFinalStatus(status)
-      refetchDiff()
-      clearDiffsOptimistically()
-      if (ref && parentProjectRef && currentBranch?.review_requested_at) {
-        updateBranch(
-          {
-            branchRef: ref,
-            projectRef: parentProjectRef,
-            requestReview: false,
-          },
-          {
-            onSuccess: () => toast.success('Branch updated successfully'),
-          }
-        )
-      }
-    },
-    [
-      refetchDiff,
-      clearDiffsOptimistically,
-      parentProjectRef,
-      ref,
-      updateBranch,
-      currentBranch?.review_requested_at,
-    ]
+  const { data: workflowRunLogs } = useActionRunLogsQuery(
+    { projectRef: ref, runId: currentWorkflowRunId },
+    { refetchInterval: 2000, refetchOnMount: 'always', staleTime: 0 }
   )
 
-  const { workflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
-    useWorkflowManagement({
-      workflowRunId: currentWorkflowRunId,
-      projectRef: ref,
-      onWorkflowComplete: handleCurrentBranchWorkflowComplete,
-    })
-
-  const { workflowRun: parentBranchWorkflow, workflowRunLogs: parentBranchLogs } =
-    useWorkflowManagement({
-      workflowRunId: currentWorkflowRunId,
-      projectRef: parentProjectRef,
-      onWorkflowComplete: handleParentBranchWorkflowComplete,
-    })
-
-  const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
-  const workflowRunLogs = currentBranchLogs || parentBranchLogs
+  const { workflowRun: currentWorkflowRun } = useWorkflowManagement({
+    workflowRunId: currentWorkflowRunId,
+    projectRef: ref,
+    onWorkflowComplete: handleCurrentBranchWorkflowComplete,
+  })
 
   const hasCurrentWorkflowFailed = workflowFinalStatus === 'FAILED'
   const hasCurrentWorkflowCompleted = workflowFinalStatus === 'SUCCESS'
-  const isWorkflowRunning = currentBranchWorkflow?.status === 'RUNNING'
+  const isWorkflowRunning = currentWorkflowRun?.status === 'RUNNING'
 
   const addWorkflowRun = useCallback(
     (workflowRunId: string) => {
@@ -445,25 +412,28 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   const pageTitle = () => (
-    <span>
-      Merge{' '}
+    <div className="flex items-center gap-x-2">
+      <span>Merge</span>
+
       <Link href={`/project/${ref}/editor`}>
-        <Badge className="font-mono text-lg gap-1">
+        <Badge className="font-mono text-sm gap-1 px-2">
           <GitBranchIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
           {currentBranch.name}
         </Badge>
-      </Link>{' '}
-      into{' '}
+      </Link>
+
+      <span>into</span>
+
       <Link
         href={`/project/${mainBranch?.project_ref}/editor`}
         className="font-mono inline-flex gap-4"
       >
-        <Badge className="font-mono text-lg gap-1">
+        <Badge className="font-mono text-sm gap-1 px-2">
           <Shield strokeWidth={1.5} size={16} className="text-warning" />
           {mainBranch?.name || 'main'}
         </Badge>
       </Link>
-    </span>
+    </div>
   )
 
   const pageSubtitle = () => {
@@ -533,8 +503,7 @@ const MergePage: NextPageWithLayout = () => {
                     >
                       <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
                     </Button>
-                  ) : hasCurrentWorkflowCompleted &&
-                    currentWorkflowRun?.id === parentBranchWorkflow?.id ? (
+                  ) : hasCurrentWorkflowCompleted ? (
                     <Button
                       type="default"
                       onClick={handleCloseBranch}
