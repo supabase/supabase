@@ -19,7 +19,16 @@ export const getStatusLevel = (status?: number | string): string => {
 }
 
 export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 'border', string> {
-  switch (value) {
+  const normalized =
+    typeof value === 'number'
+      ? value < 100
+        ? String(value)
+        : String(Math.floor(value / 100))
+      : typeof value === 'string' && /^\d+$/.test(value) && value.length >= 3
+        ? String(Math.floor(Number(value) / 100))
+        : value
+
+  switch (normalized) {
     case '1':
     case 'info':
       return {
