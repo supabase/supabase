@@ -114,9 +114,11 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
             <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            Learn more about backup types{' '}
+            {backup.isPhysicalBackup
+              ? 'Simple and flexible backups at the database level.'
+              : 'Low-level backups of the entire database cluster.'}{' '}
             <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
-              here
+              Learn more
             </InlineLink>
           </TooltipContent>
         </Tooltip>
