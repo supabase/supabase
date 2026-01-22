@@ -3,9 +3,19 @@
 import { cn } from 'ui'
 
 export interface StatusCodeProps {
-  type: 'success' | 'warning' | 'error' | 'info' | 'default'
-  method?: string
+  method: string
   statusCode: number | string | undefined
+}
+
+export const getStatusLevel = (status?: number | string): string => {
+  if (!status) return 'success'
+  const statusNum = Number(status)
+  if (statusNum >= 500) return 'error'
+  if (statusNum >= 400) return 'warning'
+  if (statusNum >= 300) return 'info' // 3xx redirects are informational
+  if (statusNum >= 200) return 'success'
+  if (statusNum >= 100) return 'info'
+  return 'success'
 }
 
 export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 'border', string> {
@@ -48,8 +58,10 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
   }
 }
 
-export const StatusCode = ({ type, method, statusCode }: StatusCodeProps) => {
-  const colors = getStatusColor(type)
+export const StatusCode = ({ method, statusCode }: StatusCodeProps) => {
+  const level = getStatusLevel(statusCode)
+  const colors = getStatusColor(level)
+
   return (
     <div className="flex items-center gap-2">
       <span className="flex-shrink-0 flex items-center text-xs font-mono">
