@@ -401,7 +401,7 @@ export const StorageSettings = () => {
                         {isFreeTier && (
                           <UpgradeToPro
                             fullWidth
-                            buttonVariant="primary"
+                            variant="primary"
                             source="storageSizeLimit"
                             featureProposition="configure upload file size limits in Storage"
                             primaryText="Free Plan has a fixed upload file size limit of 50 MB"
@@ -414,7 +414,7 @@ export const StorageSettings = () => {
                           <UpgradeToPro
                             fullWidth
                             addon="spendCap"
-                            buttonVariant="default"
+                            variant="default"
                             source="storageSizeLimit"
                             featureProposition="increase the file upload size limits in Storage"
                             buttonText="Disable spend cap"

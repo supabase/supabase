@@ -19,7 +19,7 @@ interface UpgradeToProProps {
   disabled?: boolean
   fullWidth?: boolean
   layout?: 'vertical' | 'horizontal'
-  buttonVariant?: 'default' | 'primary'
+  variant?: 'default' | 'primary'
   className?: string
 }
 
@@ -35,7 +35,7 @@ export const UpgradeToPro = ({
   disabled = false,
   fullWidth = false,
   layout = 'horizontal',
-  buttonVariant = 'primary',
+  variant = 'primary',
   className,
 }: UpgradeToProProps) => {
   return (
@@ -53,7 +53,7 @@ export const UpgradeToPro = ({
           source={source}
           featureProposition={featureProposition}
           disabled={disabled}
-          variant={buttonVariant}
+          variant={variant}
         >
           {buttonText}
         </UpgradePlanButton>
