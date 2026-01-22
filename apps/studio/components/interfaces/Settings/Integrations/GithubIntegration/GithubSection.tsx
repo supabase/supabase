@@ -87,7 +87,7 @@ export const GitHubSection = () => {
 
                 {/* [Joshen] Show connection form if GH has already been authorized OR no GH authorization but on a paid plan */}
                 {/* So this shouldn't render if there's no GH authorization and on a free plan */}
-                {(!!gitHubAuthorization || (!gitHubAuthorization && !promptProPlanUpgrade)) && (
+                {(!!gitHubAuthorization || !promptProPlanUpgrade) && (
                   <GitHubIntegrationConnectionForm
                     disabled={promptProPlanUpgrade}
                     connection={existingConnection}
