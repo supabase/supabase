@@ -90,7 +90,7 @@ const StatCard = ({
             className="pb-4"
             label={title}
             tooltip={tooltip}
-            diffValue={`${Math.abs(previous).toFixed(1)}%`}
+            diffValue={`${previous.toFixed(1)}%`}
             value={`${formattedCurrent}${suffix}`}
           />
           <ChartActions actions={actions} />
