@@ -1020,6 +1020,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/invoices/{invoice_id}/receipt': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the receipt PDF URL for a paid invoice */
+    get: operations['OrgInvoicesController_getInvoiceReceipt']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     parameters: {
       query?: never
@@ -6873,6 +6890,10 @@ export interface components {
     }
     InvoicePaymentLinkResponse: {
       redirectUrl: string
+    }
+    InvoiceReceiptResponse: {
+      /** Format: uri */
+      receipt_pdf: string
     }
     LFAccessToken: {
       description: string | null
@@ -13640,6 +13661,71 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve invoice payment link */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgInvoicesController_getInvoiceReceipt: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        invoice_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['InvoiceReceiptResponse']
+        }
+      }
+      /** @description Receipt not available for this invoice type or status */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Invoice or receipt not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve receipt */
       500: {
         headers: {
           [name: string]: unknown
