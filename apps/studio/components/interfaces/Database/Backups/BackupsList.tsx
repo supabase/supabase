@@ -95,18 +95,12 @@ export const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="medium"
-        confirmLabel="Yes, I’m sure"
+        size="small"
+        confirmLabel="Restore"
         confirmLabelLoading="Restoring..."
         variant="warning"
         visible={selectedBackup !== undefined}
-        title="Confirm restore"
-        alert={{
-          base: { variant: 'warning' },
-          title: 'Your project will be offline during restoration',
-          description:
-            'We suggest restoring during a time when there will be minimal impact for your application.',
-        }}
+        title="Restore from backup"
         loading={isRestoring || isSuccessBackup}
         onCancel={() => setSelectedBackup(undefined)}
         onConfirm={() => {
@@ -115,11 +109,18 @@ export const BackupsList = () => {
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
       >
-        <p className="text-sm">
-          Are you sure you want to restore from{' '}
-          {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new data
-          written since this backup was made.
-        </p>
+        <div className="text-sm space-y-2">
+          <p>
+            This will restore your database to the backup made at{' '}
+            {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}. Any new data written since
+            this backup will be lost.
+          </p>
+
+          <p>
+            Your project will be offline during restoration. Choose a time when the impact to your
+            project will be minimal.
+          </p>
+        </div>
       </ConfirmationModal>
     </>
   )
