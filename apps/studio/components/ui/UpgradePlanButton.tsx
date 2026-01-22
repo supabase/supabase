@@ -95,7 +95,7 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={variant}
         className={className}
         tooltip={{
           content: {
