@@ -26,7 +26,7 @@ There are several levels of security hardening for the Data API:
 - [Disabling the Data API entirely](#disabling-the-data-api). This is recommended if you _never_ need to access your database via Supabase client libraries or the REST and GraphQL endpoints.
 - [Exposing a custom schema](#exposing-a-custom-schema-instead-of-public) instead of `public`, giving you explicit control over what is accessible.
 - [Automatically enabling RLS on new tables](#automatically-enabling-rls-on-new-tables) using an event trigger.
-- [Adjusting table-level privileges](#adjusting-table-level-privileges) to control which roles can access specific tables.
+- [Adjusting table-level grants](#table-level-grants) to control which roles can access specific tables.
 
 ## Disabling the Data API
 
@@ -81,7 +81,7 @@ Tables created via the Supabase Dashboard have RLS enabled by default. However, 
 
 You can use an [event trigger](/docs/guides/database/postgres/event-triggers#example-trigger-function---auto-enable-row-level-security) to automatically enable RLS whenever a new table is created in the `public` schema. This ensures that no table is accidentally left exposed without RLS protection.
 
-## Adjusting table-level privileges
+## Table-level grants
 
 By default, tables in the `public` schema are granted full access (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) to the `anon` and `authenticated` roles. This allows the Data API to query those tables on behalf of users.
 
@@ -97,7 +97,7 @@ Table-level privileges work alongside [Row Level Security](/docs/guides/database
 
 </Admonition>
 
-### Adjusting privileges via the Dashboard
+### Adjusting table-level grants via the Dashboard
 
 <Admonition type="note">
 
@@ -106,13 +106,13 @@ Adjusting table-level privileges via the Dashboard is currently in beta and will
 </Admonition>
 
 1. Go to [**Table Editor**](/dashboard/project/_/editor) in the Supabase Dashboard.
-1. Select the table you want to configure.
-1. Click the vertical dots icon to open the table menu and select "Edit table".
-1. Under **Data API Access**, click the settings icon to open **Adjust API privileges per role**.
-1. For each role (`anon` and `authenticated`), select or deselect the privileges you want to grant.
-1. Click **Save**.
+2. Select the table you want to configure.
+3. Click the vertical dots icon to open the table menu and select "Edit table".
+4. Under **Data API Access**, click the settings icon to open **Adjust API privileges per role**.
+5. For each role (`anon` and `authenticated`), select or deselect the privileges you want to grant.
+6. Click **Save**.
 
-### Adjusting privileges via SQL
+### Adjusting table-level grants via SQL
 
 You can also adjust privileges using SQL. For example, to allow only `SELECT` access for `anon` on a table:
 
