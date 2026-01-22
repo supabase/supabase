@@ -108,18 +108,64 @@ export const BackupsList = () => {
           if (selectedBackup === undefined) return console.error('Backup required')
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
+        alert={{
+          title: 'This action cannot be undone',
+          description: 'Your project will be offline during restoration. Any new data since this backup will be lost.'
+        }}
       >
         <div className="text-sm space-y-2">
+        <div className="text-sm space-y-4">
           <p>
             This will restore your database to the backup made at{' '}
             {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}. Any new data written since
             this backup will be lost.
+            This will restore your database to the backup made on{' '}
+            {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')} at{' '}
+            {dayjs(selectedBackup?.inserted_at).format('HH:mm:ss')} UTC.
           </p>
 
           <p>
             Your project will be offline during restoration. Choose a time when the impact to your
             project will be minimal.
           </p>
+          {/* <Alert_Shadcn_ variant="warning">
+            <AlertDescription_Shadcn_>
+              <ul className="divide-y divide-warning-400 text-foreground">
+                <li className="py-3 first:pt-0 last:pb-0">
+                  Your project will be offline during restoration
+                </li>
+                <li className="py-3 first:pt-0 last:pb-0">
+                  Any new data since this backup will be lost
+                </li>
+              </ul>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_> */}
+
+          {/* <Admonition
+            showIcon={false}
+            type="warning"
+            title="This action cannot be undone"
+            description={
+              <ul className="list-disc list-inside">
+                <li>Your project will be offline during restoration</li>
+                <li>Any new data since this backup will be lost</li>
+              </ul>
+            }
+          /> */}
+
+          {/* <Admonition type="warning">
+            <p>
+              Your project will be offline during restoration. Any new data written since this
+              backup will be lost.
+            </p>
+          </Admonition> */}
+
+          {/* <Admonition showIcon={false} type="warning">
+            <p>
+              Your project will be offline during restoration. Any new data since this
+              backup will be lost.
+            </p>
+          </Admonition> */}
         </div>
       </ConfirmationModal>
     </>
