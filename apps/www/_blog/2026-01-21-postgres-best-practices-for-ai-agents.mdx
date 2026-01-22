@@ -65,7 +65,8 @@ from orders;
 
 ```sql
 -- Enable RLS on the table
-alter table orders enable row level security;
+alter table orders 
+enable row level security;
 
 -- Create policy for users to see only their orders
 create policy orders_user_policy on orders
