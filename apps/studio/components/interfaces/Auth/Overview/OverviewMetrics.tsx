@@ -320,7 +320,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                           return (
                             <div className="flex items-center gap-2">
                               <span className="flex-shrink-0 flex items-center text-xs font-mono">
-                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-lighter border border-r-0">
+                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
                                   {row.method}
                                 </span>
                                 <span
