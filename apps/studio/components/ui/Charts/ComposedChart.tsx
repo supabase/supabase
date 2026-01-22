@@ -453,7 +453,7 @@ export function ComposedChart({
                 y2="1"
               >
                 <stop offset="5%" stopColor={attribute.color} stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#131313" stopOpacity={0} />
+                <stop offset="95%" stopColor={isDarkMode ? '#131313' : '#FFFFFF'} stopOpacity={0} />
               </linearGradient>
             ))}
           </defs>
