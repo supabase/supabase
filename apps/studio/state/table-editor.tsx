@@ -239,11 +239,16 @@ export const createTableEditorState = () => {
 
       const newOperation: QueuedOperation = {
         ...operation,
-        id: existingIndex >= 0 ? state.operationQueue.operations[existingIndex].id : operationKey,
+        id: operationKey,
         timestamp: Date.now(),
       }
 
       if (existingIndex >= 0) {
+        if (newOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+          // Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
+          newOperation.payload.oldValue =
+            state.operationQueue.operations[existingIndex].payload.oldValue
+        }
         state.operationQueue.operations[existingIndex] = newOperation
       } else {
         state.operationQueue.operations.push(newOperation)
