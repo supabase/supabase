@@ -12,7 +12,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {operations.map((op) => {
         if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
           const { payload } = op

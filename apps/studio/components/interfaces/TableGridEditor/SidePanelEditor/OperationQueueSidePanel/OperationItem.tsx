@@ -1,5 +1,3 @@
-import { cn } from 'ui'
-
 import { formatValue } from './OperationQueueSidePanel.utils'
 import { EditCellContentPayload } from '@/state/table-editor-operation-queue.types'
 
@@ -32,31 +30,16 @@ export const OperationItem = ({ content }: OperationItemProps) => {
       </div>
 
       <div className="font-mono text-xs">
-        <div
-          className={cn(
-            'flex items-start gap-2 px-3 py-1.5',
-            'bg-destructive-200 dark:bg-destructive-400/20'
-          )}
-        >
-          <span className="text-destructive-600 dark:text-destructive-400 select-none font-bold">
-            -
-          </span>
-          <span
-            className="text-destructive-600 dark:text-destructive-400 truncate max-w-full"
-            title={formattedOldValue}
-          >
+        <div className="flex items-start gap-2 px-3 py-0.5 bg-red-400/20">
+          <span className="text-red-900 select-none font-bold">-</span>
+          <span className="text-red-900 truncate max-w-full" title={formattedOldValue}>
             {formattedOldValue}
           </span>
         </div>
 
-        <div
-          className={cn('flex items-start gap-2 px-3 py-1.5', 'bg-brand-200 dark:bg-brand-400/20')}
-        >
-          <span className="text-brand-600 dark:text-brand-400 select-none font-bold">+</span>
-          <span
-            className="text-brand-600 dark:text-brand-400 truncate max-w-full"
-            title={formattedNewValue}
-          >
+        <div className="flex items-start gap-2 px-3 py-0.5 bg-green-400/20">
+          <span className="text-green-900 select-none font-bold">+</span>
+          <span className="text-green-900 truncate max-w-full" title={formattedNewValue}>
             {formattedNewValue}
           </span>
         </div>
