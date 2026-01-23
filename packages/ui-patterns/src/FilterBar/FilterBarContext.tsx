@@ -42,7 +42,10 @@ export type FilterBarContextValue = {
   handleLogicalOperatorChange: (path: number[]) => void
 
   // Options cache
-  propertyOptionsCache: Record<string, { options: (string | FilterOptionObject)[]; searchValue: string }>
+  propertyOptionsCache: Record<
+    string,
+    { options: (string | FilterOptionObject)[]; searchValue: string }
+  >
   loadingOptions: Record<string, boolean>
   loadPropertyOptions: (property: FilterProperty, search: string) => void
   optionsError: string | null

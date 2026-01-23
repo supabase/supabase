@@ -331,8 +331,8 @@ export function DiskManagementForm() {
         {isEntitlementsLoaded && isPlanUpgradeRequired && (
           <UpgradeToPro
             featureProposition="configure compute and disk"
-            primaryText="Compute and Disk configuration is not available on the Free Plan"
-            secondaryText="You will need to upgrade to at least the Pro Plan to configure compute and disk"
+            primaryText="Only available on Pro Plan and above"
+            secondaryText="Upgrade to the Pro Plan to configure compute and disk settings."
           />
         )}
 

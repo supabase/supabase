@@ -78,7 +78,7 @@ import UtilityPanel from './UtilityPanel/UtilityPanel'
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 const DiffEditor = dynamic(
-  () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
+  () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
 
@@ -788,7 +788,6 @@ export const SQLEditor = () => {
                   {isDiffOpen && (
                     <div className="w-full h-full">
                       <DiffEditor
-                        theme="supabase"
                         language="pgsql"
                         original={defaultSqlDiff.original}
                         modified={defaultSqlDiff.modified}
@@ -796,21 +795,6 @@ export const SQLEditor = () => {
                           diffEditorRef.current = editor
                           setIsDiffEditorMounted(true)
                         }}
-                        options={{
-                          fontSize: 13,
-                          renderSideBySide: false,
-                          minimap: { enabled: false },
-                          wordWrap: 'on',
-                          lineNumbers: 'on',
-                          folding: false,
-                          padding: { top: 4 },
-                          lineNumbersMinChars: 3,
-                        }}
-                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
-                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
-                        // Error: TextModel got disposed before DiffEditorWidget model got reset
-                        keepCurrentModifiedModel={true}
-                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget
