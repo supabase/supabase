@@ -30,13 +30,9 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
 
   switch (normalized) {
     case '1':
-    case 'info':
-      return {
-        text: 'text-foreground-lighter',
-        bg: 'bg-surface-200',
-        border: '',
-      }
     case '2':
+    case '3':
+    case 'info':
     case 'success':
       return {
         text: 'text-foreground-lighter',
