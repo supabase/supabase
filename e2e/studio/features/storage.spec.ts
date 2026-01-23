@@ -1,7 +1,8 @@
 import { expect } from '@playwright/test'
 import path from 'path'
 import { env } from '../env.config.js'
-import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
+import { test } from '../utils/test.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 import {
   createBucket,
   createFolder,
@@ -13,8 +14,7 @@ import {
   renameItem,
   uploadFile,
 } from '../utils/storage-helpers.js'
-import { test } from '../utils/test.js'
-import { waitForApiResponse } from '../utils/wait-for-response.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 
 const bucketNamePrefix = 'pw_bucket'
 
