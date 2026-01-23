@@ -2,11 +2,11 @@
 id: 'realtime-with-nextjs'
 title: 'Using Realtime with Next.js'
 description: 'Client & Server Components in Next.js with Realtime Updates'
+subtitle: 'Combine Server Components for initial data with Client Components for real-time subscriptions.'
 sidebar_label: 'Videos'
 ---
 
-In this guide, we explore the best ways to receive real-time Postgres changes with your Next.js application.
-We'll show both client and server side updates, and explore which option is best.
+In this guide, we explore the best ways to receive real-time Postgres changes with your Next.js application. We'll show how to combine Server Components (for initial data fetching) with Client Components (for real-time subscriptions).
 
 <div className="video-container">
   <iframe
@@ -16,3 +16,384 @@ We'll show both client and server side updates, and explore which option is best
     allowFullScreen
   ></iframe>
 </div>
+
+## Prerequisites
+
+Install the required packages:
+
+```bash
+npm install @supabase/supabase-js @supabase/ssr
+```
+
+Set your environment variables in `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+```
+
+## Enable Realtime on your table
+
+Before subscribing to changes, you need to enable Realtime on your table. You can do this in the Dashboard under **Database → Replication**, or via SQL:
+
+```sql
+alter publication supabase_realtime add table posts;
+```
+
+To receive old record data on `UPDATE` and `DELETE` events:
+
+```sql
+alter table posts replica identity full;
+```
+
+## Setting up Supabase clients
+
+Next.js App Router requires two Supabase clients: one for the browser and one for the server.
+
+### Browser client
+
+Create `lib/supabase/client.ts` for Client Components:
+
+```ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+```
+
+### Server client
+
+Create `lib/supabase/server.ts` for Server Components, Server Actions, and Route Handlers:
+
+```ts
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export async function createClient() {
+  const cookieStore = await cookies()
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Called from Server Component - ignore if middleware handles refresh
+          }
+        },
+      },
+    }
+  )
+}
+```
+
+### Middleware for session refresh
+
+Create `lib/supabase/middleware.ts`:
+
+```ts
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function updateSession(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getUser()
+
+  return supabaseResponse
+}
+```
+
+Create `middleware.ts` at your project root:
+
+```ts
+import { type NextRequest } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
+
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+}
+```
+
+## The Server + Client Component pattern
+
+The key pattern for real-time in Next.js App Router:
+
+1. **Server Component** fetches initial data (can be `async`)
+2. **Client Component** receives data as props and subscribes to real-time updates
+
+Server Components cannot use hooks like `useEffect`, and Client Components cannot be `async`. This pattern combines the strengths of both.
+
+## Subscribing to a table
+
+### Server Component
+
+Create `app/posts/page.tsx` to fetch initial data:
+
+```tsx
+import { createClient } from '@/lib/supabase/server'
+import RealtimePosts from './realtime-posts'
+
+export default async function PostsPage() {
+  const supabase = await createClient()
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  return <RealtimePosts serverPosts={posts ?? []} />
+}
+```
+
+### Client Component
+
+Create `app/posts/realtime-posts.tsx` to subscribe to changes:
+
+```tsx
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import type { RealtimeChannel } from '@supabase/supabase-js'
+
+export default function RealtimePosts({ serverPosts }) {
+  const [posts, setPosts] = useState(serverPosts)
+  const supabase = useMemo(() => createClient(), [])
+
+  // Sync with server data when it changes
+  useEffect(() => {
+    setPosts(serverPosts)
+  }, [serverPosts])
+
+  useEffect(() => {
+    let channel: RealtimeChannel
+
+    async function setupRealtime() {
+      // Pass auth token to realtime for RLS to work
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session?.access_token) {
+        await supabase.realtime.setAuth(session.access_token)
+      }
+
+      channel = supabase
+        .channel('posts-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'posts',
+          },
+          (payload) => {
+            setPosts((current) => [payload.new, ...current])
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'posts',
+          },
+          (payload) => {
+            setPosts((current) => current.filter((post) => post.id !== payload.old.id))
+          }
+        )
+        .subscribe()
+    }
+
+    setupRealtime()
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [supabase])
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## Subscribing to a single record
+
+Use the `filter` parameter to listen to changes on a specific row.
+
+### Server Component
+
+Create `app/posts/[id]/page.tsx`:
+
+```tsx
+import { createClient } from '@/lib/supabase/server'
+import RealtimePost from './realtime-post'
+import { notFound } from 'next/navigation'
+
+export default async function PostPage({ params }) {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: post } = await supabase.from('posts').select('*').eq('id', id).single()
+
+  if (!post) notFound()
+
+  return <RealtimePost serverPost={post} />
+}
+```
+
+### Client Component
+
+Create `app/posts/[id]/realtime-post.tsx`:
+
+```tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+export default function RealtimePost({ serverPost }) {
+  const [post, setPost] = useState(serverPost)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`post-${post.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'posts',
+          filter: `id=eq.${post.id}`,
+        },
+        (payload) => {
+          setPost(payload.new)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, post.id])
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <p>{post.content}</p>
+    </article>
+  )
+}
+```
+
+## Alternative: Using router.refresh()
+
+If your data requires complex joins or you want to leverage Server Component caching, you can trigger a refetch instead of managing state:
+
+```tsx
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+
+export default function RealtimeRefresh({ children }) {
+  const router = useRouter()
+  const supabase = createClient()
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+        router.refresh()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, router])
+
+  return <>{children}</>
+}
+```
+
+This approach re-runs your Server Components to fetch fresh data, which is useful when you need related data that's complex to reconstruct on the client.
+
+## Cleanup
+
+Always clean up subscriptions when the component unmounts to maintain performance:
+
+```ts
+return () => {
+  supabase.removeChannel(channel)
+}
+```
+
+Supabase automatically handles cleanup 30 seconds after disconnect, but removing unused channels prevents degradation with many simultaneous subscribers.
+
+## Row Level Security with Realtime
+
+For RLS policies to work with Realtime subscriptions, you must pass the auth token before subscribing:
+
+```ts
+const {
+  data: { session },
+} = await supabase.auth.getSession()
+if (session?.access_token) {
+  await supabase.realtime.setAuth(session.access_token)
+}
+```
+
+Without this, the Realtime server cannot evaluate RLS policies and events will be blocked.
+
+## Limitations
+
+Postgres Changes have some [limitations](/docs/guides/realtime/postgres-changes#limitations) as your application scales:
+
+- Every change event must be checked against each subscriber's access permissions
+- High subscriber counts can create database bottlenecks
+- Row Level Security does not apply to `DELETE` events
+
+For high-traffic applications, consider using [Broadcast](/docs/guides/realtime/broadcast) with triggers instead.
