@@ -7,64 +7,13 @@ import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import type { Entity } from 'data/table-editor/table-editor-types'
 import type { Dictionary } from 'types'
 
-// ============================================================================
-// Operation Queue Types
-// ============================================================================
-
-/**
- * Extensible enum for queued operation types.
- * Add new operation types here as we expand the queuing system.
- */
-export enum QueuedOperationType {
-  EDIT_CELL_CONTENT = 'edit_cell_content',
-  // Future: DELETE_ROW, ADD_ROW, EDIT_COLUMN, etc.
-}
-
-/**
- * Payload for EDIT_CELL_CONTENT operations
- */
-export interface EditCellContentPayload {
-  rowIdentifiers: Dictionary<any> // Primary key values to identify the row
-  columnName: string
-  oldValue: any
-  newValue: any
-  // For mutation support
-  table: Entity
-  enumArrayColumns?: string[]
-}
-
-/**
- * Union type for all operation payloads.
- * Extend this as new operation types are added.
- */
-export type QueuedOperationPayload = EditCellContentPayload
-
-/**
- * Individual queued operation
- */
-export interface QueuedOperation {
-  id: string
-  type: QueuedOperationType
-  tableId: number // Which table this operation belongs to
-  timestamp: number
-  payload: QueuedOperationPayload
-}
-
-/**
- * Status of the operation queue
- */
-export type QueueStatus = 'idle' | 'pending' | 'saving' | 'error'
-
-/**
- * Operation queue state structure
- */
-export interface OperationQueueState {
-  operations: QueuedOperation[]
-  status: QueueStatus
-}
+import type {
+  OperationQueueState,
+  QueuedOperation,
+  QueueStatus,
+} from './table-editor-operation-queue.types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 

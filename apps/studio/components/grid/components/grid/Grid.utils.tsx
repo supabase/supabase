@@ -13,9 +13,10 @@ import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
-import { QueuedOperationType, useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
 
 /**
  * Feature flag to enable queuing cell edits instead of immediately saving.
