@@ -1,4 +1,5 @@
 import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
+import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, SidePanel } from 'ui'
 
@@ -18,6 +19,14 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
   const { handleSave, handleCancel, isSaving } = useOperationQueueActions({
     onSaveSuccess: closePanel,
     onCancelSuccess: closePanel,
+  })
+
+  const { modKey } = useOperationQueueShortcuts({
+    enabled: visible,
+    onSave: handleSave,
+    onTogglePanel: closePanel,
+    isSaving,
+    hasOperations: operations.length > 0,
   })
 
   return (
@@ -46,6 +55,7 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
             loading={isSaving}
           >
             Save All
+            <span className="text-foreground-lighter text-xs ml-1.5">{modKey}S</span>
           </Button>
         </div>
       }

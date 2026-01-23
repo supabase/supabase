@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
+import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SaveQueueToastContent } from './SaveQueueToast.Content'
 
@@ -23,6 +24,14 @@ export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
   const toastShownRef = useRef(false)
   const operationCount = snap.operationQueue.operations.length
   const isSaving = snap.operationQueue.status === 'saving'
+
+  useOperationQueueShortcuts({
+    enabled: snap.hasPendingOperations,
+    onSave,
+    onTogglePanel: () => snap.onViewOperationQueue(),
+    isSaving,
+    hasOperations: operationCount > 0,
+  })
 
   useEffect(() => {
     if (snap.hasPendingOperations) {
