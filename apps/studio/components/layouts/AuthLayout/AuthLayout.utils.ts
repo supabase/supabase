@@ -103,6 +103,12 @@ export const generateAuthMenu = (
                 url: `/project/${ref}/auth/sessions`,
                 items: [],
               },
+              {
+                name: 'JWT Keys',
+                key: 'jwt',
+                url: `/project/${ref}/auth/jwt`,
+                items: [],
+              },
               ...(authenticationRateLimits
                 ? [
                     {

@@ -247,7 +247,17 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/settings/jwt/signing-keys',
-        destination: '/project/:ref/settings/jwt',
+        destination: '/project/:ref/auth/jwt',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt',
+        destination: '/project/:ref/auth/jwt',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/legacy',
+        destination: '/project/:ref/auth/jwt/legacy',
       },
       {
         source: '/project/:ref/database/api-logs',
