@@ -377,26 +377,30 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     title: 'Branching',
     subtitle: 'Test and preview changes using Supabase Branches.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. This feature works similarly to Git branches, enabling safe experimentation with configurations, database schemas, and new features.
+Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
 
 ## Key features
-1. Git-based workflow: Integrates with GitHub, creating preview branches for each pull request.
-2. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
-3. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-4. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
-5. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
+1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
+2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
+3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
+4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
+5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
+6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
+7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
 
 ## Benefits:
 - Risk-free experimentation: Test changes without affecting the production environment.
 - Improved collaboration: Multiple team members can work on different features simultaneously.
 - Streamlined reviews: Facilitate thorough checks of database changes before merging.
 - Rapid iteration: Quickly prototype and validate database-driven features.
+- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
 
 ## Supabase Branching is valuable for:
 - Agile teams working on multiple features concurrently
 - Projects with complex database schemas requiring careful management
 - Applications undergoing significant refactoring or upgrades
 - CI/CD pipelines integrating database changes
+- Teams preferring no-code or database-first development workflows
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -1510,21 +1514,26 @@ Supabase's Server-side Auth feature allows developers to create more secure and 
     title: 'File storage',
     subtitle: 'Supabase Storage makes it simple to store and serve files.',
     description: `
-Supabase Storage provides a scalable solution for storing and serving files in your applications, allowing easy management of user-generated content and assets within your Supabase project.
+Supabase Storage provides a scalable solution for storing and serving files in your applications, allowing easy management of user-generated content and assets within your Supabase project. Storage supports files up to 500GB on paid plans, offers S3 protocol compatibility for any S3-compatible client, and includes three specialized bucket types: File buckets for traditional storage, Analytics buckets for data warehousing, and Vector buckets for AI embeddings with similarity search.
 
 ## Key features
-1. Global CDN: Serve files quickly from over 285 cities worldwide.
-2. Image optimization: Resize and compress media files on the fly.
-3. Flexible file types: Store images, videos, documents, and any other file type.
-4. Access control: Implement fine-grained access using Postgres RLS policies.
-5. Resumable uploads: Support for protocols like TUS for reliable file transfers.
-6. Organization: Structure files into buckets and folders for efficient management.
+1. 500GB file support: Upload files up to 500GB using the new storage-specific hostname on paid plans.
+2. Three bucket types: File buckets for traditional storage, Analytics buckets (Iceberg format) for data lakes, and Vector buckets for AI embeddings with similarity search.
+3. S3 compatibility: Use any S3-compatible client to interact with Storage—upload with TUS, manage with S3, serve with REST API.
+4. Global CDN: Serve files quickly from over 285 cities worldwide.
+5. Smart CDN: Automatic cache revalidation with changes propagating globally within 60 seconds.
+6. Image optimization: Resize and compress media files on the fly with automatic WebP conversion.
+7. Flexible file types: Store images, videos, documents, and any other file type.
+8. Access control: Implement fine-grained access using Postgres RLS policies.
+9. Resumable uploads: Support for protocols like TUS for reliable file transfers.
+10. Organization: Structure files into buckets and folders for efficient management.
 
 ## Benefits:
 - Seamless integration: Use the same Supabase client for both database and storage operations.
 - Scalability: Handle large numbers of files and high traffic loads without infrastructure management.
-- Performance: Quick file serving with global CDN support.
+- Performance: Quick file serving with global CDN support and Smart CDN optimization.
 - Cost-effectiveness: Pay only for the storage you use, with no upfront costs.
+- Massive file support: Handle files up to 500GB with reliable multipart upload protocols.
 
 ## File storage is valuable for:
 - Social media platforms storing user-uploaded media
@@ -1532,6 +1541,8 @@ Supabase Storage provides a scalable solution for storing and serving files in y
 - Content management systems handling various file types
 - Collaborative tools storing shared assets
 - Mobile apps needing to sync user data and media
+- Data teams requiring SQL-accessible data lakes
+- AI applications storing and searching vector embeddings
 
 Supabase Storage simplifies adding robust file management to your applications, allowing you to focus on building unique features while relying on Supabase for secure, scalable file storage and serving.
 `,
@@ -2286,12 +2297,16 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
     description: `
 The Logs & Analytics feature in Supabase provides users with comprehensive logging and analytics capabilities, powered by Logflare. This tool enables developers to track and analyze log events from various Supabase services, such as the API gateway, Postgres databases, Storage, Edge Functions, and more. By leveraging a multi-node Elixir cluster, Supabase processes billions of log events daily, ensuring that users have access to critical insights for optimizing their applications.
 
+OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
+
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
 2. Comprehensive Log Management: Ingest and store logs from multiple sources, allowing for centralized management of application events.
 3. Powerful Querying: Utilize SQL queries through Logflare Endpoints to analyze logs efficiently, enabling users to extract meaningful metrics.
 4. Customizable Dashboards: Create tailored views within Supabase Studio to visualize log data and track key performance indicators (KPIs).
 5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
+6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
+7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
