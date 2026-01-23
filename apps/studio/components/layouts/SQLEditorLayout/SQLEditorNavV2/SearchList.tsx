@@ -115,13 +115,9 @@ export const SearchList = ({ search }: SearchListProps) => {
                     ...element,
                     name: (
                       <span className="flex flex-col py-0.5">
-                        <span className="truncate">
-                          {element.name}
-                        </span>
+                        <span className="truncate">{element.name}</span>
                         {!!visibility && (
-                          <span className="text-foreground-lighter text-xs">
-                            {visibility}
-                          </span>
+                          <span className="text-foreground-lighter text-xs">{visibility}</span>
                         )}
                       </span>
                     ),

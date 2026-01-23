@@ -186,7 +186,7 @@ const TreeViewItem = forwardRef<
     } = props as any
 
     const trimmedDescription = description?.trim()
-    const titleText = trimmedDescription ? `${nameString}: ${trimmedDescription}` : nameString
+    const titleText = trimmedDescription ? `${nameString}\n${trimmedDescription}` : nameString
 
     return (
       <div
@@ -265,9 +265,7 @@ const TreeViewItem = forwardRef<
               />
             )
           )}
-          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>
-            {name}
-          </span>
+          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>{name}</span>
         </div>
 
         {!isEditing && actions}
