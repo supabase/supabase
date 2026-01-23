@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
@@ -11,6 +11,7 @@ import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import { useTextSelection } from 'hooks/useTextSelection'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
@@ -29,11 +30,13 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import LogSelection from './LogSelection'
+import { addSearchTerm } from './Logs.searchParser'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { TextSelectionPopup } from './TextSelectionPopup'
 
 interface Props {
   data?: LogData[]
@@ -56,6 +59,8 @@ interface Props {
   isSelectedLogLoading?: boolean
   selectedLogError?: LogQueryError | ResponseError
   onSelectedLogChange?: (log: LogData | null) => void
+  currentSearch?: string
+  onSearchChange?: (search: string) => void
 }
 type LogMap = { [id: string]: LogData }
 
@@ -84,11 +89,16 @@ const LogTable = ({
   isSelectedLogLoading,
   selectedLogError,
   onSelectedLogChange,
+  currentSearch,
+  onSearchChange,
 }: Props) => {
   const { ref } = useParams()
   const { profile } = useProfile()
   const [selectedLogId] = useSelectedLog()
   const { show: showContextMenu } = useContextMenu()
+
+  const tableContainerRef = useRef<HTMLDivElement>(null)
+  const { selection, clearSelection, setPopupRef } = useTextSelection(tableContainerRef)
 
   const [cellPosition, setCellPosition] = useState<any>()
   const [selectionOpen, setSelectionOpen] = useState(false)
@@ -247,6 +257,20 @@ const LogTable = ({
     })
   }
 
+  const handleAddToSearch = (text: string) => {
+    if (!onSearchChange) return
+    const newSearch = addSearchTerm(currentSearch || '', text, false)
+    onSearchChange(newSearch)
+    clearSelection()
+  }
+
+  const handleFilterOut = (text: string) => {
+    if (!onSearchChange) return
+    const newSearch = addSearchTerm(currentSearch || '', text, true)
+    onSearchChange(newSearch)
+    clearSelection()
+  }
+
   const LogsExplorerTableHeader = () => (
     <div
       className={cn(
@@ -388,7 +412,7 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'h-full flex w-full flex-col flex-1'}>
+    <section ref={tableContainerRef} className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
 
       <ResizablePanelGroup direction="horizontal">
@@ -443,6 +467,16 @@ const LogTable = ({
               </Menu>,
               document.body
             )}
+          {selection && onSearchChange && (
+            <TextSelectionPopup
+              selectedText={selection.text}
+              position={selection.position}
+              onAddToSearch={handleAddToSearch}
+              onFilterOut={handleFilterOut}
+              onClose={clearSelection}
+              setPopupRef={setPopupRef}
+            />
+          )}
         </ResizablePanel>
 
         <ResizableHandle withHandle />

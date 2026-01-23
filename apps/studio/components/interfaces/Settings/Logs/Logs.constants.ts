@@ -286,7 +286,34 @@ limit 100;
 ]
 
 const _SQL_FILTER_COMMON = {
-  search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
+  search_query: (value: string) => {
+    // Import the parser at runtime to avoid circular dependencies
+    const { parseSearchString, escapeRegex } = require('./Logs.searchParser')
+
+    const terms = parseSearchString(value)
+    if (terms.length === 0) return ''
+
+    const includeTerms = terms.filter((t: any) => !t.exclude)
+    const excludeTerms = terms.filter((t: any) => t.exclude)
+
+    // Use LOWER() for case-insensitive matching
+    const includes = includeTerms
+      .map((t: any) => `regexp_contains(LOWER(event_message), LOWER('${escapeRegex(t.value)}'))`)
+      .join(' AND ')
+
+    const excludes = excludeTerms
+      .map((t: any) => `regexp_contains(LOWER(event_message), LOWER('${escapeRegex(t.value)}'))`)
+      .join(' OR ')
+
+    if (includes && excludes) {
+      return `(${includes}) AND NOT (${excludes})`
+    } else if (includes) {
+      return includes
+    } else if (excludes) {
+      return `NOT (${excludes})`
+    }
+    return ''
+  },
 }
 
 export const SQL_FILTER_TEMPLATES: any = {
