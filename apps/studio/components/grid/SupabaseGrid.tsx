@@ -17,7 +17,6 @@ import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { SaveQueueToast } from './components/footer/SaveQueueToast'
 import { Grid } from './components/grid/Grid'
-import { QUEUE_CELL_EDITS } from './components/grid/Grid.utils'
 import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
@@ -29,6 +28,7 @@ import { useOperationQueueActions } from './hooks/useOperationQueueActions'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
+import { useIsQueueOperationsEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -41,6 +41,8 @@ export const SupabaseGrid = ({
 >) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
+
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
@@ -132,7 +134,7 @@ export const SupabaseGrid = ({
         {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
 
         {/* Toast for pending save operations (only when queuing is enabled) */}
-        {QUEUE_CELL_EDITS && (
+        {isQueueOperationsEnabled && (
           <SaveQueueToast onSave={handleSaveQueue} onCancel={handleCancelQueue} />
         )}
       </div>

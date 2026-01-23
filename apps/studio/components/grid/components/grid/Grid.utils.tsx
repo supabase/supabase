@@ -17,15 +17,10 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
-
-/**
- * Feature flag to enable queuing cell edits instead of immediately saving.
- * When true: cell edits are queued and a "Save" toast appears
- * When false: cell edits are saved immediately (default behavior)
- */
-export const QUEUE_CELL_EDITS = true
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export function useOnRowsChange(rows: SupaRow[]) {
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorTableStateSnapshot()
@@ -132,7 +127,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       const configuration = { identifiers }
 
-      if (QUEUE_CELL_EDITS) {
+      if (isQueueOperationsEnabled) {
         // Queue the operation instead of immediately mutating
         tableEditorSnap.queueOperation({
           type: QueuedOperationType.EDIT_CELL_CONTENT,
@@ -181,6 +176,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
     },
     [
       getImpersonatedRoleState,
+      isQueueOperationsEnabled,
       mutateUpdateTableRow,
       project,
       rows,
