@@ -60,11 +60,14 @@ export async function saveOperationQueue({
     return { result: [] }
   }
 
-  // Generate SQL for each operation
-  const statements = operations.map((op) => getOperationSql(op))
+  // Generate SQL for each operation, stripping trailing semicolons to avoid double semicolons when joining
+  const statements = operations.map((op) => {
+    const sql = getOperationSql(op)
+    return sql.endsWith(';') ? sql.slice(0, -1) : sql
+  })
 
   // Combine all statements into a single transaction
-  const transactionSql = wrapWithTransaction(statements.join(';\n'))
+  const transactionSql = wrapWithTransaction(statements.join(';\n') + ';')
 
   // Wrap with role impersonation if enabled
   const sql = wrapWithRoleImpersonation(transactionSql, roleImpersonationState)
