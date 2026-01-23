@@ -46,7 +46,7 @@ export default function MetricsCardDemo() {
             {Math.abs(diffPercentage).toFixed(1)}%
           </MetricCardDifferential>
         </MetricCardContent>
-        <MetricCardSparkline data={data} dataKey="value" />
+        <MetricCardSparkline data={data} dataKey="value" hasTimestamp />
       </MetricCard>
     </div>
   )
