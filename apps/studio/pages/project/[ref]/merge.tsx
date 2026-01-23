@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 import { useParams } from 'common'
 import { DatabaseDiffPanel } from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import { EdgeFunctionsDiffPanel } from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
@@ -112,16 +111,48 @@ const MergePage: NextPageWithLayout = () => {
     [refetchDiff, clearDiffsOptimistically]
   )
 
-  const { data: workflowRunLogs } = useActionRunLogsQuery(
-    { projectRef: ref, runId: currentWorkflowRunId },
-    { refetchInterval: 2000, refetchOnMount: 'always', staleTime: 0 }
+  const handleParentBranchWorkflowComplete = useCallback(
+    (status: 'SUCCESS' | 'FAILED') => {
+      setWorkflowFinalStatus(status)
+      refetchDiff()
+      clearDiffsOptimistically()
+      if (ref && parentProjectRef && currentBranch?.review_requested_at) {
+        updateBranch(
+          {
+            branchRef: ref,
+            projectRef: parentProjectRef,
+            requestReview: false,
+          },
+          {
+            onSuccess: () => toast.success('Branch updated successfully'),
+          }
+        )
+      }
+    },
+    [
+      refetchDiff,
+      clearDiffsOptimistically,
+      parentProjectRef,
+      ref,
+      updateBranch,
+      currentBranch?.review_requested_at,
+    ]
   )
 
-  const { workflowRun: currentWorkflowRun } = useWorkflowManagement({
+  const { run: currentBranchWorkflow, logs: currentBranchLogs } = useWorkflowManagement({
     workflowRunId: currentWorkflowRunId,
     projectRef: ref,
     onWorkflowComplete: handleCurrentBranchWorkflowComplete,
   })
+
+  const { run: parentBranchWorkflow, logs: parentBranchLogs } = useWorkflowManagement({
+    workflowRunId: currentWorkflowRunId,
+    projectRef: parentProjectRef,
+    onWorkflowComplete: handleParentBranchWorkflowComplete,
+  })
+
+  const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
+  const workflowRunLogs = currentBranchLogs || parentBranchLogs
 
   const hasCurrentWorkflowFailed = workflowFinalStatus === 'FAILED'
   const hasCurrentWorkflowCompleted = workflowFinalStatus === 'SUCCESS'

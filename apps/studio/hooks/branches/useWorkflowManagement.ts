@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { useActionRunQuery } from '@/data/actions/action-detail-query'
+import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 
 interface UseWorkflowManagementProps {
   workflowRunId?: string
@@ -18,8 +19,20 @@ export const useWorkflowManagement = ({
   const { data: workflowRun } = useActionRunQuery(
     { projectRef, runId: workflowRunId },
     {
-      enabled: Boolean(workflowRunId),
-      refetchInterval: 2000,
+      refetchInterval: (query) => {
+        return query.state.error?.code === 404 ? false : 2000
+      },
+      refetchOnMount: 'always',
+      staleTime: 0,
+    }
+  )
+
+  const { data: workflowRunLogs } = useActionRunLogsQuery(
+    { projectRef, runId: workflowRunId },
+    {
+      refetchInterval: (query) => {
+        return query.state.error?.code === 404 ? false : 2000
+      },
       refetchOnMount: 'always',
       staleTime: 0,
     }
@@ -42,6 +55,7 @@ export const useWorkflowManagement = ({
   }, [workflowRunId])
 
   return {
-    workflowRun,
+    run: workflowRun,
+    logs: workflowRunLogs,
   }
 }
