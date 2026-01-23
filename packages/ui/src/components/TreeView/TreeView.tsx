@@ -185,7 +185,8 @@ const TreeViewItem = forwardRef<
       ...divProps
     } = props as any
 
-    const titleText = `${nameString}${description && typeof description === 'string' && description.trim() ? `: ${description.trim()}` : ''}`
+    const trimmedDescription = description?.trim()
+    const titleText = trimmedDescription ? `${nameString}: ${trimmedDescription}` : nameString
 
     return (
       <div
