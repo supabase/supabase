@@ -7,8 +7,12 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, SidePanel } from 'ui'
 
 import { OperationList } from './OperationList'
-import type { OperationQueueSidePanelProps } from './OperationQueueSidePanel.types'
 import { QueuedOperation, QueueStatus } from '@/state/table-editor-operation-queue.types'
+
+interface OperationQueueSidePanelProps {
+  visible: boolean
+  closePanel: () => void
+}
 
 export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueSidePanelProps) => {
   const queryClient = useQueryClient()
@@ -45,7 +49,7 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
         <div className="flex items-center justify-between w-full">
           <div className="flex flex-col gap-1">
             <span>Pending Changes</span>
-            <span className="text-xs text-foreground-light font-mono">
+            <span className="text-xs text-foreground-light">
               {operations.length} operation{operations.length !== 1 ? 's' : ''}
             </span>
           </div>
