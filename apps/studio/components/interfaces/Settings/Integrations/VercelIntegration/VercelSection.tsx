@@ -129,7 +129,7 @@ Connect your Vercel teams to your Supabase organization.
 
   const VercelContentSectionTop = `
 
-### How does the Vercel integration work?
+#### How does the Vercel integration work?
 
 Supabase will keep your environment variables up to date in each of the projects you assign to a Supabase project.
 You can also link multiple Vercel Projects to the same Supabase project.

@@ -65,7 +65,7 @@ export const AWSPrivateLinkSection = () => {
       <ScaffoldContainer>
         <ScaffoldSection className="py-12">
           <ScaffoldSectionDetail title="Private Connectivity">
-            <p>Connect to your Supabase project from your AWS VPC using AWS PrivateLink.</p>
+            <p>Access your Supabase project over a private network.</p>
             <IntegrationImageHandler title="aws" />
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
@@ -73,14 +73,14 @@ export const AWSPrivateLinkSection = () => {
               <div>
                 <h5 className="text-foreground mb-2">How does Private Connectivity work?</h5>
                 <p className="text-foreground-light text-sm mb-6">
-                  Connecting to AWS PrivateLink allows you to create a private connection between
-                  your AWS VPC and your Supabase project.
+                  Enabling Private Connectivity allows private access to your Supabase project from
+                  an AWS VPC, implemented using AWS PrivateLink.
                 </p>
                 {promptPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
-                      primaryText="Upgrade to Team or Enterprise to use Private Connectivity"
-                      secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
+                      primaryText="Only available on Team or Enterprise"
+                      secondaryText="Upgrade to the Team or Enterprise plan to use Private Connectivity."
                       buttonText="Upgrade to Team"
                       source="aws-privatelink-integration"
                     />
@@ -90,7 +90,9 @@ export const AWSPrivateLinkSection = () => {
               <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-foreground text-sm">AWS Accounts</h3>
-                  <Button onClick={onAddAccount}>Add Account</Button>
+                  <Button onClick={onAddAccount} type={promptPlanUpgrade ? 'default' : 'primary'}>
+                    Add account
+                  </Button>
                 </div>
                 {(accounts?.length ?? 0) > 0 ? (
                   <ResourceList>
