@@ -358,7 +358,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed && !isBackupsPage) {
+  if (isProjectRestoreFailed && !isBackupsPage && !isEdgeFunctionPages) {
     return <RestoreFailedState />
   }
 
