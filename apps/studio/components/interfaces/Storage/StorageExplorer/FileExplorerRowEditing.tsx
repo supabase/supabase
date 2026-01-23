@@ -1,5 +1,6 @@
 import { has } from 'lodash'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { toast } from 'sonner'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -29,6 +30,11 @@ export const FileExplorerRowEditing = ({
     if (event) {
       event.preventDefault()
       event.stopPropagation()
+    }
+
+    if (name.length === 0) {
+      inputRef.current.focus()
+      return toast.error('Name cannot be empty')
     }
 
     if (item.type === STORAGE_ROW_TYPES.FILE) {

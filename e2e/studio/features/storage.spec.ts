@@ -237,6 +237,95 @@ test.describe.serial('Storage', () => {
     await deleteItem(page, folderName)
   })
 
+  test('cannot create a folder with special characters', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_folder_special_chars`
+
+    // Create a bucket and navigate to it
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Try to create a folder with invalid character '#'
+    const createFolderBtn = page.getByRole('button', { name: 'Create folder' })
+    await expect(createFolderBtn, 'Create folder button should be visible').toBeVisible()
+    await createFolderBtn.click()
+
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Folder name input should be visible').toBeVisible()
+    await nameInput.fill('test#folder')
+    await nameInput.press('Enter')
+
+    // Verify error toast appears
+    await expect(
+      page.getByText('Folder name cannot contain the "#" character'),
+      'Error message for invalid character should appear'
+    ).toBeVisible()
+
+    // Verify folder was not created (input should still be visible since creation failed)
+    await expect(
+      page.getByTitle('test#folder'),
+      'Folder with invalid character should not be created'
+    ).not.toBeVisible()
+  })
+
+  test('cannot create a folder with duplicate name', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_folder_duplicate`
+    const folderName = 'duplicate_folder'
+
+    // Create a bucket, navigate to it, and create a folder
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Dismiss any toasts from previous action
+    await dismissToastsIfAny(page)
+
+    // Try to create another folder with the same name
+    const createFolderBtn = page.getByRole('button', { name: 'Create folder' })
+    await createFolderBtn.click()
+
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Folder name input should be visible').toBeVisible()
+    await nameInput.fill(folderName)
+    await nameInput.press('Enter')
+
+    // Verify error toast appears for duplicate name
+    await expect(
+      page.getByText(`The name ${folderName} already exists in the current directory`),
+      'Error message for duplicate name should appear'
+    ).toBeVisible()
+  })
+
+  test('cancels folder creation when name is empty', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_folder_empty_name`
+
+    // Create a bucket and navigate to it
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Click create folder button
+    const createFolderBtn = page.getByRole('button', { name: 'Create folder' })
+    await expect(createFolderBtn, 'Create folder button should be visible').toBeVisible()
+    await createFolderBtn.click()
+
+    // Clear the input and press Enter with empty name
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Folder name input should be visible').toBeVisible()
+    await nameInput.clear()
+    await nameInput.press('Enter')
+
+    // Verify the input disappears (folder creation cancelled)
+    await expect(
+      nameInput,
+      'Input should disappear when folder creation is cancelled'
+    ).not.toBeVisible({ timeout: 3000 })
+
+    // Verify no folder was created (no items in the explorer besides the empty state)
+    await expect(
+      page.getByTitle('Untitled folder'),
+      'No folder should be created with empty name'
+    ).not.toBeVisible()
+  })
+
   test('can download a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_download`
     const fileName = 'test-file.txt'
