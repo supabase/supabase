@@ -127,6 +127,14 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 ### Sync and track state
 
+<Admonition type="note">
+
+When a `sync` event triggers, you may receive `join` and `leave` events simultaneously. This is expected behavior and occurs as the Presence system reconciles its local state with the server. It does not necessarily indicate that a user has physically joined or left.
+
+**Tip:** You should process `leave` events before `join` events to ensure your local presence state remains accurate during these updates.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
