@@ -1,4 +1,4 @@
-import { forwardRef, memo, Ref, useRef } from 'react'
+import { forwardRef, memo, Ref, useMemo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { ref as valtioRef } from 'valtio'
 
@@ -7,6 +7,7 @@ import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -136,6 +137,43 @@ export const Grid = memo(
 
       const removeAllFilters = () => onApplyFilters([])
 
+      // Compute columns with cellClass for dirty cells
+      // This needs to be computed at render time so it reacts to operation queue changes
+      const columnsWithDirtyCellClass = useMemo(() => {
+        const primaryKeys = isTableLike(snap.originalTable) ? snap.originalTable.primary_keys : []
+        const pendingOperations = tableEditorSnap.operationQueue.operations
+
+        // If no pending operations, return columns as-is
+        if (pendingOperations.length === 0) {
+          return snap.gridColumns as CalculatedColumn<any, any>[]
+        }
+
+        return (snap.gridColumns as CalculatedColumn<any, any>[]).map((col) => {
+          // Skip special columns like select column
+          if (col.key === 'select-row' || col.key === 'add-column') {
+            return col
+          }
+
+          return {
+            ...col,
+            cellClass: (row: SupaRow) => {
+              // Build row identifiers from primary keys
+              const rowIdentifiers: Record<string, any> = {}
+              for (const pk of primaryKeys) {
+                rowIdentifiers[pk.name] = row[pk.name]
+              }
+              // Check if this cell has pending changes
+              const isDirty = tableEditorSnap.hasPendingCellChange(
+                snap.table.id,
+                rowIdentifiers,
+                col.key
+              )
+              return isDirty ? 'rdg-cell--dirty' : undefined
+            },
+          }
+        })
+      }, [snap.gridColumns, snap.originalTable, snap.table.id, tableEditorSnap])
+
       return (
         <div
           className={cn('flex flex-col relative transition-colors', containerClass)}
@@ -245,7 +283,7 @@ export const Grid = memo(
             ref={ref}
             className={`${gridClass} flex-grow`}
             rowClass={rowClass}
-            columns={snap.gridColumns as CalculatedColumn<any, any>[]}
+            columns={columnsWithDirtyCellClass}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
             rowKeyGetter={rowKeyGetter}

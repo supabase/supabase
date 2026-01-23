@@ -9,10 +9,12 @@ import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelE
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import type { Dictionary } from 'types'
 
-import type {
-  OperationQueueState,
-  QueuedOperation,
-  QueueStatus,
+import {
+  QueuedOperationType,
+  type EditCellContentPayload,
+  type OperationQueueState,
+  type QueuedOperation,
+  type QueueStatus,
 } from './table-editor-operation-queue.types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
@@ -282,6 +284,33 @@ export const createTableEditorState = () => {
      */
     get hasPendingOperations(): boolean {
       return state.operationQueue.operations.length > 0
+    },
+
+    /**
+     * Check if a specific cell has pending changes
+     * @param tableId - The table ID
+     * @param rowIdentifiers - Primary key values identifying the row
+     * @param columnName - The column name
+     * @returns true if the cell has pending changes
+     */
+    hasPendingCellChange: (
+      tableId: number,
+      rowIdentifiers: Record<string, any>,
+      columnName: string
+    ): boolean => {
+      return state.operationQueue.operations.some((op) => {
+        if (op.tableId !== tableId || op.type !== QueuedOperationType.EDIT_CELL_CONTENT) {
+          return false
+        }
+        const payload = op.payload as EditCellContentPayload
+        if (payload.columnName !== columnName) {
+          return false
+        }
+        // Match row by primary key identifiers
+        return Object.entries(rowIdentifiers).every(
+          ([key, value]) => payload.rowIdentifiers[key] === value
+        )
+      })
     },
   })
 

@@ -23,7 +23,7 @@ import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
  * When true: cell edits are queued and a "Save" toast appears
  * When false: cell edits are saved immediately (default behavior)
  */
-export const QUEUE_CELL_EDITS = false
+export const QUEUE_CELL_EDITS = true
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const queryClient = useQueryClient()
