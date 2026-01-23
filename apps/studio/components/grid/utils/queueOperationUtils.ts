@@ -39,10 +39,10 @@ interface QueueCellEditParams {
   projectRef: string
   tableId: number
   table: Entity
-  rowIdentifiers: Dictionary<any>
+  rowIdentifiers: Dictionary<unknown>
   columnName: string
-  oldValue: any
-  newValue: any
+  oldValue: unknown
+  newValue: unknown
   enumArrayColumns?: string[]
 }
 

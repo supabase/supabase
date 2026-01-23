@@ -321,7 +321,7 @@ export const createTableEditorState = () => {
      */
     hasPendingCellChange: (
       tableId: number,
-      rowIdentifiers: Record<string, any>,
+      rowIdentifiers: Record<string, unknown>,
       columnName: string
     ): boolean => {
       return state.operationQueue.operations.some((op) => {

@@ -14,10 +14,10 @@ export enum QueuedOperationType {
  * Payload for EDIT_CELL_CONTENT operations
  */
 export interface EditCellContentPayload {
-  rowIdentifiers: Dictionary<any> // Primary key values to identify the row
+  rowIdentifiers: Dictionary<unknown> // Primary key values to identify the row
   columnName: string
-  oldValue: any
-  newValue: any
+  oldValue: unknown
+  newValue: unknown
   // For mutation support
   table: Entity
   enumArrayColumns?: string[]

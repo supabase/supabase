@@ -26,8 +26,8 @@ const rowKeyGetter = (row: SupaRow) => {
 }
 
 interface IGrid extends GridProps {
-  rows: any[]
-  error: any
+  rows: SupaRow[]
+  error: Error | null
   isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -66,9 +66,17 @@ export const Grid = memo(
         snap.setSelectedRows(selectedRows)
       }
 
-      const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
+      const selectedCellRef = useRef<{
+        rowIdx: number
+        row: SupaRow
+        column: CalculatedColumn<SupaRow, unknown>
+      } | null>(null)
 
-      function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
+      function onSelectedCellChange(args: {
+        rowIdx: number
+        row: SupaRow
+        column: CalculatedColumn<SupaRow, unknown>
+      }) {
         selectedCellRef.current = args
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
@@ -158,7 +166,7 @@ export const Grid = memo(
             ...col,
             cellClass: (row: SupaRow) => {
               // Build row identifiers from primary keys
-              const rowIdentifiers: Record<string, any> = {}
+              const rowIdentifiers: Record<string, unknown> = {}
               for (const pk of primaryKeys) {
                 rowIdentifiers[pk.name] = row[pk.name]
               }
