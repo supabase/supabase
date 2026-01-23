@@ -2,10 +2,6 @@ import { useCallback, useEffect } from 'react'
 
 import { detectOS } from 'lib/helpers'
 
-/**
- * Returns the modifier key symbol based on the current OS.
- * Returns '⌘' for macOS and 'Ctrl+' for other platforms.
- */
 export function getModKey() {
   const os = detectOS()
   return os === 'macos' ? '⌘' : 'Ctrl+'

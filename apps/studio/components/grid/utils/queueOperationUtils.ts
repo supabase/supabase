@@ -10,11 +10,6 @@ import {
 } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from 'types'
 
-/**
- * Generates a unique key for a queued operation based on its type, tableId,
- * column name, and row identifiers. This can be used to deduplicate operations
- * or check if an operation already exists in the queue.
- */
 export function generateQueueOperationKey(
   operation: Omit<QueuedOperation, 'id' | 'timestamp'>
 ): string {
@@ -46,10 +41,6 @@ interface QueueCellEditParams {
   enumArrayColumns?: string[]
 }
 
-/**
- * Queues a cell edit operation and applies an optimistic update to the UI.
- * Used by both inline cell editors and the expanded side panel editors.
- */
 export function queueCellEditWithOptimisticUpdate({
   queryClient,
   queueOperation,
@@ -100,10 +91,6 @@ interface ReapplyOptimisticUpdatesParams {
   operations: readonly QueuedOperation[]
 }
 
-/**
- * Re-applies optimistic updates from the operation queue to the query cache.
- * Used after a refresh to ensure pending changes are still visible in the UI.
- */
 export function reapplyOptimisticUpdates({
   queryClient,
   projectRef,

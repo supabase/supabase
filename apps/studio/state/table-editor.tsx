@@ -260,30 +260,11 @@ export const createTableEditorState = () => {
     },
 
     /**
-     * Get all operations for a specific table
-     */
-    getOperationsForTable: (tableId: number): QueuedOperation[] => {
-      return state.operationQueue.operations.filter((op) => op.tableId === tableId)
-    },
-
-    /**
      * Clear all operations from the queue
      */
     clearQueue: () => {
       state.operationQueue.operations = []
       state.operationQueue.status = 'idle'
-    },
-
-    /**
-     * Clear operations only for a specific table
-     */
-    clearQueueForTable: (tableId: number) => {
-      state.operationQueue.operations = state.operationQueue.operations.filter(
-        (op) => op.tableId !== tableId
-      )
-      if (state.operationQueue.operations.length === 0) {
-        state.operationQueue.status = 'idle'
-      }
     },
 
     /**

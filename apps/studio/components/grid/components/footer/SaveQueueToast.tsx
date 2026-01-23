@@ -11,13 +11,6 @@ interface SaveQueueToastProps {
   onSave: () => void
 }
 
-/**
- * Component that manages a persistent toast notification when there are
- * pending operations in the table editor queue.
- *
- * Shows the count of pending changes along with "View Details", "Save", and "Cancel" buttons.
- * Automatically dismisses when the queue is empty or when the operation queue side panel is open.
- */
 export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
   const snap = useTableEditorStateSnapshot()
   const toastShownRef = useRef(false)

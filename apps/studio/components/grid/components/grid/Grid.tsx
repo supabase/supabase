@@ -1,3 +1,4 @@
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useMemo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { ref as valtioRef } from 'valtio'
@@ -131,14 +132,14 @@ export const Grid = memo(
         return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 
-      function onRowDoubleClick(row: any, column: any) {
+      function onRowDoubleClick(row: SupaRow, column: { name: string }) {
         const foreignKey = getColumnForeignKey(column.name)
 
         if (foreignKey) {
           tableEditorSnap.onEditForeignKeyColumnValue({
             foreignKey,
             row,
-            column,
+            column: column as unknown as PostgresColumn,
           })
         }
       }
@@ -153,10 +154,10 @@ export const Grid = memo(
 
         // If no pending operations, return columns as-is
         if (pendingOperations.length === 0) {
-          return snap.gridColumns as CalculatedColumn<any, any>[]
+          return snap.gridColumns as CalculatedColumn<SupaRow, unknown>[]
         }
 
-        return (snap.gridColumns as CalculatedColumn<any, any>[]).map((col) => {
+        return (snap.gridColumns as CalculatedColumn<SupaRow, unknown>[]).map((col) => {
           // Skip special columns like select column
           if (col.key === 'select-row' || col.key === 'add-column') {
             return col
@@ -300,7 +301,11 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
-            onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
+            onCellDoubleClick={(props) => {
+              if (typeof props.column.name === 'string') {
+                onRowDoubleClick(props.row, { name: props.column.name })
+              }
+            }}
             onCellKeyDown={handleCopyCell}
           />
         </div>
