@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -15,7 +15,9 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
+import { SaveQueueToast } from './components/footer/SaveQueueToast'
 import { Grid } from './components/grid/Grid'
+import { QUEUE_CELL_EDITS } from './components/grid/Grid.utils'
 import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
@@ -45,6 +47,18 @@ export const SupabaseGrid = ({
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
+
+  // Handlers for the save queue toast
+  const handleSaveQueue = useCallback(() => {
+    // TODO: Implement save logic - process queued operations
+    console.log('Save queue triggered', tableEditorSnap.operationQueue.operations)
+  }, [tableEditorSnap])
+
+  const handleCancelQueue = useCallback(() => {
+    // Clear the queue and revert optimistic updates
+    tableEditorSnap.clearQueue()
+    // TODO: Invalidate queries to refetch original data
+  }, [tableEditorSnap])
 
   const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
 
@@ -124,6 +138,11 @@ export const SupabaseGrid = ({
         )}
 
         {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
+
+        {/* Toast for pending save operations (only when queuing is enabled) */}
+        {QUEUE_CELL_EDITS && (
+          <SaveQueueToast onSave={handleSaveQueue} onCancel={handleCancelQueue} />
+        )}
       </div>
     </DndProvider>
   )

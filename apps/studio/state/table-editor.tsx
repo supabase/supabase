@@ -7,7 +7,64 @@ import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { Entity } from 'data/table-editor/table-editor-types'
 import type { Dictionary } from 'types'
+
+// ============================================================================
+// Operation Queue Types
+// ============================================================================
+
+/**
+ * Extensible enum for queued operation types.
+ * Add new operation types here as we expand the queuing system.
+ */
+export enum QueuedOperationType {
+  EDIT_CELL_CONTENT = 'edit_cell_content',
+  // Future: DELETE_ROW, ADD_ROW, EDIT_COLUMN, etc.
+}
+
+/**
+ * Payload for EDIT_CELL_CONTENT operations
+ */
+export interface EditCellContentPayload {
+  rowIdentifiers: Dictionary<any> // Primary key values to identify the row
+  columnName: string
+  oldValue: any
+  newValue: any
+  // For mutation support
+  table: Entity
+  enumArrayColumns?: string[]
+}
+
+/**
+ * Union type for all operation payloads.
+ * Extend this as new operation types are added.
+ */
+export type QueuedOperationPayload = EditCellContentPayload
+
+/**
+ * Individual queued operation
+ */
+export interface QueuedOperation {
+  id: string
+  type: QueuedOperationType
+  tableId: number // Which table this operation belongs to
+  timestamp: number
+  payload: QueuedOperationPayload
+}
+
+/**
+ * Status of the operation queue
+ */
+export type QueueStatus = 'idle' | 'pending' | 'saving' | 'error'
+
+/**
+ * Operation queue state structure
+ */
+export interface OperationQueueState {
+  operations: QueuedOperation[]
+  status: QueueStatus
+}
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
@@ -200,6 +257,82 @@ export const createTableEditorState = () => {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade
       }
+    },
+
+    // ========================================================================
+    // Operation Queue
+    // ========================================================================
+
+    operationQueue: {
+      operations: [],
+      status: 'idle',
+    } as OperationQueueState,
+
+    /**
+     * Queue a new operation for later processing
+     */
+    queueOperation: (operation: Omit<QueuedOperation, 'id' | 'timestamp'>) => {
+      state.operationQueue.operations.push({
+        ...operation,
+        id: crypto.randomUUID(),
+        timestamp: Date.now(),
+      })
+      if (state.operationQueue.status === 'idle') {
+        state.operationQueue.status = 'pending'
+      }
+    },
+
+    /**
+     * Get all operations for a specific table
+     */
+    getOperationsForTable: (tableId: number): QueuedOperation[] => {
+      return state.operationQueue.operations.filter((op) => op.tableId === tableId)
+    },
+
+    /**
+     * Clear all operations from the queue
+     */
+    clearQueue: () => {
+      state.operationQueue.operations = []
+      state.operationQueue.status = 'idle'
+    },
+
+    /**
+     * Clear operations only for a specific table
+     */
+    clearQueueForTable: (tableId: number) => {
+      state.operationQueue.operations = state.operationQueue.operations.filter(
+        (op) => op.tableId !== tableId
+      )
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
+     * Remove a specific operation from the queue
+     */
+    removeOperation: (operationId: string) => {
+      state.operationQueue.operations = state.operationQueue.operations.filter(
+        (op) => op.id !== operationId
+      )
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
+     * Update the queue status
+     */
+    setQueueStatus: (status: QueueStatus) => {
+      state.operationQueue.status = status
+    },
+
+    /**
+     * Check if there are any pending operations in the queue
+     */
+    get hasPendingOperations(): boolean {
+      return state.operationQueue.operations.length > 0
     },
   })
 

@@ -13,13 +13,22 @@ import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import { QueuedOperationType, useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'
+
+/**
+ * Feature flag to enable queuing cell edits instead of immediately saving.
+ * When true: cell edits are queued and a "Save" toast appears
+ * When false: cell edits are saved immediately (default behavior)
+ */
+export const QUEUE_CELL_EDITS = false
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorTableStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
@@ -88,8 +97,6 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       if (!previousRow || !changedColumn) return
 
-      const updatedData = { [changedColumn]: rowData[changedColumn] }
-
       const enumArrayColumns = snap.originalTable.columns
         ?.filter((column) => {
           return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
@@ -106,7 +113,6 @@ export function useOnRowsChange(rows: SupaRow[]) {
               : previousRow[column.name]
         })
 
-      const configuration = { identifiers }
       if (Object.keys(identifiers).length === 0) {
         return toast('Unable to update row as table has no primary keys', {
           description: (
@@ -123,16 +129,64 @@ export function useOnRowsChange(rows: SupaRow[]) {
         })
       }
 
-      mutateUpdateTableRow({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        table: snap.originalTable,
-        configuration,
-        payload: updatedData,
-        enumArrayColumns,
-        roleImpersonationState: getImpersonatedRoleState(),
-      })
+      const configuration = { identifiers }
+
+      if (QUEUE_CELL_EDITS) {
+        // Queue the operation instead of immediately mutating
+        tableEditorSnap.queueOperation({
+          type: QueuedOperationType.EDIT_CELL_CONTENT,
+          tableId: snap.table.id,
+          payload: {
+            rowIdentifiers: identifiers,
+            columnName: changedColumn,
+            oldValue: previousRow[changedColumn],
+            newValue: rowData[changedColumn],
+            table: snap.originalTable,
+            enumArrayColumns,
+          },
+        })
+
+        // Apply optimistic update to the UI
+        const queryKey = tableRowKeys.tableRows(project.ref, { table: { id: snap.table.id } })
+        queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+          if (!old) return old
+          return {
+            rows: old.rows.map((row) => {
+              // Match by primary keys
+              const matches = Object.entries(identifiers).every(
+                ([key, value]) => row[key] === value
+              )
+              if (matches) {
+                return { ...row, [changedColumn]: rowData[changedColumn] }
+              }
+              return row
+            }),
+          }
+        })
+      } else {
+        // Default behavior: immediately save the change
+        const updatedData = { [changedColumn]: rowData[changedColumn] }
+
+        mutateUpdateTableRow({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: snap.originalTable,
+          configuration,
+          payload: updatedData,
+          enumArrayColumns,
+          roleImpersonationState: getImpersonatedRoleState(),
+        })
+      }
     },
-    [getImpersonatedRoleState, mutateUpdateTableRow, project, rows, snap.originalTable]
+    [
+      getImpersonatedRoleState,
+      mutateUpdateTableRow,
+      project,
+      rows,
+      snap.originalTable,
+      snap.table.id,
+      tableEditorSnap,
+      queryClient,
+    ]
   )
 }
