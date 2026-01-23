@@ -249,6 +249,13 @@ export const CreateBranchModal = () => {
     }
   }, [form, showCreateBranchModal])
 
+  let tooltipText: string | undefined
+  if (promptPlanUpgrade) {
+    tooltipText = 'Upgrade to unlock branching'
+  } else if (!gitlessBranching && !githubConnection) {
+    tooltipText = 'Set up a GitHub connection first to create branches'
+  }
+
   return (
     <Dialog open={showCreateBranchModal} onOpenChange={(open) => setShowCreateBranchModal(open)}>
       <DialogContent
@@ -585,15 +592,12 @@ export const CreateBranchModal = () => {
                 form={formId}
                 disabled={isDisabled}
                 loading={isCreatingBranch}
-                type="primary"
+                type={promptPlanUpgrade ? 'default' : 'primary'}
                 htmlType="submit"
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text:
-                      !gitlessBranching && !githubConnection
-                        ? 'Set up a GitHub connection first to create branches'
-                        : undefined,
+                    text: tooltipText,
                   },
                 }}
               >
