@@ -4517,6 +4517,7 @@
                 "properties": {
                   "custom_hostname": {
                     "type": "string",
+                    "maxLength": 253,
                     "minLength": 1
                   }
                 },
@@ -6969,7 +6970,8 @@
                 "type": "object",
                 "properties": {
                   "vanity_subdomain": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 63
                   }
                 },
                 "required": ["vanity_subdomain"]
@@ -7052,7 +7054,8 @@
                 "type": "object",
                 "properties": {
                   "vanity_subdomain": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 63
                   }
                 },
                 "required": ["vanity_subdomain"]
@@ -22263,6 +22266,7 @@
         "properties": {
           "custom_hostname": {
             "type": "string",
+            "maxLength": 253,
             "minLength": 1
           }
         },
@@ -22714,7 +22718,8 @@
         "type": "object",
         "properties": {
           "vanity_subdomain": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 63
           }
         },
         "required": ["vanity_subdomain"]
