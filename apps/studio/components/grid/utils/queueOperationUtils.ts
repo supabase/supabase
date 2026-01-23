@@ -74,7 +74,10 @@ export function queueCellEditWithOptimisticUpdate({
     return {
       ...old,
       rows: old.rows.map((row) => {
-        const matches = Object.entries(rowIdentifiers).every(([key, value]) => row[key] === value)
+        const identifierEntries = Object.entries(rowIdentifiers)
+        const matches =
+          identifierEntries.length > 0 &&
+          identifierEntries.every(([key, value]) => row[key] === value)
         if (matches) {
           return { ...row, [columnName]: newValue }
         }
@@ -112,7 +115,10 @@ export function reapplyOptimisticUpdates({
       if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
         const { rowIdentifiers, columnName, newValue } = operation.payload as EditCellContentPayload
         updatedRows = updatedRows.map((row) => {
-          const matches = Object.entries(rowIdentifiers).every(([key, value]) => row[key] === value)
+          const identifierEntries = Object.entries(rowIdentifiers)
+          const matches =
+            identifierEntries.length > 0 &&
+            identifierEntries.every(([key, value]) => row[key] === value)
           if (matches) {
             return { ...row, [columnName]: newValue }
           }

@@ -305,6 +305,7 @@ export const createTableEditorState = () => {
       rowIdentifiers: Record<string, unknown>,
       columnName: string
     ): boolean => {
+      if (Object.keys(rowIdentifiers).length === 0) return false
       return state.operationQueue.operations.some((op) => {
         if (op.tableId !== tableId || op.type !== QueuedOperationType.EDIT_CELL_CONTENT) {
           return false
