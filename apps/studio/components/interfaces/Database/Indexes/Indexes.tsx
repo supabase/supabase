@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -11,7 +11,6 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -57,21 +56,31 @@ const Indexes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { setValue: setSelectedIndexName, value: selectedIndex } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-    enabled: !!allIndexes,
-    onError: () => toast.error(`Index not found`),
-  })
+  const [selectedIndexName, setSelectedIndexName] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
-  const { setValue: setSelectedIndexNameToDelete, value: selectedIndexToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'delete',
-      select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-      enabled: !!allIndexes,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingIndexNameRef, selectedId, `Index not found`),
-    })
+  const selectedIndex = useMemo(
+    () =>
+      allIndexes !== undefined
+        ? allIndexes.find((index) => index.name === selectedIndexName)
+        : undefined,
+    [selectedIndexName, allIndexes]
+  )
+
+  const [indexNameToDelete, setIndexNameToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const indexToDelete = useMemo(
+    () =>
+      allIndexes !== undefined
+        ? allIndexes.find((index) => index.name === indexNameToDelete)
+        : undefined,
+    [indexNameToDelete, allIndexes]
+  )
 
   const {
     data: schemas,
@@ -85,7 +94,7 @@ const Indexes = () => {
 
   const { mutate: deleteIndex, isPending: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setSelectedIndexNameToDelete(null)
+      setIndexNameToDelete(null)
       toast.success('Successfully deleted index')
     },
   })
@@ -120,6 +129,25 @@ const Indexes = () => {
   useEffect(() => {
     if (table !== undefined) setSearch(table)
   }, [table])
+
+  useEffect(() => {
+    if (!isLoadingIndexes && selectedIndexName !== null && selectedIndex === undefined) {
+      toast.error('Index not found')
+      setSelectedIndexName(null)
+    }
+  }, [isLoadingIndexes, selectedIndexName, setSelectedIndexName, selectedIndex])
+
+  useEffect(() => {
+    if (!isLoadingIndexes && indexNameToDelete !== null) {
+      if (isSchemaLocked) {
+        toast.error("Can't delete index because it is applied on a protected schema")
+        setIndexNameToDelete(null)
+      } else if (indexToDelete === undefined) {
+        toast.error('Index not found')
+        setIndexNameToDelete(null)
+      }
+    }
+  }, [isLoadingIndexes, indexNameToDelete, setIndexNameToDelete, isSchemaLocked, indexToDelete])
 
   return (
     <>
@@ -168,7 +196,7 @@ const Indexes = () => {
           {isLoadingIndexes && <GenericSkeletonLoader />}
 
           {isErrorIndexes && (
-            <AlertError error={indexesError as any} subject="Failed to retrieve database indexes" />
+            <AlertError error={indexesError} subject="Failed to retrieve database indexes" />
           )}
 
           {isSuccessIndexes && (
@@ -230,7 +258,7 @@ const Indexes = () => {
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}
-                                  onClick={() => setSelectedIndexNameToDelete(index.name)}
+                                  onClick={() => setIndexNameToDelete(index.name)}
                                 />
                               )}
                             </div>
@@ -247,7 +275,7 @@ const Indexes = () => {
 
       <SidePanel
         size="xlarge"
-        visible={!!selectedIndex}
+        visible={selectedIndex !== undefined}
         header={
           <>
             <span>Index:</span>
@@ -274,18 +302,16 @@ const Indexes = () => {
         variant="warning"
         size="medium"
         loading={isExecuting}
-        visible={!!selectedIndexToDelete}
+        visible={!isSchemaLocked && indexToDelete !== undefined}
         title={
           <>
-            Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index <code className="text-sm">{indexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"
         confirmLabelLoading="Deleting..."
-        onConfirm={() =>
-          selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
-        }
-        onCancel={() => setSelectedIndexNameToDelete(null)}
+        onConfirm={() => (indexToDelete !== undefined ? onConfirmDeleteIndex(indexToDelete) : {})}
+        onCancel={() => setIndexNameToDelete(null)}
         alert={{
           title: 'This action cannot be undone',
           description:

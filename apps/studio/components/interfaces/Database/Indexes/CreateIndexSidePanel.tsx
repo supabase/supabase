@@ -38,6 +38,7 @@ import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -48,6 +49,8 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
+  const { data: protectedSchemas } = useProtectedSchemas()
+
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
@@ -56,10 +59,13 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: AllSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = (AllSchemas ?? []).filter(
+    (schema) => !protectedSchemas.some((_schema) => _schema.name === schema.name)
+  )
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
@@ -146,7 +152,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
 
-  const isSelectEntityDisabled = entityTypes.length === 0
+  const isSelectEntityDisabled = entityTypes.length === 0 && searchTerm.length === 0
 
   return (
     <SidePanel
@@ -187,11 +193,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 sameWidthAsTrigger
               >
                 <Command_Shadcn_>
-                  <CommandInput_Shadcn_
-                    placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
-                  />
+                  <CommandInput_Shadcn_ placeholder="Find table..." />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
@@ -210,7 +212,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             }}
                           >
                             <span>{schema.name}</span>
-                            {selectedEntity === schema.name && (
+                            {selectedSchema === schema.name && (
                               <Check className="text-brand" strokeWidth={2} size={16} />
                             )}
                           </CommandItem_Shadcn_>
