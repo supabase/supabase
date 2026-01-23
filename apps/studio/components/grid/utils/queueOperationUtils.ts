@@ -92,3 +92,48 @@ export function queueCellEditWithOptimisticUpdate({
     }
   })
 }
+
+interface ReapplyOptimisticUpdatesParams {
+  queryClient: QueryClient
+  projectRef: string
+  tableId: number
+  operations: readonly QueuedOperation[]
+}
+
+/**
+ * Re-applies optimistic updates from the operation queue to the query cache.
+ * Used after a refresh to ensure pending changes are still visible in the UI.
+ */
+export function reapplyOptimisticUpdates({
+  queryClient,
+  projectRef,
+  tableId,
+  operations,
+}: ReapplyOptimisticUpdatesParams) {
+  // Filter operations for this specific table
+  const tableOperations = operations.filter((op) => op.tableId === tableId)
+
+  if (tableOperations.length === 0) return
+
+  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
+  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+    if (!old) return old
+
+    let updatedRows = [...old.rows]
+
+    for (const operation of tableOperations) {
+      if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+        const { rowIdentifiers, columnName, newValue } = operation.payload as EditCellContentPayload
+        updatedRows = updatedRows.map((row) => {
+          const matches = Object.entries(rowIdentifiers).every(([key, value]) => row[key] === value)
+          if (matches) {
+            return { ...row, [columnName]: newValue }
+          }
+          return row
+        })
+      }
+    }
+
+    return { ...old, rows: updatedRows }
+  })
+}

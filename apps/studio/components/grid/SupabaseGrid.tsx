@@ -12,6 +12,7 @@ import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
@@ -21,8 +22,9 @@ import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
+import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
 
-import { keepPreviousData } from '@tanstack/react-query'
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useOperationQueueActions } from './hooks/useOperationQueueActions'
 import { useTableFilter } from './hooks/useTableFilter'
@@ -44,6 +46,7 @@ export const SupabaseGrid = ({
 
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
+  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -98,6 +101,34 @@ export const SupabaseGrid = ({
   useEffect(() => {
     if (!mounted) setMounted(true)
   }, [])
+
+  // Re-apply optimistic updates when table data is loaded/refetched
+  // This ensures pending changes remain visible when switching tabs or after data refresh
+  useEffect(() => {
+    if (
+      isSuccess &&
+      project?.ref &&
+      tableId &&
+      isQueueOperationsEnabled &&
+      tableEditorSnap.hasPendingOperations
+    ) {
+      reapplyOptimisticUpdates({
+        queryClient,
+        projectRef: project.ref,
+        tableId,
+        operations: tableEditorSnap.operationQueue.operations as readonly QueuedOperation[],
+      })
+    }
+  }, [
+    isSuccess,
+    data,
+    project?.ref,
+    tableId,
+    isQueueOperationsEnabled,
+    tableEditorSnap.hasPendingOperations,
+    tableEditorSnap.operationQueue.operations,
+    queryClient,
+  ])
 
   const rows = data?.rows ?? EMPTY_ARR
 
