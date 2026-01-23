@@ -21,8 +21,8 @@ Start with building the Angular app from scratch.
 
 ### Initialize an Angular app
 
-You can use the [Angular CLI](https://angular.io/cli) to initialize
-an app called `supabase-angular`. The command sets some defaults, that you change to suit your needs:
+You can use the [Angular CLI](https://angular.io/cli) to initialize an app called `supabase-angular`.
+The command sets some defaults, that you change to suit your needs:
 
 ```bash
 npx ng new supabase-angular --routing false --style css --standalone false --zoneless true --ssr false
@@ -55,11 +55,9 @@ Now you have the API credentials in place, create a `SupabaseService` with `ng g
 
 <$CodeTabs>
 
-```ts name=src/app/supabase.service.ts
-import { Injectable } from '@angular/core'
+```ts name=src/app/supabase.service.tsimport { Injectable } from '@angular/core'
 import {
   AuthChangeEvent,
-  AuthSession,
   createClient,
   Session,
   SupabaseClient,
@@ -79,17 +77,17 @@ export interface Profile {
 })
 export class SupabaseService {
   private supabase: SupabaseClient
-  _session: AuthSession | null = null
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
-  get session() {
-    this.supabase.auth.getSession().then(({ data }) => {
-      this._session = data.session
-    })
-    return this._session
+  async getUser(): Promise<User | null> {
+    const { data, error } = await this.supabase.auth.getUser()
+    if (error) {
+      return null
+    }
+    return data.user
   }
 
   profile(user: User) {
@@ -225,7 +223,7 @@ Create an `AccountComponent` with the `ng g c account` Angular CLI command and a
 ```ts name=src/app/account/account.ts
 import { Component, Input, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
-import { AuthSession } from '@supabase/supabase-js'
+import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
 
 @Component({
@@ -250,7 +248,7 @@ export class AccountComponent implements OnInit {
   }
 
   @Input()
-  session!: AuthSession
+  user!: User
 
   constructor(
     private readonly supabase: SupabaseService,
@@ -277,8 +275,7 @@ export class AccountComponent implements OnInit {
   async getProfile() {
     try {
       this.loading = true
-      const { user } = this.session
-      const { data: profile, error, status } = await this.supabase.profile(user)
+      const { data: profile, error, status } = await this.supabase.profile(this.user)
 
       if (error && status !== 406) {
         throw error
@@ -299,14 +296,13 @@ export class AccountComponent implements OnInit {
   async updateProfile(): Promise<void> {
     try {
       this.loading = true
-      const { user } = this.session
 
       const username = this.updateProfileForm.value.username as string
       const website = this.updateProfileForm.value.website as string
       const avatar_url = this.updateProfileForm.value.avatar_url as string
 
       const { error } = await this.supabase.updateProfile({
-        id: user.id,
+        id: this.user.id,
         username,
         website,
         avatar_url,
@@ -332,7 +328,7 @@ export class AccountComponent implements OnInit {
   <app-avatar [avatarUrl]="this.avatarUrl" (upload)="updateAvatar($event)"> </app-avatar>
   <div>
     <label for="email">Email</label>
-    <input id="email" type="text" [value]="session.user.email" disabled />
+    <input id="email" type="text" [value]="user.email" disabled />
   </div>
   <div>
     <label for="username">Name</label>
@@ -357,83 +353,7 @@ export class AccountComponent implements OnInit {
 
 </$CodeTabs>
 
-### Launch!
-
-Now you have all the components in place, update `AppComponent`:
-
-<$CodeTabs>
-
-```ts name=src/app/app.ts
-import { Component, OnInit } from '@angular/core'
-import { SupabaseService } from './supabase.service'
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.html',
-  styleUrls: ['./app.css'],
-  standalone: false,
-})
-export class AppComponent implements OnInit {
-  constructor(private readonly supabase: SupabaseService) {}
-
-  title = 'angular-user-management'
-  session: any
-
-  ngOnInit() {
-    this.session = this.supabase.session
-    this.supabase.authChanges((_, session) => (this.session = session))
-  }
-}
-```
-
-```html name=src/app/app.html
-<div class="container" style="padding: 50px 0 100px 0">
-  <app-account *ngIf="session; else auth" [session]="session"></app-account>
-  <ng-template #auth>
-    <app-auth></app-auth>
-  </ng-template>
-</div>
-```
-
-</$CodeTabs>
-
-You also need to change `app.module.ts` to include the `ReactiveFormsModule` from the `@angular/forms` package.
-
-<$CodeTabs>
-
-```ts name=src/app/app.module.ts
-import { NgModule } from '@angular/core'
-import { BrowserModule } from '@angular/platform-browser'
-
-import { AppComponent } from './app'
-import { AuthComponent } from './auth/auth'
-import { AccountComponent } from './account/account'
-import { ReactiveFormsModule } from '@angular/forms'
-import { AvatarComponent } from './avatar/avatar'
-
-@NgModule({
-  declarations: [AppComponent, AuthComponent, AccountComponent, AvatarComponent],
-  imports: [BrowserModule, ReactiveFormsModule],
-  providers: [],
-  bootstrap: [AppComponent],
-  exports: [AppComponent, AuthComponent, AccountComponent, AvatarComponent],
-})
-export class AppModule {}
-```
-
-</$CodeTabs>
-
-Once that's done, run the application in a terminal:
-
-```bash
-npm run start
-```
-
-Open the browser to [localhost:4200](http://localhost:4200) and you should see the completed app.
-
-![Screenshot of the Supabase Angular application running in a browser](/docs/img/supabase-angular-demo.png)
-
-## Bonus: Profile photos
+## Profile photos
 
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
@@ -540,7 +460,7 @@ export class AvatarComponent {
 
 ### Add the new widget
 
-And then we can add the widget on top of the `AccountComponent` HTML template:
+Then add the widget on top of the `AccountComponent` HTML template:
 
 <$CodeTabs>
 
@@ -553,7 +473,7 @@ And then we can add the widget on top of the `AccountComponent` HTML template:
 
 </$CodeTabs>
 
-And add an `updateAvatar` function along with an `avatarUrl` getter to the `AccountComponent` typescript file:
+Add an `updateAvatar` function along with an `avatarUrl` getter to the `AccountComponent` typescript file:
 
 <$CodeTabs>
 
@@ -580,5 +500,84 @@ export class AccountComponent implements OnInit {
 ```
 
 </$CodeTabs>
+
+### Launch!
+
+Now you have all the components in place, update `AppComponent`:
+
+<$CodeTabs>
+
+```ts name=src/app/app.ts
+import { Component, OnInit } from '@angular/core'
+import { User } from '@supabase/supabase-js'
+import { SupabaseService } from './supabase.service'
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.html',
+  styleUrls: ['./app.css'],
+  standalone: false,
+})
+export class AppComponent implements OnInit {
+  constructor(private readonly supabase: SupabaseService) {}
+
+  title = 'angular-user-management'
+  user: User | null = null
+
+  async ngOnInit() {
+    this.user = await this.supabase.getUser()
+    this.supabase.authChanges(async () => {
+      this.user = await this.supabase.getUser()
+    })
+  }
+}
+```
+
+```html name=src/app/app.html
+<div class="container" style="padding: 50px 0 100px 0">
+  <app-account *ngIf="session; else auth" [session]="session"></app-account>
+  <ng-template #auth>
+    <app-auth></app-auth>
+  </ng-template>
+</div>
+```
+
+</$CodeTabs>
+
+You also need to change `app.module.ts` to include the `ReactiveFormsModule` from the `@angular/forms` package.
+
+<$CodeTabs>
+
+```ts name=src/app/app.module.ts
+import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
+
+import { AppComponent } from './app'
+import { AuthComponent } from './auth/auth'
+import { AccountComponent } from './account/account'
+import { ReactiveFormsModule } from '@angular/forms'
+import { AvatarComponent } from './avatar/avatar'
+
+@NgModule({
+  declarations: [AppComponent, AuthComponent, AccountComponent, AvatarComponent],
+  imports: [BrowserModule, ReactiveFormsModule],
+  providers: [],
+  bootstrap: [AppComponent],
+  exports: [AppComponent, AuthComponent, AccountComponent, AvatarComponent],
+})
+export class AppModule {}
+```
+
+</$CodeTabs>
+
+Once that's done, run the application in a terminal:
+
+```bash
+npm run start
+```
+
+Open the browser to [localhost:4200](http://localhost:4200) and you should see the completed app.
+
+![Screenshot of the Supabase Angular application running in a browser](/docs/img/supabase-angular-demo.png)
 
 At this stage you have a fully functional application!
