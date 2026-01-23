@@ -1,4 +1,4 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
+import { PgRole } from 'data/database-roles/database-roles-query'
 import { toast } from 'sonner'
 
 import { useDatabaseRoleDeleteMutation } from 'data/database-roles/database-role-delete-mutation'
@@ -6,7 +6,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Modal } from 'ui'
 
 interface DeleteRoleModalProps {
-  role: PostgresRole
+  role: PgRole
   visible: boolean
   onClose: () => void
   onDelete?: () => void
