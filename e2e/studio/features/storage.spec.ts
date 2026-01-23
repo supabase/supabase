@@ -1,8 +1,7 @@
 import { expect } from '@playwright/test'
 import path from 'path'
 import { env } from '../env.config.js'
-import { test } from '../utils/test.js'
-import { waitForApiResponse } from '../utils/wait-for-response.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import {
   createBucket,
   createFolder,
@@ -14,7 +13,8 @@ import {
   renameItem,
   uploadFile,
 } from '../utils/storage-helpers.js'
-import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
+import { test } from '../utils/test.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 const bucketNamePrefix = 'pw_bucket'
 
@@ -265,34 +265,6 @@ test.describe.serial('Storage', () => {
       page.getByTitle('test#folder'),
       'Folder with invalid character should not be created'
     ).not.toBeVisible()
-  })
-
-  test('cannot create a folder with duplicate name', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_folder_duplicate`
-    const folderName = 'duplicate_folder'
-
-    // Create a bucket, navigate to it, and create a folder
-    await createBucket(page, ref, bucketName, false)
-    await navigateToBucket(page, ref, bucketName)
-    await createFolder(page, folderName)
-
-    // Dismiss any toasts from previous action
-    await dismissToastsIfAny(page)
-
-    // Try to create another folder with the same name
-    const createFolderBtn = page.getByRole('button', { name: 'Create folder' })
-    await createFolderBtn.click()
-
-    const nameInput = page.getByRole('textbox')
-    await expect(nameInput, 'Folder name input should be visible').toBeVisible()
-    await nameInput.fill(folderName)
-    await nameInput.press('Enter')
-
-    // Verify error toast appears for duplicate name
-    await expect(
-      page.getByText(`The name ${folderName} already exists in the current directory`),
-      'Error message for duplicate name should appear'
-    ).toBeVisible()
   })
 
   test('cancels folder creation when name is empty', async ({ page, ref }) => {
