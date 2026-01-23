@@ -392,6 +392,7 @@ allow_list = [
     "plpgsql",
     "psql",
     "scrypt",
+    "screencast",
     "sessionStorage",
     "signInWithIdToken",
     "stdin",
