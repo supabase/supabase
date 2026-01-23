@@ -174,14 +174,15 @@ const ColumnType = ({
             aria-expanded={open}
             className={cn('w-full justify-between', !value && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+            title={value && value.replaceAll('"', '')}
           >
             {value ? (
               <div className="flex gap-2 items-center">
                 <span>{inferIcon(getOptionByName(value)?.type ?? '')}</span>
-                {value.replaceAll('"', '')}
+                <span className="block truncate">{value.replaceAll('"', '')}</span>
               </div>
             ) : (
-              'Choose a column type...'
+              'Choose a type'
             )}
           </Button>
         </PopoverTrigger_Shadcn_>

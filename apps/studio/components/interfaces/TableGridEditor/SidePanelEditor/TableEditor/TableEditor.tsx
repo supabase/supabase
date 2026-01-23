@@ -354,7 +354,7 @@ export const TableEditor = ({
   return (
     <SidePanel
       data-testid="table-editor-side-panel"
-      size="large"
+      size="xlarge"
       key="TableEditor"
       visible={visible}
       header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
