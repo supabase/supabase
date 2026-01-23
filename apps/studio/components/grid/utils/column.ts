@@ -42,3 +42,9 @@ export function getInitialGridColumns(
 
   return result
 }
+
+export function getColumnFormat(type: string, format: string) {
+  if ('array' == type.toLowerCase()) {
+    return `${format.replace('_', '')}[]`
+  } else return format
+}

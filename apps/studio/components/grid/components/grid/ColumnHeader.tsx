@@ -13,6 +13,7 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu/ColumnMenu'
+import { getColumnFormat } from 'components/grid/utils/column'
 
 export function ColumnHeader<R>({
   column,
@@ -213,10 +214,4 @@ function renderColumnIcon(
     default:
       return null
   }
-}
-
-function getColumnFormat(type: ColumnType, format: string) {
-  if (type == 'array') {
-    return `${format.replace('_', '')}[]`
-  } else return format
 }
