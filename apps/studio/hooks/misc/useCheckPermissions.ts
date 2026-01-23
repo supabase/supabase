@@ -188,3 +188,5 @@ export function useAsyncCheckPermissions(
 
   return { isLoading, isSuccess, can }
 }
+
+export { useAsyncCheckPermissions as useCheckPermissions }
