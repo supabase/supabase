@@ -4,6 +4,7 @@ import { proxy, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
+import { generateQueueOperationKey } from 'components/grid/utils/queueOperationUtils'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
@@ -227,14 +228,31 @@ export const createTableEditorState = () => {
     } as OperationQueueState,
 
     /**
-     * Queue a new operation for later processing
+     * Queue a new operation for later processing.
+     * If an operation with the same key already exists, it will be overwritten.
      */
     queueOperation: (operation: Omit<QueuedOperation, 'id' | 'timestamp'>) => {
-      state.operationQueue.operations.push({
+      const operationKey = generateQueueOperationKey(operation)
+      const existingIndex = state.operationQueue.operations.findIndex(
+        (op) => generateQueueOperationKey(op) === operationKey
+      )
+
+      const newOperation: QueuedOperation = {
         ...operation,
-        id: crypto.randomUUID(),
+        id: existingIndex >= 0 ? state.operationQueue.operations[existingIndex].id : operationKey,
         timestamp: Date.now(),
-      })
+      }
+
+      if (existingIndex >= 0) {
+        state.operationQueue.operations[existingIndex] = {
+          ...operation,
+          id: operationKey,
+          timestamp: Date.now(),
+        }
+      } else {
+        state.operationQueue.operations.push(newOperation)
+      }
+
       if (state.operationQueue.status === 'idle') {
         state.operationQueue.status = 'pending'
       }
