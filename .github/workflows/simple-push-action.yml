@@ -1,0 +1,11 @@
+name: Simple Push Action
+
+on:
+  push:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run exit 0
+        run: exit 0
