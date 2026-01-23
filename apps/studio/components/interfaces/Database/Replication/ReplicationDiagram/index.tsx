@@ -22,6 +22,12 @@ export const ReplicationDiagram = () => {
   )
 }
 
+const nodeTypes = {
+  primary: PrimaryDatabaseNode,
+  replication: ReplicationNode,
+  readReplica: ReadReplicaNode,
+}
+
 const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
@@ -36,7 +42,7 @@ const ReplicationDiagramContent = () => {
   const { data, isSuccess: isSuccessDestinations } = useReplicationDestinationsQuery({
     projectRef,
   })
-  const destinations = data?.destinations ?? []
+  const destinations = useMemo(() => data?.destinations ?? [], [data])
 
   const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
 
@@ -57,6 +63,7 @@ const ReplicationDiagramContent = () => {
       })),
     ]
   }, [destinations, projectRef, readReplicas])
+
   const edges = useMemo(() => {
     return [
       ...readReplicas.map((x) => {
@@ -98,15 +105,6 @@ const ReplicationDiagramContent = () => {
       }),
     ]
   }, [destinations, pipelinesData?.pipelines, projectRef, queryClient, readReplicas])
-
-  const nodeTypes = useMemo(
-    () => ({
-      primary: PrimaryDatabaseNode,
-      replication: ReplicationNode,
-      readReplica: ReadReplicaNode,
-    }),
-    []
-  )
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
