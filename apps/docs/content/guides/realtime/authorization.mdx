@@ -133,7 +133,7 @@ exists (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -266,7 +266,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -293,7 +293,7 @@ using (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -316,7 +316,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and name = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -343,7 +343,7 @@ using (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
@@ -366,7 +366,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and name = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
