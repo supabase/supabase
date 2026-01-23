@@ -41,9 +41,14 @@ export interface QueuedOperation {
 }
 
 /**
- * Status of the operation queue
+ * Status of the overall operation queue
  */
 export type QueueStatus = 'idle' | 'pending' | 'saving' | 'error'
+
+/**
+ * Status of an individual operation within the queue
+ */
+export type OperationStatus = 'pending' | 'saving' | 'success' | 'error'
 
 /**
  * Operation queue state structure

@@ -67,6 +67,7 @@ import {
 } from './TableEditor/ApiAccessToggle'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { OperationQueueSidePanel } from './OperationQueueSidePanel/OperationQueueSidePanel'
 
 export type SaveTableParams =
   | SaveTableParamsNew
@@ -935,6 +936,10 @@ export const SidePanelEditor = ({
         saveContent={onImportData}
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
+      />
+      <OperationQueueSidePanel
+        visible={snap.sidePanel?.type === 'operation-queue'}
+        closePanel={snap.closeSidePanel}
       />
       <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>

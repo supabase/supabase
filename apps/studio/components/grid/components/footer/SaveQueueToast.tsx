@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { SaveQueueToastContent } from './SaveQueueToast.Content'
 
 const SAVE_QUEUE_TOAST_ID = 'table-editor-save-queue-toast'
 
@@ -15,27 +16,23 @@ interface SaveQueueToastProps {
  * Component that manages a persistent toast notification when there are
  * pending operations in the table editor queue.
  *
- * Shows "Save" and "Cancel" buttons when the queue has pending operations,
- * and automatically dismisses when the queue is empty.
+ * Shows the count of pending changes along with "View Details", "Save", and "Cancel" buttons.
+ * Automatically dismisses when the queue is empty.
  */
 export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
   const snap = useTableEditorStateSnapshot()
   const toastShownRef = useRef(false)
+  const operationCount = snap.operationQueue.operations.length
 
   useEffect(() => {
-    if (snap.hasPendingOperations && !toastShownRef.current) {
+    if (snap.hasPendingOperations) {
       toast(
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Save</span>
-          <div className="flex items-center gap-1">
-            <Button size="tiny" type="primary" onClick={onSave}>
-              Save
-            </Button>
-            <Button size="tiny" type="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-          </div>
-        </div>,
+        <SaveQueueToastContent
+          count={operationCount}
+          onSave={onSave}
+          onCancel={onCancel}
+          onViewDetails={() => snap.onViewOperationQueue()}
+        />,
         {
           id: SAVE_QUEUE_TOAST_ID,
           duration: Infinity,
@@ -48,7 +45,7 @@ export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
       toast.dismiss(SAVE_QUEUE_TOAST_ID)
       toastShownRef.current = false
     }
-  }, [snap.hasPendingOperations, onSave, onCancel])
+  }, [snap.hasPendingOperations, operationCount, onSave, onCancel, snap])
 
   // This component doesn't render anything visible itself
   // It only manages the toast lifecycle
