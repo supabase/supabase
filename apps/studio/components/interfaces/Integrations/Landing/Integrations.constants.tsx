@@ -62,10 +62,10 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
       <Layers className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Lightweight message queue in Postgres',
-    docsUrl: 'https://github.com/tembo-io/pgmq',
+    docsUrl: 'https://github.com/pgmq/pgmq',
     author: {
       name: 'pgmq',
-      websiteUrl: 'https://github.com/tembo-io/pgmq',
+      websiteUrl: 'https://github.com/pgmq/pgmq',
     },
     navigation: [
       {
