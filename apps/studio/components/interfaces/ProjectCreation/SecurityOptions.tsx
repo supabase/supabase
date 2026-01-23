@@ -10,6 +10,7 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  useWatch_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -21,7 +22,11 @@ interface SecurityOptionsProps {
 }
 
 export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
-  const shouldShowEnableRlsEventTrigger = usePHFlag<string>('projectCreationEnableRlsEventTrigger')
+  const rlsExperimentVariant = usePHFlag<'control' | 'test' | false | undefined>(
+    'projectCreationEnableRlsEventTrigger'
+  )
+  const shouldShowEnableRlsEventTrigger = rlsExperimentVariant === 'test'
+  const dataApi = useWatch_Shadcn_({ control: form.control, name: 'dataApi' })
 
   return (
     <Panel.Content className="pb-8">
@@ -87,7 +92,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
             />
           )}
 
-          {!form.getValues('dataApi') && (
+          {!dataApi && (
             <Admonition type="warning" title="Data API will effectively be disabled">
               You will not be able to query or mutate data via Supabase client libraries like
               supabase-js.

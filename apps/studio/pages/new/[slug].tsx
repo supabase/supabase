@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -72,6 +72,10 @@ const Wizard: NextPageWithLayout = () => {
   const { profile } = useProfile()
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const rlsExperimentVariant = usePHFlag<'control' | 'test' | false | undefined>(
+    'projectCreationEnableRlsEventTrigger'
+  )
+  const shouldShowEnableRlsEventTrigger = rlsExperimentVariant === 'test'
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -90,6 +94,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
+  const hasTrackedRlsExposure = useRef(false)
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -228,9 +233,11 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const userPrimaryEmail = profile?.primary_email?.toLowerCase()
-  const isUserAtFreeProjectLimit = membersExceededLimit.some(
-    (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
-  )
+  const isUserAtFreeProjectLimit = userPrimaryEmail
+    ? membersExceededLimit.some(
+        (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
+      )
+    : false
   const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
 
   const {
@@ -244,6 +251,9 @@ const Wizard: NextPageWithLayout = () => {
         {
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
+          ...((rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test') && {
+            rlsOptionVariant: rlsExperimentVariant,
+          }),
         },
         {
           project: res.ref,
@@ -377,6 +387,23 @@ const Wizard: NextPageWithLayout = () => {
       })
     }
   }, [instanceSize, watchedInstanceSize, form])
+
+  // Track exposure to RLS option experiment (only when explicitly assigned to a variant)
+  useEffect(() => {
+    if (
+      !hasTrackedRlsExposure.current &&
+      currentOrg?.slug &&
+      (rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test')
+    ) {
+      hasTrackedRlsExposure.current = true
+      track(
+        'project_creation_rls_option_experiment_exposed',
+        {
+          variant: rlsExperimentVariant,
+        }
+      )
+    }
+  }, [currentOrg?.slug, rlsExperimentVariant, track])
 
   return (
     <Form_Shadcn_ {...form}>
