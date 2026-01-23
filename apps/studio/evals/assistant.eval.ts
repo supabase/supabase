@@ -10,6 +10,7 @@ import {
   correctnessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
+  sqlCorrectnessScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
 } from './scorer'
@@ -24,8 +25,8 @@ Eval('Assistant', {
   task: async (input) => {
     const result = await generateAssistantResponse({
       model: openai('gpt-5-mini'),
-      messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input }] }],
-      tools: await getMockTools(),
+      messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input.prompt }] }],
+      tools: await getMockTools(input.mockToolOutputs),
     })
 
     const finishReason = await result.finishReason
@@ -76,6 +77,7 @@ Eval('Assistant', {
   scores: [
     toolUsageScorer,
     sqlSyntaxScorer,
+    sqlCorrectnessScorer,
     goalCompletionScorer,
     concisenessScorer,
     completenessScorer,

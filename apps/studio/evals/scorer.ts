@@ -6,7 +6,16 @@ import { parse } from 'libpg-query'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
-type Input = string
+type Input = {
+  prompt: string
+  mockToolOutputs?: {
+    list_tables?: Array<{
+      name: string
+      rls_enabled: boolean
+      columns: Array<{ name: string; data_type: string }>
+    }>
+  }
+}
 
 type Output = {
   finishReason: FinishReason
@@ -19,6 +28,7 @@ type Output = {
 export type Expected = {
   requiredTools?: string[]
   correctAnswer?: string
+  correctSql?: string
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -125,7 +135,7 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 
 export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
   return await concisenessEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -152,7 +162,7 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
   output,
 }) => {
   return await completenessEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -180,7 +190,7 @@ export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async (
   output,
 }) => {
   return await goalCompletionEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -258,8 +268,22 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
   }
 
   return await correctnessEvaluator({
-    input,
+    input: input.prompt,
     expected: expected.correctAnswer,
     output: extractTextOnly(output.steps),
   })
+}
+
+export const sqlCorrectnessScorer: EvalScorer<Input, Output, Expected> = async ({
+  output,
+  expected,
+}) => {
+  if (!expected.correctSql) return null
+
+  const match = output.sqlQueries.some((sql) => sql === expected.correctSql)
+
+  return {
+    name: 'SQL Correctness',
+    score: match ? 1 : 0,
+  }
 }
