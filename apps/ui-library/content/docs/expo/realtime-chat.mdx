@@ -1,0 +1,189 @@
+---
+title: Realtime Chat
+description: Real-time chat component for Expo and React Native applications
+---
+
+## Introduction
+
+The Realtime Chat example shows how to build a low-latency chat experience in **Expo and React Native** using Supabase Realtime.
+
+Unlike web-based chat, mobile apps must handle **app backgrounding**, **re-subscription**, and **presence cleanup** explicitly. This guide focuses on those mobile-specific considerations.
+
+---
+
+## How it works under the hood
+
+This example combines multiple Supabase Realtime features:
+
+- **Broadcast** for delivering chat messages
+- **Presence** for tracking online users and typing indicators
+- **Postgres Changes** (optional) for persisted message delivery
+
+Each chat room maps to a single Realtime channel, for example:
+
+```ts
+supabase.channel(`chat:${roomId}`)
+```
+
+---
+
+## Setup
+
+This guide assumes:
+
+- An Expo project using the managed workflow
+- `@supabase/supabase-js` installed
+- A Supabase client configured with `AsyncStorage`
+
+See the [Expo User Management guide](/docs/guides/getting-started/tutorials/with-expo-react-native) for initial setup.
+
+---
+
+## Subscribing to a chat room
+
+In React Native, channel references should be **stored and cleaned up explicitly** to avoid duplicate subscriptions.
+
+```ts
+const channelRef = useRef<RealtimeChannel | null>(null)
+
+useEffect(() => {
+  const channel = supabase.channel(`chat:${roomId}`)
+  channelRef.current = channel
+
+  channel.subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      channel.track({
+        userId,
+        typing: false,
+        onlineAt: new Date().toISOString(),
+      })
+    }
+  })
+
+  return () => {
+    supabase.removeChannel(channel)
+  }
+}, [roomId])
+```
+
+---
+
+## Sending messages (Broadcast)
+
+Messages are sent using Broadcast, which provides very low latency but does not persist messages.
+
+```ts
+channel.send({
+  type: 'broadcast',
+  event: 'message',
+  payload: {
+    text,
+    userId,
+    createdAt: new Date().toISOString(),
+  },
+})
+```
+
+If you need message history, persist messages separately using Postgres and load them on mount.
+
+---
+
+## Tracking presence and typing indicators
+
+Presence is used to track:
+
+- Online status
+- Typing state
+
+```ts
+channel.track({
+  userId,
+  typing: true,
+})
+```
+
+A short timeout is typically used to reset typing state after inactivity.
+
+```ts
+setTimeout(() => {
+  channel.track({ userId, typing: false })
+}, 1500)
+```
+
+---
+
+## Reading presence state
+
+Presence state is synchronized across all connected clients and can be queried locally:
+
+```ts
+const state = channel.presenceState()
+```
+
+Use this to determine:
+
+- Whether another user is online
+- Whether they are currently typing
+
+---
+
+## Handling app backgrounding
+
+Mobile apps frequently transition between foreground and background. You should re-sync presence when the app becomes active.
+
+```ts
+import { AppState } from 'react-native'
+
+AppState.addEventListener('change', (state) => {
+  if (state === 'active') {
+    channel.track({ userId, typing: false })
+  }
+})
+```
+
+Failing to do this can result in ghost users or stale presence state.
+
+---
+
+## Cleaning up subscriptions
+
+Always remove channels when a screen unmounts or a room changes:
+
+```ts
+supabase.removeChannel(channel)
+```
+
+This prevents duplicate listeners and incorrect presence counts.
+
+---
+
+## When to use Postgres Changes
+
+Use Postgres Changes if you need:
+
+- Guaranteed message delivery
+- Message persistence
+- Multi-device sync after reconnect
+
+Broadcast and Presence should be treated as ephemeral signals, not durable storage.
+
+---
+
+## Summary
+
+This Expo Realtime Chat example demonstrates:
+
+- Low-latency messaging with Broadcast
+- Online and typing indicators with Presence
+- Safe subscription lifecycle management in React Native
+- Mobile-specific pitfalls and cleanup patterns
+
+For framework-agnostic concepts, see the core [Realtime documentation](https://supabase.com/docs/guides/realtime).
+
+---
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime Presence](https://supabase.com/docs/guides/realtime/presence)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)
