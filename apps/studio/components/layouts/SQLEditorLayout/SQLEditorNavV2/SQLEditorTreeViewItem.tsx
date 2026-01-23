@@ -251,6 +251,7 @@ export const SQLEditorTreeViewItem = ({
             }}
             {...props}
             name={element.name}
+            description={element.metadata?.description || undefined}
             xPadding={16}
           />
         </ContextMenuTrigger_Shadcn_>

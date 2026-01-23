@@ -64,6 +64,8 @@ const TreeViewItem = forwardRef<
     xPadding?: number
     /** name of entity */
     name: string
+    /** Optional description of entity */
+    description?: string
     /** icon of entity */
     icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
@@ -90,6 +92,7 @@ const TreeViewItem = forwardRef<
       isLoading = false,
       xPadding = 16,
       name = '',
+      description,
       icon,
       isEditing = false,
       onEditSubmit,
@@ -181,6 +184,7 @@ const TreeViewItem = forwardRef<
     return (
       <div
         ref={ref}
+        title={description && typeof description === 'string' && description.trim() ? description : undefined}
         {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
