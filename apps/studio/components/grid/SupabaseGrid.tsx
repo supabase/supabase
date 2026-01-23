@@ -134,9 +134,7 @@ export const SupabaseGrid = ({
         {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
 
         {/* Toast for pending save operations (only when queuing is enabled) */}
-        {isQueueOperationsEnabled && (
-          <SaveQueueToast onSave={handleSaveQueue} onCancel={handleCancelQueue} />
-        )}
+        {isQueueOperationsEnabled && <SaveQueueToast onSave={handleSaveQueue} />}
       </div>
     </DndProvider>
   )

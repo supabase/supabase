@@ -9,7 +9,6 @@ const SAVE_QUEUE_TOAST_ID = 'table-editor-save-queue-toast'
 
 interface SaveQueueToastProps {
   onSave: () => void
-  onCancel: () => void
 }
 
 /**
@@ -19,7 +18,7 @@ interface SaveQueueToastProps {
  * Shows the count of pending changes along with "View Details", "Save", and "Cancel" buttons.
  * Automatically dismisses when the queue is empty.
  */
-export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
+export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
   const snap = useTableEditorStateSnapshot()
   const toastShownRef = useRef(false)
   const operationCount = snap.operationQueue.operations.length
@@ -54,7 +53,7 @@ export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
       toast.dismiss(SAVE_QUEUE_TOAST_ID)
       toastShownRef.current = false
     }
-  }, [snap.hasPendingOperations, operationCount, isSaving, onSave, onCancel, snap])
+  }, [snap.hasPendingOperations, operationCount, isSaving, onSave, snap])
 
   // This component doesn't render anything visible itself
   // It only manages the toast lifecycle

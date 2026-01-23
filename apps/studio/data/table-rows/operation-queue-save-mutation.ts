@@ -77,7 +77,7 @@ export async function saveOperationQueue({
     queryKey: ['operation-queue-save'],
   })
 
-  return result
+  return { result }
 }
 
 type OperationQueueSaveData = Awaited<ReturnType<typeof saveOperationQueue>>

@@ -33,6 +33,10 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
         toast.success('Changes saved successfully')
         onSaveSuccess?.()
       },
+      onError: (error) => {
+        snap.setQueueStatus('idle')
+        toast.error(`Failed to save changes: ${error.message}`)
+      },
     })
 
   const isSaving = snap.operationQueue.status === 'saving' || isMutationPending

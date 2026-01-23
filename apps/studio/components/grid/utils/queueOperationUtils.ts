@@ -81,6 +81,7 @@ export function queueCellEditWithOptimisticUpdate({
   queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
     if (!old) return old
     return {
+      ...old,
       rows: old.rows.map((row) => {
         const matches = Object.entries(rowIdentifiers).every(([key, value]) => row[key] === value)
         if (matches) {

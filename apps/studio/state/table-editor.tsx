@@ -244,11 +244,7 @@ export const createTableEditorState = () => {
       }
 
       if (existingIndex >= 0) {
-        state.operationQueue.operations[existingIndex] = {
-          ...operation,
-          id: operationKey,
-          timestamp: Date.now(),
-        }
+        state.operationQueue.operations[existingIndex] = newOperation
       } else {
         state.operationQueue.operations.push(newOperation)
       }
