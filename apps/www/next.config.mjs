@@ -51,13 +51,13 @@ const nextConfig = {
     'shared-data',
     'icons',
     'api-types',
-    // needed to make the octokit packages work in /changelog
-    '@octokit/plugin-paginate-graphql',
+    '@octokit/core',
   ],
-  experimental: {
-    // needed to make the octokit packages work in /changelog
-    esmExternals: 'loose',
-  },
+  serverExternalPackages: [
+    '@octokit/plugin-paginate-graphql',
+    '@octokit/auth-app',
+    '@octokit/rest',
+  ],
   /**
    * Exclude huge directories from being traced into serverless functions
    * to avoid the max size limit for Serverless Functions on Vercel:

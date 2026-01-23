@@ -12,7 +12,7 @@
     "downlevelIteration": true,
     "target": "ES2021",
     "module": "esnext",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -37,6 +37,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".contentlayer/generated",
-    "./../../packages/ui/src/**/*.d.ts"
+    "./../../packages/ui/src/**/*.d.ts",
+    ".next/dev/types/**/*.ts"
   ]
 }
