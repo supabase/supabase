@@ -90,9 +90,9 @@ export const AWSPrivateLinkSection = () => {
               <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-foreground text-sm">AWS Accounts</h3>
-                  <Button onClick={onAddAccount} type={promptPlanUpgrade ? 'default' : 'primary'}>
                     Add account
                   </Button>
+                  <Button onClick={onAddAccount} type={promptPlanUpgrade ? 'default' : 'primary'}>
                 </div>
                 {(accounts?.length ?? 0) > 0 ? (
                   <ResourceList>

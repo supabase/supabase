@@ -102,7 +102,13 @@ export const ChartHeader = ({
       return formatBytes(bytesValue, valuePrecision)
     }
 
-    return numberFormatter(value, valuePrecision)
+    const formattedValue = numberFormatter(value, valuePrecision)
+
+    if (typeof format === 'string' && format) {
+      return `${formattedValue}${format}`
+    }
+
+    return formattedValue
   }
 
   useEffect(() => {
