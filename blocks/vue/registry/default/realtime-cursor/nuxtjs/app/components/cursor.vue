@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { MousePointer2 } from 'lucide-vue-next'
-import { cn } from '@/lib/utils'
 import type { CSSProperties } from 'vue'
+// @ts-ignore
+import { cn } from '@/lib/utils'
 
 defineProps<{
   className?: string

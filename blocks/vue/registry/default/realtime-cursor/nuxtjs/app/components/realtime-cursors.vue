@@ -1,5 +1,7 @@
 <script setup lang="ts">
+// @ts-ignore
 import { Cursor } from '@/components/cursor'
+// @ts-ignore
 import { useRealtimeCursors } from '@/composables/useRealtimeCursors'
 
 const THROTTLE_MS = 50

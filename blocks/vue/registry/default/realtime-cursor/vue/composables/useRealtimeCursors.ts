@@ -1,6 +1,7 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
-import { createClient } from '@/lib/supabase/client'
 import { REALTIME_SUBSCRIBE_STATES, type RealtimeChannel } from '@supabase/supabase-js'
+// @ts-ignore
+import { createClient } from '@/lib/supabase/client'
 
 /**
  * Throttle a callback to a certain delay.
@@ -114,7 +115,7 @@ export function useRealtimeCursors({
         Object.keys(cursors).forEach((k) => delete cursors[k])
         channelRef.value = null
       })
-      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+      .on('presence', { event: 'leave' }, ({ leftPresences }: { leftPresences: Array<{ key: string }> }) => {
         leftPresences.forEach(({ key }) => {
           delete cursors[key]
         })
@@ -133,7 +134,7 @@ export function useRealtimeCursors({
 
         cursors[payload.user.id] = payload
       })
-      .subscribe(async (status) => {
+      .subscribe(async (status: REALTIME_SUBSCRIBE_STATES) => {
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
           try {
             await channel.track({ key: userId })

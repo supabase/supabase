@@ -1,5 +1,6 @@
 import { ref, computed, watch, onUnmounted } from 'vue'
 import { useDropZone } from '@vueuse/core'
+// @ts-ignore
 import { createClient } from "@/lib/supabase/client"
 
 const supabase = createClient()
