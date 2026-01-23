@@ -673,30 +673,117 @@ response = supabase.storage.from_('bucket').download(
 
 ## Self hosting
 
-Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/)
+Supabase image transformations can be self-hosted like any other Supabase service. Under the hood, Supabase Storage uses [imgproxy](https://imgproxy.net/) to perform the transformations.
 
-#### imgproxy configuration:
+### How self-hosting works
 
-Deploy an imgproxy container with the following configuration:
+- Supabase Storage serves transformed images via `/storage/v1/render/image/...`
+- Storage calls **imgproxy** to perform the transformation
+- In self-hosted setups, you must ensure Storage can reach imgproxy over your internal network
+
+<Admonition type="note" title="Using Supabase’s Docker stack? imgproxy is already included">
+If you are using Supabase’s self-hosting Docker stack, `imgproxy` already runs as a container (typically internal-only). Storage is configured to talk to it via `IMGPROXY_URL` (for example: `http://imgproxy:5001`).
+
+You only need to run your own imgproxy container if you have a custom setup where Storage cannot reach the bundled `imgproxy` service.
+
+</Admonition>
+
+### Option 1: Local development (Supabase CLI / local Docker)
+
+Use this option if you are running Supabase locally via the Supabase CLI or a local Docker setup.
+
+#### 1) Enable image transformations in `supabase/config.toml`
+
+`supabase/config.toml` is used by the Supabase CLI to configure your local stack (Auth, Storage, Studio, etc.). For more details, see `/docs/guides/local-development/managing-config`.
+
+Enable image transformations in your local config:
+
+```toml
+[storage.image_transformation]
+enabled = true
+```
+
+This flag enables the feature locally, but it does not magically install or expose imgproxy — your stack must include imgproxy and Storage must be able to reach it.
+
+#### 2) Start your local Supabase stack
+
+Start your local stack as usual. For example:
+
+```bash
+supabase start
+```
+
+#### 3) Confirm Storage can reach imgproxy
+
+If imgproxy is internal-only (recommended), you may not be able to `curl localhost:<port>` without explicitly publishing a port in development. Prefer checking health from inside the Docker network.
+
+If you are using Supabase’s Docker stack, imgproxy includes a built-in health check (`imgproxy health`).
+
+#### 4) Verify end-to-end with a transformed image URL
+
+Hit the `/render/image` route with a simple transformation. In local development, Storage is served via your local API URL (default: `http://localhost:54321`).
+
+```text
+http://localhost:54321/storage/v1/render/image/public/<bucket>/<path-to-image>?width=200
+```
+
+If your local ports differ, run `supabase status` and use the API URL it prints.
+
+### Option 2: Production self-hosting (your infrastructure)
+
+Use this option if you run Storage outside of Supabase’s default Docker stack, or if `storage-api` needs to call an external imgproxy service.
+
+#### 1) Deploy imgproxy inside a private/internal network
+
+Do not expose imgproxy to the public internet unless you understand the security implications and have configured URL signing (see `IMGPROXY_KEY` and `IMGPROXY_SALT` below).
+
+Example deployment:
 
 ```yaml
 imgproxy:
-  image: darthsim/imgproxy
+  image: darthsim/imgproxy:v3.8.0
   environment:
     - IMGPROXY_ENABLE_WEBP_DETECTION=true
     - IMGPROXY_JPEG_PROGRESSIVE=true
 ```
 
-Note: make sure that this service can only be reachable within an internal network and not exposed to the public internet
+#### 2) Configure Storage API environment variables
 
-#### Storage API configuration:
-
-Once [imgproxy](https://imgproxy.net/) is deployed we need to configure a couple of environment variables in your self-hosted [`storage-api`](https://github.com/supabase/storage-api) service as follows:
+Set the following environment variables for your self-hosted [`storage-api`](https://github.com/supabase/storage-api):
 
 ```shell
 ENABLE_IMAGE_TRANSFORMATION=true
-IMGPROXY_URL=yourinternalimgproxyurl.internal.com
+IMGPROXY_URL=http://<internal-imgproxy-host>:<port>
 ```
+
+### Configuration reference
+
+#### Storage API (Supabase integration)
+
+- `ENABLE_IMAGE_TRANSFORMATION`: Enables the image transformation endpoints in Storage
+- `IMGPROXY_URL`: The internal URL Storage uses to call imgproxy
+
+#### imgproxy (recommended settings)
+
+This is a curated list of commonly used imgproxy environment variables (not exhaustive):
+
+- Security: `IMGPROXY_KEY`, `IMGPROXY_SALT`
+- Compatibility: `IMGPROXY_ENABLE_WEBP_DETECTION`, `IMGPROXY_JPEG_PROGRESSIVE`
+- CORS: `IMGPROXY_ALLOW_ORIGIN`
+- Quality / formats: `IMGPROXY_AUTO_WEBP`, `IMGPROXY_AUTO_AVIF`, `IMGPROXY_QUALITY`, `IMGPROXY_FORMAT_QUALITY`
+- Safety: `IMGPROXY_MAX_SRC_RESOLUTION`
+- Logging: `IMGPROXY_LOG_FORMAT`
+- Performance/timeouts: `IMGPROXY_TIMEOUT`, `IMGPROXY_READ_REQUEST_TIMEOUT`, `IMGPROXY_WRITE_RESPONSE_TIMEOUT`
+
+For the full list of imgproxy options, see the imgproxy docs at `https://docs.imgproxy.net/configuration`.
+
+### Troubleshooting
+
+- 404: Wrong bucket/path, or using a `public` route for a private bucket
+- 500: Storage cannot reach imgproxy (bad `IMGPROXY_URL` or network/DNS issue)
+- Health checks fail: imgproxy container not running, or the port/bind address is incorrect
+- CORS errors in browsers: configure `IMGPROXY_ALLOW_ORIGIN`
+- Large images fail: check the limits (25MB file size / 50MP resolution) and any `IMGPROXY_MAX_SRC_RESOLUTION` you set
 
 {/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
 
