@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +15,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards, SqlSnippets } from 'types'
+import { parseCustomSQL } from '../parseCustomSQL'
 import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
@@ -79,6 +81,19 @@ export const ReportBlock = ({
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
   const postgresConnectionString = primaryDatabase?.connectionString
 
+  const timerangeFromIso = dayjs(startDate).isValid() ? dayjs(startDate).toISOString() : undefined
+  const timerangeToIso = dayjs(endDate).isValid() ? dayjs(endDate).toISOString() : undefined
+
+  const parsedSql =
+    isSnippet && sql
+      ? parseCustomSQL(sql, {
+          timerange_from: timerangeFromIso,
+          timerange_to: timerangeToIso,
+        })
+      : undefined
+
+  const effectiveSql = parsedSql ?? sql
+
   const {
     data: queryResult,
     error: executeSqlError,
@@ -87,12 +102,14 @@ export const ReportBlock = ({
   } = useQuery({
     queryKey: sqlKeys.query(projectRef, [
       item.id,
-      sql,
+      effectiveSql,
       readOnlyConnectionString,
       postgresConnectionString,
+      timerangeFromIso,
+      timerangeToIso,
     ]),
     queryFn: async () => {
-      if (!projectRef || !sql) return null
+      if (!projectRef || !effectiveSql) return null
 
       const connectionString = readOnlyConnectionString ?? postgresConnectionString
 
@@ -104,7 +121,7 @@ export const ReportBlock = ({
       return executeSql({
         projectRef,
         connectionString,
-        sql,
+        sql: effectiveSql,
       })
     },
     enabled: !isLoadingContent && contentError == null,
