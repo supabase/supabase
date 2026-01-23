@@ -45,18 +45,24 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
         </div>
       }
       customFooter={
-        <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
-          <Button type="default" onClick={handleCancel} disabled={isSaving}>
-            Cancel All
+        <div className="flex w-full justify-between border-t border-default px-3 py-4">
+          <Button type="default" onClick={closePanel}>
+            Close
+            <span className="text-foreground-lighter text-xs ml-1.5">{modKey}.</span>
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving || operations.length === 0}
-            loading={isSaving}
-          >
-            Save All
-            <span className="text-foreground-lighter text-xs ml-1.5">{modKey}S</span>
-          </Button>
+          <div className="flex space-x-3">
+            <Button type="default" onClick={handleCancel} disabled={isSaving}>
+              Cancel All
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={isSaving || operations.length === 0}
+              loading={isSaving}
+            >
+              Save All
+              <span className="text-foreground-lighter text-xs ml-1.5">{modKey}S</span>
+            </Button>
+          </div>
         </div>
       }
     >

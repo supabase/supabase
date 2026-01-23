@@ -16,13 +16,14 @@ interface SaveQueueToastProps {
  * pending operations in the table editor queue.
  *
  * Shows the count of pending changes along with "View Details", "Save", and "Cancel" buttons.
- * Automatically dismisses when the queue is empty.
+ * Automatically dismisses when the queue is empty or when the operation queue side panel is open.
  */
 export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
   const snap = useTableEditorStateSnapshot()
   const toastShownRef = useRef(false)
   const operationCount = snap.operationQueue.operations.length
   const isSaving = snap.operationQueue.status === 'saving'
+  const isOperationQueuePanelOpen = snap.sidePanel?.type === 'operation-queue'
 
   useOperationQueueShortcuts({
     enabled: snap.hasPendingOperations,
@@ -33,7 +34,7 @@ export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
   })
 
   useEffect(() => {
-    if (snap.hasPendingOperations) {
+    if (snap.hasPendingOperations && !isOperationQueuePanelOpen) {
       toast(
         <SaveQueueToastContent
           count={operationCount}
@@ -49,11 +50,11 @@ export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
         }
       )
       toastShownRef.current = true
-    } else if (!snap.hasPendingOperations && toastShownRef.current) {
+    } else if ((!snap.hasPendingOperations || isOperationQueuePanelOpen) && toastShownRef.current) {
       toast.dismiss(SAVE_QUEUE_TOAST_ID)
       toastShownRef.current = false
     }
-  }, [snap.hasPendingOperations, operationCount, isSaving, onSave, snap])
+  }, [snap.hasPendingOperations, operationCount, isSaving, onSave, snap, isOperationQueuePanelOpen])
 
   // This component doesn't render anything visible itself
   // It only manages the toast lifecycle
