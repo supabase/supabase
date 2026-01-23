@@ -215,6 +215,12 @@ export const CreateBranchModal = () => {
     isCreatingBranch ||
     isCheckingGHBranchValidity
 
+  const tooltipText = promptPlanUpgrade
+    ? 'Upgrade to unlock branching'
+    : !gitlessBranching && !githubConnection
+      ? 'Set up a GitHub connection first to create branches'
+      : undefined
+
   const validateGitBranchName = useCallback(
     (branchName: string) => {
       if (!githubConnection) {
@@ -305,7 +311,8 @@ export const CreateBranchModal = () => {
                 source="create-branch"
                 featureProposition="enable branching"
                 primaryText="Upgrade to unlock branching"
-                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production."
+                className="pb-5"
               />
             )}
 
@@ -624,15 +631,12 @@ export const CreateBranchModal = () => {
                 form={formId}
                 disabled={isDisabled}
                 loading={isCreatingBranch}
-                type="primary"
+                type={promptPlanUpgrade ? 'default' : 'primary'}
                 htmlType="submit"
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text:
-                      !gitlessBranching && !githubConnection
-                        ? 'Set up a GitHub connection first to create branches'
-                        : undefined,
+                    text: tooltipText,
                   },
                 }}
               >
