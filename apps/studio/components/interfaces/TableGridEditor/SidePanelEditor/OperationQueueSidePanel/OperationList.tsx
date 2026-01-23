@@ -15,8 +15,14 @@ export const OperationList = ({ operations }: OperationListProps) => {
     <div className="space-y-4">
       {operations.map((op) => {
         if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-          const { payload } = op
-          return <OperationItem key={op.id} content={payload} />
+          return (
+            <OperationItem
+              key={op.id}
+              operationId={op.id}
+              tableId={op.tableId}
+              content={op.payload}
+            />
+          )
         }
         return null
       })}
