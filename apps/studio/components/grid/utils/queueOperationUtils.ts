@@ -3,23 +3,39 @@ import type { QueryClient } from '@tanstack/react-query'
 import type { Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import {
+  QueuedOperation,
+  QueuedOperationType,
+  type EditCellContentPayload,
+} from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from 'types'
+
+/**
+ * Generates a unique key for a queued operation based on its type, tableId,
+ * column name, and row identifiers. This can be used to deduplicate operations
+ * or check if an operation already exists in the queue.
+ */
+export function generateQueueOperationKey(
+  operation: Omit<QueuedOperation, 'id' | 'timestamp'>
+): string {
+  switch (operation.type) {
+    case QueuedOperationType.EDIT_CELL_CONTENT: {
+      const payload = operation.payload as EditCellContentPayload
+      const rowIdentifiersKey = Object.entries(payload.rowIdentifiers)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, value]) => `${key}:${value}`)
+        .join('|')
+      return `${operation.type}:${operation.tableId}:${payload.columnName}:${rowIdentifiersKey}`
+    }
+    default:
+      // Fallback for future operation types
+      return `${operation.type}:${operation.tableId}:${JSON.stringify(operation.payload)}`
+  }
+}
 
 interface QueueCellEditParams {
   queryClient: QueryClient
-  queueOperation: (operation: {
-    type: QueuedOperationType
-    tableId: number
-    payload: {
-      rowIdentifiers: Dictionary<any>
-      columnName: string
-      oldValue: any
-      newValue: any
-      table: Entity
-      enumArrayColumns?: string[]
-    }
-  }) => void
+  queueOperation: (operation: Omit<QueuedOperation, 'id' | 'timestamp'>) => void
   projectRef: string
   tableId: number
   table: Entity
