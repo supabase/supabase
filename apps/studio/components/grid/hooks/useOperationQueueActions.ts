@@ -58,11 +58,18 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
   }, [snap, project, saveOperationQueue, getImpersonatedRoleState])
 
   const handleCancel = useCallback(() => {
+    // Get unique table IDs from the queue before clearing
+    const operations = snap.operationQueue.operations as readonly QueuedOperation[]
+    const tableIds = [...new Set(operations.map((op) => op.tableId))]
+
     // Clear the queue and invalidate queries to revert optimistic updates
     snap.clearQueue()
     if (project) {
-      queryClient.invalidateQueries({
-        queryKey: tableRowKeys.tableRows(project.ref, {}),
+      // Invalidate queries for each table that had pending operations
+      tableIds.forEach((tableId) => {
+        queryClient.invalidateQueries({
+          queryKey: tableRowKeys.tableRowsAndCount(project.ref, tableId),
+        })
       })
     }
     onCancelSuccess?.()
