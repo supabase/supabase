@@ -12,6 +12,7 @@ Aleksi Immonen
 Alexander Korotkov
 Ali Waseem
 Allan S
+Amir Issaei
 Amy Q
 Ana Mogul
 Andrew Valleteau
@@ -53,6 +54,7 @@ David A. Ventimiglia
 David Weitzman
 Deepthi Sigireddi
 Deji I
+Dennis Senn
 Div Arora
 Divit D
 Douglas Hunley
