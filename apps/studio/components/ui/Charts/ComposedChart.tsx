@@ -442,6 +442,22 @@ export function ComposedChart({
             key={xAxisKey}
           />
 
+          <defs>
+            {visibleAttributes.map((attribute) => (
+              <linearGradient
+                key={`gradient-${attribute.name}`}
+                id={`gradient-${attribute.name}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={attribute.color} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={isDarkMode ? '#131313' : '#FFFFFF'} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
+
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
                 <Bar
@@ -461,10 +477,10 @@ export function ComposedChart({
             : visibleAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
-                  type="step"
+                  type="linear"
                   dataKey={attribute.name}
                   stackId="1"
-                  fill={attribute.fill}
+                  fill={`url(#gradient-${attribute.name})`}
                   fillOpacity={1}
                   stroke={attribute.color}
                   radius={20}
@@ -480,7 +496,7 @@ export function ComposedChart({
           {maxAttribute && _showMaxValue && (
             <Line
               key={maxAttribute.attribute}
-              type="step"
+              type="linear"
               dataKey={maxAttribute.attribute}
               stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
