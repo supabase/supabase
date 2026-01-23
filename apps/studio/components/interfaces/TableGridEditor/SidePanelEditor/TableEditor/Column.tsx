@@ -144,7 +144,7 @@ const Column = ({
               <PopoverContent_Shadcn_
                 className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
                 side="bottom"
-                align="end"
+                align="center"
               >
                 <div className="text-xs px-2 pt-2">
                   Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
@@ -171,7 +171,7 @@ const Column = ({
                               </div>
                             ) : (
                               <div className="flex items-center gap-x-2 truncate">
-                                <Badge variant={status === 'ADD' ? 'brand' : 'warning'}>
+                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
                                   {status}
                                 </Badge>
                                 <p className="truncate">

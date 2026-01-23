@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, cn, Input, Modal } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
-  projects: ProjectInfo[]
+  projects: OrgProject[]
   onClose: (success?: boolean) => void
 }
 
@@ -24,20 +23,21 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
         toast.error(`Failed to downgrade project: ${error.message}`)
       },
     }
   )
-  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
     useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
-  const projectsWithComputeDowngrade = projects.filter(
-    (project) => project.infra_compute_size !== 'nano'
-  )
+  const projectsWithComputeDowngrade = projects.filter((project) => {
+    const computeSize = getComputeSize(project)
+    return computeSize !== 'nano'
+  })
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 

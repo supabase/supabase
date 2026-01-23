@@ -27,13 +27,13 @@ message = "permission denied"
 
 ### Cause 1: Search path broken
 
-When directly accessing a table that is not in the `public` schema, it's important to reference the external schema explicitly in your query. Below is an example from the [JS client:](https://supabase.com/docs/reference/javascript/select)
+When directly accessing a table that is not in the `public` schema, it's important to reference the external schema explicitly in your query. Below is an example from the [JS client:](/docs/reference/javascript/select)
 
 ```js
 const { data, error } = await supabase.schema('myschema').from('mytable').select()
 ```
 
-If after calling the table directly, you get a `42501` permission denied error, then you must also [expose the custom schema to the API.](https://supabase.com/docs/guides/api/using-custom-schemas). For Supabase managed schemas, such as `vault` and `auth`, these cannot be directly accessed through the DB REST API for security reasons. If necessary, they can be strictly accessed through [security definer functions.](https://supabase.com/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker)
+If after calling the table directly, you get a `42501` permission denied error, then you must also [expose the custom schema to the API.](/docs/guides/api/using-custom-schemas). For Supabase managed schemas, such as `vault` and `auth`, these cannot be directly accessed through the DB REST API for security reasons. If necessary, they can be strictly accessed through [security definer functions.](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker)
 
 ---
 

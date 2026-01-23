@@ -1,9 +1,10 @@
+import { BookOpen } from 'lucide-react'
+import Link from 'next/link'
+
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
-import { BookOpen } from 'lucide-react'
-import Link from 'next/link'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
 const GrafanaPromoBanner = () => (
@@ -58,7 +59,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
     <div className={cn('flex gap-2', className)}>
       <Button type="outline" className="bg-alternative" size="tiny" icon={<BookOpen />} asChild>
         <Link
-          href="https://supabase.com/docs/guides/telemetry/metrics"
+          href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
           onClick={() =>
             sendEvent({

@@ -1,4 +1,4 @@
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { ResponseError, ResponseFailure } from 'types'
 import { IS_PLATFORM } from '../constants'
@@ -26,9 +26,9 @@ export function isResponseOk<T>(response: T | ResponseFailure | undefined): resp
 export default async function apiWrapper(
   req: NextApiRequest,
   res: NextApiResponse,
-  handler: NextApiHandler,
+  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<Response | void>,
   options?: { withAuth: boolean }
-) {
+): Promise<Response | void> {
   try {
     const { withAuth } = options || {}
 
@@ -40,9 +40,6 @@ export default async function apiWrapper(
             message: `Unauthorized: ${response.error.message}`,
           },
         })
-      } else {
-        // Attach user information to request parameters
-        ;(req as any).user = response
       }
     }
 

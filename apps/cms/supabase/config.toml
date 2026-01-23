@@ -4,6 +4,9 @@
 # working directory name when running `supabase init`.
 project_id = "cms"
 
+[remotes.prod]
+project_id = "koovxkbhviltdcwwaqvc"
+
 [api]
 enabled = true
 # Port to use for the API URL.
@@ -28,7 +31,7 @@ port = 34322
 shadow_port = 34320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 17
+major_version = 15
 
 [db.pooler]
 enabled = false

@@ -46,7 +46,7 @@ export const generateRowFields = (
   table: PostgresTable,
   foreignKeys: ForeignKey[]
 ): RowField[] => {
-  const { primary_keys } = table
+  const { primary_keys = [] } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return (table.columns ?? []).map((column) => {

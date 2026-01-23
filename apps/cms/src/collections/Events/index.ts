@@ -28,6 +28,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '../../fields/slug/index.ts'
 import { timezoneOptions } from '../../utilities/timezones.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const eventTypeOptions = [
   { label: 'Conference', value: 'conference' },
@@ -47,16 +48,20 @@ export const Events: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-      const isDraft = data?._status === 'draft'
-      return `${baseUrl}/events/${data?.slug}${isDraft ? '?preview=true' : ''}`
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
+      // Always use the preview route to ensure draft mode is enabled
+      return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&path=events&secret=${process.env.PREVIEW_SECRET || 'secret'}`
     },
   },
   access: {
-    create: isAuthenticated,
-    delete: isAuthenticated,
-    read: isAnyone,
-    update: isAuthenticated,
+    // create: isAuthenticated,
+    // delete: isAuthenticated,
+    // read: isAnyone,
+    // update: isAuthenticated,
+    create: () => false,
+    delete: () => false,
+    read: () => false,
+    update: () => false,
   },
   defaultPopulate: {
     title: true,
@@ -393,9 +398,9 @@ export const Events: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 100,
-      },
+      // autosave: {
+      //   interval: 100,
+      // },
       schedulePublish: true,
     },
     maxPerDoc: 50,

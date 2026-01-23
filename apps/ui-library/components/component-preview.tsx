@@ -10,7 +10,7 @@ import { styles } from '@/registry/styles'
 import { ChevronRight } from 'lucide-react'
 
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
-  name: string
+  name: keyof (typeof Index)['default']
   extractClassname?: boolean
   extractedClassNames?: string
   align?: 'center' | 'start' | 'end'
@@ -35,8 +35,6 @@ export function ComponentPreview({
 }: ComponentPreviewProps) {
   const [config] = useConfig()
   const index = styles.findIndex((style) => style.name === config.style)
-
-  const [expand, setExpandState] = React.useState(false)
 
   const Preview = React.useMemo(() => {
     const Component = Index['default'][name]?.component

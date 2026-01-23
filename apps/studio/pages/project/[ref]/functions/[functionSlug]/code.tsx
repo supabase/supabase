@@ -1,20 +1,23 @@
-import { common, dirname, relative } from '@std/path/posix'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEqual } from 'lodash'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
@@ -28,15 +31,15 @@ const CodePage = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
-  const { can: canDeployFunction } = useAsyncCheckProjectPermissions(
-    PermissionAction.FUNCTIONS_WRITE,
-    '*'
-  )
+  const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const { data: selectedFunction } = useEdgeFunctionQuery({
+    projectRef: ref,
+    slug: functionSlug,
+  })
   const {
-    data: functionFiles,
-    isLoading: isLoadingFiles,
+    data: functionBody,
+    isPending: isLoadingFiles,
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
     error: filesError,
@@ -58,48 +61,44 @@ const CodePage = () => {
       refetchIntervalInBackground: false,
     }
   )
-  const [files, setFiles] = useState<
-    { id: number; name: string; content: string; selected?: boolean }[]
-  >([])
+  const [files, setFiles] = useState<FileData[]>([])
 
-  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const initialFiles = useMemo(() => {
+    return !!functionBody
+      ? formatFunctionBodyToFiles({
+          functionBody,
+          entrypointPath: selectedFunction?.entrypoint_path,
+        })
+      : []
+  }, [functionBody, selectedFunction?.entrypoint_path])
+
+  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
+      setFiles((files) =>
+        files.map((f) => {
+          return { ...f, state: 'unchanged' }
+        })
+      )
     },
   })
+
+  const fileExists = (filePath: string | undefined): boolean => {
+    return filePath ? files.some((file) => file.name === filePath) : false
+  }
 
   const onUpdate = async () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
     try {
-      const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
+      const entrypoint_path =
+        functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction.entrypoint_path
+      const newEntrypointPath = entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
-      const fallbackEntrypointPath = () => {
-        // when there's no matching entrypoint path is set,
-        // we use few heuristics to find an entrypoint file
-        // 1. If the function has only a single TS / JS file, if so set it as entrypoint
-        const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
-        if (jsFiles.length === 1) {
-          return jsFiles[0].name
-        } else if (jsFiles.length) {
-          // 2. If function has a `index` or `main` file use it as the entrypoint
-          const regex = /^.*?(index|main).*$/i
-          const matchingFile = jsFiles.find(({ name }) => regex.test(name))
-          // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
-          return matchingFile ? matchingFile.name : jsFiles[0].name
-        } else {
-          // no potential entrypoint files found, this will most likely result in an error on deploy
-          return 'index.ts'
-        }
-      }
-
-      const fallbackImportMapPath = () => {
-        // try to find a deno.json or import_map.json file
-        const regex = /^.*?(deno|import_map).json*$/i
-        return files.find(({ name }) => regex.test(name))?.name
-      }
+      const entrypointExists = fileExists(newEntrypointPath)
+      const importMapExists = fileExists(newImportMapPath)
 
       deployFunction({
         projectRef: ref,
@@ -107,12 +106,8 @@ const CodePage = () => {
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: files.some(({ name }) => name === newEntrypointPath)
-            ? (newEntrypointPath as string)
-            : fallbackEntrypointPath(),
-          import_map_path: files.some(({ name }) => name === newImportMapPath)
-            ? newImportMapPath
-            : fallbackImportMapPath(),
+          ...(entrypointExists && { entrypoint_path: newEntrypointPath }),
+          ...(importMapExists && { import_map_path: newImportMapPath }),
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })
@@ -123,76 +118,55 @@ const CodePage = () => {
     }
   }
 
-  function getBasePath(entrypoint: string | undefined): string {
-    if (!entrypoint) {
-      return '/'
-    }
-
-    try {
-      return dirname(new URL(entrypoint).pathname)
-    } catch (e) {
-      console.error('Failed to parse entrypoint', entrypoint)
-      return '/'
-    }
-  }
-
   const handleDeployClick = () => {
     if (files.length === 0 || isLoadingFiles) return
     setShowDeployWarning(true)
     sendEvent({
       action: 'edge_function_deploy_updates_button_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
   }
 
   const handleDeployConfirm = () => {
     sendEvent({
       action: 'edge_function_deploy_updates_confirm_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
     onUpdate()
   }
 
   useEffect(() => {
-    // Set files from API response when available
-    if (selectedFunction?.entrypoint_path && functionFiles) {
-      const base_path = getBasePath(selectedFunction?.entrypoint_path)
-      const filesWithRelPath = functionFiles
-        // ignore empty files
-        .filter((file: { name: string; content: string }) => !!file.content.length)
-        // set file paths relative to entrypoint
-        .map((file: { name: string; content: string }) => {
-          try {
-            // if the current file and base path doesn't share a common path,
-            // return unmodified file
-            const common_path = common([base_path, file.name])
-            if (common_path === '' || common_path === '/tmp/') {
-              return file
-            }
+    if (initialFiles.length === 0) return
+    setFiles(initialFiles)
+  }, [initialFiles])
 
-            file.name = relative(base_path, file.name)
-            return file
-          } catch (e) {
-            console.error(e)
-            // return unmodified file
-            return file
-          }
-        })
+  // [Joshen] Probably a candidate for useStaticEffectEvent
+  const filesRef = useLatest(files)
+  const initialFilesRef = useLatest(initialFiles)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const normalizeFiles = (list: FileData[]) =>
+        list.map(({ id, name, content }) => ({ id, name, content }))
+      const hasUnsavedChanges = !isEqual(
+        normalizeFiles(initialFilesRef.current),
+        normalizeFiles(filesRef.current)
+      )
 
-      setFiles((prev) => {
-        return filesWithRelPath.map((file: { name: string; content: string }, index: number) => {
-          const prevState = prev.find((x) => x.name === file.name)
-          return {
-            id: index + 1,
-            name: file.name,
-            content: file.content,
-            selected: prevState?.selected ?? index === 0,
-          }
-        })
-      })
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
     }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [functionFiles])
+  }, [])
 
   return (
     <div className="flex flex-col h-full">
@@ -219,7 +193,20 @@ const CodePage = () => {
         <>
           <FileExplorerAndEditor
             files={files}
-            onFilesChange={setFiles}
+            onFilesChange={(files) => {
+              const formattedFiles: FileData[] = files.map((f) => {
+                const originalFile = initialFiles.find((x) => x.id === f.id)
+                if (!originalFile) {
+                  return f
+                } else if (originalFile.name !== f.name) {
+                  return { ...f, state: 'new' }
+                } else if (originalFile.content !== f.content) {
+                  return { ...f, state: 'modified' }
+                }
+                return { ...f, state: 'unchanged' }
+              })
+              setFiles(formattedFiles)
+            }}
             aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,

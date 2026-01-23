@@ -52,18 +52,7 @@ const data: () => {
           Build in a weekend, scale to millions.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/no-code/no-code-hero-dark.svg',
-            light: '/images/solutions/no-code/no-code-hero-light.svg',
-          }}
-          alt="Supabase for No Coders"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',

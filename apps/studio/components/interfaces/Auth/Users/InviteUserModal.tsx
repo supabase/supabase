@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, Form, Input, Modal } from 'ui'
 
 export type InviteUserModalProps = {
@@ -16,13 +16,13 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
   const handleToggle = () => setVisible(!visible)
-  const { mutate: inviteUser, isLoading: isInviting } = useUserInviteMutation({
+  const { mutate: inviteUser, isPending: isInviting } = useUserInviteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Sent invite email to ${variables.email}`)
       setVisible(false)
     },
   })
-  const { can: canInviteUsers } = useAsyncCheckProjectPermissions(
+  const { can: canInviteUsers } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'invite_user'
   )

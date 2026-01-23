@@ -1,11 +1,14 @@
 import {
-  ArrowLeftRight,
   BotIcon,
   Building2Icon,
   Code2Icon,
+  HammerIcon,
+  LightbulbIcon,
   PointerIcon,
   PuzzleIcon,
   TrendingUpIcon,
+  UsersIcon,
+  ZapIcon,
 } from 'lucide-react'
 
 export type SolutionTypes = Solutions[keyof Solutions]
@@ -16,9 +19,15 @@ export enum Solutions {
   beginners = 'beginners',
   developers = 'developers',
   postgresDevs = 'postgres-developers',
+  firebase = 'firebase',
   neon = 'neon',
+  convex = 'convex',
   startups = 'startups',
+  agencies = 'agencies',
   enterprise = 'enterprise',
+  hackathon = 'hackathon',
+  innovationTeams = 'innovation-teams',
+  vibeCoders = 'vibe-coders',
 }
 
 export const skillBasedSolutions = {
@@ -86,6 +95,13 @@ export const skillBasedSolutions = {
         </svg>
       ),
     },
+    {
+      id: Solutions.vibeCoders,
+      text: 'Vibe Coders',
+      description: '',
+      url: '/solutions/vibe-coders',
+      icon: ZapIcon,
+    },
   ],
 }
 
@@ -93,11 +109,11 @@ export const useCaseSolutions = {
   label: 'Solutions',
   solutions: [
     {
-      id: Solutions.neon,
-      text: 'Switch From Neon',
+      id: Solutions.hackathon,
+      text: 'Hackathon Contestants',
       description: '',
-      url: '/solutions/switch-from-neon',
-      icon: ArrowLeftRight,
+      url: '/solutions/hackathon',
+      icon: HammerIcon,
     },
     {
       id: Solutions.startups,
@@ -107,11 +123,129 @@ export const useCaseSolutions = {
       icon: TrendingUpIcon,
     },
     {
+      id: Solutions.agencies,
+      text: 'Agencies',
+      description: '',
+      url: '/solutions/agencies',
+      icon: UsersIcon,
+    },
+    {
       id: Solutions.enterprise,
       text: 'Enterprise',
       description: '',
       url: '/solutions/enterprise',
       icon: Building2Icon,
+    },
+    {
+      id: Solutions.innovationTeams,
+      text: 'Innovation Teams',
+      description: '',
+      url: '/solutions/innovation-teams',
+      icon: LightbulbIcon,
+    },
+  ],
+}
+
+export const migrationSolutions = {
+  label: 'Solutions',
+  solutions: [
+    {
+      id: Solutions.firebase,
+      text: 'Switch from Firebase',
+      description: '',
+      url: '/solutions/switch-from-firebase',
+      icon: (props: any) => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 600 600" {...props}>
+          <path
+            fill="#FF9100"
+            d="M213.918 560.499c23.248 9.357 48.469 14.909 74.952 15.834 35.84 1.252 69.922-6.158 100.391-20.234-36.537-14.355-69.627-35.348-97.869-61.448-18.306 29.31-45.382 52.462-77.474 65.848"
+          ></path>
+          <path
+            fill="#FFC400"
+            d="M291.389 494.66c-64.466-59.622-103.574-145.917-100.269-240.568.108-3.073.27-6.145.46-9.216a167 167 0 0 0-36.004-5.241 167 167 0 0 0-51.183 6.153c-17.21 30.145-27.594 64.733-28.888 101.781-3.339 95.611 54.522 179.154 138.409 212.939 32.093-13.387 59.168-36.51 77.475-65.848"
+          ></path>
+          <path
+            fill="#FF9100"
+            d="M291.39 494.657c14.988-23.986 24.075-52.106 25.133-82.403 2.783-79.695-50.792-148.251-124.942-167.381-.19 3.071-.352 6.143-.46 9.216-3.305 94.651 35.803 180.946 100.269 240.568"
+          ></path>
+          <path
+            fill="#DD2C00"
+            d="M308.231 20.858C266 54.691 232.652 99.302 212.475 150.693c-11.551 29.436-18.81 61.055-20.929 94.2 74.15 19.13 127.726 87.686 124.943 167.38-1.058 30.297-10.172 58.39-25.134 82.404 28.24 26.127 61.331 47.093 97.868 61.447 73.337-33.9 125.37-106.846 128.383-193.127 1.952-55.901-19.526-105.724-49.875-147.778-32.051-44.477-159.5-194.36-159.5-194.36Z"
+          ></path>
+        </svg>
+      ),
+    },
+    {
+      id: Solutions.neon,
+      text: 'Switch from Neon',
+      description: '',
+      url: '/solutions/switch-from-neon',
+      icon: (props: any) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid"
+          viewBox="0 0 256 256"
+          {...props}
+        >
+          <defs>
+            <linearGradient id="neon__a" x1="100%" x2="12.069%" y1="100%" y2="0%">
+              <stop offset="0%" stopColor="#62F755"></stop>
+              <stop offset="100%" stopColor="#8FF986" stopOpacity="0"></stop>
+            </linearGradient>
+            <linearGradient id="neon__b" x1="100%" x2="40.603%" y1="100%" y2="76.897%">
+              <stop offset="0%" stopOpacity="0.9"></stop>
+              <stop offset="100%" stopColor="#1A1A1A" stopOpacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <path
+            fill="#00E0D9"
+            d="M0 44.139C0 19.762 19.762 0 44.139 0H211.86C236.238 0 256 19.762 256 44.139v142.649c0 25.216-31.915 36.16-47.388 16.256l-48.392-62.251v75.484c0 21.939-17.784 39.723-39.722 39.723h-76.36C19.763 256 0 236.238 0 211.861zm44.139-8.825a8.817 8.817 0 0 0-8.825 8.818v167.73c0 4.878 3.946 8.831 8.818 8.831h77.688c2.44 0 3.087-1.977 3.087-4.416v-101.22c0-25.222 31.914-36.166 47.395-16.255l48.391 62.243V44.14c0-4.879.455-8.825-4.416-8.825H44.14Z"
+          ></path>
+          <path
+            fill="url(#neon__a)"
+            d="M0 44.139C0 19.762 19.762 0 44.139 0H211.86C236.238 0 256 19.762 256 44.139v142.649c0 25.216-31.915 36.16-47.388 16.256l-48.392-62.251v75.484c0 21.939-17.784 39.723-39.722 39.723h-76.36C19.763 256 0 236.238 0 211.861zm44.139-8.825a8.817 8.817 0 0 0-8.825 8.818v167.73c0 4.878 3.946 8.831 8.818 8.831h77.688c2.44 0 3.087-1.977 3.087-4.416v-101.22c0-25.222 31.914-36.166 47.395-16.255l48.391 62.243V44.14c0-4.879.455-8.825-4.416-8.825H44.14Z"
+          ></path>
+          <path
+            fill="url(#neon__b)"
+            fillOpacity="0.4"
+            d="M0 44.139C0 19.762 19.762 0 44.139 0H211.86C236.238 0 256 19.762 256 44.139v142.649c0 25.216-31.915 36.16-47.388 16.256l-48.392-62.251v75.484c0 21.939-17.784 39.723-39.722 39.723h-76.36C19.763 256 0 236.238 0 211.861zm44.139-8.825a8.817 8.817 0 0 0-8.825 8.818v167.73c0 4.878 3.946 8.831 8.818 8.831h77.688c2.44 0 3.087-1.977 3.087-4.416v-101.22c0-25.222 31.914-36.166 47.395-16.255l48.391 62.243V44.14c0-4.879.455-8.825-4.416-8.825H44.14Z"
+          ></path>
+          <path
+            fill="#63F655"
+            d="M211.861 0C236.238 0 256 19.762 256 44.139v142.649c0 25.216-31.915 36.16-47.388 16.256l-48.392-62.251v75.484c0 21.939-17.784 39.723-39.722 39.723a4.41 4.41 0 0 0 4.409-4.409V115.058c0-25.223 31.914-36.167 47.395-16.256l48.391 62.243V8.825c0-4.871-3.953-8.825-8.832-8.825"
+          ></path>
+        </svg>
+      ),
+    },
+    {
+      id: Solutions.convex,
+      text: 'Switch from Convex',
+      description: '',
+      url: '/solutions/switch-from-convex',
+      icon: (props: any) => (
+        <svg
+          width="184"
+          height="188"
+          viewBox="0 0 184 188"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          {...props}
+        >
+          <path
+            d="M108.092 130.021C126.258 128.003 143.385 118.323 152.815 102.167C148.349 142.128 104.653 167.385 68.9858 151.878C65.6992 150.453 62.8702 148.082 60.9288 145.034C52.9134 132.448 50.2786 116.433 54.0644 101.899C64.881 120.567 86.8748 132.01 108.092 130.021Z"
+            fill="#F3B01C"
+          />
+          <path
+            d="M53.4012 90.1735C46.0375 107.191 45.7186 127.114 54.7463 143.51C22.9759 119.608 23.3226 68.4578 54.358 44.7949C57.2286 42.6078 60.64 41.3097 64.2178 41.1121C78.9312 40.336 93.8804 46.0225 104.364 56.6193C83.0637 56.831 62.318 70.4756 53.4012 90.1735Z"
+            fill="#8D2676"
+          />
+          <path
+            d="M114.637 61.8552C103.89 46.8701 87.0686 36.6684 68.6387 36.358C104.264 20.1876 148.085 46.4045 152.856 85.1654C153.3 88.7635 152.717 92.4322 151.122 95.6775C144.466 109.195 132.124 119.679 117.702 123.559C128.269 103.96 126.965 80.0151 114.637 61.8552Z"
+            fill="#EE342F"
+          />
+        </svg>
+      ),
     },
   ],
 }
@@ -132,6 +266,16 @@ export const navData = {
       label: "Who it's for",
       links: [
         ...useCaseSolutions.solutions.map((solution) => ({
+          text: solution.text,
+          url: solution.url,
+          icon: solution.icon,
+        })),
+      ],
+    },
+    {
+      label: 'Migration',
+      links: [
+        ...migrationSolutions.solutions.map((solution) => ({
           text: solution.text,
           url: solution.url,
           icon: solution.icon,

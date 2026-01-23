@@ -5,11 +5,11 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import InvoicesSettings from './InvoicesSettings'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { InvoicesSettings } from './InvoicesSettings'
 
-const InvoicesSection = () => {
-  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckProjectPermissions(
+export const InvoicesSection = () => {
+  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -36,5 +36,3 @@ const InvoicesSection = () => {
     </ScaffoldSection>
   )
 }
-
-export default InvoicesSection

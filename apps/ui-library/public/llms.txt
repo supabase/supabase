@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-07-13T02:57:35.186Z
+Last updated: 2025-11-20T11:14:14.146Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -31,6 +31,14 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/nextjs/social-auth)
     - Social authentication block for Next.js
+- [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
+    - Supabase client for Nuxt.js
+- [Password-based Authentication](https://supabase.com/ui/docs/nuxtjs/password-based-auth)
+    - Password-based authentication block for Nuxt.js
+- [Social Authentication](https://supabase.com/ui/docs/nuxtjs/social-auth)
+    - Social authentication block for Nuxt.js
+- [Platform Kit](https://supabase.com/ui/docs/platform/platform-kit)
+    - The easiest way to build platforms on top of Supabase
 - [Supabase Client Libraries](https://supabase.com/ui/docs/react-router/client)
     - Supabase client for React Router
 - [Current User Avatar](https://supabase.com/ui/docs/react-router/current-user-avatar)
@@ -79,3 +87,9 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/tanstack/social-auth)
     - Social authentication block for Tanstack Start
+- [Supabase Client Libraries](https://supabase.com/ui/docs/vue/client)
+    - Supabase client for Vue Single Page Applications
+- [Password-based Authentication](https://supabase.com/ui/docs/vue/password-based-auth)
+    - Password-based authentication block for Vue Single Page Applications
+- [Social Authentication](https://supabase.com/ui/docs/vue/social-auth)
+    - Social authentication block for Vue Single Page Applications

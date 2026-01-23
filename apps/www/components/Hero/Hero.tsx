@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import AnnouncementBadge from '../Announcement/Badge'
-import { announcement } from 'ui-patterns'
 
 const Hero = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()

@@ -12,7 +12,7 @@ const unitMap = {
   years: 3600 * 24 * 365,
 }
 
-const CustomExpiryModal = () => {
+export const CustomExpiryModal = () => {
   const { onCopyUrl } = useCopyUrl()
   const snap = useStorageExplorerStateSnapshot()
   const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = snap
@@ -100,5 +100,3 @@ const CustomExpiryModal = () => {
     </Modal>
   )
 }
-
-export default CustomExpiryModal

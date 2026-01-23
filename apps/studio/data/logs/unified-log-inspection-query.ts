@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import {
   getAuthServiceFlowQuery,
@@ -9,7 +9,7 @@ import {
 } from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { logsKeys } from './keys'
 import {
   getUnifiedLogsISOStartEnd,
@@ -178,14 +178,12 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
+  }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) =>
-  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>(
-    logsKeys.serviceFlow(projectRef, search, logId),
-    ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
+    queryKey: logsKeys.serviceFlow(projectRef, search, logId),
+    queryFn: ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

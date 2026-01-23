@@ -200,7 +200,7 @@ The `before-user-created` hook solves this by:
 - Detecting that a user is about to be created
 - Providing the email address in the `user.email` field
 
-Run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `signup_email_domains` table with some sample data and a `hook_restrict_signup_by_email_domain` function to be called by the `before-user-created` auth hook.
+Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create a `signup_email_domains` table with some sample data and a `hook_restrict_signup_by_email_domain` function to be called by the `before-user-created` auth hook.
 
 ```sql
 -- Create ENUM type for domain rule classification
@@ -305,7 +305,7 @@ The `before-user-created` hook solves this by:
 - Allowing you to inspect the `app_metadata.provider`
 - Knowing the request came from an OAuth flow
 
-Run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `hook_reject_discord_signups` function to be called by the `before-user-created` auth hook.
+Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create a `hook_reject_discord_signups` function to be called by the `before-user-created` auth hook.
 
 ```sql
 -- Create the function
@@ -352,7 +352,7 @@ The `before-user-created` hook solves this by:
 - Detecting that a user is about to be created
 - Providing the IP address in the `metadata.ip_address` field
 
-Run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `signup_networks` table with some sample data and a `hook_restrict_signup_by_network` function to be called by the `before-user-created` auth hook.
+Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create a `signup_networks` table with some sample data and a `hook_restrict_signup_by_network` function to be called by the `before-user-created` auth hook.
 
 ```sql SQL_EDITOR
 -- Create ENUM type for network rule classification
@@ -607,7 +607,7 @@ The `before-user-created` hook solves this by:
 - Detecting that a user is about to be created
 - Providing the IP address in the `metadata.ip_address` field
 
-Before creating the edge function run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `signup_networks` table with some sample data and a `hook_restrict_signup_by_network` function to be called by the `before-user-created` auth hook.
+Before creating the edge function run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create a `signup_networks` table with some sample data and a `hook_restrict_signup_by_network` function to be called by the `before-user-created` auth hook.
 
 ```sql SQL_EDITOR
 -- Create ENUM type for network rule classification

@@ -1,11 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
-import { invalidateTablePrivilegesQuery } from './table-privileges-query'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { privilegeKeys } from './keys'
+import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 
 export type TablePrivilegesRevoke = Parameters<
   typeof pgMeta.tablePrivileges.revoke
@@ -41,32 +41,34 @@ export const useTablePrivilegesRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TablePrivilegesRevokeData, ResponseError, TablePrivilegesRevokeVariables>,
+  UseCustomMutationOptions<
+    TablePrivilegesRevokeData,
+    ResponseError,
+    TablePrivilegesRevokeVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TablePrivilegesRevokeData, ResponseError, TablePrivilegesRevokeVariables>(
-    (vars) => revokeTablePrivileges(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<TablePrivilegesRevokeData, ResponseError, TablePrivilegesRevokeVariables>({
+    mutationFn: (vars) => revokeTablePrivileges(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          invalidateTablePrivilegesQuery(queryClient, projectRef),
-          queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
-        ])
+      await Promise.all([
+        invalidateTablePrivilegesQuery(queryClient, projectRef),
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.columnPrivilegesList(projectRef) }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

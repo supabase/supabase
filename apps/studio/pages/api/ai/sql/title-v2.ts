@@ -39,7 +39,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel()
+    const { model, error: modelError } = await getModel({
+      provider: 'openai',
+      routingKey: 'sql',
+    })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -55,7 +58,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         The description should describe why this table was created (eg. "Table to track todos") or what the query does.
       `,
-      temperature: 0,
     })
 
     return res.json(result.object)

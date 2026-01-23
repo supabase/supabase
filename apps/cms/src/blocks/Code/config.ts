@@ -10,16 +10,40 @@ export const Code: Block = {
       defaultValue: 'typescript',
       options: [
         {
-          label: 'Typescript',
-          value: 'typescript',
+          label: 'SQL',
+          value: 'sql',
+        },
+        {
+          label: 'JSON',
+          value: 'json',
+        },
+        {
+          label: 'bash',
+          value: 'bash',
         },
         {
           label: 'Javascript',
-          value: 'javascript',
+          value: 'js',
         },
         {
-          label: 'CSS',
-          value: 'css',
+          label: 'Typescript',
+          value: 'ts',
+        },
+        {
+          label: 'tsx',
+          value: 'tsx',
+        },
+        {
+          label: 'Python',
+          value: 'py',
+        },
+        {
+          label: 'kotlin',
+          value: 'kotlin',
+        },
+        {
+          label: 'yaml',
+          value: 'yaml',
         },
       ],
     },

@@ -5,10 +5,11 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useChanged } from 'hooks/misc/useChanged'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SidePanel, Tabs } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
@@ -20,8 +21,7 @@ import {
   parseSpreadsheet,
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
-import SpreadsheetImportPreview from './SpreadsheetImportPreview'
-import { useChanged } from 'hooks/misc/useChanged'
+import { SpreadsheetImportPreview } from './SpreadsheetImportPreview'
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
@@ -34,7 +34,10 @@ interface SpreadsheetImportProps {
   updateEditorDirty?: (value: boolean) => void
 }
 
-const SpreadsheetImport = ({
+const csvParseErrorMessage =
+  'Some issues have been detected. More details below the content preview.'
+
+export const SpreadsheetImport = ({
   visible = false,
   debounceDuration = 250,
   headers = [],
@@ -90,9 +93,7 @@ const SpreadsheetImport = ({
       )
 
       if (errors.length > 0) {
-        toast.error(
-          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
-        )
+        toast.error(csvParseErrorMessage)
       }
 
       setErrors(errors)
@@ -109,9 +110,8 @@ const SpreadsheetImport = ({
       const [file] = event.target.files || event.dataTransfer.files
       if (file && !flagInvalidFileImport(file)) {
         await processFile(file)
-      } else {
-        event.target.value = ''
       }
+      event.target.value = ''
     },
     [processFile]
   )
@@ -128,9 +128,7 @@ const SpreadsheetImport = ({
     if (text.length > 0) {
       const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
       if (errors.length > 0) {
-        toast.error(
-          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
-        )
+        toast.error(csvParseErrorMessage)
       }
       setErrors(errors)
       setSelectedHeaders(headers)
@@ -257,5 +255,3 @@ const SpreadsheetImport = ({
     </SidePanel>
   )
 }
-
-export default SpreadsheetImport

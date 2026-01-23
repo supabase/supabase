@@ -1,5 +1,5 @@
 import { cn } from 'ui'
-import { range } from 'lodash'
+import { range } from 'lib/helpers'
 
 interface Props {
   showHeading?: boolean

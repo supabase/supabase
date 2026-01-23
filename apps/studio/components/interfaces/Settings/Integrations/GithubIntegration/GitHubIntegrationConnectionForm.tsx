@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Loader2, PlusIcon } from 'lucide-react'
+import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { IS_PLATFORM } from 'common'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -16,7 +17,7 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { GitHubConnection } from 'data/integrations/integrations.types'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
@@ -33,6 +34,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -47,6 +49,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
+    <title>GitHub icon</title>
     <path
       fill="#ffffff"
       fillRule="evenodd"
@@ -70,24 +73,37 @@ const GitHubIntegrationConnectionForm = ({
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
-  const isParentProject = !Boolean(selectedProject?.parent_project_ref)
+  const isParentProject = !selectedProject?.parent_project_ref
 
-  const { can: canUpdateGitHubConnection } = useAsyncCheckProjectPermissions(
+  const isProPlanAndUp = selectedOrganization?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
-  const { can: canCreateGitHubConnection } = useAsyncCheckProjectPermissions(
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
+  const { data: gitHubAuthorization, refetch: refetchGitHubAuthorization } =
+    useGitHubAuthorizationQuery()
 
-  const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
-    any[]
-  >({
+  const {
+    data: githubReposData,
+    isPending: isLoadingGitHubRepos,
+    refetch: refetchGitHubRepositories,
+  } = useGitHubRepositoriesQuery({
     enabled: Boolean(gitHubAuthorization),
   })
+
+  const refetchGitHubAuthorizationAndRepositories = () => {
+    setTimeout(() => {
+      refetchGitHubAuthorization()
+      refetchGitHubRepositories()
+    }, 2000) // 2 second to delay to let github authorization and repositories to be updated
+  }
 
   const { mutate: updateBranch } = useBranchUpdateMutation({
     onSuccess: () => {
@@ -108,29 +124,29 @@ const GitHubIntegrationConnectionForm = ({
     { enabled: !!selectedProject?.ref }
   )
 
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingBranch } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
 
-  const { mutate: createConnection, isLoading: isCreatingConnection } =
+  const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onSuccess: () => {
         toast.success('GitHub integration successfully updated')
       },
     })
 
-  const { mutateAsync: deleteConnection, isLoading: isDeletingConnection } =
+  const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
       onSuccess: () => {
         toast.success('Successfully removed GitHub integration')
       },
     })
 
-  const { mutate: updateConnectionSettings, isLoading: isUpdatingConnection } =
+  const { mutate: updateConnectionSettings, isPending: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation()
 
   const githubRepos = useMemo(
     () =>
-      githubReposData?.map((repo: any) => ({
+      githubReposData?.repositories?.map((repo) => ({
         id: repo.id.toString(),
         name: repo.name,
         installation_id: repo.installation_id,
@@ -138,6 +154,8 @@ const GitHubIntegrationConnectionForm = ({
       })) ?? EMPTY_ARR,
     [githubReposData]
   )
+
+  const hasPartialResponseDueToSSO = githubReposData?.partial_response_due_to_sso ?? false
 
   const prodBranch = existingBranches?.find((branch) => branch.is_default)
 
@@ -161,7 +179,7 @@ const GitHubIntegrationConnectionForm = ({
               repositoryId: Number(repositoryId),
               branchName: val.branchName,
             })
-          } catch (error) {
+          } catch {
             const selectedRepo = githubRepos.find((repo) => repo.id === repositoryId)
             const repoName =
               selectedRepo?.name || connection?.repository.name || 'selected repository'
@@ -242,7 +260,7 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    if (!prodBranch?.id) {
+    if (!prodBranch) {
       createBranch({
         projectRef: selectedProject.ref,
         branchName: 'main',
@@ -251,7 +269,7 @@ const GitHubIntegrationConnectionForm = ({
       })
     } else {
       updateBranch({
-        id: prodBranch.id,
+        branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.branchName,
       })
@@ -291,9 +309,9 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    if (prodBranch?.id) {
+    if (prodBranch) {
       updateBranch({
-        id: prodBranch.id,
+        branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
         branchName: data.branchName || 'main',
@@ -337,11 +355,11 @@ const GitHubIntegrationConnectionForm = ({
     const data = githubSettingsForm.getValues()
     const selectedRepo = githubRepos.find((repo) => repo.id === data.repositoryId)
 
-    if (!selectedRepo || !connection) return
+    if (!selectedRepo || !connection || !selectedOrganization?.id) return
 
     try {
       await deleteConnection({
-        organizationId: selectedOrganization!.id,
+        organizationId: selectedOrganization.id,
         connectionId: connection.id,
       })
 
@@ -390,7 +408,10 @@ const GitHubIntegrationConnectionForm = ({
           </p>
           <Button
             onClick={() => {
-              openInstallGitHubIntegrationWindow('authorize')
+              openInstallGitHubIntegrationWindow(
+                'authorize',
+                refetchGitHubAuthorizationAndRepositories
+              )
             }}
           >
             Authorize GitHub
@@ -431,7 +452,7 @@ const GitHubIntegrationConnectionForm = ({
                           <Button
                             type="default"
                             className="justify-start h-[34px] w-full"
-                            disabled={isLoadingGitHubRepos}
+                            disabled={disabled || isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
                               <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -455,39 +476,67 @@ const GitHubIntegrationConnectionForm = ({
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
                           <CommandList_Shadcn_ className="!max-h-[200px]">
                             <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
-                            <CommandGroup_Shadcn_>
-                              {githubRepos.map((repo, i) => (
-                                <CommandItem_Shadcn_
-                                  key={repo.id}
-                                  value={`${repo.name.replaceAll('"', '')}-${i}`}
-                                  className="flex gap-2 items-center"
-                                  onSelect={() => {
-                                    field.onChange(repo.id)
-                                    setRepoComboboxOpen(false)
-                                    githubSettingsForm.setValue(
-                                      'branchName',
-                                      repo.default_branch || 'main'
-                                    )
-                                  }}
-                                >
-                                  <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">
-                                    {GITHUB_ICON}
-                                  </div>
-                                  <span className="truncate" title={repo.name}>
-                                    {repo.name}
-                                  </span>
-                                </CommandItem_Shadcn_>
-                              ))}
-                            </CommandGroup_Shadcn_>
+                            {githubRepos.length > 0 ? (
+                              <CommandGroup_Shadcn_>
+                                {githubRepos.map((repo, i) => (
+                                  <CommandItem_Shadcn_
+                                    key={repo.id}
+                                    value={`${repo.name.replaceAll('"', '')}-${i}`}
+                                    className="flex gap-2 items-center"
+                                    onSelect={() => {
+                                      field.onChange(repo.id)
+                                      setRepoComboboxOpen(false)
+                                      githubSettingsForm.setValue(
+                                        'branchName',
+                                        repo.default_branch || 'main'
+                                      )
+                                    }}
+                                  >
+                                    <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">
+                                      {GITHUB_ICON}
+                                    </div>
+                                    <span className="truncate" title={repo.name}>
+                                      {repo.name}
+                                    </span>
+                                  </CommandItem_Shadcn_>
+                                ))}
+                              </CommandGroup_Shadcn_>
+                            ) : null}
                             <CommandGroup_Shadcn_>
                               <CommandItem_Shadcn_
                                 className="flex gap-2 items-center cursor-pointer"
-                                onSelect={() => openInstallGitHubIntegrationWindow('install')}
+                                onSelect={() =>
+                                  openInstallGitHubIntegrationWindow(
+                                    'install',
+                                    refetchGitHubAuthorizationAndRepositories
+                                  )
+                                }
                               >
                                 <PlusIcon size={16} />
                                 Add GitHub Repositories
                               </CommandItem_Shadcn_>
                             </CommandGroup_Shadcn_>
+                            {hasPartialResponseDueToSSO && (
+                              <>
+                                <CommandSeparator_Shadcn_ />
+                                <CommandGroup_Shadcn_>
+                                  <CommandItem_Shadcn_
+                                    className="flex gap-2 items-start cursor-pointer"
+                                    onSelect={() => {
+                                      openInstallGitHubIntegrationWindow(
+                                        'authorize',
+                                        refetchGitHubAuthorizationAndRepositories
+                                      )
+                                    }}
+                                  >
+                                    <RefreshCw size={16} className="mt-0.5 shrink-0" />
+                                    <div className="text-xs text-foreground-light">
+                                      Re-authorize GitHub with SSO to show all repositories
+                                    </div>
+                                  </CommandItem_Shadcn_>
+                                </CommandGroup_Shadcn_>
+                              </>
+                            )}
                           </CommandList_Shadcn_>
                         </Command_Shadcn_>
                       </PopoverContent_Shadcn_>
@@ -654,7 +703,7 @@ const GitHubIntegrationConnectionForm = ({
                   <Button
                     type="outline"
                     onClick={handleRemoveIntegration}
-                    disabled={disabled || isDeletingConnection}
+                    disabled={isDeletingConnection}
                     loading={isDeletingConnection}
                   >
                     Disable integration
@@ -674,7 +723,7 @@ const GitHubIntegrationConnectionForm = ({
                   </Button>
                 )}
                 <Button
-                  type="primary"
+                  type={promptProPlanUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     disabled ||

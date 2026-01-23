@@ -1,17 +1,29 @@
+import { DOCS_URL } from 'lib/constants'
+
+export const API_DOCS_CATEGORIES = {
+  INTRODUCTION: 'introduction',
+  USER_MANAGEMENT: 'user-management',
+  ENTITIES: 'entities',
+  STORED_PROCEDURES: 'stored-procedures',
+  STORAGE: 'storage',
+  EDGE_FUNCTIONS: 'edge-functions',
+  REALTIME: 'realtime',
+}
+
 export const DOCS_MENU = [
-  { name: 'Connect', key: 'introduction' },
-  { name: 'User Management', key: 'user-management' },
-  { name: 'Tables & Views', key: 'entities' },
-  { name: 'Stored Procedures', key: 'stored-procedures' },
-  { name: 'Storage', key: 'storage' },
-  { name: 'Edge Functions', key: 'edge-functions' },
-  { name: 'Realtime', key: 'realtime' },
-]
+  { name: 'Connect', key: API_DOCS_CATEGORIES.INTRODUCTION },
+  { name: 'User Management', key: API_DOCS_CATEGORIES.USER_MANAGEMENT },
+  { name: 'Tables & Views', key: API_DOCS_CATEGORIES.ENTITIES },
+  { name: 'Stored Procedures', key: API_DOCS_CATEGORIES.STORED_PROCEDURES },
+  { name: 'Storage', key: API_DOCS_CATEGORIES.STORAGE },
+  { name: 'Edge Functions', key: API_DOCS_CATEGORIES.EDGE_FUNCTIONS },
+  { name: 'Realtime', key: API_DOCS_CATEGORIES.REALTIME },
+] as const
 
 export const DOCS_CONTENT = {
   init: {
     key: 'introduction',
-    category: 'introduction',
+    category: API_DOCS_CATEGORIES.INTRODUCTION,
     title: `Connect to your project`,
     description: `Projects have a RESTful endpoint that you can use with your project's API key to query and manage your database. Put these keys in your .env file.`,
     js: (apikey?: string, endpoint?: string) => `
@@ -24,7 +36,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)`,
   },
   clientApiKeys: {
     key: 'client-api-keys',
-    category: 'introduction',
+    category: API_DOCS_CATEGORIES.INTRODUCTION,
     title: `Client API Keys`,
     description: `Client keys allow "anonymous access" to your database, until the user has logged in. After logging in, the keys will switch to the user's own login token.
 
@@ -37,7 +49,7 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
   },
   serviceApiKeys: {
     key: 'service-keys',
-    category: 'introduction',
+    category: API_DOCS_CATEGORIES.INTRODUCTION,
     title: `Service Keys`,
     description: `Service keys have *FULL* access to your data, bypassing any security policies. Be VERY careful where you expose these keys. They should only be used on a server and never on a client or browser.
 
@@ -51,7 +63,7 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
   // User Management
   userManagement: {
     key: 'user-management',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Introduction`,
     description: `Supabase makes it easy to manage your users.
 
@@ -63,7 +75,7 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
   },
   signUp: {
     key: 'sign-up',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Sign up`,
     description: `Allow your users to sign up and create a new account
 
@@ -84,7 +96,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
   },
   emailLogin: {
     key: 'email-login',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Log in with Email/Password`,
     description: `
 If an account is created, users can login to your app.
@@ -108,7 +120,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
   },
   magicLinkLogin: {
     key: 'magic-link-login',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Log in with Magic Link via Email`,
     description: `
 Send a user a passwordless link which they can use to redeem an access_token.
@@ -130,7 +142,7 @@ curl -X POST '${endpoint}/auth/v1/magiclink' \\
   },
   phoneLogin: {
     key: 'phone-log-in',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Sign up with Phone/Password`,
     description: `
 A phone number can be used instead of an email as a primary account confirmation mechanism.
@@ -156,7 +168,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
   },
   smsLogin: {
     key: 'sms-otp-log-in',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Login via SMS OTP`,
     description: `
 SMS OTPs work like magic links, except you have to provide an interface for the user to verify the 6 digit number they receive.
@@ -178,7 +190,7 @@ curl -X POST '${endpoint}/auth/v1/otp' \\
   },
   smsVerify: {
     key: 'sms-verify',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Verify an SMS OTP`,
     description: `
 Once the user has received the OTP, have them enter it in a form and send it for verification
@@ -204,7 +216,7 @@ curl -X POST '${endpoint}/auth/v1/verify' \\
   },
   oauthLogin: {
     key: 'oauth-login',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Log in with Third Party OAuth`,
     description: `
 Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You must first enable each of these in the Auth Providers settings [here](https://supabase.com).
@@ -223,7 +235,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
   },
   user: {
     key: 'get-user',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Get user`,
     description: `Get the JSON object for the logged in user.`,
     js: (apikey?: string, endpoint?: string) => `
@@ -237,7 +249,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
   },
   forgotPassWordEmail: {
     key: 'forgot-password-email',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Forgot password / email`,
     description: `Sends the user a log in link via email. Once logged in you should direct the user to a new password form. And use "Update User" below to save the new password.`,
     js: (apikey?: string, endpoint?: string) => `
@@ -254,7 +266,7 @@ curl -X POST '${endpoint}/auth/v1/recover' \\
   },
   updateUser: {
     key: 'update-user',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Update User`,
     description: `Update the user with a new email or password. Each key (email, password, and data) is optional.`,
     js: (apikey?: string, endpoint?: string) => `
@@ -280,7 +292,7 @@ curl -X PUT '${endpoint}/auth/v1/user' \\
   },
   logout: {
     key: 'log-out',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Log out`,
     description: `After calling log out, all interactions using the Supabase JS client will be "anonymous".`,
     js: (apikey?: string, endpoint?: string) => `
@@ -295,7 +307,7 @@ curl -X POST '${endpoint}/auth/v1/logout' \\
   },
   emailInvite: {
     key: 'email-invite',
-    category: 'user-management',
+    category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Invite user over email`,
     description: `
 Send a user a passwordless link which they can use to sign up and log in.
@@ -319,7 +331,7 @@ curl -X POST '${endpoint}/auth/v1/invite' \\
   // Storage
   storage: {
     key: 'storage',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: `Introduction`,
     description: `Supabase Storage makes it simple to upload and serve files of any size, providing a robust framework for file access controls.
 
@@ -330,7 +342,7 @@ You can use Supabase Storage to store images, videos, documents, and any other f
   // Edge functions
   edgeFunctions: {
     key: 'edge-function',
-    category: 'edge-functions',
+    category: API_DOCS_CATEGORIES.EDGE_FUNCTIONS,
     title: 'Introduction',
     description: `
 Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties like Stripe. Edge Functions are developed using Deno, which offers a few benefits to you as a developer:
@@ -340,23 +352,23 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
   },
   edgeFunctionsPreReq: {
     key: 'edge-function-pre-req',
-    category: 'edge-functions',
+    category: API_DOCS_CATEGORIES.EDGE_FUNCTIONS,
     title: 'Pre-requisites',
     description: `
 Follow the steps to prepare your Supabase project on your local machine.
 
-- Install the Supabase [CLI](https://supabase.com/docs/guides/cli).
-- [Login to the CLI](https://supabase.com/docs/reference/cli/usage#supabase-login) using the command: \`supabase login\`..
-- [Initialize Supabase](https://supabase.com/docs/guides/getting-started/local-development#getting-started) inside your project using the command: \`supabase init\`..
-- [Link to your Remote Project](https://supabase.com/docs/reference/cli/usage#supabase-link) using the command \`supabase link --project-ref [ref]\`..
-- Setup your environment: Follow the steps [here](https://supabase.com/docs/guides/functions/quickstart#setting-up-your-environment).
+- Install the Supabase [CLI](${DOCS_URL}/guides/cli).
+- [Login to the CLI](${DOCS_URL}/reference/cli/usage#supabase-login) using the command: \`supabase login\`..
+- [Initialize Supabase](${DOCS_URL}/guides/getting-started/local-development#getting-started) inside your project using the command: \`supabase init\`..
+- [Link to your Remote Project](${DOCS_URL}/reference/cli/usage#supabase-link) using the command \`supabase link --project-ref [ref]\`..
+- Setup your environment: Follow the steps [here](${DOCS_URL}/guides/functions/quickstart#setting-up-your-environment).
 `,
     js: undefined,
     bash: undefined,
   },
   createEdgeFunction: {
     key: 'create-edge-function',
-    category: 'edge-functions',
+    category: API_DOCS_CATEGORIES.EDGE_FUNCTIONS,
     title: 'Create an Edge Function',
     description: `
 Create a Supabase Edge Function locally via the Supabase CLI.
@@ -368,7 +380,7 @@ supabase functions new hello-world
   },
   deployEdgeFunction: {
     key: 'deploy-edge-function',
-    category: 'edge-functions',
+    category: API_DOCS_CATEGORIES.EDGE_FUNCTIONS,
     title: 'Deploy an Edge Function',
     description: `
 Deploy a Supabase Edge Function to your Supabase project via the Supabase CLI.
@@ -380,7 +392,7 @@ Deploy a Supabase Edge Function to your Supabase project via the Supabase CLI.
   // Entities
   entitiesIntroduction: {
     key: 'entities-introduction',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Introduction',
     description: `
 All views and tables in the \`public\` schema, and those accessible by the active database role for a request are available for querying via the API.
@@ -392,19 +404,19 @@ If you don't want to expose tables in your API, simply add them to a different s
   },
   generatingTypes: {
     key: 'generating-types',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Generating Types',
     description: `
 Supabase APIs are generated from your database, which means that we can use database introspection to generate type-safe API definitions.
 
-You can generate types from your database either through the [Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types), or by downloading the types file via the button on the right and importing it in your application within \`src/index.ts\`.
+You can generate types from your database either through the [Supabase CLI](${DOCS_URL}/guides/database/api/generating-types), or by downloading the types file via the button on the right and importing it in your application within \`src/index.ts\`.
 `,
     js: undefined,
     bash: undefined,
   },
   graphql: {
     key: 'graphql',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'GraphQL vs PostgREST',
     description: `
 If you have a GraphQL background, you might be wondering if you can fetch your data in a single round-trip. The answer is yes! The syntax is very similar. This example shows how you might achieve the same thing with Apollo GraphQL and Supabase.
@@ -462,7 +474,7 @@ const { data, error } = await supabase
   // Stored Procedures
   storedProceduresIntroduction: {
     key: 'stored-procedures-introduction',
-    category: 'stored-procedures',
+    category: API_DOCS_CATEGORIES.STORED_PROCEDURES,
     title: 'Introduction',
     description: `
 All of your database stored procedures are available on your API. This means you can build your logic directly into the database (if you're brave enough)!
@@ -475,27 +487,27 @@ The API endpoint supports POST (and in some cases GET) to execute the function.
   // Realtime
   realtime: {
     key: 'realtime-introduction',
-    category: 'realtime',
+    category: API_DOCS_CATEGORIES.REALTIME,
     title: 'Introduction',
     description: `
 Supabase provides a globally distributed cluster of Realtime servers that enable the following functionality:
 
-- [Broadcast](https://supabase.com/docs/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
-- [Presence](https://supabase.com/docs/guides/realtime/presence): Track and synchronize shared state between clients.
-- [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
+- [Broadcast](${DOCS_URL}/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
+- [Presence](${DOCS_URL}/guides/realtime/presence): Track and synchronize shared state between clients.
+- [Postgres Changes](${DOCS_URL}/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
 `,
     js: undefined,
     bash: undefined,
   },
   subscribeChannel: {
     key: 'subscribe-to-channel',
-    category: 'realtime',
+    category: API_DOCS_CATEGORIES.REALTIME,
     title: 'Subscribe to channel',
     description: `
 Creates an event handler that listens to changes.
 
 - By default, Broadcast and Presence are enabled for all projects.
-- By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](https://supabase.com/docs/guides/api#realtime-api-overview).
+- By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](${DOCS_URL}/guides/api#realtime-api-overview).
 - You can receive the "previous" data for updates and deletes by setting the table's \`REPLICA IDENTITY\` to \`FULL\` (e.g., \`ALTER TABLE your_table REPLICA IDENTITY FULL;\`).
 - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
 `,
@@ -519,7 +531,7 @@ supabase
   },
   unsubscribeChannel: {
     key: 'unsubscribe-channel',
-    category: 'realtime',
+    category: API_DOCS_CATEGORIES.REALTIME,
     title: 'Unsubscribe from a channel',
     description: `
 Unsubscribes and removes Realtime channel from Realtime client.
@@ -531,7 +543,7 @@ Removing a channel is a great way to maintain the performance of your project's 
   },
   unsubscribeChannels: {
     key: 'unsubscribe-channels',
-    category: 'realtime',
+    category: API_DOCS_CATEGORIES.REALTIME,
     title: 'Unsubscribe from all channels',
     description: `
 Unsubscribes and removes all Realtime channels from Realtime client.
@@ -543,7 +555,7 @@ Removing a channel is a great way to maintain the performance of your project's 
   },
   retrieveAllChannels: {
     key: 'unsubscribe-channel',
-    category: 'realtime',
+    category: API_DOCS_CATEGORIES.REALTIME,
     title: 'Unsubscribe from a channel',
     description: `
 Returns all Realtime channels.
@@ -566,9 +578,9 @@ export const DOCS_RESOURCE_CONTENT: {
   rpcSingle: {
     key: 'invoke-function',
     title: 'Invoke function',
-    category: 'stored-procedures',
+    category: API_DOCS_CATEGORIES.STORED_PROCEDURES,
     description: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/rpc',
+    docsUrl: `${DOCS_URL}/reference/javascript/rpc`,
     code: ({
       rpcName,
       rpcParams,
@@ -623,8 +635,8 @@ else console.log(data)
   readRows: {
     key: 'read-rows',
     title: `Read rows`,
-    category: 'entities',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/select',
+    category: API_DOCS_CATEGORIES.ENTITIES,
+    docsUrl: `${DOCS_URL}/reference/javascript/select`,
     description: `To read rows in this table, use the \`select\` method.`,
     code: ({
       resourceId,
@@ -704,10 +716,10 @@ let { data: ${resourceId}, error } = await supabase
   },
   filtering: {
     key: 'filter-rows',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Filtering',
     description: `Supabase provides a wide range of filters`,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/using-filters',
+    docsUrl: `${DOCS_URL}/reference/javascript/using-filters`,
     code: ({
       resourceId,
       endpoint,
@@ -779,14 +791,14 @@ let { data: ${resourceId}, error } = await supabase
   },
   insertRows: {
     key: 'insert-rows',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Insert rows',
     description: `
 \`insert\` lets you insert into your tables. You can also insert in bulk and do UPSERT.
 
 \`insert\` will also return the replaced values for UPSERT.
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/insert',
+    docsUrl: `${DOCS_URL}/reference/javascript/insert`,
     code: ({
       resourceId,
       endpoint,
@@ -860,14 +872,14 @@ const { data, error } = await supabase
   },
   updateRows: {
     key: 'update-rows',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Update rows',
     description: `
 \`update\` lets you update rows. \`update\` will match all rows by default. You can update specific rows using horizontal filters, e.g. \`eq\`, \`lt\`, and \`is\`.
 
 \`update\` will also return the replaced values for UPDATE.
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/update',
+    docsUrl: `${DOCS_URL}/reference/javascript/update`,
     code: ({
       resourceId,
       endpoint,
@@ -902,12 +914,12 @@ const { data, error } = await supabase
   },
   deleteRows: {
     key: 'delete-rows',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Delete rows',
     description: `
 \`delete\` lets you delete rows. \`delete\` will match all rows by default, so remember to specify your filters!
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/delete',
+    docsUrl: `${DOCS_URL}/reference/javascript/delete`,
     code: ({
       resourceId,
       endpoint,
@@ -938,12 +950,12 @@ const { error } = await supabase
   },
   subscribeChanges: {
     key: 'subscribe-changes',
-    category: 'entities',
+    category: API_DOCS_CATEGORIES.ENTITIES,
     title: 'Subscribe to changes',
     description: `
 Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/subscribe',
+    docsUrl: `${DOCS_URL}/reference/javascript/subscribe`,
     code: ({ resourceId }: { resourceId: string }) => {
       return [
         {
@@ -1026,9 +1038,9 @@ const channels = supabase.channel('custom-filter-channel')
   },
   uploadFile: {
     key: 'upload-file',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Upload a file',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-upload',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-upload`,
     description: `
 Upload a file to an existing bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1062,9 +1074,9 @@ const { data, error } = await supabase
   },
   deleteFiles: {
     key: 'delete-files',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Delete files',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-remove',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-remove`,
     description: `
 Delete files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1091,9 +1103,9 @@ const { data, error } = await supabase
   },
   listFiles: {
     key: 'list-files',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: 'List all files',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-list',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-list`,
     description: `
 List all files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1123,9 +1135,9 @@ const { data, error } = await supabase
   },
   downloadFile: {
     key: 'download-file',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Download a file',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-download',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-download`,
     description: `
 Downloads a file from a private bucket. For public buckets, make a request to the URL returned from getPublicUrl instead. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1152,9 +1164,9 @@ const { data, error } = await supabase
   },
   createSignedURL: {
     key: 'create-signed-url',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Create a signed URL',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-createsignedurl',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-createsignedurl`,
     description: `
 Create a signed URL which can be used to share a file for a fixed amount of time. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1181,9 +1193,9 @@ const { data, error } = await supabase
   },
   retrievePublicURL: {
     key: 'retrieve-public-url',
-    category: 'storage',
+    category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Retrieve public URL',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-getpublicurl',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-getpublicurl`,
     description: `
 A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
 
@@ -1214,9 +1226,9 @@ const { data } = supabase
   },
   invokeEdgeFunction: {
     key: 'invoke-edge-function',
-    category: 'edge-functions',
+    category: API_DOCS_CATEGORIES.EDGE_FUNCTIONS,
     title: 'Invoke an edge function',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/functions-invoke',
+    docsUrl: `${DOCS_URL}/reference/javascript/functions-invoke`,
     description: `
 Invokes a Supabase Edge Function. Requires an Authorization header, and invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
 
@@ -1243,4 +1255,4 @@ const { data, error } = await supabase
       },
     ],
   },
-}
+} as const

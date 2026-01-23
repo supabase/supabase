@@ -2,6 +2,7 @@ import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 import type { components } from 'data/api'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 
 export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -33,11 +34,21 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider =
-  process.env.NEXT_PUBLIC_ENVIRONMENT &&
-  ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
-    ? 'AWS_K8S'
-    : 'AWS'
+export function useDefaultProvider() {
+  const defaultProvider: CloudProvider =
+    process.env.NEXT_PUBLIC_ENVIRONMENT &&
+    ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
+      ? 'AWS_K8S'
+      : 'AWS'
+
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+
+  if (validCloudProviders?.includes(defaultProvider)) {
+    return defaultProvider
+  }
+
+  return (validCloudProviders?.[0] ?? 'AWS') as CloudProvider
+}
 
 export const PROVIDERS = {
   FLY: {
@@ -57,6 +68,12 @@ export const PROVIDERS = {
     id: 'AWS_K8S',
     name: 'AWS (Revamped)',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
+  AWS_NIMBUS: {
+    id: 'AWS_NIMBUS',
+    name: 'AWS (Nimbus)',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
   },
@@ -101,11 +118,11 @@ export const PASSWORD_STRENGTH_COLOR = {
 }
 
 export const PASSWORD_STRENGTH_PERCENTAGE = {
-  0: '10%',
-  1: '30%',
-  2: '50%',
-  3: '80%',
-  4: '100%',
+  0: 10,
+  1: 30,
+  2: 50,
+  3: 80,
+  4: 100,
 }
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1

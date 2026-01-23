@@ -15,6 +15,8 @@ import {
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
 
 export function useIndexInvalidation() {
   const router = useRouter()
@@ -26,8 +28,10 @@ export function useIndexInvalidation() {
     sort: parseAsString,
     search: parseAsString.withDefault(''),
     order: parseAsString,
-    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+    preset: parseAsString.withDefault('unified'),
   })
+
+  const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
@@ -43,7 +47,11 @@ export function useIndexInvalidation() {
 
   return useCallback(() => {
     queryPerformanceQuery.runQuery()
-    queryClient.invalidateQueries(databaseKeys.indexAdvisorFromQuery(project?.ref, ''))
-    queryClient.invalidateQueries(databaseIndexesKeys.list(project?.ref))
-  }, [queryPerformanceQuery, queryClient, project?.ref])
+    queryClient.invalidateQueries({
+      queryKey: databaseKeys.indexAdvisorFromQuery(project?.ref, ''),
+    })
+    queryClient.invalidateQueries({ queryKey: databaseIndexesKeys.list(project?.ref) })
+
+    invalidateTableIndexAdvisor()
+  }, [queryPerformanceQuery, queryClient, project?.ref, invalidateTableIndexAdvisor])
 }

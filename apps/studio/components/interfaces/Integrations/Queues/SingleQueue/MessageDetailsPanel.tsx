@@ -54,19 +54,19 @@ export const MessageDetailsPanel = ({
 
   const {
     mutate: archiveMessage,
-    isLoading: isLoadingArchive,
+    isPending: isLoadingArchive,
     isSuccess: isSuccessArchive,
   } = useDatabaseQueueMessageArchiveMutation()
 
   const {
     mutate: readMessage,
-    isLoading: isLoadingRead,
+    isPending: isLoadingRead,
     isSuccess: isSuccessRead,
   } = useDatabaseQueueMessageReadMutation()
 
   const {
     mutate: deleteMessage,
-    isLoading: isLoadingDelete,
+    isPending: isLoadingDelete,
     isSuccess: isSuccessDelete,
   } = useDatabaseQueueMessageDeleteMutation()
 
@@ -146,7 +146,7 @@ export const MessageDetailsPanel = ({
                       readMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                         duration: 60,
                       })
@@ -173,7 +173,7 @@ export const MessageDetailsPanel = ({
                       archiveMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                       })
                     },

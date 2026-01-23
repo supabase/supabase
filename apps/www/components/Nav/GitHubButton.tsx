@@ -1,10 +1,11 @@
 import { Button } from 'ui'
-import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-
-const { githubStars } = staticContent
+import staticContent from '.generated/staticContent/_index.json'
 
 const GitHubButton = () => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const githubStars = staticContent.githubStars
+
   const kFormatter = (num: number) => {
     const kFormat = Math.floor(num / 1000)
     const lastTwoDigits = num % 1000
@@ -21,7 +22,6 @@ const GitHubButton = () => {
       ? `${kFormat}.${decimalPart >= 8 ? hundreds + 1 : hundreds}K`
       : `${isAlmostNextThousand ? kFormat + 1 : kFormat}K`
   }
-  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <Button

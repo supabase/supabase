@@ -33,6 +33,10 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
     const { sdkId, maybeVersion, path } = parsedPath
 
     const sdkData = REFERENCES[sdkId]
+    if (sdkData.enabled === false) {
+      notFound()
+    }
+
     const latestVersion = sdkData.versions[0]
     const version = maybeVersion ?? latestVersion
 

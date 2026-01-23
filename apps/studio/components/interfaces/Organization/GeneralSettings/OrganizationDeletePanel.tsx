@@ -1,11 +1,11 @@
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { Admonition } from 'ui-patterns'
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
 
-const OrganizationDeletePanel = () => {
+export const OrganizationDeletePanel = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return (
@@ -33,5 +33,3 @@ const OrganizationDeletePanel = () => {
     </ScaffoldSection>
   )
 }
-
-export default OrganizationDeletePanel

@@ -1,4 +1,5 @@
 'use client'
+
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
@@ -15,22 +16,26 @@ const CHART_COLORS = {
   YELLOW_1: 'hsl(var(--warning-default))',
   YELLOW_2: 'hsl(var(--warning-500))',
 }
+
 type LogsBarChartDatum = {
   timestamp: string
   error_count: number
   ok_count: number
   warning_count: number
 }
+
 export const LogsBarChart = ({
   data,
   onBarClick,
   EmptyState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
+  isFullHeight = false,
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
   DateTimeFormat?: string
+  isFullHeight?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -43,8 +48,12 @@ export const LogsBarChart = ({
   const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
 
   return (
-    <div data-testid="logs-bar-chart" className={cn('flex flex-col gap-y-3')}>
+    <div
+      data-testid="logs-bar-chart"
+      className={cn('flex flex-col gap-y-3', isFullHeight ? 'h-full' : 'h-24')}
+    >
       <ChartContainer
+        className="h-full"
         config={
           {
             error_count: {
@@ -58,7 +67,6 @@ export const LogsBarChart = ({
             },
           } satisfies ChartConfig
         }
-        className="h-[80px]"
       >
         <RechartBarChart
           data={data}
@@ -90,7 +98,7 @@ export const LogsBarChart = ({
             content={
               <ChartTooltipContent
                 className="text-foreground-light -mt-5"
-                labelFormatter={(v) => dayjs(v).format(DateTimeFormat)}
+                labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
               />
             }
           />

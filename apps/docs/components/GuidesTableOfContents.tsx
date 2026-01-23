@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { isFeatureEnabled } from 'common'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
@@ -18,6 +19,8 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
   const pathname = usePathname()
   const { toc } = useTocAnchors()
 
+  const showFeedback = isFeatureEnabled('feedback:docs')
+
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
@@ -28,9 +31,11 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
             <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
           </div>
         )}
-        <div className="pl-5">
-          <Feedback key={pathname} />
-        </div>
+        {showFeedback && (
+          <div className="pl-5">
+            <Feedback key={pathname} />
+          </div>
+        )}
         {toc.length !== 0 && (
           <Toc className="-ml-[calc(0.25rem+6px)]">
             <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">

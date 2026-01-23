@@ -11,5 +11,8 @@
     "apps/studio/public/**",
     // ignore studio components, they're dynamically imported
     "apps/studio/components/interfaces/Connect/content/**",
+    // ignore registry blocks in ui-library
+    "apps/ui-library/registry/default/**",
+    "apps/ui-library/contentlayer.config.js",
   ],
 }

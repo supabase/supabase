@@ -63,7 +63,7 @@ const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
             />
           </svg>
         ) : (
-          <Icon className={cn('stroke-1 mb-2 text-current', iconWidth, iconHeight)} />
+          <Icon className={cn('mb-2 text-current', iconWidth, iconHeight)} strokeWidth={1.5} />
         ))}
       <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
         <span className={cn('h-full bg-foreground-lighter', iconWidth)} />

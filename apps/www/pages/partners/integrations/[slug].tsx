@@ -248,7 +248,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             <span className="text-lighter">Category</span>
             <Link
               href={`/partners/integrations#${partner.category.toLowerCase()}`}
-              className="text-brand hover:underline transition-colors"
+              className="text-brand-link hover:underline transition-colors"
             >
               {partner.category}
             </Link>
@@ -260,7 +260,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
               href={partner.website}
               target="_blank"
               rel="noreferrer"
-              className="text-brand hover:underline transition-colors"
+              className="text-brand-link hover:underline transition-colors"
             >
               {new URL(partner.website).host}
             </a>
@@ -273,7 +273,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
                 href={partner.docs}
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand hover:underline transition-colors"
+                className="text-brand-link hover:underline transition-colors"
               >
                 <span className="flex items-center space-x-1">
                   <span>Learn</span>

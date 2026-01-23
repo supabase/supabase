@@ -23,7 +23,7 @@ RUN apt-get update -qq && \
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
 
-RUN npm install -g pnpm@9.15.5
+RUN npm install -g pnpm@10.16.1
 
 WORKDIR /app
 

@@ -1,8 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
@@ -36,26 +37,25 @@ export async function getSchemas(
 
 export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
-  { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<SchemasData, SchemasError, TData> = {}
 ) =>
-  useQuery<SchemasData, SchemasError, TData>(
-    databaseKeys.schemas(projectRef),
-    ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<SchemasData, SchemasError, TData>({
+    queryKey: databaseKeys.schemas(projectRef),
+    queryFn: ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseKeys.schemas(projectRef))
+  return client.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
 }
 
 export function prefetchSchemas(
   client: QueryClient,
   { projectRef, connectionString }: SchemasVariables
 ) {
-  return client.fetchQuery(databaseKeys.schemas(projectRef), ({ signal }) =>
-    getSchemas({ projectRef, connectionString }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: databaseKeys.schemas(projectRef),
+    queryFn: ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
+  })
 }

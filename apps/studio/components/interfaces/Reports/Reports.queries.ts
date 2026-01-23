@@ -4,6 +4,8 @@ import { Presets } from './Reports.types'
 
 export type QueryPerformanceSort = {
   column:
+    | 'query'
+    | 'rolname'
     | 'total_time'
     | 'prop_total_time'
     | 'calls'
@@ -15,11 +17,21 @@ export type QueryPerformanceSort = {
 }
 
 export type QueryPerformanceQueryOpts = {
-  preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
+  preset:
+    | 'mostFrequentlyInvoked'
+    | 'mostTimeConsuming'
+    | 'slowestExecutionTime'
+    | 'queryHitRate'
+    | 'unified'
+    | 'slowQueriesCount'
+    | 'queryMetrics'
   searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]
   runIndexAdvisor?: boolean
+  minCalls?: number
+  minTotalTime?: number
+  filterIndexAdvisor?: boolean
 }
 
 export const useQueryPerformanceQuery = ({
@@ -28,6 +40,9 @@ export const useQueryPerformanceQuery = ({
   searchQuery = '',
   roles,
   runIndexAdvisor = false,
+  minCalls,
+  minTotalTime,
+  filterIndexAdvisor = false,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
@@ -36,7 +51,11 @@ export const useQueryPerformanceQuery = ({
     roles !== undefined && roles.length > 0
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
-    searchQuery.length > 0 ? `statements.query ~ '${searchQuery}'` : '',
+    searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
+    typeof minCalls === 'number' && minCalls > 0 ? `statements.calls >= ${minCalls}` : '',
+    typeof minTotalTime === 'number' && minTotalTime > 0
+      ? `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
+      : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')
@@ -46,7 +65,8 @@ export const useQueryPerformanceQuery = ({
     [],
     whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
     orderBySql,
-    runIndexAdvisor
+    runIndexAdvisor,
+    filterIndexAdvisor
   )
   return useDbQuery({
     sql,

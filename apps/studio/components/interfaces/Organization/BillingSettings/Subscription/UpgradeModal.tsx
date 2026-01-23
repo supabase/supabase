@@ -28,7 +28,7 @@ const UpgradeSurveyModal = ({
 
   const upgradeReasons = generateUpgradeReasons(originalPlan, subscription?.plan.id)
 
-  const { mutate: sendUpgradeSurvey, isLoading: isSubmitting } = useSendUpgradeFeedbackMutation({
+  const { mutate: sendUpgradeSurvey, isPending: isSubmitting } = useSendUpgradeFeedbackMutation({
     onError: (error) => {
       toast.error(`Failed to submit survey: ${error.message}`)
     },

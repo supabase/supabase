@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
 
@@ -12,7 +12,7 @@ export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

@@ -31,6 +31,12 @@ const isDevOrStaging =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
+const NIMBUS_STAGING_PROJECTS_URL = 'https://*.nmb-proj.com'
+const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.nmb-proj.com'
+
+const NIMBUS_PROD_PROJECTS_URL = process.env.NIMBUS_PROD_PROJECTS_URL || ''
+const NIMBUS_PROD_PROJECTS_URL_WS = process.env.NIMBUS_PROD_PROJECTS_URL_WS || ''
+
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -96,6 +102,8 @@ module.exports.getCSP = function getCSP() {
     STAPE_URL,
     GOOGLE_MAPS_API_URL,
     POSTHOG_URL,
+    ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
+    CLOUDFLARE_CDN_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -105,7 +113,12 @@ module.exports.getCSP = function getCSP() {
     STAPE_URL,
     POSTHOG_URL,
   ]
-  const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
+  const FRAME_SRC_URLS = [
+    HCAPTCHA_ASSET_URL,
+    STRIPE_JS_URL,
+    STAPE_URL,
+    ...(isDevOrStaging ? [POSTHOG_URL] : []),
+  ]
   const IMG_SRC_URLS = [
     SUPABASE_URL,
     SUPABASE_COM_URL,
@@ -115,6 +128,7 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_APP_URL,
     STAPE_URL,
+    ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
@@ -126,6 +140,8 @@ module.exports.getCSP = function getCSP() {
       ? [
           SUPABASE_STAGING_PROJECTS_URL,
           SUPABASE_STAGING_PROJECTS_URL_WS,
+          NIMBUS_STAGING_PROJECTS_URL,
+          NIMBUS_STAGING_PROJECTS_URL_WS,
           VERCEL_LIVE_URL,
           SUPABASE_DOCS_PROJECT_URL,
           SUPABASE_CONTENT_API_URL,
@@ -140,7 +156,9 @@ module.exports.getCSP = function getCSP() {
     `blob:`,
     `data:`,
     ...IMG_SRC_URLS,
-    ...(isDevOrStaging ? [SUPABASE_STAGING_PROJECTS_URL, VERCEL_URL] : []),
+    ...(isDevOrStaging
+      ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
+      : []),
   ].join(' ')
 
   const scriptSrcDirective = [

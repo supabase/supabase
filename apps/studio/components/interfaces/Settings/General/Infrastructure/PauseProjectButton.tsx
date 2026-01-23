@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -7,9 +6,9 @@ import { toast } from 'sonner'
 
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -17,26 +16,28 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const PauseProjectButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const isProjectActive = useIsProjectActive()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const { can: canPauseProject } = useAsyncCheckProjectPermissions(
+  const { can: canPauseProject } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
 
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isFreePlan = organization?.plan.id === 'free'
-  const isPaidAndNotAwsK8s = !isFreePlan && !isAwsK8s
+  const isBranch = Boolean(project?.parent_project_ref)
+  const isPaidAndNotAwsK8s = !isBranch && !isFreePlan && !isAwsK8s
 
-  const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
+  const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')
       router.push(`/project/${projectRef}`)
     },

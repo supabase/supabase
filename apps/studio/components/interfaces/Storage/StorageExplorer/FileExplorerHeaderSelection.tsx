@@ -1,19 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, Move, Trash2, X } from 'lucide-react'
 
-import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Button } from 'ui'
-import { downloadFile } from './StorageExplorer.utils'
 
-const FileExplorerHeaderSelection = () => {
-  const { ref: projectRef, bucketId } = useParams()
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+export const FileExplorerHeaderSelection = () => {
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const {
     selectedItems,
+    downloadFile,
     downloadSelectedFiles,
     clearSelectedItems,
     setSelectedItemsToDelete,
@@ -37,7 +35,7 @@ const FileExplorerHeaderSelection = () => {
           type="primary"
           onClick={async () => {
             if (selectedItems.length === 1) {
-              await downloadFile({ projectRef, bucketId, file: selectedItems[0] })
+              await downloadFile(selectedItems[0])
             } else {
               await downloadSelectedFiles(selectedItems)
             }
@@ -80,5 +78,3 @@ const FileExplorerHeaderSelection = () => {
     </div>
   )
 }
-
-export default FileExplorerHeaderSelection

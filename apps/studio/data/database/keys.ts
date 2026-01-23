@@ -37,4 +37,13 @@ export const databaseKeys = {
     ['projects', projectRef, 'pgbouncer', 'status'] as const,
   pgbouncerConfig: (projectRef: string | undefined) =>
     ['projects', projectRef, 'pgbouncer', 'config'] as const,
+  checkPrimaryKeysExists: (
+    projectRef: string | undefined,
+    tables: { name: string; schema: string }[]
+  ) => ['projects', projectRef, 'check-primary-keys', tables] as const,
+  tableIndexAdvisor: (
+    projectRef: string | undefined,
+    schema: string | undefined,
+    table: string | undefined
+  ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
 }

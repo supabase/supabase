@@ -11,6 +11,7 @@ import type {
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
@@ -59,7 +60,7 @@ const VercelIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateVercelConnection, isLoading } = useVercelConnectionUpdateMutation({
+  const { mutate: updateVercelConnection, isPending } = useVercelConnectionUpdateMutation({
     onSuccess: () => {
       form.reset(form.getValues())
       toast.success(`Updated Vercel connection`)
@@ -110,7 +111,7 @@ const VercelIntegrationConnectionForm = ({
                   <Link
                     target="_blank"
                     rel="noreferrer"
-                    href="https://supabase.com/docs/guides/platform/branching"
+                    href={`${DOCS_URL}/guides/platform/branching`}
                     className="underline"
                   >
                     Branching
@@ -252,7 +253,7 @@ const VercelIntegrationConnectionForm = ({
           </div>
 
           {form.formState.isDirty ? (
-            <p className="mt-2 text-sm text-warning-600">
+            <p className="mt-2 text-sm text-warning">
               Note: Changing these settings will <strong>not</strong> trigger a resync of
               environment variables.
             </p>
@@ -264,7 +265,7 @@ const VercelIntegrationConnectionForm = ({
             disabled={disabled}
             form={vercelConnectionFormId}
             hasChanges={form.formState.isDirty}
-            isSubmitting={isLoading}
+            isSubmitting={isPending}
             handleReset={() => form.reset()}
           />
         </div>

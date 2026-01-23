@@ -1,3 +1,4 @@
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
@@ -5,13 +6,14 @@ import { Handle, NodeProps } from 'reactflow'
 import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
-const TABLE_NODE_WIDTH = 320
-const TABLE_NODE_ROW_HEIGHT = 40
+export const TABLE_NODE_WIDTH = 320
+export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
-  id?: number
+  id: number
+  schema: string
   name: string
-  ref: string
+  ref?: string
   isForeign: boolean
   columns: {
     id: string
@@ -24,7 +26,7 @@ export type TableNodeData = {
   }[]
 }
 
-const TableNode = ({
+export const TableNode = ({
   data,
   targetPosition,
   sourcePosition,
@@ -65,9 +67,15 @@ const TableNode = ({
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {data.id && !placeholder && (
+            {!placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                <Link
+                  href={buildTableEditorUrl({
+                    projectRef: data.ref,
+                    tableId: data.id,
+                    schema: data.schema,
+                  })}
+                >
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
@@ -152,5 +160,3 @@ const TableNode = ({
     </>
   )
 }
-
-export { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode }

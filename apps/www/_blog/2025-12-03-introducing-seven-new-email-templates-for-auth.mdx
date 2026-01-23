@@ -1,0 +1,205 @@
+---
+title: 'Introducing Seven New Email Templates for Supabase Auth'
+description: 'Notify users when security-sensitive actions are taken on their account.'
+author: fady,danny
+image: 2025-12-03-introducing-seven-new-email-templates-for-auth/og.png
+thumb: 2025-12-03-introducing-seven-new-email-templates-for-auth/og.png
+categories:
+  - product
+date: '2025-12-03:10:00:00'
+toc_depth: 2
+---
+
+Today we're releasing 7 new email notification templates for Supabase Auth. These security-related emails can be used to notify users when sensitive actions happen on their account to help surface any suspicious activity.
+
+For example, a user may receive an email that their password was changed, or that their email address was updated to `suspicious@example.com`.
+
+## What's included
+
+To start, we're introducing the following security notification email templates:
+
+- **Password changed** - Notify users when their password has changed
+- **Email address changed** - Notify users when their email address has changed
+- **Phone number changed** - Notify users when their phone number has changed
+- **Identity linked** - Notify users when a new identity (e.g.: GitHub) has been linked to their account
+- **Identity unlinked** - Notify users when an identity (e.g.: GitHub) has been unlinked from their account
+- **Multi-factor authentication (MFA) method added** - Notify users when a new multi-factor authentication method has been added to their account
+- **Multi-factor authentication (MFA) method removed** - Notify users when a multi-factor authentication method has been removed from their account
+
+Each notification includes relevant context depending on the event. For example, the old email when an address changes, the provider name when an identity is linked or unlinked, or the specific MFA method that was modified. This helps users quickly identify whether the action was legitimate.
+
+## Configuring notifications
+
+### Dashboard
+
+As part of this release, we've also taken some time to give the Emails section in the Dashboard a refresh and a dedicated section in the sidebar. Each security notification can be enabled or disabled individually, and the content can be customized to match your brand and tone.
+
+<Img
+  alt="Security notification settings"
+  src="/images/blog/2025-12-03-introducing-seven-new-email-templates-for-auth/security-settings.png"
+  className="border-none"
+  wide
+/>
+
+You can edit and preview the email templates directly from the Dashboard and use template variables to customize the content.
+
+<Img
+  alt="Email template content editor"
+  src="/images/blog/2025-12-03-introducing-seven-new-email-templates-for-auth/template-content.png"
+  className="border-none"
+  wide
+/>
+
+### CLI
+
+You can also manage the new security notification templates through the Supabase CLI by updating your `supabase/config.toml` file:
+
+```toml
+[auth.email.notification.password_changed]
+enabled = true
+subject = "Your password has been changed"
+content_path = "./templates/password_changed_notification.html"
+
+[auth.email.notification.mfa_factor_enrolled]
+enabled = true
+subject = "A new MFA method has been added to your account"
+content_path = "./templates/mfa_factor_enrolled_notification.html"
+```
+
+where `content_path` is a relative path to the HTML file for the email template. The notification types can be any of the following:
+
+- `password_changed`
+- `email_changed`
+- `phone_changed`
+- `identity_linked`
+- `identity_unlinked`
+- `mfa_factor_enrolled`
+- `mfa_factor_unenrolled`
+
+For more details, see the [Local Dev / CLI Configuration Reference](https://supabase.com/docs/reference/cli/config).
+
+### Management API
+
+For programmatic management of the new security notification templates, you can use the Supabase Management API to fetch and update the email templates. For example, to enable the MFA factor enrolled notification and customize its content, you can make a PATCH request to the Auth service configuration endpoint:
+
+```bash
+# Get your access token from <https://supabase.com/dashboard/account/tokens>
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Update email templates
+curl -X PATCH "<https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+      "mailer_notifications_mfa_factor_enrolled_enabled": true,
+      "mailer_subjects_mfa_factor_enrolled_notification": "A new MFA factor has been enrolled",
+      "mailer_templates_mfa_factor_enrolled_notification_content": "<h2>A new MFA factor has been enrolled</h2><p>A new factor ({{ .FactorType }}) has been enrolled for your account {{ .Email }}.</p>"
+  }'
+```
+
+Once enabled, users will receive an email notifying them when their MFA factors have modified on their account.
+
+You can find the complete list of available fields in the [Management API reference](https://supabase.com/docs/reference/api/v1-update-auth-service-config).
+
+## Auth email send hook support
+
+Security notifications are also supported through the [Auth email send hook](https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook), with new `email_action_type` values for each notification:
+
+- `password_changed_notification`
+- `email_changed_notification`
+- `phone_changed_notification`
+- `identity_linked_notification` / `identity_unlinked_notification`
+- `mfa_factor_enrolled_notification` / `mfa_factor_unenrolled_notification`
+
+The hook payload includes contextual data like `old_email`, `provider`, and `factor_type`, enabling custom email providers and internationalization for security notifications.
+
+For example, you can configure the Auth email send hook to send a password changed notification using [Resend's brand new email templates feature](https://resend.com/blog/introducing-templates) via a Supabase Edge Function:
+
+```ts
+import { Webhook } from '<https://esm.sh/standardwebhooks@1.0.0>'
+import { Resend } from 'npm:resend@6.4'
+
+const resend = new Resend(Deno.env.get('RESEND_API_KEY'))
+const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET')
+
+Deno.serve(async (req) => {
+  if (req.method !== 'POST') {
+    return new Response('method not allowed', {
+      status: 405,
+    })
+  }
+
+  const payload = await req.text()
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(hookSecret)
+
+  try {
+    const {
+      user,
+      email_data: { email_action_type },
+    } = wh.verify(payload, headers)
+
+    // Handle the different notification types
+    if (email_action_type === 'password_changed_notification') {
+      const { error } = await resend.emails.send({
+        to: user.email,
+        template: {
+          id: 'password_changed_notification',
+          variables: {
+            CURRENT_EMAIL: user.email,
+          },
+        },
+      })
+
+      if (error) {
+        console.error('failed to send email:', error)
+        return Response.json(
+          {
+            error: {
+              http_code: error.code,
+              message: error.message,
+            },
+          },
+          {
+            status: 500,
+          }
+        )
+      }
+    }
+  } catch (error) {
+    console.error('failed to verify webhook:', error)
+    return Response.json(
+      {
+        error: {
+          http_code: error.code,
+          message: error.message,
+        },
+      },
+      {
+        status: 401,
+      }
+    )
+  }
+
+  return Response.json({})
+})
+```
+
+Check out the guide for a complete example on [how to send Custom Auth Emails with Resend](https://supabase.com/docs/guides/functions/examples/auth-send-email-hook-react-email-resend).
+
+## What's next
+
+We're planning on adding more security-related email notifications in the future, such as notifying a user when a new device has been used to log into their account or when suspicious activity is detected.
+
+We'd love to hear your feedback on which notifications would be most useful for your application and how we can improve the existing templates.
+
+## Get started
+
+Here are some resources to help you get started:
+
+- [Email Templates Documentation](https://supabase.com/docs/guides/auth/auth-email-templates) - Complete guide to customizing all email templates
+- [Auth Configuration Reference](https://supabase.com/docs/reference/cli/config) - CLI configuration options for templates
+- [Management API](https://supabase.com/docs/reference/api) - Programmatic template management
+
+Have questions or feedback? Join our [Discord community](https://discord.supabase.com/) or open a [GitHub issue](https://github.com/supabase/auth).

@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -21,8 +22,14 @@ import {
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 const orioleExtCallOuts = ['vector', 'postgis']
+
+// Extensions that have recommended schemas (rather than required schemas)
+const extensionsWithRecommendedSchemas: Record<string, string> = {
+  wrappers: 'extensions',
+}
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -36,14 +43,15 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+  const { data: schemas, isPending: isSchemasLoading } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     { enabled: visible }
   )
-  const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
+  const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()
@@ -86,6 +94,20 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     }
   }, [visible, extension.name])
 
+  const getSchemaDescriptionText = (extensionName: string, schema: string | null | undefined) => {
+    // Prioritize defaultSchema (required/forced) over recommended schema
+    if (schema) {
+      return `Extension must be installed in the “${schema}” schema.`
+    }
+
+    const recommendedSchema = extensionsWithRecommendedSchemas[extensionName]
+    if (recommendedSchema) {
+      return `Use the “${recommendedSchema}” schema for full compatibility with related features.`
+    }
+
+    return undefined
+  }
+
   const validate = (values: any) => {
     const errors: any = {}
     if (values.schema === 'custom' && !values.name) errors.name = 'Required field'
@@ -121,8 +143,8 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       size="small"
       header={
         <div className="flex items-baseline gap-2">
-          <h5 className="text-foreground">Confirm to enable</h5>
-          <code className="text-xs">{extension.name}</code>
+          <h5 className="text-foreground">Enable</h5>
+          <code className="text-code-inline">{extension.name}</code>
         </div>
       }
     >
@@ -144,7 +166,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       {extension.name} cannot be accelerated by indexes on tables that are using the
                       OrioleDB access method
                     </span>
-                    <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+                    <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
                   </Admonition>
                 )}
 
@@ -162,13 +184,14 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                     name="schema"
                     value={defaultSchema}
                     label="Select a schema to enable the extension for"
-                    descriptionText={`Extension must be installed in ${defaultSchema}.`}
+                    descriptionText={getSchemaDescriptionText(extension.name, defaultSchema)}
                   />
                 ) : (
                   <Listbox
                     size="small"
                     name="schema"
                     label="Select a schema to enable the extension for"
+                    descriptionText={getSchemaDescriptionText(extension.name, null)}
                   >
                     <Listbox.Option
                       key="custom"
@@ -180,19 +203,26 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
                     <Modal.Separator />
-                    {schemas?.map((schema) => {
-                      return (
-                        <Listbox.Option
-                          key={schema.id}
-                          id={schema.name}
-                          label={schema.name}
-                          value={schema.name}
-                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
-                        >
-                          {schema.name}
-                        </Listbox.Option>
+                    {schemas
+                      ?.filter(
+                        (schema) =>
+                          !protectedSchemas.some(
+                            (protectedSchema) => protectedSchema.name === schema.name
+                          )
                       )
-                    })}
+                      .map((schema) => {
+                        return (
+                          <Listbox.Option
+                            key={schema.id}
+                            id={schema.name}
+                            label={schema.name}
+                            value={schema.name}
+                            addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
+                          >
+                            {schema.name}
+                          </Listbox.Option>
+                        )
+                      })}
                   </Listbox>
                 )}
               </Modal.Content>

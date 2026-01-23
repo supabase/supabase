@@ -1,17 +1,32 @@
+import Head from 'next/head'
+import { PropsWithChildren, useMemo, useState } from 'react'
+
 import { useParams } from 'common'
 import { ProjectClaimBenefits } from 'components/interfaces/Organization/ProjectClaim/benefits'
 import { ProjectClaimChooseOrg } from 'components/interfaces/Organization/ProjectClaim/choose-org'
 import { ProjectClaimConfirm } from 'components/interfaces/Organization/ProjectClaim/confirm'
 import { ProjectClaimLayout } from 'components/interfaces/Organization/ProjectClaim/layout'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimQuery } from 'data/organizations/organization-project-claim-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { withAuth } from 'hooks/misc/withAuth'
-import Head from 'next/head'
-import { useMemo, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Alert } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {
+  const { appTitle } = useCustomContent(['app:title'])
+
+  return (
+    <>
+      <Head>
+        <title>{`Claim project | ${appTitle ?? 'Supabase'}`}</title>
+      </Head>
+      {children}
+    </>
+  )
+}
 
 const ClaimProjectPage: NextPageWithLayout = () => {
   const { auth_id, token: claimToken } = useParams()
@@ -20,7 +35,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   const {
     data: requester,
-    isLoading: isLoadingRequester,
+    isPending: isLoadingRequester,
     isError: isErrorRequester,
     error: errorRequester,
   } = useApiAuthorizationQuery({ id: auth_id })
@@ -34,7 +49,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     data: projectClaim,
     error: errorProjectClaim,
     isError: isErrorProjectClaim,
-    isLoading: isLoadingProjectClaim,
+    isPending: isLoadingProjectClaim,
     isSuccess: isSuccessProjectClaim,
   } = useOrganizationProjectClaimQuery(
     {
@@ -48,8 +63,8 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   if ((selectedOrgSlug && claimToken && isLoadingProjectClaim) || isLoadingRequester) {
     return (
-      <ProjectClaimLayout title="Claim a project">
-        <div className="py-6 space-y-2">
+      <ProjectClaimLayout title="Claim a project" className="py-6">
+        <div className="space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
@@ -60,23 +75,12 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   if ((selectedOrgSlug && claimToken && isErrorProjectClaim) || isErrorRequester) {
     return (
-      <ProjectClaimLayout title="Claim a project">
-        <div className="py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Failed to retrieve project claim request details"
-          >
-            <p>Please retry your claim request from the requesting app</p>
-            {errorProjectClaim != undefined && (
-              <p className="mt-2">Error: {errorProjectClaim?.message}</p>
-            )}
-            {errorRequester != undefined && (
-              <p className="mt-2">Error: {errorRequester?.message}</p>
-            )}
-            <p>Please go back to the requesting app and try again.</p>
-          </Alert>
-        </div>
+      <ProjectClaimLayout title="Claim a project" className="py-6">
+        <Admonition type="warning" title="Failed to retrieve project claim request details">
+          <p>Please retry your claim request from the requesting app</p>
+          {!!errorProjectClaim && <p className="mt-2">Error: {errorProjectClaim?.message}</p>}
+          {!!errorRequester && <p className="mt-2">Error: {errorRequester?.message}</p>}
+        </Admonition>
       </ProjectClaimLayout>
     )
   }
@@ -84,8 +88,8 @@ const ClaimProjectPage: NextPageWithLayout = () => {
   if (step === 'choose-org' || !selectedOrganization) {
     return (
       <ProjectClaimChooseOrg
-        onChoose={(org) => {
-          setSelectedOrgSlug(org.slug)
+        onChoose={(orgSlug) => {
+          setSelectedOrgSlug(orgSlug)
           setStep('benefits')
         }}
       />
@@ -112,16 +116,14 @@ const ClaimProjectPage: NextPageWithLayout = () => {
       />
     )
   }
+
   return null
 }
 
 ClaimProjectPage.getLayout = (page) => (
-  <>
-    <Head>
-      <title>Claim project | Supabase</title>
-    </Head>
-    <main className="flex-grow flex flex-col w-full h-full overflow-y-auto">{page}</main>
-  </>
+  <ClaimProjectPageLayout>
+    <main className="flex flex-col w-full min-h-screen overflow-y-auto">{page}</main>
+  </ClaimProjectPageLayout>
 )
 
 export default withAuth(ClaimProjectPage)

@@ -6,7 +6,7 @@ import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { SqlSnippets } from 'types'
+import type { SqlSnippets } from 'types'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export const ShareSnippetModal = ({
@@ -21,7 +21,7 @@ export const ShareSnippetModal = ({
   const { ref: projectRef } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { mutate: upsertContent, isLoading: isUpserting } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to update query: ${error.message}`)
     },

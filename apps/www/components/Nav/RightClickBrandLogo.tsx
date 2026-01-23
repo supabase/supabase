@@ -1,9 +1,11 @@
+'use client'
+
 import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Fragment, MouseEvent, ReactNode, useRef, useState } from 'react'
-import { useClickAway, useKey } from 'react-use'
+import { useRouter } from 'next/compat/router'
+import { Fragment, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { useClickAway } from 'react-use'
 import {
   cn,
   copyToClipboard,
@@ -36,7 +38,15 @@ const RightClickBrandLogo = () => {
   /**
    * Close dropdown by using the Escape key
    */
-  useKey('Escape', () => setOpen(false))
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [setOpen])
 
   /**
    * Open dropdown by right clicking on the Supabase logo
@@ -84,7 +94,7 @@ const RightClickBrandLogo = () => {
           href="/"
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
-          onKeyDown={(e) => e.key === 'Enter' && router.push('/')}
+          onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
           className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
         >
           <Image

@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { sslEnforcementKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type SSLEnforcementVariables = { projectRef?: string }
 
@@ -44,10 +45,11 @@ export const useSSLEnforcementQuery = <TData = SSLEnforcementData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<SSLEnforcementData, SSLEnforcementError, TData> = {}
+  }: UseCustomQueryOptions<SSLEnforcementData, SSLEnforcementError, TData> = {}
 ) =>
-  useQuery<SSLEnforcementData, SSLEnforcementError, TData>(
-    sslEnforcementKeys.list(projectRef),
-    ({ signal }) => getSSLEnforcementConfiguration({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<SSLEnforcementData, SSLEnforcementError, TData>({
+    queryKey: sslEnforcementKeys.list(projectRef),
+    queryFn: ({ signal }) => getSSLEnforcementConfiguration({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

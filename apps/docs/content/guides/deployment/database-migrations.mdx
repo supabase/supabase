@@ -15,6 +15,12 @@ For this guide, we'll create a table called `employees` and see how we can make 
 
 You will need to [install](/docs/guides/local-development#quickstart) the Supabase CLI and start the local development stack.
 
+<Admonition type="tip">
+
+If a lock timeout error occurs, in your migration file, consider increasing your [`lock_timeout`](https://postgresqlco.nf/doc/en/param/lock_timeout/) setting.
+
+</Admonition>
+
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
@@ -262,7 +268,7 @@ The last step is deploying these changes to a live Supabase project.
 
 You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users!
 
-Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
+Head over to [Supabase](/dashboard) and create a new project to deploy to.
 
 <StepHikeCompact>
 
@@ -336,4 +342,4 @@ supabase db push --include-seed
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-Visiting your live project on [Supabase](https://supabase.com/dashboard/project/_), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+Visiting your live project on [Supabase](/dashboard/project/_), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.

@@ -4,6 +4,7 @@ type LogTable =
   | 'function_logs'
   | 'function_edge_logs'
   | 'auth_logs'
+  | 'auth_audit_logs'
   | 'realtime_logs'
   | 'storage_logs'
   | 'postgrest_logs'
@@ -98,6 +99,7 @@ const schemas: LogSchema[] = [
       { path: 'timestamp', type: 'datetime' },
       { path: 'metadata.auth_event.action', type: 'string' },
       { path: 'metadata.auth_event.actor_id', type: 'string' },
+      { path: 'metadata.auth_event.actor_via_sso', type: 'boolean' },
       { path: 'metadata.auth_event.actor_username', type: 'string' },
       { path: 'metadata.auth_event.log_type', type: 'string' },
       { path: 'metadata.auth_event.traits.provider', type: 'string' },
@@ -115,6 +117,29 @@ const schemas: LogSchema[] = [
       { path: 'metadata.remote_addr', type: 'string' },
       { path: 'metadata.status', type: 'number' },
       { path: 'metadata.timestamp', type: 'string' },
+    ],
+  },
+  {
+    name: 'Auth Audit Logs',
+    reference: 'auth_audit_logs',
+    fields: [
+      { path: 'event_message', type: 'string' },
+      { path: 'id', type: 'string' },
+      { path: 'identifier', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
+      { path: 'metadata.auth_audit_event.action', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_id', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_name', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_username', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_via_sso', type: 'boolean' },
+      { path: 'metadata.auth_audit_event.audit_log_id', type: 'string' },
+      { path: 'metadata.auth_audit_event.created_at', type: 'string' },
+      { path: 'metadata.auth_audit_event.log_type', type: 'string' },
+      { path: 'metadata.auth_audit_event.request_id', type: 'string' },
+      { path: 'metadata.auth_audit_event.user_agent', type: 'string' },
+      { path: 'metadata.host', type: 'string' },
+      { path: 'metadata.level', type: 'string' },
+      { path: 'metadata.msg', type: 'string' },
     ],
   },
   {

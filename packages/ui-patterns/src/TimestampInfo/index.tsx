@@ -51,14 +51,16 @@ export const TimestampInfo = ({
   utcTimestamp,
   className,
   displayAs = 'local',
-  format = 'DD MMM  HH:mm:ss',
-  labelFormat = 'DD MMM HH:mm:ss',
+  format = 'DD MMM YY HH:mm:ss',
+  labelFormat = 'DD MMM YY HH:mm:ss',
+  label,
 }: {
   className?: string
   utcTimestamp: string | number
   displayAs?: 'local' | 'utc'
   format?: string
   labelFormat?: string
+  label?: string
 }) => {
   const local = timestampLocalFormatter({ utcTimestamp, format })
   const utc = timestampUtcFormatter({ utcTimestamp, format })
@@ -139,9 +141,11 @@ export const TimestampInfo = ({
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
         <span>
-          {displayAs === 'local'
-            ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
-            : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
+          {label
+            ? label
+            : displayAs === 'local'
+              ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
+              : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
         </span>
       </TooltipTrigger>
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1 min-w-80">

@@ -15,7 +15,13 @@ type FeedbackModalProps = {
 
 function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps) {
   return (
-    <Modal hideFooter header="Leave a comment" visible={visible} onEscapeKeyDown={onCancel}>
+    <Modal
+      hideFooter
+      header="Leave a comment"
+      visible={visible}
+      onCancel={onCancel}
+      onEscapeKeyDown={onCancel}
+    >
       <Form
         initialValues={{ page, comment: '' }}
         validateOnBlur
@@ -58,7 +64,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
                     href="https://supabase.com/dashboard/support/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand-link hover:underline"
                   >
                     support request
                   </a>

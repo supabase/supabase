@@ -1,5 +1,5 @@
 import { has } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -10,9 +10,15 @@ export interface FileExplorerRowEditingProps {
   item: StorageItem
   view: STORAGE_VIEWS
   columnIndex: number
+  style?: CSSProperties
 }
 
-const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEditingProps) => {
+export const FileExplorerRowEditing = ({
+  item,
+  view,
+  columnIndex,
+  style,
+}: FileExplorerRowEditingProps) => {
   const { renameFile, renameFolder, addNewFolder, updateRowStatus } =
     useStorageExplorerStateSnapshot()
 
@@ -82,7 +88,10 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
   }, [])
 
   return (
-    <div className="storage-row flex items-center justify-between rounded bg-gray-500">
+    <div
+      style={style}
+      className="storage-row flex items-center justify-between rounded bg-gray-500"
+    >
       <div className="flex h-full flex-grow items-center px-2.5">
         <div>
           <RowIcon
@@ -112,5 +121,3 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
     </div>
   )
 }
-
-export default FileExplorerRowEditing

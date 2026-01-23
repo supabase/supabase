@@ -1,14 +1,28 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
-  EnableRequested = 'EnableRequested',
-  DisableRequested = 'DisableRequested',
+  StartRequested = 'StartRequested',
+  StopRequested = 'StopRequested',
+  RestartRequested = 'RestartRequested',
 }
 
 interface PipelineRequestStatusContextType {
   requestStatus: Record<number, PipelineStatusRequestStatus>
-  setRequestStatus: (pipelineId: number, status: PipelineStatusRequestStatus) => void
+  pipelineStatusSnapshot: Record<number, string | undefined>
+  setRequestStatus: (
+    pipelineId: number,
+    status: PipelineStatusRequestStatus,
+    snapshotStatus?: string
+  ) => void
   getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
   updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
 }
@@ -21,16 +35,65 @@ const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextT
   undefined
 )
 
+// [Joshen] Leaving a comment for future investigation
+// Do we need this? Afaict the status is getting returned from the API so we might not need
+// to track the pipeline status on the client side
 export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatusProviderProps) => {
   const [requestStatus, setRequestStatusState] = useState<
     Record<number, PipelineStatusRequestStatus>
   >({})
+  const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<
+    Record<number, string | undefined>
+  >({})
+  const timeoutsRef = useRef<Record<number, number>>({})
+  const REQUEST_TIMEOUT_MS = 10_000
 
-  const setRequestStatus = (pipelineId: number, status: PipelineStatusRequestStatus) => {
+  const setRequestStatus = (
+    pipelineId: number,
+    status: PipelineStatusRequestStatus,
+    snapshotStatus?: string
+  ) => {
     setRequestStatusState((prev) => ({
       ...prev,
       [pipelineId]: status,
     }))
+    setPipelineStatusSnapshot((prev) => {
+      if (status === PipelineStatusRequestStatus.None) {
+        const { [pipelineId]: _omit, ...rest } = prev
+        return rest
+      }
+      // Only set snapshot when provided to avoid undefined entries
+      if (snapshotStatus !== undefined) {
+        return { ...prev, [pipelineId]: snapshotStatus }
+      }
+      return prev
+    })
+
+    // Clear existing timeout for this pipeline
+    const existing = timeoutsRef.current[pipelineId]
+    if (existing !== undefined) {
+      clearTimeout(existing)
+      delete timeoutsRef.current[pipelineId]
+    }
+
+    // Start auto-reset timer for non-None states
+    if (status !== PipelineStatusRequestStatus.None) {
+      const id = window.setTimeout(() => {
+        // If still pending, clear to None to show backend state
+        setRequestStatusState((prev) => {
+          if (prev[pipelineId] && prev[pipelineId] !== PipelineStatusRequestStatus.None) {
+            return { ...prev, [pipelineId]: PipelineStatusRequestStatus.None }
+          }
+          return prev
+        })
+        setPipelineStatusSnapshot((prev) => {
+          const { [pipelineId]: _omit, ...rest } = prev
+          return rest
+        })
+        delete timeoutsRef.current[pipelineId]
+      }, REQUEST_TIMEOUT_MS)
+      timeoutsRef.current[pipelineId] = id
+    }
   }
 
   const getRequestStatus = (pipelineId: number): PipelineStatusRequestStatus => {
@@ -38,25 +101,32 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   }
 
   const updatePipelineStatus = useCallback(
-    (pipelineId: number, backendStatus: string | undefined) => {
+    (pipelineId: number, newStatus: string | undefined) => {
       const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
+      if (currentRequestStatus === PipelineStatusRequestStatus.None) return
 
-      if (
-        (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested &&
-          (backendStatus === 'started' || backendStatus === 'failed')) ||
-        (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested &&
-          (backendStatus === 'stopped' || backendStatus === 'failed'))
-      ) {
+      // Only remove when backend status differs from snapshot
+      const snapshotStatus = pipelineStatusSnapshot[pipelineId]
+      if (newStatus !== snapshotStatus) {
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }
     },
-    [requestStatus, setRequestStatus]
+    [requestStatus, pipelineStatusSnapshot]
   )
+
+  // Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(timeoutsRef.current).forEach((id) => clearTimeout(id))
+      timeoutsRef.current = {}
+    }
+  }, [])
 
   return (
     <PipelineRequestStatusContext.Provider
       value={{
         requestStatus,
+        pipelineStatusSnapshot,
         setRequestStatus,
         getRequestStatus,
         updatePipelineStatus,

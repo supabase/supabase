@@ -1,4 +1,4 @@
-import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -15,7 +15,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
-import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
+import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -97,26 +97,23 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
+
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}
                 type="text"
                 tooltip={{
                   content: {
+                    side: 'left',
                     text: isLoading ? 'Loading log...' : 'Copy as JSON',
                   },
                 }}
+                icon={showCopied ? <Check /> : <Copy />}
                 onClick={() => {
                   setShowCopied(true)
                   copyToClipboard(JSON.stringify(log, null, 2))
                 }}
-              >
-                {showCopied ? (
-                  <Check size={14} strokeWidth={2} />
-                ) : (
-                  <Clipboard size={14} strokeWidth={2} />
-                )}
-              </ButtonTooltip>
+              />
 
               <Button type="text" onClick={onClose}>
                 <X size={14} strokeWidth={2} />
