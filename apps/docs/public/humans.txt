@@ -13,6 +13,7 @@ Alexander Korotkov
 Ali Waseem
 Allan S
 Amy Q
+Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
@@ -78,6 +79,7 @@ Gregor Vand
 Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
+Haritabh Gupta
 Haydn Maley
 Hieu Pham
 Ignacio Dobronich
