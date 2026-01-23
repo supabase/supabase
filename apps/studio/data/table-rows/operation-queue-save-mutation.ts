@@ -100,11 +100,11 @@ export const useOperationQueueSaveMutation = ({
       // Collect all unique table IDs that were affected
       const affectedTableIds = [...new Set(operations.map((op) => op.tableId))]
 
-      // Invalidate queries for all affected tables
+      // Invalidate queries for all affected tables (both rows and count)
       await Promise.all(
         affectedTableIds.map((tableId) =>
           queryClient.invalidateQueries({
-            queryKey: tableRowKeys.tableRows(projectRef, { table: { id: tableId } }),
+            queryKey: tableRowKeys.tableRowsAndCount(projectRef, tableId),
           })
         )
       )
