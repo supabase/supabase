@@ -49,6 +49,13 @@ export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
     }
   }, [snap.hasPendingOperations, operationCount, isSaving, onSave, snap, isOperationQueuePanelOpen])
 
+  // Dismiss toast when component unmounts (e.g., navigating away from table editor)
+  useEffect(() => {
+    return () => {
+      toast.dismiss(SAVE_QUEUE_TOAST_ID)
+    }
+  }, [])
+
   // This component doesn't render anything visible itself
   // It only manages the toast lifecycle
   return null
