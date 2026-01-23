@@ -4,6 +4,8 @@ import { RowsChangeData } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { SupaRow } from 'components/grid/types'
+import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -16,8 +18,6 @@ import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
@@ -128,36 +128,17 @@ export function useOnRowsChange(rows: SupaRow[]) {
       const configuration = { identifiers }
 
       if (isQueueOperationsEnabled) {
-        // Queue the operation instead of immediately mutating
-        tableEditorSnap.queueOperation({
-          type: QueuedOperationType.EDIT_CELL_CONTENT,
+        queueCellEditWithOptimisticUpdate({
+          queryClient,
+          queueOperation: tableEditorSnap.queueOperation,
+          projectRef: project.ref,
           tableId: snap.table.id,
-          payload: {
-            rowIdentifiers: identifiers,
-            columnName: changedColumn,
-            oldValue: previousRow[changedColumn],
-            newValue: rowData[changedColumn],
-            table: snap.originalTable,
-            enumArrayColumns,
-          },
-        })
-
-        // Apply optimistic update to the UI
-        const queryKey = tableRowKeys.tableRows(project.ref, { table: { id: snap.table.id } })
-        queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
-          if (!old) return old
-          return {
-            rows: old.rows.map((row) => {
-              // Match by primary keys
-              const matches = Object.entries(identifiers).every(
-                ([key, value]) => row[key] === value
-              )
-              if (matches) {
-                return { ...row, [changedColumn]: rowData[changedColumn] }
-              }
-              return row
-            }),
-          }
+          table: snap.originalTable,
+          rowIdentifiers: identifiers,
+          columnName: changedColumn,
+          oldValue: previousRow[changedColumn],
+          newValue: rowData[changedColumn],
+          enumArrayColumns,
         })
       } else {
         // Default behavior: immediately save the change
