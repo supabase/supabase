@@ -183,8 +183,8 @@ export const SignUpForm = () => {
                       />
                       <Button
                         type="default"
-                        title={passwordHidden ? `Hide password` : `Show password`}
-                        aria-label={passwordHidden ? `Hide password` : `Show password`}
+                        title={passwordHidden ? `Show password` : `Hide password`}
+                        aria-label={passwordHidden ? `Show password` : `Hide password`}
                         className="absolute right-1 top-1 px-1.5"
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
                         disabled={isSubmitting}
