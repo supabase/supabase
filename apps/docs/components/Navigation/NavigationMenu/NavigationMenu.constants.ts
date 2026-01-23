@@ -2586,7 +2586,10 @@ export const platform: NavMenuConstant = {
           name: 'Default Platform Permissions',
           url: '/guides/platform/permissions' as `/${string}`,
         },
-        { name: 'Private Connectivity', url: '/guides/platform/privatelink' as `/${string}` },
+        {
+          name: 'Private Connectivity',
+          url: '/guides/platform/private-connectivity' as `/${string}`,
+        },
       ],
     },
     {

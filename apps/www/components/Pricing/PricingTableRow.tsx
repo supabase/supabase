@@ -1,9 +1,9 @@
 import ProductIcon from 'components/ProductIcon'
-import { Fragment, ReactNode } from 'react'
-import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { FeatureKey } from 'shared-data/pricing'
 import Link from 'next/link'
+import { Fragment, ReactNode } from 'react'
+import { FeatureKey } from 'shared-data/pricing'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 
 type PricingTooltips = {
   [key in FeatureKey]?: {
@@ -96,8 +96,8 @@ export const pricingTooltips: PricingTooltips = {
     main: (
       <span className="prose text-xs">
         Private Connectivity enables secure connections between your cloud VPC and Supabase, keeping
-        traffic within the cloud provider's network. Read more in our{' '}
-        <Link href="/docs/guides/platform/privatelink" target="_blank">
+        traffic within the cloud provider’s network. Read more in our{' '}
+        <Link href="/docs/guides/platform/private-connectivity" target="_blank">
           docs
         </Link>
         .

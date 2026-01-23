@@ -109,7 +109,9 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
           <SheetTitle>{isNew ? 'Add AWS Account' : 'AWS Account Details'}</SheetTitle>
           <SheetDescription>
             Connect to your Supabase project from your AWS VPC using AWS PrivateLink.{' '}
-            <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
+            <InlineLink href={`${DOCS_URL}/guides/platform/private-connectivity`}>
+              Learn more
+            </InlineLink>
           </SheetDescription>
         </SheetHeader>
         <Form_Shadcn_ {...form}>
@@ -162,7 +164,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                           <Link
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`${DOCS_URL}/guides/platform/privatelink#step-2-accept-resource-share`}
+                            href={`${DOCS_URL}/guides/platform/private-connectivity#step-2-accept-resource-share`}
                           >
                             How to accept?
                           </Link>
