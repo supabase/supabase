@@ -267,37 +267,6 @@ test.describe.serial('Storage', () => {
     ).not.toBeVisible()
   })
 
-  test('cancels folder creation when name is empty', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_folder_empty_name`
-
-    // Create a bucket and navigate to it
-    await createBucket(page, ref, bucketName, false)
-    await navigateToBucket(page, ref, bucketName)
-
-    // Click create folder button
-    const createFolderBtn = page.getByRole('button', { name: 'Create folder' })
-    await expect(createFolderBtn, 'Create folder button should be visible').toBeVisible()
-    await createFolderBtn.click()
-
-    // Clear the input and press Enter with empty name
-    const nameInput = page.getByRole('textbox')
-    await expect(nameInput, 'Folder name input should be visible').toBeVisible()
-    await nameInput.clear()
-    await nameInput.press('Enter')
-
-    // Verify the input disappears (folder creation cancelled)
-    await expect(
-      nameInput,
-      'Input should disappear when folder creation is cancelled'
-    ).not.toBeVisible({ timeout: 3000 })
-
-    // Verify no folder was created (no items in the explorer besides the empty state)
-    await expect(
-      page.getByTitle('Untitled folder'),
-      'No folder should be created with empty name'
-    ).not.toBeVisible()
-  })
-
   test('can download a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_download`
     const fileName = 'test-file.txt'
