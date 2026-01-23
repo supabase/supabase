@@ -1,23 +1,23 @@
 ---
 id: 'private-connectivity'
 title: 'Private Connectivity'
-description: 'Secure private network connectivity to your Supabase database using AWS VPC Lattice.'
+description: 'Secure private network connectivity to your Supabase database using AWS PrivateLink via VPC Lattice.'
 ---
 
 <Admonition type="note">
 
-PrivateLink is currently in beta and available only to Team and Enterprise customers.
-Contact support if you would like to create a PrivateLink connection for a read-only replica.
+Private Connectivity is currently in beta and available only to Team and Enterprise customers.
+Contact support if you would like to create a Private Connectivity connection for a read-only replica.
 
 </Admonition>
 
-PrivateLink provides enterprise-grade private network connectivity between your AWS VPC and your Supabase database using AWS VPC Lattice. This eliminates exposure to the public internet by creating a secure, private connection that keeps your database traffic within the AWS network backbone.
+Private Connectivity provides enterprise-grade private network connectivity between your cloud VPC and your Supabase database. On AWS, this is implemented using AWS PrivateLink via VPC Lattice. This eliminates exposure to the public internet by creating a secure, private connection that keeps your database traffic within the AWS network backbone.
 
-By enabling PrivateLink, database connections never traverse the public internet, enabling the disablement of public facing connectivity and providing an additional layer of security and compliance for sensitive workloads. This infrastructure-level security feature helps organizations meet strict data governance requirements and reduces potential attack vectors.
+By enabling Private Connectivity, database connections never traverse the public internet, enabling the disablement of public facing connectivity and providing an additional layer of security and compliance for sensitive workloads. This infrastructure-level security feature helps organizations meet strict data governance requirements and reduces potential attack vectors.
 
-## How PrivateLink works
+## How Private Connectivity works
 
-Supabase PrivateLink is an organisation level configuration. It works by sharing a [VPC Lattice Resource Configuration](https://docs.aws.amazon.com/vpc-lattice/latest/ug/resource-configuration.html) to any number of AWS Accounts for each of your Supabase projects. Connectivity can be achieved by either associating the Resource Configuration to a PrivateLink endpoint, or a [VPC Lattice Service Network](https://docs.aws.amazon.com/vpc-lattice/latest/ug/service-networks.html). This means:
+Supabase Private Connectivity is an organisation level configuration. It works by sharing a [VPC Lattice Resource Configuration](https://docs.aws.amazon.com/vpc-lattice/latest/ug/resource-configuration.html) to any number of AWS Accounts for each of your Supabase projects. Connectivity can be achieved by either associating the Resource Configuration with an AWS PrivateLink endpoint, or with an [AWS VPC Lattice Service Network](https://docs.aws.amazon.com/vpc-lattice/latest/ug/service-networks.html). This means:
 
 - Database traffic flows through private AWS infrastructure only
 - Connection latency is typically reduced compared to public internet routing
@@ -26,11 +26,11 @@ Supabase PrivateLink is an organisation level configuration. It works by sharing
 
 The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
 
-Supabase PrivateLink is currently just for direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+Supabase Private Connectivity currently supports direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
 
 ## Requirements
 
-To use PrivateLink with your Supabase project:
+To use Private Connectivity with your Supabase project:
 
 - Team or Enterprise Supabase subscription
 - AWS VPC in the same region as your Supabase project
@@ -40,15 +40,15 @@ To use PrivateLink with your Supabase project:
 
 #### Step 1: Add AWS account
 
-Navigate to your project's Integrations section to set up PrivateLink:
+Navigate to your project's Integrations section to set up Private Connectivity:
 
 1. Go to your Supabase project dashboard
 2. Navigate to [**Settings** > **Integrations**](/dashboard/project/_/settings/integrations)
-3. Find the **AWS PrivateLink** section
-4. Click **Add Account**
+3. Find the **Private Connectivity** section
+4. Click **Add account**
 5. Enter your AWS Account ID
 6. Provide a description for the account (recommended)
-7. Click **Add Account** to submit
+7. Click **Add account** to submit
 
 After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the account will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
 
@@ -85,7 +85,7 @@ Ensure your security groups allow traffic on the appropriate ports:
 
 In your AWS account, you have two options to establish connectivity:
 
-##### Option A: Create a PrivateLink endpoint
+##### Option A: Create an AWS PrivateLink endpoint
 
 1. Navigate to the VPC console in your AWS account
 2. Go to [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) in the left sidebar
@@ -163,24 +163,24 @@ For maximum security, you can disable public internet access for your database:
 
 During the beta phase:
 
-- **Read Replicas**: PrivateLink does not currently support read replicas
+- **Read Replicas**: Private Connectivity does not currently support read replicas
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
 
 ## Compatibility
 
-The PrivateLink endpoint is a layer 3 solution so behaves like a standard Postgres endpoint, allowing you to connect using:
+The Private Connectivity endpoint is a layer 3 solution so behaves like a standard Postgres endpoint, allowing you to connect using:
 
 - Direct Postgres connections using standard tools
 - Third-party database tools and ORMs (with the appropriate routing)
 
 ## Next steps
 
-Ready to enhance your database security with PrivateLink? [Contact our Enterprise team](/contact/enterprise) to discuss your requirements and begin the setup process.
+Ready to enhance your database security with Private Connectivity? [Contact our Enterprise team](/contact/enterprise) to discuss your requirements and begin the setup process.
 
 Our support team will guide you through the configuration and ensure your private database connectivity meets your security and performance requirements.
 
 ## Regional availability
 
-PrivateLink is not currently available in the following regions:
+Private Connectivity is not currently available in the following regions:
 
 - **eu-central-2 (Zurich)** - Expected availability: April 2026

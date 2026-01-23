@@ -582,6 +582,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/guides/platform/privatelink',
+    destination: '/guides/platform/private-connectivity',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/custom-postgres-config',
     destination: '/docs/guides/database/custom-postgres-config',
   },
