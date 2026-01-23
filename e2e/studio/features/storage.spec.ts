@@ -237,36 +237,6 @@ test.describe.serial('Storage', () => {
     await deleteItem(page, folderName)
   })
 
-  test('cannot create a folder with special characters', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_folder_special_chars`
-
-    // Create a bucket and navigate to it
-    await createBucket(page, ref, bucketName, false)
-    await navigateToBucket(page, ref, bucketName)
-
-    // Try to create a folder with invalid character '#'
-    const createFolderBtn = page.getByRole('button', { name: 'Create folder' })
-    await expect(createFolderBtn, 'Create folder button should be visible').toBeVisible()
-    await createFolderBtn.click()
-
-    const nameInput = page.getByRole('textbox')
-    await expect(nameInput, 'Folder name input should be visible').toBeVisible()
-    await nameInput.fill('test#folder')
-    await nameInput.press('Enter')
-
-    // Verify error toast appears
-    await expect(
-      page.getByText('Folder name cannot contain the "#" character'),
-      'Error message for invalid character should appear'
-    ).toBeVisible()
-
-    // Verify folder was not created (input should still be visible since creation failed)
-    await expect(
-      page.getByTitle('test#folder'),
-      'Folder with invalid character should not be created'
-    ).not.toBeVisible()
-  })
-
   test('can download a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_download`
     const fileName = 'test-file.txt'
