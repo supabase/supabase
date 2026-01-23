@@ -30,7 +30,6 @@ export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
         <SaveQueueToastContent
           count={operationCount}
           onSave={onSave}
-          onCancel={onCancel}
           onViewDetails={() => snap.onViewOperationQueue()}
         />,
         {
