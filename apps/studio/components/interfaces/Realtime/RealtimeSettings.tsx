@@ -20,6 +20,7 @@ import {
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import {
   Button,
   Card,
@@ -89,6 +90,11 @@ export const RealtimeSettings = () => {
       },
     })
 
+  const { getEntitlementNumericValue: getEntitledMaxPayloadSize } = useCheckEntitlements(
+    'realtime.max_message_size'
+  )
+  const entitledMaxPayloadSize = getEntitledMaxPayloadSize() ?? 3000
+
   const FormSchema = z.object({
     connection_pool: z.coerce
       .number()
@@ -97,7 +103,7 @@ export const RealtimeSettings = () => {
     max_concurrent_users: z.coerce.number().min(1).max(50000),
     max_events_per_second: z.coerce.number().min(1).max(10000),
     max_presence_events_per_second: z.coerce.number().min(1).max(10000),
-    max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
+    max_payload_size_in_kb: z.coerce.number().min(1).max(entitledMaxPayloadSize),
     suspend: z.boolean(),
     // [Joshen] These fields are temporarily hidden from the UI
     // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
