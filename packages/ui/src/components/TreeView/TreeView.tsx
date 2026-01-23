@@ -74,6 +74,8 @@ const TreeViewItem = forwardRef<
     isLoading?: boolean
     /** Callback for double-click */
     onDoubleClick?: (e: React.MouseEvent) => void
+    /** Actions to render on the right end of the item */
+    actions?: ReactNode
   }
 >(
   (
@@ -92,6 +94,7 @@ const TreeViewItem = forwardRef<
       isEditing = false,
       onEditSubmit,
       onDoubleClick,
+      actions,
       ...props
     },
     ref
@@ -182,7 +185,12 @@ const TreeViewItem = forwardRef<
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }), props.className)}
+        className={cn(
+          TreeViewItemVariant({ isSelected, isOpened, isPreview }),
+          !!actions && 'pr-2',
+          !isEditing && !!actions && 'justify-between',
+          props.className
+        )}
         style={{
           paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,
           ...props.style,
@@ -199,54 +207,60 @@ const TreeViewItem = forwardRef<
             className={'absolute h-full w-px bg-border-strong'}
           ></div>
         ))}
+
         {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        {isBranch ? (
-          <>
-            {isLoading ? (
-              <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
-            ) : (
-              <ChevronRight
+
+        <div className="flex items-center gap-x-3 truncate">
+          {isBranch ? (
+            <>
+              {isLoading ? (
+                <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
+              ) : (
+                <ChevronRight
+                  className={cn(
+                    'text-foreground-muted',
+                    'group-aria-selected:text-foreground-light',
+                    'group-aria-expanded:text-foreground-light',
+                    'transition-transform duration-200',
+                    'group-aria-expanded:rotate-90'
+                  )}
+                  size={CHEVRON_ICON_SIZE}
+                  strokeWidth={1.5}
+                />
+              )}
+              <TreeViewFolderIcon
                 className={cn(
-                  'text-foreground-muted',
+                  'transition-colors',
+                  ' text-foreground-muted',
                   'group-aria-selected:text-foreground-light',
-                  'group-aria-expanded:text-foreground-light',
-                  'transition-transform duration-200',
-                  'group-aria-expanded:rotate-90'
+                  'group-aria-expanded:text-foreground-light'
                 )}
-                size={CHEVRON_ICON_SIZE}
+                isOpen={isExpanded}
+                size={ENTITY_ICON_SIZE}
                 strokeWidth={1.5}
               />
-            )}
-            <TreeViewFolderIcon
-              className={cn(
-                'transition-colors',
-                ' text-foreground-muted',
-                'group-aria-selected:text-foreground-light',
-                'group-aria-expanded:text-foreground-light'
-              )}
-              isOpen={isExpanded}
-              size={ENTITY_ICON_SIZE}
-              strokeWidth={1.5}
-            />
-          </>
-        ) : (
-          icon || (
-            <SQL_ICON
-              className={cn(
-                'transition-colors',
-                'fill-foreground-muted',
-                'group-aria-selected:fill-foreground',
-                'w-5 h-5 shrink-0',
-                '-ml-0.5'
-              )}
-              size={ENTITY_ICON_SIZE}
-              strokeWidth={1.5}
-            />
-          )
-        )}
-        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
-          {name}
-        </span>
+            </>
+          ) : (
+            icon || (
+              <SQL_ICON
+                className={cn(
+                  'transition-colors',
+                  'fill-foreground-muted',
+                  'group-aria-selected:fill-foreground',
+                  'w-5 h-5 shrink-0'
+                )}
+                size={ENTITY_ICON_SIZE}
+                strokeWidth={1.5}
+              />
+            )
+          )}
+          <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
+            {name}
+          </span>
+        </div>
+
+        {!isEditing && actions}
+
         <form onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
             autoFocus
