@@ -76,7 +76,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
 
     export const supabase = createClient(
       process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
-      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
+      process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '',
       {
         auth: {
           storage: ExpoWebSecureStoreAdapter,
@@ -126,7 +126,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
 
     export const supabase = createClient(
       process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
-      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
+      process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '',
       {
         auth: {
           storage: ExpoSecureStoreAdapter as any,
@@ -154,7 +154,7 @@ Create a `.env` file containing these variables:
 
 ```bash name=.env
 EXPO_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
-EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
 </$CodeTabs>
