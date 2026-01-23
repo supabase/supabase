@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface SecurityOptionsProps {
@@ -20,6 +21,10 @@ interface SecurityOptionsProps {
 }
 
 export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
+  const shouldShowEnableRlsEventTrigger = usePHFlag<string>(
+    'projectCreationEnableRlsEventTrigger'
+  )
+
   return (
     <Panel.Content className="pb-8">
       <FormItemLayout layout={layout} label="Security" isReactForm={false}>
@@ -57,30 +62,32 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
             )}
           />
 
-          <FormField_Shadcn_
-            name="enableRlsEventTrigger"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem_Shadcn_ className="flex items-start gap-3">
-                <FormControl_Shadcn_>
-                  <Checkbox_Shadcn_
-                    checked={field.value}
-                    disabled={field.disabled}
-                    onCheckedChange={(value) => field.onChange(value === true)}
-                  />
-                </FormControl_Shadcn_>
-                <div className="space-y-1">
-                  <FormLabel_Shadcn_ className="text-sm text-foreground">
-                    Enable automatic RLS
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Create an event trigger that automatically enables Row Level Security on all new
-                    tables in the public schema.
-                  </FormDescription_Shadcn_>
-                </div>
-              </FormItem_Shadcn_>
-            )}
-          />
+          {shouldShowEnableRlsEventTrigger && (
+            <FormField_Shadcn_
+              name="enableRlsEventTrigger"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex items-start gap-3">
+                  <FormControl_Shadcn_>
+                    <Checkbox_Shadcn_
+                      checked={field.value}
+                      disabled={field.disabled}
+                      onCheckedChange={(value) => field.onChange(value === true)}
+                    />
+                  </FormControl_Shadcn_>
+                  <div className="space-y-1">
+                    <FormLabel_Shadcn_ className="text-sm text-foreground">
+                      Enable automatic RLS
+                    </FormLabel_Shadcn_>
+                    <FormDescription_Shadcn_ className="text-foreground-lighter">
+                      Create an event trigger that automatically enables Row Level Security on all new
+                      tables in the public schema.
+                    </FormDescription_Shadcn_>
+                  </div>
+                </FormItem_Shadcn_>
+              )}
+            />
+          )}
 
           {!form.getValues('dataApi') && (
             <Admonition type="warning" title="Data API will effectively be disabled">

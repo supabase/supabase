@@ -278,6 +278,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    */
   properties: {
     instanceSize?: string
+    /**
+     * Whether the automatic RLS event trigger option was enabled
+     */
+    enableRlsEventTrigger?: boolean
   }
   groups: TelemetryGroups
 }

@@ -243,6 +243,7 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
         },
         {
           project: res.ref,
