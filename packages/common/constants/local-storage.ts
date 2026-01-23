@@ -68,7 +68,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2025-11-21',
+  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2026-01-16',
   REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys

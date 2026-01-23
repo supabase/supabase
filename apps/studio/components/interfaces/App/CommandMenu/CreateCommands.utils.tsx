@@ -1,24 +1,25 @@
 import { useMemo } from 'react'
+
 import { useFlag, useParams } from 'common'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
+import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
 import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
-import {
-  useIsVectorBucketsEnabled,
-  useIsAnalyticsBucketsEnabled,
-} from 'data/config/project-storage-config-query'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSetPage } from 'ui-patterns/CommandMenu'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
 import {
   type IntegrationDefinition,
   INTEGRATIONS,
 } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import {
+  useIsAnalyticsBucketsEnabled,
+  useIsVectorBucketsEnabled,
+} from 'data/config/project-storage-config-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { useSetPage } from 'ui-patterns/CommandMenu'
 
 export function getIntegrationRoute(
   integration: IntegrationDefinition,
@@ -93,11 +94,13 @@ export function useCreateCommandsConfig() {
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     reportsAll: reportsEnabled,
+    integrationsWrappers: integrationsWrappersEnabled,
   } = useIsFeatureEnabled([
     'project_auth:all',
     'project_edge_function:all',
     'project_storage:all',
     'reports:all',
+    'integrations:wrappers',
   ])
 
   const {
@@ -163,11 +166,13 @@ export function useCreateCommandsConfig() {
     [installedIntegrations]
   )
 
-  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-
-  const allIntegrations = integrationsWrappers
-    ? INTEGRATIONS
-    : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper'))
+  const allIntegrations = useMemo(
+    () =>
+      integrationsWrappersEnabled
+        ? INTEGRATIONS
+        : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper')),
+    [integrationsWrappersEnabled]
+  )
 
   return {
     ref,
@@ -190,7 +195,7 @@ export function useCreateCommandsConfig() {
     isVectorBucketsEnabled,
     isAnalyticsBucketsEnabled,
     installedIntegrationIds,
-    integrationsWrappers,
+    integrationsWrappers: integrationsWrappersEnabled,
     allIntegrations,
     reportsEnabled,
   }

@@ -15,7 +15,7 @@ interface DropReplicaConfirmationModalProps {
   onCancel: () => void
 }
 
-const DropReplicaConfirmationModal = ({
+export const DropReplicaConfirmationModal = ({
   selectedReplica,
   onSuccess,
   onCancel,
@@ -83,5 +83,3 @@ const DropReplicaConfirmationModal = ({
     </ConfirmationModal>
   )
 }
-
-export default DropReplicaConfirmationModal
