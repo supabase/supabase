@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
 
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SaveQueueToastContent } from './SaveQueueToast.Content'
@@ -23,12 +22,14 @@ export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
   const snap = useTableEditorStateSnapshot()
   const toastShownRef = useRef(false)
   const operationCount = snap.operationQueue.operations.length
+  const isSaving = snap.operationQueue.status === 'saving'
 
   useEffect(() => {
     if (snap.hasPendingOperations) {
       toast(
         <SaveQueueToastContent
           count={operationCount}
+          isSaving={isSaving}
           onSave={onSave}
           onViewDetails={() => snap.onViewOperationQueue()}
         />,
@@ -44,7 +45,7 @@ export const SaveQueueToast = ({ onSave, onCancel }: SaveQueueToastProps) => {
       toast.dismiss(SAVE_QUEUE_TOAST_ID)
       toastShownRef.current = false
     }
-  }, [snap.hasPendingOperations, operationCount, onSave, onCancel, snap])
+  }, [snap.hasPendingOperations, operationCount, isSaving, onSave, onCancel, snap])
 
   // This component doesn't render anything visible itself
   // It only manages the toast lifecycle

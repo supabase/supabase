@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -25,6 +25,7 @@ import { GridProps } from './types'
 
 import { keepPreviousData } from '@tanstack/react-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useOperationQueueActions } from './hooks/useOperationQueueActions'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
@@ -48,17 +49,8 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  // Handlers for the save queue toast
-  const handleSaveQueue = useCallback(() => {
-    // TODO: Implement save logic - process queued operations
-    console.log('Save queue triggered', tableEditorSnap.operationQueue.operations)
-  }, [tableEditorSnap])
-
-  const handleCancelQueue = useCallback(() => {
-    // Clear the queue and revert optimistic updates
-    tableEditorSnap.clearQueue()
-    // TODO: Invalidate queries to refetch original data
-  }, [tableEditorSnap])
+  const { handleSave: handleSaveQueue, handleCancel: handleCancelQueue } =
+    useOperationQueueActions()
 
   const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
 

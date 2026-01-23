@@ -1,13 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-
-import { tableRowKeys } from 'data/table-rows/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, SidePanel } from 'ui'
 
 import { OperationList } from './OperationList'
-import { QueuedOperation, QueueStatus } from '@/state/table-editor-operation-queue.types'
+import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 
 interface OperationQueueSidePanelProps {
   visible: boolean
@@ -15,30 +11,14 @@ interface OperationQueueSidePanelProps {
 }
 
 export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueSidePanelProps) => {
-  const queryClient = useQueryClient()
-  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
 
   const operations = snap.operationQueue.operations as readonly QueuedOperation[]
-  const queueStatus = snap.operationQueue.status as QueueStatus
 
-  const handleSave = useCallback(async () => {
-    // TODO: Implement save logic - will be handled by a separate method
-    console.log('Save triggered', operations)
-  }, [operations])
-
-  const handleCancel = useCallback(() => {
-    // Clear the queue and invalidate to revert optimistic updates
-    snap.clearQueue()
-    if (project) {
-      queryClient.invalidateQueries({
-        queryKey: tableRowKeys.tableRows(project.ref, {}),
-      })
-    }
-    closePanel()
-  }, [snap, project, queryClient, closePanel])
-
-  const isSaving = queueStatus === 'saving'
+  const { handleSave, handleCancel, isSaving } = useOperationQueueActions({
+    onSaveSuccess: closePanel,
+    onCancelSuccess: closePanel,
+  })
 
   return (
     <SidePanel

@@ -1,14 +1,15 @@
-import { Eye, Trash } from 'lucide-react'
 import { Button } from 'ui'
 
 interface SaveQueueToastContentProps {
   count: number
+  isSaving: boolean
   onSave: () => void
   onViewDetails: () => void
 }
 
 export const SaveQueueToastContent = ({
   count,
+  isSaving,
   onSave,
   onViewDetails,
 }: SaveQueueToastContentProps) => {
@@ -18,7 +19,7 @@ export const SaveQueueToastContent = ({
         {count} pending change{count !== 1 ? 's' : ''}
       </span>
       <div className="flex items-center gap-3">
-        <Button size="tiny" type="primary" onClick={onSave}>
+        <Button size="tiny" type="primary" onClick={onSave} disabled={isSaving} loading={isSaving}>
           Save
         </Button>
       </div>

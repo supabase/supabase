@@ -1,0 +1,72 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import { toast } from 'sonner'
+
+import { tableRowKeys } from 'data/table-rows/keys'
+import { useOperationQueueSaveMutation } from 'data/table-rows/operation-queue-save-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { QueuedOperation } from 'state/table-editor-operation-queue.types'
+
+interface UseOperationQueueActionsOptions {
+  onSaveSuccess?: () => void
+  onCancelSuccess?: () => void
+}
+
+/**
+ * Hook that provides save and cancel actions for the operation queue.
+ * Consolidates the logic used by both the SaveQueueToast and OperationQueueSidePanel.
+ */
+export function useOperationQueueActions(options: UseOperationQueueActionsOptions = {}) {
+  const { onSaveSuccess, onCancelSuccess } = options
+
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const snap = useTableEditorStateSnapshot()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
+  const { mutate: saveOperationQueue, isPending: isMutationPending } =
+    useOperationQueueSaveMutation({
+      onSuccess: () => {
+        snap.clearQueue()
+        toast.success('Changes saved successfully')
+        onSaveSuccess?.()
+      },
+    })
+
+  const isSaving = snap.operationQueue.status === 'saving' || isMutationPending
+
+  const handleSave = useCallback(() => {
+    if (!project) return
+
+    const operations = snap.operationQueue.operations as readonly QueuedOperation[]
+    if (operations.length === 0) return
+
+    snap.setQueueStatus('saving')
+
+    saveOperationQueue({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      operations,
+      roleImpersonationState: getImpersonatedRoleState(),
+    })
+  }, [snap, project, saveOperationQueue, getImpersonatedRoleState])
+
+  const handleCancel = useCallback(() => {
+    // Clear the queue and invalidate queries to revert optimistic updates
+    snap.clearQueue()
+    if (project) {
+      queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRows(project.ref, {}),
+      })
+    }
+    onCancelSuccess?.()
+  }, [snap, project, queryClient, onCancelSuccess])
+
+  return {
+    handleSave,
+    handleCancel,
+    isSaving,
+  }
+}
