@@ -436,7 +436,7 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/auth',
-        destination: '/project/:ref/auth',
+        destination: '/project/:ref/auth/providers',
         permanent: false,
       },
 
