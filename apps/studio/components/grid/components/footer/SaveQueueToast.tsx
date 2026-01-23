@@ -47,13 +47,6 @@ export const SaveQueueToast = ({ onSave }: SaveQueueToastProps) => {
       toast.dismiss(SAVE_QUEUE_TOAST_ID)
       toastShownRef.current = false
     }
-
-    return () => {
-      if (toastShownRef.current) {
-        toast.dismiss(SAVE_QUEUE_TOAST_ID)
-        toastShownRef.current = false
-      }
-    }
   }, [snap.hasPendingOperations, operationCount, isSaving, onSave, snap, isOperationQueuePanelOpen])
 
   // This component doesn't render anything visible itself
