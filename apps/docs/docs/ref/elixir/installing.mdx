@@ -1,0 +1,124 @@
+---
+id: installing
+title: 'Installing'
+slug: installing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_elixir_v0.yml
+---
+
+### Install from Hex.pm
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    You can install the supabase_potion package from [Hex.pm](https://hex.pm/packages/supabase_potion).
+
+    This package provides the core client functionality for interacting with Supabase services. Mix will automatically fetch all required dependencies including the HTTP client.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="mix"
+      queryGroup="package-manager"
+    >
+      <TabPanel id="mix" label="mix.exs">
+
+```elixir
+def deps do
+  [
+    {:supabase_potion, "~> 0.7"}
+  ]
+end
+```
+
+      </TabPanel>
+      <TabPanel id="terminal" label="Terminal">
+
+```sh
+mix deps.get
+```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Install service-specific modules (optional)
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    supabase-ex follows a modular architecture. Install only the service modules you need:
+
+    - [**supabase_auth**](https://github.com/supabase-community/auth-ex) - Authentication and user management
+    - [**supabase_storage**](https://github.com/supabase-community/storage-ex) - File storage and management
+    - [**supabase_postgrest**](https://github.com/supabase-community/postgrest-ex) - Database queries via PostgREST
+    - [**supabase_functions**](https://github.com/supabase-community/functions-ex) - Edge Functions invocation
+    - [**supabase_realtime**](https://github.com/supabase-community/realtime-ex) - Real-time subscriptions
+
+    Each module can be installed independently based on your application needs. Mix will handle all transitive dependencies automatically.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+```elixir
+def deps do
+  [
+    {:supabase_potion, "~> 0.7"},
+    {:supabase_auth, "~> 0.4"},
+    {:supabase_storage, "~> 0.3"},
+    {:supabase_postgrest, "~> 0.2"},
+    {:supabase_functions, "~> 0.1"},
+    {:supabase_realtime, "~> 0.1"}
+  ]
+end
+```
+
+  </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Customize HTTP client (optional)
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    supabase-ex uses a pluggable HTTP client adapter system. By default, it uses Finch, but you can implement your own adapter by following the `Supabase.Fetcher.Adapter` behaviour.
+
+    This allows you to use alternative HTTP clients or add custom middleware for logging, monitoring, or other cross-cutting concerns.
+
+    See the [adapter documentation](https://hexdocs.pm/supabase_potion/Supabase.Fetcher.Adapter.html) for implementation details.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+```elixir
+defmodule MyApp.CustomHTTPAdapter do
+  @behaviour Supabase.Fetcher.Adapter
+
+  @impl true
+  def request(%Supabase.Fetcher.Request{} = req) do
+    # Your custom HTTP client implementation
+  end
+
+  @impl true
+  def stream(%Supabase.Fetcher.Request{} = req) do
+    # Your custom streaming implementation
+  end
+
+  @impl true
+  def upload(%Supabase.Fetcher.Request{} = req, file_path, opts) do
+    # Your custom upload implementation
+  end
+end
+```
+
+  </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>

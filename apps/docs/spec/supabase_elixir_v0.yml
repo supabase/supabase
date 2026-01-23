@@ -1,0 +1,1086 @@
+openref: 0.1
+
+info:
+  id: reference/supabase-elixir
+  title: Supabase Elixir Client
+  description: |
+    Supabase Elixir SDK (supabase-ex).
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_elixir_v0.yml
+  slugPrefix: '/'
+  libraries:
+    - name: 'Elixir'
+      id: 'ex'
+      version: '0.7.2'
+
+functions:
+  - id: initializing
+    title: 'Initializing'
+    description: |
+      You can initialize a new Supabase client using `Supabase.init_client/2` or `Supabase.init_client/3`.
+
+      supabase-ex provides two patterns:
+
+      1. **One-off clients**: Create clients on-demand. The client is returned as a struct and you manage its lifecycle.
+
+      2. **Self-managed clients**: Define a client module with `use Supabase.Client, otp_app: :my_app` and add it to your supervision tree. The client runs as an Agent process managed by your application.
+
+    params:
+      - name: base_url
+        isOptional: false
+        type: String.t()
+        description: The unique Supabase URL for your project (e.g., `https://xyzcompany.supabase.co`)
+      - name: api_key
+        isOptional: false
+        type: String.t()
+        description: The unique Supabase API key (anon key or service role key)
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Configuration options for the client
+        subContent:
+          - name: db
+            isOptional: true
+            type: keyword()
+            description: Database configuration options
+            subContent:
+              - name: schema
+                isOptional: true
+                type: String.t()
+                description: Database schema name (default `"public"`)
+          - name: auth
+            isOptional: true
+            type: keyword()
+            description: Authentication configuration options
+            subContent:
+              - name: auto_refresh_token
+                isOptional: true
+                type: boolean()
+                description: Automatically refresh access tokens (default `true`)
+              - name: persist_session
+                isOptional: true
+                type: boolean()
+                description: Persist session to storage (default `true`)
+              - name: detect_session_in_url
+                isOptional: true
+                type: boolean()
+                description: Detect session in URL (default `true`)
+              - name: flow_type
+                isOptional: true
+                type: atom()
+                description: OAuth flow type - `:implicit`, `:pkce`, or `:magicLink` (default `:implicit`)
+              - name: debug
+                isOptional: true
+                type: boolean()
+                description: Enable debug logging for auth operations (default `false`)
+              - name: storage_key
+                isOptional: true
+                type: String.t()
+                description: Storage key for persisting session (default `"sb-<host>-auth-token"`)
+          - name: global
+            isOptional: true
+            type: keyword()
+            description: Global client configuration
+            subContent:
+              - name: headers
+                isOptional: true
+                type: map()
+                description: Map of custom HTTP headers to include in all requests
+
+    examples:
+      - id: init-client-basic
+        name: Basic initialization
+        code: |
+          ```elixir
+          {:ok, client} = Supabase.init_client(
+            "https://xyzcompany.supabase.co",
+            "public-anon-key"
+          )
+          ```
+
+      - id: init-client-options
+        name: Initialization with options
+        code: |
+          ```elixir
+          {:ok, client} = Supabase.init_client(
+            "https://xyzcompany.supabase.co",
+            "public-anon-key",
+            db: [schema: "custom_schema"],
+            auth: [flow_type: :pkce, auto_refresh_token: true],
+            global: [headers: %{"x-api-version" => "2024-01-01"}]
+          )
+          ```
+
+      - id: init-client-raising
+        name: Initialization (raising variant)
+        code: |
+          ```elixir
+          client = Supabase.init_client!(
+            "https://xyzcompany.supabase.co",
+            "public-anon-key"
+          )
+          ```
+
+      - id: self-managed-client
+        name: Self-managed client setup
+        code: |
+          ```elixir
+          # Define client module
+          defmodule MyApp.Supabase.Client do
+            use Supabase.Client, otp_app: :my_app
+          end
+
+          # Configure in config/config.exs
+          config :my_app, MyApp.Supabase.Client,
+            base_url: "https://xyzcompany.supabase.co",
+            api_key: "public-anon-key",
+            db: [schema: "public"],
+            auth: [flow_type: :implicit]
+
+          # Add to supervision tree in application.ex
+          def start(_type, _args) do
+            children = [
+              {Finch, name: MyApp.Finch},
+              MyApp.Supabase.Client
+            ]
+            Supervisor.start_link(children, strategy: :one_for_one)
+          end
+
+          # Retrieve client
+          {:ok, client} = MyApp.Supabase.Client.get_client()
+
+          # Update auth token
+          MyApp.Supabase.Client.set_auth("new-access-token")
+          ```
+
+  - id: from
+    title: 'Fetch data: from()'
+    description: |
+      Initializes a query builder for a specified table. This is the starting point for all database operations.
+
+      All operations in supabase-postgrest are lazy, meaning queries are only executed when you explicitly call `execute/1` or `execute_to/2`.
+    params:
+      - name: client
+        isOptional: false
+        type: Supabase.Client.t()
+        description: The Supabase client instance
+      - name: table
+        isOptional: false
+        type: String.t()
+        description: The database table name to query
+    examples:
+      - id: basic-from
+        name: Basic table query
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: select
+    title: 'Fetch data: select()'
+    description: |
+      Selects records from a table. You can specify specific columns or use `"*"` for all columns.
+
+      Note: By default this function does not return data. You must pass `returning: true` to get the selected fields returned in the response.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: columns
+        isOptional: false
+        type: String.t() | [String.t()]
+        description: A list of column names to fetch, or `"*"` for all columns
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Query options
+        subContent:
+          - name: count
+            isOptional: true
+            type: atom()
+            description: Count algorithm - `:exact`, `:planned`, or `:estimated` (default `:exact`)
+          - name: returning
+            isOptional: true
+            type: boolean()
+            description: Whether to return the selected data (default `false`)
+    examples:
+      - id: select-all
+        name: Select all columns
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+      - id: select-specific
+        name: Select specific columns
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select(["id", "name", "email"], returning: true)
+          |> Q.execute()
+          ```
+
+  - id: insert
+    title: 'Create data: insert()'
+    description: |
+      Inserts new records into the database. Supports conflict resolution and specifying how the result should be returned.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: data
+        isOptional: false
+        type: map() | [map()]
+        description: The data to insert - a map or list of maps
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Insert options
+        subContent:
+          - name: on_conflict
+            isOptional: true
+            type: String.t()
+            description: Column name for conflict resolution
+          - name: returning
+            isOptional: true
+            type: atom()
+            description: Return representation - `:representation` or `:minimal` (default `:representation`)
+          - name: count
+            isOptional: true
+            type: atom()
+            description: Count algorithm - `:exact`, `:planned`, or `:estimated` (default `:exact`)
+    examples:
+      - id: insert-single
+        name: Insert a single record
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.insert(%{name: "John Doe", email: "john@example.com"})
+          |> Q.execute()
+          ```
+      - id: insert-multiple
+        name: Insert multiple records
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.insert([
+            %{name: "John Doe", email: "john@example.com"},
+            %{name: "Jane Smith", email: "jane@example.com"}
+          ])
+          |> Q.execute()
+          ```
+
+  - id: update
+    title: 'Update data: update()'
+    description: |
+      Updates existing records in the database. Allows specifying return options and how the update is counted.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: data
+        isOptional: false
+        type: map()
+        description: The new data for the update
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Update options
+        subContent:
+          - name: returning
+            isOptional: true
+            type: atom()
+            description: Return representation - `:representation` or `:minimal` (default `:representation`)
+          - name: count
+            isOptional: true
+            type: atom()
+            description: Count algorithm - `:exact`, `:planned`, or `:estimated` (default `:exact`)
+    examples:
+      - id: update-record
+        name: Update a record
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("id", 1)
+          |> Q.update(%{name: "John Smith"})
+          |> Q.execute()
+          ```
+
+  - id: upsert
+    title: 'Upsert data: upsert()'
+    description: |
+      Upserts data into a table, allowing for conflict resolution. If a record with the same unique constraint exists, it will be updated; otherwise, a new record is created.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: data
+        isOptional: false
+        type: map() | [map()]
+        description: The data to upsert
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Upsert options
+        subContent:
+          - name: on_conflict
+            isOptional: true
+            type: String.t()
+            description: Column name for conflict resolution
+          - name: returning
+            isOptional: true
+            type: atom()
+            description: Return representation - `:representation` or `:minimal` (default `:representation`)
+          - name: count
+            isOptional: true
+            type: atom()
+            description: Count algorithm - `:exact`, `:planned`, or `:estimated` (default `:exact`)
+    examples:
+      - id: upsert-record
+        name: Upsert a record
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.upsert(%{id: 1, name: "Jane Doe"}, on_conflict: "id")
+          |> Q.execute()
+          ```
+
+  - id: delete
+    title: 'Delete data: delete()'
+    description: |
+      Deletes records from a table based on the conditions specified.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Delete options
+        subContent:
+          - name: returning
+            isOptional: true
+            type: atom()
+            description: Return representation - `:representation` or `:minimal` (default `:representation`)
+          - name: count
+            isOptional: true
+            type: atom()
+            description: Count algorithm - `:exact`, `:planned`, or `:estimated` (default `:exact`)
+    examples:
+      - id: delete-record
+        name: Delete a record
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("id", 1)
+          |> Q.delete()
+          |> Q.execute()
+          ```
+
+  - id: using-filters
+    title: Using Filters
+    description: |
+      Filters allow you to only return rows that match certain conditions.
+
+      Filters can be used on `select/3`, `update/3`, `upsert/3`, and `delete/2` queries.
+
+      All filter operations are chainable and lazy - they build up the query without executing it. You must call `execute/1` or `execute_to/2` to run the query.
+    examples:
+      - id: applying-filters
+        name: Applying Filters
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          # Chain multiple filters
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("status", "active")
+          |> Q.gte("age", 18)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+      - id: filters-with-update
+        name: Filters with updates
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          # Update only matching rows
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("status", "pending")
+          |> Q.update(%{status: "active"})
+          |> Q.execute()
+          ```
+
+  - id: eq
+    title: 'Using filters: eq()'
+    description: |
+      Match only rows where the column is equal to the value.
+
+      To check if a column value is NULL, use `is/3` instead.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any()
+        description: The value to match (must implement `String.Chars` protocol)
+    examples:
+      - id: eq-filter
+        name: Filter by equality
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("email", "john@example.com")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: neq
+    title: 'Using filters: neq()'
+    description: |
+      Match only rows where the column is not equal to the value.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any()
+        description: The value to not match (must implement `String.Chars` protocol)
+    examples:
+      - id: neq-filter
+        name: Filter by inequality
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.neq("status", "inactive")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: gt
+    title: 'Using filters: gt()'
+    description: |
+      Match only rows where the column is greater than the value.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any()
+        description: The value to compare (must implement `String.Chars` protocol)
+    examples:
+      - id: gt-filter
+        name: Filter by greater than
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.gt("age", 21)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: gte
+    title: 'Using filters: gte()'
+    description: |
+      Match only rows where the column is greater than or equal to the value.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any()
+        description: The value to compare (must implement `String.Chars` protocol)
+    examples:
+      - id: gte-filter
+        name: Filter by greater than or equal
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.gte("age", 18)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: lt
+    title: 'Using filters: lt()'
+    description: |
+      Match only rows where the column is less than the value.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any()
+        description: The value to compare (must implement `String.Chars` protocol)
+    examples:
+      - id: lt-filter
+        name: Filter by less than
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.lt("age", 65)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: lte
+    title: 'Using filters: lte()'
+    description: |
+      Match only rows where the column is less than or equal to the value.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any()
+        description: The value to compare (must implement `String.Chars` protocol)
+    examples:
+      - id: lte-filter
+        name: Filter by less than or equal
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.lte("age", 65)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: like
+    title: 'Using filters: like()'
+    description: |
+      Match only rows where the column matches the pattern (case-sensitive).
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: pattern
+        isOptional: false
+        type: String.t()
+        description: The pattern to match (use `%` for wildcards)
+    examples:
+      - id: like-filter
+        name: Filter with pattern matching
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.like("name", "%John%")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: ilike
+    title: 'Using filters: ilike()'
+    description: |
+      Match only rows where the column matches the pattern (case-insensitive).
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: pattern
+        isOptional: false
+        type: String.t()
+        description: The pattern to match (use `%` for wildcards)
+    examples:
+      - id: ilike-filter
+        name: Filter with case-insensitive pattern matching
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.ilike("name", "%john%")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: is
+    title: 'Using filters: is()'
+    description: |
+      Match only rows where the column IS the value.
+
+      For non-boolean columns, this is only relevant for checking if the value is NULL by setting value to `nil`.
+
+      For boolean columns, you can also set value to `true` or `false`.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: nil | boolean()
+        description: The value to check - `nil` for NULL checks, or boolean
+    examples:
+      - id: is-null
+        name: Filter for NULL values
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.is("deleted_at", nil)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: within
+    title: 'Using filters: within()'
+    description: |
+      Match only rows where the column value is in the provided list.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to filter on
+      - name: values
+        isOptional: false
+        type: [any()]
+        description: List of acceptable values (all must implement `String.Chars` protocol)
+    examples:
+      - id: within-filter
+        name: Filter by list of values
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.within("status", ["active", "pending", "verified"])
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: text_search
+    title: 'Using filters: text_search()'
+    description: |
+      Match only rows where the column matches the full-text search query.
+
+      Only relevant for text and tsvector columns.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to search
+      - name: query
+        isOptional: false
+        type: String.t()
+        description: The text query for the search
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Search options
+        subContent:
+          - name: type
+            isOptional: true
+            type: atom()
+            description: Search type - `:plain`, `:phrase`, or `:websearch`
+          - name: config
+            isOptional: true
+            type: String.t()
+            description: Text search configuration name
+    examples:
+      - id: text-search-filter
+        name: Full-text search
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "posts")
+          |> Q.text_search("content", "elixir supabase", type: :plain)
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Modifiers allow you to change the format and structure of the response.
+
+      Filters work on the row level - they allow you to return rows that only match certain conditions without changing the shape of the rows. Modifiers are everything that don't fit that definition - allowing you to change the format of the response (e.g., ordering, limiting, or returning a single object instead of an array).
+
+      Modifiers must be specified after filters. Most modifiers apply to queries that return rows (e.g., `select/3` or `rpc/4` on a function that returns a table response).
+    examples:
+      - id: applying-modifiers
+        name: Applying Modifiers
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          # Chain modifiers to shape the response
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.order("created_at", asc: false)
+          |> Q.limit(10)
+          |> Q.execute()
+          ```
+      - id: modifiers-order
+        name: Modifiers specify order of application
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          # Filters first, then modifiers
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("status", "active")        # Filter
+          |> Q.gte("age", 18)                # Filter
+          |> Q.select("*", returning: true)  # Query
+          |> Q.order("name", asc: true)      # Modifier
+          |> Q.limit(20)                     # Modifier
+          |> Q.execute()
+          ```
+
+  - id: order
+    title: 'Using modifiers: order()'
+    description: |
+      Order the query results by the specified column.
+
+      You can call this method multiple times to order by multiple columns.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: column
+        isOptional: false
+        type: String.t()
+        description: The column to order by
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Ordering options
+        subContent:
+          - name: asc
+            isOptional: true
+            type: boolean()
+            description: Sort in ascending order (default `false` for descending)
+          - name: null_first
+            isOptional: true
+            type: boolean()
+            description: Place NULL values first (default `false`)
+          - name: foreign_table
+            isOptional: true
+            type: String.t()
+            description: The foreign table to order (for joins)
+    examples:
+      - id: order-asc
+        name: Order results ascending
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.order("created_at", asc: true)
+          |> Q.execute()
+          ```
+      - id: order-multiple
+        name: Order by multiple columns
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.order("age", asc: false)
+          |> Q.order("name", asc: true)
+          |> Q.execute()
+          ```
+
+  - id: limit
+    title: 'Using modifiers: limit()'
+    description: |
+      Limit the number of rows returned by the query.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: count
+        isOptional: false
+        type: integer()
+        description: The maximum number of rows to return
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Limit options
+        subContent:
+          - name: foreign_table
+            isOptional: true
+            type: String.t()
+            description: The foreign table to limit (for joins)
+    examples:
+      - id: limit-rows
+        name: Limit query results
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.limit(10)
+          |> Q.execute()
+          ```
+
+  - id: range
+    title: 'Using modifiers: range()'
+    description: |
+      Limit the query results to a specific range. The `from` and `to` values are 0-based and inclusive.
+
+      This respects the query order. If there is no order clause, the range could behave unexpectedly.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: from
+        isOptional: false
+        type: integer()
+        description: The starting index (0-based, inclusive)
+      - name: to
+        isOptional: false
+        type: integer()
+        description: The ending index (inclusive)
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Range options
+        subContent:
+          - name: foreign_table
+            isOptional: true
+            type: String.t()
+            description: The foreign table to range (for joins)
+    examples:
+      - id: range-pagination
+        name: Paginate results
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.range(0, 9)
+          |> Q.execute()
+          ```
+
+  - id: single
+    title: 'Using modifiers: single()'
+    description: |
+      Return data as a single object instead of an array of objects.
+
+      Query result must be one row (e.g., using `limit(1)`), otherwise this returns an error.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+    examples:
+      - id: single-row
+        name: Retrieve single row
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.eq("id", 1)
+          |> Q.select("*", returning: true)
+          |> Q.single()
+          |> Q.execute()
+          ```
+
+  - id: rpc
+    title: 'Calling functions: rpc()'
+    description: |
+      Perform a function call (Remote Procedure Call).
+
+      This allows you to call PostgreSQL functions exposed through PostgREST.
+    params:
+      - name: client
+        isOptional: false
+        type: Supabase.Client.t()
+        description: The Supabase client instance
+      - name: function
+        isOptional: false
+        type: String.t()
+        description: The function name to call
+      - name: args
+        isOptional: true
+        type: map()
+        description: The arguments to pass to the function (default `%{}`)
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: RPC options
+        subContent:
+          - name: head
+            isOptional: true
+            type: boolean()
+            description: When `true`, data will not be returned (default `false`)
+          - name: get
+            isOptional: true
+            type: boolean()
+            description: When `true`, function is called with read-only access (default `false`)
+          - name: count
+            isOptional: true
+            type: atom()
+            description: Count algorithm - `:exact`, `:planned`, or `:estimated`
+    examples:
+      - id: rpc-call
+        name: Call a database function
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.rpc(client, "get_user_stats", %{user_id: 123})
+          |> Q.execute()
+          ```
+
+  - id: execute
+    title: 'Execute query: execute()'
+    description: |
+      Executes the constructed query and returns the result.
+
+      All queries are lazy in supabase-postgrest, so you must call this function to actually execute the query.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+    examples:
+      - id: execute-query
+        name: Execute a query
+        code: |
+          ```elixir
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, result} = Q.from(client, "users")
+          |> Q.select("*", returning: true)
+          |> Q.execute()
+          ```
+
+  - id: execute_to
+    title: 'Execute query: execute_to()'
+    description: |
+      Executes the query and maps the resulting data to a specified Elixir struct.
+
+      This is useful for automatically casting database results to your application's domain models.
+    params:
+      - name: builder
+        isOptional: false
+        type: Supabase.Fetcher.Request.t()
+        description: The query builder instance
+      - name: schema
+        isOptional: false
+        type: module()
+        description: The Elixir module/struct to cast results to
+    examples:
+      - id: execute-to-struct
+        name: Execute and cast to struct
+        code: |
+          ```elixir
+          defmodule User do
+            defstruct [:id, :name, :email]
+          end
+
+          alias Supabase.PostgREST, as: Q
+
+          {:ok, %User{} = user} = Q.from(client, "users")
+          |> Q.eq("id", 1)
+          |> Q.select(["id", "name", "email"], returning: true)
+          |> Q.single()
+          |> Q.execute_to(User)
+          ```

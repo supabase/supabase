@@ -3,10 +3,18 @@ import { isFeatureEnabled } from 'common/enabled-features'
 const {
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
+  sdkElixir: sdkElixirEnabled,
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
-} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
+} = isFeatureEnabled([
+  'sdk:csharp',
+  'sdk:dart',
+  'sdk:elixir',
+  'sdk:kotlin',
+  'sdk:python',
+  'sdk:swift',
+])
 
 export const REFERENCES = {
   javascript: {
@@ -46,6 +54,21 @@ export const REFERENCES = {
       },
     },
     enabled: sdkDartEnabled,
+  },
+  elixir: {
+    type: 'sdk',
+    name: 'Elixir',
+    library: 'supabase-ex',
+    libPath: 'elixir',
+    versions: ['v0'],
+    icon: 'reference-elixir',
+    meta: {
+      v0: {
+        libId: 'reference_elixir_v0',
+        specFile: 'supabase_elixir_v0',
+      },
+    },
+    enabled: sdkElixirEnabled,
   },
   csharp: {
     type: 'sdk',
