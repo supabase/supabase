@@ -1,3 +1,4 @@
+import { Eye } from 'lucide-react'
 import { Button } from 'ui'
 
 interface SaveQueueToastContentProps {
@@ -14,11 +15,18 @@ export const SaveQueueToastContent = ({
   onViewDetails,
 }: SaveQueueToastContentProps) => {
   return (
-    <div onClick={onViewDetails} className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full">
       <span className="text-xs">
         {count} pending change{count !== 1 ? 's' : ''}
       </span>
       <div className="flex items-center gap-3">
+        <button
+          onClick={onViewDetails}
+          className="text-foreground-light hover:text-foreground transition-colors"
+          aria-label="View Details"
+        >
+          <Eye size={14} />
+        </button>
         <Button size="tiny" type="primary" onClick={onSave} disabled={isSaving} loading={isSaving}>
           Save
         </Button>
