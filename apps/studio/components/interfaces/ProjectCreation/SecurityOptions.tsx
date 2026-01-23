@@ -1,6 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
 
 import Panel from 'components/ui/Panel'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import {
   Checkbox_Shadcn_,
@@ -12,7 +13,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface SecurityOptionsProps {
@@ -21,9 +21,7 @@ interface SecurityOptionsProps {
 }
 
 export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
-  const shouldShowEnableRlsEventTrigger = usePHFlag<string>(
-    'projectCreationEnableRlsEventTrigger'
-  )
+  const shouldShowEnableRlsEventTrigger = usePHFlag<string>('projectCreationEnableRlsEventTrigger')
 
   return (
     <Panel.Content className="pb-8">
@@ -80,8 +78,8 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                       Enable automatic RLS
                     </FormLabel_Shadcn_>
                     <FormDescription_Shadcn_ className="text-foreground-lighter">
-                      Create an event trigger that automatically enables Row Level Security on all new
-                      tables in the public schema.
+                      Create an event trigger that automatically enables Row Level Security on all
+                      new tables in the public schema.
                     </FormDescription_Shadcn_>
                   </div>
                 </FormItem_Shadcn_>
