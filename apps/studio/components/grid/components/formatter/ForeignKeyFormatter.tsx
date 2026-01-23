@@ -83,7 +83,7 @@ export const ForeignKeyFormatter = (props: Props) => {
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
                 />
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
+              <PopoverContent_Shadcn_ align="end" className="p-0 w-96">
                 <ReferenceRecordPeek
                   table={targetTable}
                   column={relationship.target_column_name}
