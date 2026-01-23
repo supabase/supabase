@@ -32,15 +32,27 @@ Initially the application was built to be run on SQLite. However, once requireme
 
 When working with Prisma, your application will connect directly to your Postgres databases hosted on Supabase. To handle connection management efficiently, especially when working with serverless applications like Next.js, Supabase provides a connection pooler called [Supavisor](/blog/supavisor-1-million) to make sure your database runs efficiently with increasing traffic.
 
-The configuration is specified in the `schema.prisma` file where you provide the following connection strings:
+The configuration is specified in the `schema.prisma` file where you provide the datasource provider:
 
 ```ts schema.prisma
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
-  schemas   = ["prisma"] // see multi-schema support below
+  provider = "postgresql"
+  schemas  = ["prisma"] // see multi-schema support below
 }
+```
+
+Then, configure the datasource in `prisma.config.ts` to ensure Prisma CLI uses your non-pooling connection for migrations:
+
+```ts prisma.config.ts
+import 'dotenv/config'
+import { defineConfig, env } from 'prisma/config'
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    url: env('DIRECT_URL'),
+  },
+})
 ```
 
 This loads the relevant Supabase connections strings from your `.env` file

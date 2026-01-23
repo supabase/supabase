@@ -168,12 +168,25 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                     postgres://prisma.[PROJECT-REF]...
                     ```
 
-                    In your schema.prisma file, edit your `datasource db` configs to reference your DIRECT_URL
+                    In your `prisma.config.ts` file, add the following configuration to ensure Prisma CLI uses your `DIRECT_URL` for migrations.
+
+                    ```ts prisma.config.ts
+                    import 'dotenv/config'
+                    import { defineConfig, env } from 'prisma/config'
+
+                    export default defineConfig({
+                      schema: 'prisma/schema.prisma',
+                      datasource: {
+                        url: env('DIRECT_URL'),
+                      },
+                    })
+                    ```
+
+                    In your `schema.prisma` file, your `datasource db` should only specify the provider.
+
                     ```text schema.prisma
                     datasource db {
-                      provider  = "postgresql"
-                      url       = env("DATABASE_URL")
-                      directUrl = env("DIRECT_URL")
+                      provider = "postgresql"
                     }
                     ```
 
