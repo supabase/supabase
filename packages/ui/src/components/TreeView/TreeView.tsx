@@ -63,9 +63,11 @@ const TreeViewItem = forwardRef<
     /** The horizontal padding of the item */
     xPadding?: number
     /** name of entity */
-    name: string
+    name: string | ReactNode
     /** Optional description of entity */
     description?: string
+    /** String name to use for title attribute when name is a ReactNode */
+    nameForTitle?: string
     /** icon of entity */
     icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
@@ -93,6 +95,7 @@ const TreeViewItem = forwardRef<
       xPadding = 16,
       name = '',
       description,
+      nameForTitle,
       icon,
       isEditing = false,
       onEditSubmit,
@@ -102,7 +105,8 @@ const TreeViewItem = forwardRef<
     },
     ref
   ) => {
-    const [localValueState, setLocalValueState] = useState(name)
+    const nameString = nameForTitle ?? (typeof name === 'string' ? name : '')
+    const [localValueState, setLocalValueState] = useState(nameString)
     const inputRef = useRef<HTMLInputElement>(null)
     const timeRef = useRef<number>(0)
 
@@ -143,15 +147,15 @@ const TreeViewItem = forwardRef<
           }
         }, 200)
       } else {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isEditing])
+    }, [isEditing, nameString])
 
     useEffect(() => {
       if (!isLoading) {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isLoading])
+    }, [isLoading, nameString])
 
     const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
       const timestamp = Number(new Date())
@@ -181,10 +185,12 @@ const TreeViewItem = forwardRef<
       ...divProps
     } = props as any
 
+    const titleText = `${nameString}${description && typeof description === 'string' && description.trim() ? `: ${description.trim()}` : ''}`
+
     return (
       <div
         ref={ref}
-        title={description && typeof description === 'string' && description.trim() ? description : undefined}
+        title={titleText}
         {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
@@ -258,7 +264,7 @@ const TreeViewItem = forwardRef<
               />
             )
           )}
-          <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
+          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>
             {name}
           </span>
         </div>
@@ -279,8 +285,8 @@ const TreeViewItem = forwardRef<
               if (e.key === 'Enter') {
                 inputRef.current?.blur()
               } else if (e.key === 'Escape') {
-                setLocalValueState(name)
-                onEditSubmit?.(name)
+                setLocalValueState(nameString)
+                onEditSubmit?.(nameString)
               } else {
                 e.stopPropagation()
               }
