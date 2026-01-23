@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -53,7 +53,7 @@ const iconProps = {
 }
 const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
-const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+const CheckIcon = () => <CheckCircle {...iconProps} className="text-brand" />
 
 export const StatusIcon = ({
   isLoading,

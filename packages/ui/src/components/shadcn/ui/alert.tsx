@@ -56,7 +56,7 @@ const AlertDescription = React.forwardRef<
         // Optically align text in container
         'mb-0.5',
         // Handle paragraphs
-        '[&_p]:mb-0.5 [&_p:last-child]:mb-0',
+        '[&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0',
         className
       )}
       {...props}

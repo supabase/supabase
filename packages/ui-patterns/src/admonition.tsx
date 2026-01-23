@@ -159,6 +159,7 @@ export const Admonition = forwardRef<
               )}
             </div>
           ) : (
+            // Handle paragraphs, match AlertDescription styles
             <div className="text my-0.5 [&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0">
               {children}
             </div>
@@ -166,7 +167,7 @@ export const Admonition = forwardRef<
           {actions && (
             <div
               className={cn(
-                'flex flex-row gap-3',
+                'flex flex-row gap-2',
                 layout === 'vertical' ? 'mt-3 items-start' : 'items-center'
               )}
             >
