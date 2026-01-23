@@ -12,11 +12,14 @@ Aleksi Immonen
 Alexander Korotkov
 Ali Waseem
 Allan S
+Amir Issaei
 Amy Q
+Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
 Anna Weihl
+Ant Evans
 Ant Wilson
 Ariuna K
 Artur Zakirov
@@ -51,6 +54,7 @@ David A. Ventimiglia
 David Weitzman
 Deepthi Sigireddi
 Deji I
+Dennis Senn
 Div Arora
 Divit D
 Douglas Hunley
@@ -77,6 +81,7 @@ Gregor Vand
 Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
+Haritabh Gupta
 Haydn Maley
 Hieu Pham
 Ignacio Dobronich
