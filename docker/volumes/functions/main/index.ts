@@ -18,6 +18,16 @@ const SUPABASE_JWT_ISSUER = SUPABASE_URL
   ? SUPABASE_URL + '/auth/v1'
   : null
 
+/**
+ * Extract JWT token from Authorization header
+ * 
+ * Parses the Authorization header to extract the Bearer token.
+ * Expects format: "Bearer <token>"
+ * 
+ * @param req - The HTTP request object
+ * @returns The JWT token string
+ * @throws Error if Authorization header is missing or malformed
+ */
 function getAuthToken(req: Request) {
   const authHeader = req.headers.get('authorization')
   if (!authHeader) {
@@ -38,18 +48,15 @@ function getAuthToken(req: Request) {
  * - HS256 tokens are verified using JWT_SECRET (Uint8Array)
  * - ES256/RS256 tokens are verified using public keys from JWKS endpoint (CryptoKey)
  * 
+ * @param jwt - The JWT token string to decode
+ * @returns The algorithm string (e.g., 'HS256', 'ES256', 'RS256') or null if decoding fails
+ * 
  * Fix for issue #42072: Functions createClient issue when using legacy tokens in local docker
  */
 function getJWTAlgorithm(jwt: string): string | null {
   try {
-    const parts = jwt.split('.')
-    if (parts.length < 2) return null
-    const header = JSON.parse(
-      new TextDecoder().decode(
-        Uint8Array.from(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))
-      )
-    )
-    return header.alg || null
+    const header = jose.decodeProtectedHeader(jwt)
+    return header.alg ?? null
   } catch {
     return null
   }
@@ -65,6 +72,9 @@ function getJWTAlgorithm(jwt: string): string | null {
  * 
  * This fix ensures compatibility with both legacy tokens and newer asymmetric tokens,
  * resolving the "Key for the ES256 algorithm must be of type CryptoKey" error.
+ * 
+ * @param jwt - The JWT token string to verify
+ * @returns Promise resolving to true if verification succeeds, false otherwise
  */
 async function verifyJWT(jwt: string): Promise<boolean> {
   try {
