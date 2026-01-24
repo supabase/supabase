@@ -6,7 +6,7 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { EditCellContentPayload } from '@/state/table-editor-operation-queue.types'
-import { formatValue } from './OperationQueueSidePanel.utils'
+import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
 
 interface OperationItemProps {
   operationId: string
@@ -25,11 +25,11 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
 
   const fullTableName = `${tableSchema}.${tableName}`
   const whereClause = Object.entries(rowIdentifiers)
-    .map(([key, value]) => `${key} = ${formatValue(value)}`)
+    .map(([key, value]) => `${key} = ${formatOperationItemValue(value)}`)
     .join(', ')
 
-  const formattedOldValue = formatValue(oldValue)
-  const formattedNewValue = formatValue(newValue)
+  const formattedOldValue = formatOperationItemValue(oldValue)
+  const formattedNewValue = formatOperationItemValue(newValue)
 
   const handleDelete = () => {
     // Remove the operation from the queue
