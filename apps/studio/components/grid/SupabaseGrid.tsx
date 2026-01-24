@@ -71,6 +71,7 @@ export const SupabaseGrid = ({
     isError,
     isPending: isLoading,
     isRefetching,
+    dataUpdatedAt,
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
@@ -116,7 +117,7 @@ export const SupabaseGrid = ({
     }
   }, [
     isSuccess,
-    data,
+    dataUpdatedAt,
     project?.ref,
     tableId,
     isQueueOperationsEnabled,
