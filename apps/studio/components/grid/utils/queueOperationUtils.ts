@@ -10,8 +10,9 @@ import {
   type EditCellContentPayload,
 } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from 'types'
+import { SupaRow } from '../types'
 
-export interface GenerateTableChangeKeyArgs {
+interface GenerateTableChangeKeyArgs {
   type: QueuedOperationType
   tableId: number
   columnName?: string
@@ -43,6 +44,30 @@ export function generateTableChangeKey({
     .map(([key, value]) => `${key}:${value}`)
     .join('|')
   return `${type}:${tableId}:${columnName}:${rowIdentifiersKey}`
+}
+
+function rowMatchesIdentifiers(
+  row: Dictionary<unknown>,
+  rowIdentifiers: Dictionary<unknown>
+): boolean {
+  const identifierEntries = Object.entries(rowIdentifiers)
+  if (identifierEntries.length === 0) return false
+  return identifierEntries.every(([key, value]) => row[key] === value)
+}
+
+function applyCellEdit(
+  rows: SupaRow[],
+  columnName: string,
+  rowIdentifiers: Dictionary<unknown>,
+  newValue: unknown
+): SupaRow[] {
+  return rows.map((row) => {
+    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
+    if (rowMatches) {
+      return { ...row, [columnName]: newValue }
+    }
+    return row
+  })
 }
 
 interface QueueCellEditParams {
@@ -90,16 +115,7 @@ export function queueCellEditWithOptimisticUpdate({
     if (!old) return old
     return {
       ...old,
-      rows: old.rows.map((row) => {
-        const identifierEntries = Object.entries(rowIdentifiers)
-        const matches =
-          identifierEntries.length > 0 &&
-          identifierEntries.every(([key, value]) => row[key] === value)
-        if (matches) {
-          return { ...row, [columnName]: newValue }
-        }
-        return row
-      }),
+      rows: applyCellEdit(old.rows, columnName, rowIdentifiers, newValue),
     }
   })
 }
@@ -117,33 +133,29 @@ export function reapplyOptimisticUpdates({
   tableId,
   operations,
 }: ReapplyOptimisticUpdatesParams) {
-  // Filter operations for this specific table
   const tableOperations = operations.filter((op) => op.tableId === tableId)
-
   if (tableOperations.length === 0) return
 
   const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
   queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
     if (!old) return old
 
-    let updatedRows = [...old.rows]
-
+    let rows = [...old.rows]
     for (const operation of tableOperations) {
-      if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-        const { rowIdentifiers, columnName, newValue } = operation.payload as EditCellContentPayload
-        updatedRows = updatedRows.map((row) => {
-          const identifierEntries = Object.entries(rowIdentifiers)
-          const matches =
-            identifierEntries.length > 0 &&
-            identifierEntries.every(([key, value]) => row[key] === value)
-          if (matches) {
-            return { ...row, [columnName]: newValue }
-          }
-          return row
-        })
+      switch (operation.type) {
+        case QueuedOperationType.EDIT_CELL_CONTENT: {
+          const { rowIdentifiers, columnName, newValue } =
+            operation.payload as EditCellContentPayload
+          rows = applyCellEdit(rows, columnName, rowIdentifiers, newValue)
+          break
+        }
+        default: {
+          // Need to explicitly handle other operations
+          throw new Error(`Unknown operation type: ${operation.type}`)
+        }
       }
     }
 
-    return { ...old, rows: updatedRows }
+    return { ...old, rows }
   })
 }
