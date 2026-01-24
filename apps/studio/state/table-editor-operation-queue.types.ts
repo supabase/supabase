@@ -40,6 +40,8 @@ export interface QueuedOperation {
   payload: QueuedOperationPayload
 }
 
+export type NewQueuedOperation = Omit<QueuedOperation, 'id' | 'timestamp'>
+
 /**
  * Status of the overall operation queue
  */

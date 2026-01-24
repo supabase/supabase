@@ -4,33 +4,50 @@ import type { Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import {
+  NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
   type EditCellContentPayload,
 } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from 'types'
 
-export function generateQueueOperationKey(
-  operation: Omit<QueuedOperation, 'id' | 'timestamp'>
-): string {
-  switch (operation.type) {
-    case QueuedOperationType.EDIT_CELL_CONTENT: {
-      const payload = operation.payload as EditCellContentPayload
-      const rowIdentifiersKey = Object.entries(payload.rowIdentifiers)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, value]) => `${key}:${value}`)
-        .join('|')
-      return `${operation.type}:${operation.tableId}:${payload.columnName}:${rowIdentifiersKey}`
-    }
-    default:
-      // Fallback for future operation types
-      return `${operation.type}:${operation.tableId}:${JSON.stringify(operation.payload)}`
+export interface GenerateTableChangeKeyArgs {
+  type: QueuedOperationType
+  tableId: number
+  columnName?: string
+  rowIdentifiers?: Record<string, unknown>
+}
+
+export function generateTableChangeKeyFromOperation(operation: NewQueuedOperation): string {
+  if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+    return generateTableChangeKey({
+      type: operation.type,
+      tableId: operation.tableId,
+      columnName: operation.payload.columnName,
+      rowIdentifiers: operation.payload.rowIdentifiers,
+    })
   }
+
+  // Need to explicitly handle other operations
+  throw new Error(`Unknown operation type: ${operation.type}`)
+}
+
+export function generateTableChangeKey({
+  rowIdentifiers,
+  columnName,
+  tableId,
+  type,
+}: GenerateTableChangeKeyArgs): string {
+  const rowIdentifiersKey = Object.entries(rowIdentifiers ?? {})
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}:${value}`)
+    .join('|')
+  return `${type}:${tableId}:${columnName}:${rowIdentifiersKey}`
 }
 
 interface QueueCellEditParams {
   queryClient: QueryClient
-  queueOperation: (operation: Omit<QueuedOperation, 'id' | 'timestamp'>) => void
+  queueOperation: (operation: NewQueuedOperation) => void
   projectRef: string
   tableId: number
   table: Entity

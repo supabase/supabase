@@ -4,13 +4,17 @@ import { proxy, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
-import { generateQueueOperationKey } from 'components/grid/utils/queueOperationUtils'
+import {
+  generateTableChangeKey,
+  generateTableChangeKeyFromOperation,
+} from 'components/grid/utils/queueOperationUtils'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import type { Dictionary } from 'types'
 
 import {
+  NewQueuedOperation,
   QueuedOperationType,
   type EditCellContentPayload,
   type OperationQueueState,
@@ -231,10 +235,10 @@ export const createTableEditorState = () => {
      * Queue a new operation for later processing.
      * If an operation with the same key already exists, it will be overwritten.
      */
-    queueOperation: (operation: Omit<QueuedOperation, 'id' | 'timestamp'>) => {
-      const operationKey = generateQueueOperationKey(operation)
-      const existingIndex = state.operationQueue.operations.findIndex(
-        (op) => generateQueueOperationKey(op) === operationKey
+    queueOperation: (operation: NewQueuedOperation) => {
+      const operationKey = generateTableChangeKeyFromOperation(operation)
+      const existingOpIndex = state.operationQueue.operations.findIndex(
+        (op) => op.id === operationKey
       )
 
       const newOperation: QueuedOperation = {
@@ -243,13 +247,13 @@ export const createTableEditorState = () => {
         timestamp: Date.now(),
       }
 
-      if (existingIndex >= 0) {
+      if (existingOpIndex >= 0) {
         if (newOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
           // Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
           newOperation.payload.oldValue =
-            state.operationQueue.operations[existingIndex].payload.oldValue
+            state.operationQueue.operations[existingOpIndex].payload.oldValue
         }
-        state.operationQueue.operations[existingIndex] = newOperation
+        state.operationQueue.operations[existingOpIndex] = newOperation
       } else {
         state.operationQueue.operations.push(newOperation)
       }
@@ -293,32 +297,19 @@ export const createTableEditorState = () => {
       return state.operationQueue.operations.length > 0
     },
 
-    /**
-     * Check if a specific cell has pending changes
-     * @param tableId - The table ID
-     * @param rowIdentifiers - Primary key values identifying the row
-     * @param columnName - The column name
-     * @returns true if the cell has pending changes
-     */
     hasPendingCellChange: (
+      type: QueuedOperationType,
       tableId: number,
       rowIdentifiers: Record<string, unknown>,
       columnName: string
     ): boolean => {
-      if (Object.keys(rowIdentifiers).length === 0) return false
-      return state.operationQueue.operations.some((op) => {
-        if (op.tableId !== tableId || op.type !== QueuedOperationType.EDIT_CELL_CONTENT) {
-          return false
-        }
-        const payload = op.payload as EditCellContentPayload
-        if (payload.columnName !== columnName) {
-          return false
-        }
-        // Match row by primary key identifiers
-        return Object.entries(rowIdentifiers).every(
-          ([key, value]) => payload.rowIdentifiers[key] === value
-        )
+      const key = generateTableChangeKey({
+        type,
+        tableId,
+        columnName,
+        rowIdentifiers,
       })
+      return state.operationQueue.operations.some((op) => op.id === key)
     },
   })
 
