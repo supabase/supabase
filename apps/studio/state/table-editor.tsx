@@ -248,8 +248,9 @@ export const createTableEditorState = () => {
       }
 
       if (existingOpIndex >= 0) {
+        // [Ali] Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
+        // When a user edits the same cell multiple times before saving, we need to preserve the original "before edit" value, not the intermediate value from the previous queued edit
         if (newOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-          // Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
           newOperation.payload.oldValue =
             state.operationQueue.operations[existingOpIndex].payload.oldValue
         }
