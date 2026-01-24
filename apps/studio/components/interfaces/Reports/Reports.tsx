@@ -551,8 +551,9 @@ const Reports = () => {
           setConfirmNavigate(true)
           let urlToNavigate = navigateUrl ?? '/'
           if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
-            urlToNavigate = urlToNavigate.replace(BASE_PATH, '')
+            urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
           }
+          if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
           setNavigateUrl(undefined)
           router.push(urlToNavigate)
         }}
