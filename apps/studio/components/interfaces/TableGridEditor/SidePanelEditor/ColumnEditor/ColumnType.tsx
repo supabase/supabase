@@ -186,18 +186,18 @@ const ColumnType = ({
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
-          <ScrollArea className="h-[335px]">
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_
-                placeholder="Search types..."
-                // [Joshen] Addresses style issues when this component is being used in the old Form component
-                // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                className="!bg-transparent focus:!shadow-none focus:!ring-0"
-              />
-              <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
+          <Command_Shadcn_>
+            <CommandInput_Shadcn_
+              placeholder="Search types..."
+              // [Joshen] Addresses style issues when this component is being used in the old Form component
+              // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
+              className="!bg-transparent focus:!shadow-none focus:!ring-0"
+            />
 
-              <CommandList_Shadcn_>
-                <CommandGroup_Shadcn_>
+            <CommandList_Shadcn_>
+              <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
+              <CommandGroup_Shadcn_>
+                <ScrollArea className={POSTGRES_DATA_TYPE_OPTIONS.length > 7 ? 'h-[250px]' : ''}>
                   {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
                     <CommandItem_Shadcn_
                       key={option.name}
@@ -218,11 +218,13 @@ const ColumnType = ({
                       </span>
                     </CommandItem_Shadcn_>
                   ))}
-                </CommandGroup_Shadcn_>
-                {enumTypes.length > 0 && (
-                  <>
-                    <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                </ScrollArea>
+              </CommandGroup_Shadcn_>
+              {enumTypes.length > 0 && (
+                <>
+                  <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    <ScrollArea className={enumTypes.length > 7 ? 'h-[210px]' : ''}>
                       {enumTypes.map((option) => (
                         <CommandItem_Shadcn_
                           key={option.id}
@@ -263,12 +265,12 @@ const ColumnType = ({
                           </div>
                         </CommandItem_Shadcn_>
                       ))}
-                    </CommandGroup_Shadcn_>
-                  </>
-                )}
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </ScrollArea>
+                    </ScrollArea>
+                  </CommandGroup_Shadcn_>
+                </>
+              )}
+            </CommandList_Shadcn_>
+          </Command_Shadcn_>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
 
