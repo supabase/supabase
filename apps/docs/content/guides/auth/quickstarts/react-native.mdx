@@ -20,7 +20,7 @@ hideToc: true
 
      ```sql name=SQL_EDITOR
       select * from auth.users;
-      ````
+      ```
 
     </StepHikeCompact.Code>
 
@@ -54,7 +54,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed react-native-url-polyfill
+      cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-url-polyfill
       ```
 
     </StepHikeCompact.Code>
@@ -125,9 +125,8 @@ hideToc: true
 
       ```tsx name=components/Auth.tsx
       import React, { useState } from 'react'
-      import { Alert, StyleSheet, View } from 'react-native'
+      import { Alert, StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-native'
       import { supabase } from '../lib/supabase'
-      import { Button, Input } from '@rneui/themed'
 
       export default function Auth() {
         const [email, setEmail] = useState('')
@@ -163,19 +162,20 @@ hideToc: true
         return (
           <View style={styles.container}>
             <View style={[styles.verticallySpaced, styles.mt20]}>
-              <Input
-                label="Email"
-                leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
                 onChangeText={(text) => setEmail(text)}
                 value={email}
                 placeholder="email@address.com"
                 autoCapitalize={'none'}
+                keyboardType="email-address"
               />
             </View>
             <View style={styles.verticallySpaced}>
-              <Input
-                label="Password"
-                leftIcon={{ type: 'font-awesome', name: 'lock' }}
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
                 onChangeText={(text) => setPassword(text)}
                 value={password}
                 secureTextEntry={true}
@@ -184,10 +184,22 @@ hideToc: true
               />
             </View>
             <View style={[styles.verticallySpaced, styles.mt20]}>
-              <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+              <TouchableOpacity
+                style={[styles.button, loading && styles.buttonDisabled]}
+                disabled={loading}
+                onPress={() => signInWithEmail()}
+              >
+                <Text style={styles.buttonText}>Sign in</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.verticallySpaced}>
-              <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
+              <TouchableOpacity
+                style={[styles.button, loading && styles.buttonDisabled]}
+                disabled={loading}
+                onPress={() => signUpWithEmail()}
+              >
+                <Text style={styles.buttonText}>Sign up</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )
@@ -205,6 +217,34 @@ hideToc: true
         },
         mt20: {
           marginTop: 20,
+        },
+        label: {
+          fontSize: 16,
+          fontWeight: 'bold',
+          marginBottom: 5,
+          color: '#333',
+        },
+        input: {
+          borderWidth: 1,
+          borderColor: '#ddd',
+          padding: 10,
+          fontSize: 16,
+          borderRadius: 6,
+          backgroundColor: '#fff',
+        },
+        button: {
+          backgroundColor: '#007AFF',
+          padding: 15,
+          borderRadius: 6,
+          alignItems: 'center',
+        },
+        buttonDisabled: {
+          backgroundColor: '#ccc',
+        },
+        buttonText: {
+          color: '#fff',
+          fontSize: 16,
+          fontWeight: 'bold',
         },
       })
       ```
