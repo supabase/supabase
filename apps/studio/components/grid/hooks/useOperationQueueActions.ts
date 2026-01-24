@@ -16,7 +16,7 @@ interface UseOperationQueueActionsOptions {
 
 /**
  * Hook that provides save and cancel actions for the operation queue.
- * Consolidates the logic used by both the SaveQueueToast and OperationQueueSidePanel.
+ * Consolidates the logic used by both the useSaveQueueToast hook and OperationQueueSidePanel.
  */
 export function useOperationQueueActions(options: UseOperationQueueActionsOptions = {}) {
   const { onSaveSuccess, onCancelSuccess } = options

@@ -16,7 +16,6 @@ import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
-import { SaveQueueToast } from './components/footer/SaveQueueToast'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
@@ -26,7 +25,6 @@ import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
 
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useOperationQueueActions } from './hooks/useOperationQueueActions'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
@@ -53,9 +51,6 @@ export const SupabaseGrid = ({
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
-
-  const { handleSave: handleSaveQueue, handleCancel: handleCancelQueue } =
-    useOperationQueueActions()
 
   const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
 
@@ -163,9 +158,6 @@ export const SupabaseGrid = ({
         )}
 
         {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
-
-        {/* Toast for pending save operations (only when queuing is enabled) */}
-        {isQueueOperationsEnabled && <SaveQueueToast onSave={handleSaveQueue} />}
       </div>
     </DndProvider>
   )
