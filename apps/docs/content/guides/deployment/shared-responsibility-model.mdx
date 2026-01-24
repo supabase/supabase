@@ -77,6 +77,97 @@ You are responsible for using best-practices to optimize and manage your databas
 
 You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](/dashboard/project/_/observability/database) to help with this.
 
+## Database maintenance responsibilities
+
+Understanding database maintenance responsibilities is crucial for ensuring optimal performance and reliability of your Supabase project.
+
+### PostgreSQL updates and patches
+
+**Supabase responsibility:**
+
+- Security patches for critical vulnerabilities are applied automatically
+- Minor version updates are handled by Supabase during maintenance windows
+- Major version upgrades are available through [in-place upgrades](/docs/guides/platform/upgrading)
+
+**Your responsibility:**
+
+- Deciding when to upgrade to new major PostgreSQL versions
+- Testing application compatibility before major version upgrades
+- Planning and scheduling upgrade downtime windows
+
+**Notifications:**
+
+- Critical security patches are applied automatically without notification
+- Planned maintenance windows are announced via email and [status page](https://status.supabase.com/)
+- Major version upgrades require manual initiation through the Dashboard
+
+### Maintenance tasks
+
+**Automated by Supabase:**
+
+- **VACUUM**: Automatic vacuuming is enabled by default to reclaim space from deleted rows
+- **ANALYZE**: Statistics are automatically updated to optimize query planning
+- **Autovacuum**: [Configured automatically](/docs/guides/platform/database-size#vacuum-operations) with reasonable defaults
+
+**Your responsibility:**
+
+- **Manual VACUUM FULL**: For immediate space reclamation after large deletions (note: this locks the table)
+- **REINDEX**: Rebuilding indexes when corruption is detected or for optimization
+- **CLUSTER**: Reorganizing table data based on an index (manual operation)
+- **Partitioning**: Designing and implementing table partitioning strategies
+- **Custom maintenance scripts**: Any application-specific maintenance routines
+
+**Performance tuning:**
+
+- Monitor and adjust autovacuum settings if needed
+- Create and maintain indexes for optimal query performance
+- Use [pg_repack](/docs/guides/database/extensions/pg_repack) for online table reorganization
+
+### Data integrity and monitoring
+
+**Supabase provides:**
+
+- Continuous monitoring of database health and performance
+- Automatic detection of storage and compute issues
+- [Database observability tools](/dashboard/project/_/reports/database) in the Dashboard
+
+**Your responsibility:**
+
+- Application-level data validation and integrity checks
+- Custom monitoring for business-specific metrics
+- Regular review of query performance and optimization
+
+### Backups and recovery
+
+**Automated backups:**
+
+- [Daily backups](/docs/guides/platform/backups#daily-backups) are automatic for Pro plans and higher
+- Backup timing is managed by Supabase (typically during low-usage hours)
+- [Point-in-Time Recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery) available as an add-on
+
+**Backup scheduling:**
+
+- Daily backups cannot be scheduled to specific times
+- For custom backup timing, use [pg_dump via CLI](/docs/reference/cli/supabase-db-dump) or custom scripts
+- Consider PITR for more granular recovery options (up to the second)
+
+**Your responsibility:**
+
+- Planning backup retention policies within available limits (7-30 days based on plan)
+- Testing backup restoration procedures
+- Coordinating data deletion cron jobs with backup schedules
+- Managing any additional backup strategies for compliance requirements
+
+<Admonition type="tip">
+
+**Best practice for cron jobs:** Since daily backups occur automatically but at unscheduled times, consider:
+
+- Enabling [Point-in-Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) for precise restoration points
+- Creating manual backups before running data deletion scripts
+- Using database transactions for data deletion operations that can be rolled back if needed
+
+</Admonition>
+
 ## Before going to production
 
 We recommend reviewing and applying the recommendations offered in our [Production Checklist](/docs/guides/platform/going-into-prod). This checklist covers the responsibilities discussed here and a few additional general production readiness best practices.
