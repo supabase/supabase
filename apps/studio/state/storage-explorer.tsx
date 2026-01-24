@@ -716,7 +716,7 @@ function createStorageExplorerState({
           })
         }
 
-        if (state.openedFolders[columnIndex].name === folder.name) {
+        if (state.openedFolders[columnIndex]?.name === folder.name) {
           state.setSelectedFilePreview(undefined)
           state.popOpenedFoldersAtIndex(columnIndex - 1)
         }
@@ -1667,7 +1667,8 @@ function createStorageExplorerState({
     // ======== UI Helper functions ========
 
     selectRangeItems: (columnIndex: number, toItemIndex: number) => {
-      const columnItems = state.columns[columnIndex].items
+      const columnItems = state.columns[columnIndex]?.items
+      if (!columnItems) return
       const toItem = columnItems[toItemIndex]
       const selectedItemIds = state.selectedItems.map((item) => item.id)
       const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
@@ -1711,9 +1712,10 @@ function createStorageExplorerState({
     }) => {
       const columnIndex_ = columnIndex !== undefined ? columnIndex : state.getLatestColumnIndex()
       const currentColumn = state.columns[columnIndex_]
-      const currentColumnItems = currentColumn.items.filter(
+      const currentColumnItems = currentColumn?.items?.filter(
         (item) => item.status !== STORAGE_ROW_STATUS.EDITING
       )
+      if (!currentColumnItems) return name
       // [Joshen] JFYI storage does support folders of the same name with different casing
       // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
       // for folders of the same name with different casing
