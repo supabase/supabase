@@ -1264,6 +1264,11 @@ export const examples: Registry = [
     files: ['example/page-section-horizontal.tsx'],
   },
   {
+    name: 'page-section-title-only',
+    type: 'components:example',
+    files: ['example/page-section-title-only.tsx'],
+  },
+  {
     name: 'page-section-with-aside',
     type: 'components:example',
     files: ['example/page-section-with-aside.tsx'],
