@@ -290,6 +290,13 @@ export const SidePanelEditor = ({
           // Queue the operation if queue operations feature is enabled
           if (isQueueOperationsEnabled) {
             const changedColumn = Object.keys(payload)[0]
+            if (!changedColumn) {
+              saveRowError = new Error('No changed column')
+              toast.error('No changed column')
+              onComplete(saveRowError)
+              return
+            }
+
             const row =
               snap.sidePanel?.type === 'json'
                 ? snap.sidePanel.jsonValue.row
