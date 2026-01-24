@@ -1,7 +1,7 @@
 'use client'
 
 import { FlagValues } from 'flags/react'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 
 import { components } from 'api-types'
 import { useAuth } from './auth'
@@ -9,6 +9,7 @@ import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
 import { ensurePlatformSuffix } from './helpers'
+import { useParams } from './hooks'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
@@ -61,12 +62,16 @@ function getCookies() {
 export const FeatureFlagProvider = ({
   API_URL,
   enabled = true,
+  organizationSlug,
+  projectRef,
   getConfigCatFlags,
   children,
 }: PropsWithChildren<{
   API_URL?: string
   /** Accepts either `boolean` which controls all feature flags or `{ cc: boolean, ph: boolean }` for individual providers */
   enabled?: boolean | { cc: boolean; ph: boolean }
+  organizationSlug?: string
+  projectRef?: string
   /** Custom fetcher for ConfigCat flags if passing in custom attributes */
   getConfigCatFlags?: (
     userEmail?: string
@@ -74,6 +79,10 @@ export const FeatureFlagProvider = ({
 }>) => {
   const { session, isLoading } = useAuth()
   const userEmail = session?.user?.email
+  const params = useParams()
+  const resolvedOrganizationSlug = organizationSlug ?? params.slug
+  const resolvedProjectRef = projectRef ?? params.ref
+  const lastSentGroupContextRef = useRef<string | null>(null)
 
   const [store, setStore] = useState<FeatureFlagContextType>({
     API_URL,
@@ -84,6 +93,35 @@ export const FeatureFlagProvider = ({
 
   useEffect(() => {
     let mounted = true
+
+    async function ensureGroupContext() {
+      if (!API_URL) return
+
+      const userId = session?.user?.id
+      if (!userId) return
+      if (!hasConsented()) return
+
+      if (!resolvedOrganizationSlug && !resolvedProjectRef) return
+
+      const contextKey = [userId, resolvedOrganizationSlug ?? '', resolvedProjectRef ?? ''].join(
+        '|'
+      )
+      if (lastSentGroupContextRef.current === contextKey) return
+
+      try {
+        await post(
+          `${ensurePlatformSuffix(API_URL)}/telemetry/identify`,
+          {
+            user_id: userId,
+            ...(resolvedOrganizationSlug && { organization_slug: resolvedOrganizationSlug }),
+            ...(resolvedProjectRef && { project_ref: resolvedProjectRef }),
+          },
+          { headers: { Version: '2' } }
+        )
+
+        lastSentGroupContextRef.current = contextKey
+      } catch {}
+    }
 
     async function processFlags() {
       if (!enabled || isLoading) return
@@ -96,7 +134,12 @@ export const FeatureFlagProvider = ({
 
       // Run both async operations in parallel
       const [flags, flagValues] = await Promise.all([
-        loadPHFlags ? getFeatureFlags(API_URL) : Promise.resolve({}),
+        loadPHFlags
+          ? (async () => {
+              await ensureGroupContext()
+              return getFeatureFlags(API_URL)
+            })()
+          : Promise.resolve({}),
         loadCCFlags
           ? typeof getConfigCatFlags === 'function'
             ? getConfigCatFlags(userEmail)
@@ -140,7 +183,15 @@ export const FeatureFlagProvider = ({
     return () => {
       mounted = false
     }
-  }, [enabled, isLoading, userEmail])
+  }, [
+    enabled,
+    isLoading,
+    userEmail,
+    API_URL,
+    session?.user?.id,
+    resolvedOrganizationSlug,
+    resolvedProjectRef,
+  ])
 
   return (
     <FeatureFlagContext.Provider value={store}>
