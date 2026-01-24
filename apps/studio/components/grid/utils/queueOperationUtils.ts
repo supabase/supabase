@@ -46,7 +46,7 @@ export function generateTableChangeKey({
   return `${type}:${tableId}:${columnName}:${rowIdentifiersKey}`
 }
 
-function rowMatchesIdentifiers(
+export function rowMatchesIdentifiers(
   row: Dictionary<unknown>,
   rowIdentifiers: Dictionary<unknown>
 ): boolean {
@@ -55,7 +55,7 @@ function rowMatchesIdentifiers(
   return identifierEntries.every(([key, value]) => row[key] === value)
 }
 
-function applyCellEdit(
+export function applyCellEdit(
   rows: SupaRow[],
   columnName: string,
   rowIdentifiers: Dictionary<unknown>,
