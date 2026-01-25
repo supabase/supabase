@@ -13,14 +13,9 @@ export async function AiSkillsIndex() {
           href={`/guides/getting-started/ai-skills/${skill.filename}`}
           passHref
         >
-          <GlassPanel
-            title={skill.heading ?? skill.filename.replaceAll('-', ' ')}
-            hasLightIcon
-          >
+          <GlassPanel title={skill.heading ?? skill.filename.replaceAll('-', ' ')} hasLightIcon>
             {skill.metadata?.description && (
-              <p className="text-sm text-foreground-lighter">
-                {skill.metadata.description}
-              </p>
+              <p className="text-sm text-foreground-lighter">{skill.metadata.description}</p>
             )}
           </GlassPanel>
         </Link>

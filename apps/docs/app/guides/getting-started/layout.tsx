@@ -6,7 +6,7 @@ import { getAiSkills } from '../getting-started/ai-skills/[slug]/AiSkills.utils'
 export default async function GettingStartedLayout({ children }: { children: React.ReactNode }) {
   const additionalNavItems = {
     prompts: await getPrompts(),
-    skills: await getSkills()
+    skills: await getSkills(),
   }
 
   return <Layout additionalNavItems={additionalNavItems}>{children}</Layout>

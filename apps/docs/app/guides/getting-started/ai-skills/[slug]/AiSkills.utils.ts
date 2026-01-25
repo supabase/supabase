@@ -1,15 +1,18 @@
 import matter from 'gray-matter'
-import type { Heading, Root } from 'mdast'
+import type { Heading } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { readdir, readFile } from 'node:fs/promises'
-import { basename, extname, join } from 'node:path'
 import { cache } from 'react'
 import { visit, EXIT } from 'unist-util-visit'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
-import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
-const SKILLS_DIRECTORY = join(EXAMPLES_DIRECTORY, 'skills')
+
+const SKILLS_REPO = {
+  org: 'supabase',
+  repo: 'agent-skills',
+  branch: 'main',
+  path: 'skills',
+}
 
 interface SkillMetadata {
   name?: string
@@ -28,6 +31,13 @@ interface Skill {
   metadata: SkillMetadata
 }
 
+interface GitHubContentItem {
+  name: string
+  path: string
+  type: 'file' | 'dir'
+  download_url?: string
+}
+
 function parseMarkdown(markdown: string) {
   const { content: withoutFrontmatter, data } = matter(markdown)
   const mdast = fromMarkdown(withoutFrontmatter)
@@ -43,45 +53,103 @@ function parseMarkdown(markdown: string) {
   })
 
   return {
-    heading: data.title || heading,
+    heading: data.title || data.name || heading,
     content: withoutFrontmatter.trim(),
-    metadata: data as SkillMetadata
+    metadata: data as SkillMetadata,
+  }
+}
+
+async function fetchGitHubDirectory(path: string): Promise<GitHubContentItem[]> {
+  const url = `https://api.github.com/repos/${SKILLS_REPO.org}/${SKILLS_REPO.repo}/contents/${path}?ref=${SKILLS_REPO.branch}`
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'Supabase-Docs',
+      },
+      next: { revalidate: 3600 },
+    })
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (!Array.isArray(data)) {
+      throw new Error('Expected directory listing')
+    }
+
+    return data
+  } catch (err) {
+    console.error('Failed to fetch GitHub directory: %o', err)
+    return []
+  }
+}
+
+async function fetchGitHubFile(path: string): Promise<string | null> {
+  const url = `https://raw.githubusercontent.com/${SKILLS_REPO.org}/${SKILLS_REPO.repo}/${SKILLS_REPO.branch}/${path}`
+
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 3600 },
+    })
+
+    if (!response.ok) {
+      throw new Error(`GitHub raw file error: ${response.status}`)
+    }
+
+    return await response.text()
+  } catch (err) {
+    console.error('Failed to fetch GitHub file: %o', err)
+    return null
   }
 }
 
 async function getAiSkillsImpl(): Promise<Skill[]> {
-  const files = await readdir(SKILLS_DIRECTORY)
+  const directories = await fetchGitHubDirectory(SKILLS_REPO.path)
 
   const skills: Skill[] = []
 
-  for (const file of files) {
-    if (extname(file) !== '.md') continue
+  for (const item of directories) {
+    if (item.type !== 'dir') continue
 
-    const rawContent = await readFile(join(SKILLS_DIRECTORY, file), 'utf-8')
+    const skillPath = `${SKILLS_REPO.path}/${item.name}/SKILL.md`
+    const rawContent = await fetchGitHubFile(skillPath)
+
+    if (!rawContent) continue
+
     const parsed = parseMarkdown(rawContent)
 
     skills.push({
-      filename: basename(file, '.md'),
+      filename: item.name,
       heading: parsed.heading,
       content: parsed.content,
-      metadata: parsed.metadata,
+      metadata: {
+        ...parsed.metadata,
+        github: `https://github.com/${SKILLS_REPO.org}/${SKILLS_REPO.repo}/tree/${SKILLS_REPO.branch}/${SKILLS_REPO.path}/${item.name}`,
+      },
     })
   }
 
-  return skills.sort((a, b) => b.filename.localeCompare(a.filename))
+  return skills.sort((a, b) => a.heading.localeCompare(b.heading))
 }
 
 export const getAiSkills = cache(getAiSkillsImpl)
 
 async function getAiSkillImpl(slug: string) {
-  const filePath = join(SKILLS_DIRECTORY, `${slug}.md`)
+  const skillPath = `${SKILLS_REPO.path}/${slug}/SKILL.md`
+  const rawContent = await fetchGitHubFile(skillPath)
 
-  try {
-    const rawContent = await readFile(filePath, 'utf-8')
-    return parseMarkdown(rawContent)
-  } catch (err) {
-    console.error('Failed to fetch skill: %o', err)
-    return null
+  if (!rawContent) return null
+
+  const parsed = parseMarkdown(rawContent)
+  return {
+    ...parsed,
+    metadata: {
+      ...parsed.metadata,
+      github: `https://github.com/${SKILLS_REPO.org}/${SKILLS_REPO.repo}/tree/${SKILLS_REPO.branch}/${SKILLS_REPO.path}/${slug}`,
+    },
   }
 }
 
@@ -107,6 +175,6 @@ export async function generateAiSkillsStaticParams() {
   const skills = await getAiSkills()
 
   return skills.map((skill) => ({
-    slug: skill.filename
+    slug: skill.filename,
   }))
 }

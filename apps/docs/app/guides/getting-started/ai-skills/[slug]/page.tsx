@@ -1,11 +1,7 @@
 import { source } from 'common-tags'
 import { notFound } from 'next/navigation'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import {
-  generateAiSkillMetadata,
-  generateAiSkillsStaticParams,
-  getAiSkill,
-} from './AiSkills.utils'
+import { generateAiSkillMetadata, generateAiSkillsStaticParams, getAiSkill } from './AiSkills.utils'
 
 export const dynamicParams = false
 
@@ -34,7 +30,7 @@ export default async function AiSkillsPage(props: { params: Promise<{ slug: stri
     <GuideTemplate
       meta={{
         title: `AI Skill: ${heading}`,
-        description: metadata?.description || `${heading} - Supabase AI Skill`
+        description: metadata?.description || `${heading} - Supabase AI Skill`,
       }}
       content={content}
       editLink={newEditLink(`supabase/supabase/blob/master/examples/skills/${slug}.md`)}
