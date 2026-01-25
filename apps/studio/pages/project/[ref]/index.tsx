@@ -6,9 +6,9 @@ import { usePHFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const HomePage: NextPageWithLayout = () => {
-  const isHomeNewPH = usePHFlag('homeNew')
+  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
-  if (isHomeNewPH) {
+  if (isHomeNew) {
     return <HomeV2 />
   }
   return <Home />

@@ -133,6 +133,12 @@ export function isExplainQuery(rows: readonly unknown[]): boolean {
   return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
 }
 
+export function isTextFormatExplain(rows: readonly unknown[]): boolean {
+  if (!isExplainQuery(rows)) return false
+  const firstRow = rows[0] as Record<string, unknown>
+  return typeof firstRow['QUERY PLAN'] === 'string'
+}
+
 export function isExplainSql(sql: string): boolean {
   return /^\s*explain\b/i.test(sql)
 }

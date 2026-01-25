@@ -1,10 +1,11 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { Admonition } from 'ui-patterns/admonition'
 
 import { Button } from 'ui'
+import { useTrack } from 'lib/telemetry/track'
 
 export interface AlertErrorProps {
   projectRef?: string
@@ -13,6 +14,8 @@ export interface AlertErrorProps {
   layout?: 'vertical' | 'horizontal'
   className?: string
   showIcon?: boolean
+  showInstructions?: boolean
+  showErrorPrefix?: boolean
   additionalActions?: React.ReactNode
 }
 
@@ -49,12 +52,28 @@ export const AlertError = ({
   className,
   showIcon = true,
   layout = 'horizontal',
+  showInstructions = true,
+  showErrorPrefix = true,
   children,
   additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
+  const track = useTrack()
+  const hasTrackedRef = useRef(false)
+
   const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'
     : error?.message
+
+  useEffect(() => {
+    if (!hasTrackedRef.current) {
+      hasTrackedRef.current = true
+      if (Math.random() < 0.1) {
+        track('dashboard_error_created', {
+          source: 'admonition',
+        })
+      }
+    }
+  }, [track])
 
   return (
     <Admonition
@@ -64,11 +83,18 @@ export const AlertError = ({
       title={subject}
       description={
         <>
-          {error?.message && <p>Error: {formattedErrorMessage}</p>}
-          <p>
-            Try refreshing your browser. If the issue persists for more than a few minutes, please
-            reach out to us via support.
-          </p>
+          {error?.message && (
+            <p>
+              {showErrorPrefix && 'Error: '}
+              {formattedErrorMessage}
+            </p>
+          )}
+          {showInstructions && (
+            <p>
+              Try refreshing your browser, but if the issue persists for more than a few minutes,
+              please reach out to us via support.
+            </p>
+          )}
           {children}
         </>
       }

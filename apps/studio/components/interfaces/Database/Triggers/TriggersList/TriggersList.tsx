@@ -21,12 +21,14 @@ import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQuer
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { DocsButton } from 'components/ui/DocsButton'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
@@ -196,15 +198,18 @@ execute function function_name();`)
               onChange={(e) => setFilterString(e.target.value)}
             />
           </div>
-          {!isSchemaLocked && (
-            <CreateTriggerButtons
-              hasTables={hasTables}
-              canCreateTriggers={canCreateTriggers}
-              selectedSchema={selectedSchema}
-              onCreateTrigger={createTrigger}
-              showPlusIcon={true}
-            />
-          )}
+          <div className="flex items-center gap-2">
+            <DocsButton href={`${DOCS_URL}/guides/database/postgres/triggers`} />
+            {!isSchemaLocked && (
+              <CreateTriggerButtons
+                hasTables={hasTables}
+                canCreateTriggers={canCreateTriggers}
+                selectedSchema={selectedSchema}
+                onCreateTrigger={createTrigger}
+                showPlusIcon={true}
+              />
+            )}
+          </div>
         </div>
 
         {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}

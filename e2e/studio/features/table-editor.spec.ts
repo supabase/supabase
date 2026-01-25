@@ -1,7 +1,7 @@
-import { expect, Locator, Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { isCLI } from '../utils/is-cli.js'
+import { env } from '../env.config.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
@@ -13,7 +13,6 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
-import { env } from '../env.config.js'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
@@ -244,14 +243,20 @@ testRunner('table editor', () => {
     await page.getByTestId('table-name-input').fill(tableNameRlsDisabled)
     await page.getByLabel('Enable Row Level Security (').click()
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // Wait for table creation
     const apiPromise = waitForApiResponse(
       page,
       'pg-meta',
       ref,
       'tables?include_columns=false&included_schemas=public'
-    ) // wait for table creation
+    )
+    // Wait for lints refresh
+    const lintsPromise = waitForApiResponse(page, 'projects', ref, 'run-lints')
+
     await page.getByRole('button', { name: 'Save' }).click()
     await apiPromise
+    await lintsPromise
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
   })
@@ -491,7 +496,7 @@ testRunner('table editor', () => {
 
     await page.getByRole('button', { name: 'Filter', exact: true }).click()
     await page.getByRole('button', { name: 'Add filter' }).click()
-    await page.getByRole('button', { name: 'id', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'id', exact: true }).click()
     await page.getByRole('menuitem', { name: colName }).click()
     await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
     const waitForFilterApply = createApiResponseWaiter(
@@ -1026,5 +1031,145 @@ testRunner('table editor', () => {
 
     // Cleanup
     await deleteTable(page, ref, tableName)
+  })
+
+  test('can create and remove foreign key with column selection', async ({ page, ref }) => {
+    const sourceTableName = 'pw_table_fk_source'
+    const targetTableName = 'pw_table_fk_target'
+
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    await dismissToastsIfAny(page)
+
+    // Create target table first (will be referenced)
+    await createTable(page, ref, targetTableName)
+
+    // Create source table (will have the foreign key)
+    await createTable(page, ref, sourceTableName)
+    await page.getByRole('button', { name: `View ${sourceTableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Open edit table dialog
+    await page
+      .getByRole('button', { name: `View ${sourceTableName}`, exact: true })
+      .locator('button[aria-haspopup="menu"]')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+    // Open foreign key selector
+    await page.getByRole('button', { name: 'Add foreign key relation' }).click()
+
+    // Select schema (should default to public)
+    await expect(page.getByRole('button', { name: 'Select a schema' })).toContainText('public')
+
+    // Select target table
+    const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
+      response.url().includes(`table-public-${targetTableName}`)
+    )
+
+    await page.getByRole('button', { name: 'Select a table to reference to' }).click()
+    await page.getByRole('menuitem', { name: `public ${targetTableName}` }).click()
+
+    // Wait for table columns to load
+    await tableQueryPromise
+
+    // Verify column selection UI appears
+    await expect(
+      page.getByText(`Select columns from public.${targetTableName} to reference to`)
+    ).toBeVisible()
+
+    // Select source column (id from source table)
+    await page.getByRole('button', { name: '---' }).first().click()
+    await page.getByRole('menuitem', { name: 'id int8' }).click()
+
+    // Wait for the first dropdown to update - there should only be one '---' button left now
+    await expect(page.getByRole('button', { name: '---' })).toHaveCount(1)
+
+    // Select target column (id from target table)
+    await page.getByRole('button', { name: '---' }).first().click()
+    await page.getByRole('menuitem', { name: 'id int8' }).click()
+
+    // Verify cascade action options are visible
+    await expect(page.getByText('Action if referenced row is updated')).toBeVisible()
+    await expect(page.getByText('Action if referenced row is removed')).toBeVisible()
+
+    // Verify save button is now enabled
+    const saveButton = page.getByRole('button', { name: 'Save' }).last()
+    await expect(saveButton).toBeEnabled()
+
+    // Save the foreign key
+    const fkCreatePromise = waitForApiResponseWithTimeout(page, (response) =>
+      response.url().includes('query?key=')
+    )
+    await saveButton.click()
+    await fkCreatePromise
+
+    // Verify foreign key selector closed
+    await expect(
+      page.getByRole('banner', { name: `Add foreign key relationship to ${sourceTableName}` })
+    ).not.toBeVisible()
+
+    // Save table changes
+    const saveTablePromise = waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-update'),
+      15000
+    )
+    await page.getByRole('button', { name: 'Save' }).first().click()
+    await saveTablePromise
+
+    // Wait for table editor side panel to close
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+
+    // Verify foreign key was created by opening edit table dialog again
+    await page
+      .getByRole('button', { name: `View ${sourceTableName}`, exact: true })
+      .locator('button[aria-haspopup="menu"]')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+    // Scroll down to see foreign key relations section
+    await page.getByRole('heading', { name: 'Foreign keys' }).scrollIntoViewIfNeeded()
+
+    // Verify foreign key relation exists
+    await expect(page.getByRole('link', { name: 'public.pw_table_fk_target' })).toBeVisible()
+
+    // Remove the foreign key relation
+    await page.getByRole('button', { name: 'Remove' }).click()
+
+    // Save the table changes after removing foreign key
+    const removeFkPromise = waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-update'),
+      15000
+    )
+    await page.getByRole('button', { name: 'Save' }).first().click()
+    await removeFkPromise
+
+    // Wait for table editor side panel to close
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+
+    // Verify foreign key was removed by opening edit table dialog again
+    await page
+      .getByRole('button', { name: `View ${sourceTableName}`, exact: true })
+      .locator('button[aria-haspopup="menu"]')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+    // Scroll down to see foreign key relations section
+    await page.getByRole('heading', { name: 'Foreign keys' }).scrollIntoViewIfNeeded()
+    // Verify foreign key relation no longer exists
+    await expect(page.getByText(`public.${targetTableName}`, { exact: false })).not.toBeVisible()
+
+    // Close the edit table dialog
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+
+    // Clean up
+    await deleteTable(page, ref, sourceTableName)
+    await deleteTable(page, ref, targetTableName)
   })
 })

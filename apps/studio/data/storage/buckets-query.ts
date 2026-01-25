@@ -17,6 +17,7 @@ import {
   type UseCustomInfiniteQueryOptions,
   type UseCustomQueryOptions,
 } from 'types'
+import { getBucketNumberEstimate, getBucketNumberEstimateKey } from './buckets-max-size-limit-query'
 import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
@@ -145,6 +146,27 @@ export const useBucketsQuery = <TData = BucketsData>(
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
     retry: shouldRetryBucketsQuery,
+  })
+}
+
+export const useBucketNumberEstimateQuery = (
+  { projectRef }: BucketsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<number | undefined, ResponseError> = {}
+) => {
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
+
+  return useQuery<number | undefined, ResponseError>({
+    // Query remains functionally the same even if connectionString changes
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: getBucketNumberEstimateKey(projectRef),
+    queryFn: () =>
+      getBucketNumberEstimate({
+        projectRef,
+        connectionString,
+      }),
+    enabled: enabled && !!projectRef,
+    ...options,
   })
 }
 
