@@ -226,7 +226,7 @@ The report displays the median replication lag in milliseconds, showing the dela
 
 ## (Read) Private Channel Subscription RLS Execution Time
 
-The (Read)Private Channel Subscription RLS Execution Time report helps you monitor the median time it takes to execute Row Level Security (RLS) policies when users subscribe to private channels. This metric is essential for understanding how RLS policy complexity impacts channel join latency and overall connection performance.
+The (Read) Private Channel Subscription RLS Execution Time report helps you monitor the median time it takes to execute Row Level Security (RLS) policies when users subscribe to private channels. This metric is essential for understanding how RLS policy complexity impacts channel join latency and overall connection performance.
 
 The report displays the median RLS execution time in milliseconds, showing how long it takes to validate user permissions when subscribing to private channels throughout the selected time period. When a user joins a private channel, Realtime checks RLS policies on the `realtime.messages` table to determine if the user has read access. This authorization check happens once per channel subscription and the result is cached for the duration of the connection. However, complex RLS policies with joins, function calls, or missing indexes can significantly increase this initial connection time.
 
