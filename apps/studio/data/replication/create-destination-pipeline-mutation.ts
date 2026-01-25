@@ -32,7 +32,8 @@ export type IcebergDestinationConfig = {
 }
 
 export type BatchConfig = {
-  maxFillMs: number
+  maxFillMs?: number
+  maxSize?: number
 }
 
 export type CreateDestinationPipelineParams = {
@@ -43,6 +44,7 @@ export type CreateDestinationPipelineParams = {
   pipelineConfig: {
     publicationName: string
     batch?: BatchConfig
+    maxTableSyncWorkers?: number
   }
 }
 
@@ -51,7 +53,7 @@ async function createDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: { publicationName, batch },
+    pipelineConfig: { publicationName, batch, maxTableSyncWorkers },
     sourceId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
@@ -108,7 +110,17 @@ async function createDestinationPipeline(
       destination_config,
       pipeline_config: {
         publication_name: publicationName,
-        ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
+        ...(maxTableSyncWorkers !== undefined
+          ? { max_table_sync_workers: maxTableSyncWorkers }
+          : {}),
+        ...(batch
+          ? {
+              batch: {
+                ...(batch.maxFillMs !== undefined ? { max_fill_ms: batch.maxFillMs } : {}),
+                ...(batch.maxSize !== undefined ? { max_size: batch.maxSize } : {}),
+              },
+            }
+          : {}),
       },
     },
     signal,

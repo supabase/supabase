@@ -4,7 +4,10 @@ import { useState } from 'react'
 import CopyButton from 'components/ui/CopyButton'
 import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
 import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
-import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import {
+  isExplainQuery,
+  isTextFormatExplain,
+} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
@@ -35,7 +38,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
-        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
+        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4 pb-9">
           <div className="flex flex-col gap-y-1">
             {formattedError.length > 0 ? (
               formattedError.map((x: string, i: number) => (
@@ -78,6 +81,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
   }
 
   const isValidExplain = isExplainQuery(explainResult.rows)
+  const isTextFormat = isTextFormatExplain(explainResult.rows)
 
   if (!isValidExplain) {
     return (
@@ -89,10 +93,24 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
     )
   }
 
+  // Handle non-TEXT formats (JSON, YAML, XML) - show raw output only
+  if (!isTextFormat) {
+    return (
+      <div className="h-full flex flex-col pb-9">
+        <div className="px-4 py-3 bg-surface-100 border-b border-default flex items-center gap-2">
+          <span className="text-sm text-foreground-light">
+            Visual execution plan is only available for TEXT format. Showing raw output.
+          </span>
+        </div>
+        <Results rows={explainResult.rows} />
+      </div>
+    )
+  }
+
   const toggleMode = () => setMode(mode === 'visual' ? 'raw' : 'visual')
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col pb-9">
       {mode === 'visual' ? (
         <ExplainVisualizer rows={explainResult.rows} onShowRaw={toggleMode} id={id} />
       ) : (
