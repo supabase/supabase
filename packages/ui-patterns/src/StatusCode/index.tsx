@@ -69,13 +69,13 @@ export const StatusCode = ({ method, statusCode }: StatusCodeProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="flex-shrink-0 flex items-center text-xs font-mono">
-        <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0 min-w-[6ch]">
+      <span className="flex-shrink-0 flex items-center justify-end text-xs font-mono w-[100px]">
+        <span className="select-text py-0.5 px-2 text-right rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
           {method}
         </span>
         <span
           className={cn(
-            'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums min-w-[6ch] text-center',
+            'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums min-w-[5.5ch] text-right',
             colors.text,
             colors.bg,
             colors.border
