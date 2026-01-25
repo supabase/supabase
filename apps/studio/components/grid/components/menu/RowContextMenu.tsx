@@ -5,10 +5,20 @@ import { toast } from 'sonner'
 
 import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
 import type { SupaRow } from 'components/grid/types'
+import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { copyToClipboard, DialogSectionSeparator } from 'ui'
 import { formatClipboardValue } from '../../utils/common'
+import {
+  buildDuplicateRowPayload,
+  fetchFullRowForDuplicate,
+  getEnumArrayColumns,
+  isLikelyMissingPrimaryKeyError,
+  maybeAddGeneratedUuidPrimaryKeyForDuplicate,
+} from './RowContextMenu.utils'
 
 type RowContextMenuProps = {
   rows: SupaRow[]
@@ -19,6 +29,12 @@ type RowContextMenuItemProps = ItemParams<{ rowIdx: number }, string>
 export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
+  const { mutateAsync: createTableRow } = useTableRowCreateMutation({
+    onError: () => {},
+  })
 
   function onDeleteRow(p: RowContextMenuItemProps) {
     const rowIdx = p.props?.rowIdx
@@ -65,6 +81,77 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     [rows]
   )
 
+  const onDuplicateRow = useCallback(
+    async (p: RowContextMenuItemProps) => {
+      const rowIdx = p.props?.rowIdx
+      if (rowIdx === undefined || rowIdx === null) return
+
+      if (!project) {
+        toast.error('Project is required')
+        return
+      }
+
+      const row = rows[rowIdx]
+      if (!row) return
+
+      const toastId = toast.loading('Duplicating row...')
+      try {
+        const roleImpersonationState = getImpersonatedRoleState()
+        const fullRow = await fetchFullRowForDuplicate({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: snap.table,
+          row,
+          roleImpersonationState,
+        })
+        const payload = buildDuplicateRowPayload({ table: snap.table, row: fullRow })
+        const enumArrayColumns = getEnumArrayColumns(snap.table)
+
+        try {
+          await createTableRow({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            table: {
+              id: snap.table.id,
+              name: snap.table.name,
+              schema: snap.table.schema ?? undefined,
+            },
+            payload,
+            enumArrayColumns,
+            roleImpersonationState,
+          })
+        } catch (error: any) {
+          if (isLikelyMissingPrimaryKeyError({ error, table: snap.table })) {
+            const retry = maybeAddGeneratedUuidPrimaryKeyForDuplicate({ table: snap.table, payload })
+            if (retry.generated) {
+              await createTableRow({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table: {
+                  id: snap.table.id,
+                  name: snap.table.name,
+                  schema: snap.table.schema ?? undefined,
+                },
+                payload: retry.payload,
+                enumArrayColumns,
+                roleImpersonationState,
+              })
+            } else {
+              throw error
+            }
+          } else {
+            throw error
+          }
+        }
+
+        toast.success('Row duplicated', { id: toastId })
+      } catch (error: any) {
+        toast.error(error?.message ?? 'Failed to duplicate row', { id: toastId })
+      }
+    },
+    [createTableRow, getImpersonatedRoleState, project, rows, snap.table]
+  )
+
   return (
     <Menu id={ROW_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
       <Item onClick={onCopyCellContent}>
@@ -74,6 +161,10 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       <Item onClick={onCopyRowContent}>
         <Copy size={12} />
         <span className="ml-2 text-xs">Copy row</span>
+      </Item>
+      <Item onClick={onDuplicateRow} hidden={!snap.editable} data="duplicate">
+        <Copy size={12} />
+        <span className="ml-2 text-xs">Duplicate row</span>
       </Item>
 
       {/* We can't just wrap this entire section in a fragment conditional
