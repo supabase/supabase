@@ -48,7 +48,7 @@ jobs:
         run: pnpm --filter=@supabase/pg-meta run test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de  # v5.5.2
         with:
           directory: packages/pg-meta/coverage
           flags: pg-meta

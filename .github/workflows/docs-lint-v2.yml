@@ -59,7 +59,7 @@ jobs:
         run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
       - name: install reviewdog
         if: steps.filter.outputs.docs == 'true'
-        uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
+        uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f  # v1.5.0
         with:
           reviewdog_version: v0.20.2
       - name: run linter (internal)
