@@ -152,10 +152,10 @@ export const fetchFullRowForDuplicate = async ({
       if (value === null || value === undefined) {
         throw new Error('Cannot duplicate row: primary key value is missing')
       }
-      query.filter(column.name, 'eq', value)
+      query.filter(column.name, '=', value)
     }
   } else if ('ctid' in row) {
-    query.filter('ctid', 'eq', (row as any).ctid)
+    query.filter('ctid', '=', (row as any).ctid)
   } else {
     throw new Error('Cannot duplicate row without a primary key or ctid')
   }
