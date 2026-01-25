@@ -51,8 +51,12 @@ export const useOrganizationPreviewCreditCodeQuery = <TData = OrganizationPrevie
 ) => {
   const { can: canApplyCreditCode } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.customer'
+    'stripe.customer',
+    undefined,
+    { organizationSlug: slug }
   )
+
+  console.log({ canApplyCreditCode, slug })
 
   return useQuery<OrganizationPreviewCreditCodeData, OrganizationPreviewCreditCodeError, TData>({
     queryKey: organizationKeys.previewCreditCode(slug, code),
