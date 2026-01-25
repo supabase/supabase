@@ -66,7 +66,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const {
     data: branches = [],
     error: branchesError,
-    isLoading: isLoadingBranches,
+    isPending: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
@@ -89,9 +89,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
   const isError = isErrorConnections || isErrorBranches
 
+  const isGithubConnected = githubConnection !== undefined
+
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
     },
@@ -228,6 +230,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             : `/project/${branch.project_ref}/merge`
                           return (
                             <BranchRow
+                              isGithubConnected={isGithubConnected}
                               key={branch.id}
                               label={
                                 <div className="flex items-center gap-x-4">
@@ -330,7 +333,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
     },

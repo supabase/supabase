@@ -20,7 +20,7 @@ export interface paths {
     post?: never
     /**
      * Delete a database branch
-     * @description Deletes the specified database branch
+     * @description Deletes the specified database branch. By default, deletes immediately. Use force=false to schedule deletion with 1-hour grace period (only when soft deletion is enabled).
      */
     delete: operations['v1-delete-a-branch']
     options?: never
@@ -106,6 +106,26 @@ export interface paths {
      * @description Resets the specified database branch
      */
     post: operations['v1-reset-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/branches/{branch_id_or_ref}/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Restore a scheduled branch deletion
+     * @description Cancels scheduled deletion and restores the branch to active state
+     */
+    post: operations['v1-restore-a-branch']
     delete?: never
     options?: never
     head?: never
@@ -267,7 +287,7 @@ export interface paths {
      * Gets all projects for the given organization
      * @description Returns a paginated list of projects for the specified organization.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['v1-get-all-projects-for-organization']
     put?: never
@@ -288,6 +308,8 @@ export interface paths {
     /**
      * List all projects
      * @description Returns a list of all projects you've previously created.
+     *
+     *     Use `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.
      */
     get: operations['v1-list-all-projects']
     put?: never
@@ -314,7 +336,8 @@ export interface paths {
     delete: operations['v1-delete-a-project']
     options?: never
     head?: never
-    patch?: never
+    /** Updates the given project */
+    patch: operations['v1-update-a-project']
     trace?: never
   }
   '/v1/projects/{ref}/actions': {
@@ -904,6 +927,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/config/realtime': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets realtime configuration */
+    get: operations['v1-get-realtime-config']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates realtime configuration */
+    patch: operations['v1-update-realtime-config']
+    trace?: never
+  }
   '/v1/projects/{ref}/config/storage': {
     parameters: {
       query?: never
@@ -1171,10 +1212,55 @@ export interface paths {
      * @description Only available to selected partner OAuth apps
      */
     post: operations['v1-apply-a-migration']
-    delete?: never
+    /**
+     * [Beta] Rollback database migrations and remove them from history table
+     * @description Only available to selected partner OAuth apps
+     */
+    delete: operations['v1-rollback-migrations']
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/migrations/{version}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * [Beta] Fetch an existing entry from migration history
+     * @description Only available to selected partner OAuth apps
+     */
+    get: operations['v1-get-a-migration']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * [Beta] Patch an existing entry in migration history
+     * @description Only available to selected partner OAuth apps
+     */
+    patch: operations['v1-patch-a-migration']
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/password': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates the database password */
+    patch: operations['v1-update-database-password']
     trace?: never
   }
   '/v1/projects/{ref}/database/query': {
@@ -1188,6 +1274,26 @@ export interface paths {
     put?: never
     /** [Beta] Run sql query */
     post: operations['v1-run-a-query']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/query/read-only': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * [Beta] Run a sql query as supabase_read_only_user
+     * @description All entity references must be schema qualified.
+     */
+    post: operations['v1-read-only-query']
     delete?: never
     options?: never
     head?: never
@@ -1900,6 +2006,8 @@ export interface components {
     AuthConfigResponse: {
       api_max_request_duration: number | null
       db_max_pool_size: number | null
+      /** @enum {string|null} */
+      db_max_pool_size_unit: 'connections' | 'percent' | null
       disable_signup: boolean | null
       external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
@@ -1988,6 +2096,10 @@ export interface components {
       external_workos_enabled: boolean | null
       external_workos_secret: string | null
       external_workos_url: string | null
+      external_x_client_id: string | null
+      external_x_email_optional: boolean | null
+      external_x_enabled: boolean | null
+      external_x_secret: string | null
       external_zoom_client_id: string | null
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
@@ -2065,6 +2177,9 @@ export interface components {
       nimbus_oauth_client_id: string | null
       nimbus_oauth_client_secret: string | null
       nimbus_oauth_email_optional: boolean | null
+      oauth_server_allow_dynamic_registration: boolean
+      oauth_server_authorization_path: string | null
+      oauth_server_enabled: boolean
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -2173,6 +2288,8 @@ export interface components {
     BranchResponse: {
       /** Format: date-time */
       created_at: string
+      /** Format: date-time */
+      deletion_scheduled_at?: string
       git_branch?: string
       /** Format: uuid */
       id: string
@@ -2189,6 +2306,23 @@ export interface components {
       persistent: boolean
       /** Format: int32 */
       pr_number?: number
+      /** @enum {string} */
+      preview_project_status?:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -2203,6 +2337,10 @@ export interface components {
       /** Format: date-time */
       updated_at: string
       with_data: boolean
+    }
+    BranchRestoreResponse: {
+      /** @enum {string} */
+      message: 'Branch restoration initiated'
     }
     BranchUpdateResponse: {
       /** @enum {string} */
@@ -2984,9 +3122,9 @@ export interface components {
           name: string
         }[]
         /** @enum {string} */
-        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         /** @enum {string|null} */
-        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
         valid: boolean
         warnings: {
           key: string
@@ -3082,14 +3220,21 @@ export interface components {
       }[]
     }
     OrganizationResponseV1: {
+      /**
+       * @deprecated
+       * @description Deprecated: Use `slug` instead.
+       */
       id: string
       name: string
+      /** @description Organization slug */
+      slug: string
     }
     PgsodiumConfigResponse: {
       root_key: string
     }
     PostgresConfigResponse: {
-      checkpoint_timeout?: number
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -3109,10 +3254,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3145,6 +3292,10 @@ export interface components {
       eligible: boolean
       latest_app_version: string
       legacy_auth_custom_roles: string[]
+      /**
+       * @deprecated
+       * @description Use validation_errors instead.
+       */
       objects_to_be_dropped: string[]
       target_upgrade_versions: {
         app_version: string
@@ -3153,8 +3304,68 @@ export interface components {
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
+      /**
+       * @deprecated
+       * @description Use validation_errors instead.
+       */
       unsupported_extensions: string[]
+      /**
+       * @deprecated
+       * @description Use validation_errors instead.
+       */
       user_defined_objects_in_internal_schemas: string[]
+      validation_errors: (
+        | {
+            dependents: string[]
+            /** @enum {string} */
+            type: 'objects_depending_on_pg_cron'
+          }
+        | {
+            index_name: string
+            schema_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'indexes_referencing_ll_to_earth'
+          }
+        | {
+            function_name: string
+            lang_name: string
+            schema_name: string
+            /** @enum {string} */
+            type: 'function_using_obsolete_lang'
+          }
+        | {
+            extension_name: string
+            /** @enum {string} */
+            type: 'unsupported_extension'
+          }
+        | {
+            fdw_handler_name: string
+            fdw_name: string
+            /** @enum {string} */
+            type: 'unsupported_fdw_handler'
+          }
+        | {
+            schema_name: string
+            sequence_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'unlogged_table_with_persistent_sequence'
+          }
+        | {
+            obj_name: string
+            /** @enum {string} */
+            obj_type: 'table' | 'function'
+            schema_name: string
+            /** @enum {string} */
+            type: 'user_defined_objects_in_internal_schemas'
+          }
+        | {
+            slot_name: string
+            /** @enum {string} */
+            type: 'active_replication_slot'
+          }
+      )[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
@@ -3163,6 +3374,28 @@ export interface components {
       enabled: boolean
       override_active_until: string
       override_enabled: boolean
+    }
+    RealtimeConfigResponse: {
+      /** @description Sets connection pool size for Realtime Authorization */
+      connection_pool: number | null
+      /** @description Sets maximum number of bytes per second rate per channel limit */
+      max_bytes_per_second: number | null
+      /** @description Sets maximum number of channels per client rate limit */
+      max_channels_per_client: number | null
+      /** @description Sets maximum number of concurrent users rate limit */
+      max_concurrent_users: number | null
+      /** @description Sets maximum number of events per second rate per channel limit */
+      max_events_per_second: number | null
+      /** @description Sets maximum number of joins per second rate limit */
+      max_joins_per_second: number | null
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb: number | null
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second: number | null
+      /** @description Whether to only allow private channels */
+      private_only: boolean | null
+      /** @description Whether to suspend realtime */
+      suspend: boolean | null
     }
     RegionsInfo: {
       all: {
@@ -3358,14 +3591,22 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
+          maxCatalogs: number
+          maxNamespaces: number
+          maxTables: number
         }
         imageTransformation: {
           enabled: boolean
         }
         s3Protocol: {
           enabled: boolean
+        }
+        vectorBuckets: {
+          enabled: boolean
+          maxBuckets: number
+          maxIndexes: number
         }
       }
       /** Format: int64 */
@@ -3418,6 +3659,8 @@ export interface components {
     UpdateAuthConfigBody: {
       api_max_request_duration?: number | null
       db_max_pool_size?: number | null
+      /** @enum {string|null} */
+      db_max_pool_size_unit?: 'connections' | 'percent' | null
       disable_signup?: boolean | null
       external_anonymous_users_enabled?: boolean | null
       external_apple_additional_client_ids?: string | null
@@ -3506,6 +3749,10 @@ export interface components {
       external_workos_enabled?: boolean | null
       external_workos_secret?: string | null
       external_workos_url?: string | null
+      external_x_client_id?: string | null
+      external_x_email_optional?: boolean | null
+      external_x_enabled?: boolean | null
+      external_x_secret?: string | null
       external_zoom_client_id?: string | null
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
@@ -3582,6 +3829,9 @@ export interface components {
       mfa_web_authn_verify_enabled?: boolean | null
       nimbus_oauth_client_id?: string | null
       nimbus_oauth_client_secret?: string | null
+      oauth_server_allow_dynamic_registration?: boolean | null
+      oauth_server_authorization_path?: string | null
+      oauth_server_enabled?: boolean | null
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -3731,7 +3981,8 @@ export interface components {
       root_key: string
     }
     UpdatePostgresConfigBody: {
-      checkpoint_timeout?: number
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -3752,10 +4003,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3813,6 +4066,28 @@ export interface components {
       }
       updated_at?: string
     }
+    UpdateRealtimeConfigBody: {
+      /** @description Sets connection pool size for Realtime Authorization */
+      connection_pool?: number
+      /** @description Sets maximum number of bytes per second rate per channel limit */
+      max_bytes_per_second?: number
+      /** @description Sets maximum number of channels per client rate limit */
+      max_channels_per_client?: number
+      /** @description Sets maximum number of concurrent users rate limit */
+      max_concurrent_users?: number
+      /** @description Sets maximum number of events per second rate per channel limit */
+      max_events_per_second?: number
+      /** @description Sets maximum number of joins per second rate limit */
+      max_joins_per_second?: number
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb?: number
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second?: number
+      /** @description Whether to only allow private channels */
+      private_only?: boolean
+      /** @description Whether to suspend realtime */
+      suspend?: boolean
+    }
     UpdateRunStatusBody: {
       /** @enum {string} */
       clone?: 'CREATED' | 'DEAD' | 'EXITED' | 'PAUSED' | 'REMOVING' | 'RESTARTING' | 'RUNNING'
@@ -3845,12 +4120,20 @@ export interface components {
       features?: {
         icebergCatalog?: {
           enabled: boolean
+          maxCatalogs: number
+          maxNamespaces: number
+          maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
+        }
+        vectorBuckets?: {
+          enabled: boolean
+          maxBuckets: number
+          maxIndexes: number
         }
       }
       /** Format: int64 */
@@ -3897,6 +4180,7 @@ export interface components {
     V1CreateMigrationBody: {
       name?: string
       query: string
+      rollback?: string
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -3930,8 +4214,13 @@ export interface components {
       kps_enabled?: boolean
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
-      organization_id: string
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
+      organization_id?: string
+      /** @description Organization slug */
+      organization_slug: string
       /**
        * @deprecated
        * @description Subscription Plan is now set on organization level and is ignored in this request
@@ -4022,6 +4311,14 @@ export interface components {
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
        */
       template_url?: string
+    }
+    V1GetMigrationResponse: {
+      created_by?: string
+      idempotency_key?: string
+      name?: string
+      rollback?: string[]
+      statements?: string[]
+      version: string
     }
     V1GetUsageApiCountResponse: {
       error?:
@@ -4135,7 +4432,11 @@ export interface components {
         | 'AI_LOG_GENERATOR_OPT_IN'
       )[]
       /** @enum {string} */
-      plan?: 'free' | 'pro' | 'team' | 'enterprise'
+      plan?: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+    }
+    V1PatchMigrationBody: {
+      name?: string
+      rollback?: string
     }
     V1PgbouncerConfigResponse: {
       connection_string?: string
@@ -4221,12 +4522,22 @@ export interface components {
        * @example 2023-03-29T16:32:59Z
        */
       created_at: string
-      /** @description Id of your project */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `ref` instead.
+       */
       id: string
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
       organization_id: string
+      /** @description Organization slug */
+      organization_slug: string
+      /** @description Project ref */
+      ref: string
       /**
        * @description Region of your project
        * @example us-east-1
@@ -4266,12 +4577,22 @@ export interface components {
         /** @description Database version */
         version: string
       }
-      /** @description Id of your project */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `ref` instead.
+       */
       id: string
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
       organization_id: string
+      /** @description Organization slug */
+      organization_slug: string
+      /** @description Project ref */
+      ref: string
       /**
        * @description Region of your project
        * @example us-east-1
@@ -4295,6 +4616,10 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
+    V1ReadOnlyQueryBody: {
+      parameters?: unknown[]
+      query: string
+    }
     V1RestorePitrBody: {
       /** Format: int64 */
       recovery_time_target_unix: number
@@ -4314,6 +4639,10 @@ export interface components {
     }
     V1ServiceHealthResponse: {
       error?: string
+      /**
+       * @deprecated
+       * @description Deprecated. Use `status` instead.
+       */
       healthy: boolean
       info?:
         | {
@@ -4325,6 +4654,10 @@ export interface components {
         | {
             connected_cluster: number
             db_connected: boolean
+            /**
+             * @deprecated
+             * @description Deprecated. Use `status` instead.
+             */
             healthy: boolean
           }
         | {
@@ -4359,15 +4692,25 @@ export interface components {
       name?: string
       verify_jwt?: boolean
     }
+    V1UpdatePasswordBody: {
+      password: string
+    }
+    V1UpdatePasswordResponse: {
+      message: string
+    }
     V1UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
       db_pool?: number
       db_schema?: string
       max_rows?: number
     }
+    V1UpdateProjectBody: {
+      name: string
+    }
     V1UpsertMigrationBody: {
       name?: string
       query: string
+      rollback?: string
     }
     VanitySubdomainBody: {
       vanity_subdomain: string
@@ -4417,7 +4760,10 @@ export interface operations {
   }
   'v1-delete-a-branch': {
     parameters: {
-      query?: never
+      query?: {
+        /** @description If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled). */
+        force?: boolean
+      }
       header?: never
       path: {
         /** @description Branch ID */
@@ -4599,6 +4945,35 @@ export interface operations {
         }
       }
       /** @description Failed to reset database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-restore-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Branch ID */
+        branch_id_or_ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchRestoreResponse']
+        }
+      }
+      /** @description Failed to restore database branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -5106,6 +5481,60 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-a-project': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdateProjectBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ProjectRefResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -7721,6 +8150,95 @@ export interface operations {
       }
     }
   }
+  'v1-get-realtime-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Gets project's realtime configuration */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RealtimeConfigResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-realtime-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRealtimeConfigBody']
+      }
+    }
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-storage-config': {
     parameters: {
       query?: never
@@ -8774,6 +9292,215 @@ export interface operations {
       }
     }
   }
+  'v1-rollback-migrations': {
+    parameters: {
+      query: {
+        /** @description Rollback migrations greater or equal to this version */
+        gte: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to rollback database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        version: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1GetMigrationResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        version: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1PatchMigrationBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to patch database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-database-password': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdatePasswordBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1UpdatePasswordResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update database password */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-run-a-query': {
     parameters: {
       query?: never
@@ -8818,6 +9545,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to run sql query */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-read-only-query': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1ReadOnlyQueryBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to run read-only sql query */
       500: {
         headers: {
           [name: string]: unknown

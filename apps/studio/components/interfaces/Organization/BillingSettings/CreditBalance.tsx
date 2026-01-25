@@ -25,7 +25,7 @@ const CreditBalance = () => {
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })

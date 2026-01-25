@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
@@ -5,8 +6,8 @@ import { useParams } from 'common'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import { Bucket } from './Content/Bucket'
 import { EdgeFunction } from './Content/EdgeFunction'
 import { EdgeFunctions } from './Content/EdgeFunctions'
@@ -18,9 +19,9 @@ import { RPC } from './Content/RPC'
 import { Storage } from './Content/Storage'
 import { StoredProcedures } from './Content/StoredProcedures'
 import { UserManagement } from './Content/UserManagement'
-import FirstLevelNav from './FirstLevelNav'
+import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
-import SecondLevelNav from './SecondLevelNav'
+import { SecondLevelNav } from './SecondLevelNav'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature
@@ -44,7 +45,7 @@ export const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs && canReadAPIKeys }

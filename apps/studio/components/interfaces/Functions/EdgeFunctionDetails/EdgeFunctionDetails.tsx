@@ -10,8 +10,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
@@ -36,8 +35,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input,
-  Input_Shadcn_,
   Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
@@ -45,12 +42,14 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
@@ -84,7 +83,7 @@ export const EdgeFunctionDetails = () => {
     '*'
   )
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     {
       projectRef,
@@ -96,7 +95,7 @@ export const EdgeFunctionDetails = () => {
   const {
     data: selectedFunction,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useEdgeFunctionQuery({
@@ -104,8 +103,8 @@ export const EdgeFunctionDetails = () => {
     slug: functionSlug,
   })
 
-  const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
-  const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
+  const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
       router.push(`/project/${projectRef}/functions`)
@@ -172,11 +171,15 @@ export const EdgeFunctionDetails = () => {
   return (
     <PageContainer size="full">
       <PageSection orientation="horizontal">
-        <PageSectionSummary className="gap-6">
+        <PageSectionSummary className="gap-6 !self-start">
           <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
-            <AlertError error={error} subject="Failed to retrieve edge function details" />
+            <AlertError
+              error={error}
+              subject="Failed to retrieve edge function details"
+              layout="vertical"
+            />
           )}
           {isSuccess && (
             <dl className="grid grid-cols-1 @xl:grid-cols-[auto_1fr] gap-y-2 [&>dd]:mb-3 @xl:[&>dd]:mb-0 @xl:gap-y-4 gap-x-10">
@@ -186,10 +189,10 @@ export const EdgeFunctionDetails = () => {
               <dt className="text-sm text-foreground-light">Endpoint URL</dt>
               <dd className="text-sm @lg:text-left">
                 <Input
-                  className="font-mono input-mono"
-                  disabled
                   copy
+                  readOnly
                   size="small"
+                  className="font-mono input-mono"
                   value={functionUrl}
                 />
               </dd>
@@ -245,9 +248,11 @@ export const EdgeFunctionDetails = () => {
         </PageSectionSummary>
         <PageSectionContent>
           <PageSection className="pt-0">
-            <PageSectionSummary>
-              <PageSectionTitle>Function Configuration</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Function configuration</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onUpdateFunction)}>
@@ -263,7 +268,7 @@ export const EdgeFunctionDetails = () => {
                             description="Your slug and endpoint URL will remain the same"
                           >
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                              <Input
                                 {...field}
                                 className="w-64"
                                 disabled={!canUpdateEdgeFunction}
@@ -327,9 +332,11 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Invoke function</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Invoke function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Card>
                 <CardContent className="px-0">
@@ -395,9 +402,11 @@ export const EdgeFunctionDetails = () => {
           </PageSection>
 
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Develop locally</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Develop locally</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
                 <div className="space-y-6">
@@ -423,9 +432,11 @@ export const EdgeFunctionDetails = () => {
             </PageSectionContent>
           </PageSection>
           <PageSection>
-            <PageSectionSummary>
-              <PageSectionTitle>Delete function</PageSectionTitle>
-            </PageSectionSummary>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Delete function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <PageSectionContent>
               <Alert_Shadcn_ variant="destructive">
                 <CriticalIcon />
