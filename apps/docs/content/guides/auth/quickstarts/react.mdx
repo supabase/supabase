@@ -123,9 +123,10 @@ hideToc: true
 
               if (token_hash) {
                   // Verify the OTP token
+                  // Use "magiclink" for magic link flows, "email" for numeric OTP codes
                   supabase.auth.verifyOtp({
                       token_hash,
-                      type: type || "email",
+                      type: type || "magiclink",
                   }).then(({ error }) => {
                       if (error) {
                           setAuthError(error.message);
@@ -262,7 +263,7 @@ hideToc: true
 
     - Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
     - Select the Confirm sign up template.
-    - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}?token_hash={{ .TokenHash }}&type=email`.
+    - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}?token_hash={{ .TokenHash }}&type=magiclink`.
     - Change your [Site URL](/dashboard/project/_/auth/url-configuration) to `https://localhost:5173`
 
     </StepHikeCompact.Details>
