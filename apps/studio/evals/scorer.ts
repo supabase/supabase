@@ -3,6 +3,7 @@ import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
+import { MOCK_TABLES_DATA } from 'lib/ai/tools/mock-tools'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
@@ -28,7 +29,6 @@ type Output = {
 export type Expected = {
   requiredTools?: string[]
   correctAnswer?: string
-  correctSql?: string
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -274,16 +274,106 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
   })
 }
 
-export const sqlCorrectnessScorer: EvalScorer<Input, Output, Expected> = async ({
-  output,
-  expected,
-}) => {
-  if (!expected.correctSql) return null
+/**
+ * Recursively traverse a libpg-query AST to extract all identifiers.
+ * Collects table names from RangeVar and column names from ColumnRef.
+ */
+function extractIdentifiers(ast: unknown): string[] {
+  const identifiers: string[] = []
 
-  const match = output.sqlQueries.some((sql) => sql === expected.correctSql)
+  function traverse(node: unknown): void {
+    if (!node || typeof node !== 'object') return
+
+    const obj = node as Record<string, unknown>
+
+    // RangeVar - table references
+    if ('RangeVar' in obj) {
+      const rv = obj.RangeVar as { relname?: string; schemaname?: string }
+      if (rv.relname) identifiers.push(rv.relname)
+      if (rv.schemaname) identifiers.push(rv.schemaname)
+    }
+
+    // ColumnRef - column references
+    if ('ColumnRef' in obj) {
+      const cr = obj.ColumnRef as { fields?: Array<{ String?: { sval?: string } }> }
+      for (const field of cr.fields ?? []) {
+        if (field.String?.sval) identifiers.push(field.String.sval)
+      }
+    }
+
+    // Recurse into all values
+    for (const value of Object.values(obj)) {
+      if (Array.isArray(value)) {
+        value.forEach(traverse)
+      } else {
+        traverse(value)
+      }
+    }
+  }
+
+  traverse(ast)
+  return identifiers
+}
+
+export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = async ({
+  input,
+  output,
+}) => {
+  // Skip if no SQL queries
+  if (!output.sqlQueries?.length) {
+    return null
+  }
+
+  // Use override if provided, otherwise fall back to default mock data
+  const tables = input.mockToolOutputs?.list_tables ?? MOCK_TABLES_DATA
+
+  // Build index: lowercase name → original name
+  const schemaIndex = new Map<string, string>()
+  for (const table of tables) {
+    schemaIndex.set(table.name.toLowerCase(), table.name)
+    for (const col of table.columns) {
+      schemaIndex.set(col.name.toLowerCase(), col.name)
+    }
+  }
+
+  // Find identifiers that need quoting (contain uppercase)
+  const needsQuoting = (name: string) => /[A-Z]/.test(name)
+  const identifiersRequiringQuotes = new Set(Array.from(schemaIndex.values()).filter(needsQuoting))
+
+  if (identifiersRequiringQuotes.size === 0) {
+    return null // Nothing to check (all lowercase)
+  }
+
+  let totalChecks = 0
+  let properlyQuoted = 0
+  const errors: string[] = []
+
+  for (const sql of output.sqlQueries) {
+    try {
+      const ast = await parse(sql)
+      const identifiers = extractIdentifiers(ast)
+
+      for (const id of identifiers) {
+        const original = schemaIndex.get(id.toLowerCase())
+        if (original && needsQuoting(original)) {
+          totalChecks++
+          if (id === original) {
+            properlyQuoted++
+          } else {
+            errors.push(`"${id}" should be quoted as "${original}"`)
+          }
+        }
+      }
+    } catch {
+      // Parse errors handled by sqlSyntaxScorer
+    }
+  }
+
+  if (totalChecks === 0) return null
 
   return {
-    name: 'SQL Correctness',
-    score: match ? 1 : 0,
+    name: 'SQL Identifier Quoting',
+    score: properlyQuoted / totalChecks,
+    metadata: errors.length > 0 ? { errors } : undefined,
   }
 }

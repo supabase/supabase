@@ -23,7 +23,7 @@ const listPoliciesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to get the policies for'),
 })
 
-const MOCK_TABLES_DATA = [
+export const MOCK_TABLES_DATA = [
   {
     name: 'user_documents',
     rls_enabled: false,

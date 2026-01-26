@@ -84,7 +84,6 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['execute_sql'],
-      correctSql: `SELECT * FROM public.locations WHERE "locationType" = 'office';`,
     },
     metadata: { category: ['sql_generation'] },
   },
