@@ -3,9 +3,19 @@ title: Migrating within Supabase
 subtitle: Learn how to migrate from one Supabase project to another
 ---
 
-### Caveats
+<Admonition type="caution">
 
-- If you need to move your project to a different organization, see [project transfers](/docs/guides/platform/project-transfer).
+For Paid Plan projects, use the simpler and more reliable [Restore to a new project feature](/dashboard/project/_/database/backups/restore-to-new-project)
+
+</Admonition>
+
+<Admonition type="tip">
+
+If you need to move your project to a different organization, see [project transfers](/docs/guides/platform/project-transfer).
+
+</Admonition>
+
+## Important to know
 
 - What will be restored to the new project?
 
@@ -16,143 +26,64 @@ subtitle: Learn how to migrate from one Supabase project to another
 
 - What needs manual reconfiguration?
 
-  - Storage objects & settings (See [storage object migration guide](/docs/guides/platform/migrating-within-supabase#migrate-storage) at the end of this page)
+  - Storage objects & settings
   - Edge Functions
   - Auth settings & API keys
   - Realtime settings
   - Database extensions and settings
   - Read replicas
 
-### Before you begin
+---
 
-    <Accordion
+## Quick Start
 
-type="default"
-openBehaviour="multiple"
-chevronAlign="right"
-justified
-className="text-foreground-light mt-8 mb-6"
+The simplest option is to use our Google Colab notebook where you provide the necessray details to perform Backup and Restore operations remotely:
 
->
+[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
 
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
-      header={<span className="text-foreground">Install postgres and psql</span>}
-      id="install-postgres"
-    >
-      <$Partial path="postgres_installation.mdx" />
-    </AccordionItem>
-  </div>
-  </Accordion>
+---
 
-<Accordion
-  type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <div className="border-b mt-3 pb-3">
-        <AccordionItem
-        header={<span className="text-foreground">Database backup file (*.backup or *.sql only. <strong>Decompress the file if it is *.backup.gz</strong>)</span>}
-        id="backup-project"
-        >
-        <StepHikeCompact>
-        Database backups can be downloaded from the [Database backups](dashboard/project/_/database/backups/scheduled) page or from the [paused project](dashboard/project/_) page if paused for greater than 90 days.
-        
-        How to manually take a database backup:
-  <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Install the Supabase CLI" fullWidth>
-    Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
-    </StepHikeCompact.Details>
-  </StepHikeCompact.Step>
+## Alternative method
 
-<StepHikeCompact.Step step={2}>
-  <StepHikeCompact.Details title="Install Docker Desktop" fullWidth>
-    Install [Docker Desktop](https://www.docker.com) for your platform.
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
+This should be used if there are issues using the Colab notebook or you prefer running the operations locally.
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Get the new project's database connection string" fullWidth>
-      <ProjectConfigVariables variable="sessionpooler" />
-    </StepHikeCompact.Details>
+### Backup Database
 
-  </StepHikeCompact.Step>
+    1. Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Get the database password" fullWidth>
-      If you do not have your database password, reset and note the new password in the [Database Settings](/dashboard/project/_/settings/database). 
-      
-      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
-    </StepHikeCompact.Details>
+    2. Install [Docker Desktop](https://www.docker.com) for your platform.
 
-  </StepHikeCompact.Step>
+    3. Get the Database connection string
 
-  <StepHikeCompact.Step step={5}>
-      <StepHikeCompact.Details title="Backup database" fullWidth>
-       Run these commands after replacing ```[CONNECTION_STRING]``` with your updated connection string from the previous steps:
+        <ProjectConfigVariables variable="sessionpooler" />
+
+        If you do not have your database password, reset the password in the [Database Settings](/dashboard/project/_/settings/database).
+
+    4. Run these commands after replacing ```[CONNECTION_STRING]``` with your updated connection string
 
         ```bash
         supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
         supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
         supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
         ```
-      </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
 
-</StepHikeCompact>
-        </AccordionItem>
-  </div>
-</Accordion>
+### Restore Database Backup
 
-### How to restore a backup to a new Supabase project
+1.  Install [Postgresql](https://www.postgresql.org/download/) which includes the command line tool psql
 
-<StepHikeCompact>
-    <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create and configure new Supabase project" fullWidth>
-          Create a [new project](https://database.new). In the new project:
-            - Enable [Database Webhooks](/dashboard/project/_/database/hooks) as needed.
-            - Enable the [Extensions](/dashboard/project/_/database/extensions) used in the old project.
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+2.  Create a [new project](https://database.new). In the new project:
 
-    <StepHikeCompact.Step step={2}>
-      <StepHikeCompact.Details title="Get the database connection string of the new project" fullWidth>
+    - Enable [Database Webhooks](/dashboard/project/_/database/hooks) as needed.
+    - Enable the [Extensions](/dashboard/project/_/database/extensions) used in the old project.
 
-      <ProjectConfigVariables variable="sessionpooler" />
+3.  Get the Database connection string
 
-      </StepHikeCompact.Details>
+        <ProjectConfigVariables variable="sessionpooler" />
 
-    </StepHikeCompact.Step>
+        If you do not have your database password, reset the password in the [Database Settings](/dashboard/project/_/settings/database).
 
-    <StepHikeCompact.Step step={3}>
+4.  Run the following command:
 
-    <StepHikeCompact.Details title="Get the database password for the new project" fullWidth>
-      If you do not have your database password, reset and note the new password in the [Database Settings](/dashboard/project/_/settings/database).
-
-      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
-    </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={4}>
-      <StepHikeCompact.Details title="Restore the database backup with psql" fullWidth>
-          Replace ```[CONNECTION_STRING]``` with the connection string. Select the appropriate option and run the command:
-
-        <Tabs
-          scrollable
-          size="large"
-          type="underlined"
-          defaultActiveId="backup-file"
-        >
-          <TabPanel id="backup-file" label="*.backup file">
-          ```bash
-          psql -d [CONNECTION_STRING] -f file/path
-          ```
-          </TabPanel>
-
-          <TabPanel id="sql-file" label="*.sql files">
           ```bash
           psql \
             --single-transaction \
@@ -162,72 +93,12 @@ className="text-foreground-light mt-8 mb-6"
             --file data.sql \
             --dbname [CONNECTION_STRING]
           ```
-          </TabPanel>
-        </Tabs>
-      </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
 
 ### Migrate Storage
 
-        If you have your storage objects locally (e.g. >90 day paused projects), migrate the storage objects to the new project using this [Google Colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
+Use the Google colab notebook to either upload the Storage objects or transfer the Storage objects from an active Supabase Project.
 
-        If the old project is still active, use this script to move storage objects from one project to another:
-
-        ```js
-        // npm install @supabase/supabase-js@1
-        const { createClient } = require('@supabase/supabase-js')
-
-        const OLD_PROJECT_URL = 'https://xxx.supabase.co'
-        const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
-
-        const NEW_PROJECT_URL = 'https://yyy.supabase.co'
-        const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
-
-        ;(async () => {
-        const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-        schema: 'storage',
-        })
-        const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
-        const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
-
-        // make sure you update max_rows in postgrest settings if you have a lot of objects
-        // or paginate here
-        const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
-        if (error) {
-        console.log('error getting objects from old bucket')
-        throw error
-        }
-
-        for (const objectData of oldObjects) {
-        console.log(`moving ${objectData.id}`)
-        try {
-        const { data, error: downloadObjectError } = await oldSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .download(objectData.name)
-        if (downloadObjectError) {
-        throw downloadObjectError
-        }
-
-            const { _, error: uploadObjectError } = await newSupabaseClient.storage
-                .from(objectData.bucket_id)
-                .upload(objectData.name, data, {
-                upsert: true,
-                contentType: objectData.metadata.mimetype,
-                cacheControl: objectData.metadata.cacheControl,
-                })
-            if (uploadObjectError) {
-                throw uploadObjectError
-            }
-            } catch (err) {
-            console.log('error moving ', objectData)
-            console.log(err)
-            }
-
-        }
-        })()
-        ```
+[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
 
 ### Troubleshooting notes
 
