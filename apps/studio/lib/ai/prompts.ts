@@ -235,6 +235,7 @@ export const PG_BEST_PRACTICES = `
 ## SQL Style Guidelines
 - Ensure all generated SQL is valid for Postgres.
 - Always escape single quotes within strings using double apostrophes (e.g., \`'Night''s watch'\`).
+- Always quote identifiers (table names, column names) containing uppercase letters with double quotes to preserve case (e.g., \`SELECT "locationType" FROM "Locations"\`). PostgreSQL normalizes unquoted identifiers to lowercase.
 - Terminate each SQL statement with a semicolon (`
 ;`).
 - For embeddings or vector queries, use \`vector(384)\`.
