@@ -1271,7 +1271,7 @@ OAuth 2.1 Server provides enterprise-grade identity provider capabilities built 
     docsUrl: 'https://supabase.com/docs/guides/auth/oauth-server',
     slug: 'oauth2-1-server',
     status: {
-      stage: PRODUCT_STAGES.GA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
