@@ -28,27 +28,6 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
   )
 }
 
-const getValidationErrorKey = (error: ProjectUpgradeEligibilityValidationError): string => {
-  switch (error.type) {
-    case 'objects_depending_on_pg_cron':
-      return `pg_cron-${error.dependents.join(',')}`
-    case 'indexes_referencing_ll_to_earth':
-      return `index-${error.schema_name}.${error.index_name}`
-    case 'function_using_obsolete_lang':
-      return `function-${error.schema_name}.${error.function_name}`
-    case 'unsupported_extension':
-      return `extension-${error.extension_name}`
-    case 'unsupported_fdw_handler':
-      return `fdw-${error.fdw_name}`
-    case 'unlogged_table_with_persistent_sequence':
-      return `sequence-${error.schema_name}.${error.table_name}.${error.sequence_name}`
-    case 'user_defined_objects_in_internal_schemas':
-      return `internal-${error.schema_name}.${error.obj_name}`
-    case 'active_replication_slot':
-      return `slot-${error.slot_name}`
-  }
-}
-
 const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
@@ -91,13 +70,8 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
   }
 }
 
-const ValidationErrorItem = ({
-  error,
-  projectRef,
-}: {
-  error: ProjectUpgradeEligibilityValidationError
-  projectRef: string
-}) => {
+const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValidationError }) => {
+  const { ref: projectRef } = useParams()
   const title = getValidationErrorTitle(error)
   const description = getValidationErrorDescription(error)
 
@@ -155,8 +129,6 @@ export const ValidationErrorsWarning = ({
 }: {
   validationErrors: ProjectUpgradeEligibilityValidationError[]
 }) => {
-  const { ref } = useParams()
-  if (!ref) return null
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
       <div className="flex flex-col gap-3">
@@ -165,12 +137,8 @@ export const ValidationErrorsWarning = ({
           <InlineLink href={`${DOCS_URL}/guides/platform/upgrading`}>Learn more</InlineLink>
         </p>
         <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
-          {validationErrors.map((error) => (
-            <ValidationErrorItem
-              key={getValidationErrorKey(error)}
-              error={error}
-              projectRef={ref}
-            />
+          {validationErrors.map((error, idx) => (
+            <ValidationErrorItem key={`${error.type}-${idx}`} error={error} />
           ))}
         </ul>
       </div>
