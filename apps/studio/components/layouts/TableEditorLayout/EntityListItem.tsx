@@ -259,7 +259,7 @@ export const EntityListItem = ({
                 <DropdownMenuItem
                   key="copy-schema"
                   className="space-x-2"
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
@@ -271,7 +271,6 @@ export const EntityListItem = ({
                       if (!tableDefinition) {
                         throw new Error('Failed to get table schema')
                       }
-
                       return formatSql(tableDefinition)
                     })
 
@@ -279,9 +278,7 @@ export const EntityListItem = ({
                       copyToClipboard(formattedSchema)
                       toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
-                      toast.error('Failed to copy schema: ' + (err.message || err), {
-                        id: toastId,
-                      })
+                      toast.error('Failed to copy schema: ' + (err.message || err), { id: toastId })
                     }
                   }}
                 >
