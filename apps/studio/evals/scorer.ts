@@ -4,6 +4,7 @@ import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 import { MOCK_TABLES_DATA } from 'lib/ai/tools/mock-tools'
+import { extractIdentifiers } from 'lib/sql-identifiers'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
@@ -272,47 +273,6 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
     expected: expected.correctAnswer,
     output: extractTextOnly(output.steps),
   })
-}
-
-/**
- * Recursively traverse a libpg-query AST to extract all identifiers.
- * Collects table names from RangeVar and column names from ColumnRef.
- */
-function extractIdentifiers(ast: unknown): string[] {
-  const identifiers: string[] = []
-
-  function traverse(node: unknown): void {
-    if (!node || typeof node !== 'object') return
-
-    const obj = node as Record<string, unknown>
-
-    // RangeVar - table references
-    if ('RangeVar' in obj) {
-      const rv = obj.RangeVar as { relname?: string; schemaname?: string }
-      if (rv.relname) identifiers.push(rv.relname)
-      if (rv.schemaname) identifiers.push(rv.schemaname)
-    }
-
-    // ColumnRef - column references
-    if ('ColumnRef' in obj) {
-      const cr = obj.ColumnRef as { fields?: Array<{ String?: { sval?: string } }> }
-      for (const field of cr.fields ?? []) {
-        if (field.String?.sval) identifiers.push(field.String.sval)
-      }
-    }
-
-    // Recurse into all values
-    for (const value of Object.values(obj)) {
-      if (Array.isArray(value)) {
-        value.forEach(traverse)
-      } else {
-        traverse(value)
-      }
-    }
-  }
-
-  traverse(ast)
-  return identifiers
 }
 
 export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = async ({
