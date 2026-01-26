@@ -215,7 +215,21 @@ export const formatScheduleString = (value: string) => {
     if (secondsPattern.test(value)) {
       return value
     } else {
-      return CronToString(value)
+      // Handle pg_cron's $ syntax for "last day of month" in the day-of-month field (3rd field).
+      // We use 28 as a placeholder because it exists in every month, allowing cronstrue to parse
+      // the expression. We then replace "day 28" with "the last day" in the output text.
+      const parts = value.split(/\s+/)
+      const hasDollarInDayOfMonth = parts.length >= 3 && parts[2] === '$'
+
+      let normalizedValue = value
+      if (hasDollarInDayOfMonth) {
+        parts[2] = '28'
+        normalizedValue = parts.join(' ')
+      }
+
+      const result = CronToString(normalizedValue)
+      // Replace "day 28" with "the last day" for better readability
+      return hasDollarInDayOfMonth ? result.replace(/day 28/gi, 'the last day') : result
     }
   } catch (error) {
     return ''
