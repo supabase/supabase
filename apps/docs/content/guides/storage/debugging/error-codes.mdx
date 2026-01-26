@@ -21,9 +21,7 @@ When using the Supabase SDKs, storage errors provide detailed information to hel
 
 ```js
 try {
-  const { data, error } = await supabase.storage
-    .from('avatars')
-    .download('avatar.png')
+  const { data, error } = await supabase.storage.from('avatars').download('avatar.png')
 
   if (error) {
     // Access error details

@@ -54,11 +54,9 @@ const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
 // Download with custom filename
-const { data, error } = await supabase.storage
-  .from('avatars')
-  .download('avatar1.png', {
-    download: 'my-custom-name.png'
-  })
+const { data, error } = await supabase.storage.from('avatars').download('avatar1.png', {
+  download: 'my-custom-name.png',
+})
 ```
 
 </TabPanel>
