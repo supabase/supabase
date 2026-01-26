@@ -16,7 +16,14 @@ import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 import type { Organization } from 'types'
 import { toast } from 'sonner'
-import { copyToClipboard, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Button } from 'ui'
+import {
+  copyToClipboard,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Button,
+} from 'ui'
 
 export interface ProjectCardProps {
   slug?: string
@@ -75,7 +82,10 @@ export const ProjectCard = ({
                           type="text"
                           icon={<MoreVertical size={14} />}
                           className="w-6 h-6 px-0"
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault() }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                          }}
                           onPointerDown={(e) => e.stopPropagation()}
                         />
                       </DropdownMenuTrigger>
