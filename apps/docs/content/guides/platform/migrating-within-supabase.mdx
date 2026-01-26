@@ -15,6 +15,8 @@ If you need to move your project to a different organization, see [project trans
 
 </Admonition>
 
+---
+
 ## Important to know
 
 - What will be restored to the new project?
@@ -35,9 +37,9 @@ If you need to move your project to a different organization, see [project trans
 
 ---
 
-## Quick Start
+## Quick start
 
-The simplest option is to use our Google Colab notebook where you provide the necessray details to perform Backup and Restore operations remotely:
+The simplest option using this Google Colab notebook where you provide the necessary details for Backup and Restore operations:
 
 [![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
 
@@ -45,9 +47,9 @@ The simplest option is to use our Google Colab notebook where you provide the ne
 
 ## Alternative method
 
-This should be used if there are issues using the Colab notebook or you prefer running the operations locally.
+This method can be used if there are issues using the Colab notebook or you prefer running the operations locally.
 
-### Backup Database
+### Backup database
 
     1. Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
 
@@ -67,7 +69,7 @@ This should be used if there are issues using the Colab notebook or you prefer r
         supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
         ```
 
-### Restore Database Backup
+### Restore database backup
 
 1.  Install [Postgresql](https://www.postgresql.org/download/) which includes the command line tool psql
 
@@ -94,9 +96,9 @@ This should be used if there are issues using the Colab notebook or you prefer r
             --dbname [CONNECTION_STRING]
           ```
 
-### Migrate Storage
+### Migrate storage
 
-Use the Google colab notebook to either upload the Storage objects or transfer the Storage objects from an active Supabase Project.
+Use the Google Colab notebook to either upload the Storage objects or transfer the Storage objects from an active Supabase Project.
 
 [![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
 
