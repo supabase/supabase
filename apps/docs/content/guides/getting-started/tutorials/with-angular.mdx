@@ -42,78 +42,13 @@ The application exposes these variables in the browser, and that's fine as you h
 
 <$CodeSample
   path="/user-management/angular-user-management/src/environments/environment.ts"
-  lines={[[1, -1]]}
-  meta="name=src/environments/environment.ts"
-/>
-
-Now you have the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
-
-<$CodeSample
-  path="/user-management/angular-user-management/src/app/supabase.service.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/supabase.service.ts"
-/>
-
-Optionally, update `src/styles.css` to style the app. You can find the full contents of this file [in the example repository](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management/src/styles.css).
-
-### Set up a login component
-
-Next, set up an Angular component to manage logins and sign ups. The component uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
-
-Create an `AuthComponent` with the `ng g c auth` Angular CLI command and add the following code.
-
 <$CodeTabs>
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/auth/auth.component.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/auth/auth.component.ts"
-/>
-
-<$CodeSample
-  path="/user-management/angular-user-management/src/app/auth/auth.component.html"
-  lines={[[1, -1]]}
-  meta="name=src/app/auth/auth.component.html"
-/>
-
-</$CodeTabs>
-
-### Account page
-
-Users also need a way to edit their profile details and manage their accounts after signing in.
-Create an `AccountComponent` with the `ng g c account` Angular CLI command and add the following code.
-
-<$CodeTabs>
-
-<$CodeSample
-  path="/user-management/angular-user-management/src/app/account/account.component.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/account/account.component.ts"
-/>
-
-<$CodeSample
-  path="/user-management/angular-user-management/src/app/account/account.component.html"
-  lines={[[1, -1]]}
-  meta="name=src/app/account/account.component.html"
-/>
-
-</$CodeTabs>
-
-## Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
-
-### Create an upload widget
-
-Create an avatar for the user so that they can upload a profile photo.
-Create an `AvatarComponent` with `ng g c avatar` Angular CLI command and add the following code.
-
-<$CodeTabs>
-
-<$CodeSample
-path="/user-management/angular-user-management/src/app/avatar/avatar.component.ts"
+  path="/user-management/angular-user-management/src/app/avatar/avatar.component.ts"
   lines={[[1, -1]]}
   meta="name=src/app/avatar/avatar.component.ts"
+  language="typescript"
 />
 
 <$CodeSample
