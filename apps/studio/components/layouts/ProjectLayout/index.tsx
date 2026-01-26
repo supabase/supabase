@@ -277,12 +277,16 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
+  const isEdgeFunctionPages = router.pathname.includes('/project/[ref]/functions')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
   const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
-    (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
+    (!isEdgeFunctionPages &&
+      !isSettingsPages &&
+      !routesToIgnoreDBConnection.includes(router.pathname)) ||
+    isVaultPage
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
@@ -348,7 +352,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed && !isBackupsPage) {
+  if (isProjectRestoreFailed && !isBackupsPage && !isEdgeFunctionPages) {
     return <RestoreFailedState />
   }
 
