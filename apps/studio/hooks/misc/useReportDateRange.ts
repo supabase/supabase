@@ -19,10 +19,13 @@ export const DATERANGE_LIMITS: { [key: string]: number } = {
   platform: 1,
 }
 
+// api doesnt support 2m granularity for this endpoint but we can handle it client side
+type ReportInterval = AnalyticsInterval | '2m'
+
 export interface ReportDateRange {
   period_start: { date: string; time_period: string }
   period_end: { date: string; time_period: string }
-  interval: AnalyticsInterval
+  interval: ReportInterval
 }
 
 // Create parsers for individual URL parameters
@@ -176,7 +179,7 @@ export const useReportDateRange = (
     return getDefaultHelper().helper.text
   }, [timestampStartValue, timestampEndValue, helperTextValue, getDefaultHelper])
 
-  const handleIntervalGranularity = (from: string, to: string) => {
+  const handleIntervalGranularity = (from: string, to: string): ReportInterval => {
     const diffInDays = dayjs(to).diff(from, 'day', true)
     const diffInHours = dayjs(to).diff(from, 'hour', true)
 
