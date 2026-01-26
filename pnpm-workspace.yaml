@@ -63,6 +63,7 @@ overrides:
   '@redocly/respect-core>js-yaml': ^4.1.1
   '@tanstack/directive-functions-plugin>vite': 'catalog:'
   '@tanstack/react-start-plugin>vite': 'catalog:'
+  '@smithy/config-resolver': ^4.4.0
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
   preact: 10.26.10
