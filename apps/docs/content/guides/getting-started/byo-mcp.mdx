@@ -16,16 +16,12 @@ This guide covers MCP servers that do not require authentication. Auth support f
 
 Before you begin, make sure you have:
 
-- [Docker](https://docs.docker.com/get-docker/) installed and running (required for local development)
+- [Docker](https://docs.docker.com/get-docker/) or a compatible runtime installed and running (required for local development)
 - [Deno](https://deno.land/) installed (Supabase Edge Functions runtime)
-- [Supabase CLI](/docs/guides/local-development) installed
+- [Supabase CLI](/docs/guides/local-development) installed and authenticated
 - [Node.js 20 or later](https://nodejs.org/) (required by Supabase CLI)
 
----
-
 ## Deploy your MCP server
-
----
 
 ### Step 1: Create a new project
 
@@ -65,9 +61,9 @@ Replace the contents of `supabase/functions/mcp/index.ts` with:
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
-import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.1/server/mcp.js'
-import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.1/server/webStandardStreamableHttp.js'
-import { Hono } from 'npm:hono@^4.9.2'
+import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/mcp.js'
+import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/webStandardStreamableHttp.js'
+import { Hono } from 'npm:hono@^4.9.7'
 import { z } from 'npm:zod@^4.1.13'
 
 // Create Hono app
@@ -105,6 +101,12 @@ Deno.serve(app.fetch)
 <Admonition type="note">
 
 After this step, you should have a new file at `supabase/functions/mcp/index.ts`.
+
+</Admonition>
+
+<Admonition type="caution">
+
+Within Edge Functions, paths are prefixed with the function name. If your function is named something other than `mcp`, configure Hono with a base path: `new Hono().basePath('/your-function-name')`.
 
 </Admonition>
 
@@ -189,8 +191,6 @@ After this step, you should have your MCP server running locally and be able to 
 
 </Admonition>
 
----
-
 ### Step 4: Deploy to production
 
 When you're ready to deploy, link your project and deploy the function:
@@ -213,8 +213,6 @@ Update your MCP client configuration to use the production URL.
 After this step, you have a fully deployed MCP server accessible from anywhere. You can test it using the MCP Inspector with your production URL.
 
 </Admonition>
-
----
 
 ## Examples
 
