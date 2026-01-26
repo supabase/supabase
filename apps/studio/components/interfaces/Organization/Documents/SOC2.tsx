@@ -57,7 +57,7 @@ export const SOC2 = () => {
 
   return (
     <ScaffoldSection>
-      <ScaffoldSectionDetail className="sticky space-y-6 top-12">
+      <ScaffoldSectionDetail>
         <p className="text-base m-0">SOC2 Type 2</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
@@ -67,19 +67,19 @@ export const SOC2 = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         {isLoadingPermissions || isLoadingEntitlement ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="@lg:flex items-center justify-center h-full">
             <ShimmeringLoader className="w-24" />
           </div>
         ) : !canReadSubscriptions ? (
           <NoPermission resourceText="access our SOC2 Type 2 report" />
         ) : !hasAccessToSoc2Report ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="@lg:flex items-center justify-center h-full">
             <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
               <Button type="default">Upgrade to Team</Button>
             </Link>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className="@lg:flex items-center justify-center h-full">
             <Button
               type="default"
               icon={<Download />}

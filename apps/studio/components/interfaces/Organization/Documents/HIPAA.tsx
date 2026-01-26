@@ -16,9 +16,9 @@ export const HIPAA = () => {
   return (
     <>
       <ScaffoldSection>
-        <ScaffoldSectionDetail className="sticky space-y-6 top-12">
+        <ScaffoldSectionDetail>
           <p className="text-base m-0">HIPAA</p>
-          <div className="space-y-2 text-sm text-foreground-light m-0">
+          <div className="space-y-2 text-sm text-foreground-light">
             <p>
               This is only for HIPAA requests. Please ignore this if you already have HIPAA enabled.
             </p>
@@ -34,7 +34,7 @@ export const HIPAA = () => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          <div className="flex items-center justify-center h-full">
+          <div className="@lg:flex items-center justify-center h-full">
             <Button asChild type="default" iconRight={<ExternalLink />}>
               <a
                 href="https://forms.supabase.com/hipaa2"

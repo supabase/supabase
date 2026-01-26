@@ -58,7 +58,7 @@ export const Documents = () => {
 
       <ScaffoldContainer>
         <ScaffoldSection>
-          <p className="sticky space-y-6 top-12 text-sm text-foreground-light m-0 whitespace-nowrap">
+          <p className="text-sm text-foreground-light m-0">
             <SupportLink className={InlineLinkClassName}>Submit a support request</SupportLink> if
             you require additional documents for financial or tax reasons, such as a W-9 form.
           </p>

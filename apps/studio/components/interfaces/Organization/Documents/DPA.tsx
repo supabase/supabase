@@ -38,9 +38,9 @@ export const DPA = () => {
   return (
     <>
       <ScaffoldSection>
-        <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-          <p className="text-base m-0">Data Processing Addendum (DPA)</p>
-          <div className="space-y-2 text-sm text-foreground-light m-0">
+        <ScaffoldSectionDetail>
+          <p className="text-base">Data Processing Addendum (DPA)</p>
+          <div className="space-y-2 text-sm text-foreground-light">
             <p>
               All organizations can sign our Data Processing Addendum ("DPA") as part of their GDPR
               compliance.
@@ -62,18 +62,20 @@ export const DPA = () => {
             </p>
           </div>
         </ScaffoldSectionDetail>
-        <ScaffoldSectionContent className="flex items-center justify-center h-full">
-          <Button
-            onClick={() => {
-              setIsOpen(true)
-              sendEvent({
-                action: 'dpa_request_button_clicked',
-              })
-            }}
-            type="default"
-          >
-            Request DPA
-          </Button>
+        <ScaffoldSectionContent>
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button
+              onClick={() => {
+                setIsOpen(true)
+                sendEvent({
+                  action: 'dpa_request_button_clicked',
+                })
+              }}
+              type="default"
+            >
+              Request DPA
+            </Button>
+          </div>
         </ScaffoldSectionContent>
       </ScaffoldSection>
 
