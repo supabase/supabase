@@ -73,6 +73,7 @@ overrides:
   '@tanstack/react-start-plugin>vite': ^7.1.11
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
+  preact: 10.26.10
   refractor>prismjs: ^1.30.0
   tar: ^7.0.0
   tmp: ^0.2.4
@@ -16629,8 +16630,8 @@ packages:
       rrweb-snapshot:
         optional: true
 
-  preact@10.26.9:
-    resolution: {integrity: sha512-SSjF9vcnF27mJK1XyFMNJzFd5u3pQiATFqoaDy03XuN00u4ziveVVEGt5RKJrDR8MHE/wJo9Nnad56RLzS2RMA==}
+  preact@10.26.10:
+    resolution: {integrity: sha512-sqdfdSa8AZeJ+wfMYjFImIRTnhfyPSLCH+LEb1+BoRUDKLnE6AnvZeClx3Bkj2Q9nn44GFAefOKIx5oc54q93A==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -37959,10 +37960,10 @@ snapshots:
     dependencies:
       core-js: 3.44.0
       fflate: 0.4.8
-      preact: 10.26.9
+      preact: 10.26.10
       web-vitals: 4.2.4
 
-  preact@10.26.9: {}
+  preact@10.26.10: {}
 
   prelude-ls@1.2.1: {}
 

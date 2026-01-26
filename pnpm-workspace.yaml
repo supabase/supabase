@@ -65,6 +65,7 @@ overrides:
   '@tanstack/react-start-plugin>vite': 'catalog:'
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
+  preact: 10.26.10
   refractor>prismjs: ^1.30.0
   tar: ^7.0.0
   tmp: ^0.2.4
