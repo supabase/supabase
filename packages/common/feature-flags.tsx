@@ -14,9 +14,22 @@ import { useParams } from './hooks'
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
 
-export async function getFeatureFlags(API_URL: string) {
+export async function getFeatureFlags(
+  API_URL: string,
+  options: { organizationSlug?: string; projectRef?: string } = {}
+) {
   try {
-    const data = await get(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
+    const url = new URL(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
+
+    if (options.organizationSlug) {
+      url.searchParams.set('organization_slug', options.organizationSlug)
+    }
+
+    if (options.projectRef) {
+      url.searchParams.set('project_ref', options.projectRef)
+    }
+
+    const data = await get(url.toString())
     return data as CallFeatureFlagsResponse
   } catch (error: any) {
     if (error.message.includes('Failed to fetch')) {
@@ -137,7 +150,10 @@ export const FeatureFlagProvider = ({
         loadPHFlags
           ? (async () => {
               await ensureGroupContext()
-              return getFeatureFlags(API_URL)
+              return getFeatureFlags(API_URL, {
+                organizationSlug: resolvedOrganizationSlug,
+                projectRef: resolvedProjectRef,
+              })
             })()
           : Promise.resolve({}),
         loadCCFlags
