@@ -269,8 +269,7 @@ export const EntityListItem = ({
                       connectionString: project?.connectionString,
                     }).then((tableDefinition) => {
                       if (!tableDefinition) {
-                        toast.error('Failed to get table schema', { id: toastId })
-                        return ''
+                        throw new Error('Failed to get table schema')
                       }
 
                       return formatSql(tableDefinition)
