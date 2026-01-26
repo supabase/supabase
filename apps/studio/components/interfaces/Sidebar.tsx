@@ -58,7 +58,7 @@ const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   }
 >
 
-export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> { }
+export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const { setOpen } = useSidebar()
@@ -319,10 +319,10 @@ const ProjectLinks = () => {
                 route={
                   isNewAPIDocsEnabled
                     ? {
-                      label: route.label,
-                      icon: route.icon,
-                      key: route.key,
-                    }
+                        label: route.label,
+                        icon: route.icon,
+                        key: route.key,
+                      }
                     : route
                 }
                 active={activeRoute === route.key}
@@ -414,13 +414,13 @@ const OrganizationLinks = () => {
     },
     ...(showBilling
       ? [
-        {
-          label: 'Billing',
-          href: `/org/${organizationSlug}/billing`,
-          key: 'billing',
-          icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-        },
-      ]
+          {
+            label: 'Billing',
+            href: `/org/${organizationSlug}/billing`,
+            key: 'billing',
+            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          },
+        ]
       : []),
     {
       label: 'Organization settings',
@@ -444,10 +444,10 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                  router.pathname.includes('/apps') ||
-                  router.pathname.includes('/audit') ||
-                  router.pathname.includes('/documents') ||
-                  router.pathname.includes('/security')
+                    router.pathname.includes('/apps') ||
+                    router.pathname.includes('/audit') ||
+                    router.pathname.includes('/documents') ||
+                    router.pathname.includes('/security')
                   : activeRoute === item.key
             }
             route={{
