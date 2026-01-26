@@ -1,12 +1,12 @@
 import { History } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
 import { useRecentRoutes } from 'hooks/misc/useRecentRoutes'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
-import { useRouter } from 'next/router'
-import { useParams } from 'common'
 
 export function useRecentRoutesCommands() {
   const router = useRouter()
@@ -15,22 +15,20 @@ export function useRecentRoutesCommands() {
   const { recentRoutes } = useRecentRoutes()
 
   const commands = useMemo(() => {
-    return recentRoutes.map((route) => {
-      // Format: "Parent > Child" (e.g., "Authentication > Users")
-      const displayName = route.parentLabel
-        ? `${route.parentLabel} > ${route.childName}`
-        : route.childName
-
-      return {
-        id: `recent-${route.key}`,
-        name: displayName,
-        action: () => {
-          router.push(route.link)
-          setIsOpen(false)
-        },
-        icon: () => <History size={18} />,
-      }
-    })
+    return recentRoutes.map((route) => ({
+      id: `recent-${route.key}`,
+      name: route.childName,
+      // Include parent label in value for search
+      value: route.parentLabel ? `${route.childName} ${route.parentLabel}` : route.childName,
+      action: () => {
+        router.push(route.link)
+        setIsOpen(false)
+      },
+      icon: () => <History size={18} />,
+      badge: route.parentLabel
+        ? () => <span className="text-xs text-foreground-muted">{route.parentLabel}</span>
+        : undefined,
+    }))
   }, [recentRoutes, router, setIsOpen])
 
   useRegisterCommands(COMMAND_MENU_SECTIONS.RECENTS, commands, {

@@ -228,11 +228,7 @@ const ProjectLinks = () => {
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
   const { mutate: sendEvent } = useSendEventMutation()
-  const { recentRoutes, trackRoute } = useRecentRoutes()
-  const [sidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
-    DEFAULT_SIDEBAR_BEHAVIOR
-  )
+  const { trackRoute } = useRecentRoutes()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
@@ -397,33 +393,6 @@ const ProjectLinks = () => {
           />
         ))}
       </SidebarGroup>
-      {recentRoutes.length > 0 && (
-        <>
-          <Separator className="w-[calc(100%-1rem)] mx-auto" />
-          <SidebarGroup className="gap-0.5">
-            <span className="text-xs text-foreground-lighter w-full px-2 py-1 uppercase font-mono">Recents</span>
-            {recentRoutes.map((route) => (
-              <SidebarMenuItem key={`recent-${route.key}`}>
-                <SidebarMenuButton
-                  asChild
-                  tooltip={sidebarBehaviour === 'closed' ? route.childName : ''}
-                  className={cn('text-sm', sidebarBehaviour === 'open' ? '' : '')}
-                  size="sm"
-                >
-                  <Link href={route.link}>
-                    <div className="flex flex-col items-start leading-tight">
-                      <span>{route.childName}</span>
-                      {route.parentLabel && (
-                        <span className="text-[10px] text-foreground-muted">{route.parentLabel}</span>
-                      )}
-                    </div>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarGroup>
-        </>
-      )}
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {productRoutes.map((route, i) => (
