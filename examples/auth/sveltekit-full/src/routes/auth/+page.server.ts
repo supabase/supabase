@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit'
+import type { Provider } from '@supabase/supabase-js'
 
 import type { Actions } from './$types'
 
@@ -28,5 +29,23 @@ export const actions: Actions = {
     } else {
       redirect(303, '/private')
     }
+  },
+  oauth: async ({ request, locals: { supabase }, url }) => {
+    const formData = await request.formData()
+    const provider = formData.get('provider') as Provider
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${url.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      console.error(error)
+      redirect(303, '/auth/error')
+    }
+
+    redirect(303, data.url)
   },
 }
