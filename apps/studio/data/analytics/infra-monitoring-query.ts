@@ -102,13 +102,13 @@ export async function getInfraMonitoringAttributes(
   })
 
   if (error) handleError(error)
-  
+
   // Store original interval for aggregation
   const response = data as unknown as InfraMonitoringResponse & { _originalInterval?: '2m' }
   if (is2MinInterval) {
     response._originalInterval = '2m'
   }
-  
+
   return response
 }
 

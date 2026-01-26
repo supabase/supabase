@@ -78,8 +78,8 @@ export function useInfraMonitoringQueries(
 }
 
 const aggregate1MinTo2Min = (
-  dataPoints: Array<{ period_start: string; [key: string]: any }>
-): Array<{ period_start: string; [key: string]: any }> => {
+  dataPoints: Array<{ period_start: string; periodStartFormatted?: string; [key: string]: any }>
+): Array<{ period_start: string; periodStartFormatted: string; [key: string]: any }> => {
   const aggregated = new Map<
     string,
     { period_start: string; [key: string]: any; _counts: Record<string, number> }
@@ -89,7 +89,11 @@ const aggregate1MinTo2Min = (
   // Collect all value keys
   dataPoints.forEach((point) => {
     Object.keys(point).forEach((key) => {
-      if (key !== 'period_start' && key !== 'periodStartFormatted' && typeof point[key] === 'number') {
+      if (
+        key !== 'period_start' &&
+        key !== 'periodStartFormatted' &&
+        typeof point[key] === 'number'
+      ) {
         valueKeys.add(key)
       }
     })
@@ -121,15 +125,22 @@ const aggregate1MinTo2Min = (
   })
 
   // Calculate averages
-  const result = Array.from(aggregated.values()).map((bucket) => {
-    const { _counts, ...rest } = bucket
-    valueKeys.forEach((key) => {
-      if (_counts[key] > 0) {
-        rest[key] = rest[key] / _counts[key]
+  const result: Array<{ period_start: string; periodStartFormatted: string; [key: string]: any }> =
+    Array.from(aggregated.values()).map((bucket) => {
+      const { _counts, period_start, periodStartFormatted, ...rest } = bucket
+      const averaged: { period_start: string; periodStartFormatted: string; [key: string]: any } = {
+        period_start,
+        periodStartFormatted,
       }
+      valueKeys.forEach((key) => {
+        if (_counts[key] > 0) {
+          averaged[key] = rest[key] / _counts[key]
+        } else {
+          averaged[key] = rest[key] || 0
+        }
+      })
+      return averaged
     })
-    return rest
-  })
 
   return result.sort((a, b) => dayjs(a.period_start).valueOf() - dayjs(b.period_start).valueOf())
 }
