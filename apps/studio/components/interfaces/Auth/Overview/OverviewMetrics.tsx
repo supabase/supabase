@@ -314,7 +314,13 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Request',
                         className: 'w-auto !pr-0',
                         render: (row) => {
-                          return <StatusCode method={row.method} statusCode={row.status_code} />
+                          return (
+                            <StatusCode
+                              method={row.method}
+                              statusCode={row.status_code}
+                              align="left"
+                            />
+                          )
                         },
                       },
                       {
