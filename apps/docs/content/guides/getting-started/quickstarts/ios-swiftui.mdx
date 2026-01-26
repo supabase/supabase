@@ -27,9 +27,11 @@ hideToc: true
 
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-      Install Supabase package dependency using Xcode by following Apple's [tutorial](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+      Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
 
-      Make sure to add `Supabase` product package as dependency to the application.
+      In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+
+      Make sure to add `Supabase` product package as a dependency to your application target.
 
     </StepHikeCompact.Details>
 
@@ -76,7 +78,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift name=Supabase.swift
+      ```swift name=Instrument.swift
       struct Instrument: Decodable, Identifiable {
         let id: Int
         let name: String
@@ -100,6 +102,8 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```swift name=ContentView.swift
+      import SwiftUI
+
       struct ContentView: View {
 
         @State var instruments: [Instrument] = []
@@ -138,3 +142,12 @@ hideToc: true
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+## Setting up deep links
+
+If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
+
+## Next steps
+
+- Learn how to build a complete user management app with authentication in the [Swift tutorial](/docs/guides/getting-started/tutorials/with-swift)
+- Explore the [supabase-swift](https://github.com/supabase/supabase-swift) library on GitHub
