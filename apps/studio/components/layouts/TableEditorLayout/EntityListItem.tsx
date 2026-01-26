@@ -276,7 +276,7 @@ export const EntityListItem = ({
                     })
 
                     try {
-                      await copyToClipboard(formattedSchema)
+                      copyToClipboard(formattedSchema)
                       toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
                       toast.error('Failed to copy schema: ' + (err.message || err), {
