@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
+import { useProfile } from '@/lib/profile'
 import { mergeRefs, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -271,6 +272,7 @@ interface ContentWrapperProps {
 const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
   const { ref } = useParams()
+  const { isSupportAccount } = useProfile()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isHomeNew = usePHFlag('homeNew') === 'new-home'
@@ -320,7 +322,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     if (ref) state.setSelectedDatabaseId(ref)
   }, [ref])
 
-  if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
+  if (
+    !isSupportAccount &&
+    isBlocking &&
+    (isLoading || (requiresProjectDetails && selectedProject === undefined))
+  ) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
   }
 

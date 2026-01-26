@@ -2,11 +2,12 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { useProfile } from '@/lib/profile'
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import useLatest from 'hooks/misc/useLatest'
+import { useLatest } from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
@@ -19,6 +20,8 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const isLoggedIn = useIsLoggedIn()
   const isUserMFAEnabled = useIsMFAEnabled()
+
+  const { isSupportAccount } = useProfile()
 
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
   const [lastVisitedOrganization, setLastVisitedOrganization] = useLocalStorageQuery(
@@ -61,7 +64,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const organizationsRef = useLatest(organizations)
 
   useEffect(() => {
-    // check if current route is excempted from route validation check
+    // check if current route is exempted from route validation check
     if (isExceptUrl() || !isLoggedIn) return
 
     if (orgsInitialized && slug) {
@@ -78,8 +81,8 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   }, [orgsInitialized])
 
   useEffect(() => {
-    // check if current route is excempted from route validation check
-    if (isExceptUrl() || !isLoggedIn) return
+    // check if current route is exempted from route validation check
+    if (isExceptUrl() || !isLoggedIn || isSupportAccount) return
 
     // A successful request to project details will validate access to both project and branches
     if (!!ref && isErrorProject) {
@@ -87,7 +90,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       router.push(DEFAULT_HOME)
       return
     }
-  }, [isErrorProject])
+  }, [isSupportAccount, isErrorProject])
 
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
