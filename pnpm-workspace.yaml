@@ -14,6 +14,8 @@ catalog:
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
   next: ^15.5.10
+  lodash-es: ^4.17.23
+  lodash: ^4.17.23
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -54,6 +56,8 @@ minimumReleaseAgeExclude:
   - braintrust
   - tar
   - diff
+  - lodash-es
+  - lodash
 
 onlyBuiltDependencies:
   - supabase
@@ -71,6 +75,8 @@ overrides:
   '@smithy/config-resolver': ^4.4.0
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
+  lodash-es: 'catalog:'
+  lodash: 'catalog:'
   payload>undici: ^7.18.2
   preact: 10.26.10
   refractor>prismjs: ^1.30.0
