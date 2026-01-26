@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your Angular App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/getting-started/angular).
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
 
 </Admonition>
 
@@ -44,7 +44,6 @@ The application exposes these variables in the browser, and that's fine as you h
   path="/user-management/angular-user-management/src/environments/environment.ts"
   lines={[[1, -1]]}
   meta="name=src/environments/environment.ts"
-  language="typescript"
 />
 
 Now you have the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
@@ -53,7 +52,6 @@ Now you have the API credentials in place, create a `SupabaseService` with `ng g
   path="/user-management/angular-user-management/src/app/supabase.service.ts"
   lines={[[1, -1]]}
   meta="name=src/app/supabase.service.ts"
-  language="typescript"
 />
 
 Optionally, update `src/styles.css` to style the app. You can find the full contents of this file [in the example repository](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management/src/styles.css).
@@ -70,14 +68,12 @@ Create an `AuthComponent` with the `ng g c auth` Angular CLI command and add the
   path="/user-management/angular-user-management/src/app/auth/auth.component.ts"
   lines={[[1, -1]]}
   meta="name=src/app/auth/auth.component.ts"
-  language="typescript"
 />
 
 <$CodeSample
   path="/user-management/angular-user-management/src/app/auth/auth.component.html"
   lines={[[1, -1]]}
   meta="name=src/app/auth/auth.component.html"
-  language="html"
 />
 
 </$CodeTabs>
@@ -93,14 +89,12 @@ Create an `AccountComponent` with the `ng g c account` Angular CLI command and a
   path="/user-management/angular-user-management/src/app/account/account.component.ts"
   lines={[[1, -1]]}
   meta="name=src/app/account/account.component.ts"
-  language="typescript"
 />
 
 <$CodeSample
   path="/user-management/angular-user-management/src/app/account/account.component.html"
   lines={[[1, -1]]}
   meta="name=src/app/account/account.component.html"
-  language="html"
 />
 
 </$CodeTabs>
@@ -120,14 +114,12 @@ Create an `AvatarComponent` with `ng g c avatar` Angular CLI command and add the
 path="/user-management/angular-user-management/src/app/avatar/avatar.component.ts"
   lines={[[1, -1]]}
   meta="name=src/app/avatar/avatar.component.ts"
-  language="typescript"
 />
 
 <$CodeSample
   path="/user-management/angular-user-management/src/app/avatar/avatar.component.html"
   lines={[[1, -1]]}
   meta="name=src/app/avatar/avatar.component.html"
-  language="html"
 />
 
 </$CodeTabs>
@@ -142,14 +134,12 @@ Now you have all the components in place, update `AppComponent`:
   path="/user-management/angular-user-management/src/app/app.component.ts"
   lines={[[1, -1]]}
   meta="name=src/app/app.component.ts"
-  language="typescript"
 />
 
 <$CodeSample
   path="/user-management/angular-user-management/src/app/app.component.html"
   lines={[[1, -1]]}
   meta="name=src/app/app.component.html"
-  language="html"
 />
 
 </$CodeTabs>
@@ -160,7 +150,6 @@ You also need to change `app.module.ts` to include the `ReactiveFormsModule` fro
   path="/user-management/angular-user-management/src/app/app.module.ts"
   lines={[[1, -1]]}
   meta="name=src/app/app.module.ts"
-  language="typescript"
 />
 
 Once that's done, run the application in a terminal:
