@@ -368,7 +368,7 @@ export const SessionsAuthSettingsForm = () => {
                     source="authSessions"
                     featureProposition="configure user sessions"
                     primaryText="Configuring user sessions is only available on the Pro Plan and above"
-                    secondaryText="Upgrade to the Pro plan to configure settings for user sessions"
+                    secondaryText="Upgrade to Pro Plan to configure settings for user sessions."
                   />
                 )}
 
@@ -379,7 +379,7 @@ export const SessionsAuthSettingsForm = () => {
                     </Button>
                   )}
                   <Button
-                    type="primary"
+                    type={promptProPlanUpgrade ? 'default' : 'primary'}
                     htmlType="submit"
                     disabled={
                       !canUpdateConfig ||

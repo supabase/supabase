@@ -10,13 +10,13 @@ import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
 import { BackupsStorageAlert } from './BackupsStorageAlert'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export const BackupsList = () => {
   const router = useRouter()
@@ -60,7 +60,7 @@ export const BackupsList = () => {
         addon="pitr"
         source="backups"
         featureProposition="have up to 7 days of scheduled backups"
-        icon={<Clock size={20} strokeWidth={1.5} />}
+        icon={<Clock size={20} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
         buttonText="Upgrade"
