@@ -72,6 +72,7 @@ overrides:
   '@tanstack/directive-functions-plugin>vite': ^7.1.11
   '@tanstack/react-start-plugin>vite': ^7.1.11
   '@smithy/config-resolver': ^4.4.0
+  payload>undici: ^7.18.2
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
   preact: 10.26.10
@@ -18946,12 +18947,12 @@ packages:
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
-  undici@6.21.2:
-    resolution: {integrity: sha512-uROZWze0R0itiAKVPsYhFov9LxrPMHLMEQFszeI2gCN6bnIIZ8twzBCJcN2LJrBBLfrP0t1FW0g+JmKVl8Vk1g==}
+  undici@6.23.0:
+    resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
     engines: {node: '>=18.17'}
 
-  undici@7.10.0:
-    resolution: {integrity: sha512-u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==}
+  undici@7.18.2:
+    resolution: {integrity: sha512-y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==}
     engines: {node: '>=20.18.1'}
 
   unenv@1.10.0:
@@ -27232,7 +27233,7 @@ snapshots:
       openapi-sampler: 1.6.1
       outdent: 0.8.0
       set-cookie-parser: 2.7.1
-      undici: 6.21.2
+      undici: 6.23.0
     transitivePeerDependencies:
       - ajv
       - supports-color
@@ -37523,7 +37524,7 @@ snapshots:
       scmp: 2.1.0
       ts-essentials: 10.0.3(typescript@5.9.2)
       tsx: 4.20.3
-      undici: 7.10.0
+      undici: 7.18.2
       uuid: 10.0.0
       ws: 8.18.3
     transitivePeerDependencies:
@@ -40815,9 +40816,9 @@ snapshots:
 
   undici-types@6.20.0: {}
 
-  undici@6.21.2: {}
+  undici@6.23.0: {}
 
-  undici@7.10.0: {}
+  undici@7.18.2: {}
 
   unenv@1.10.0:
     dependencies:
