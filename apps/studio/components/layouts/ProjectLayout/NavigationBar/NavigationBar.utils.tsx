@@ -93,6 +93,38 @@ export const generateProductRoutes = (
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
+            items: [
+              {
+                title: 'Storage',
+                items: [
+                  { name: 'Files', key: 'files', url: `/project/${ref}/storage/files`, items: [] },
+                  {
+                    name: 'Analytics',
+                    key: 'analytics',
+                    url: `/project/${ref}/storage/analytics`,
+                    items: [],
+                  },
+                  {
+                    name: 'Vectors',
+                    key: 'vectors',
+                    url: `/project/${ref}/storage/vectors`,
+                    items: [],
+                  },
+                  {
+                    name: 'S3 Access',
+                    key: 's3',
+                    url: `/project/${ref}/storage/s3`,
+                    items: [],
+                  },
+                  {
+                    name: 'Settings',
+                    key: 'settings',
+                    url: `/project/${ref}/storage/settings`,
+                    items: [],
+                  },
+                ],
+              },
+            ],
           },
         ]
       : []),
@@ -103,6 +135,26 @@ export const generateProductRoutes = (
             label: 'Edge Functions',
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
+            items: [
+              {
+                title: 'Edge Functions',
+                items: [
+                  {
+                    name: 'Functions',
+                    key: 'main',
+                    pages: ['', 'new'],
+                    url: `/project/${ref}/functions`,
+                    items: [],
+                  },
+                  {
+                    name: 'Secrets',
+                    key: 'secrets',
+                    url: `/project/${ref}/functions/secrets`,
+                    items: [],
+                  },
+                ],
+              },
+            ],
           },
         ]
       : []),
@@ -113,6 +165,25 @@ export const generateProductRoutes = (
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+            items: [
+              {
+                title: 'Realtime',
+                items: [
+                  {
+                    name: 'Inspector',
+                    key: 'inspector',
+                    url: `/project/${ref}/realtime/inspector`,
+                    items: [],
+                  },
+                  {
+                    name: 'Quotas',
+                    key: 'quotas',
+                    url: `/project/${ref}/realtime/quotas`,
+                    items: [],
+                  },
+                ],
+              },
+            ],
           },
         ]
       : []),
@@ -137,6 +208,25 @@ export const generateOtherRoutes = (
       label: 'Advisors',
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      items: [
+        {
+          title: 'Advisors',
+          items: [
+            {
+              name: 'Security',
+              key: 'security',
+              url: `/project/${ref}/advisors/security`,
+              items: [],
+            },
+            {
+              name: 'Performance',
+              key: 'performance',
+              url: `/project/${ref}/advisors/performance`,
+              items: [],
+            },
+          ],
+        },
+      ],
     },
     ...(IS_PLATFORM && reportsEnabled
       ? [
