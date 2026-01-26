@@ -170,3 +170,125 @@ describe('mapMultiResponseToAnalyticsData (deprecated)', () => {
     expect(mapMultiResponseToAnalyticsData).toBe(mapResponseToAnalyticsData)
   })
 })
+
+describe('2m interval aggregation', () => {
+  it('aggregates 1m data points into 2m buckets for multi-attribute response', () => {
+    const mock1MinData: InfraMonitoringMultiResponse = {
+      data: [
+        {
+          period_start: '2024-01-02 03:00:00',
+          values: { max_cpu_usage: '10', ram_usage: '100' },
+        },
+        {
+          period_start: '2024-01-02 03:01:00',
+          values: { max_cpu_usage: '20', ram_usage: '200' },
+        },
+        {
+          period_start: '2024-01-02 03:02:00',
+          values: { max_cpu_usage: '15', ram_usage: '150' },
+        },
+        {
+          period_start: '2024-01-02 03:03:00',
+          values: { max_cpu_usage: '25', ram_usage: '250' },
+        },
+      ],
+      series: {
+        max_cpu_usage: { format: 'percent', total: 70, totalAverage: 17.5, yAxisLimit: 100 },
+        ram_usage: { format: 'bytes', total: 700, totalAverage: 175, yAxisLimit: 200 },
+      },
+    }
+
+    const responseWith2m = {
+      ...mock1MinData,
+      _originalInterval: '2m',
+    } as InfraMonitoringMultiData & { _originalInterval?: string }
+
+    const result = mapResponseToAnalyticsData(responseWith2m, ['max_cpu_usage', 'ram_usage'])
+
+    expect(result.max_cpu_usage?.data).toHaveLength(2)
+    expect(result.max_cpu_usage?.data[0]).toMatchObject({
+      period_start: expect.stringMatching(/2024-01-02T03:00:00/),
+      max_cpu_usage: 15, // (10 + 20) / 2
+    })
+    expect(result.max_cpu_usage?.data[1]).toMatchObject({
+      period_start: expect.stringMatching(/2024-01-02T03:02:00/),
+      max_cpu_usage: 20, // (15 + 25) / 2
+    })
+
+    expect(result.ram_usage?.data[0].ram_usage).toBe(150) // (100 + 200) / 2
+    expect(result.ram_usage?.data[1].ram_usage).toBe(200) // (150 + 250) / 2
+  })
+
+  it('aggregates 1m data points into 2m buckets for single-attribute response', () => {
+    const mock1MinData: InfraMonitoringSingleResponse = {
+      data: [
+        { period_start: '2024-01-02 03:00:00', disk_io_budget: '10' },
+        { period_start: '2024-01-02 03:01:00', disk_io_budget: '20' },
+        { period_start: '2024-01-02 03:02:00', disk_io_budget: '15' },
+        { period_start: '2024-01-02 03:03:00', disk_io_budget: '25' },
+      ],
+      format: 'percent',
+      total: 70,
+      totalAverage: 17.5,
+      yAxisLimit: 100,
+    }
+
+    const responseWith2m = {
+      ...mock1MinData,
+      _originalInterval: '2m',
+    } as InfraMonitoringMultiData & { _originalInterval?: string }
+
+    const result = mapResponseToAnalyticsData(responseWith2m, ['disk_io_budget'])
+
+    expect(result.disk_io_budget?.data).toHaveLength(2)
+    expect(result.disk_io_budget?.data[0]).toMatchObject({
+      period_start: expect.stringMatching(/2024-01-02T03:00:00/),
+      disk_io_budget: 15, // (10 + 20) / 2
+    })
+    expect(result.disk_io_budget?.data[1]).toMatchObject({
+      period_start: expect.stringMatching(/2024-01-02T03:02:00/),
+      disk_io_budget: 20, // (15 + 25) / 2
+    })
+  })
+
+  it('does not aggregate when interval is not 2m', () => {
+    const result = mapResponseToAnalyticsData(mockMultiResponse, ['max_cpu_usage', 'ram_usage'])
+
+    expect(result.max_cpu_usage?.data).toHaveLength(2)
+    expect(result.max_cpu_usage?.data[0].max_cpu_usage).toBe(1.5)
+    expect(result.max_cpu_usage?.data[1].max_cpu_usage).toBe(0)
+  })
+
+  it('handles odd number of 1m data points', () => {
+    const mock1MinData: InfraMonitoringMultiResponse = {
+      data: [
+        {
+          period_start: '2024-01-02 03:00:00',
+          values: { max_cpu_usage: '10' },
+        },
+        {
+          period_start: '2024-01-02 03:01:00',
+          values: { max_cpu_usage: '20' },
+        },
+        {
+          period_start: '2024-01-02 03:02:00',
+          values: { max_cpu_usage: '15' },
+        },
+      ],
+      series: {
+        max_cpu_usage: { format: 'percent', total: 45, totalAverage: 15, yAxisLimit: 100 },
+      },
+    }
+
+    const responseWith2m = {
+      ...mock1MinData,
+      _originalInterval: '2m',
+    } as InfraMonitoringMultiData & { _originalInterval?: string }
+
+    const result = mapResponseToAnalyticsData(responseWith2m, ['max_cpu_usage'])
+
+    expect(result.max_cpu_usage?.data).toHaveLength(2)
+    expect(result.max_cpu_usage?.data[0].max_cpu_usage).toBe(15) // (10 + 20) / 2
+    expect(result.max_cpu_usage?.data[1].max_cpu_usage).toBe(15) // single point in second bucket
+  })
+})

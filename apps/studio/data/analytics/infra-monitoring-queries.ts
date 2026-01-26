@@ -77,18 +77,77 @@ export function useInfraMonitoringQueries(
   }))
 }
 
+const aggregate1MinTo2Min = (
+  dataPoints: Array<{ period_start: string; [key: string]: any }>
+): Array<{ period_start: string; [key: string]: any }> => {
+  const aggregated = new Map<
+    string,
+    { period_start: string; [key: string]: any; _counts: Record<string, number> }
+  >()
+  const valueKeys = new Set<string>()
+
+  // Collect all value keys
+  dataPoints.forEach((point) => {
+    Object.keys(point).forEach((key) => {
+      if (key !== 'period_start' && key !== 'periodStartFormatted' && typeof point[key] === 'number') {
+        valueKeys.add(key)
+      }
+    })
+  })
+
+  // Aggregate by 2min buckets (average the 1min values)
+  dataPoints.forEach((point) => {
+    const timestamp = dayjs(point.period_start)
+    const twoMinBucket = timestamp.startOf('minute').subtract(timestamp.minute() % 2, 'minute')
+    const bucketKey = twoMinBucket.toISOString()
+
+    if (!aggregated.has(bucketKey)) {
+      aggregated.set(bucketKey, {
+        period_start: bucketKey,
+        periodStartFormatted: twoMinBucket.format('HH:mm DD MMM'),
+        ...Object.fromEntries(Array.from(valueKeys).map((key) => [key, 0])),
+        _counts: Object.fromEntries(Array.from(valueKeys).map((key) => [key, 0])),
+      })
+    }
+
+    const bucket = aggregated.get(bucketKey)!
+    valueKeys.forEach((key) => {
+      const value = point[key]
+      if (typeof value === 'number') {
+        bucket[key] = (bucket[key] || 0) + value
+        bucket._counts[key] = (bucket._counts[key] || 0) + 1
+      }
+    })
+  })
+
+  // Calculate averages
+  const result = Array.from(aggregated.values()).map((bucket) => {
+    const { _counts, ...rest } = bucket
+    valueKeys.forEach((key) => {
+      if (_counts[key] > 0) {
+        rest[key] = rest[key] / _counts[key]
+      }
+    })
+    return rest
+  })
+
+  return result.sort((a, b) => dayjs(a.period_start).valueOf() - dayjs(b.period_start).valueOf())
+}
+
 export function mapResponseToAnalyticsData(
   response: InfraMonitoringMultiData,
   attributes: InfraMonitoringAttribute[],
   dateFormat: string = DEFAULT_DATE_FORMAT
 ): Record<string, AnalyticsData> {
+  const needs2MinAggregation = (response as { _originalInterval?: '2m' })._originalInterval === '2m'
+
   // Handle multi-attribute response format
   if (isMultiResponse(response)) {
     return attributes.reduce<Record<string, AnalyticsData>>((acc, attribute) => {
       const metadata = response.series?.[attribute]
       if (!metadata) return acc
 
-      const dataPoints = response.data.map((point) => {
+      let dataPoints = response.data.map((point) => {
         const value = point.values?.[attribute]
         return {
           period_start: point.period_start,
@@ -96,6 +155,11 @@ export function mapResponseToAnalyticsData(
           [attribute]: value === undefined ? 0 : Number(value),
         }
       })
+
+      // Aggregate 1m data to 2m if needed
+      if (needs2MinAggregation) {
+        dataPoints = aggregate1MinTo2Min(dataPoints)
+      }
 
       acc[attribute] = {
         data: dataPoints,
@@ -115,7 +179,7 @@ export function mapResponseToAnalyticsData(
   const attribute = attributes[0]
   if (!attribute) return {}
 
-  const dataPoints = singleResponse.data.map((point) => {
+  let dataPoints = singleResponse.data.map((point) => {
     const value = point[attribute]
     return {
       period_start: point.period_start,
@@ -123,6 +187,11 @@ export function mapResponseToAnalyticsData(
       [attribute]: value === undefined ? 0 : Number(value),
     }
   })
+
+  // Aggregate 1m data to 2m if needed
+  if (needs2MinAggregation) {
+    dataPoints = aggregate1MinTo2Min(dataPoints)
+  }
 
   return {
     [attribute]: {
