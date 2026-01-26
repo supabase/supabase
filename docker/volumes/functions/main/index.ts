@@ -8,11 +8,16 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
 
 // Create JWKS for ES256/RS256 tokens (newer tokens)
-const SUPABASE_JWT_KEYS = SUPABASE_URL
-  ? jose.createRemoteJWKSet(
+let SUPABASE_JWT_KEYS: ReturnType<typeof jose.createRemoteJWKSet> | null = null
+if (SUPABASE_URL) {
+  try {
+    SUPABASE_JWT_KEYS = jose.createRemoteJWKSet(
       new URL(SUPABASE_URL + '/auth/v1/.well-known/jwks.json')
     )
-  : null
+  } catch (err) {
+    console.error('Failed to create JWKS from SUPABASE_URL:', err)
+  }
+}
 
 const SUPABASE_JWT_ISSUER = SUPABASE_URL
   ? SUPABASE_URL + '/auth/v1'
