@@ -101,7 +101,10 @@ export const FileExplorerRowEditing = ({
             mimeType={item.metadata?.mimetype}
           />
         </div>
-        <form className="h-9" onSubmit={(event) => onSaveItemName(itemName || item.name, event)}>
+        <form
+          className="h-9"
+          onSubmit={(event) => onSaveItemName(itemName.trim() || item.name, event)}
+        >
           <input
             autoFocus
             ref={inputRef}
@@ -109,12 +112,12 @@ export const FileExplorerRowEditing = ({
             type="text"
             value={itemName}
             onChange={(event) => setItemName(event.target.value)}
-            onBlur={(event) => onSaveItemName(itemName || item.name, event)}
+            onBlur={(event) => onSaveItemName(itemName.trim() || item.name, event)}
           />
           <button
             className="hidden"
             type="submit"
-            onClick={(event) => onSaveItemName(itemName || item.name, event)}
+            onClick={(event) => onSaveItemName(itemName.trim() || item.name, event)}
           />
         </form>
       </div>
