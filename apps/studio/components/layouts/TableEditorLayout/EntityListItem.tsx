@@ -263,18 +263,21 @@ export const EntityListItem = ({
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
-                    const tableDefinition = await getTableDefinition({
+                    const formattedSchema = getTableDefinition({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
+                    }).then((tableDefinition) => {
+                      if (!tableDefinition) {
+                        toast.error('Failed to get table schema', { id: toastId })
+                        return ''
+                      }
+
+                      return formatSql(tableDefinition)
                     })
-                    if (!tableDefinition) {
-                      return toast.error('Failed to get table schema', { id: toastId })
-                    }
 
                     try {
-                      const formatted = formatSql(tableDefinition)
-                      await copyToClipboard(formatted)
+                      await copyToClipboard(formattedSchema)
                       toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
                       toast.error('Failed to copy schema: ' + (err.message || err), {
