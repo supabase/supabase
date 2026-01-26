@@ -3,7 +3,7 @@ import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect, useMemo } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
@@ -18,6 +18,7 @@ import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useRecentRoutes } from 'hooks/misc/useRecentRoutes'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
@@ -58,7 +59,7 @@ const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   }
 >
 
-export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
+export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> { }
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const { setOpen } = useSidebar()
@@ -227,6 +228,11 @@ const ProjectLinks = () => {
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
   const { mutate: sendEvent } = useSendEventMutation()
+  const { recentRoutes, trackRoute } = useRecentRoutes()
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
@@ -261,6 +267,114 @@ const ProjectLinks = () => {
   })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
+  // Get the child route key from pathname (e.g., "indexes" from /project/ref/database/indexes)
+  const childRouteKey = router.pathname.split('/')[4]
+
+  // Create a map of parent routes by key for icon lookup
+  const parentRoutesMap = useMemo(() => {
+    const routes = [...toolRoutes, ...productRoutes, ...otherRoutes, ...settingsRoutes]
+    return routes.reduce(
+      (acc, route) => {
+        acc[route.key] = route
+        return acc
+      },
+      {} as Record<string, (typeof routes)[0]>
+    )
+  }, [toolRoutes, productRoutes, otherRoutes, settingsRoutes])
+
+  // Create a flat map of all child routes with their parent info
+  const childRoutesMap = useMemo(() => {
+    const map: Record<
+      string,
+      {
+        childKey: string
+        childName: string
+        childUrl: string
+        parentKey: string
+        parentLabel: string
+        parentIcon: React.ReactNode
+        pages?: string[] // Alternative page keys that map to this child route
+      }
+    > = {}
+
+    const allParentRoutes = [...toolRoutes, ...productRoutes, ...otherRoutes, ...settingsRoutes]
+
+    for (const parentRoute of allParentRoutes) {
+      if (parentRoute.items) {
+        for (const group of parentRoute.items) {
+          const items = group.items || []
+          for (const item of items) {
+            // Use parentKey-childKey as the unique key
+            const uniqueKey = `${parentRoute.key}-${item.key}`
+            map[uniqueKey] = {
+              childKey: item.key,
+              childName: item.name,
+              childUrl: item.url,
+              parentKey: parentRoute.key,
+              parentLabel: parentRoute.label,
+              parentIcon: parentRoute.icon,
+              pages: item.pages,
+            }
+            // Also map by just the child key for lookup during tracking
+            if (!map[item.key]) {
+              map[item.key] = map[uniqueKey]
+            }
+            // Map alternative page keys if they exist
+            if (item.pages) {
+              for (const page of item.pages) {
+                if (!map[page]) {
+                  map[page] = map[uniqueKey]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return map
+  }, [toolRoutes, productRoutes, otherRoutes, settingsRoutes])
+
+  // Track route visits when activeRoute or childRouteKey changes
+  useEffect(() => {
+    if (!activeRoute) return
+
+    // First check if there's a child route
+    if (childRouteKey) {
+      const childRoute = childRoutesMap[childRouteKey]
+      if (childRoute && childRoute.parentKey === activeRoute) {
+        // Track the child route with parent context
+        const uniqueKey = `${childRoute.parentKey}-${childRoute.childKey}`
+        trackRoute({
+          key: uniqueKey,
+          childName: childRoute.childName,
+          parentLabel: childRoute.parentLabel,
+          link: childRoute.childUrl,
+          parentKey: childRoute.parentKey,
+          childKey: childRoute.childKey,
+        })
+        return
+      }
+    }
+
+    // Fall back to tracking the parent route if no child route or it doesn't have children
+    const parentRoute = parentRoutesMap[activeRoute]
+    if (parentRoute && parentRoute.link) {
+      // Only track parent routes that don't have child menus (like Table Editor, SQL Editor)
+      const hasChildRoutes = parentRoute.items && parentRoute.items.length > 0
+      if (!hasChildRoutes) {
+        trackRoute({
+          key: parentRoute.key,
+          childName: parentRoute.label,
+          parentLabel: '',
+          link: parentRoute.link,
+          parentKey: parentRoute.key,
+        })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeRoute, childRouteKey])
+
   return (
     <SidebarMenu>
       <SidebarGroup className="gap-0.5">
@@ -283,6 +397,33 @@ const ProjectLinks = () => {
           />
         ))}
       </SidebarGroup>
+      {recentRoutes.length > 0 && (
+        <>
+          <Separator className="w-[calc(100%-1rem)] mx-auto" />
+          <SidebarGroup className="gap-0.5">
+            <span className="text-xs text-foreground-lighter w-full px-2 py-1 uppercase font-mono">Recents</span>
+            {recentRoutes.map((route) => (
+              <SidebarMenuItem key={`recent-${route.key}`}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={sidebarBehaviour === 'closed' ? route.childName : ''}
+                  className={cn('text-sm', sidebarBehaviour === 'open' ? '' : '')}
+                  size="sm"
+                >
+                  <Link href={route.link}>
+                    <div className="flex flex-col items-start leading-tight">
+                      <span>{route.childName}</span>
+                      {route.parentLabel && (
+                        <span className="text-[10px] text-foreground-muted">{route.parentLabel}</span>
+                      )}
+                    </div>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarGroup>
+        </>
+      )}
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {productRoutes.map((route, i) => (
@@ -319,10 +460,10 @@ const ProjectLinks = () => {
                 route={
                   isNewAPIDocsEnabled
                     ? {
-                        label: route.label,
-                        icon: route.icon,
-                        key: route.key,
-                      }
+                      label: route.label,
+                      icon: route.icon,
+                      key: route.key,
+                    }
                     : route
                 }
                 active={activeRoute === route.key}
@@ -414,13 +555,13 @@ const OrganizationLinks = () => {
     },
     ...(showBilling
       ? [
-          {
-            label: 'Billing',
-            href: `/org/${organizationSlug}/billing`,
-            key: 'billing',
-            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-          },
-        ]
+        {
+          label: 'Billing',
+          href: `/org/${organizationSlug}/billing`,
+          key: 'billing',
+          icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+        },
+      ]
       : []),
     {
       label: 'Organization settings',
@@ -444,10 +585,10 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/apps') ||
-                    router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents') ||
-                    router.pathname.includes('/security')
+                  router.pathname.includes('/apps') ||
+                  router.pathname.includes('/audit') ||
+                  router.pathname.includes('/documents') ||
+                  router.pathname.includes('/security')
                   : activeRoute === item.key
             }
             route={{
