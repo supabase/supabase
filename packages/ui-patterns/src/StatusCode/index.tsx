@@ -3,22 +3,30 @@
 import { cn } from 'ui'
 
 export interface StatusCodeProps {
-  method: string
+  method?: string
   statusCode: number | string | undefined
+  align?: 'center' | 'left' | 'right'
+  className?: string
 }
 
-export const getStatusLevel = (status?: number | string): string => {
-  if (!status) return 'success'
-  const statusNum = Number(status)
-  if (statusNum >= 500) return 'error'
-  if (statusNum >= 400) return 'warning'
-  if (statusNum >= 300) return 'info' // 3xx redirects are informational
-  if (statusNum >= 200) return 'success'
-  if (statusNum >= 100) return 'info'
-  return 'success'
-}
+export function getStatusColor(
+  value?: number | string,
+  method?: string
+): Record<'text' | 'bg' | 'border', string> {
+  if (!method && value !== undefined) {
+    const statusNum = Number(value)
 
-export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 'border', string> {
+    const isValidHttpStatus = !isNaN(statusNum) && statusNum >= 100 && statusNum < 600
+
+    if (!isValidHttpStatus) {
+      return {
+        text: 'text-foreground-lighter',
+        bg: 'bg-surface-200',
+        border: '',
+      }
+    }
+  }
+
   const normalized =
     typeof value === 'number'
       ? value < 100
@@ -34,6 +42,7 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
     case '3':
     case 'info':
     case 'success':
+    case undefined:
       return {
         text: 'text-foreground-lighter',
         bg: 'bg-surface-200',
@@ -63,25 +72,54 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
   }
 }
 
-export const StatusCode = ({ method, statusCode }: StatusCodeProps) => {
-  const level = getStatusLevel(statusCode)
-  const colors = getStatusColor(level)
+export const StatusCode = ({
+  method,
+  statusCode,
+  align = 'center',
+  className,
+}: StatusCodeProps) => {
+  const colors = getStatusColor(statusCode, method)
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="flex-shrink-0 flex items-center justify-end text-xs font-mono w-[100px]">
-        <span className="select-text py-0.5 px-2 text-right rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
-          {method}
-        </span>
+    <div className={cn('flex items-center gap-2', className)}>
+      <span
+        className={cn(
+          'flex-shrink-0 flex text-xs font-mono w-[104px]',
+          method && align === 'center' && 'w-[120px]',
+          align === 'center' && 'items-center justify-center',
+          align === 'right' && 'items-end justify-end',
+          align === 'left' && 'items-start justify-start'
+        )}
+      >
+        {method && (
+          <span
+            className={cn(
+              'w-1/2 flex items-center justify-end',
+              align === 'left' || (align === 'right' && 'w-auto')
+            )}
+          >
+            <span className="select-text py-0.5 px-2 text-right rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0 w-auto">
+              {method}
+            </span>
+          </span>
+        )}
         <span
           className={cn(
-            'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums min-w-[5.5ch] text-right',
-            colors.text,
-            colors.bg,
-            colors.border
+            'w-1/2 flex items-center justify-start',
+            align === 'left' || (align === 'right' && 'w-auto')
           )}
         >
-          {statusCode}
+          <span
+            className={cn(
+              'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums text-left w-auto',
+              !method && 'rounded-l',
+              colors.text,
+              colors.bg,
+              colors.border
+            )}
+          >
+            {statusCode}
+          </span>
         </span>
       </span>
     </div>
