@@ -91,7 +91,11 @@ export const ProjectTableRow = ({
                 {isCopied ? (
                   <Check size={12} strokeWidth={1.25} className="text-brand" />
                 ) : (
-                  <Copy size={12} strokeWidth={1.25} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Copy
+                    size={12}
+                    strokeWidth={1.25}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
                 )}
               </button>
             </div>
