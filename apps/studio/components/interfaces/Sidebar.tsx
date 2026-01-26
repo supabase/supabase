@@ -3,7 +3,7 @@ import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect, useMemo } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
@@ -18,7 +18,6 @@ import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useRecentRoutes } from 'hooks/misc/useRecentRoutes'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
@@ -228,7 +227,6 @@ const ProjectLinks = () => {
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
   const { mutate: sendEvent } = useSendEventMutation()
-  const { trackRoute } = useRecentRoutes()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
@@ -262,114 +260,6 @@ const ProjectLinks = () => {
     showReports,
   })
   const settingsRoutes = generateSettingsRoutes(ref, project)
-
-  // Get the child route key from pathname (e.g., "indexes" from /project/ref/database/indexes)
-  const childRouteKey = router.pathname.split('/')[4]
-
-  // Create a map of parent routes by key for icon lookup
-  const parentRoutesMap = useMemo(() => {
-    const routes = [...toolRoutes, ...productRoutes, ...otherRoutes, ...settingsRoutes]
-    return routes.reduce(
-      (acc, route) => {
-        acc[route.key] = route
-        return acc
-      },
-      {} as Record<string, (typeof routes)[0]>
-    )
-  }, [toolRoutes, productRoutes, otherRoutes, settingsRoutes])
-
-  // Create a flat map of all child routes with their parent info
-  const childRoutesMap = useMemo(() => {
-    const map: Record<
-      string,
-      {
-        childKey: string
-        childName: string
-        childUrl: string
-        parentKey: string
-        parentLabel: string
-        parentIcon: React.ReactNode
-        pages?: string[] // Alternative page keys that map to this child route
-      }
-    > = {}
-
-    const allParentRoutes = [...toolRoutes, ...productRoutes, ...otherRoutes, ...settingsRoutes]
-
-    for (const parentRoute of allParentRoutes) {
-      if (parentRoute.items) {
-        for (const group of parentRoute.items) {
-          const items = group.items || []
-          for (const item of items) {
-            // Use parentKey-childKey as the unique key
-            const uniqueKey = `${parentRoute.key}-${item.key}`
-            map[uniqueKey] = {
-              childKey: item.key,
-              childName: item.name,
-              childUrl: item.url,
-              parentKey: parentRoute.key,
-              parentLabel: parentRoute.label,
-              parentIcon: parentRoute.icon,
-              pages: item.pages,
-            }
-            // Also map by just the child key for lookup during tracking
-            if (!map[item.key]) {
-              map[item.key] = map[uniqueKey]
-            }
-            // Map alternative page keys if they exist
-            if (item.pages) {
-              for (const page of item.pages) {
-                if (!map[page]) {
-                  map[page] = map[uniqueKey]
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return map
-  }, [toolRoutes, productRoutes, otherRoutes, settingsRoutes])
-
-  // Track route visits when activeRoute or childRouteKey changes
-  useEffect(() => {
-    if (!activeRoute) return
-
-    // First check if there's a child route
-    if (childRouteKey) {
-      const childRoute = childRoutesMap[childRouteKey]
-      if (childRoute && childRoute.parentKey === activeRoute) {
-        // Track the child route with parent context
-        const uniqueKey = `${childRoute.parentKey}-${childRoute.childKey}`
-        trackRoute({
-          key: uniqueKey,
-          childName: childRoute.childName,
-          parentLabel: childRoute.parentLabel,
-          link: childRoute.childUrl,
-          parentKey: childRoute.parentKey,
-          childKey: childRoute.childKey,
-        })
-        return
-      }
-    }
-
-    // Fall back to tracking the parent route if no child route or it doesn't have children
-    const parentRoute = parentRoutesMap[activeRoute]
-    if (parentRoute && parentRoute.link) {
-      // Only track parent routes that don't have child menus (like Table Editor, SQL Editor)
-      const hasChildRoutes = parentRoute.items && parentRoute.items.length > 0
-      if (!hasChildRoutes) {
-        trackRoute({
-          key: parentRoute.key,
-          childName: parentRoute.label,
-          parentLabel: '',
-          link: parentRoute.link,
-          parentKey: parentRoute.key,
-        })
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeRoute, childRouteKey])
 
   return (
     <SidebarMenu>
