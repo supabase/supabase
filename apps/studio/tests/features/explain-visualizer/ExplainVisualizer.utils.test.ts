@@ -3,12 +3,19 @@ import {
   splitSqlStatements,
   isExplainQuery,
   isExplainSql,
+  isTextFormatExplain,
   formatNodeDuration,
 } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 
 describe('isExplainQuery', () => {
   test('returns true for valid EXPLAIN result rows', () => {
     const rows = [{ 'QUERY PLAN': 'Seq Scan on users' }]
+    expect(isExplainQuery(rows)).toBe(true)
+  })
+
+  test('returns true for JSON format EXPLAIN result rows', () => {
+    // JSON format returns an array/object in the QUERY PLAN column
+    const rows = [{ 'QUERY PLAN': [{ Plan: { 'Node Type': 'Seq Scan' } }] }]
     expect(isExplainQuery(rows)).toBe(true)
   })
 
@@ -19,6 +26,34 @@ describe('isExplainQuery', () => {
   test('returns false for regular query results', () => {
     const rows = [{ id: 1, name: 'John' }]
     expect(isExplainQuery(rows)).toBe(false)
+  })
+})
+
+describe('isTextFormatExplain', () => {
+  test('returns true for TEXT format EXPLAIN result rows', () => {
+    const rows = [
+      { 'QUERY PLAN': 'Seq Scan on users  (cost=0.00..10.50 rows=100 width=36)' },
+      { 'QUERY PLAN': '  Filter: (active = true)' },
+    ]
+    expect(isTextFormatExplain(rows)).toBe(true)
+  })
+
+  test('returns false for JSON format EXPLAIN result rows', () => {
+    const rows = [
+      { 'QUERY PLAN': [{ Plan: { 'Node Type': 'Seq Scan', 'Relation Name': 'users' } }] },
+    ]
+    expect(isTextFormatExplain(rows)).toBe(false)
+  })
+
+  test('returns true for YAML format EXPLAIN result rows (returned as string)', () => {
+    const rows = [
+      {
+        'QUERY PLAN':
+          '- Plan: \n    Node Type: "Seq Scan"\n    Parallel Aware: false\n    Async Capable: false\n    Relation Name: "orders"\n    Alias: "orders"\n    Startup Cost: 0.00\n    Total Cost: 97.00\n    Plan Rows: 5000\n    Plan Width: 41',
+      },
+    ]
+
+    expect(isTextFormatExplain(rows)).toBe(true)
   })
 })
 

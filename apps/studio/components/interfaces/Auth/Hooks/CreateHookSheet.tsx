@@ -360,7 +360,6 @@ export const CreateHookSheet = ({
                         >
                           <FormControl_Shadcn_>
                             <SchemaSelector
-                              portal={false}
                               size="small"
                               showError={false}
                               selectedSchemaName={field.value}
