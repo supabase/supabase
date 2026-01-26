@@ -9,7 +9,9 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      redirect(303, `/${next.slice(1)}`)
+      // Ensure the redirect path starts with a single slash
+      const redirectPath = next.startsWith('/') ? next : `/${next}`
+      redirect(303, redirectPath)
     }
   }
 

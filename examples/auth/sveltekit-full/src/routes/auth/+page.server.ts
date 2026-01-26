@@ -41,7 +41,7 @@ export const actions: Actions = {
       },
     })
 
-    if (error) {
+    if (error || !data.url) {
       console.error(error)
       redirect(303, '/auth/error')
     }
