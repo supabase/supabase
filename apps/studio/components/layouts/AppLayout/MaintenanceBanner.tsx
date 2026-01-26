@@ -7,7 +7,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 export function MaintenanceBanner() {
   return (
     <HeaderBanner
-      variant="warning"
+      variant="note"
       title="Scheduled maintenance is in progress"
       description={
         <>
