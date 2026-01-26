@@ -51,6 +51,13 @@ describe('extractIdentifiers', () => {
     expect(identifiers).toEqual(expect.arrayContaining(['users', 'name', 'id']))
   })
 
+  it('handles CREATE TABLE statements', async () => {
+    const identifiers = extractIdentifiers(
+      await parse('CREATE TABLE "MyTable" ("MyColumn" TEXT, other_col INT)')
+    )
+    expect(identifiers).toEqual(expect.arrayContaining(['MyTable', 'MyColumn', 'other_col']))
+  })
+
   it('returns empty array when no identifiers exist', async () => {
     const identifiers = extractIdentifiers(await parse('SELECT 1'))
     expect(identifiers).toEqual([])

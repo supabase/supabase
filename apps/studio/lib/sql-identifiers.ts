@@ -1,4 +1,4 @@
-import type { ColumnRef, Node, RangeVar, ResTarget } from 'libpg-query'
+import type { ColumnDef, ColumnRef, Node, RangeVar, ResTarget } from 'libpg-query'
 
 /**
  * Recursively traverse a libpg-query AST to extract all identifiers.
@@ -42,6 +42,12 @@ export function extractIdentifiers(ast: Node | Node[]): string[] {
     if ('ResTarget' in obj) {
       const rt = obj.ResTarget as ResTarget
       if (rt.name) identifiers.push(rt.name)
+    }
+
+    // ColumnDef - column definitions in CREATE TABLE
+    if ('ColumnDef' in obj) {
+      const cd = obj.ColumnDef as ColumnDef
+      if (cd.colname) identifiers.push(cd.colname)
     }
 
     // Recurse into all values
