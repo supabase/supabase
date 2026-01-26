@@ -115,8 +115,8 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
           </TooltipTrigger>
           <TooltipContent side="bottom">
             {backup.isPhysicalBackup
-              ? 'Low-level backups of the entire database cluster.'
-              : 'Simple and flexible backups at the database level.'}{' '}
+              ? 'File-level backups of your entire database.'
+              : 'SQL-based backups of your entire database.'}{' '}
             <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
               Learn more
             </InlineLink>
