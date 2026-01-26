@@ -5,6 +5,7 @@ import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 import { MOCK_TABLES_DATA } from 'lib/ai/tools/mock-tools'
 import { extractIdentifiers } from 'lib/sql-identifiers'
+import { isQuotedInSql, needsQuoting } from 'lib/sql-identifier-quoting'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
@@ -284,56 +285,40 @@ export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = a
     return null
   }
 
-  // Use override if provided, otherwise fall back to default mock data
   const tables = input.mockToolOutputs?.list_tables ?? MOCK_TABLES_DATA
-
-  // Build index: lowercase name → original name
-  const schemaIndex = new Map<string, string>()
-  for (const table of tables) {
-    schemaIndex.set(table.name.toLowerCase(), table.name)
-    for (const col of table.columns) {
-      schemaIndex.set(col.name.toLowerCase(), col.name)
-    }
-  }
-
-  // Find identifiers that need quoting (contain uppercase)
-  const needsQuoting = (name: string) => /[A-Z]/.test(name)
-  const identifiersRequiringQuotes = new Set(Array.from(schemaIndex.values()).filter(needsQuoting))
-
-  if (identifiersRequiringQuotes.size === 0) {
-    return null // Nothing to check (all lowercase)
-  }
-
-  let totalChecks = 0
-  let properlyQuoted = 0
   const errors: string[] = []
+  let totalNeedingQuotes = 0
+  let properlyQuoted = 0
 
   for (const sql of output.sqlQueries) {
     try {
       const ast = await parse(sql)
       const identifiers = extractIdentifiers(ast)
 
-      for (const id of identifiers) {
-        const original = schemaIndex.get(id.toLowerCase())
-        if (original && needsQuoting(original)) {
-          totalChecks++
-          if (id === original) {
+      for (const identifier of identifiers) {
+        if (needsQuoting(identifier)) {
+          totalNeedingQuotes++
+          if (isQuotedInSql(sql, identifier)) {
             properlyQuoted++
           } else {
-            errors.push(`"${id}" should be quoted as "${original}"`)
+            const sqlPreview = sql.length > 100 ? `${sql.substring(0, 100)}...` : sql
+            errors.push(
+              `Identifier "${identifier}" needs quoting but is not quoted in: ${sqlPreview}`
+            )
           }
         }
       }
-    } catch {
-      // Parse errors handled by sqlSyntaxScorer
+    } catch (error) {
+      // Skip invalid SQL - already handled by sqlSyntaxScorer
+      continue
     }
   }
 
-  if (totalChecks === 0) return null
+  const score = totalNeedingQuotes === 0 ? 1 : properlyQuoted / totalNeedingQuotes
 
   return {
     name: 'SQL Identifier Quoting',
-    score: properlyQuoted / totalChecks,
+    score,
     metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
