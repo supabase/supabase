@@ -20,7 +20,7 @@ import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 
 export const StorageExplorer = () => {
-  const { ref } = useParams()
+  const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
     projectRef,
@@ -49,7 +49,11 @@ export const StorageExplorer = () => {
   } = useStorageExplorerStateSnapshot()
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const { data: bucket } = useSelectedBucket()
+  const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
+
+  // Detect when transitioning between buckets to avoid showing stale content from the previous bucket.
+  // This happens because the bucket query and effects that update the store run after the first render.
+  const isLoading = isBucketQueryLoading || (!!bucketId && bucketId !== selectedBucket.id)
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
@@ -186,6 +190,7 @@ export const StorageExplorer = () => {
           columns={columns}
           selectedItems={selectedItems}
           itemSearchString={itemSearchString}
+          isLoading={isLoading}
           onFilesUpload={onFilesUpload}
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
