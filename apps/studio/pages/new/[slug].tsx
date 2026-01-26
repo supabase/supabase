@@ -257,6 +257,9 @@ const Wizard: NextPageWithLayout = () => {
     if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
+        dataApiEnabled: values.dataApi,
+        useApiSchema: values.useApiSchema,
+        useOrioleDb: values.useOrioleDb,
       })
       setIsComputeCostsConfirmationModalVisible(true)
     } else {
