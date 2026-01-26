@@ -1,4 +1,4 @@
-import { Github, MoreVertical, Trash, Copy, Check } from 'lucide-react'
+import { Github, MoreVertical, Trash, Copy } from 'lucide-react'
 import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
 
@@ -39,7 +39,6 @@ export const ProjectCard = ({
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isCopied, setIsCopied] = useState(false)
 
   const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
   const providerLabel =
@@ -56,15 +55,6 @@ export const ProjectCard = ({
   const githubRepository = githubIntegration?.metadata.name ?? undefined
   const projectStatus = inferProjectStatus(project.status)
 
-  const handleCopyProjectRef = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    copyToClipboard(projectRef)
-    setIsCopied(true)
-    toast.success('Copied project ID to clipboard')
-    setTimeout(() => setIsCopied(false), 2000)
-  }
-
   return (
     <>
       <li className="list-none h-min">
@@ -74,7 +64,7 @@ export const ProjectCard = ({
           hideChevron
           title={
             <div className="w-full flex flex-col gap-y-4 justify-between px-5">
-              {/* Header with name, ID, and more menu */}
+              {/* Header with name and more menu */}
               <div className="flex flex-col gap-y-0.5">
                 <div className="flex items-center justify-between">
                   <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
@@ -85,7 +75,7 @@ export const ProjectCard = ({
                           type="text"
                           icon={<MoreVertical size={14} />}
                           className="w-6 h-6 px-0"
-                          onClick={(e) => { e.stopPropagation(), e.preventDefault()}}
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault() }}
                           onPointerDown={(e) => e.stopPropagation()}
                         />
                       </DropdownMenuTrigger>
