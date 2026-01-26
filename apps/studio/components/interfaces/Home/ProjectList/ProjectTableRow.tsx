@@ -1,4 +1,4 @@
-import { Github, MoreVertical, Trash } from 'lucide-react'
+import { Github, MoreVertical, Trash, Copy, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
@@ -23,6 +23,8 @@ import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { toast } from 'sonner'
+import { copyToClipboard } from 'ui'
 
 export interface ProjectTableRowProps {
   project: OrgProject
@@ -45,15 +47,21 @@ export const ProjectTableRow = ({
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project.status)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
 
   const url = rewriteHref ?? `/project/${project.ref}`
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-
-  const infraInformation = project.databases.find((x) => x.identifier === project.ref)
-
   const handleNavigation = createNavigationHandler(url, router)
+
+  const handleCopyProjectRef = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    copyToClipboard(projectRef)
+    setIsCopied(true)
+    toast.success('Copied project ID to clipboard')
+    setTimeout(() => setIsCopied(false), 2000)
+  }
 
   return (
     <>
@@ -69,7 +77,23 @@ export const ProjectTableRow = ({
             {/* Text */}
             <div>
               <h5 className="text-sm">{name}</h5>
-              <p className="text-sm text-foreground-lighter">ID: {projectRef}</p>
+              <button
+                tabIndex={0}
+                onClick={handleCopyProjectRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleCopyProjectRef(e as any)
+                  }
+                }}
+                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
+              >
+                {projectRef}
+                {isCopied ? (
+                  <Check size={12} strokeWidth={1.25} className="text-brand" />
+                ) : (
+                  <Copy size={12} strokeWidth={1.25} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+              </button>
             </div>
             {/* Integrations */}
             {(isGithubIntegrated || isVercelIntegrated) && (
