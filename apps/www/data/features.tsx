@@ -377,7 +377,7 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     title: 'Branching',
     subtitle: 'Test and preview changes using Supabase Branches.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
+Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
 
 ## Key features
 1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
@@ -409,7 +409,7 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
