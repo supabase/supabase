@@ -54,46 +54,43 @@ export const SecurityQuestionnaire = () => {
   }
 
   return (
-    <>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail>
-          <p className="text-base m-0">Standard Security Questionnaire</p>
-          <div className="space-y-2 text-sm text-foreground-light m-0">
-            <p>
-              Organizations on Team Plan or above have access to our standard security
-              questionnaire.
-            </p>
+    <ScaffoldSection className="py-12">
+      <ScaffoldSectionDetail>
+        <h4 className="mb-5">Standard Security Questionnaire</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
+          <p>
+            Organizations on Team Plan or above have access to our standard security questionnaire.
+          </p>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent>
+        {isLoadingPermissions || isLoadingEntitlement ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <ShimmeringLoader className="w-24" />
           </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          {isLoadingPermissions || isLoadingEntitlement ? (
-            <div className="@lg:flex items-center justify-center h-full">
-              <ShimmeringLoader className="w-24" />
-            </div>
-          ) : !canReadSubscriptions ? (
-            <NoPermission resourceText="access our security questionnaire" />
-          ) : !hasAccessToQuestionnaire ? (
-            <div className="@lg:flex items-center justify-center h-full">
-              <Link
-                href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
-              >
-                <Button type="default">Upgrade to Team</Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="@lg:flex items-center justify-center h-full">
-              <Button
-                type="default"
-                icon={<Download />}
-                onClick={handleDownloadClick}
-                disabled={!slug}
-              >
-                Download Questionnaire
-              </Button>
-            </div>
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </>
+        ) : !canReadSubscriptions ? (
+          <NoPermission resourceText="access our security questionnaire" />
+        ) : !hasAccessToQuestionnaire ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <Link
+              href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
+            >
+              <Button type="default">Upgrade to Team</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button
+              type="default"
+              icon={<Download />}
+              onClick={handleDownloadClick}
+              disabled={!slug}
+            >
+              Download Questionnaire
+            </Button>
+          </div>
+        )}
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }

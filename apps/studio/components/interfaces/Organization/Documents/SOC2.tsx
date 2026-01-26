@@ -56,10 +56,10 @@ export const SOC2 = () => {
   }
 
   return (
-    <ScaffoldSection>
+    <ScaffoldSection className="py-12">
       <ScaffoldSectionDetail>
-        <p className="text-base m-0">SOC2 Type 2</p>
-        <div className="space-y-2 text-sm text-foreground-light m-0">
+        <h4 className="mb-5">SOC2 Type 2</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
           <p>
             Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>

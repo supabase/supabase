@@ -37,10 +37,10 @@ export const DPA = () => {
 
   return (
     <>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail>
-          <p className="text-base">Data Processing Addendum (DPA)</p>
-          <div className="space-y-2 text-sm text-foreground-light">
+          <h4 className="mb-5">Data Processing Addendum (DPA)</h4>
+          <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
             <p>
               All organizations can sign our Data Processing Addendum ("DPA") as part of their GDPR
               compliance.
