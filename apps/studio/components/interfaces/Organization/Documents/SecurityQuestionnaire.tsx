@@ -72,9 +72,7 @@ export const SecurityQuestionnaire = () => {
           <NoPermission resourceText="access our security questionnaire" />
         ) : !hasAccessToQuestionnaire ? (
           <div className="@lg:flex items-center justify-center h-full">
-            <Link
-              href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
-            >
+            <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}>
               <Button type="default">Upgrade to Team</Button>
             </Link>
           </div>
