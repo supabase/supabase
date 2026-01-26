@@ -1,3 +1,4 @@
+import { partition } from 'lodash'
 import { PropsWithChildren } from 'react'
 
 import { MaintenanceBanner } from '@/components/layouts/AppLayout/MaintenanceBanner'
@@ -6,7 +7,6 @@ import { useFlag } from 'common'
 import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 import { IncidentBanner } from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
-import { partition } from 'lodash'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -20,17 +20,15 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     useFlag('ongoingIncident') ||
     process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true' ||
     incidents.length > 0
+  const ongoingMaintenance = maintenanceEvents.length > 0
+
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
-
-  const ongoingMaintenance = maintenanceEvents.length > 0
-  const showMaintenanceBanner = ongoingMaintenance && !ongoingIncident
 
   return (
     <div className="flex flex-col">
       <div className="flex-shrink-0">
-        {ongoingIncident && <IncidentBanner />}
-        {showMaintenanceBanner && <MaintenanceBanner />}
+        {ongoingIncident ? <IncidentBanner /> : ongoingMaintenance ? <MaintenanceBanner /> : null}
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}
