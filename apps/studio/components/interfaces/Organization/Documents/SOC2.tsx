@@ -74,9 +74,11 @@ export const SOC2 = () => {
           <NoPermission resourceText="access our SOC2 Type 2 report" />
         ) : !hasAccessToSoc2Report ? (
           <div className="@lg:flex items-center justify-center h-full">
-            <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
-              <Button type="default">Upgrade to Team</Button>
-            </Link>
+            <Button asChild type="default">
+              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
+                Upgrade to Team
+              </Link>
+            </Button>
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
