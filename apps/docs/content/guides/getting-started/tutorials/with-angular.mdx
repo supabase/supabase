@@ -41,17 +41,17 @@ All you need are the API URL and the key that you copied [earlier](#get-api-deta
 The application exposes these variables in the browser, and that's fine as you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/environments/environment.ts"
-  lines={[[1, -1]]}
-  meta="name=src/environments/environment.ts"
+path="/user-management/angular-user-management/src/environments/environment.ts"
+lines={[[1, -1]]}
+meta="name=src/environments/environment.ts"
 />
 
 Now you have the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/supabase.service.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/supabase.service.ts"
+path="/user-management/angular-user-management/src/app/supabase.service.ts"
+lines={[[1, -1]]}
+meta="name=src/app/supabase.service.ts"
 />
 
 Optionally, update `src/styles.css` to style the app. You can find the full contents of this file [in the example repository](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management/src/styles.css).
@@ -65,15 +65,15 @@ Create an `AuthComponent` with the `ng g c auth` Angular CLI command and add the
 <$CodeTabs>
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/auth/auth.component.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/auth/auth.component.ts"
+path="/user-management/angular-user-management/src/app/auth/auth.component.ts"
+lines={[[1, -1]]}
+meta="name=src/app/auth/auth.component.ts"
 />
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/auth/auth.component.html"
-  lines={[[1, -1]]}
-  meta="name=src/app/auth/auth.component.html"
+path="/user-management/angular-user-management/src/app/auth/auth.component.html"
+lines={[[1, -1]]}
+meta="name=src/app/auth/auth.component.html"
 />
 
 </$CodeTabs>
@@ -86,15 +86,15 @@ Create an `AccountComponent` with the `ng g c account` Angular CLI command and a
 <$CodeTabs>
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/account/account.component.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/account/account.component.ts"
+path="/user-management/angular-user-management/src/app/account/account.component.ts"
+lines={[[1, -1]]}
+meta="name=src/app/account/account.component.ts"
 />
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/account/account.component.html"
-  lines={[[1, -1]]}
-  meta="name=src/app/account/account.component.html"
+path="/user-management/angular-user-management/src/app/account/account.component.html"
+lines={[[1, -1]]}
+meta="name=src/app/account/account.component.html"
 />
 
 </$CodeTabs>
@@ -112,14 +112,14 @@ Create an `AvatarComponent` with `ng g c avatar` Angular CLI command and add the
 
 <$CodeSample
 path="/user-management/angular-user-management/src/app/avatar/avatar.component.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/avatar/avatar.component.ts"
+lines={[[1, -1]]}
+meta="name=src/app/avatar/avatar.component.ts"
 />
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/avatar/avatar.component.html"
-  lines={[[1, -1]]}
-  meta="name=src/app/avatar/avatar.component.html"
+path="/user-management/angular-user-management/src/app/avatar/avatar.component.html"
+lines={[[1, -1]]}
+meta="name=src/app/avatar/avatar.component.html"
 />
 
 </$CodeTabs>
@@ -131,15 +131,15 @@ Now you have all the components in place, update `AppComponent`:
 <$CodeTabs>
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/app.component.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/app.component.ts"
+path="/user-management/angular-user-management/src/app/app.component.ts"
+lines={[[1, -1]]}
+meta="name=src/app/app.component.ts"
 />
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/app.component.html"
-  lines={[[1, -1]]}
-  meta="name=src/app/app.component.html"
+path="/user-management/angular-user-management/src/app/app.component.html"
+lines={[[1, -1]]}
+meta="name=src/app/app.component.html"
 />
 
 </$CodeTabs>
@@ -147,9 +147,9 @@ Now you have all the components in place, update `AppComponent`:
 You also need to change `app.module.ts` to include the `ReactiveFormsModule` from the `@angular/forms` package.
 
 <$CodeSample
-  path="/user-management/angular-user-management/src/app/app.module.ts"
-  lines={[[1, -1]]}
-  meta="name=src/app/app.module.ts"
+path="/user-management/angular-user-management/src/app/app.module.ts"
+lines={[[1, -1]]}
+meta="name=src/app/app.module.ts"
 />
 
 Once that's done, run the application in a terminal:
