@@ -32,7 +32,15 @@ export const actions: Actions = {
   },
   oauth: async ({ request, locals: { supabase }, url }) => {
     const formData = await request.formData()
-    const provider = formData.get('provider') as Provider
+    const providerValue = formData.get('provider')
+
+    // Validate provider is a non-empty string
+    if (!providerValue || typeof providerValue !== 'string') {
+      console.error('Invalid provider')
+      redirect(303, '/auth/error')
+    }
+
+    const provider = providerValue as Provider
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
