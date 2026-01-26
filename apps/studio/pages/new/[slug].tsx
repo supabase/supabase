@@ -236,6 +236,9 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          dataApiEnabled: form.getValues('dataApi'),
+          useApiSchema: form.getValues('useApiSchema'),
+          useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
           project: res.ref,
