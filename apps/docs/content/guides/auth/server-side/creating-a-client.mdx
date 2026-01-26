@@ -312,6 +312,104 @@ You're done! To recap, you've successfully:
 
 You can now use any Supabase features from your client or server code!
 
+### Implementing OAuth Authentication
+
+To implement OAuth authentication with SvelteKit SSR, you need to handle the OAuth flow on the server side. Here's how to set it up:
+
+#### Create an OAuth callback route
+
+Create a callback route at `src/routes/auth/callback/+server.ts` to handle the OAuth code exchange:
+
+```ts name=src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/'
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      return redirect(303, next)
+    }
+  }
+
+  // Return the user to an error page with instructions
+  return redirect(303, '/auth/error')
+}
+```
+
+#### Initiate OAuth sign-in
+
+You can initiate OAuth sign-in from either a client component or a server action. Here's an example using a server action:
+
+```ts name=src/routes/auth/login/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { Actions } from './$types'
+
+export const actions: Actions = {
+  default: async ({ url, locals: { supabase } }) => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github', // or 'google', 'discord', etc.
+      options: {
+        redirectTo: `${url.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      return {
+        error: error.message,
+      }
+    }
+
+    if (data.url) {
+      return redirect(303, data.url)
+    }
+  },
+}
+```
+
+Or from a client component:
+
+```svelte name=src/routes/auth/login/+page.svelte
+<script lang="ts">
+  import { page } from '$app/stores'
+
+  let { data, form } = $props()
+
+  const handleOAuthSignIn = async (provider: string) => {
+    const { data: oauthData, error } = await data.supabase.auth.signInWithOAuth({
+      provider: provider as any,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      console.error('OAuth error:', error)
+      return
+    }
+
+    if (oauthData.url) {
+      window.location.href = oauthData.url
+    }
+  }
+</script>
+
+<button on:click={() => handleOAuthSignIn('github')}>
+  Sign in with GitHub
+</button>
+```
+
+The OAuth flow works as follows:
+
+1. User clicks the OAuth sign-in button
+2. `signInWithOAuth` is called, which redirects to the OAuth provider
+3. After authentication, the provider redirects back to your callback route (`/auth/callback`)
+4. The callback route exchanges the code for a session using `exchangeCodeForSession`
+5. The user is redirected to the specified `next` URL or the home page
+
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
