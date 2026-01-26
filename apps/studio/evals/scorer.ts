@@ -4,7 +4,7 @@ import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 import { MOCK_TABLES_DATA } from 'lib/ai/tools/mock-tools'
-import { extractIdentifiers } from 'lib/sql-identifiers'
+import { extractIdentifiers } from 'lib/sql-identifier-quoting'
 import { isQuotedInSql, needsQuoting } from 'lib/sql-identifier-quoting'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
