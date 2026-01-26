@@ -17,7 +17,6 @@ import {
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
-import { useParams } from 'common'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -115,8 +114,6 @@ export const FileExplorerRow = ({
   selectedItems = [],
   style,
 }: FileExplorerRowProps) => {
-  const { bucketId } = useParams()
-
   const {
     selectedBucket,
     selectedFilePreview,
