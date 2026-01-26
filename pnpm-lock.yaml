@@ -66,6 +66,7 @@ catalogs:
 
 overrides:
   '@eslint/eslintrc>js-yaml': ^4.1.1
+  '@nuxt/devtools-wizard>diff': ^8.0.3
   '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
@@ -74,11 +75,12 @@ overrides:
   '@tanstack/start-server-core>h3': ^1.15.5
   '@tanstack/react-start-server>h3': ^1.15.5
   '@smithy/config-resolver': ^4.4.0
-  payload>undici: ^7.18.2
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
+  payload>undici: ^7.18.2
   preact: 10.26.10
   refractor>prismjs: ^1.30.0
+  shadcn>diff: ^8.0.3
   tar: ^7.5.4
   tmp: ^0.2.4
   vinxi>vite: ^7.1.11
@@ -11828,20 +11830,20 @@ packages:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
-  diff@4.0.2:
-    resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
+  diff@4.0.4:
+    resolution: {integrity: sha512-X07nttJQkwkfKfvTPG/KSnE2OMdcUCao6+eXF3wmnIQRn2aPAHH3VxDbDOdegkd6JbPsXqShpvEOHfAT+nCNwQ==}
     engines: {node: '>=0.3.1'}
 
-  diff@5.2.0:
-    resolution: {integrity: sha512-uIFDxqpRZGZ6ThOk84hEfqWoHx2devRFvpTZcTHur85vImfaxUbTW9Ryh4CpCuDnToOP1CEtXKIgytHBPVff5A==}
+  diff@5.2.2:
+    resolution: {integrity: sha512-vtcDfH3TOjP8UekytvnHH1o1P4FcUdt4eQ1Y+Abap1tk/OB2MWQvcwS2ClCd1zuIhc3JKOx6p3kod8Vfys3E+A==}
     engines: {node: '>=0.3.1'}
 
   diff@7.0.0:
     resolution: {integrity: sha512-PJWHUb1RFevKCwaFA9RlG5tCd+FO5iRh9A8HEtkmBH2Li03iJriB6m6JIN4rGz3K3JLawI7/veA1xzRKP6ISBw==}
     engines: {node: '>=0.3.1'}
 
-  diff@8.0.2:
-    resolution: {integrity: sha512-sSuxWU5j5SR9QQji/o2qMvqRNYRDOcBTgsJ/DeCf4iSN4gW+gNMXM7wFIP+fdXZxoNiAnHUTGjCr+TSWXdRDKg==}
+  diff@8.0.3:
+    resolution: {integrity: sha512-qejHi7bcSD4hQAZE0tNAawRK1ZtafHDmMTMkrrIGgSLl7hTnQHmKCeB45xAcbfTqK2zowkM3j3bHt/4b/ARbYQ==}
     engines: {node: '>=0.3.1'}
 
   dir-glob@3.0.1:
@@ -23767,7 +23769,7 @@ snapshots:
   '@nuxt/devtools-wizard@2.6.4':
     dependencies:
       consola: 3.4.2
-      diff: 8.0.2
+      diff: 8.0.3
       execa: 8.0.1
       magicast: 0.3.5
       pathe: 2.0.3
@@ -31822,14 +31824,14 @@ snapshots:
 
   diff-sequences@29.6.3: {}
 
-  diff@4.0.2:
+  diff@4.0.4:
     optional: true
 
-  diff@5.2.0: {}
+  diff@5.2.2: {}
 
   diff@7.0.0: {}
 
-  diff@8.0.2: {}
+  diff@8.0.3: {}
 
   dir-glob@3.0.1:
     dependencies:
@@ -39476,7 +39478,7 @@ snapshots:
       cosmiconfig: 9.0.0(typescript@5.9.2)
       dedent: 1.7.0(babel-plugin-macros@3.1.0)
       deepmerge: 4.3.1
-      diff: 8.0.2
+      diff: 8.0.3
       execa: 9.6.0
       fast-glob: 3.3.3
       fs-extra: 11.3.2
@@ -40594,7 +40596,7 @@ snapshots:
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
-      diff: 4.0.2
+      diff: 4.0.4
       make-error: 1.3.6
       typescript: 5.9.2
       v8-compile-cache-lib: 3.0.1
@@ -41178,7 +41180,7 @@ snapshots:
   uvu@0.5.6:
     dependencies:
       dequal: 2.0.3
-      diff: 5.2.0
+      diff: 5.2.2
       kleur: 4.1.5
       sade: 1.8.1
 
