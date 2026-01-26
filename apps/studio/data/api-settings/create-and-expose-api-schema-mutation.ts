@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { configKeys } from 'data/config/keys'
 import { databaseKeys } from 'data/database/keys'
 import { handleError, patch } from 'data/fetchers'
@@ -11,12 +12,14 @@ export type CreateAndExposeAPISchemaVariables = {
   projectRef: string
   connectionString?: string | null
   existingPostgrestConfig: {
-    db_pool: any
+    db_pool?: number | null
     max_rows: number
     db_extra_search_path: string
     db_schema: string
   }
 }
+
+type UpdatePostgrestConfigBody = components['schemas']['UpdatePostgrestConfigBody']
 
 export async function createAndExposeApiSchema({
   projectRef,
@@ -31,14 +34,17 @@ grant usage on schema api to anon, authenticated;
   await executeSql({ projectRef, connectionString, sql })
 
   const { db_extra_search_path, db_pool, db_schema, max_rows } = existingPostgrestConfig
+
+  const body: UpdatePostgrestConfigBody = {
+    max_rows,
+    db_extra_search_path,
+    db_schema: `api, ${db_schema}`,
+  }
+  if (db_pool) body.db_pool = db_pool
+
   const { error } = await patch('/platform/projects/{ref}/config/postgrest', {
     params: { path: { ref: projectRef } },
-    body: {
-      db_pool,
-      max_rows,
-      db_extra_search_path,
-      db_schema: `api, ${db_schema}`,
-    },
+    body,
   })
 
   if (error) handleError(error)
