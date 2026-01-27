@@ -233,10 +233,10 @@ const authProvider: AuthProvider = {
   },
   check: async () => {
     try {
-      const { data } = await supabaseClient.auth.getSession()
-      const { session } = data
+      const { data } = await supabaseClient.auth.getUser()
+      const { User } = data
 
-      if (!session) {
+      if (!User) {
         return {
           authenticated: false,
           error: {
