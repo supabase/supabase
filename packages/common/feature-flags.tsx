@@ -207,6 +207,7 @@ export const FeatureFlagProvider = ({
     session?.user?.id,
     resolvedOrganizationSlug,
     resolvedProjectRef,
+    getConfigCatFlags,
   ])
 
   return (
