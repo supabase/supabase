@@ -1,0 +1,23 @@
+{
+  "name": "transactional",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "email build",
+    "dev": "email dev",
+    "export": "email export"
+  },
+  "dependencies": {
+    "@react-email/components": "^1.0.5",
+    "@react-email/tailwind": "^1.0.5",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-email": "^5.2.5"
+  },
+  "devDependencies": {
+    "@react-email/preview-server": "5.2.5",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "config": "workspace:*",
+    "ui": "workspace:*"
+  }
+}
