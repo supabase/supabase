@@ -10,8 +10,9 @@ import { CreateReportModal } from 'components/interfaces/Reports/CreateReportMod
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Content, useContentQuery } from 'data/content/content-query'
+import { Content, ContentBase, useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { Dashboards } from 'types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
@@ -89,10 +90,17 @@ const ObservabilityMenu = () => {
     deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] })
   }
 
+  function isReportContent(c: Content): c is ContentBase & {
+    type: 'report'
+    content: Dashboards.Content
+  } {
+    return c.type === 'report'
+  }
+
   function getReportMenuItems() {
     if (!content) return []
 
-    const reports = content?.content.filter((c) => c.type === 'report')
+    const reports = content?.content.filter(isReportContent)
 
     const sortedReports = reports?.sort((a, b) => {
       if (a.name < b.name) {
@@ -303,7 +311,7 @@ const ObservabilityMenu = () => {
                   {reportMenuItems.map((item) => (
                     <ObservabilityMenuItem
                       key={item.id}
-                      item={item as any}
+                      item={item}
                       pageKey={pageKey}
                       onSelectEdit={() => {
                         setSelectedReportToUpdate(item.report)
