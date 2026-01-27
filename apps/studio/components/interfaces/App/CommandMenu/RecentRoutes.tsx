@@ -14,8 +14,8 @@ import {
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 
-const RECENTS_PAGE_NAME = 'Recent Pages'
-const VISIBLE_RECENTS_COUNT = 3
+const RECENTS_PAGE_NAME = 'All Recents'
+const VISIBLE_RECENTS_COUNT = 2
 
 export function useRecentRoutesCommands() {
   const router = useRouter()
@@ -51,7 +51,7 @@ export function useRecentRoutesCommands() {
     }))
   }, [recentRoutes])
 
-  // Commands shown in the main menu (first 3)
+  // Commands shown in the main menu (first 2 or 3)
   const visibleCommands = useMemo(() => {
     return allCommands.slice(0, VISIBLE_RECENTS_COUNT)
   }, [allCommands])
@@ -91,7 +91,7 @@ export function useRecentRoutesCommands() {
       sections: [
         {
           id: 'all-recents',
-          name: 'Recent Pages',
+          name: 'All Recents',
           commands: allCommandsWithActions,
         },
       ],
@@ -103,12 +103,12 @@ export function useRecentRoutesCommands() {
   const commandsWithAllRecents = useMemo(() => {
     const commands = [...visibleCommandsWithActions]
 
-    // Add "All recents..." command if there are more than visible
+    // Add "View more recents..." command if there are more than visible
     if (allCommands.length > VISIBLE_RECENTS_COUNT) {
       commands.push({
         id: 'all-recents',
-        name: 'All recents...',
-        value: 'All recents recent pages history',
+        name: 'View more...',
+        value: 'More recents',
         action: goToAllRecents,
         icon: () => <History size={18} />,
         badge: undefined,
