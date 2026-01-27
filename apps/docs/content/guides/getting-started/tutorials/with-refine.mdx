@@ -233,15 +233,14 @@ const authProvider: AuthProvider = {
   },
   check: async () => {
     try {
-      const { data } = await supabaseClient.auth.getSession()
-      const { session } = data
+      const { data, error } = await supabaseClient.auth.getUser()
 
-      if (!session) {
+      if (error || !data?.user) {
         return {
           authenticated: false,
           error: {
             message: 'Check failed',
-            name: 'Session not found',
+            name: 'User not found',
           },
           logout: true,
           redirectTo: '/login',
