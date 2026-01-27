@@ -187,7 +187,25 @@ describe('parseConnectionsData', () => {
     expect(result).toEqual({ current: 31, max: 100 }) // 30.7 rounded to 31
   })
 
-  it('returns 0 max when maxConnections is missing', () => {
+  it('returns current connections even when maxConnectionsData is undefined', () => {
+    const mockInfraData: InfraMonitoringMultiResponse = {
+      data: [],
+      series: {
+        pg_stat_database_num_backends: {
+          format: 'number',
+          total: 150,
+          totalAverage: 25,
+          yAxisLimit: 100,
+        },
+      },
+    }
+
+    const result = parseConnectionsData(mockInfraData, undefined)
+
+    expect(result).toEqual({ current: 25, max: 0 })
+  })
+
+  it('returns 0 max when maxConnections is missing from data object', () => {
     const mockInfraData: InfraMonitoringMultiResponse = {
       data: [],
       series: {

@@ -68,7 +68,7 @@ export function parseConnectionsData(
   infraData: InfraMonitoringResponse | undefined,
   maxConnectionsData: MaxConnectionsData | undefined
 ): ConnectionsData {
-  if (!infraData || !maxConnectionsData) {
+  if (!infraData) {
     return { current: 0, max: 0 }
   }
 
@@ -76,7 +76,7 @@ export function parseConnectionsData(
 
   const currentVal = series.pg_stat_database_num_backends?.totalAverage
   const current = Math.round(parseNumericValue(currentVal))
-  const max = maxConnectionsData.maxConnections || 0
+  const max = maxConnectionsData?.maxConnections || 0
 
   return { current, max }
 }
