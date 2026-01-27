@@ -1494,6 +1494,9 @@ function createStorageExplorerState({
               state.updateRowStatus({ name, status: STORAGE_ROW_STATUS.READY, columnIndex })
             })
           }
+        } else {
+          toast.dismiss(toastId)
+          throw err
         }
       }
     },
