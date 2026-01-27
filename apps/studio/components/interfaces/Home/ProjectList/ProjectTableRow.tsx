@@ -55,7 +55,7 @@ export const ProjectTableRow = ({
   const githubRepository = githubIntegration?.metadata.name ?? undefined
   const handleNavigation = createNavigationHandler(url, router)
 
-  const handleCopyProjectRef = (e: React.MouseEvent) => {
+  const handleCopyProjectRef = (e: React.SyntheticEvent) => {
     e.stopPropagation()
     copyToClipboard(projectRef)
     setIsCopied(true)
@@ -81,7 +81,8 @@ export const ProjectTableRow = ({
                 onClick={handleCopyProjectRef}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    handleCopyProjectRef(e as any)
+                    e.preventDefault()
+                    handleCopyProjectRef(e)
                   }
                 }}
                 className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
