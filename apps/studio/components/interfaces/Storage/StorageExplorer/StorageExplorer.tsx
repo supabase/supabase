@@ -5,7 +5,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
-import useLatest from 'hooks/misc/useLatest'
+import { useLatest } from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
@@ -26,7 +26,6 @@ export const StorageExplorer = () => {
     view,
     columns,
     selectedItems,
-    selectedItemsToDelete,
     openedFolders,
     selectedItemsToMove,
     selectedBucket,
@@ -34,9 +33,7 @@ export const StorageExplorer = () => {
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
-    deleteFolder,
     uploadFiles,
-    deleteFiles,
     moveFiles,
     popColumnAtIndex,
     popOpenedFoldersAtIndex,
@@ -44,7 +41,6 @@ export const StorageExplorer = () => {
     clearSelectedItems,
     setSelectedFilePreview,
     setSelectedItemsToMove,
-    setSelectedItemsToDelete,
   } = useStorageExplorerStateSnapshot()
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
@@ -153,24 +149,6 @@ export const StorageExplorer = () => {
     await moveFiles(newPath)
   }
 
-  const onDeleteSelectedFiles = async () => {
-    if (selectedItemsToDelete.length === 1) {
-      const [itemToDelete] = selectedItemsToDelete
-      if (!itemToDelete) return
-
-      switch (itemToDelete.type) {
-        case STORAGE_ROW_TYPES.FOLDER:
-          await deleteFolder(itemToDelete)
-          break
-        case STORAGE_ROW_TYPES.FILE:
-          await deleteFiles({ files: [itemToDelete] })
-          break
-      }
-    } else {
-      await deleteFiles({ files: selectedItemsToDelete })
-    }
-  }
-
   /** Misc UI methods */
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
@@ -207,12 +185,9 @@ export const StorageExplorer = () => {
         />
         <PreviewPane />
       </div>
-      <ConfirmDeleteModal
-        visible={selectedItemsToDelete.length > 0}
-        selectedItemsToDelete={selectedItemsToDelete}
-        onSelectCancel={() => setSelectedItemsToDelete([])}
-        onSelectDelete={onDeleteSelectedFiles}
-      />
+
+      <ConfirmDeleteModal />
+
       <MoveItemsModal
         bucketName={selectedBucket.name}
         visible={selectedItemsToMove.length > 0}
@@ -220,6 +195,7 @@ export const StorageExplorer = () => {
         onSelectCancel={() => setSelectedItemsToMove([])}
         onSelectMove={onMoveSelectedFiles}
       />
+
       <CustomExpiryModal />
     </div>
   )
