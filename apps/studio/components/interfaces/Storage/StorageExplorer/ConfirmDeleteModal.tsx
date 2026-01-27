@@ -36,7 +36,6 @@ export const ConfirmDeleteModal = () => {
         await deleteFiles({ files: selectedItemsToDelete })
       }
     } catch (err) {
-      // console.log('ERROR', err)
     } finally {
       setDeleting(false)
     }
