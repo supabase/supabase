@@ -68,7 +68,7 @@ Check updates for each service to learn more.
 
 ### Studio
 - Updated to `2025.12.17-sha-43f4f7f`
-- ⚠️ Fixed additional potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- ⚠️ Fixed additional issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 - Fixed an issue with the Users page not being updated on changes - PR [#41254](https://github.com/supabase/supabase/pull/41254)
 
 ### MCP Server
@@ -91,7 +91,7 @@ Check updates for each service to learn more.
 ### Studio
 
 - Updated to `2025.12.09-sha-434634f`
-- ⚠️ Fixed potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- ⚠️ Fixed security issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 
 ### MCP Server
 
