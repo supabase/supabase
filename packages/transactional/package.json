@@ -7,16 +7,17 @@
     "export": "email export"
   },
   "dependencies": {
-    "@react-email/components": "0.0.23",
-    "@react-email/tailwind": "0.1.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-email": "3.0.0"
+    "@react-email/components": "^1.0.5",
+    "@react-email/tailwind": "^1.0.5",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-email": "^5.2.5"
   },
   "devDependencies": {
-    "@types/react": "18.3.4",
-    "@types/react-dom": "18.3.0",
-    "config": "*",
-    "ui": "*"
+    "@react-email/preview-server": "5.2.5",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "config": "workspace:*",
+    "ui": "workspace:*"
   }
 }
