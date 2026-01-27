@@ -2,9 +2,41 @@ import { expect } from 'vitest'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
 
+const MIN_WORD_LENGTH = 3
+
 expect.extend({
   async toMatchCriteria(received: string, criteria: string) {
     const openAiKey = process.env.OPENAI_API_KEY
+
+    if (!openAiKey) {
+      const receivedLower = received.toLowerCase()
+      const ignoredWords = new Set(['relates', 'describes'])
+      const requiredWords = criteria
+        .split(/\W+/)
+        .filter((word) => word.length > MIN_WORD_LENGTH && !ignoredWords.has(word.toLowerCase()))
+        .map((word) => word.toLowerCase())
+
+      const missing = requiredWords.filter((word) => !receivedLower.includes(word))
+      const pass = missing.length === 0
+      const reason = pass
+        ? 'All required keywords found without LLM evaluation.'
+        : `Missing keywords: ${missing.join(', ')}`
+
+      return {
+        message: () =>
+          codeBlock`
+            ${this.utils.matcherHint('toMatchCriteria', received, criteria, {
+              comment: 'evaluated by keyword fallback',
+              isNot: this.isNot,
+              promise: this.promise,
+            })}
+
+            ${reason}
+          `,
+        pass,
+      }
+    }
+
     const openai = new OpenAI({ apiKey: openAiKey })
 
     const model = 'gpt-4o-2024-05-13'

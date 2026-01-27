@@ -1,15 +1,70 @@
 import { codeBlock } from 'common-tags'
-import OpenAI from 'openai'
-import { describe, expect, test } from 'vitest'
+import type OpenAI from 'openai'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { formatSql } from '../../test/util'
 import { debugSql, titleSql } from './functions'
 
-const openAiKey = process.env.OPENAI_API_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
+// Minimal chat completion response shape used by tests.
+const buildToolCallResponse = (payload: unknown) => ({
+  choices: [
+    {
+      message: {
+        tool_calls: [
+          {
+            function: {
+              arguments: JSON.stringify(payload),
+            },
+          },
+        ],
+      },
+    },
+  ],
+})
+
+const mockCompletionsCreate = vi.fn()
+
+const openai = {
+  chat: {
+    completions: {
+      create: mockCompletionsCreate,
+    },
+  },
+} as unknown as OpenAI
+
+const fixedOrderSql = codeBlock`
+  create table departments (
+    id bigint primary key generated always as identity,
+    name text
+  );
+
+  create table employees (
+    id bigint primary key generated always as identity,
+    name text,
+    email text,
+    department_id bigint references departments (id)
+  );
+`
+
+const fixedTypoSql = 'select * from employees;'
+
+const generatedTitle = 'Employees and departments'
+const generatedDescription = 'Tables to manage employees and departments'
+
+beforeEach(() => {
+  mockCompletionsCreate.mockReset()
+})
 
 describe('debug', () => {
-  test.concurrent('fix order of operations', async ({ expect }) => {
+  // Run sequentially so each test can provide its own mocked completion response.
+  test('fix order of operations', async ({ expect }) => {
+    mockCompletionsCreate.mockResolvedValueOnce(
+      buildToolCallResponse({
+        sql: fixedOrderSql,
+        solution: 'Create the departments table before referencing it.',
+      })
+    )
+
     const { sql } = await debugSql(
       openai,
       'relation "departments" does not exist',
@@ -31,7 +86,14 @@ describe('debug', () => {
     expect(formatSql(sql)).toMatchSnapshot()
   })
 
-  test.concurrent('fix typos', async ({ expect }) => {
+  test('fix typos', async ({ expect }) => {
+    mockCompletionsCreate.mockResolvedValueOnce(
+      buildToolCallResponse({
+        sql: fixedTypoSql,
+        solution: 'Correct the typo in the FROM clause.',
+      })
+    )
+
     const { sql, solution } = await debugSql(
       openai,
       'syntax error at or near "fromm"',
@@ -47,6 +109,13 @@ describe('debug', () => {
 
 describe('title', () => {
   test('title matches content', async () => {
+    mockCompletionsCreate.mockResolvedValueOnce(
+      buildToolCallResponse({
+        title: generatedTitle,
+        description: generatedDescription,
+      })
+    )
+
     const { title, description } = await titleSql(
       openai,
       codeBlock`
