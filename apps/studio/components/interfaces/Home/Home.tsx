@@ -1,7 +1,3 @@
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { useEffect, useRef } from 'react'
-
 import { useParams } from 'common'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
 import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
@@ -19,24 +15,29 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import dayjs from 'dayjs'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
-  cn,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import QuickConnect from './QuickConnect'
 
 export const Home = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -108,7 +109,7 @@ export const Home = () => {
 
   return (
     <div className="w-full px-4">
-      <div className={cn('py-16 ', !isPaused && 'border-b border-muted ')}>
+      <div className={cn('py-8 ', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
             <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
@@ -212,22 +213,23 @@ export const Home = () => {
       </div>
 
       <>
-        <div className="py-16 border-b border-muted">
-          <div className="mx-auto max-w-7xl space-y-16 @container">
+        <div className="py-12 border-b border-muted">
+          <div className="mx-auto max-w-7xl space-y-8 @container">
             {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
               <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
             )}
             {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
+            <QuickConnect />
           </div>
         </div>
 
-        <div className="bg-surface-100/5 py-16">
+        <div className="bg-surface-100/5 py-8">
           <div className="mx-auto max-w-7xl space-y-16 @container">
             {project?.status !== PROJECT_STATUS.INACTIVE && (
               <>
                 <div className="space-y-8">
                   <h2 className="text-lg">Client libraries</h2>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-4 md:gap-y-12 mb-12 md:grid-cols-3">
                     {clientLibraries!.map((library) => (
                       // [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later.
                       <ClientLibrary key={(library as any).language} {...(library as any)} />
@@ -238,7 +240,7 @@ export const Home = () => {
                   <div className="flex flex-col gap-y-8">
                     <h4 className="text-lg">Example projects</h4>
                     {!!projectHomepageExampleProjects ? (
-                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                      <div className="grid gap-2 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {/* [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later. */}
                         {(projectHomepageExampleProjects as any)
                           .sort((a: any, b: any) => a.title.localeCompare(b.title))
@@ -256,7 +258,7 @@ export const Home = () => {
                             </TabsTrigger_Shadcn_>
                           </TabsList_Shadcn_>
                           <TabsContent_Shadcn_ value="app">
-                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-2 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
                               {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
                                 .sort((a, b) => a.title.localeCompare(b.title))
                                 .map((project) => (
