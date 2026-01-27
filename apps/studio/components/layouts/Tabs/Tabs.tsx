@@ -134,12 +134,37 @@ export const EditorTabs = () => {
   }
 
   const tabsListRef = useRef<HTMLDivElement>(null)
+  const prevTabCountRef = useRef<number>(editorTabs.length)
 
   useEffect(() => {
     if (tabsListRef.current) {
       tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
     }
-  }, [editorTabs.length])
+  }, [])
+
+  useEffect(() => {
+    if (!tabsListRef.current) return
+
+    const tabCountIncreased = editorTabs.length > prevTabCountRef.current
+
+    if (tabCountIncreased) {
+      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
+    } else if (tabs.activeTab) {
+      const activeTabElement = tabsListRef.current.querySelector(
+        `[data-state="active"]`
+      ) as HTMLElement
+
+      if (activeTabElement) {
+        activeTabElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        })
+      }
+    }
+
+    prevTabCountRef.current = editorTabs.length
+  }, [tabs.activeTab, editorTabs.length])
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
