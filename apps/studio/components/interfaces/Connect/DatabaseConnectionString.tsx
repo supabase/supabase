@@ -9,7 +9,8 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_CLI, IS_PLATFORM } from 'lib/constants'
+import { useDeploymentModeQuery } from 'data/config/deployment-mode-query'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -68,17 +69,21 @@ export const DatabaseConnectionString = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
+  // Fetch deployment mode (CLI vs self-hosted) for non-platform environments
+  const { data: deploymentMode } = useDeploymentModeQuery()
+  const isCliMode = deploymentMode?.is_cli_mode ?? false
+
   // Determine which connection methods are available based on environment
   // CLI: only direct connection (postgres directly accessible)
   // Self-hosted: only session and transaction pooler (via Supavisor)
   // Platform: all methods available
-  const isSelfHosted = !IS_PLATFORM && !IS_CLI
-  const availableMethods: ConnectionStringMethod[] = IS_CLI
+  const isSelfHosted = !IS_PLATFORM && !isCliMode
+  const availableMethods: ConnectionStringMethod[] = isCliMode
     ? ['direct']
     : isSelfHosted
       ? ['session', 'transaction']
       : ['direct', 'transaction', 'session']
-  const defaultMethod = IS_CLI ? 'direct' : isSelfHosted ? 'session' : 'direct'
+  const defaultMethod = isCliMode ? 'direct' : isSelfHosted ? 'session' : 'direct'
 
   // URL state management
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
@@ -429,7 +434,7 @@ export const DatabaseConnectionString = () => {
               </div>
             )}
             <div className="px-4 md:px-7 py-8">
-              {selectedMethod === 'direct' && (IS_PLATFORM || IS_CLI) && (
+              {selectedMethod === 'direct' && (IS_PLATFORM || isCliMode) && (
                 <ConnectionPanel
                   type="direct"
                   title={connectionStringMethodOptions.direct.label}
