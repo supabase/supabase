@@ -3,21 +3,107 @@ title: Migrating within Supabase
 subtitle: Learn how to migrate from one Supabase project to another
 ---
 
-If you are on a Paid Plan and have physical backups enabled, you should instead use the [Restore
-to another project feature](/docs/guides/platform/clone-project).
+<Admonition type="caution">
 
-## Database migration guides
+For Paid Plan projects, use the simpler and more reliable [Restore to a new project feature](/dashboard/project/_/database/backups/restore-to-new-project)
 
-If you need to migrate from one Supabase project to another, choose the appropriate guide below:
+</Admonition>
 
-### Backup file from the dashboard (\*.backup)
+<Admonition type="tip">
 
-Follow the [Restore dashboard backup guide](/docs/guides/platform/migrating-within-supabase/dashboard-restore)
+If you need to move your project to a different organization, see [project transfers](/docs/guides/platform/project-transfer).
 
-### SQL backup files (\*.sql)
+</Admonition>
 
-Follow the [Backup and Restore using the CLI guide](/docs/guides/platform/migrating-within-supabase/backup-restore)
+---
 
-## Transfer project to a different organization
+## Important to know
 
-Project migration is primarily for changing regions or upgrading to new major versions of the platform in some scenarios. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).
+- What will be restored to the new project?
+
+  - Database schema (tables, views, procedures)
+  - All data and indexes
+  - Database roles, permissions and users
+  - Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
+
+- What needs manual reconfiguration?
+
+  - Storage objects & settings
+  - Edge Functions
+  - Auth settings & API keys
+  - Realtime settings
+  - Database extensions and settings
+  - Read replicas
+
+---
+
+## Quick start
+
+The simplest option using this Google Colab notebook where you provide the necessary details for Backup and Restore operations:
+
+[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
+
+---
+
+## Alternative method
+
+This method can be used if there are issues using the Colab notebook or you prefer running the operations locally.
+
+### Backup database
+
+    1. Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
+
+    2. Install [Docker Desktop](https://www.docker.com) for your platform.
+
+    3. Get the Database connection string
+
+        <ProjectConfigVariables variable="sessionpooler" />
+
+        If you do not have your database password, reset the password in the [Database Settings](/dashboard/project/_/settings/database).
+
+    4. Run these commands after replacing ```[CONNECTION_STRING]``` with your updated connection string
+
+        ```bash
+        supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
+        supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
+        supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
+        ```
+
+### Restore database backup
+
+1.  Install [Postgresql](https://www.postgresql.org/download/) which includes the command line tool psql
+
+2.  Create a [new project](https://database.new). In the new project:
+
+    - Enable [Database Webhooks](/dashboard/project/_/database/hooks) as needed.
+    - Enable the [Extensions](/dashboard/project/_/database/extensions) used in the old project.
+
+3.  Get the Database connection string
+
+        <ProjectConfigVariables variable="sessionpooler" />
+
+        If you do not have your database password, reset the password in the [Database Settings](/dashboard/project/_/settings/database).
+
+4.  Run the following command:
+
+          ```bash
+          psql \
+            --single-transaction \
+            --variable ON_ERROR_STOP=1 \
+            --file roles.sql \
+            --file schema.sql \
+            --file data.sql \
+            --dbname [CONNECTION_STRING]
+          ```
+
+### Migrate storage
+
+Use the Google Colab notebook to either upload the Storage objects or transfer the Storage objects from an active Supabase Project.
+
+[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
+
+### Troubleshooting notes
+
+- If you have created any custom roles with login attribute, you have to manually set their passwords in the new project.
+- If you get this error: **"...received invalid response to GSSAPI negotiation..."**. You are likely using psql and Postgres version 15 or lower. Install the latest version to resolve this issue.
+- If you are still getting connection errors, try adding this to the end of the connection string: "?sslmode=require&gssencmode=disable"
