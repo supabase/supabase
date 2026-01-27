@@ -32,6 +32,7 @@ import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
   formatMessage,
+  formatStudioVersion,
   getOrgSubscriptionPlan,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
@@ -141,8 +142,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         message: values.message,
         attachments,
         error: initialError,
-        commit,
-        dashboardLogUrl: dashboardLogUrl?.[0],
       }),
       verified: true,
       tags: ['dashboard-support-form'],
@@ -155,6 +154,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
             .join(';'),
       browserInformation: detectBrowser(),
+      dashboardLogs: dashboardLogUrl?.[0],
+      dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
     }
 
     if (values.projectRef !== NO_PROJECT_MARKER) {

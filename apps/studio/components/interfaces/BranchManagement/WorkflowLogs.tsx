@@ -50,9 +50,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     error: workflowRunsError,
   } = useActionsQuery({ ref: projectRef }, { enabled: isOpen })
 
-  const [selectedWorkflowRun, setSelectedWorkflowRun] = useState<ActionRunData | undefined>(
-    undefined
-  )
+  const [selectedWorkflowRun, setSelectedWorkflowRun] = useState<ActionRunData>()
 
   const {
     data: workflowRunLogs,
@@ -61,7 +59,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
   } = useActionRunLogsQuery(
-    { ref: projectRef, run_id: selectedWorkflowRun?.id ?? '' },
+    { projectRef, runId: selectedWorkflowRun?.id },
     { enabled: isOpen && Boolean(selectedWorkflowRun) }
   )
 

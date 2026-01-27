@@ -42,4 +42,5 @@ export interface ColumnHeaderProps<R> extends RenderHeaderCellProps<R> {
   isEncrypted: boolean | undefined
   format: string
   foreignKey?: GridForeignKey
+  comment?: string | null
 }

@@ -27,24 +27,23 @@ export const formatMessage = ({
   message,
   attachments = [],
   error,
-  commit,
-  dashboardLogUrl,
 }: {
   message: string
-  attachments?: string[]
+  attachments?: Array<string>
   error: string | null | undefined
-  commit: { commitSha: string; commitTime: string } | undefined
-  dashboardLogUrl?: string
 }) => {
   const errorString = error != null ? `\n\nError: ${error}` : ''
   const attachmentsString =
     attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
-  const commitString =
-    commit != undefined
-      ? `\n\n---\nSupabase Studio version: SHA ${commit.commitSha} deployed at ${commit.commitTime === 'unknown' ? 'unknown time' : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
-      : ''
-  const logString = dashboardLogUrl ? `\nDashboard logs: ${dashboardLogUrl}` : ''
-  return `${message}${errorString}${attachmentsString}${commitString}${logString}`
+  return `${message}${errorString}${attachmentsString}`
+}
+
+export const formatStudioVersion = (commit: { commitSha: string; commitTime: string }): string => {
+  const formattedTime =
+    commit.commitTime === 'unknown'
+      ? 'unknown time'
+      : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')
+  return `SHA ${commit.commitSha} deployed at ${formattedTime}`
 }
 
 export function getPageIcon(page: Page) {
