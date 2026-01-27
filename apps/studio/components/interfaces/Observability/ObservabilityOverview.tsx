@@ -65,7 +65,6 @@ export const ObservabilityOverview = () => {
   const { plan } = useCurrentOrgPlan()
   const queryClient = useQueryClient()
 
-  // Feature flags for report availability
   const authReportEnabled = useFlag('authreportv2')
   const edgeFnReportEnabled = useFlag('edgefunctionreport')
   const realtimeReportEnabled = useFlag('realtimeReport')
@@ -73,7 +72,6 @@ export const ObservabilityOverview = () => {
   const postgrestReportEnabled = useFlag('postgrestreport')
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
 
-  // Time interval selection
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -85,7 +83,6 @@ export const ObservabilityOverview = () => {
     return { datetimeFormat: format }
   }, [selectedInterval])
 
-  // Data fetching
   const overviewData = useObservabilityOverviewData(projectRef!, interval)
 
   const handleRefresh = useCallback(() => {
@@ -96,7 +93,6 @@ export const ObservabilityOverview = () => {
     queryClient.invalidateQueries({ queryKey: ['max-connections'] })
   }, [queryClient])
 
-  // Service configuration
   const serviceBase = useMemo(
     () => [
       {
@@ -161,10 +157,9 @@ export const ObservabilityOverview = () => {
 
   const enabledServices = serviceBase.filter((s) => s.enabled)
 
-  // Database data
   const dbServiceData = overviewData.services.db
 
-  // Bar click handler - navigate to logs with 2-minute window
+  // Creates a 2-minute time window around the clicked bar for log filtering
   const handleBarClick = useCallback(
     (serviceKey: string, logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
@@ -183,7 +178,6 @@ export const ObservabilityOverview = () => {
     [router]
   )
 
-  // Database bar click handler
   const handleDbBarClick = useCallback(
     handleBarClick('db', `/project/${projectRef}/logs/postgres-logs`),
     [handleBarClick, projectRef]
@@ -237,14 +231,20 @@ export const ObservabilityOverview = () => {
                           {retentionDuration > 1 ? 's' : ''} of log retention
                         </p>
                         <p className="text-foreground-light">
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}
-                          >
-                            Upgrade your plan
-                          </InlineLink>{' '}
-                          to increase log retention and view statistics for the{' '}
-                          {i.label.toLowerCase()}
+                          {organization?.slug ? (
+                            <>
+                              <InlineLink
+                                className="text-foreground-light hover:text-foreground"
+                                href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}
+                              >
+                                Upgrade your plan
+                              </InlineLink>{' '}
+                              to increase log retention and view statistics for the{' '}
+                              {i.label.toLowerCase()}
+                            </>
+                          ) : (
+                            `Upgrade your plan to increase log retention and view statistics for the ${i.label.toLowerCase()}`
+                          )}
                         </p>
                       </TooltipContent>
                     </Tooltip>
