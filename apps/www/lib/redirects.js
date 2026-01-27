@@ -3038,6 +3038,11 @@ module.exports = [
     source: '/mcp',
     destination: '/docs/guides/getting-started/mcp',
   },
+  {
+    permanent: true,
+    source: '/design-system',
+    destination: '/design',
+  },
 
   // marketing
 
