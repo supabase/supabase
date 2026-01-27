@@ -133,25 +133,6 @@ export const useBucketQuery = <TData = BucketData>(
   })
 }
 
-/**
- * @deprecated - use usePaginatedBucketsQuery instead for better performance
- */
-export const useBucketsQuery = <TData = BucketsData>(
-  { projectRef }: BucketsVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<BucketsData, BucketsError, TData> = {}
-) => {
-  const { data: project } = useSelectedProjectQuery()
-  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  return useQuery<BucketsData, BucketsError, TData>({
-    queryKey: storageKeys.buckets(projectRef),
-    queryFn: ({ signal }) => getBuckets({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-    ...options,
-    retry: shouldRetryBucketsQuery,
-  })
-}
-
 export const useBucketNumberEstimateQuery = (
   { projectRef }: BucketsVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<number | undefined, ResponseError> = {}
