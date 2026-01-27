@@ -1,29 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { paths } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { UseCustomQueryOptions } from 'types'
 import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
 
-export type InfraMonitoringAttribute =
-  | 'max_cpu_usage'
-  | 'avg_cpu_usage'
-  | 'disk_io_budget'
-  | 'ram_usage'
-  | 'disk_io_consumption'
-  | 'pg_stat_database_num_backends'
-  | 'supavisor_connections_active'
-  | 'realtime_connections_connected'
-  | 'realtime_channel_events'
-  | 'realtime_channel_db_events'
-  | 'realtime_channel_presence_events'
-  | 'realtime_channel_joins'
-  | 'realtime_read_authorization_rls_execution_time'
-  | 'realtime_write_authorization_rls_execution_time'
-  | 'realtime_payload_size'
-  | 'realtime_sum_connections_connected'
-  | 'realtime_replication_connection_lag'
-  | 'physical_replication_lag_physical_replica_lag_seconds'
+export type InfraMonitoringAttribute = NonNullable<
+  paths['/platform/projects/{ref}/infra-monitoring']['get']['parameters']['query']['attributes']
+>[number]
 
 export type InfraMonitoringSeriesMetadata = {
   yAxisLimit: number
