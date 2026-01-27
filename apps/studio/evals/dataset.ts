@@ -25,7 +25,7 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        'Write a SQL query to select all products from the products table where the price is greater than 100',
+        'Write a SQL query to select all projects from the projects table where the name is not null',
     },
     expected: {
       requiredTools: ['execute_sql'],
@@ -33,7 +33,7 @@ export const dataset: AssistantEvalCase[] = [
     metadata: { category: ['sql_generation'] },
   },
   {
-    input: { prompt: 'Create an index on the products table for the name column' },
+    input: { prompt: 'Create an index on the projects table for the name column' },
     expected: {
       requiredTools: ['execute_sql'],
     },
