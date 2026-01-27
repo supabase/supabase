@@ -10,6 +10,7 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
@@ -132,6 +133,14 @@ export const EditorTabs = () => {
     tabs.handleTabNavigation(id, router)
   }
 
+  const tabsListRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (tabsListRef.current) {
+      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
+    }
+  }, [editorTabs.length])
+
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <Tabs_Shadcn_
@@ -141,6 +150,7 @@ export const EditorTabs = () => {
       >
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_
+          ref={tabsListRef}
           className={cn(
             'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
             'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
