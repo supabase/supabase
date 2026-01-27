@@ -10,6 +10,10 @@ import type { Project } from 'data/projects/project-detail-query'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
+// Helper to safely build project URLs when ref might be undefined
+const projectUrl = (ref: string | undefined, path: string) =>
+  ref ? `/project/${ref}/${path}` : ''
+
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
@@ -97,29 +101,29 @@ export const generateProductRoutes = (
               {
                 title: 'Storage',
                 items: [
-                  { name: 'Files', key: 'files', url: `/project/${ref}/storage/files`, items: [] },
+                  { name: 'Files', key: 'files', url: projectUrl(ref, 'storage/files'), items: [] },
                   {
                     name: 'Analytics',
                     key: 'analytics',
-                    url: `/project/${ref}/storage/analytics`,
+                    url: projectUrl(ref, 'storage/analytics'),
                     items: [],
                   },
                   {
                     name: 'Vectors',
                     key: 'vectors',
-                    url: `/project/${ref}/storage/vectors`,
+                    url: projectUrl(ref, 'storage/vectors'),
                     items: [],
                   },
                   {
                     name: 'S3 Access',
                     key: 's3',
-                    url: `/project/${ref}/storage/s3`,
+                    url: projectUrl(ref, 'storage/s3'),
                     items: [],
                   },
                   {
                     name: 'Settings',
                     key: 'settings',
-                    url: `/project/${ref}/storage/settings`,
+                    url: projectUrl(ref, 'storage/settings'),
                     items: [],
                   },
                 ],
@@ -143,13 +147,13 @@ export const generateProductRoutes = (
                     name: 'Functions',
                     key: 'main',
                     pages: ['', 'new'],
-                    url: `/project/${ref}/functions`,
+                    url: projectUrl(ref, 'functions'),
                     items: [],
                   },
                   {
                     name: 'Secrets',
                     key: 'secrets',
-                    url: `/project/${ref}/functions/secrets`,
+                    url: projectUrl(ref, 'functions/secrets'),
                     items: [],
                   },
                 ],
@@ -172,13 +176,13 @@ export const generateProductRoutes = (
                   {
                     name: 'Inspector',
                     key: 'inspector',
-                    url: `/project/${ref}/realtime/inspector`,
+                    url: projectUrl(ref, 'realtime/inspector'),
                     items: [],
                   },
                   {
                     name: 'Quotas',
                     key: 'quotas',
-                    url: `/project/${ref}/realtime/quotas`,
+                    url: projectUrl(ref, 'realtime/quotas'),
                     items: [],
                   },
                 ],
@@ -215,13 +219,13 @@ export const generateOtherRoutes = (
             {
               name: 'Security',
               key: 'security',
-              url: `/project/${ref}/advisors/security`,
+              url: projectUrl(ref, 'advisors/security'),
               items: [],
             },
             {
               name: 'Performance',
               key: 'performance',
-              url: `/project/${ref}/advisors/performance`,
+              url: projectUrl(ref, 'advisors/performance'),
               items: [],
             },
           ],

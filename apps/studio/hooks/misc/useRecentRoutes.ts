@@ -20,19 +20,22 @@ const DEFAULT_RECENT_ROUTES: RecentRoute[] = []
 export const useRecentRoutes = () => {
   const { ref } = useParams()
   const lastTrackedKeyRef = useRef<string | null>(null)
-  const recentRoutesRef = useRef<RecentRoute[]>(DEFAULT_RECENT_ROUTES)
+  const refRef = useRef<string | undefined>(ref)
+
+  // Keep ref in sync
+  useEffect(() => {
+    refRef.current = ref
+  }, [ref])
+
+  // Only use storage when ref is available to prevent data leakage between projects
+  const storageKey = ref ? LOCAL_STORAGE_KEYS.RECENT_SIDEBAR_ROUTES(ref) : null
 
   const [recentRoutes, setRecentRoutes, { isSuccess }] = useLocalStorageQuery<RecentRoute[]>(
-    LOCAL_STORAGE_KEYS.RECENT_SIDEBAR_ROUTES(ref ?? ''),
+    storageKey ?? '',
     DEFAULT_RECENT_ROUTES
   )
 
-  // Keep ref in sync with latest routes
-  useEffect(() => {
-    recentRoutesRef.current = recentRoutes
-  }, [recentRoutes])
-
-  // Stable trackRoute that uses ref for current routes
+  // Stable trackRoute that uses functional updates to avoid race conditions
   const trackRoute = useCallback(
     (route: {
       key: string
@@ -42,6 +45,11 @@ export const useRecentRoutes = () => {
       parentKey: string
       childKey?: string
     }) => {
+      // Don't track if project ref isn't available
+      if (!refRef.current) {
+        return
+      }
+
       // Don't track excluded routes
       if (EXCLUDED_ROUTE_KEYS.includes(route.parentKey)) {
         return
@@ -58,42 +66,40 @@ export const useRecentRoutes = () => {
       }
       lastTrackedKeyRef.current = route.key
 
-      const currentRoutes = recentRoutesRef.current
+      // Use functional update to get current value from query cache (avoids race conditions)
+      setRecentRoutes((currentRoutes) => {
+        // Check if this route is already at the top - if so, don't update
+        if (currentRoutes.length > 0 && currentRoutes[0].key === route.key) {
+          return currentRoutes
+        }
 
-      // Check if this route is already at the top - if so, don't update
-      if (currentRoutes.length > 0 && currentRoutes[0].key === route.key) {
-        return
-      }
+        const newRoute: RecentRoute = {
+          key: route.key,
+          childName: route.childName,
+          parentLabel: route.parentLabel,
+          link: route.link,
+          parentKey: route.parentKey,
+          childKey: route.childKey,
+          visitedAt: Date.now(),
+        }
 
-      // Remove existing entry with the same key (to update visitedAt)
-      const filteredRoutes = currentRoutes.filter((r) => r.key !== route.key)
-
-      // Add new entry at the beginning
-      const newRoute: RecentRoute = {
-        key: route.key,
-        childName: route.childName,
-        parentLabel: route.parentLabel,
-        link: route.link,
-        parentKey: route.parentKey,
-        childKey: route.childKey,
-        visitedAt: Date.now(),
-      }
-
-      // Keep only the most recent MAX_RECENT_ROUTES
-      const newRoutes = [newRoute, ...filteredRoutes].slice(0, MAX_RECENT_ROUTES)
-      setRecentRoutes(newRoutes)
+        const filteredRoutes = currentRoutes.filter((r) => r.key !== route.key)
+        return [newRoute, ...filteredRoutes].slice(0, MAX_RECENT_ROUTES)
+      })
     },
     [setRecentRoutes]
   )
 
   // Sort by visitedAt descending (most recent first)
+  // Return empty array if ref is not available to prevent data leakage
   const sortedRecentRoutes = useMemo(() => {
+    if (!ref) return DEFAULT_RECENT_ROUTES
     return [...recentRoutes].sort((a, b) => b.visitedAt - a.visitedAt)
-  }, [recentRoutes])
+  }, [recentRoutes, ref])
 
   return {
     recentRoutes: sortedRecentRoutes,
     trackRoute,
-    isLoaded: isSuccess,
+    isLoaded: isSuccess && !!ref,
   }
 }

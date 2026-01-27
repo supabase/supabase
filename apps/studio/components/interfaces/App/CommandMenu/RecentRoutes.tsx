@@ -37,8 +37,7 @@ export function useRecentRoutesCommands() {
   // Stable page navigation
   const goToAllRecents = useCallback(() => {
     setPage(RECENTS_PAGE_NAME)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setPage])
 
   // Create command objects from recent routes - only depend on the route data, not callbacks
   const allCommands = useMemo(() => {
