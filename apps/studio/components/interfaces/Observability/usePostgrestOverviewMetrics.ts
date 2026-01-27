@@ -86,8 +86,8 @@ export const usePostgrestOverviewMetrics = (
     queryKey: ['postgrest-overview-metrics', projectRef, startDate, endDate, interval],
     queryFn: ({ signal }) =>
       fetchPostgrestMetrics({ projectRef, startDate, endDate, interval }, signal),
-    enabled: options?.enabled ?? true,
-    staleTime: 1000 * 60, // 1 minute
+    enabled: (options?.enabled ?? true) && Boolean(projectRef),
+    staleTime: 1000 * 60,
   })
 }
 
