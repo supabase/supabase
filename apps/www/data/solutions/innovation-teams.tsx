@@ -53,9 +53,9 @@ interface Quote {
   text: string
   author: string
   role: string
-  logo?: string
+  logo?: string | JSX.Element
   link?: string
-  avatar?: string
+  avatar?: string | JSX.Element
 }
 
 interface AIBuilderEcosystemSection {
@@ -99,7 +99,7 @@ const data: () => {
   metadata: Metadata
   heroSection: HeroSection
   quote: Quote
-  secondaryQuote: Quote
+  secondaryQuote?: Quote
   aiBuilderEcosystem: AIBuilderEcosystemSection
   why: FeaturesSection
   customerEvidence: CustomerEvidenceSection
