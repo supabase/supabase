@@ -1,23 +1,23 @@
-import { useParams } from 'common'
-import { VectorBucket as VectorBucketIcon } from 'icons'
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
+import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
+import { VectorBucket as VectorBucketIcon } from 'icons'
+import { createNavigationHandler } from 'lib/navigation'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
-import AlertError from '@/components/ui/AlertError'
-import { AlphaNotice } from '@/components/ui/AlphaNotice'
-import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
-import { createNavigationHandler } from '@/lib/navigation'
 
 /**
  * [Joshen] Low-priority refactor: We should use a virtualized table here as per how we do it
