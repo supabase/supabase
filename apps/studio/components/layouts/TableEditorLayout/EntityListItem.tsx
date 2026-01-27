@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
+import { formatSql } from '@/lib/formatSql'
 import { useFlag, useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
@@ -18,7 +19,6 @@ import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/tabl
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationState,
@@ -259,7 +259,7 @@ export const EntityListItem = ({
                 <DropdownMenuItem
                   key="copy-schema"
                   className="space-x-2"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
@@ -275,7 +275,7 @@ export const EntityListItem = ({
                     })
 
                     try {
-                      copyToClipboard(formattedSchema)
+                      await copyToClipboard(formattedSchema)
                       toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
                       toast.error('Failed to copy schema: ' + (err.message || err), { id: toastId })
