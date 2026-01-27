@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic'
+import { IS_PLATFORM } from 'lib/constants'
 import { ConnectionPooling } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
@@ -16,6 +17,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import type { NextPageWithLayout } from 'types'
+import { SettingsDatabaseEmptyStateLocal } from 'components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 
 const SSLConfiguration = dynamic(
   () => import('components/interfaces/Settings/Database/SSLConfiguration')
@@ -50,25 +52,37 @@ const ProjectSettings: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer className="pb-12">
-        <PageSection>
-          <PageSectionContent className="space-y-4 md:space-y-8">
-            <DatabaseReadOnlyAlert />
-            <ResetDbPassword />
-            <ConnectionPooling />
-          </PageSectionContent>
-        </PageSection>
-        <SSLConfiguration />
-        {showNewDiskManagementUI ? (
-          // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
-          <DiskManagementPanelForm />
-        ) : (
-          <DiskSizeConfiguration />
-        )}
-        {databaseNetworkRestrictions && <NetworkRestrictions />}
-        <BannedIPs />
-      </PageContainer>
-      <PoolingModesModal />
+      {IS_PLATFORM ? (
+        <>
+          <PageContainer className="pb-12">
+            <PageSection>
+              <PageSectionContent className="space-y-4 md:space-y-8">
+                <DatabaseReadOnlyAlert />
+                <ResetDbPassword />
+                <ConnectionPooling />
+              </PageSectionContent>
+            </PageSection>
+            <SSLConfiguration />
+            {showNewDiskManagementUI ? (
+              // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
+              <DiskManagementPanelForm />
+            ) : (
+              <DiskSizeConfiguration />
+            )}
+            {databaseNetworkRestrictions && <NetworkRestrictions />}
+            <BannedIPs />
+          </PageContainer>
+          <PoolingModesModal />
+        </>
+      ) : (
+        <PageContainer className="pb-12">
+          <PageSection>
+            <PageSectionContent className="space-y-4 md:space-y-8">
+              <SettingsDatabaseEmptyStateLocal />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      )}
     </>
   )
 }

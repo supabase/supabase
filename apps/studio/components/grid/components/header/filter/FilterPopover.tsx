@@ -4,11 +4,7 @@ import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { FilterPopoverPrimitive } from './FilterPopoverPrimitive'
 
-export interface FilterPopoverProps {
-  portal?: boolean
-}
-
-export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
+export const FilterPopover = () => {
   const { urlFilters, onApplyFilters } = useTableFilter()
 
   // Convert string[] to Filter[]
@@ -16,7 +12,5 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
     return formatFilterURLParams(urlFilters ?? [])
   }, [urlFilters])
 
-  return (
-    <FilterPopoverPrimitive portal={portal} filters={filters} onApplyFilters={onApplyFilters} />
-  )
+  return <FilterPopoverPrimitive filters={filters} onApplyFilters={onApplyFilters} />
 }

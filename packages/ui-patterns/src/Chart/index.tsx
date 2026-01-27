@@ -62,6 +62,8 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-6 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-6 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
+
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
   ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
     return (
@@ -138,7 +140,7 @@ const ChartTitle = React.forwardRef<HTMLDivElement, ChartTitleProps>(
                 className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
               />
             </TooltipTrigger>
-            <TooltipContent>{tooltip}</TooltipContent>
+            <TooltipContent className="max-w-72">{tooltip}</TooltipContent>
           </Tooltip>
         )}
       </h3>
@@ -280,7 +282,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
                     className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
                   />
                 </TooltipTrigger>
-                <TooltipContent>{tooltip}</TooltipContent>
+                <TooltipContent className="max-w-72">{tooltip}</TooltipContent>
               </Tooltip>
             )}
           </h3>
@@ -336,7 +338,7 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
     }
 
     return (
-      <div ref={ref} className={cn('px-6 pt-4 pb-6', className)} {...props}>
+      <div ref={ref} className={cn('px-6 pt-4 pb-6', chartTableClasses, className)} {...props}>
         {content}
       </div>
     )
@@ -478,7 +480,6 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
 ChartDisabledState.displayName = 'ChartDisabledState'
 
 /* Chart Footer */
-const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 interface ChartFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode

@@ -42,7 +42,6 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -61,7 +60,6 @@ import { Telemetry } from 'lib/telemetry'
 import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { ToastErrorTracker } from 'lib/toast-errors'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -161,21 +159,19 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         enableSystem
                         disableTransitionOnChange
                       >
-                        <AppBannerContextProvider>
-                          <AiAssistantStateContextProvider>
-                            <CommandProvider>
-                              <FeaturePreviewContextProvider>
-                                <MainScrollContainerProvider>
-                                  {getLayout(<Component {...pageProps} />)}
-                                </MainScrollContainerProvider>
-                                <StudioCommandMenu />
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                              <SonnerToaster position="top-right" />
-                              <MonacoThemeProvider />
-                            </CommandProvider>
-                          </AiAssistantStateContextProvider>
-                        </AppBannerContextProvider>
+                        <AiAssistantStateContextProvider>
+                          <CommandProvider>
+                            <FeaturePreviewContextProvider>
+                              <MainScrollContainerProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                              </MainScrollContainerProvider>
+                              <StudioCommandMenu />
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
+                            <SonnerToaster position="top-right" />
+                            <MonacoThemeProvider />
+                          </CommandProvider>
+                        </AiAssistantStateContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

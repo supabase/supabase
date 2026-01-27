@@ -32,7 +32,10 @@ Following the [upcoming API key changes](https://github.com/orgs/supabase/discus
 
 ## Integrating with Supabase Auth
 
-The simplest way to secure your endpoints is by using Supabase Auth to verify users.
+Important notes to consider:
+
+- This is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+- Use `Deno.env.get('SUPABASE_URL')` to get the URL associated with your project. Using a value such as `http://localhost:54321` for local development will fail due to Docker containerization.
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 

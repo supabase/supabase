@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
+import { UseCustomQueryOptions } from 'types'
 import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 export type InfraMonitoringAttribute =
   | 'max_cpu_usage'
@@ -23,6 +23,7 @@ export type InfraMonitoringAttribute =
   | 'realtime_payload_size'
   | 'realtime_sum_connections_connected'
   | 'realtime_replication_connection_lag'
+  | 'physical_replication_lag_physical_replica_lag_seconds'
 
 export type InfraMonitoringSeriesMetadata = {
   yAxisLimit: number
@@ -53,12 +54,14 @@ export type InfraMonitoringMultiResponse = {
 // API returns different shapes based on attribute count
 export type InfraMonitoringResponse = InfraMonitoringSingleResponse | InfraMonitoringMultiResponse
 
+type InfraMonitoringInterval = AnalyticsInterval | '2m'
+
 export type InfraMonitoringMultiVariables = {
   projectRef?: string
   attributes: InfraMonitoringAttribute[]
   startDate?: string
   endDate?: string
-  interval?: AnalyticsInterval
+  interval?: InfraMonitoringInterval
   databaseIdentifier?: string
 }
 
@@ -78,6 +81,10 @@ export async function getInfraMonitoringAttributes(
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('End date is required')
 
+  // Backend doesn't support 2m granularity, so request 1m and aggregate in frontend
+  const is2MinInterval = interval === '2m'
+  const requestInterval: AnalyticsInterval = is2MinInterval ? '1m' : (interval as AnalyticsInterval)
+
   const { data, error } = await get('/platform/projects/{ref}/infra-monitoring', {
     params: {
       path: { ref: projectRef },
@@ -86,7 +93,7 @@ export async function getInfraMonitoringAttributes(
         attributes,
         startDate,
         endDate,
-        interval,
+        interval: requestInterval,
         databaseIdentifier,
       } as any,
     },
@@ -94,7 +101,13 @@ export async function getInfraMonitoringAttributes(
   })
 
   if (error) handleError(error)
-  return data as unknown as InfraMonitoringResponse
+
+  const response = data as unknown as InfraMonitoringResponse & { _originalInterval?: '2m' }
+  if (is2MinInterval) {
+    response._originalInterval = '2m'
+  }
+
+  return response
 }
 
 export type InfraMonitoringError = unknown
