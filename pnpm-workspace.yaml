@@ -6,10 +6,10 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.93.1
-  '@supabase/postgrest-js': 2.93.1
-  '@supabase/realtime-js': 2.93.1
-  '@supabase/supabase-js': 2.93.1
+  '@supabase/auth-js': https://pkg.pr.new/@supabase/auth-js@2065
+  '@supabase/postgrest-js': https://pkg.pr.new/@supabase/postgrest-js@2065
+  '@supabase/realtime-js': https://pkg.pr.new/@supabase/realtime-js@2065
+  '@supabase/supabase-js': https://pkg.pr.new/@supabase/supabase-js@2065
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
