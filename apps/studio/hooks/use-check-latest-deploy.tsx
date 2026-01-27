@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM, useFlag } from 'common'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
 
@@ -34,43 +33,31 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
 // there's a new version of Studio is available, and the user has been on the old dashboard (based on commit) for more than 24 hours.
 // [Joshen] K-Dog has a suggestion here to bring down the time period here by checking commits
 export function useCheckLatestDeploy() {
-  const showRefreshToast = useFlag('showRefreshToast')
-
-  const [currentCommitTime, setCurrentCommitTime] = useState('')
   const [isToastShown, setIsToastShown] = useState(false)
 
-  const { data: commit } = useDeploymentCommitQuery({
-    enabled: IS_PLATFORM,
-    staleTime: 1000 * 60 * 10, // 10 minutes
-  })
+  const { data } = useDeploymentCommitQuery()
+  const commit = data?.deploymentCommit
+  const latestCommit = data?.latestCommit
 
   const commitLoggedRef = useRef(false)
   useEffect(() => {
     if (commit && !commitLoggedRef.current) {
       const commitTime =
-        commit.commitTime === 'unknown'
+        commit.time === 'unknown'
           ? 'unknown time'
-          : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')
-      console.log(
-        `Supabase Studio is running commit ${commit.commitSha} deployed at ${commitTime}.`
-      )
+          : dayjs(commit.time).format('YYYY-MM-DD HH:mm:ss Z')
+      console.log(`Supabase Studio is running commit ${commit.sha} deployed at ${commitTime}.`)
       commitLoggedRef.current = true
     }
   }, [commit])
 
   useEffect(() => {
-    if (!showRefreshToast || !commit || commit.commitTime === 'unknown') {
-      return
-    }
-
-    // set the current commit on first load
-    if (!currentCommitTime) {
-      setCurrentCommitTime(commit.commitTime)
-      return
-    }
-
-    // if the current commit is the same as the fetched commit, do nothing
-    if (currentCommitTime === commit.commitTime) {
+    if (
+      !commit?.time ||
+      commit.time === 'unknown' ||
+      !latestCommit?.time ||
+      latestCommit.time === 'unknown'
+    ) {
       return
     }
 
@@ -80,7 +67,7 @@ export function useCheckLatestDeploy() {
     }
 
     // check if the time difference between commits is more than 24 hours
-    const hourDiff = dayjs(commit.commitTime).diff(dayjs(currentCommitTime), 'hour')
+    const hourDiff = dayjs(latestCommit.time).diff(dayjs(commit.time), 'hour')
     if (hourDiff < 24) {
       return
     }
@@ -91,5 +78,5 @@ export function useCheckLatestDeploy() {
       position: 'bottom-right',
     })
     setIsToastShown(true)
-  }, [commit, showRefreshToast, isToastShown, currentCommitTime])
+  }, [commit?.time, latestCommit?.time, isToastShown])
 }
