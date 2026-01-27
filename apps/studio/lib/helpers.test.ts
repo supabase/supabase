@@ -311,7 +311,7 @@ describe('isValidHttpUrl', () => {
   })
 })
 
-describe.only('extractUrls', () => {
+describe('extractUrls', () => {
   it('should extract basic http URLs', () => {
     const result = extractUrls('Visit http://example.com for more info')
     expect(result).toEqual(['http://example.com'])
