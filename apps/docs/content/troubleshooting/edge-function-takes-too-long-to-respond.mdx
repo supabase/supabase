@@ -24,10 +24,7 @@ Inefficient database queries are a common cause of slow responses:
 
 ```tsx
 // Good: Only select needed columns and limit results
-const { data } = await supabase
-  .from('users')
-  .select('id, name')
-  .limit(10)
+const { data } = await supabase.from('users').select('id, name').limit(10)
 
 // Avoid: Fetching all columns from large tables
 const { data } = await supabase.from('users').select('*')

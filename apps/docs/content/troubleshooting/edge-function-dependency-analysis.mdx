@@ -54,6 +54,7 @@ Only import what you actually use. Avoid wildcard imports (`import *`) when poss
 ### Choose lightweight alternatives
 
 Research smaller packages that provide the same functionality. Consider:
+
 - Native Deno APIs instead of NPM polyfills
 - Focused single-purpose packages instead of large utility libraries
 
@@ -73,6 +74,7 @@ import { something } from 'npm:package@1.2.3'
 ## Common heavy dependencies
 
 Watch out for these commonly heavy packages:
+
 - Full AWS SDK (use individual service packages instead)
 - Moment.js (consider [`date-fns`](https://date-fns.org/)) or native Date APIs)
 - Lodash (import specific functions: `lodash/get`)
