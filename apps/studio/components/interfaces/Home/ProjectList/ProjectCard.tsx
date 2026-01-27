@@ -1,7 +1,6 @@
 import { Github, MoreVertical, Trash, Copy } from 'lucide-react'
 import InlineSVG from 'react-inlinesvg'
-import { useState, useMemo } from 'react'
-import { Bar, BarChart, ResponsiveContainer } from 'recharts'
+import { useState } from 'react'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
@@ -10,7 +9,6 @@ import type { IntegrationProjectConnection } from 'data/integrations/integration
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { useProjectMetricsQuery } from 'data/analytics/project-metrics-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
@@ -64,26 +62,6 @@ export const ProjectCard = ({
   const githubRepository = githubIntegration?.metadata.name ?? undefined
   const projectStatus = inferProjectStatus(project.status)
 
-  const { data: metrics } = useProjectMetricsQuery(
-    { projectRef, interval: '1day' },
-    { enabled: projectStatus === 'isHealthy' }
-  )
-
-  const dbChartData = useMemo(() => {
-    if (!metrics) return []
-
-    return metrics
-      .filter((row) => row.service === 'db' && row.time_window === 'current')
-      .map((row) => ({
-        timestamp: row.timestamp,
-        ok: row.ok_count,
-        warning: row.warning_count,
-        error: row.error_count,
-        total: row.ok_count + row.warning_count + row.error_count,
-      }))
-      .sort((a, b) => a.timestamp - b.timestamp)
-  }, [metrics])
-
   return (
     <>
       <li className="list-none h-min">
@@ -93,15 +71,6 @@ export const ProjectCard = ({
           hideChevron
           title={
             <div className="w-full flex flex-col gap-y-4 justify-between px-5 z-10">
-              {dbChartData.length > 0 && (
-                <div className="absolute inset-0 pt-28 z-0 opacity-[0.02] pointer-events-none">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dbChartData} margin={{ top: 0, left: 0, right: 0, bottom: 0 }}>
-                      <Bar dataKey="ok" fill="currentColor" radius={[2, 2, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
               <div className="flex flex-col gap-y-0.5 relative z-10">
                 <div className="flex items-center justify-between">
                   <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
