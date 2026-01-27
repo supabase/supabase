@@ -76,6 +76,7 @@ const PITR = () => {
   } = useBackupsQuery({ projectRef })
 
   const plan = organization?.plan?.id
+  const isFreePlan = plan === 'free'
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -108,13 +109,13 @@ const PITR = () => {
         <>
           {!isEnabled ? (
             <UpgradeToPro
-              addon="pitr"
+              addon={isFreePlan ? undefined : 'pitr'}
               source="pitr"
               featureProposition="enable Point in Time Recovery"
-              primaryText="Point in Time Recovery is a Pro Plan add-on."
+              primaryText="Point in Time Recovery is a Pro Plan add-on"
               secondaryText={
-                plan === 'free'
-                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge — PITR is an optional upgrade that starts at $100/month.'
+                isFreePlan
+                  ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
             />

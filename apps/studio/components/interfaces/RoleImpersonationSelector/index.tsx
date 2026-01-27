@@ -99,31 +99,27 @@ export const RoleImpersonationSelector = ({
 
         {selectedOption === 'service_role' && (
           <p className="text-foreground-light text-sm">
-            The default Postgres/superuser role.
-            {disallowAuthenticatedOption ? <br /> : ' '}
-            This has admin privileges.
+            <span className="text-foreground">The default Postgres/superuser role</span>
             <br />
-            It will bypass Row Level Security (RLS) policies.
+            This has admin privileges and will bypass Row Level Security (RLS) policies.
           </p>
         )}
 
         {selectedOption === 'anon' && (
           <p className="text-foreground-light text-sm">
-            For "anonymous access".
-            {disallowAuthenticatedOption ? <br /> : ' '}
-            This is the role which the API (PostgREST)
+            <span className="text-foreground">For "anonymous access"</span>
             <br />
-            will use when a user is not logged in.
-            {disallowAuthenticatedOption ? <br /> : ' '}
+            This is the role which the API (PostgREST) will use when a user is not logged in. <br />
             It will respect Row Level Security (RLS) policies.
           </p>
         )}
 
         {selectedOption === 'authenticated' && (
           <p className="text-foreground-light text-sm">
-            For "authenticated access". This is the role which the API (PostgREST)
+            <span className="text-foreground">For "authenticated access"</span>
             <br />
-            will use when a user is logged in. It will respect Row Level Security (RLS) policies.
+            This is the role which the API (PostgREST) will use when a user is logged in. <br />
+            It will respect Row Level Security (RLS) policies.
           </p>
         )}
       </div>

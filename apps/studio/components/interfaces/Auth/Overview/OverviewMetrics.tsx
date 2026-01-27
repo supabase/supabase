@@ -1,25 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
+import { ChevronRight, ExternalLink, Telescope, BarChart2, Bot } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  cn,
-  Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger, Button } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -27,6 +15,17 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import {
+  Chart,
+  ChartCard,
+  ChartHeader,
+  ChartActions,
+  ChartMetric,
+  ChartTitle,
+  ChartContent,
+  ChartEmptyState,
+  ChartLoadingState,
+} from 'ui-patterns/Chart'
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
@@ -39,9 +38,13 @@ import {
   calculatePercentageChange,
   getApiSuccessRates,
   getAuthSuccessRates,
-  getChangeColor,
   getMetricValues,
 } from './OverviewUsage.constants'
+import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
+import { AiIconAnimation } from 'ui'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const StatCard = ({
   title,
@@ -63,84 +66,55 @@ const StatCard = ({
   tooltip?: string
 }) => {
   const router = useRouter()
-  const isZeroChange = previous === 0
-  const changeColor = isZeroChange
-    ? 'text-foreground-lighter'
-    : invert
-      ? previous >= 0
-        ? 'text-destructive'
-        : 'text-brand'
-      : getChangeColor(previous)
   const formattedCurrent =
     suffix === 'ms'
       ? current.toFixed(2)
       : suffix === '%'
         ? current.toFixed(1)
         : Math.round(current).toLocaleString()
-  const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
+  // const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
+
+  const actions = [
+    {
+      label: 'Go to Auth Report',
+      icon: <ExternalLink size={12} />,
+      onClick: href ? () => router.push(href) : undefined,
+    },
+  ]
 
   return (
-    <Card className={cn(href, 'mb-0 flex flex-col')}>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative">
-        <CardTitle className="text-foreground-light flex items-center gap-2">
-          {title}
-          {tooltip && (
-            <Tooltip>
-              <TooltipTrigger>
-                <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
-              </TooltipTrigger>
-              <TooltipContent className="w-[300px]">
-                <p>{tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </CardTitle>
-        <ButtonTooltip
-          type="text"
-          size="tiny"
-          icon={<ExternalLink />}
-          className="w-6 h-6 absolute right-4 top-3"
-          onClick={() => router.push(href || '')}
-          tooltip={{
-            content: {
-              side: 'top',
-              text: 'Go to Auth Report',
-            },
-          }}
-        />
-      </CardHeader>
-      <CardContent
-        className={cn(
-          'pb-4 px-6 pt-0 flex-1 h-full overflow-hidden',
-          loading && 'pt-2 opacity-50 items-center justify-center'
-        )}
-      >
-        {loading ? (
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-6 w-20" />
-            <Skeleton className="h-3 w-8" />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-0.5">
-            <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
-            <span className={cn('flex items-center gap-1 text-sm', changeColor)}>
-              <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <Chart isLoading={loading}>
+      <ChartCard>
+        <ChartHeader align="start">
+          <ChartMetric
+            className="pb-4"
+            label={title}
+            tooltip={tooltip}
+            diffValue={`${previous.toFixed(1)}%`}
+            value={`${formattedCurrent}${suffix}`}
+          />
+          <ChartActions actions={actions} />
+        </ChartHeader>
+      </ChartCard>
+    </Chart>
   )
 }
 
 const LogsLink = ({ href }: { href: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Link className="block text-foreground-lighter hover:text-foreground p-1.5" href={href}>
-        <ChevronRight className="size-4" />
-      </Link>
+      <Button
+        type="text"
+        size="tiny"
+        className="p-1.5 text-foreground-lighter hover:text-foreground"
+        asChild
+      >
+        <Link href={href} aria-label="Go to Logs">
+          <ChevronRight size={12} />
+        </Link>
+      </Button>
     </TooltipTrigger>
-    <TooltipContent>Go to logs</TooltipContent>
+    <TooltipContent>Go to Logs</TooltipContent>
   </Tooltip>
 )
 
@@ -171,6 +145,8 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
   const { ref } = useParams()
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { current: activeUsersCurrent, previous: activeUsersPrevious } = getMetricValues(
     metrics,
@@ -218,6 +194,20 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
     ? (codeErrData?.result as unknown[]).filter(isAuthErrorCodeRow)
     : []
 
+  const errorCodesActions = [
+    {
+      label: 'Ask Assistant about Error Codes',
+      icon: <AiIconAnimation size={12} />,
+      onClick: () => {
+        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        aiSnap.newChat({
+          name: 'Auth Help',
+          initialInput: `Can you explain to me what the authentication error codes mean?`,
+        })
+      },
+    },
+  ]
+
   return (
     <>
       <PageSection>
@@ -236,11 +226,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               <PageSectionTitle>Usage</PageSectionTitle>
               <Link
                 href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
-                className="text-sm text-link inline-flex items-center gap-x-1.5"
+                className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all text-sm inline-flex items-center gap-x-1.5"
               >
-                <Telescope size={14} />
+                <Telescope size={14} className="text-foreground-lighter" />
                 <span>Go to observability</span>
-                <ChevronRight size={14} />
+                <ChevronRight size={14} className="text-foreground-lighter" />
               </Link>
             </div>
           </PageSectionSummary>
@@ -292,112 +282,143 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className={cn('border-b-0', responseErrors.length > 0 ? 'pb-4' : 'pb-0')}>
-                <CardTitle className="text-foreground-light">Auth API Errors</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <OverviewTable<ResponseErrorRow>
-                  isLoading={isLoadingResp}
-                  data={responseErrors}
-                  columns={[
-                    {
-                      key: 'request',
-                      header: 'Request',
-                      className: 'w-[60px]',
-                      render: (row) => (
-                        <span className="font-mono text-xs truncate select-text cursor-text py-1 px-1.5 text-center rounded-md bg-alternative-200">
-                          {row.method}
-                        </span>
-                      ),
-                    },
-                    {
-                      key: 'status_code',
-                      header: 'Status',
-                      className: 'w-[60px]',
-                      render: (row) => (
-                        <DataTableColumnStatusCode
-                          value={row.status_code}
-                          level={getStatusLevel(row.status_code)}
-                          className="text-sm"
-                        />
-                      ),
-                    },
-                    {
-                      key: 'path',
-                      header: 'Path',
-                      className: 'flex-shrink-0 w-52',
-                      render: (row) => (
-                        <div className="line-clamp-1 font-mono text-foreground-light text-xs">
-                          {row.path}
-                        </div>
-                      ),
-                    },
-                    {
-                      key: 'count',
-                      header: 'Count',
-                      className: 'text-right flex-shrink-0 ml-auto justify-end',
-                      render: (row) => (
-                        <div className="text-right text-xs tabular-nums">{row.count}</div>
-                      ),
-                    },
-                    {
-                      key: 'actions',
-                      header: '',
-                      className: 'w-6',
-                      render: (row) => (
-                        <div className="flex justify-end">
-                          <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
-                        </div>
-                      ),
-                    },
-                  ]}
-                />
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 gap-4">
+            <Chart isLoading={isLoadingResp}>
+              <ChartCard>
+                <ChartHeader>
+                  <ChartTitle>Auth API Errors</ChartTitle>
+                </ChartHeader>
+                <ChartContent
+                  className="p-0"
+                  isEmpty={responseErrors.length === 0}
+                  emptyState={
+                    <div className="p-6">
+                      <ChartEmptyState
+                        icon={<BarChart2 size={16} />}
+                        title="No data to show"
+                        description="It may take up to 24 hours for data to refresh"
+                      />
+                    </div>
+                  }
+                  loadingState={
+                    <div className="p-6">
+                      <ChartLoadingState />
+                    </div>
+                  }
+                >
+                  <OverviewTable<ResponseErrorRow>
+                    isLoading={isLoadingResp}
+                    data={responseErrors}
+                    columns={[
+                      {
+                        key: 'request',
+                        header: 'Request',
+                        className: 'w-auto !pr-0',
+                        render: (row) => {
+                          const level = getStatusLevel(row.status_code)
+                          const colors = getStatusColor(level)
+                          return (
+                            <div className="flex items-center gap-2">
+                              <span className="flex-shrink-0 flex items-center text-xs font-mono">
+                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
+                                  {row.method}
+                                </span>
+                                <span
+                                  className={cn(
+                                    'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums',
+                                    colors.text,
+                                    colors.bg,
+                                    colors.border
+                                  )}
+                                >
+                                  {row.status_code}
+                                </span>
+                              </span>
+                            </div>
+                          )
+                        },
+                      },
+                      {
+                        key: 'path',
+                        header: 'Path',
+                        className: 'w-full',
+                        render: (row) => (
+                          <span className="line-clamp-1 font-mono text-foreground-light text-xs">
+                            {row.path}
+                          </span>
+                        ),
+                      },
+                      {
+                        key: 'count',
+                        header: 'Count',
+                        className: 'text-right flex-shrink-0 ml-auto justify-end',
+                        render: (row) => (
+                          <div className="flex justify-end items-center gap-2">
+                            <div className="text-right text-xs tabular-nums">{row.count}</div>
+                            <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                </ChartContent>
+              </ChartCard>
+            </Chart>
 
-            <Card>
-              <CardHeader className={cn('border-b-0', errorCodes.length > 0 ? 'pb-4' : 'pb-0')}>
-                <CardTitle className="text-foreground-light">Auth Server Errors</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <OverviewTable<AuthErrorCodeRow>
-                  isLoading={isLoadingCodes}
-                  data={errorCodes}
-                  columns={[
-                    {
-                      key: 'error_code',
-                      header: 'Error code',
-                      className: 'w-full',
-                      render: (row) => (
-                        <div className="line-clamp-1 font-mono text-foreground uppercase text-xs">
-                          {row.error_code}
-                        </div>
-                      ),
-                    },
-                    {
-                      key: 'count',
-                      header: 'Count',
-                      className: 'text-right',
-                      render: (row) => (
-                        <div className="text-right text-xs tabular-nums">{row.count}</div>
-                      ),
-                    },
-                    {
-                      key: 'actions',
-                      header: '',
-                      className: 'text-right',
-                      render: (row) => (
-                        <div>
-                          <LogsLink href={`/project/${ref}/logs/auth-logs?s=${row.error_code}`} />
-                        </div>
-                      ),
-                    },
-                  ]}
-                />
-              </CardContent>
-            </Card>
+            <Chart isLoading={isLoadingCodes}>
+              <ChartCard>
+                <ChartHeader>
+                  <ChartTitle>Auth Server Errors</ChartTitle>
+                  <ChartActions actions={errorCodesActions} />
+                </ChartHeader>
+                <ChartContent
+                  className="p-0"
+                  isEmpty={errorCodes.length === 0}
+                  emptyState={
+                    <div className="p-6">
+                      <ChartEmptyState
+                        icon={<BarChart2 size={16} />}
+                        title="No data to show"
+                        description="It may take up to 24 hours for data to refresh"
+                      />
+                    </div>
+                  }
+                  loadingState={
+                    <div className="p-6">
+                      <ChartLoadingState />
+                    </div>
+                  }
+                >
+                  <OverviewTable<AuthErrorCodeRow>
+                    isLoading={isLoadingCodes}
+                    data={errorCodes}
+                    columns={[
+                      {
+                        key: 'error_code',
+                        header: 'Error code',
+                        className: 'w-full',
+                        render: (row) => (
+                          <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light">
+                            {row.error_code}
+                          </span>
+                        ),
+                      },
+                      {
+                        key: 'count',
+                        header: 'Count',
+                        className: 'text-right',
+                        render: (row) => (
+                          <div className="flex justify-end items-center gap-2">
+                            <div className="text-right text-xs tabular-nums">{row.count}</div>
+                            <LogsLink href={`/project/${ref}/logs/auth-logs?s=${row.error_code}`} />
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                </ChartContent>
+              </ChartCard>
+            </Chart>
           </div>
         </PageSectionContent>
       </PageSection>

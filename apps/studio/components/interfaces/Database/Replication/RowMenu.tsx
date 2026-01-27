@@ -181,7 +181,7 @@ export const RowMenu = ({
             <p>Edit destination</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
-            <Trash stroke="red" size={14} />
+            <Trash size={14} />
             <p>Delete destination</p>
           </DropdownMenuItem>
         </DropdownMenuContent>

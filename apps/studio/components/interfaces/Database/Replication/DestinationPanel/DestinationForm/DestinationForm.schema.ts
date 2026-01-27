@@ -7,6 +7,12 @@ export const DestinationPanelFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
   maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
+  maxSize: z.number().min(1, 'Max batch size should be greater than 0').int().optional(),
+  maxTableSyncWorkers: z
+    .number()
+    .min(1, 'Max table sync workers should be greater than 0')
+    .int()
+    .optional(),
   // BigQuery fields
   projectId: z.string().optional(),
   datasetId: z.string().optional(),

@@ -22,8 +22,8 @@
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
-    "format": "prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "test:prettier": "SORT_IMPORTS=false prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "SORT_IMPORTS=false prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
@@ -39,10 +39,12 @@
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
-    "knip": "pnpx knip@~5.50.0"
+    "knip": "pnpx knip@~5.50.0",
+    "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.823.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "prettier": "3.2.4",
@@ -52,8 +54,10 @@
     "supabase": "^2.65.6",
     "supports-color": "^8.0.0",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "turbo": "2.3.3",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "zod": "catalog:"
   },
   "repository": {
     "type": "git",

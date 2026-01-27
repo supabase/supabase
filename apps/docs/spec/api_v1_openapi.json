@@ -40,7 +40,7 @@
         "summary": "Get database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "patch": {
@@ -85,7 +85,7 @@
         "summary": "Update database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -133,7 +133,7 @@
         "summary": "Delete a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -182,7 +182,7 @@
         "summary": "Pushes a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -231,7 +231,7 @@
         "summary": "Merges a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -280,7 +280,7 @@
         "summary": "Resets a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -323,7 +323,7 @@
         "summary": "Restore a scheduled branch deletion",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -368,13 +368,13 @@
         "summary": "[Beta] Diffs a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.",
+        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -394,7 +394,7 @@
         "summary": "List all projects",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -414,11 +414,11 @@
             }
           }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_create"] }],
         "summary": "Create a project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -485,10 +485,12 @@
             }
           }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["available_regions_read"] }],
+        "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"]
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations": {
@@ -514,7 +516,7 @@
         "summary": "List all organizations",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       },
       "post": {
@@ -539,10 +541,10 @@
           },
           "500": { "description": "Unexpected error creating an organization" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_create"] }],
         "summary": "Create an organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api", "billing"]
       }
     },
     "/v1/oauth/authorize": {
@@ -606,7 +608,7 @@
         "security": [{ "oauth2": ["read"] }],
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/token": {
@@ -634,7 +636,7 @@
         "security": [{ "oauth2": ["write"] }],
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/revoke": {
@@ -653,7 +655,7 @@
         "security": [{ "oauth2": ["write"] }],
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth", "management-api"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -707,10 +709,13 @@
           }
         ],
         "responses": { "204": { "description": "" } },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["organization_admin_write", "project_admin_write"] }
+        ],
         "summary": "Authorize user through oauth and claim a project",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api"]
       }
     },
     "/v1/snippets": {
@@ -757,7 +762,7 @@
         "summary": "Lists SQL snippets for the logged in user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -785,7 +790,7 @@
         "summary": "Gets a specific SQL snippet",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -828,11 +833,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list action runs" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["action_runs_read"] }],
         "summary": "List all action runs",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "head": {
@@ -862,7 +867,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to count action runs" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["action_runs_read"] }],
         "summary": "Count the number of action runs",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -901,11 +906,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get action run status" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["action_runs_read"] }],
         "summary": "Get the status of an action run",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -949,11 +954,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update action run status" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["action_runs_write"] }],
         "summary": "Update the status of an action run",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -987,11 +992,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get action run logs" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["action_runs_read"] }],
         "summary": "Get the logs of an action run",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -1030,11 +1035,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_read"] }],
         "summary": "Get project api keys",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -1072,11 +1077,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_write"] }],
         "summary": "Creates a new API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1105,11 +1110,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_read"] }],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -1143,11 +1148,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_write"] }],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1193,11 +1198,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_write"] }],
         "summary": "Updates an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -1235,11 +1240,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_read"] }],
         "summary": "Get API key",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -1285,11 +1290,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["api_gateway_keys_write"] }],
         "summary": "Deletes an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth", "management-api"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1323,11 +1328,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_read"] }],
         "summary": "List all database branches",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       },
       "post": {
@@ -1360,11 +1365,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_write"] }],
         "summary": "Create a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       },
       "delete": {
@@ -1386,11 +1391,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable preview branching" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_write"] }],
         "summary": "Disables preview branching",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:write"
       }
     },
@@ -1420,11 +1425,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_read"] }],
         "summary": "Get a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "environment:read"
       }
     },
@@ -1454,11 +1459,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's custom hostname config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["custom_domain_read"] }],
         "summary": "[Beta] Gets project's custom hostname config",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -1479,11 +1484,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete project custom hostname configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["custom_domain_write"] }],
         "summary": "[Beta] Deletes a project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1521,11 +1526,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project custom hostname configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["custom_domain_write"] }],
         "summary": "[Beta] Updates project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1555,11 +1560,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to verify project custom hostname configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["custom_domain_write"] }],
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1589,11 +1594,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to activate project custom hostname configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["custom_domain_write"] }],
         "summary": "[Beta] Activates a custom hostname for a project.",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -1623,11 +1628,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's network bans" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_network_bans_read"] }],
         "summary": "[Beta] Gets project's network bans",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -1657,11 +1662,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's enriched network bans" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_network_bans_read"] }],
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -1692,11 +1697,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove network bans." }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_network_bans_write"] }],
         "summary": "[Beta] Remove network bans.",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1726,11 +1731,14 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's network restrictions" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["database_network_restrictions_read"] }
+        ],
         "summary": "[Beta] Gets project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:read"
       },
       "patch": {
@@ -1766,11 +1774,14 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project network restrictions" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["database_network_restrictions_write"] }
+        ],
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1808,11 +1819,14 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project network restrictions" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["database_network_restrictions_write"] }
+        ],
         "summary": "[Beta] Updates project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -1842,11 +1856,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's pgsodium config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "[Beta] Gets project's pgsodium config",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "secrets:read"
       },
       "put": {
@@ -1882,11 +1896,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's pgsodium config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -1916,11 +1930,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's postgrest config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["data_api_config_read"] }],
         "summary": "Gets project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -1956,11 +1970,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's postgrest config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["data_api_config_write"] }],
         "summary": "Updates project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "rest:write"
       }
     },
@@ -1990,11 +2004,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
         "summary": "Gets a specific project that belongs to the authenticated user",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       },
       "delete": {
@@ -2021,11 +2035,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Deletes the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
         "x-oauth-scope": "projects:write"
       },
       "patch": {
@@ -2059,11 +2073,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Updates the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -2097,11 +2111,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's secrets" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_secrets_read"] }],
         "summary": "List all secrets",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -2129,11 +2143,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create project's secrets" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_secrets_write"] }],
         "summary": "Bulk create secrets",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:write"
       },
       "delete": {
@@ -2161,11 +2175,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete secrets with given names" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_secrets_write"] }],
         "summary": "Bulk delete secrets",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "secrets:write"
       }
     },
@@ -2195,11 +2209,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's SSL enforcement config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_ssl_config_read"] }],
         "summary": "[Beta] Get project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -2235,11 +2249,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's SSL enforcement configuration." }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_ssl_config_write"] }],
         "summary": "[Beta] Update project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -2276,11 +2290,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to generate TypeScript types" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_read"] }],
         "summary": "Generate TypeScript types",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2310,11 +2324,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project vanity subdomain configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_read"] }],
         "summary": "[Beta] Gets current vanity subdomain config",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
       "delete": {
@@ -2335,11 +2349,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete project vanity subdomain configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -2375,11 +2389,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to check project vanity subdomain configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Checks vanity subdomain availability",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -2415,11 +2429,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to activate project vanity subdomain configuration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
     },
@@ -2455,11 +2469,14 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to initiate project upgrade" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["project_admin_write", "database_write"] }
+        ],
         "summary": "[Beta] Upgrades the project's Postgres version",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -2489,11 +2506,14 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to determine project upgrade eligibility" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["project_admin_read", "database_read"] }
+        ],
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -2529,11 +2549,14 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project upgrade status" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["project_admin_read", "database_read"] }
+        ],
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -2563,11 +2586,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project readonly mode status" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_readonly_config_read"] }],
         "summary": "Returns project's readonly mode status",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -2590,11 +2613,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable project's readonly mode" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_readonly_config_write"] }],
         "summary": "Disables project's readonly mode for the next 15 minutes",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -2625,10 +2648,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to set up read replica" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_read_replicas_write"] }],
         "summary": "[Beta] Set up a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api", "infra"]
       }
     },
     "/v1/projects/{ref}/read-replicas/remove": {
@@ -2658,10 +2681,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove read replica" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_read_replicas_write"] }],
         "summary": "[Beta] Remove a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api", "infra"]
       }
     },
     "/v1/projects/{ref}/health": {
@@ -2720,11 +2743,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's service health status" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
         "summary": "Gets project's service health status",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -2753,11 +2776,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_write"] }],
         "summary": "Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found.",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -2784,11 +2807,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_read"] }],
         "summary": "Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -2825,11 +2848,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_write"] }],
         "summary": "Create a new signing key for the project in standby status",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "get": {
@@ -2856,11 +2879,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_read"] }],
         "summary": "List all signing keys for the project",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:read"
       }
     },
@@ -2895,10 +2918,10 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_read"] }],
         "summary": "Get information about a signing key",
         "tags": ["Auth"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["auth"]
       },
       "delete": {
         "operationId": "v1-remove-project-signing-key",
@@ -2930,11 +2953,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_write"] }],
         "summary": "Remove a signing key from a project. Only possible if the key has been in revoked status for a while.",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
       },
       "patch": {
@@ -2975,259 +2998,12 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_signing_keys_write"] }],
         "summary": "Update a signing key, mainly its status",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "secrets:write"
-      }
-    },
-    "/v1/projects/{ref}/config/storage": {
-      "get": {
-        "operationId": "v1-get-storage-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/StorageConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's storage config" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Gets project's storage config",
-        "tags": ["Storage"],
-        "x-endpoint-owners": ["unowned"]
-      },
-      "patch": {
-        "operationId": "v1-update-storage-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateStorageConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's storage config" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Updates project's storage config",
-        "tags": ["Storage"],
-        "x-endpoint-owners": ["unowned"]
-      }
-    },
-    "/v1/projects/{ref}/config/database/postgres": {
-      "get": {
-        "operationId": "v1-get-postgres-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's Postgres config" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Gets project's Postgres config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
-        "x-oauth-scope": "database:read"
-      },
-      "put": {
-        "operationId": "v1-update-postgres-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdatePostgresConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's Postgres config" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Updates project's Postgres config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
-        "x-oauth-scope": "database:write"
-      }
-    },
-    "/v1/projects/{ref}/config/database/pgbouncer": {
-      "get": {
-        "operationId": "v1-get-project-pgbouncer-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's pgbouncer config" }
-        },
-        "summary": "Get project's pgbouncer config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
-        "x-oauth-scope": "database:read"
-      }
-    },
-    "/v1/projects/{ref}/config/database/pooler": {
-      "get": {
-        "operationId": "v1-get-pooler-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse" }
-                }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's supavisor config" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Gets project's supavisor config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
-        "x-oauth-scope": "database:read"
-      },
-      "patch": {
-        "operationId": "v1-update-pooler-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's supavisor config" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Updates project's supavisor config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
-        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/config/auth": {
@@ -3256,11 +3032,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's auth config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_read"] }],
         "summary": "Gets project's auth config",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       },
       "patch": {
@@ -3296,73 +3072,15 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's auth config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["auth_config_write", "project_admin_write"] }
+        ],
         "summary": "Updates a project's auth config",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
-      }
-    },
-    "/v1/projects/{ref}/config/realtime": {
-      "get": {
-        "operationId": "v1-get-realtime-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Gets project's realtime configuration",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Gets realtime configuration",
-        "tags": ["Realtime"],
-        "x-endpoint-owners": ["unowned"]
-      },
-      "patch": {
-        "operationId": "v1-update-realtime-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateRealtimeConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "204": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Updates realtime configuration",
-        "tags": ["Realtime"],
-        "x-endpoint-owners": ["unowned"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -3396,11 +3114,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_write"] }],
         "summary": "Creates a new third-party auth integration",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -3430,11 +3148,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_read"] }],
         "summary": "Lists all third-party auth integrations",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -3467,11 +3185,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_write"] }],
         "summary": "Removes a third-party auth integration",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -3502,11 +3220,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_read"] }],
         "summary": "Get a third-party integration",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -3528,11 +3246,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Pauses the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -3563,11 +3281,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
         "summary": "Lists available restore versions for the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:read"
       },
       "post": {
@@ -3587,11 +3305,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Restores the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -3613,11 +3331,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Cancels the given project restoration",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "projects:write"
       }
     },
@@ -3648,10 +3366,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list project addons" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_add_ons_read"] }],
         "summary": "List billing addons and compute instance selections",
         "tags": ["Billing"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["billing"]
       },
       "patch": {
         "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
@@ -3680,10 +3398,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to apply project addon" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_add_ons_write"] }],
         "summary": "Apply or update billing addons, including compute instance size",
         "tags": ["Billing"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["billing"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
@@ -3741,10 +3459,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove project addon" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_add_ons_write"] }],
         "summary": "Remove billing addons or revert compute instance sizing",
         "tags": ["Billing"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["billing"]
       }
     },
     "/v1/projects/{ref}/claim-token": {
@@ -3772,10 +3490,10 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "post": {
@@ -3802,10 +3520,13 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["organization_admin_write", "project_admin_write"] }
+        ],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "delete": {
@@ -3825,10 +3546,13 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["organization_admin_write", "project_admin_write"] }
+        ],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       }
     },
@@ -3859,11 +3583,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["advisors_read"] }],
         "summary": "Gets project performance advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -3900,11 +3624,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["advisors_read"] }],
         "summary": "Gets project security advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -3951,11 +3675,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_logs_read"] }],
         "summary": "Gets project's logs",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["analytics"],
         "x-oauth-scope": "analytics:read"
       }
     },
@@ -3994,10 +3718,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's usage api counts" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_usage_read"] }],
         "summary": "Gets project's usage api counts",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/usage.api-requests-count": {
@@ -4026,10 +3750,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's usage api requests count" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_usage_read"] }],
         "summary": "Gets project's usage api requests count",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/functions.combined-stats": {
@@ -4063,10 +3787,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's function combined statistics" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_usage_read"] }],
         "summary": "Gets a project's function combined statistics",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["analytics"]
       }
     },
     "/v1/projects/{ref}/cli/login-role": {
@@ -4101,11 +3825,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create login role" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
         "summary": "[Beta] Create a login role for CLI with temporary password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -4133,11 +3857,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete login roles" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
         "summary": "[Beta] Delete existing login roles used by CLI",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["dev-workflows"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4168,11 +3892,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database migrations" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
         "summary": "[Beta] List applied migration versions",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -4209,11 +3933,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to apply database migration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
         "summary": "[Beta] Apply a database migration",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       },
       "put": {
@@ -4250,11 +3974,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to upsert database migration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
         "summary": "[Beta] Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       },
       "delete": {
@@ -4283,11 +4007,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to rollback database migration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
         "summary": "[Beta] Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4324,11 +4048,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get database migration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
         "summary": "[Beta] Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
       "patch": {
@@ -4364,11 +4088,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to patch database migration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
         "summary": "[Beta] Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4397,11 +4121,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to run sql query" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
         "summary": "[Beta] Run sql query",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4431,11 +4155,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to run read-only sql query" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_read"] }],
         "summary": "[Beta] Run a sql query as supabase_read_only_user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -4458,11 +4182,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to enable Database Webhooks on the project" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_webhooks_config_write"] }],
         "summary": "[Beta] Enables Database Webhooks on the project",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4493,11 +4217,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_read"] }],
         "summary": "Gets database metadata for the given project.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "projects:read"
       }
     },
@@ -4535,11 +4259,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database password" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api", "infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -4568,11 +4292,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database jit access" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_read"] }],
         "summary": "Get user-id to role mappings for JIT access",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["security"],
         "x-oauth-scope": "database:read"
       },
       "post": {
@@ -4609,11 +4333,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to authorize database jit access" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_read"] }],
         "summary": "Authorize user-id to role mappings for JIT access",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["security"],
         "x-oauth-scope": "database:read"
       },
       "put": {
@@ -4646,10 +4370,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to upsert database migration" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_write"] }],
         "summary": "Updates a user mapping for JIT access",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/database/jit/list": {
@@ -4679,10 +4403,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database jit access" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_read"] }],
         "summary": "List all user-id to role mappings for JIT access",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/database/jit/{user_id}": {
@@ -4711,10 +4435,10 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove JIT access" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_write"] }],
         "summary": "Delete JIT access by user-id",
         "tags": ["Database"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["security"]
       }
     },
     "/v1/projects/{ref}/functions": {
@@ -4747,11 +4471,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's functions" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_read"] }],
         "summary": "List all functions",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       },
       "post": {
@@ -4830,11 +4554,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create project's function" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_write"] }],
         "summary": "Create a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       },
       "put": {
@@ -4872,11 +4596,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update functions" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_write"] }],
         "summary": "Bulk update functions",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -4929,11 +4653,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to deploy function" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_write"] }],
         "summary": "Deploy a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -4971,11 +4695,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_read"] }],
         "summary": "Retrieve a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       },
       "patch": {
@@ -5059,11 +4783,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update function with given slug" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_write"] }],
         "summary": "Update a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       },
       "delete": {
@@ -5092,11 +4816,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete function with given slug" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_write"] }],
         "summary": "Delete a function",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:write"
       }
     },
@@ -5132,11 +4856,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve function body with given slug" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["edge_functions_read"] }],
         "summary": "Retrieve a function body",
         "tags": ["Edge Functions"],
         "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["functions"],
         "x-oauth-scope": "edge_functions:read"
       }
     },
@@ -5169,12 +4893,416 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get list of buckets" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_read"] }],
         "summary": "Lists all buckets",
         "tags": ["Storage"],
         "x-badges": [{ "name": "OAuth scope: storage:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["storage"],
         "x-oauth-scope": "storage:read"
+      }
+    },
+    "/v1/projects/{ref}/config/disk/util": {
+      "get": {
+        "operationId": "v1-get-disk-utilization",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DiskUtilMetricsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get disk utilization" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get disk utilization",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/disk": {
+      "post": {
+        "operationId": "v1-modify-database-disk",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DiskRequestBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to modify database disk" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_add_ons_write"] }],
+        "summary": "Modify database disk",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/disk/autoscale": {
+      "get": {
+        "operationId": "v1-get-project-disk-autoscale-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DiskAutoscaleConfig" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get project disk autoscale config" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Gets project disk autoscale config",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/storage": {
+      "get": {
+        "operationId": "v1-get-storage-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StorageConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's storage config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_config_read"] }],
+        "summary": "Gets project's storage config",
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["storage"]
+      },
+      "patch": {
+        "operationId": "v1-update-storage-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateStorageConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's storage config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_config_write"] }],
+        "summary": "Updates project's storage config",
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["storage"]
+      }
+    },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "v1-get-project-pgbouncer-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's pgbouncer config" }
+        },
+        "security": [{ "fga_permissions": ["database_read"] }],
+        "summary": "Get project's pgbouncer config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "database:read"
+      }
+    },
+    "/v1/projects/{ref}/config/database/pooler": {
+      "get": {
+        "operationId": "v1-get-pooler-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's supavisor config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_pooling_config_read"] }],
+        "summary": "Gets project's supavisor config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "operationId": "v1-update-pooler-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's supavisor config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_pooling_config_write"] }],
+        "summary": "Updates project's supavisor config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/config/database/postgres": {
+      "get": {
+        "operationId": "v1-get-postgres-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's Postgres config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_read"] }],
+        "summary": "Gets project's Postgres config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "database:read"
+      },
+      "put": {
+        "operationId": "v1-update-postgres-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostgresConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's Postgres config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
+        "summary": "Updates project's Postgres config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/config/realtime": {
+      "get": {
+        "operationId": "v1-get-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets project's realtime configuration",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Gets realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      },
+      "patch": {
+        "operationId": "v1-update-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRealtimeConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
       }
     },
     "/v1/projects/{ref}/config/auth/sso/providers": {
@@ -5209,11 +5337,11 @@
           "404": { "description": "SAML 2.0 support is not enabled for this project" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_write"] }],
         "summary": "Creates a new SSO provider",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "get": {
@@ -5241,11 +5369,11 @@
           "404": { "description": "SAML 2.0 support is not enabled for this project" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_read"] }],
         "summary": "Lists all SSO providers",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       }
     },
@@ -5283,11 +5411,11 @@
           },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_read"] }],
         "summary": "Gets a SSO provider by its UUID",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:read"
       },
       "put": {
@@ -5329,11 +5457,11 @@
           },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_write"] }],
         "summary": "Updates a SSO provider by its UUID",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       },
       "delete": {
@@ -5369,11 +5497,11 @@
           },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["auth_config_write"] }],
         "summary": "Removes a SSO provider by its UUID",
         "tags": ["Auth"],
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
       }
     },
@@ -5401,11 +5529,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get backups" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_read"] }],
         "summary": "Lists all backups",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       }
     },
@@ -5433,11 +5561,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
         "summary": "Restores a PITR backup for a database",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
     },
@@ -5474,11 +5602,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
         "summary": "Initiates a creation of a restore point for a database",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       },
@@ -5513,11 +5641,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get requested restore points" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_read"] }],
         "summary": "Get restore points for project",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:read"
       }
@@ -5546,11 +5674,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
         "summary": "Initiates an undo to a given restore point",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["infra"],
         "x-internal": true,
         "x-oauth-scope": "database:write"
       }
@@ -5583,11 +5711,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["members_read"] }],
         "summary": "List members of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -5616,11 +5744,11 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_read"] }],
         "summary": "Gets information about the organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "organizations:read"
       }
     },
@@ -5650,10 +5778,10 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_write"] }],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       },
       "post": {
@@ -5674,16 +5802,16 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_write"] }],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["unowned"],
+        "x-endpoint-owners": ["management-api"],
         "x-internal": true
       }
     },
     "/v1/organizations/{slug}/projects": {
       "get": {
-        "description": "Returns a paginated list of projects for the specified organization.\n\n    This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
+        "description": "Returns a paginated list of projects for the specified organization.\n\nThis endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
         "operationId": "v1-get-all-projects-for-organization",
         "parameters": [
           {
@@ -5744,10 +5872,10 @@
           },
           "500": { "description": "Failed to retrieve projects" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["unowned"]
+        "x-endpoint-owners": ["management-api"]
       }
     }
   },
@@ -6414,7 +6542,7 @@
       },
       "CreateOrganizationV1": {
         "type": "object",
-        "properties": { "name": { "type": "string" } },
+        "properties": { "name": { "type": "string", "maxLength": 256 } },
         "required": ["name"],
         "additionalProperties": false
       },
@@ -6894,7 +7022,7 @@
       },
       "UpdateCustomHostnameBody": {
         "type": "object",
-        "properties": { "custom_hostname": { "type": "string", "minLength": 1 } },
+        "properties": { "custom_hostname": { "type": "string", "maxLength": 253, "minLength": 1 } },
         "required": ["custom_hostname"]
       },
       "NetworkBanResponse": {
@@ -7162,7 +7290,7 @@
       },
       "VanitySubdomainBody": {
         "type": "object",
-        "properties": { "vanity_subdomain": { "type": "string" } },
+        "properties": { "vanity_subdomain": { "type": "string", "maxLength": 63 } },
         "required": ["vanity_subdomain"]
       },
       "SubdomainAvailabilityResponse": {
@@ -7221,11 +7349,109 @@
           },
           "duration_estimate_hours": { "type": "number" },
           "legacy_auth_custom_roles": { "type": "array", "items": { "type": "string" } },
-          "objects_to_be_dropped": { "type": "array", "items": { "type": "string" } },
-          "unsupported_extensions": { "type": "array", "items": { "type": "string" } },
+          "objects_to_be_dropped": {
+            "type": "array",
+            "items": { "type": "string" },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
+          },
+          "unsupported_extensions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
+          },
           "user_defined_objects_in_internal_schemas": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": { "type": "string" },
+            "deprecated": true,
+            "description": "Use validation_errors instead."
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["objects_depending_on_pg_cron"] },
+                    "dependents": { "type": "array", "items": { "type": "string" } }
+                  },
+                  "required": ["type", "dependents"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["indexes_referencing_ll_to_earth"] },
+                    "schema_name": { "type": "string" },
+                    "table_name": { "type": "string" },
+                    "index_name": { "type": "string" }
+                  },
+                  "required": ["type", "schema_name", "table_name", "index_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["function_using_obsolete_lang"] },
+                    "schema_name": { "type": "string" },
+                    "function_name": { "type": "string" },
+                    "lang_name": { "type": "string" }
+                  },
+                  "required": ["type", "schema_name", "function_name", "lang_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["unsupported_extension"] },
+                    "extension_name": { "type": "string" }
+                  },
+                  "required": ["type", "extension_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["unsupported_fdw_handler"] },
+                    "fdw_name": { "type": "string" },
+                    "fdw_handler_name": { "type": "string" }
+                  },
+                  "required": ["type", "fdw_name", "fdw_handler_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["unlogged_table_with_persistent_sequence"]
+                    },
+                    "schema_name": { "type": "string" },
+                    "table_name": { "type": "string" },
+                    "sequence_name": { "type": "string" }
+                  },
+                  "required": ["type", "schema_name", "table_name", "sequence_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["user_defined_objects_in_internal_schemas"]
+                    },
+                    "obj_type": { "type": "string", "enum": ["table", "function"] },
+                    "schema_name": { "type": "string" },
+                    "obj_name": { "type": "string" }
+                  },
+                  "required": ["type", "obj_type", "schema_name", "obj_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["active_replication_slot"] },
+                    "slot_name": { "type": "string" }
+                  },
+                  "required": ["type", "slot_name"]
+                }
+              ]
+            }
           }
         },
         "required": [
@@ -7238,7 +7464,8 @@
           "legacy_auth_custom_roles",
           "objects_to_be_dropped",
           "unsupported_extensions",
-          "user_defined_objects_in_internal_schemas"
+          "user_defined_objects_in_internal_schemas",
+          "validation_errors"
         ]
       },
       "DatabaseUpgradeStatusResponse": {
@@ -7349,7 +7576,11 @@
               "pg_bouncer"
             ]
           },
-          "healthy": { "type": "boolean" },
+          "healthy": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "Deprecated. Use `status` instead."
+          },
           "status": { "type": "string", "enum": ["COMING_UP", "ACTIVE_HEALTHY", "UNHEALTHY"] },
           "info": {
             "oneOf": [
@@ -7365,7 +7596,11 @@
               {
                 "type": "object",
                 "properties": {
-                  "healthy": { "type": "boolean" },
+                  "healthy": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "description": "Deprecated. Use `status` instead."
+                  },
                   "db_connected": { "type": "boolean" },
                   "connected_cluster": { "type": "integer" }
                 },
@@ -7536,276 +7771,6 @@
         },
         "required": ["status"],
         "additionalProperties": false
-      },
-      "StorageConfigResponse": {
-        "type": "object",
-        "properties": {
-          "fileSizeLimit": { "type": "integer", "format": "int64" },
-          "features": {
-            "type": "object",
-            "properties": {
-              "imageTransformation": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "s3Protocol": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "icebergCatalog": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxNamespaces": { "type": "integer", "minimum": 0 },
-                  "maxTables": { "type": "integer", "minimum": 0 },
-                  "maxCatalogs": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
-              },
-              "vectorBuckets": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxBuckets": { "type": "integer", "minimum": 0 },
-                  "maxIndexes": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxBuckets", "maxIndexes"]
-              }
-            },
-            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
-          },
-          "capabilities": {
-            "type": "object",
-            "properties": {
-              "list_v2": { "type": "boolean" },
-              "iceberg_catalog": { "type": "boolean" }
-            },
-            "required": ["list_v2", "iceberg_catalog"]
-          },
-          "external": {
-            "type": "object",
-            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
-            "required": ["upstreamTarget"]
-          },
-          "migrationVersion": { "type": "string" },
-          "databasePoolMode": { "type": "string" }
-        },
-        "required": [
-          "fileSizeLimit",
-          "features",
-          "capabilities",
-          "external",
-          "migrationVersion",
-          "databasePoolMode"
-        ]
-      },
-      "UpdateStorageConfigBody": {
-        "type": "object",
-        "properties": {
-          "fileSizeLimit": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 536870912000,
-            "format": "int64"
-          },
-          "features": {
-            "type": "object",
-            "properties": {
-              "imageTransformation": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "s3Protocol": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "icebergCatalog": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxNamespaces": { "type": "integer", "minimum": 0 },
-                  "maxTables": { "type": "integer", "minimum": 0 },
-                  "maxCatalogs": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
-              },
-              "vectorBuckets": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxBuckets": { "type": "integer", "minimum": 0 },
-                  "maxIndexes": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxBuckets", "maxIndexes"]
-              }
-            }
-          },
-          "external": {
-            "type": "object",
-            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
-            "required": ["upstreamTarget"]
-          }
-        },
-        "additionalProperties": false
-      },
-      "PostgresConfigResponse": {
-        "type": "object",
-        "properties": {
-          "effective_cache_size": { "type": "string" },
-          "logical_decoding_work_mem": { "type": "string" },
-          "maintenance_work_mem": { "type": "string" },
-          "track_activity_query_size": { "type": "string" },
-          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
-          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
-          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_replication_slots": { "type": "integer" },
-          "max_slot_wal_keep_size": { "type": "string" },
-          "max_standby_archive_delay": { "type": "string" },
-          "max_standby_streaming_delay": { "type": "string" },
-          "max_wal_size": { "type": "string" },
-          "max_wal_senders": { "type": "integer" },
-          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
-          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
-          "shared_buffers": { "type": "string" },
-          "statement_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "track_commit_timestamp": { "type": "boolean" },
-          "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "work_mem": { "type": "string" },
-          "checkpoint_timeout": {
-            "type": "string",
-            "description": "Default unit: s",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "hot_standby_feedback": { "type": "boolean" }
-        }
-      },
-      "UpdatePostgresConfigBody": {
-        "type": "object",
-        "properties": {
-          "effective_cache_size": { "type": "string" },
-          "logical_decoding_work_mem": { "type": "string" },
-          "maintenance_work_mem": { "type": "string" },
-          "track_activity_query_size": { "type": "string" },
-          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
-          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
-          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_replication_slots": { "type": "integer" },
-          "max_slot_wal_keep_size": { "type": "string" },
-          "max_standby_archive_delay": { "type": "string" },
-          "max_standby_streaming_delay": { "type": "string" },
-          "max_wal_size": { "type": "string" },
-          "max_wal_senders": { "type": "integer" },
-          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
-          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
-          "shared_buffers": { "type": "string" },
-          "statement_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "track_commit_timestamp": { "type": "boolean" },
-          "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "work_mem": { "type": "string" },
-          "checkpoint_timeout": {
-            "type": "string",
-            "description": "Default unit: s",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "hot_standby_feedback": { "type": "boolean" },
-          "restart_database": { "type": "boolean" }
-        },
-        "additionalProperties": false
-      },
-      "V1PgbouncerConfigResponse": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": { "type": "integer" },
-          "ignore_startup_parameters": { "type": "string" },
-          "max_client_conn": { "type": "integer" },
-          "pool_mode": { "type": "string", "enum": ["transaction", "session", "statement"] },
-          "connection_string": { "type": "string" },
-          "server_idle_timeout": { "type": "integer" },
-          "server_lifetime": { "type": "integer" },
-          "query_wait_timeout": { "type": "integer" },
-          "reserve_pool_size": { "type": "integer" }
-        }
-      },
-      "SupavisorConfigResponse": {
-        "type": "object",
-        "properties": {
-          "identifier": { "type": "string" },
-          "database_type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
-          "is_using_scram_auth": { "type": "boolean" },
-          "db_user": { "type": "string" },
-          "db_host": { "type": "string" },
-          "db_port": { "type": "integer" },
-          "db_name": { "type": "string" },
-          "connection_string": { "type": "string" },
-          "connectionString": { "type": "string", "description": "Use connection_string instead" },
-          "default_pool_size": { "type": "integer", "nullable": true },
-          "max_client_conn": { "type": "integer", "nullable": true },
-          "pool_mode": { "type": "string", "enum": ["transaction", "session"] }
-        },
-        "required": [
-          "identifier",
-          "database_type",
-          "is_using_scram_auth",
-          "db_user",
-          "db_host",
-          "db_port",
-          "db_name",
-          "connection_string",
-          "connectionString",
-          "default_pool_size",
-          "max_client_conn",
-          "pool_mode"
-        ]
-      },
-      "UpdateSupavisorConfigBody": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 3000,
-            "nullable": true
-          },
-          "pool_mode": {
-            "type": "string",
-            "enum": ["transaction", "session"],
-            "description": "Dedicated pooler mode for the project"
-          }
-        }
-      },
-      "UpdateSupavisorConfigResponse": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": { "type": "integer", "nullable": true },
-          "pool_mode": { "type": "string" }
-        },
-        "required": ["default_pool_size", "pool_mode"]
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -8093,7 +8058,10 @@
           "smtp_port": { "type": "string", "nullable": true },
           "smtp_sender_name": { "type": "string", "nullable": true },
           "smtp_user": { "type": "string", "nullable": true },
-          "uri_allow_list": { "type": "string", "nullable": true }
+          "uri_allow_list": { "type": "string", "nullable": true },
+          "oauth_server_enabled": { "type": "boolean" },
+          "oauth_server_allow_dynamic_registration": { "type": "boolean" },
+          "oauth_server_authorization_path": { "type": "string", "nullable": true }
         },
         "required": [
           "api_max_request_duration",
@@ -8322,7 +8290,10 @@
           "smtp_port",
           "smtp_sender_name",
           "smtp_user",
-          "uri_allow_list"
+          "uri_allow_list",
+          "oauth_server_enabled",
+          "oauth_server_allow_dynamic_registration",
+          "oauth_server_authorization_path"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -8692,150 +8663,11 @@
           },
           "mfa_phone_template": { "type": "string", "nullable": true },
           "nimbus_oauth_client_id": { "type": "string", "nullable": true },
-          "nimbus_oauth_client_secret": { "type": "string", "nullable": true }
+          "nimbus_oauth_client_secret": { "type": "string", "nullable": true },
+          "oauth_server_enabled": { "type": "boolean", "nullable": true },
+          "oauth_server_allow_dynamic_registration": { "type": "boolean", "nullable": true },
+          "oauth_server_authorization_path": { "type": "string", "nullable": true }
         }
-      },
-      "RealtimeConfigResponse": {
-        "type": "object",
-        "properties": {
-          "private_only": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Whether to only allow private channels"
-          },
-          "connection_pool": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100,
-            "nullable": true,
-            "description": "Sets connection pool size for Realtime Authorization"
-          },
-          "max_concurrent_users": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "nullable": true,
-            "description": "Sets maximum number of concurrent users rate limit"
-          },
-          "max_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "nullable": true,
-            "description": "Sets maximum number of events per second rate per channel limit"
-          },
-          "max_bytes_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000,
-            "nullable": true,
-            "description": "Sets maximum number of bytes per second rate per channel limit"
-          },
-          "max_channels_per_client": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "nullable": true,
-            "description": "Sets maximum number of channels per client rate limit"
-          },
-          "max_joins_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "nullable": true,
-            "description": "Sets maximum number of joins per second rate limit"
-          },
-          "max_presence_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "nullable": true,
-            "description": "Sets maximum number of presence events per second rate limit"
-          },
-          "max_payload_size_in_kb": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "nullable": true,
-            "description": "Sets maximum number of payload size in KB rate limit"
-          },
-          "suspend": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Whether to suspend realtime"
-          }
-        },
-        "required": [
-          "private_only",
-          "connection_pool",
-          "max_concurrent_users",
-          "max_events_per_second",
-          "max_bytes_per_second",
-          "max_channels_per_client",
-          "max_joins_per_second",
-          "max_presence_events_per_second",
-          "max_payload_size_in_kb",
-          "suspend"
-        ]
-      },
-      "UpdateRealtimeConfigBody": {
-        "type": "object",
-        "properties": {
-          "private_only": {
-            "type": "boolean",
-            "description": "Whether to only allow private channels"
-          },
-          "connection_pool": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100,
-            "description": "Sets connection pool size for Realtime Authorization"
-          },
-          "max_concurrent_users": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "description": "Sets maximum number of concurrent users rate limit"
-          },
-          "max_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "description": "Sets maximum number of events per second rate per channel limit"
-          },
-          "max_bytes_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000,
-            "description": "Sets maximum number of bytes per second rate per channel limit"
-          },
-          "max_channels_per_client": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "description": "Sets maximum number of channels per client rate limit"
-          },
-          "max_joins_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "description": "Sets maximum number of joins per second rate limit"
-          },
-          "max_presence_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "description": "Sets maximum number of presence events per second rate limit"
-          },
-          "max_payload_size_in_kb": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "description": "Sets maximum number of payload size in KB rate limit"
-          },
-          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
-        },
-        "additionalProperties": false
       },
       "CreateThirdPartyAuthBody": {
         "type": "object",
@@ -9755,6 +9587,491 @@
           "public": { "type": "boolean" }
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string" },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": { "type": "number" },
+              "fs_avail_bytes": { "type": "number" },
+              "fs_used_bytes": { "type": "number" }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
+      },
+      "DiskRequestBody": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "discriminator": { "propertyName": "type" },
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "throughput_mibps": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["gp3"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["io2"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              }
+            ]
+          }
+        },
+        "required": ["attributes"]
+      },
+      "DiskAutoscaleConfig": {
+        "type": "object",
+        "properties": {
+          "growth_percent": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Growth percentage for disk autoscaling"
+          },
+          "min_increment_gb": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Minimum increment size for disk autoscaling in GB"
+          },
+          "max_size_gb": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Maximum limit the disk size will grow to in GB"
+          }
+        },
+        "required": ["growth_percent", "min_increment_gb", "max_size_gb"]
+      },
+      "StorageConfigResponse": {
+        "type": "object",
+        "properties": {
+          "fileSizeLimit": { "type": "integer", "format": "int64" },
+          "features": {
+            "type": "object",
+            "properties": {
+              "imageTransformation": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "s3Protocol": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "icebergCatalog": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxNamespaces": { "type": "integer", "minimum": 0 },
+                  "maxTables": { "type": "integer", "minimum": 0 },
+                  "maxCatalogs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxBuckets": { "type": "integer", "minimum": 0 },
+                  "maxIndexes": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
+              }
+            },
+            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
+          },
+          "capabilities": {
+            "type": "object",
+            "properties": {
+              "list_v2": { "type": "boolean" },
+              "iceberg_catalog": { "type": "boolean" }
+            },
+            "required": ["list_v2", "iceberg_catalog"]
+          },
+          "external": {
+            "type": "object",
+            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
+            "required": ["upstreamTarget"]
+          },
+          "migrationVersion": { "type": "string" },
+          "databasePoolMode": { "type": "string" }
+        },
+        "required": [
+          "fileSizeLimit",
+          "features",
+          "capabilities",
+          "external",
+          "migrationVersion",
+          "databasePoolMode"
+        ]
+      },
+      "UpdateStorageConfigBody": {
+        "type": "object",
+        "properties": {
+          "fileSizeLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 536870912000,
+            "format": "int64"
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "imageTransformation": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "s3Protocol": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "icebergCatalog": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxNamespaces": { "type": "integer", "minimum": 0 },
+                  "maxTables": { "type": "integer", "minimum": 0 },
+                  "maxCatalogs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxBuckets": { "type": "integer", "minimum": 0 },
+                  "maxIndexes": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
+              }
+            }
+          },
+          "external": {
+            "type": "object",
+            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
+            "required": ["upstreamTarget"]
+          }
+        },
+        "additionalProperties": false
+      },
+      "V1PgbouncerConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer" },
+          "ignore_startup_parameters": { "type": "string" },
+          "max_client_conn": { "type": "integer" },
+          "pool_mode": { "type": "string", "enum": ["transaction", "session", "statement"] },
+          "connection_string": { "type": "string" },
+          "server_idle_timeout": { "type": "integer" },
+          "server_lifetime": { "type": "integer" },
+          "query_wait_timeout": { "type": "integer" },
+          "reserve_pool_size": { "type": "integer" }
+        }
+      },
+      "SupavisorConfigResponse": {
+        "type": "object",
+        "properties": {
+          "identifier": { "type": "string" },
+          "database_type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
+          "is_using_scram_auth": { "type": "boolean" },
+          "db_user": { "type": "string" },
+          "db_host": { "type": "string" },
+          "db_port": { "type": "integer" },
+          "db_name": { "type": "string" },
+          "connection_string": { "type": "string" },
+          "connectionString": { "type": "string", "description": "Use connection_string instead" },
+          "default_pool_size": { "type": "integer", "nullable": true },
+          "max_client_conn": { "type": "integer", "nullable": true },
+          "pool_mode": { "type": "string", "enum": ["transaction", "session"] }
+        },
+        "required": [
+          "identifier",
+          "database_type",
+          "is_using_scram_auth",
+          "db_user",
+          "db_host",
+          "db_port",
+          "db_name",
+          "connection_string",
+          "connectionString",
+          "default_pool_size",
+          "max_client_conn",
+          "pool_mode"
+        ]
+      },
+      "UpdateSupavisorConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3000,
+            "nullable": true
+          },
+          "pool_mode": {
+            "type": "string",
+            "enum": ["transaction", "session"],
+            "description": "Dedicated pooler mode for the project"
+          }
+        }
+      },
+      "UpdateSupavisorConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer", "nullable": true },
+          "pool_mode": { "type": "string" }
+        },
+        "required": ["default_pool_size", "pool_mode"]
+      },
+      "PostgresConfigResponse": {
+        "type": "object",
+        "properties": {
+          "effective_cache_size": { "type": "string" },
+          "logical_decoding_work_mem": { "type": "string" },
+          "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_replication_slots": { "type": "integer" },
+          "max_slot_wal_keep_size": { "type": "string" },
+          "max_standby_archive_delay": { "type": "string" },
+          "max_standby_streaming_delay": { "type": "string" },
+          "max_wal_size": { "type": "string" },
+          "max_wal_senders": { "type": "integer" },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
+          "shared_buffers": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "track_commit_timestamp": { "type": "boolean" },
+          "wal_keep_size": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "work_mem": { "type": "string" },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "hot_standby_feedback": { "type": "boolean" }
+        }
+      },
+      "UpdatePostgresConfigBody": {
+        "type": "object",
+        "properties": {
+          "effective_cache_size": { "type": "string" },
+          "logical_decoding_work_mem": { "type": "string" },
+          "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_replication_slots": { "type": "integer" },
+          "max_slot_wal_keep_size": { "type": "string" },
+          "max_standby_archive_delay": { "type": "string" },
+          "max_standby_streaming_delay": { "type": "string" },
+          "max_wal_size": { "type": "string" },
+          "max_wal_senders": { "type": "integer" },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
+          "shared_buffers": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "track_commit_timestamp": { "type": "boolean" },
+          "wal_keep_size": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "work_mem": { "type": "string" },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "hot_standby_feedback": { "type": "boolean" },
+          "restart_database": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "RealtimeConfigResponse": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "nullable": true,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "required": [
+          "private_only",
+          "connection_pool",
+          "max_concurrent_users",
+          "max_events_per_second",
+          "max_bytes_per_second",
+          "max_channels_per_client",
+          "max_joins_per_second",
+          "max_presence_events_per_second",
+          "max_payload_size_in_kb",
+          "suspend"
+        ]
+      },
+      "UpdateRealtimeConfigBody": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
+        },
+        "additionalProperties": false
       },
       "CreateProviderBody": {
         "type": "object",

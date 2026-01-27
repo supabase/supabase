@@ -51,6 +51,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
@@ -82,7 +83,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const isHomeNew = useFlag('homeNew')
+  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -223,6 +224,8 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
+
   const {
     mutate: createProject,
     isPending: isCreatingNewProject,
@@ -233,6 +236,9 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          dataApiEnabled: form.getValues('dataApi'),
+          useApiSchema: form.getValues('useApiSchema'),
+          useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
           project: res.ref,
@@ -439,6 +445,23 @@ const Wizard: NextPageWithLayout = () => {
                     {showAdvancedConfig && !!availableOrioleVersion && (
                       <AdvancedConfiguration form={form} />
                     )}
+
+                    {shouldShowFreeProjectInfo ? (
+                      <Admonition
+                        className="rounded-none border-0"
+                        type="note"
+                        title="Need a free project?"
+                        description={
+                          <p>
+                            You can have up to 2 free projects across all organizations.{' '}
+                            <Link className="underline text-foreground" href="/new">
+                              Create a free organization
+                            </Link>{' '}
+                            to use them.
+                          </p>
+                        }
+                      />
+                    ) : null}
                   </>
                 )}
 

@@ -289,11 +289,7 @@ const ReportFilterBar = ({
               <span>Add filter</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent
-            align={filters.length > 0 ? 'end' : 'start'}
-            portal={true}
-            className="p-0 w-60"
-          >
+          <PopoverContent align={filters.length > 0 ? 'end' : 'start'} className="p-0 w-60">
             <div className="flex flex-col gap-3 p-3">
               <Select
                 size="tiny"
