@@ -1,7 +1,3 @@
-import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
@@ -14,8 +10,10 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_CLI, IS_PLATFORM } from 'lib/constants'
-import { PROJECT_DB_HOST } from 'lib/constants/api'
 import { pluckObjectFields } from 'lib/helpers'
+import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -34,6 +32,7 @@ import {
   cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,
@@ -263,8 +262,12 @@ export const DatabaseConnectionString = () => {
 
   // Self-hosted pooler connection strings (Supavisor)
   // Uses placeholders for tenant ID and password since these are user-configured
-  const selfHostedSessionPoolerStrings = getSelfHostedPoolerStrings(PROJECT_DB_HOST, 5432)
-  const selfHostedTransactionPoolerStrings = getSelfHostedPoolerStrings(PROJECT_DB_HOST, 6543)
+  // Use connectionInfo.db_host which comes from the API (server-side has access to SUPABASE_PUBLIC_URL)
+  const selfHostedSessionPoolerStrings = getSelfHostedPoolerStrings(connectionInfo.db_host, 5432)
+  const selfHostedTransactionPoolerStrings = getSelfHostedPoolerStrings(
+    connectionInfo.db_host,
+    6543
+  )
 
   const lang = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
   const contentType =
@@ -556,7 +559,7 @@ export const DatabaseConnectionString = () => {
                   connectionString={selfHostedTransactionPoolerStrings[selectedTab]}
                   notice={['Does not support PREPARE statements']}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: PROJECT_DB_HOST },
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
                     { ...CONNECTION_PARAMETERS.port, value: '6543' },
                     { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
                     {
@@ -612,7 +615,7 @@ export const DatabaseConnectionString = () => {
                   description={connectionStringMethodOptions.session.description}
                   connectionString={selfHostedSessionPoolerStrings[selectedTab]}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: PROJECT_DB_HOST },
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
                     { ...CONNECTION_PARAMETERS.port, value: '5432' },
                     { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
                     {
