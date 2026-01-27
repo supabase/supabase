@@ -105,7 +105,7 @@
     "memoize-one": "^5.0.1",
     "mime-db": "^1.53.0",
     "monaco-editor": "0.52.2",
-    "next": "^16.0.10",
+    "next": "catalog:",
     "next-themes": "^0.3.0",
     "nuqs": "2.7.1",
     "openai": "^4.75.1",
