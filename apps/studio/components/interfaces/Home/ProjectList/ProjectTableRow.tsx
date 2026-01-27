@@ -74,7 +74,6 @@ export const ProjectTableRow = ({
       >
         <TableCell>
           <div className="flex flex-col gap-y-2">
-            {/* Text */}
             <div>
               <h5 className="text-sm">{name}</h5>
               <button
@@ -99,7 +98,6 @@ export const ProjectTableRow = ({
                 )}
               </button>
             </div>
-            {/* Integrations */}
             {(isGithubIntegrated || isVercelIntegrated) && (
               <div className="flex items-center gap-x-1.5">
                 {isVercelIntegrated && (

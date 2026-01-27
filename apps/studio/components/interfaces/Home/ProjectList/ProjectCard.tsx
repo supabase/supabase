@@ -66,7 +66,7 @@ export const ProjectCard = ({
 
   const { data: metrics } = useProjectMetricsQuery(
     { projectRef, interval: '1day' },
-    { enabled: project.status !== 'INACTIVE' }
+    { enabled: projectStatus === 'isHealthy' }
   )
 
   const dbChartData = useMemo(() => {
@@ -93,9 +93,8 @@ export const ProjectCard = ({
           hideChevron
           title={
             <div className="w-full flex flex-col gap-y-4 justify-between px-5 z-10">
-              {/* Background bar chart - showing OK requests */}
               {dbChartData.length > 0 && (
-                <div className="absolute inset-0 pt-28 z-0 opacity-[0.04] pointer-events-none">
+                <div className="absolute inset-0 pt-28 z-0 opacity-[0.02] pointer-events-none">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dbChartData} margin={{ top: 0, left: 0, right: 0, bottom: 0 }}>
                       <Bar dataKey="ok" fill="currentColor" radius={[2, 2, 0, 0]} />
@@ -103,7 +102,6 @@ export const ProjectCard = ({
                   </ResponsiveContainer>
                 </div>
               )}
-              {/* Header with name and more menu */}
               <div className="flex flex-col gap-y-0.5 relative z-10">
                 <div className="flex items-center justify-between">
                   <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
@@ -149,7 +147,6 @@ export const ProjectCard = ({
                 </div>
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
-              {/* Status, Compute, and integrations */}
               <div className="flex items-center gap-x-1.5 relative z-10">
                 <ProjectCardStatus
                   projectStatus={projectStatus}
