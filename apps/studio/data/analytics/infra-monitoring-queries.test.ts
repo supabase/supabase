@@ -328,7 +328,7 @@ describe('aggregate1MinTo2Min', () => {
     expect(result[0].ram_usage).toBe(150) // (100 + 200) / 2
     expect(result[0].periodStartFormatted).toBeDefined()
     expect(dayjs(result[0].period_start).minute() % 2).toBe(0) // Should be even minute
-    
+
     // Check that second bucket contains 03:02 and 03:03 data averaged
     expect(result[1].max_cpu_usage).toBe(20) // (15 + 25) / 2
     expect(result[1].ram_usage).toBe(200) // (150 + 250) / 2
