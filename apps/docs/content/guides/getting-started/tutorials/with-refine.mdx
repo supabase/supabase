@@ -194,90 +194,94 @@ import { supabaseClient } from './utility'
 const authProvider: AuthProvider = {
   login: async ({ email }) => {
     try {
-      const { error } = await supabaseClient.auth.signInWithOtp({ email })
+      const { error } = await supabaseClient.auth.signInWithOtp({ email });
 
       if (!error) {
-        alert('Check your email for the login link!')
+        alert("Check your email for the login link!");
         return {
           success: true,
-        }
+        };
       }
 
-      throw error
+      throw error;
     } catch (e: any) {
-      alert(e.message)
+      alert(e.message);
       return {
         success: false,
-        e,
-      }
+        error: e,
+      };
     }
   },
+
   logout: async () => {
-    const { error } = await supabaseClient.auth.signOut()
+    const { error } = await supabaseClient.auth.signOut();
 
     if (error) {
       return {
         success: false,
         error,
-      }
+      };
     }
 
     return {
       success: true,
-      redirectTo: '/',
-    }
+      redirectTo: "/",
+    };
   },
+
   onError: async (error) => {
-    console.error(error)
-    return { error }
+    console.error(error);
+    return { error };
   },
+
   check: async () => {
     try {
-      const { data } = await supabaseClient.auth.getSession()
-      const { session } = data
+      const { data: { user }, error } = await supabaseClient.auth.getUser();
 
-      if (!session) {
+      if (error || !user) {
         return {
           authenticated: false,
           error: {
-            message: 'Check failed',
-            name: 'Session not found',
+            message: "Check failed",
+            name: "User not found",
           },
           logout: true,
-          redirectTo: '/login',
-        }
+          redirectTo: "/login",
+        };
       }
+
+      return {
+        authenticated: true,
+      };
     } catch (error: any) {
       return {
         authenticated: false,
         error: error || {
-          message: 'Check failed',
-          name: 'Not authenticated',
+          message: "Check failed",
+          name: "Not authenticated",
         },
         logout: true,
-        redirectTo: '/login',
-      }
+        redirectTo: "/login",
+      };
+    }
+  },
+
+  getIdentity: async () => {
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+    if (!user || error) {
+      return null;
     }
 
     return {
-      authenticated: true,
-    }
+      ...user,
+      name: user.email,
+    };
   },
-  getIdentity: async () => {
-    const { data } = await supabaseClient.auth.getUser()
+};
 
-    if (data?.user) {
-      return {
-        ...data.user,
-        name: data.user.email,
-      }
-    }
+export default authProvider;
 
-    return null
-  },
-}
-
-export default authProvider
 ```
 
 </$CodeTabs>
