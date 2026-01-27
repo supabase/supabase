@@ -117,7 +117,7 @@ export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
 export type BucketsWithPaginationData = Awaited<ReturnType<typeof getBucketsPaginated>>
 export type BucketsError = ResponseError
 
-const useBucketQuery = <TData = BucketData>(
+export const useBucketQuery = <TData = BucketData>(
   { projectRef, bucketId }: GetBucketParams,
   { enabled = true, ...options }: UseCustomQueryOptions<BucketData, BucketsError, TData>
 ) => {
@@ -133,6 +133,9 @@ const useBucketQuery = <TData = BucketData>(
   })
 }
 
+/**
+ * @deprecated - use usePaginatedBucketsQuery instead for better performance
+ */
 export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<BucketsData, BucketsError, TData> = {}
