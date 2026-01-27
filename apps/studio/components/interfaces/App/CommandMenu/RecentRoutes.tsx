@@ -1,6 +1,6 @@
 import { History } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
 import { useRecentRoutes } from 'hooks/misc/useRecentRoutes'
@@ -24,20 +24,24 @@ export function useRecentRoutesCommands() {
   const setPage = useSetPage()
   const { recentRoutes } = useRecentRoutes()
 
-  // Stable navigation function
-  const navigateTo = useCallback(
-    (link: string) => {
-      router.push(link)
-      setIsOpen(false)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  // Use refs to keep callbacks stable while accessing latest values
+  const routerRef = useRef(router)
+  const setIsOpenRef = useRef(setIsOpen)
+  const setPageRef = useRef(setPage)
+  routerRef.current = router
+  setIsOpenRef.current = setIsOpen
+  setPageRef.current = setPage
 
-  // Stable page navigation
+  // Stable navigation function using refs
+  const navigateTo = useCallback((link: string) => {
+    routerRef.current.push(link)
+    setIsOpenRef.current(false)
+  }, [])
+
+  // Stable page navigation using ref
   const goToAllRecents = useCallback(() => {
-    setPage(RECENTS_PAGE_NAME)
-  }, [setPage])
+    setPageRef.current(RECENTS_PAGE_NAME)
+  }, [])
 
   // Create command objects from recent routes - only depend on the route data, not callbacks
   const allCommands = useMemo(() => {
@@ -49,11 +53,6 @@ export function useRecentRoutesCommands() {
       parentLabel: route.parentLabel,
     }))
   }, [recentRoutes])
-
-  // Commands shown in the main menu (first 2 or 3)
-  const visibleCommands = useMemo(() => {
-    return allCommands.slice(0, VISIBLE_RECENTS_COUNT)
-  }, [allCommands])
 
   // Convert to ICommand format with actions
   const allCommandsWithActions = useMemo(() => {
@@ -69,18 +68,10 @@ export function useRecentRoutesCommands() {
     }))
   }, [allCommands, navigateTo])
 
+  // Commands shown in the main menu (first 2 or 3)
   const visibleCommandsWithActions = useMemo(() => {
-    return visibleCommands.map((cmd) => ({
-      id: cmd.id,
-      name: cmd.name,
-      value: cmd.value,
-      action: () => navigateTo(cmd.link),
-      icon: () => <History size={18} />,
-      badge: cmd.parentLabel
-        ? () => <span className="text-xs text-foreground-muted">{cmd.parentLabel}</span>
-        : undefined,
-    }))
-  }, [visibleCommands, navigateTo])
+    return allCommandsWithActions.slice(0, VISIBLE_RECENTS_COUNT)
+  }, [allCommandsWithActions])
 
   // Register the "All recents" subpage with all commands
   useRegisterPage(

@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 
 import { useFlag, useParams } from 'common'
+import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -11,7 +12,7 @@ import {
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useRecentRoutes } from 'hooks/misc/useRecentRoutes'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 
 /**
  * Hook to track recent route visits for the command menu.
@@ -39,20 +40,36 @@ export const useTrackRecentRoutes = () => {
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
 
-  // Generate all routes
-  const toolRoutes = generateToolRoutes(ref, project)
-  const productRoutes = generateProductRoutes(ref, project, {
-    auth: authEnabled,
-    edgeFunctions: edgeFunctionsEnabled,
-    storage: storageEnabled,
-    realtime: realtimeEnabled,
-    authOverviewPage: authOverviewPageEnabled,
-  })
-  const otherRoutes = generateOtherRoutes(ref, project, {
-    unifiedLogs: isUnifiedLogsEnabled,
-    showReports,
-  })
-  const settingsRoutes = generateSettingsRoutes(ref, project)
+  // Generate all routes (memoized to prevent unnecessary recomputation)
+  const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
+  const productRoutes = useMemo(
+    () =>
+      generateProductRoutes(ref, project, {
+        auth: authEnabled,
+        edgeFunctions: edgeFunctionsEnabled,
+        storage: storageEnabled,
+        realtime: realtimeEnabled,
+        authOverviewPage: authOverviewPageEnabled,
+      }),
+    [
+      ref,
+      project,
+      authEnabled,
+      edgeFunctionsEnabled,
+      storageEnabled,
+      realtimeEnabled,
+      authOverviewPageEnabled,
+    ]
+  )
+  const otherRoutes = useMemo(
+    () =>
+      generateOtherRoutes(ref, project, {
+        unifiedLogs: isUnifiedLogsEnabled,
+        showReports,
+      }),
+    [ref, project, isUnifiedLogsEnabled, showReports]
+  )
+  const settingsRoutes = useMemo(() => generateSettingsRoutes(ref, project), [ref, project])
 
   // Get route keys from pathname
   const activeRoute = router.pathname.split('/')[3]
@@ -120,9 +137,18 @@ export const useTrackRecentRoutes = () => {
     return map
   }, [toolRoutes, productRoutes, otherRoutes, settingsRoutes])
 
+  // Create stable event readers to avoid stale closures
+  const getTrackRoute = useStaticEffectEvent(() => trackRoute)
+  const getChildRoutesMap = useStaticEffectEvent(() => childRoutesMap)
+  const getParentRoutesMap = useStaticEffectEvent(() => parentRoutesMap)
+
   // Track route visits when activeRoute or childRouteKey changes
   useEffect(() => {
     if (!activeRoute || !ref) return
+
+    const trackRoute = getTrackRoute()
+    const childRoutesMap = getChildRoutesMap()
+    const parentRoutesMap = getParentRoutesMap()
 
     // First check if there's a child route
     if (childRouteKey) {
@@ -155,6 +181,5 @@ export const useTrackRecentRoutes = () => {
         })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeRoute, childRouteKey, ref])
+  }, [activeRoute, childRouteKey, ref, getTrackRoute, getChildRoutesMap, getParentRoutesMap])
 }
