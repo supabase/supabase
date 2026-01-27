@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import dayjs from 'dayjs'
 import { ChevronDown, RefreshCw } from 'lucide-react'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -75,6 +76,7 @@ export const ObservabilityOverview = () => {
   // Time interval selection
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
@@ -87,6 +89,7 @@ export const ObservabilityOverview = () => {
   const overviewData = useObservabilityOverviewData(projectRef!, interval)
 
   const handleRefresh = useCallback(() => {
+    setRefreshKey((prev) => prev + 1)
     queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
     queryClient.invalidateQueries({ queryKey: ['postgrest-overview-metrics'] })
     queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
@@ -189,7 +192,10 @@ export const ObservabilityOverview = () => {
   return (
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
-        <ReportHeader title="Overview" />
+        <div className="flex items-center gap-3">
+          <ReportHeader title="Overview" />
+          <Badge variant="warning">Beta</Badge>
+        </div>
         <div className="flex items-center gap-3">
           <Button
             type="outline"
@@ -261,10 +267,9 @@ export const ObservabilityOverview = () => {
 
       <DatabaseInfrastructureSection
         interval={interval}
-        selectedInterval={selectedInterval}
+        refreshKey={refreshKey}
         dbErrorRate={dbServiceData.errorRate}
         dbChartData={dbServiceData.eventChartData}
-        dbTotal={dbServiceData.total}
         dbErrorCount={dbServiceData.errorCount}
         dbWarningCount={dbServiceData.warningCount}
         isLoading={dbServiceData.isLoading}
