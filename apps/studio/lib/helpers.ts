@@ -271,7 +271,7 @@ export const extractUrls = (text: string): string[] => {
   const matches = text.match(urlRegex)
   if (!matches) return []
   // Remove trailing punctuation that might have been captured (common in text)
-  return matches.map((url) => url.replace(/[.,;:!?)]+$/, ''))
+  return matches.map((url) => url.replace(/[.,;:!?)*]+$/, ''))
 }
 
 /**

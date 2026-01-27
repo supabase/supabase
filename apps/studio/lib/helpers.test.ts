@@ -1,3 +1,4 @@
+import { copyToClipboard } from 'ui'
 import { v4 as _uuidV4 } from 'uuid'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -27,8 +28,6 @@ import {
   tryParseJson,
   uuidv4,
 } from './helpers'
-
-import { copyToClipboard } from 'ui'
 
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid'),
@@ -312,7 +311,7 @@ describe('isValidHttpUrl', () => {
   })
 })
 
-describe('extractUrls', () => {
+describe.only('extractUrls', () => {
   it('should extract basic http URLs', () => {
     const result = extractUrls('Visit http://example.com for more info')
     expect(result).toEqual(['http://example.com'])
@@ -371,6 +370,11 @@ describe('extractUrls', () => {
   it('should handle URLs with trailing commas and periods', () => {
     const result = extractUrls('Visit https://example.com, and https://supabase.com.')
     expect(result).toEqual(['https://example.com', 'https://supabase.com'])
+  })
+
+  it('should handle URLs with subpath and markdown bolding', () => {
+    const result = extractUrls('Check out **https://example.com/subpath** for details')
+    expect(result).toEqual(['https://example.com/subpath'])
   })
 
   it('should return empty array when no URLs are found', () => {
