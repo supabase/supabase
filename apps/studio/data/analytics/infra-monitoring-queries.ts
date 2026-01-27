@@ -3,7 +3,7 @@ import type { UseQueryResult } from '@tanstack/react-query'
 
 import dayjs from 'dayjs'
 
-import type { AnalyticsData, AnalyticsInterval } from './constants'
+import type { AnalyticsData, AnalyticsInterval, DataPoint } from './constants'
 import type {
   InfraMonitoringAttribute,
   InfraMonitoringMultiResponse,
@@ -40,7 +40,7 @@ export function useInfraMonitoringQueries(
   endDate: string,
   interval: AnalyticsInterval,
   databaseIdentifier: string | undefined,
-  data: any,
+  data: AnalyticsData | undefined,
   isVisible: boolean
 ) {
   const shouldFetch = data === undefined && isVisible
@@ -77,13 +77,19 @@ export function useInfraMonitoringQueries(
   }))
 }
 
-const aggregate1MinTo2Min = (
-  dataPoints: Array<{ period_start: string; periodStartFormatted?: string; [key: string]: any }>
-): Array<{ period_start: string; periodStartFormatted: string; [key: string]: any }> => {
-  const aggregated = new Map<
-    string,
-    { period_start: string; [key: string]: any; _counts: Record<string, number> }
-  >()
+type AggregatedBucket = {
+  period_start: string
+  periodStartFormatted: string
+  _counts: Record<string, number>
+  [key: string]: string | number | Record<string, number>
+}
+
+type DataPointWithFormatted = DataPoint & {
+  periodStartFormatted: string
+}
+
+const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithFormatted[] => {
+  const aggregated = new Map<string, AggregatedBucket>()
   const valueKeys = new Set<string>()
 
   // Collect all value keys
@@ -106,41 +112,46 @@ const aggregate1MinTo2Min = (
     const bucketKey = twoMinBucket.toISOString()
 
     if (!aggregated.has(bucketKey)) {
-      aggregated.set(bucketKey, {
+      const initialBucket: AggregatedBucket = {
         period_start: bucketKey,
         periodStartFormatted: twoMinBucket.format('HH:mm DD MMM'),
-        ...Object.fromEntries(Array.from(valueKeys).map((key) => [key, 0])),
         _counts: Object.fromEntries(Array.from(valueKeys).map((key) => [key, 0])),
+      }
+      // Initialize all value keys to 0
+      valueKeys.forEach((key) => {
+        initialBucket[key] = 0
       })
+      aggregated.set(bucketKey, initialBucket)
     }
 
     const bucket = aggregated.get(bucketKey)!
     valueKeys.forEach((key) => {
       const value = point[key]
       if (typeof value === 'number') {
-        bucket[key] = (bucket[key] || 0) + value
+        const currentValue = typeof bucket[key] === 'number' ? bucket[key] : 0
+        bucket[key] = currentValue + value
         bucket._counts[key] = (bucket._counts[key] || 0) + 1
       }
     })
   })
 
   // Calculate averages
-  const result: Array<{ period_start: string; periodStartFormatted: string; [key: string]: any }> =
-    Array.from(aggregated.values()).map((bucket) => {
-      const { _counts, period_start, periodStartFormatted, ...rest } = bucket
-      const averaged: { period_start: string; periodStartFormatted: string; [key: string]: any } = {
-        period_start,
-        periodStartFormatted,
+  const result: DataPointWithFormatted[] = Array.from(aggregated.values()).map((bucket) => {
+    const { _counts, period_start, periodStartFormatted, ...rest } = bucket
+    const averaged: DataPointWithFormatted = {
+      period_start,
+      periodStartFormatted,
+    }
+    valueKeys.forEach((key) => {
+      if (_counts[key] > 0) {
+        const restValue = rest[key]
+        averaged[key] = typeof restValue === 'number' ? restValue / _counts[key] : 0
+      } else {
+        averaged[key] = typeof rest[key] === 'number' ? rest[key] : 0
       }
-      valueKeys.forEach((key) => {
-        if (_counts[key] > 0) {
-          averaged[key] = rest[key] / _counts[key]
-        } else {
-          averaged[key] = rest[key] || 0
-        }
-      })
-      return averaged
     })
+    return averaged
+  })
 
   return result.sort((a, b) => dayjs(a.period_start).valueOf() - dayjs(b.period_start).valueOf())
 }
