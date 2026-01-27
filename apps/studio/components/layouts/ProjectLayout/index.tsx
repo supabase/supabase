@@ -47,6 +47,7 @@ const routesToIgnoreDBConnection = [
   '/project/[ref]/database/backups/scheduled',
   '/project/[ref]/database/backups/pitr',
   '/project/[ref]/settings/addons',
+  '/project/[ref]/functions',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -103,13 +104,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const organizationName = selectedOrganization?.name
 
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-    const showProductMenu = selectedProject
-      ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-        (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings')) ||
-        router.pathname.includes('/project/[ref]/branches') ||
-        router.pathname.includes('/project/[ref]/functions')
-      : true
 
     const ignorePausedState =
       router.pathname === '/project/[ref]' ||
@@ -140,7 +134,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         <div className="flex flex-row h-full w-full">
           {/*  autoSaveId="project-layout" */}
           <ResizablePanelGroup direction="horizontal">
-            {showProductMenu && productMenu && (
+            {productMenu && (
               <ResizablePanel
                 order={1}
                 minSize={sidebarMinSizePercentage}
@@ -180,7 +174,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 )}
               </ResizablePanel>
             )}
-            {showProductMenu && productMenu && sideBarIsOpen && (
+            {productMenu && sideBarIsOpen && (
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}

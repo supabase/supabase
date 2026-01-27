@@ -13,8 +13,9 @@ import type { CommonChartProps, StackedChartProps } from './Charts.types'
  * numberFormatter(123.123)   // "123.12"
  * numberFormatter(123, 2)    // "123.00"
  */
-export const numberFormatter = (num: number, precision = 2) =>
-  isFloat(num) ? precisionFormatter(num, precision) : num.toLocaleString()
+export const numberFormatter = (num: number, precision = 2) => {
+  return isFloat(num) ? precisionFormatter(num, precision) : num.toLocaleString()
+}
 
 /**
  * Tests if a number is a float.
@@ -55,6 +56,28 @@ export const precisionFormatter = (num: number, precision: number): string => {
     // pad int with 0
     return num.toLocaleString() + '.' + '0'.repeat(precision)
   }
+}
+
+/**
+ * Formats a percentage, trimming decimals at 100.
+ *
+ * @example
+ * formatPercentage(100, 2) // "100%"
+ * formatPercentage(99.99, 2) // "99.99%"
+ */
+export const formatPercentage = (value: number, precision = 2) => {
+  const isHundred = Math.abs(value - 100) < 1e-6
+  if (isHundred) return '100%'
+  if (Number.isInteger(value)) return `${value}%`
+  const formatted = precisionFormatter(value, precision)
+  if (formatted.startsWith('<') || formatted.startsWith('>')) {
+    return `${formatted}%`
+  }
+  if (formatted.includes('.')) {
+    const [head, tail = ''] = formatted.split('.')
+    return `${head}.${tail.padEnd(precision, '0')}%`
+  }
+  return `${formatted}%`
 }
 
 /**

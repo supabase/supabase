@@ -54,7 +54,8 @@ const getStatusDescription = (
 }
 
 export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
-  const { data: incidents, isLoading, isError } = useIncidentStatusQuery()
+  const { data: allStatusPageEvents = [], isLoading, isError } = useIncidentStatusQuery()
+  const incidents = allStatusPageEvents.filter((x) => x.impact !== 'maintenance')
 
   // Don't render anything while loading, on error, or if no incidents
   if (isLoading || isError || !incidents || incidents.length === 0) {
