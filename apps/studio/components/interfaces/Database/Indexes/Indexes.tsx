@@ -30,7 +30,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
+import { CreateIndexSidePanel } from './CreateIndexSidePanel'
 
 const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()

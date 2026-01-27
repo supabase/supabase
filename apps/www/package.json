@@ -14,7 +14,6 @@
     "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "node scripts/generateStaticContent.mjs",
-    "prettier": "prettier --cache --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
     "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {
@@ -41,7 +40,7 @@
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.3.1",
     "clsx": "^1.2.1",
-    "cobe": "^0.6.2",
+    "cobe": "^0.6.5",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",

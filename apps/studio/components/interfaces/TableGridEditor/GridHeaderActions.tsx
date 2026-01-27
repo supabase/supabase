@@ -315,12 +315,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
-                  // using `portal` for a safari fix. issue with rendering outside of body element
-                  portal
-                  className="w-80 text-sm"
-                  align="end"
-                >
+                <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
                   <h4 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h4>
@@ -355,7 +350,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   Index Advisor
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ portal className="w-80 text-sm" align="end">
+              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
                 <h4 className="flex items-center gap-2">
                   <Lightbulb size={16} /> Index Advisor
                 </h4>
@@ -431,12 +426,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                portal
-                className="min-w-[395px] text-sm"
-                align="end"
-              >
+              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -482,12 +472,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                portal
-                className="min-w-[395px] text-sm"
-                align="end"
-              >
+              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -525,12 +510,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   Unprotected Data API access
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                portal
-                className="min-w-[395px] text-sm"
-                align="end"
-              >
+              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>

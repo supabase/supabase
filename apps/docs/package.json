@@ -77,7 +77,7 @@
     "jsrsasign": "^11.0.0",
     "katex": "^0.16.21",
     "libpg-query": "15.2.0",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "catalog:",
     "lucide-react": "*",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.2.0",
