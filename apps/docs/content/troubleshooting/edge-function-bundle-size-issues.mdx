@@ -1,0 +1,54 @@
+---
+title = "Edge Function bundle size issues"
+topics = [ "functions" ]
+keywords = [ "bundle", "size", "limit", "dependencies", "edge function", "10MB" ]
+
+[api]
+cli = ["supabase-functions-deploy"]
+---
+
+Edge Functions have a 10MB source code limit. If your function exceeds this limit, deployment will fail.
+
+## Check your bundle size
+
+Use the `deno info` command to analyze your function's dependencies and total size:
+
+```bash
+deno info /path/to/function/index.ts
+```
+
+Look for the "size" field in the output to see the total bundle size.
+
+## How to reduce bundle size
+
+If your bundle is too large, try these strategies:
+
+### Remove unused dependencies
+
+Review your imports and remove any packages you're not actively using.
+
+### Use selective imports
+
+Instead of importing entire packages, import only the specific modules you need:
+
+```tsx
+// Good: Import specific submodules
+import { specific } from 'npm:package/specific'
+
+// Avoid: Import entire package
+import * as everything from 'npm:package'
+```
+
+### Split large functions
+
+Consider breaking large functions into smaller, more focused functions. Each function can handle a specific task, reducing the code needed in any single deployment.
+
+### Choose lightweight alternatives
+
+Research smaller packages that provide the same functionality. Many NPM packages designed for Node.js include unnecessary polyfills that increase bundle size.
+
+## Additional resources
+
+- [Unable to deploy Edge Function](./unable-to-deploy-edge-function)
+- [Dependency analysis](./edge-function-dependency-analysis)
+- [Edge Function limits](/docs/guides/functions/limits)
