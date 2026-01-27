@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import WrappedClient from './WrappedClient'
 
 export const metadata: Metadata = {

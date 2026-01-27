@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 interface TabProps {

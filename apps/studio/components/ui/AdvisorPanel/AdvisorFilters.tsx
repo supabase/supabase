@@ -1,7 +1,6 @@
-import { X } from 'lucide-react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
+import { X } from 'lucide-react'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 

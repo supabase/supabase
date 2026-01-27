@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Button, cn, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { Button, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
+
 import { primaryLinks, secondaryLinks } from '~/data/footer'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 

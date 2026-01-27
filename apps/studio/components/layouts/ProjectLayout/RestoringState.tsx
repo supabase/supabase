@@ -1,6 +1,3 @@
-import { CheckCircle, Download, Loader } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -11,6 +8,8 @@ import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-q
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { CheckCircle, Download, Loader } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 const RestoringState = () => {

@@ -1,14 +1,13 @@
 import { Check, ChevronRight, Copy } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   Button,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  copyToClipboard,
+  Collapsible_Shadcn_,
   Separator,
+  cn,
+  copyToClipboard,
 } from 'ui'
 
 interface Parameter {

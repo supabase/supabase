@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
+import { ExecuteSqlError, executeSql } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { z } from 'zod'
 
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 import { privilegeKeys } from './keys'
 
 export type TablePrivilegesVariables = {

@@ -1,8 +1,7 @@
 import { tool } from 'ai'
-import { z } from 'zod'
-
 import { IS_PLATFORM } from 'common'
 import type { IncidentInfo } from 'lib/api/incident-status'
+import { z } from 'zod'
 
 /**
  * Creates incident-related tools for the AI assistant.

@@ -2,9 +2,9 @@ import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { Button, cn, DialogSectionSeparator } from 'ui'
+import { Button, DialogSectionSeparator, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
 
 export function LinkSupportTicketPage() {

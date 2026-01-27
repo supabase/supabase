@@ -1,5 +1,5 @@
-import Image from 'next/image'
 import { useTheme } from 'next-themes'
+import Image from 'next/image'
 
 type VideoType = {
   sources: {

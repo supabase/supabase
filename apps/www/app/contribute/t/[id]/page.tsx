@@ -1,11 +1,12 @@
+import { ArrowLeft } from 'lucide-react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import DefaultLayout from '~/components/Layouts/Default'
-import { ThreadContent } from '~/components/Contribute/ThreadContent'
-import PageLoading from './page-loading'
-import type { Metadata } from 'next'
+
 import { ContributeGuard } from '../../ContributeGuard'
+import PageLoading from './page-loading'
+import { ThreadContent } from '~/components/Contribute/ThreadContent'
+import DefaultLayout from '~/components/Layouts/Default'
 
 export const metadata: Metadata = {
   robots: {

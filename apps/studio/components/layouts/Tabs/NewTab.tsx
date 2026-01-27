@@ -1,11 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { Table2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -23,6 +16,12 @@ import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
+import { partition } from 'lodash'
+import { Table2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { AssistantMessageType, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -38,8 +37,9 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import { useEditorType } from '../editors/EditorsLayout.hooks'
+
 import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 

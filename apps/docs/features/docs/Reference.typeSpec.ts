@@ -5,7 +5,6 @@
  * The format of this typespec is difficult to walk, so we re-shape it for easy
  * access to a function's type definition, given its name and module.
  */
-
 import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' with { type: 'json' }
 
 // [Charis] 2024-07-10

@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { METRICS } from 'lib/constants/metrics'
 import { ReactNode } from 'react'
+
 import { ReportBlockContainer } from './ReportBlockContainer'
 
 interface DeprecatedChartBlockProps {

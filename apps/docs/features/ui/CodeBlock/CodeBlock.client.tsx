@@ -1,10 +1,11 @@
 'use client'
 
-import { Check, Copy, WrapText, ArrowRightFromLine } from 'lucide-react'
-import { type MouseEvent, useCallback, useEffect, useState, useRef } from 'react'
+import { ArrowRightFromLine, Check, Copy, WrapText } from 'lucide-react'
+import { type MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
-import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger, cn, copyToClipboard } from 'ui'
+
 import { getFontStyle } from './CodeBlock.utils'
 
 export function AnnotatedSpan({

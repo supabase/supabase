@@ -5,6 +5,7 @@ import type {
   VercelTeamAccount,
 } from 'data/integrations/integrations.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   getInitialMigrationSQLFromGitHubRepo,
   getIntegrationConfigurationUrl,

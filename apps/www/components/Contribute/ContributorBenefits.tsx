@@ -1,4 +1,4 @@
-import { Award, Zap, MessageCircle, DollarSign, Gift, TrendingUp, LucideIcon } from 'lucide-react'
+import { Award, DollarSign, Gift, LucideIcon, MessageCircle, TrendingUp, Zap } from 'lucide-react'
 
 interface Benefit {
   icon: LucideIcon

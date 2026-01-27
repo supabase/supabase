@@ -1,8 +1,8 @@
-import { Lightbulb } from 'lucide-react'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { Lightbulb } from 'lucide-react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { cn } from 'ui'
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {

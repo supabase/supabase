@@ -1,10 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-
 import { stripIndent } from 'common-tags'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { _createElidedLine, codeSampleRemark } from './CodeSample'
 

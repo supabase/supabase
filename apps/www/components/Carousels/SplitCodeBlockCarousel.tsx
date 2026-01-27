@@ -1,14 +1,15 @@
 import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, Space, Tabs } from 'ui'
 
-import { Tabs, Button, Space } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
 import 'swiper/css'
-import { Badge } from 'ui'
+
 import Link from 'next/link'
+import { Badge } from 'ui'
 
 interface Content {
   lang: 'js' | 'py' | 'sql'

@@ -1,7 +1,3 @@
-import { ChevronDown, Download, ExternalLink } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -12,6 +8,9 @@ import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Database, Storage } from 'icons'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
+import { ChevronDown, Download, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,

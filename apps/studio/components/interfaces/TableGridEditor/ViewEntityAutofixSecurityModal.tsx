@@ -1,11 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { lintKeys } from 'data/lint/keys'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Entity, isViewLike } from 'data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { toast } from 'sonner'
 import { ScrollArea, SimpleCodeBlock } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'

@@ -1,10 +1,9 @@
+import { IS_PLATFORM, useFlag } from 'common'
+import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { IS_PLATFORM, useFlag } from 'common'
-import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {

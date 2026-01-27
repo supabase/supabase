@@ -1,17 +1,20 @@
+import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
   Badge,
-  cn,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
 } from 'ui'
 
-import { isFeatureEnabled } from 'common'
+import { type IApiEndPoint } from './Reference.api.utils'
+import { RefInternalLink } from './Reference.navigation.client'
+import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 import ApiSchema from '~/components/ApiSchema'
-import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
+import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -20,7 +23,7 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
@@ -35,9 +38,6 @@ import {
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
-import { type IApiEndPoint } from './Reference.api.utils'
-import { RefInternalLink } from './Reference.navigation.client'
-import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
 type RefSectionsProps = {
   libraryId: string

@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -10,8 +7,10 @@ import { useDatabasePasswordResetMutation } from 'data/database/database-passwor
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
+import { PasswordStrengthScore, passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Card, CardContent, Input, Modal } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 

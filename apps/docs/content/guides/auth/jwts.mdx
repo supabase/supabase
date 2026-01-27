@@ -212,7 +212,7 @@ Make sure that you do not cache this data for longer in your application, as it 
 Below is an example of how to use the [jose TypeScript JWT verification library](https://github.com/panva/jose) with Supabase JWTs:
 
 ```typescript
-import { jwtVerify, createRemoteJWKSet } from 'jose'
+import { createRemoteJWKSet, jwtVerify } from 'jose'
 
 const PROJECT_JWKS = createRemoteJWKSet(
   new URL('https://project-id.supabase.co/auth/v1/.well-known/jwks.json')

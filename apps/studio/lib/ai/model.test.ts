@@ -1,7 +1,8 @@
 import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as bedrockModule from './bedrock'
-import { getModel, ModelErrorMessage } from './model'
+import { ModelErrorMessage, getModel } from './model'
 
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { sqlEventParser } from 'lib/sql-event-parser'
-import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+import { toast } from 'sonner'
 import { UseCustomMutationOptions } from 'types'
+
+import { ExecuteSqlData, ExecuteSqlVariables, executeSql } from './execute-sql-query'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better

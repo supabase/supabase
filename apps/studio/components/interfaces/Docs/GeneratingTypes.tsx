@@ -1,14 +1,13 @@
-import { Download } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { generateTypes } from 'data/projects/project-type-generation-query'
 import { DOCS_URL } from 'lib/constants'
+import { Download } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 
 interface Props {

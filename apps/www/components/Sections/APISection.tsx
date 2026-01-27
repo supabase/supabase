@@ -1,12 +1,13 @@
 // Import Swiper styles if swiper used on page
 import 'swiper/css'
 
+import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button, Tabs } from 'ui'
+
 import CodeBlock, { LANG } from '../CodeBlock/CodeBlock'
-import { ArrowUpRight } from 'lucide-react'
 
 export interface APIExample {
   lang: LANG

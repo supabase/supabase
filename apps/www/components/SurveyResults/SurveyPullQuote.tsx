@@ -1,4 +1,5 @@
 import Image from 'next/image'
+
 import { SurveySectionBreak } from './SurveySectionBreak'
 
 export function SurveyPullQuote({

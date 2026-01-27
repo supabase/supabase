@@ -3,7 +3,8 @@
 import { CalendarIcon, MapPinIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn, Button, Badge } from 'ui'
+import { Badge, Button, cn } from 'ui'
+
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
 

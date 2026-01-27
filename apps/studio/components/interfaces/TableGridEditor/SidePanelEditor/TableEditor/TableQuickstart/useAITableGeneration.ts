@@ -3,6 +3,7 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+
 import { LIMITS } from './constants'
 import type { AIGeneratedSchema, PostgresType, TableSuggestion } from './types'
 import { TableSource } from './types'

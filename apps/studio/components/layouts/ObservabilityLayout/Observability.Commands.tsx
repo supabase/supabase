@@ -1,8 +1,7 @@
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useMemo } from 'react'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { orderSectionFirst, useQuery, useRegisterCommands } from 'ui-patterns/CommandMenu'
 

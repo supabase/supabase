@@ -1,6 +1,7 @@
 import { components } from 'api-types'
 import { hasConsented } from 'common'
 import { handleError, post } from 'data/fetchers'
+
 import { IS_PLATFORM } from './constants'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']

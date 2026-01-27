@@ -1,21 +1,20 @@
+import { useParams } from 'common'
+import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
 import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
 import { markdownTable } from 'markdown-table'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import Papa from 'papaparse'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import Link from 'next/link'
-import { useParams } from 'common'
-import { usePathname } from 'next/navigation'
-import { IS_PLATFORM } from 'common'
-
 import {
   Button,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  copyToClipboard,
 } from 'ui'
 
 interface DownloadResultsButtonProps {

@@ -1,8 +1,7 @@
 import { useParams } from 'common'
+import { useDisableReadOnlyModeMutation } from 'data/config/project-temp-disable-read-only-mutation'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
-
-import { useDisableReadOnlyModeMutation } from 'data/config/project-temp-disable-read-only-mutation'
 
 interface ConfirmDisableReadOnlyModeModalProps {
   visible: boolean

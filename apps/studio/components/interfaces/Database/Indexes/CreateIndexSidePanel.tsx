@@ -1,8 +1,3 @@
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { Fragment, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
@@ -11,6 +6,10 @@ import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -37,6 +36,7 @@ import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { INDEX_TYPES } from './Indexes.constants'
 
 interface CreateIndexSidePanelProps {

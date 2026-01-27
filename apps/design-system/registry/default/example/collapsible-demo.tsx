@@ -1,10 +1,9 @@
 'use client'
 
-import * as React from 'react'
 import { ChevronsUpDown, Plus, X } from 'lucide-react'
-
+import * as React from 'react'
 import { Button } from 'ui'
-import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+import { CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, Collapsible_Shadcn_ } from 'ui'
 
 export default function CollapsibleDemo() {
   const [isOpen, setIsOpen] = React.useState(false)

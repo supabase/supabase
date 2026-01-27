@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest'
+
 // End of third-party imports
 
 import rate from '../../pages/api/ai/feedback/rate'

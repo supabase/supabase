@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { ConnectionVars } from 'data/common.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import {

@@ -1,9 +1,7 @@
 // Props to https://github.com/shadcn-ui/ui/issues/885#issuecomment-2059600641
 // @mildtomato - consider using this as the main Slider component in packages/ui
-
 import * as SliderPrimitive from '@radix-ui/react-slider'
-import { ComponentPropsWithoutRef, ElementRef, forwardRef, Fragment } from 'react'
-
+import { ComponentPropsWithoutRef, ElementRef, Fragment, forwardRef } from 'react'
 import { cn } from 'ui'
 
 export const Slider = forwardRef<

@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lightbulb, Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
@@ -31,7 +26,11 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { Lightbulb, Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -44,6 +43,7 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 

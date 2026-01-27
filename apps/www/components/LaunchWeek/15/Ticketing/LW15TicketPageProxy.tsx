@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/compat/router'
-
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { useRegistration } from 'components/LaunchWeek/15/hooks/use-registration'
+import { useRouter } from 'next/compat/router'
+import { useEffect } from 'react'
+
 import LW15TicketPage from './LW15TicketPage'
 
 const LW15TicketRedirect = () => {

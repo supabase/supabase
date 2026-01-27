@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLString } from 'graphql'
+
 import { GraphQLInterfaceTypeSearchResult } from '../globalSearch/globalSearchSchema'
 import { ReferenceManagementApiModel } from './referenceManagementApiModel'
 

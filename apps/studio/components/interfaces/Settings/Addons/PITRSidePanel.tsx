@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -21,6 +15,11 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { ExternalLink } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
   AlertDescription_Shadcn_,

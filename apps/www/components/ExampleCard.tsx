@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
 import { useBreakpoint } from 'common'
-
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
+
 import Panel from './Panel'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 

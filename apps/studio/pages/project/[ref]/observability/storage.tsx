@@ -1,7 +1,9 @@
-import dayjs from 'dayjs'
-import { ArrowRight, ExternalLinkIcon, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
-
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
@@ -12,12 +14,6 @@ import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import {
   DatePickerValue,
   LogsDatePicker,
@@ -26,11 +22,14 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useStorageReport } from 'data/reports/storage-report-query'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+import { useStorageReport } from 'data/reports/storage-report-query'
+import dayjs from 'dayjs'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { DOCS_URL } from 'lib/constants'
+import { ArrowRight, ExternalLinkIcon, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import type { NextPageWithLayout } from 'types'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()

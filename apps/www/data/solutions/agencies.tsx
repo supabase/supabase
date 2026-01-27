@@ -1,4 +1,12 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
+import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { frameworks } from 'components/Hero/HeroFrameworks'
+import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from 'components/Solutions/MPCSection'
+import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
+import type { TwoColumnsSectionProps } from 'components/Solutions/TwoColumnsSection'
 import {
   ArrowLeftRight,
   Check,
@@ -14,33 +22,24 @@ import {
   ShieldCheck,
   Sparkles,
   Timer,
-  Users,
   UserX,
+  Users,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { Image } from 'ui'
 
 import MainProducts from '../MainProducts'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { TwoColumnsSectionProps } from 'components/Solutions/TwoColumnsSection'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
+import { companyStats } from '../company-stats'
 import {
-  FrameworkLink,
   type FeaturesSection,
+  FrameworkLink,
   type FrameworkLinkProps,
   type HeroSection,
   type Metadata,
   type Quotes,
   getEditors,
 } from './solutions.utils'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { companyStats } from '../company-stats'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))

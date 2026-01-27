@@ -1,12 +1,12 @@
-import { useRouter } from 'next/router'
-import type { ReactElement } from 'react'
-import { useEffect } from 'react'
 import { LinkSupportTicketPage } from 'components/interfaces/Support/LinkSupportTicketPage'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types'
 import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
+import type { ReactElement } from 'react'
+import { useEffect } from 'react'
+import type { NextPageWithLayout } from 'types'
 
 const LinkSupportTicketPageRoute: NextPageWithLayout = () => {
   const router = useRouter()

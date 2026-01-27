@@ -1,5 +1,5 @@
-import customContentRaw from './custom-content.json'
 import { CustomContentTypes } from './CustomContent.types'
+import customContentRaw from './custom-content.json'
 
 // [Joshen] See if we can de-dupe any of the logic here with enabled-features
 // For now just getting something working going first

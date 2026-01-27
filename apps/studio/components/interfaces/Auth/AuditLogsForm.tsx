@@ -1,10 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { boolean, object } from 'yup'
-
 import { useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -13,6 +8,9 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -24,7 +22,6 @@ import {
   Switch,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
@@ -32,6 +29,8 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { boolean, object } from 'yup'
 
 const schema = object({
   AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),

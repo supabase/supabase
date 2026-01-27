@@ -1,7 +1,4 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
-import { Download, MoreVertical, Trash } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -12,6 +9,8 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Download, MoreVertical, Trash } from 'lucide-react'
+import { useState } from 'react'
 import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
 export const PauseFailedState = () => {

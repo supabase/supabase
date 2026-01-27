@@ -1,9 +1,10 @@
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Accordion } from 'ui'
 
-import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/7/lw7_days'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import Day5 from './Day5'
 import {
   AccordionHeader,
   CartTitle,
@@ -13,10 +14,8 @@ import {
   SmallCard,
   StyledArticleBadge,
 } from './components'
-
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { motion } from 'framer-motion'
-import Day5 from './Day5'
+import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/7/lw7_days'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25

@@ -5,8 +5,8 @@ import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsS
 import { useSupportCommands } from 'ui-patterns/CommandMenu/prepackaged/Support'
 import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/ThemeSwitcher'
 
-import { useQuickstartCommands } from './Quickstarts'
 import { useDocsNavCommands } from '../../components/Navigation/Navigation.commands'
+import { useQuickstartCommands } from './Quickstarts'
 
 const DocsCommandMenu = () => {
   useDocsSearchCommands({

@@ -1,5 +1,5 @@
-import { cn } from 'ui'
 import { range } from 'lib/helpers'
+import { cn } from 'ui'
 
 interface Props {
   showHeading?: boolean

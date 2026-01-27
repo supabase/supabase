@@ -1,4 +1,5 @@
-import { useQueryStates, parseAsString } from 'nuqs'
+import { parseAsString, useQueryStates } from 'nuqs'
+
 import { QueryPerformanceSort } from '../../Reports/Reports.queries'
 
 export const useQueryPerformanceSort = () => {

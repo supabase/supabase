@@ -1,11 +1,10 @@
 'use client'
 
-import React, { FC, Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React, { FC, Fragment, useEffect, useState } from 'react'
 import {
   Badge,
-  cn,
   MenubarSeparator,
   NavigationMenu,
   NavigationMenuContent,
@@ -13,6 +12,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  cn,
   navigationMenuTriggerStyle,
 } from 'ui'
 

@@ -50,6 +50,7 @@ Write one simple test to verify everything works:
 
 ```tsx
 import { expect, test } from 'vitest'
+
 import { formatPrice } from '../src/lib/format'
 
 test('formats cents into dollars', () => {
@@ -76,7 +77,8 @@ export const supabase = createClient(
 Write integration tests that verify your most critical systems work together. This test confirms that Supabase Auth, database triggers, and Row Level Security all work correctly:
 
 ```tsx
-import { expect, test, beforeEach } from 'vitest'
+import { beforeEach, expect, test } from 'vitest'
+
 import { supabase } from './setup'
 
 beforeEach(async () => {
@@ -256,8 +258,8 @@ For tests that need volume, write a seed script that populates your database wit
 
 ```tsx
 // tests/seed.ts
-import { createClient } from '@supabase/supabase-js'
 import { faker } from '@faker-js/faker'
+import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('http://localhost:54321', process.env.SUPABASE_SERVICE_ROLE_KEY)
 

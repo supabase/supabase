@@ -1,26 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-// import { useQueryState } from 'nuqs'
-import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
+// import { useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Separator,
   Sheet,
   SheetContent,
@@ -35,6 +33,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
 import { generateRuleDescription } from './AdvisorRules.utils'

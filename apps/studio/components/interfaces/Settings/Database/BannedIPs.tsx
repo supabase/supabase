@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -15,16 +11,19 @@ import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Globe } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
+  PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionContent,
-  PageSectionDescription,
 } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const BannedIPs = () => {
   const { ref } = useParams()

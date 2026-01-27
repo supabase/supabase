@@ -1,9 +1,9 @@
-import type { Metadata } from 'next'
-
 import blogAuthors from 'lib/authors.json'
 import { getAllCMSPosts } from 'lib/get-cms-posts'
 import { getSortedPosts } from 'lib/posts'
+import type { Metadata } from 'next'
 import type PostTypes from 'types/post'
+
 import AuthorClient from './AuthorClient'
 
 type Params = { author: string }

@@ -86,7 +86,9 @@ Next, wrap the root in `layout.tsx`:
 ```tsx app/layout.tsx
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+
 import './globals.css'
+
 import { ReactQueryClientProvider } from '@/components/ReactQueryClientProvider'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -148,6 +150,7 @@ To make sure we have the proper typing available in all our components, we can c
 
 ```ts utils/types.ts
 import { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '@/utils/database.types'
 
 export type TypedSupabaseClient = SupabaseClient<Database>
@@ -157,9 +160,10 @@ export type TypedSupabaseClient = SupabaseClient<Database>
 
 ```ts utils/supabase-browser.ts
 import { createBrowserClient } from '@supabase/ssr'
+import { useMemo } from 'react'
+
 import type { Database } from '@/utils/database.types'
 import type { TypedSupabaseClient } from '@/utils/types'
-import { useMemo } from 'react'
 
 let client: TypedSupabaseClient | undefined
 
@@ -188,6 +192,7 @@ export default useSupabaseBrowser
 ```ts utils/supabase-server.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+
 import { Database } from './database.types'
 
 export default function useSupabaseServer(cookieStore: ReturnType<typeof cookies>) {
@@ -271,9 +276,10 @@ Our query will be executed and fetch the data on the server. This means when usi
 ```tsx app/ssrcountries/country.tsx
 'use client'
 
-import useSupabaseBrowser from '@/utils/supabase-browser'
-import { getCountryById } from '@/queries/get-country-by-id'
 import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
+
+import { getCountryById } from '@/queries/get-country-by-id'
+import useSupabaseBrowser from '@/utils/supabase-browser'
 
 export default function Country({ id }: { id: number }) {
   const supabase = useSupabaseBrowser()
@@ -298,9 +304,10 @@ Of course you can still combine this with fetching data client side. React Query
 ```tsx app/countries/[id]/page.tsx
 'use client'
 
-import useSupabaseBrowser from '@/utils/supabase-browser'
-import { getCountryById } from '@/queries/get-country-by-id'
 import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
+
+import { getCountryById } from '@/queries/get-country-by-id'
+import useSupabaseBrowser from '@/utils/supabase-browser'
 
 export default function CountryPage({ params }: { params: { id: number } }) {
   const supabase = useSupabaseBrowser()

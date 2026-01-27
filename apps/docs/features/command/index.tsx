@@ -1,8 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-
 import { useCommandMenuInitiated } from 'ui-patterns/CommandMenu'
+
 import { DocsCommandProvider } from './DocsCommandProvider'
 
 const LazyCommandMenu = dynamic(() => import('./CommandMenu'), { ssr: false })

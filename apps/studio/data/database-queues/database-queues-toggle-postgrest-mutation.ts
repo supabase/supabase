@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import minify from 'pg-minify'
-import { toast } from 'sonner'
-
 import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { isGreaterThanOrEqual } from 'lib/semver'
+import minify from 'pg-minify'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueExposePostgrestVariables = {

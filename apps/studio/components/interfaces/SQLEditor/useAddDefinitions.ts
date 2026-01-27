@@ -1,7 +1,4 @@
 import { Monaco } from '@monaco-editor/react'
-import type { IDisposable } from 'monaco-editor'
-import { useEffect, useRef } from 'react'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
@@ -12,6 +9,8 @@ import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
+import type { IDisposable } from 'monaco-editor'
+import { useEffect, useRef } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 export const useAddDefinitions = (id: string, monaco: Monaco | null) => {

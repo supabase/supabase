@@ -1,3 +1,4 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Maximize2 } from 'lucide-react'
 import { ChangeEvent, InputHTMLAttributes, SyntheticEvent, useEffect, useRef } from 'react'
 import {
@@ -7,10 +8,9 @@ import {
   RenderHeaderCellProps,
   useRowSelection,
 } from 'react-data-grid'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+
 import { SELECT_COLUMN_KEY } from '../../constants'
 import type { SupaRow } from '../../types'
 

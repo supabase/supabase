@@ -1,12 +1,12 @@
 import VideoWithHighlights from 'components/VideoWithHighlights'
+import MainProducts from 'data/MainProducts'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import Link from 'next/link'
-import { Button } from 'ui'
-import ProductModules from '../ProductModules'
-
-import MainProducts from 'data/MainProducts'
 import { topTweets } from 'shared-data/tweets'
+import { Button } from 'ui'
 import { IconDiscord } from 'ui'
+
+import ProductModules from '../ProductModules'
 
 export default () => {
   const sendTelemetryEvent = useSendTelemetryEvent()

@@ -1,14 +1,14 @@
+import { useParams } from 'common'
 import { ExternalLink, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
+import { Badge, Button, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
-import { useParams } from 'common'
-import { Badge, Button, cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ErroredTableDetails } from '../ErroredTableDetails'
 import { TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
   table: ReplicationPipelineTableStatus

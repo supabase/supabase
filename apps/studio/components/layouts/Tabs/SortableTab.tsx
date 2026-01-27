@@ -1,13 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
+import { type Tab, useTabsStateSnapshot } from 'state/tabs'
+import { TabsTrigger_Shadcn_, cn } from 'ui'
 
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useTabsStateSnapshot, type Tab } from 'state/tabs'
-import { cn, TabsTrigger_Shadcn_ } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 
 /**

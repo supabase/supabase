@@ -1,3 +1,6 @@
+import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
+import { LINT_TYPES, Lint } from 'data/lint/lint-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Box,
   Clock,
@@ -12,10 +15,6 @@ import {
   User,
 } from 'lucide-react'
 import Link from 'next/link'
-
-import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
-import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 export const lintInfoMap: LintInfo[] = [

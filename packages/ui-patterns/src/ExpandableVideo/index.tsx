@@ -1,8 +1,8 @@
 import { useBreakpoint } from 'common'
+import { Play } from 'lucide-react'
 import Image from 'next/image'
 import React, { ReactNode } from 'react'
 import { Modal, cn } from 'ui'
-import { Play } from 'lucide-react'
 
 interface ExpandableVideoProps {
   videoId: string

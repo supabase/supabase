@@ -1,9 +1,8 @@
+import type { DragItem, Sort } from 'components/grid/types'
 import type { XYCoord } from 'dnd-core'
 import { Menu, X } from 'lucide-react'
 import { memo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-
-import type { DragItem, Sort } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Switch } from 'ui'
 

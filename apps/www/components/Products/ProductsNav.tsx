@@ -1,7 +1,7 @@
-import React from 'react'
-import { cn } from 'ui'
 import Link from 'next/link'
+import React from 'react'
 import { PRODUCT_NAMES, products } from 'shared-data/products'
+import { cn } from 'ui'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 

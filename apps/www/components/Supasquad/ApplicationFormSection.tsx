@@ -1,7 +1,8 @@
 import React from 'react'
 import { cn } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+
 import ApplyToSupaSquadForm from '~/components/Forms/ApplyToSupaSquadForm'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {
   id: string

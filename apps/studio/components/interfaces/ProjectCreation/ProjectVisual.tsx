@@ -1,9 +1,8 @@
+import { SchemaVisualizer } from 'components/interfaces/SchemaVisualizer'
 import { AnimatePresence, motion } from 'framer-motion'
+import { BASE_PATH } from 'lib/constants'
 import { Box, Clock, Database, File, ListOrdered, User2, Zap } from 'lucide-react'
 import { memo } from 'react'
-
-import { SchemaVisualizer } from 'components/interfaces/SchemaVisualizer'
-import { BASE_PATH } from 'lib/constants'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 interface SupabaseService {

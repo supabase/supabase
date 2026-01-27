@@ -1,9 +1,8 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
-
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -14,9 +13,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Tooltip,
 } from 'ui'
 
 interface ModelSelectorProps {

@@ -1,7 +1,7 @@
-import { ReactNode } from 'react'
-import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Loader2 } from 'lucide-react'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import { Loader2 } from 'lucide-react'
+import { ReactNode } from 'react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from 'ui'
 
 export type OverviewTableColumn<T> = {
   key: keyof T | string

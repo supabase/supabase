@@ -1,7 +1,8 @@
-import { Button } from 'ui'
-import Panel from '../Panel'
-import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from 'ui'
+
+import Panel from '../Panel'
 
 const diskTypes = [
   {

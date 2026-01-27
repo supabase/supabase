@@ -1,7 +1,7 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
+import Table from 'components/to-be-cleaned/Table'
 import { noop } from 'lodash'
 
-import Table from 'components/to-be-cleaned/Table'
 import { HookList } from './HookList'
 
 interface SchemaTableProps {

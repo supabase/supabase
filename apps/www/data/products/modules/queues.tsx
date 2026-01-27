@@ -1,6 +1,7 @@
 import { PRODUCT_MODULES } from 'shared-data/products'
-import BrowserFrame from '~/components/BrowserFrame'
 import { Image } from 'ui'
+
+import BrowserFrame from '~/components/BrowserFrame'
 
 export default () => ({
   metaTitle: 'Supabase Queues | Durable Message Queues with Guaranteed Delivery',

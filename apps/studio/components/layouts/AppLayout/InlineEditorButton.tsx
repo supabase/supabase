@@ -4,7 +4,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { SqlEditor } from 'icons'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { cn, KeyboardShortcut } from 'ui'
+import { KeyboardShortcut, cn } from 'ui'
 
 const InlineEditorKeyboardTooltip = () => {
   const [hotkeyEnabled] = useLocalStorageQuery(

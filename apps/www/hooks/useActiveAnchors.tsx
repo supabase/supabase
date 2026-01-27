@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+
 import { isBrowser, stripEmojis } from '~/lib/helpers'
 
 interface UseActiveAnchorsOptions {

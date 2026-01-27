@@ -1,16 +1,16 @@
 // ============================================
+// == TYPE IT IN WHEN THE TICKET IS FLIPPED ===
+// ============================================
+import { RefObject, useEffect, useState } from 'react'
+
+import useConfData from './use-conf-data'
+import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
+
+// ============================================
 // ============ 🏆 SECRET CODE 🏆 ==============
 // ============================================
 
 const SUPA_SECRET_CODE = 'ship'
-
-// ============================================
-// == TYPE IT IN WHEN THE TICKET IS FLIPPED ===
-// ============================================
-
-import { RefObject, useEffect, useState } from 'react'
-import { SITE_ORIGIN, LW_URL } from '~/lib/constants'
-import useConfData from './use-conf-data'
 
 const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) => {
   const { supabase, userData: user } = useConfData()

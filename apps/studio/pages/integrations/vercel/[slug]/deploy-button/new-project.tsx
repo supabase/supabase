@@ -1,8 +1,4 @@
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
-
 import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
@@ -17,11 +13,14 @@ import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
+import { PasswordStrengthScore, passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
+import { toast } from 'sonner'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (

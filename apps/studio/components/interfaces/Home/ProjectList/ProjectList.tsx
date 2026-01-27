@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -14,8 +12,10 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import type { Organization } from 'types'
-import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from 'ui'
+
 import { LoadingCardView, LoadingTableView, NoProjectsState } from './EmptyStates'
 import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'

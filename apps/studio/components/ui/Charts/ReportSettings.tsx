@@ -2,13 +2,14 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Settings } from 'lucide-react'
 import { useState } from 'react'
 import {
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   Label_Shadcn_,
   Switch,
+  cn,
 } from 'ui'
+
 import { useChartHoverState } from './useChartHoverState'
 
 interface ReportSettingsProps {

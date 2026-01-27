@@ -1,4 +1,4 @@
-import { products, PRODUCT_MODULES } from 'shared-data'
+import { PRODUCT_MODULES, products } from 'shared-data'
 
 export default {
   metaTitle: 'Supabase Open Source Community',

@@ -1,9 +1,8 @@
-import { useRouter } from 'next/router'
-
 import AlertError from 'components/ui/AlertError'
 import { OrganizationInviteByToken } from 'data/organization-members/organization-invitation-token-query'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 import { cn } from 'ui'
 

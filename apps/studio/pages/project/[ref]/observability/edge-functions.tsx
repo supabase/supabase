@@ -1,12 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import {
   ReportsNumericFilter,
@@ -17,24 +15,22 @@ import {
   selectFilterSchema,
 } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
-
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { edgeFunctionReports } from 'data/reports/v2/edge-functions.config'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
-
-import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
-import { ReportSettings } from 'components/ui/Charts/ReportSettings'
+import dayjs from 'dayjs'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { BASE_PATH } from 'lib/constants'
+import { ArrowRight, RefreshCw } from 'lucide-react'
 import { parseAsJson, useQueryState } from 'nuqs'
+import { useMemo, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (

@@ -1,5 +1,6 @@
-import useIsMounted from './useIsMounted'
 import { useEffect, useState } from 'react'
+
+import useIsMounted from './useIsMounted'
 
 const useWindowLocation = (): Location | void => {
   const isMounted = useIsMounted()

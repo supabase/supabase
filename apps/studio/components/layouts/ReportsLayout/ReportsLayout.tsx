@@ -1,9 +1,9 @@
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
+import { PropsWithChildren } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 import ReportsMenu from './ReportsMenu'
 

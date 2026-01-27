@@ -1,6 +1,5 @@
 import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { ReactNode } from 'react'
-
 import { Badge, cn } from 'ui'
 
 export function LastSignInWrapper({

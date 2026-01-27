@@ -28,7 +28,6 @@
  * - Counts occurrences regardless of severity (warn/error).
  * - Fails if any selected rule has currentCount > baselineCount.
  */
-
 import { spawnSync } from 'node:child_process'
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'

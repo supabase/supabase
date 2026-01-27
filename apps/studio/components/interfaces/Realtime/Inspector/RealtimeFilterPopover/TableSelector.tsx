@@ -1,9 +1,8 @@
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { debounce } from 'lodash'
 import { Check, Code, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

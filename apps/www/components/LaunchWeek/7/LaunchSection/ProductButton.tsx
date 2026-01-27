@@ -1,4 +1,5 @@
 import { SparklesIcon } from '@heroicons/react/outline'
+
 import { Article } from '../../types'
 
 const ProductButton = (props: Article) => {

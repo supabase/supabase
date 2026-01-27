@@ -1,10 +1,4 @@
 import * as Sentry from '@sentry/nextjs'
-import { Loader2, Wrench } from 'lucide-react'
-import Link from 'next/link'
-import { type Dispatch, type PropsWithChildren, useCallback, useReducer } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
-import SVG from 'react-inlinesvg'
-import { toast } from 'sonner'
 // End of third-party imports
 
 import CopyButton from 'components/ui/CopyButton'
@@ -13,8 +7,15 @@ import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useStateTransition } from 'hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Loader2, Wrench } from 'lucide-react'
+import Link from 'next/link'
+import { type Dispatch, type PropsWithChildren, useCallback, useReducer } from 'react'
+import type { UseFormReturn } from 'react-hook-form'
+import SVG from 'react-inlinesvg'
+import { toast } from 'sonner'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
 import { IncidentAdmonition } from './IncidentAdmonition'
@@ -22,10 +23,10 @@ import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import {
-  createInitialSupportFormState,
   type SupportFormActions,
-  supportFormReducer,
   type SupportFormState,
+  createInitialSupportFormState,
+  supportFormReducer,
 } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'

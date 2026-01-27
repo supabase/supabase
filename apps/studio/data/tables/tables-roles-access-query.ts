@@ -1,9 +1,9 @@
 import { getTablesWithAnonAuthenticatedAccessSQL } from '@supabase/pg-meta/src/sql/studio/check-tables-anon-authenticated-access'
 import { useQuery } from '@tanstack/react-query'
-
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { tableKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
+import { tableKeys } from './keys'
 
 type TablesRolesAccessArgs = {
   schema: string

@@ -1,7 +1,6 @@
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-
 import {
   Button,
   FormControl_Shadcn_,
@@ -9,12 +8,13 @@ import {
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSOMetadata = ({

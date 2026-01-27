@@ -1,6 +1,3 @@
-import Link from 'next/link'
-import { ReactFlowProvider } from 'reactflow'
-
 import { ActivityStats } from 'components/interfaces/HomeNew/ActivityStats'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
@@ -11,7 +8,10 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import Link from 'next/link'
+import { ReactFlowProvider } from 'reactflow'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
 export const TopSection = () => {

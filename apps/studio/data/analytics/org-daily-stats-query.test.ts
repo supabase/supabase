@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getOrgDailyStats } from './org-daily-stats-query'
 
 vi.mock('data/fetchers', () => ({

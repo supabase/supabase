@@ -1,10 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, X } from 'lucide-react'
-import { Fragment, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { useParams } from 'common'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import {
@@ -13,19 +7,23 @@ import {
 } from 'data/storage/iceberg-namespace-table-create-mutation'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
+import { Plus, X } from 'lucide-react'
+import { Fragment, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   DialogSectionSeparator,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -34,7 +32,9 @@ import {
   SheetTitle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { COLUMN_TYPE_FIELDS, COLUMN_TYPES } from './CreateTableSheet.constants'
+import { z } from 'zod'
+
+import { COLUMN_TYPES, COLUMN_TYPE_FIELDS } from './CreateTableSheet.constants'
 import { createFormSchema } from './CreateTableSheet.schema'
 
 const formId = 'create-namespace-table'

@@ -1,24 +1,22 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { AnimatePresence, motion } from 'framer-motion'
-import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, HelpCircle, Image as ImageIcon, Upload, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { toPng } from 'html-to-image'
 import { timeout } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { Camera, CircleCheck, HelpCircle, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -26,8 +24,10 @@ import {
   DropdownMenuTrigger,
   PopoverSeparator_Shadcn_,
   TextArea_Shadcn_,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import {
   convertB64toBlob,
   isLikelySupportRequest,

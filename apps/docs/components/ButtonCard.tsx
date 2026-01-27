@@ -1,6 +1,6 @@
-import React, { FC } from 'react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
+import React, { FC } from 'react'
 import { cn } from 'ui'
 
 interface Props {

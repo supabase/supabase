@@ -1,15 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronDown } from 'lucide-react'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   FormControl_Shadcn_,
@@ -24,6 +22,8 @@ import {
   Popover_Shadcn_,
   Switch,
 } from 'ui'
+import * as z from 'zod'
+
 import { RealtimeConfig } from './useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {

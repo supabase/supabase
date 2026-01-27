@@ -1,21 +1,21 @@
-import { Loader2 } from 'lucide-react'
-import { MouseEvent, useState } from 'react'
-
 import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2 } from 'lucide-react'
+import { MouseEvent, useState } from 'react'
 import {
   Button,
-  cn,
   CodeBlock,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
   Separator,
   WarningIcon,
+  cn,
 } from 'ui'
-import { IndexImprovementText } from './IndexImprovementText'
+
 import { QueryPanelScoreSection } from '../QueryPanel'
 import { useIndexInvalidation } from '../hooks/useIndexInvalidation'
+import { IndexImprovementText } from './IndexImprovementText'
 import { createIndexes } from './index-advisor.utils'
 
 interface IndexSuggestionIconProps {

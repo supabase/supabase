@@ -1,20 +1,19 @@
-import { sortBy } from 'lodash'
-import { AlertCircle, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
-import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
+import { type DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { sortBy } from 'lodash'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -29,6 +28,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
 

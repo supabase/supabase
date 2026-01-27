@@ -1,13 +1,13 @@
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useVectorBucketIndexDeleteMutation } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 export const DeleteVectorTableModal = () => {

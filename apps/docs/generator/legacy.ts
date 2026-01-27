@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 /**
  * Usage:
  *    tsx ReferenceGenerator.ts -o {output_dir} {input}.yml
@@ -7,10 +6,10 @@
  * Example:
  *    tsx ReferenceGenerator.ts -o docs/client spec/supabase.yml
  */
-
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 import { uniqBy } from 'lodash-es'
+
 import { flattenSections } from '../lib/helpers'
 import Example from './legacy/components/Example'
 import Page from './legacy/components/Page'

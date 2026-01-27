@@ -1,6 +1,3 @@
-import { Key } from 'lucide-react'
-import DataGrid, { Column } from 'react-data-grid'
-
 import { NullValue } from 'components/grid/components/common/NullValue'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import type { SupaRow } from 'components/grid/types'
@@ -8,8 +5,11 @@ import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
+import { Key } from 'lucide-react'
+import DataGrid, { Column } from 'react-data-grid'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { convertByteaToHex } from '../RowEditor.utils'
 
 export interface SelectorGridProps {

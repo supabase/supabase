@@ -164,7 +164,8 @@ You can customize the email link in the email template to redirect the user to a
 When the user clicks on the link, the request will hit `https://api.example.com/v1/authenticate` and you can grab the `token_hash`, `type` and `redirect_to` query parameters from the URL. Then, you can call the [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) method to get back an authenticated session before redirecting the user back to the client. Since the `verifyOtp` method makes a `POST` request to Supabase Auth to verify the user, the session will be returned in the response body, which can be read by the server. For example:
 
 ```ts
-import { createClient, type EmailOtpType } from '@supabase/supabase-js'
+import { type EmailOtpType, createClient } from '@supabase/supabase-js'
+
 const supabase = createClient(
   'https://your-project-id.supabase.co',
   'sb_publishable_... or anon key'

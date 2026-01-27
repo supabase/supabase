@@ -1,8 +1,8 @@
-import Image from 'next/image'
-
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
+import Image from 'next/image'
+
 import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
 
 export const AdvisorRulesPreview = () => {

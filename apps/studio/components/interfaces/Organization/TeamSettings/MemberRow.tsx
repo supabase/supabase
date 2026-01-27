@@ -1,7 +1,3 @@
-import { ArrowRight, Check, User, X } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { ProfileImage } from 'components/ui/ProfileImage'
@@ -11,6 +7,9 @@ import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
+import { ArrowRight, Check, User, X } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import {
   Badge,
   HoverCardContent_Shadcn_,
@@ -22,6 +21,7 @@ import {
   cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
 

@@ -1,6 +1,5 @@
-import { QueryKey, useQuery } from '@tanstack/react-query'
-
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { QueryKey, useQuery } from '@tanstack/react-query'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { MB, PROJECT_STATUS } from 'lib/constants'
@@ -9,6 +8,7 @@ import {
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { sqlKeys } from './keys'
 
 export type ExecuteSqlVariables = {

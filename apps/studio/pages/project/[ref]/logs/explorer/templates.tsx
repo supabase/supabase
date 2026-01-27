@@ -1,7 +1,4 @@
 import { useParams } from 'common'
-import { CodeIcon } from 'lucide-react'
-import { useState } from 'react'
-
 import { TEMPLATES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from 'components/interfaces/Settings/Logs/Logs.types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -10,6 +7,8 @@ import CardButton from 'components/ui/CardButton'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { CodeIcon } from 'lucide-react'
+import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Button, Popover, cn } from 'ui'
 

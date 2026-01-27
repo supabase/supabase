@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { formatSql } from './formatSql'
 
 describe('formatSql', () => {

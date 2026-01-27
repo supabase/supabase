@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { IncidentInfo } from 'lib/api/incident-status'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { UseCustomQueryOptions } from 'types'
+
 import { platformKeys } from './keys'
 
 export async function getIncidentStatus(signal?: AbortSignal): Promise<IncidentInfo[]> {

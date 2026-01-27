@@ -1,28 +1,28 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useCallback } from 'react'
-
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useSyncTableEditorStateFromLocalStorageWithUrl } from 'components/grid/SupabaseGrid.utils'
 import {
   Entity,
+  TableLike,
   isForeignTable,
   isMaterializedView,
   isTableLike,
   isView,
-  TableLike,
 } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'

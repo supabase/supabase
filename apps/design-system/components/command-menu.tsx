@@ -1,12 +1,9 @@
 'use client'
 
-import { CircleIcon, LaptopIcon, MoonIcon, SunIcon, Search } from 'lucide-react'
+import { CircleIcon, LaptopIcon, MoonIcon, Search, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
-
-import { docsConfig } from '@/config/docs'
-import { cn } from '@/lib/utils'
 import {
   Button,
   CommandDialog,
@@ -19,6 +16,9 @@ import {
   DialogProps,
   DialogTitle,
 } from 'ui'
+
+import { docsConfig } from '@/config/docs'
+import { cn } from '@/lib/utils'
 
 export function CommandMenu({ ...props }: DialogProps) {
   const router = useRouter()

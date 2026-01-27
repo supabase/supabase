@@ -1,6 +1,5 @@
+import { InputHTMLAttributes, ReactNode, forwardRef } from 'react'
 import { cn } from 'ui'
-
-import { forwardRef, InputHTMLAttributes, ReactNode } from 'react'
 
 export interface InputWithAddonsProps extends InputHTMLAttributes<HTMLInputElement> {
   leading?: ReactNode

@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, Move, Trash2, X } from 'lucide-react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Download, Move, Trash2, X } from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Button } from 'ui'
 

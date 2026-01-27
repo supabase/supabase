@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ExternalLink, Plug } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
-
 import { ApiKeysTabContent } from 'components/interfaces/Connect/ApiKeysTabContent'
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
@@ -15,7 +11,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { ExternalLink, Plug } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -33,11 +33,11 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
+
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import Link from 'next/link'
 
 export const Connect = () => {
   const router = useRouter()

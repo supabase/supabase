@@ -1,5 +1,6 @@
 import { maybeShowUpgradePromptIfNotEntitled } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { useEffect, useState } from 'react'
+
 import { useCheckEntitlements } from './useCheckEntitlements'
 
 export const useUpgradePrompt = (from: string) => {

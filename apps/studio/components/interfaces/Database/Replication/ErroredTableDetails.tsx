@@ -1,9 +1,10 @@
-import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { CriticalIcon } from 'ui'
+
 import { isValidRetryPolicy } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RetryCountdown } from './RetryCountdown'
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface ErroredTableDetailsProps {
   table: ReplicationPipelineTableStatus

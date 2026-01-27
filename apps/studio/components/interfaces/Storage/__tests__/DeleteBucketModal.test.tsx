@@ -1,14 +1,14 @@
 import { faker } from '@faker-js/faker'
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
+import { useState } from 'react'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { DeleteBucketModal } from '../DeleteBucketModal'
 
 const bucket: Bucket = {

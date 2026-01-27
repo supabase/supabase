@@ -1,12 +1,12 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { isNull } from 'lodash'
-import type { Dictionary } from 'types'
-
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
+import type { RetrieveTableResult, RetrievedTableColumn } from 'data/tables/table-retrieve-query'
 import { uuidv4 } from 'lib/helpers'
+import { isNull } from 'lodash'
 import { toast } from 'sonner'
+import type { Dictionary } from 'types'
+
 import {
   ColumnField,
   CreateColumnPayload,

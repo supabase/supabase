@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useBreakpoint } from 'common'
 import Image from 'next/image'
+import React, { useEffect, useRef, useState } from 'react'
 import Typed from 'typed.js'
 import type { TypedOptions } from 'typed.js'
-import { useBreakpoint } from 'common'
 import { cn } from 'ui'
 
 interface Props {

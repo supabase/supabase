@@ -1,10 +1,9 @@
-import { groupBy, isEqual } from 'lodash'
-
 import {
   OrganizationRole,
   OrganizationRolesResponse,
 } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
+import { groupBy, isEqual } from 'lodash'
 
 export interface ProjectRoleConfiguration {
   ref?: string

@@ -1,18 +1,17 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ChevronUp, Search, X } from 'lucide-react'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
-
 import { useMainScrollContainer } from 'components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { type Bucket } from 'data/storage/buckets-query'
 import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
+import { ChevronUp, Search, X } from 'lucide-react'
+import { type HTMLAttributes, type ReactNode, forwardRef, useEffect, useState } from 'react'
 import {
   Button,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -24,6 +23,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 

@@ -1,5 +1,4 @@
-import { useRef } from 'react'
-import Link from 'next/link'
+import { useBreakpoint } from 'common'
 import {
   MotionValue,
   motion,
@@ -8,19 +7,20 @@ import {
   useSpring,
   useTransform,
 } from 'framer-motion'
-import { useBreakpoint } from 'common'
-import { Products } from './Sections/ProductsCta'
-import { cn } from 'ui'
-
-import { DEFAULT_TRANSITION } from '~/lib/animations'
+import Link from 'next/link'
+import { useRef } from 'react'
 import {
+  products as PRODUCTS,
   PRODUCT_MODULES,
   PRODUCT_MODULES_NAMES,
   PRODUCT_MODULES_SHORTNAMES,
   PRODUCT_NAMES,
   PRODUCT_SHORTNAMES,
-  products as PRODUCTS,
 } from 'shared-data/products'
+import { cn } from 'ui'
+
+import { Products } from './Sections/ProductsCta'
+import { DEFAULT_TRANSITION } from '~/lib/animations'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct: Products | string }) {
   let mouseX = useMotionValue(Infinity)

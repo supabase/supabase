@@ -1,14 +1,14 @@
-import Link from 'next/link'
-
 import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint } from 'data/lint/lint-query'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button } from 'ui'
+
 import { Markdown } from '../Markdown'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 

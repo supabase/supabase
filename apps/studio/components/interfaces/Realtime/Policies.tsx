@@ -1,6 +1,4 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { useMemo, useState } from 'react'
-
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
@@ -9,6 +7,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useMemo, useState } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const RealtimePolicies = () => {

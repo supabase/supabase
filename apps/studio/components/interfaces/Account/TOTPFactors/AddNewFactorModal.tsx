@@ -1,7 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import { organizationKeys } from 'data/organizations/keys'
@@ -9,6 +6,8 @@ import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and
 import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'

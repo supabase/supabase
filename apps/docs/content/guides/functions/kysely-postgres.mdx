@@ -34,6 +34,7 @@ GET YOUR CERT FROM YOUR PROJECT DASHBOARD
 Create a `DenoPostgresDriver.ts` file to manage the connection to Postgres via [deno-postgres](https://deno-postgres.com/):
 
 ```ts DenoPostgresDriver.ts
+import { Pool, PoolClient } from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 import {
   CompiledQuery,
   DatabaseConnection,
@@ -44,7 +45,6 @@ import {
 } from 'https://esm.sh/kysely@0.23.4'
 import { freeze, isFunction } from 'https://esm.sh/kysely@0.23.4/dist/esm/util/object-utils.js'
 import { extendStackTrace } from 'https://esm.sh/kysely@0.23.4/dist/esm/util/stack-trace-utils.js'
-import { Pool, PoolClient } from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 
 export interface PostgresDialectConfig {
   pool: Pool | (() => Promise<Pool>)
@@ -193,12 +193,13 @@ Create an `index.ts` file to execute a query on incoming requests:
 import { serve } from 'https://deno.land/std@0.175.0/http/server.ts'
 import { Pool } from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 import {
-  Kysely,
   Generated,
+  Kysely,
   PostgresAdapter,
   PostgresIntrospector,
   PostgresQueryCompiler,
 } from 'https://esm.sh/kysely@0.23.4'
+
 import { PostgresDriver } from './DenoPostgresDriver.ts'
 
 console.log(`Function "kysely-postgres" up and running!`)

@@ -55,6 +55,9 @@ supabase.storage.from('bucket').download('image.jpg', {
 You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://supabase.com/docs/guides/storage/serving/image-transformations#nextjs-loader) on how to get started.
 
 ```js
+// Using Next Image
+import Image from 'next/image'
+
 // supabase-image-loader.js
 const projectId = '<SUPABASE_PROJECT_ID>'
 export default function supabaseLoader({ src, width, quality }) {
@@ -71,8 +74,6 @@ module.exports = {
   },
 }
 
-// Using Next Image
-import Image from 'next/image'
 const MyImage = (props) => {
   return <Image src="bucket/image.png" alt="Picture of the author" width={500} height={500} />
 }
@@ -129,7 +130,7 @@ TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integ
 Using Uppy with Supabase Storage looks like this:
 
 ```jsx
-import { Uppy, Dashboard, Tus } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
+import { Dashboard, Tus, Uppy } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
 
 const token = 'anon-key'
 const projectId = 'your-project-ref'

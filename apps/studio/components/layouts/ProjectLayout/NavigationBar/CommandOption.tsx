@@ -1,7 +1,6 @@
+import { detectOS } from 'lib/helpers'
 import { Command } from 'lucide-react'
 import { ReactNode } from 'react'
-
-import { detectOS } from 'lib/helpers'
 import { cn } from 'ui'
 
 interface CommandOptionProps {

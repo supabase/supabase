@@ -1,9 +1,9 @@
 import { useParams } from 'common'
 import Snippets from 'components/interfaces/Docs/Snippets'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-
 import { InlineLink } from 'components/ui/InlineLink'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+
 import CodeSnippet from './CodeSnippet'
 import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
 

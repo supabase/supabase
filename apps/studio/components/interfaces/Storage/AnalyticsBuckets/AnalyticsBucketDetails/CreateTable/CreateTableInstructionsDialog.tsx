@@ -3,7 +3,6 @@ import { ChevronDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -13,7 +12,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  cn,
 } from 'ui'
+
 import { CreateTableInstructions } from './CreateTableInstructions'
 import { CreateTableSheet } from './CreateTableSheet'
 

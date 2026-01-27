@@ -4,6 +4,7 @@ import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIco
 import { EmptyStatePresentational } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
 import { BUCKET_TYPES } from './Storage.constants'
 
 export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) => {

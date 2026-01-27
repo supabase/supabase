@@ -1,22 +1,21 @@
 'use client'
 
 import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { useRouter } from 'next/compat/router'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/compat/router'
 import { Fragment, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 import {
-  cn,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  cn,
+  copyToClipboard,
 } from 'ui'
-
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 /**
  * Right click on the Supabase logo in the website navbar

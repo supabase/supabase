@@ -3,11 +3,11 @@ import {
   Database,
   GitMerge,
   Hash,
+  Layers,
   ListFilter,
+  type LucideIcon,
   SortAsc,
   Zap,
-  Layers,
-  type LucideIcon,
 } from 'lucide-react'
 
 // Get human-readable description for an operation

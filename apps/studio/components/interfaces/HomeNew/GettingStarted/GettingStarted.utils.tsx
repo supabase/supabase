@@ -1,8 +1,8 @@
-import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
-
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import { DOCS_URL } from 'lib/constants'
+import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
 import { AiIconAnimation, CodeBlock } from 'ui'
+
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'
 

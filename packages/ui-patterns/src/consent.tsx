@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
 import { useSnapshot } from 'valtio'
+
 import { ConsentToast } from './ConsentToast'
 
 export const useConsentToast = () => {

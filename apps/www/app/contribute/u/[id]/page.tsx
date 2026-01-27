@@ -1,10 +1,11 @@
+import { ArrowLeft } from 'lucide-react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import DefaultLayout from '~/components/Layouts/Default'
-import { UserProfile } from '~/components/Contribute/UserProfile'
-import type { Metadata } from 'next'
+
 import { ContributeGuard } from '../../ContributeGuard'
+import { UserProfile } from '~/components/Contribute/UserProfile'
+import DefaultLayout from '~/components/Layouts/Default'
 
 export const metadata: Metadata = {
   robots: {

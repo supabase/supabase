@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type PlanRequest = components['schemas']['RequestUpgradeBody']['requested_plan']

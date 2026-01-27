@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useMemo, useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -16,8 +12,12 @@ import {
 } from 'data/analytics/project-daily-stats-query'
 import dayjs from 'dayjs'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WarningIcon } from 'ui'
+
 import type { ChartData } from './Charts.types'
 
 interface ChartHandlerProps {

@@ -1,6 +1,7 @@
-import type { ResponseError } from '~/types/fetch'
-import { get } from './fetchWrappers'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
+import { get } from './fetchWrappers'
+import type { ResponseError } from '~/types/fetch'
 
 const projectApiKeys = {
   api: (projectRef: string | undefined) => ['projects', projectRef, 'api'] as const,

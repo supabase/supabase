@@ -1,17 +1,15 @@
+import { Github } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react'
+import Link from 'next/link'
 import { useRef } from 'react'
-
-import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore from 'swiper'
 import { Navigation, Pagination } from 'swiper/modules'
-
-import { Github } from 'lucide-react'
-import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button } from 'ui'
 
-import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react'
-import Examples from '~/data/Examples'
 import ExampleCard from '../ExampleCard'
+import Examples from '~/data/Examples'
 
 // install Swiper modules
 SwiperCore.use([Navigation, Pagination])

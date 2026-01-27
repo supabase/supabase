@@ -1,8 +1,8 @@
 import { getCheckPrimaryKeysExistsSQL } from '@supabase/pg-meta/src/sql/studio/check-primary-keys-exists'
 import { useQuery } from '@tanstack/react-query'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { databaseKeys } from './keys'
 
 type CheckPrimaryKeysExistsVariables = {

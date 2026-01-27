@@ -1,17 +1,18 @@
 'use client'
 
-import { cva, VariantProps } from 'class-variance-authority'
+import { VariantProps, cva } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
 import {
   ComponentPropsWithoutRef,
   FocusEvent,
-  forwardRef,
   ReactNode,
+  forwardRef,
   useEffect,
   useRef,
   useState,
 } from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
+
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
 

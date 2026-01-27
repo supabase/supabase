@@ -3,6 +3,7 @@ import { useProfile } from 'lib/profile'
 import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { Button, IconDiscord, Separator } from 'ui'
+
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface SuccessProps {

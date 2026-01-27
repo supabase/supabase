@@ -1,4 +1,6 @@
 import { useState } from 'react'
+
+import { Input } from '../DataInputs/Input'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { Button } from 'ui/src/components/shadcn/ui/button'
 import {
@@ -9,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'ui/src/components/shadcn/ui/dialog'
-import { Input } from '../DataInputs/Input'
 
 export type BaseUrlDialogProps = {
   defaultValue?: string

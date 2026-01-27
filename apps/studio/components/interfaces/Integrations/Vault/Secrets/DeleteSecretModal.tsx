@@ -1,7 +1,6 @@
-import { toast } from 'sonner'
-
 import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { toast } from 'sonner'
 import type { VaultSecret } from 'types'
 import { Modal } from 'ui'
 

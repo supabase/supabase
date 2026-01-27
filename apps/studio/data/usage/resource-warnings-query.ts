@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { IS_PLATFORM } from 'common'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { usageKeys } from './keys'
 
 export type ResourceWarningsVariables = {

@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { generateText, ModelMessage, stepCountIs } from 'ai'
+import { ModelMessage, generateText, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'

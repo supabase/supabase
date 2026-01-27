@@ -1,34 +1,35 @@
 'use client'
 
-import presenceExample from './examples/presence-example'
+import {
+  CheckSquare,
+  ClipboardList,
+  Edit,
+  FileText,
+  Gamepad2,
+  Hash,
+  MessageSquare,
+  MousePointer,
+  PenTool,
+  Smile,
+  StickyNote,
+  Users,
+} from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+
+import ExampleLayout from './example-layout'
 import chatExample from './examples/chat-example'
-import todoExample from './examples/todo-example'
 import collaborativeEditorExample from './examples/collaborative-editor-example'
-import whiteboardExample from './examples/whiteboard-example'
-import ticTacToeExample from './examples/tic-tac-toe-example'
+import cursorTrackingExample from './examples/cursor-tracking-example'
 import emojiPickerExample from './examples/emoji-picker-example'
-import platformer3DExample from './examples/platformer-3d-example'
+import formPresenceExample from './examples/form-presence-example'
 import iframeAnnotationExample from './examples/iframe-annotation-example'
 import logViewerExample from './examples/log-viewer-example'
-import formPresenceExample from './examples/form-presence-example'
-import cursorTrackingExample from './examples/cursor-tracking-example'
-import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import {
-  Users,
-  MessageSquare,
-  CheckSquare,
-  Edit,
-  PenTool,
-  Hash,
-  Smile,
-  Gamepad2,
-  StickyNote,
-  FileText,
-  ClipboardList,
-  MousePointer,
-} from 'lucide-react'
-import { useState, useCallback } from 'react'
-import ExampleLayout from './example-layout'
+import platformer3DExample from './examples/platformer-3d-example'
+import presenceExample from './examples/presence-example'
+import ticTacToeExample from './examples/tic-tac-toe-example'
+import todoExample from './examples/todo-example'
+import whiteboardExample from './examples/whiteboard-example'
 
 // Define the list of examples for easier navigation
 const EXAMPLES = [

@@ -8,12 +8,7 @@ import {
 } from '@dnd-kit/core'
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { Plus, RefreshCw } from 'lucide-react'
-import type { CSSProperties, DragEvent, ReactNode } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
@@ -30,16 +25,20 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { Plus, RefreshCw } from 'lucide-react'
+import type { CSSProperties, DragEvent, ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
-import { keepPreviousData } from '@tanstack/react-query'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()

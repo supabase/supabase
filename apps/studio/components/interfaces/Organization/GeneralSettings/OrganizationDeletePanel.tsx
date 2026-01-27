@@ -3,6 +3,7 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { Admonition } from 'ui-patterns'
+
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
 export const OrganizationDeletePanel = () => {

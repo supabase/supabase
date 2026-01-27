@@ -1,8 +1,4 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { RowsChangeData } from 'react-data-grid'
-import { toast } from 'sonner'
-
 import { SupaRow } from 'components/grid/types'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -12,6 +8,9 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useCallback } from 'react'
+import { RowsChangeData } from 'react-data-grid'
+import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'

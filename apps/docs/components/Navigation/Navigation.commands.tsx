@@ -1,6 +1,5 @@
-import { ArrowRight } from 'lucide-react'
-
 import { isFeatureEnabled } from 'common'
+import { ArrowRight } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 

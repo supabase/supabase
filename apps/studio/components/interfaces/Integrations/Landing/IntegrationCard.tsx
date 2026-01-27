@@ -1,11 +1,11 @@
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { BadgeCheck } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import { Badge, Card, CardContent, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { IntegrationDefinition } from './Integrations.constants'
 
 type IntegrationCardProps = IntegrationDefinition & {

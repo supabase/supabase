@@ -23,9 +23,10 @@ import {
   cn,
   copyToClipboard,
 } from 'ui'
-import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
+
 import { Admonition } from './../admonition'
+import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 
 export interface TextConfirmModalProps {
   loading: boolean

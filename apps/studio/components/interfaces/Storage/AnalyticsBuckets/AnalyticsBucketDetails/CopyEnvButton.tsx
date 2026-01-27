@@ -1,10 +1,9 @@
+import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Copy } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
-
 import { Button } from 'ui'
-import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard } from 'ui'
 
 export const CopyEnvButton = ({

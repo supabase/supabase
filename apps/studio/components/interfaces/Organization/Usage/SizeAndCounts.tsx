@@ -1,12 +1,13 @@
 import { DataPoint } from 'data/analytics/constants'
 import {
+  type OrgDailyUsageResponse,
   PricingMetric,
   useOrgDailyStatsQuery,
-  type OrgDailyUsageResponse,
 } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import UsageSection from './UsageSection/UsageSection'
+
 import { dailyUsageToDataPoints } from './Usage.utils'
+import UsageSection from './UsageSection/UsageSection'
 
 export interface SizeAndCountsProps {
   orgSlug: string

@@ -1,11 +1,11 @@
 import {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
-  CustomOptionObject,
-  FilterOptionObject,
-  FilterOperatorObject,
   AsyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
   SyncOptionsFunction,
   isGroup,
 } from './types'

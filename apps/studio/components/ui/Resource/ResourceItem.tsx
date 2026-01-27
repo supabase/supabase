@@ -1,14 +1,13 @@
 import { ChevronRight, MoreVertical } from 'lucide-react'
-import { forwardRef, HTMLAttributes, ReactNode } from 'react'
-
+import { HTMLAttributes, ReactNode, forwardRef } from 'react'
 import {
   Button,
   CardContent,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  cn,
 } from 'ui'
 
 export interface ResourceAction {

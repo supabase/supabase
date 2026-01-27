@@ -3,12 +3,6 @@ import { Monaco } from '@monaco-editor/react'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { isEqual } from 'lodash'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -17,7 +11,11 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+import { isEqual } from 'lodash'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -34,6 +32,8 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import * as z from 'zod'
+
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'

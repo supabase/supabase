@@ -1,8 +1,8 @@
 import { Book } from 'lucide-react'
 import Link from 'next/link'
-import { ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
-
+import { ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef } from 'react'
 import { cn } from 'ui'
+
 import { IntegrationDefinition } from '../Landing/Integrations.constants'
 
 interface BuiltBySectionProps extends ComponentPropsWithoutRef<'div'> {

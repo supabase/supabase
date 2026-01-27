@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
-import { Button, cn, Image } from 'ui'
+import { Button, Image, cn } from 'ui'
+
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {

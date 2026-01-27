@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { handleError } from 'data/fetchers'
 import { createProjectSupabaseClient } from 'lib/project-supabase-client'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { oauthServerAppKeys } from './keys'
 
 export type OAuthServerAppRegenerateSecretVariables = {

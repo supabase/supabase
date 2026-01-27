@@ -1,6 +1,3 @@
-import { BarChart, Shield } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
-
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
@@ -8,12 +5,15 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useTrack } from 'lib/telemetry/track'
+import { BarChart, Shield } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { Markdown } from '../Markdown'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {

@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -10,9 +7,11 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()

@@ -1,12 +1,11 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
-
-import { SimpleCodeBlock } from 'ui'
 import {
   ConnectTabContent,
-  ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
+  ConnectTabs,
 } from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (

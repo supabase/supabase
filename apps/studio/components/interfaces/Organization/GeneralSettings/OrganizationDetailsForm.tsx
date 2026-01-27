@@ -1,11 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -13,18 +8,22 @@ import { useOrganizationUpdateMutation } from 'data/organizations/organization-u
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_ as Input,
   PrePostTab,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 const OrgDetailsSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),

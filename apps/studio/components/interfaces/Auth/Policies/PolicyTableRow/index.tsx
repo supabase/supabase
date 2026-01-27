@@ -1,25 +1,25 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
-import { memo, useMemo } from 'react'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { noop } from 'lodash'
+import { memo, useMemo } from 'react'
 import {
   Card,
   CardContent,
   CardHeader,
-  cn,
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'

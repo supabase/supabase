@@ -1,12 +1,11 @@
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import {
   DatePickerValue,
   LogsDatePicker,
@@ -15,14 +14,13 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import type { NextPageWithLayout } from 'types'
 import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+import dayjs from 'dayjs'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { ArrowRight, RefreshCw } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import type { NextPageWithLayout } from 'types'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (

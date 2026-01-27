@@ -1,13 +1,12 @@
+import { useIsLoggedIn } from 'common'
+import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
+import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
+import { API_URL, BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-
-import { useIsLoggedIn } from 'common'
-import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
-import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
-import { API_URL, BASE_PATH } from 'lib/constants'
 import { Button } from 'ui'
 
 const SignInFlyTos = () => {

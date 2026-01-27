@@ -68,6 +68,7 @@ To use the Stripe-Sync-Engine in an [Edge Function](https://supabase.com/edge-fu
 
 ```tsx
 import { runMigrations } from '@supabase/stripe-sync-engine'
+
 ;(async () => {
   await runMigrations({
     databaseUrl: 'postgresql://postgres:..@db.<ref>.supabase.co:5432/postgres',
@@ -83,6 +84,7 @@ Once the schema and tables are in place, you can start syncing your Stripe data 
 
 ```tsx
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
 import { StripeSync } from 'npm:@supabase/stripe-sync-engine@0.39.0'
 
 // Load secrets from environment variables

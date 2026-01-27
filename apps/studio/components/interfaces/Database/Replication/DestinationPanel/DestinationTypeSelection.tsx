@@ -1,6 +1,7 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { Badge, RadioGroupStacked, RadioGroupStackedItem, cn } from 'ui'
+
 import { DestinationType } from './DestinationPanel.types'
 
 type DestinationTypeSelectionProps = {

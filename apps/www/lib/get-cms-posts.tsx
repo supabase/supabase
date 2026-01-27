@@ -1,7 +1,7 @@
+import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
 import { generateTocFromMarkdown } from './toc'
-import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'

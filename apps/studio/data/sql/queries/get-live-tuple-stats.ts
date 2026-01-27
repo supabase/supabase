@@ -1,4 +1,5 @@
 import { literal } from '@supabase/pg-meta/src/pg-format'
+
 import { sqlKeys } from '../keys'
 
 export const getLiveTupleEstimate = (table: string, schema: string = 'public') => {

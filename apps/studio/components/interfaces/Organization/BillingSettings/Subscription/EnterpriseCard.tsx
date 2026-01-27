@@ -1,7 +1,6 @@
-import { Check } from 'lucide-react'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+
 import './surveyResults.css'
 
 const ROTATION_DURATION = 4000

@@ -1,5 +1,5 @@
-import { Button } from 'ui'
 import { useRouter } from 'next/router'
+import { Button } from 'ui'
 
 const Benchmark = () => {
   const { basePath } = useRouter()

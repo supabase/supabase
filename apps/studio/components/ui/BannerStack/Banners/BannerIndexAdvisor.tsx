@@ -4,6 +4,7 @@ import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useTrack } from 'lib/telemetry/track'
 import { Lightbulb } from 'lucide-react'
+
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
 

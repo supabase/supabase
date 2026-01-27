@@ -1,13 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, Telescope, BarChart2, Bot } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
-import { cn, Tooltip, TooltipContent, TooltipTrigger, Button } from 'ui'
+import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
+import dayjs from 'dayjs'
+import { BarChart2, Bot, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { AiIconAnimation } from 'ui'
+import {
+  Chart,
+  ChartActions,
+  ChartCard,
+  ChartContent,
+  ChartEmptyState,
+  ChartHeader,
+  ChartLoadingState,
+  ChartMetric,
+  ChartTitle,
+} from 'ui-patterns/Chart'
 import {
   PageSection,
   PageSectionContent,
@@ -15,22 +30,12 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import {
-  Chart,
-  ChartCard,
-  ChartHeader,
-  ChartActions,
-  ChartMetric,
-  ChartTitle,
-  ChartContent,
-  ChartEmptyState,
-  ChartLoadingState,
-} from 'ui-patterns/Chart'
+
 import {
   AuthErrorCodeRow,
+  ResponseErrorRow,
   fetchTopAuthErrorCodes,
   fetchTopResponseErrors,
-  ResponseErrorRow,
 } from './OverviewErrors.constants'
 import { OverviewTable } from './OverviewTable'
 import {
@@ -40,11 +45,6 @@ import {
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
-import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
-import { AiIconAnimation } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const StatCard = ({
   title,

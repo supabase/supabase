@@ -1,4 +1,5 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
+
 import { GraphQLInterfaceTypeSearchResult } from '../globalSearch/globalSearchSchema'
 import { TroubleshootingModel } from './troubleshootingModel'
 

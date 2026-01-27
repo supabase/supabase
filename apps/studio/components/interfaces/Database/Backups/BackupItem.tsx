@@ -1,6 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download } from 'lucide-react'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -8,6 +6,7 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import type { DatabaseBackup } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import { Download } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 

@@ -1,7 +1,4 @@
 import { keepPreviousData } from '@tanstack/react-query'
-import { useMemo } from 'react'
-
-import type { ConnectionVars } from '@/data/common.types'
 import { useCronJobRunDetailsEstimateQuery } from 'data/database-cron-jobs/database-cron-job-run-details-estimate-query'
 import { useCronJobsCountEstimateQuery } from 'data/database-cron-jobs/database-cron-jobs-count-estimate-query'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
@@ -9,8 +6,11 @@ import {
   CronJob,
   useCronJobsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useMemo } from 'react'
 import type { ResponseError } from 'types'
+
 import { CRON_JOBS_THRESHOLD, JOB_RUN_DETAILS_THRESHOLD } from './CronJobsTab.constants'
+import type { ConnectionVars } from '@/data/common.types'
 
 // =============================================================================
 // Input types

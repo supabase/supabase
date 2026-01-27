@@ -1,7 +1,8 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import type { ResponseError } from '~/types/fetch'
+
 import { get } from './fetchWrappers'
+import type { ResponseError } from '~/types/fetch'
 
 const DEFAULT_LIMIT = 10
 const projectKeys = {

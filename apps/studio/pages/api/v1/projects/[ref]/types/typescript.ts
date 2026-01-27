@@ -1,8 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
 import { generateTypescriptTypes } from 'lib/api/self-hosted/generate-types'
+import { NextApiRequest, NextApiResponse } from 'next'
 import { ResponseError } from 'types'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>

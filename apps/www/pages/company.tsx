@@ -1,22 +1,18 @@
-import { useRouter } from 'next/router'
-
-import Layout from '~/components/Layouts/Default'
-
-import SectionHeader from 'components/UI/SectionHeader'
 import CTABanner from 'components/CTABanner/index'
 import ImageGrid from 'components/ImageGrid'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import PressData from 'data/Press'
+import SectionHeader from 'components/UI/SectionHeader'
 import CommunityData from 'data/Community'
 import CompaniesData from 'data/Companies'
 import InvestorData from 'data/Investors'
-
+import PressData from 'data/Press'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-
+import { useRouter } from 'next/router'
 import { Button, Card_legacy_, Space } from 'ui'
-import { NextSeo } from 'next-seo'
+
+import Layout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 type Props = {}
 

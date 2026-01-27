@@ -1,10 +1,12 @@
 import { MDXRemoteSerializeResult } from 'next-mdx-remote'
+
 import {
-  convertRichTextToMarkdownWithBlocks,
   convertRichTextToMarkdown,
+  convertRichTextToMarkdownWithBlocks,
 } from './convertRichTextToMarkdown'
-import { generateTocFromMarkdown } from '~/lib/toc'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import { generateTocFromMarkdown } from '~/lib/toc'
+
 // Define minimal block structure for compatibility
 type CMSBlock = {
   blockType: string

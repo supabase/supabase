@@ -1,10 +1,10 @@
-import { Building, Forward, Wrench } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { IS_PLATFORM } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { Building, Forward, Wrench } from 'lucide-react'
+import { useMemo } from 'react'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'

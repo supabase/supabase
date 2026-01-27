@@ -1,6 +1,6 @@
 import { source } from 'common-tags'
 import { notFound } from 'next/navigation'
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+
 import {
   generateAiPromptMetadata,
   generateAiPromptsStaticParams,
@@ -8,6 +8,7 @@ import {
   getAiPrompt,
   wrapInMarkdownCodeBlock,
 } from './AiPrompts.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 
 export const dynamicParams = false
 

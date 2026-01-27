@@ -1,9 +1,8 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'

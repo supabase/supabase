@@ -1,8 +1,8 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { useWindowSize } from 'react-use'
 import { useBreakpoint } from 'common'
+import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
+import React from 'react'
+import { useWindowSize } from 'react-use'
 import { cn } from 'ui'
 
 import styles from './hero.module.css'

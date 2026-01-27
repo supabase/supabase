@@ -722,8 +722,8 @@ supabase functions new before-user-created-hook
 Add the following code to your edge function:
 
 ```ts
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const whSecret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')

@@ -1,14 +1,13 @@
-import saveAs from 'file-saver'
-import { Download, Settings } from 'lucide-react'
-import Link from 'next/link'
-import Papa from 'papaparse'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
-import { usePathname } from 'next/navigation'
 import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useGetUnifiedLogsMutation } from 'data/logs/get-unified-logs'
+import saveAs from 'file-saver'
+import { Download, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import Papa from 'papaparse'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -22,12 +21,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
+
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
 
 const DEFAULT_NUM_ROWS = '100'

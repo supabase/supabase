@@ -1,9 +1,10 @@
-import styles from './local-dx-grid.module.css'
+import { useBreakpoint } from 'common'
 import React from 'react'
 import { cn } from 'ui'
-import { useBreakpoint } from 'common'
-import page from '~/data/products/functions/page'
+
+import styles from './local-dx-grid.module.css'
 import Panel from '~/components/Panel'
+import page from '~/data/products/functions/page'
 
 export default function LocalDXGrid() {
   const isXs = useBreakpoint(640)

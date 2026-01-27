@@ -1,4 +1,5 @@
 import { handleError } from 'data/fetchers'
+
 import type { TypedDocumentString } from './graphql'
 
 const CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL!

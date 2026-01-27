@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+
 import _authErrorCodes from '~/content/errorCodes/authErrorCodes.toml'
 import _realtimeErrorCodes from '~/content/errorCodes/realtimeErrorCodes.toml'
 import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'

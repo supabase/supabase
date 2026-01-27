@@ -1,9 +1,5 @@
-import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { keepPreviousData } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -12,24 +8,28 @@ import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessToken
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import {
   Button,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   DropdownMenuSeparator,
   Input,
   ScrollArea,
   Switch,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'

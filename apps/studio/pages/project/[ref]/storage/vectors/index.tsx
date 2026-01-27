@@ -1,6 +1,3 @@
-import { AlphaNotice } from '@/components/ui/AlphaNotice'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useParams } from 'common'
 import { BucketsUpgradePlan } from 'components/interfaces/Storage/BucketsUpgradePlan'
 import { VectorsBuckets } from 'components/interfaces/Storage/VectorBuckets'
@@ -18,6 +15,10 @@ import {
   PageSection,
   PageSectionContent,
 } from 'ui-patterns'
+
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const AVAILABLE_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-central-1', 'ap-southeast-2']
 

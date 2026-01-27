@@ -1,11 +1,10 @@
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DATETIME_FORMAT } from 'lib/constants'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -21,6 +20,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
 import { QueueTab } from './QueueTab'
 
 export const QueuePage = () => {

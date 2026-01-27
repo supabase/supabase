@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { NEW_NAMESPACE_MARKER } from './CreateTableSheet.constants'
 
 const getValidRegex = (type: 'namespace' | 'table') =>

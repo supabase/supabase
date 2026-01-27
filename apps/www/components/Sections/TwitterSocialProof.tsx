@@ -1,12 +1,11 @@
+import { useBreakpoint } from 'common'
 import { range } from 'lib/helpers'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { cn } from 'ui'
-import { TweetCard } from 'ui-patterns/TweetCard'
-
-import { useBreakpoint } from 'common'
 import React from 'react'
 import { topTweets } from 'shared-data/tweets'
+import { cn } from 'ui'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 interface Props {
   className?: string

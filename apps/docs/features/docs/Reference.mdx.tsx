@@ -2,13 +2,14 @@ import matter from 'gray-matter'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { type ComponentProps } from 'react'
+
+import { CodeBlock } from '../ui/CodeBlock/CodeBlock'
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { components } from '~/features/docs/MdxBase.shared'
 import { RefSubLayout } from '~/features/docs/Reference.ui'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { REF_DOCS_DIRECTORY } from '~/lib/docs'
-import { CodeBlock } from '../ui/CodeBlock/CodeBlock'
 
 async function getRefMarkdownInternal(relPath: string) {
   const fullPath = join(REF_DOCS_DIRECTORY, relPath + '.mdx')

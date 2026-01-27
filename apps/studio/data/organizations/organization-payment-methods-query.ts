@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }

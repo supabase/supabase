@@ -1,12 +1,12 @@
-import { BarChart2 } from 'lucide-react'
-import { useMemo } from 'react'
-
 import Panel from 'components/ui/Panel'
 import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
+import { type OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
+import { BarChart2 } from 'lucide-react'
+import { useMemo } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SectionContent } from './SectionContent'
 import { dailyUsageToDataPoints } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'

@@ -1,5 +1,3 @@
-import { Download } from 'lucide-react'
-
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -7,6 +5,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Download } from 'lucide-react'
 import { Button } from 'ui'
 
 export const TIA = () => {

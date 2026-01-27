@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, cn } from 'ui'
+
 import { AnimatedCursors } from './AnimatedCursors'
 
 /**

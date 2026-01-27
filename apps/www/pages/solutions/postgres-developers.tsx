@@ -1,13 +1,11 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
 import SubStickyNav from 'components/SolutionsStickyNav'
-
-import getContent from 'data/solutions/postgres-developers'
 import { Solutions } from 'data/Solutions'
+import getContent from 'data/solutions/postgres-developers'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 
 const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))

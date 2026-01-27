@@ -1,15 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -26,6 +24,8 @@ import {
   SidePanel,
   cn,
 } from 'ui'
+import * as z from 'zod'
+
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
 interface EditEnumeratedTypeSidePanelProps {

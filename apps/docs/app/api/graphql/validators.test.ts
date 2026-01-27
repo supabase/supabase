@@ -1,5 +1,6 @@
 import { buildSchema, parse, validate } from 'graphql'
 import { describe, expect, test } from 'vitest'
+
 import { createQueryDepthLimiter } from './validators'
 
 describe('createQueryDepthLimiter', () => {

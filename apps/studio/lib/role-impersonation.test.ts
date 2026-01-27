@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import type { RoleImpersonationState } from './role-impersonation'
 import {
   getExp1HourFromNow,

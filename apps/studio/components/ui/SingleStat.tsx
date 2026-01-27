@@ -1,9 +1,8 @@
-import Link from 'next/link'
-import type { ReactNode } from 'react'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 type SingleStatProps = {
   icon: ReactNode

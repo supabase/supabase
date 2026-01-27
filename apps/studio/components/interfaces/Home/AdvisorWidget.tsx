@@ -1,7 +1,3 @@
-import { Activity, ExternalLink, Shield } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { EntityTypeIcon, createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
@@ -9,6 +5,9 @@ import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { Activity, ExternalLink, Shield } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useMemo, useState } from 'react'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'

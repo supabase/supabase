@@ -1,5 +1,6 @@
 import { LintException } from 'data/lint/lint-rules-query'
 import { Member } from 'data/organizations/organization-members-query'
+
 import { lintInfoMap } from '../Linter/Linter.utils'
 
 export const generateRuleText = (e: LintException, member?: Member) => {

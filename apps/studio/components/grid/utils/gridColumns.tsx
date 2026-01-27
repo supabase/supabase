@@ -1,6 +1,6 @@
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { CalculatedColumn } from 'react-data-grid'
 
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { BooleanEditor } from '../components/editor/BooleanEditor'
 import { DateTimeEditor } from '../components/editor/DateTimeEditor'
 import { JsonEditor } from '../components/editor/JsonEditor'

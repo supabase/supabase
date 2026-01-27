@@ -3,8 +3,8 @@ import { FilterBarAction, FilterGroup, FilterProperty } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
-  isFilterOptionObject,
   isFilterOperatorObject,
+  isFilterOptionObject,
 } from './utils'
 
 export type MenuItem = {

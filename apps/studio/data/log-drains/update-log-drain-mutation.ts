@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, put } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { logDrainsKeys } from './keys'
 
 export type LogDrainUpdateVariables = {

@@ -1,25 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { editor } from 'monaco-editor'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import ReactMarkdown from 'react-markdown'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
+import { ValidateSpamResponse, useValidateSpamMutation } from 'data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { editor } from 'monaco-editor'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 import type { FormSchema } from 'types'
 import {
   Button,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
   Tooltip,
@@ -28,6 +27,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SpamValidation } from './SpamValidation'
 
 interface TemplateEditorProps {

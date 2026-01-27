@@ -9,21 +9,22 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
+
 import 'swiper/css'
-import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { Admonition } from 'ui-patterns/admonition'
 
+import Error404 from '../../404'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
-import Error404 from '../../404'
 
 /**
  * Returns custom components so that the markdown converts to a nice looking html.

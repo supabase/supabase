@@ -1,4 +1,5 @@
 import { GraphQLEnumType, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
+
 import { GraphQLInterfaceTypeSearchResult } from '../globalSearch/globalSearchSchema'
 import { ReferenceSDKFunctionModel, SDKLanguages } from './referenceSDKModel'
 

@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { components } from 'api-types'
 import { handleError, patch } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigUpdateVariables = {

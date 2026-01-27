@@ -1,8 +1,3 @@
-import { Plus, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { NoOrganizationsState } from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { OrganizationCard } from 'components/interfaces/Organization/OrganizationCard'
@@ -15,10 +10,14 @@ import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
+import { Plus, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Button, Skeleton } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { Admonition } from 'ui-patterns/admonition'
 
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()

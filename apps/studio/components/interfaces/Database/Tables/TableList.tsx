@@ -1,24 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import {
-  Check,
-  Columns,
-  Copy,
-  Edit,
-  Eye,
-  Filter,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
@@ -37,6 +18,24 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { noop } from 'lodash'
+import {
+  Check,
+  Columns,
+  Copy,
+  Edit,
+  Eye,
+  Filter,
+  MoreVertical,
+  Plus,
+  Search,
+  Trash,
+  X,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
   Card,
@@ -62,6 +61,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 

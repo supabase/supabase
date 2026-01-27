@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { configKeys } from './keys'
 
 export type JwtSecretUpdateVariables = {

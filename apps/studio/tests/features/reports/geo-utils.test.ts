@@ -1,13 +1,12 @@
-import { describe, expect, test } from 'vitest'
-
 import {
-  buildCountsByIso2,
-  getFillColor,
-  isMicroCountry,
-  isKnownCountryCode,
-  computeMarkerRadius,
   MAP_CHART_THEME,
+  buildCountsByIso2,
+  computeMarkerRadius,
+  getFillColor,
+  isKnownCountryCode,
+  isMicroCountry,
 } from 'components/interfaces/Reports/utils/geo'
+import { describe, expect, test } from 'vitest'
 
 describe('geo utils', () => {
   test('buildCountsByIso2 aggregates and normalizes input', () => {

@@ -1,9 +1,8 @@
+import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form, Input, Modal } from 'ui'
 
 interface AddNewSecretModalProps {

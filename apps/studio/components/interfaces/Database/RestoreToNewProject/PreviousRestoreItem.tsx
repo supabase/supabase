@@ -1,8 +1,8 @@
+import { CloneStatus } from 'data/projects/clone-status-query'
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
-
-import { CloneStatus } from 'data/projects/clone-status-query'
 import { TimestampInfo } from 'ui-patterns'
+
 import { StatusBadge } from './StatusBadge'
 
 export const PreviousRestoreItem = ({ clone }: { clone: CloneStatus['clones'][number] }) => {

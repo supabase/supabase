@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import { notFound } from 'next/navigation'
 import { type ComponentProps } from 'react'
+
 import { IS_DEV } from '~/lib/constants'
 
 const LazyGraphiQL = dynamic(

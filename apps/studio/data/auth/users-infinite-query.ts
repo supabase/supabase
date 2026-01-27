@@ -1,15 +1,15 @@
 import {
-  getPaginatedUsersSQL,
   UsersCursor,
+  getPaginatedUsersSQL,
 } from '@supabase/pg-meta/src/sql/studio/get-users-paginated'
-import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import type { components } from 'data/api'
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { ExecuteSqlError, executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { UseCustomInfiniteQueryOptions } from 'types'
+
 import { authKeys } from './keys'
 
 const USERS_PAGE_LIMIT = 50

@@ -4,16 +4,16 @@ import {
   THRESHOLD_COUNT,
 } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
-
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
+
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
-import { UseCustomQueryOptions } from 'types'
 
 type GetTableRowsCountArgs = {
   table?: SupaTable

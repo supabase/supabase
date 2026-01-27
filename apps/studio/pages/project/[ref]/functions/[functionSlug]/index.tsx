@@ -1,12 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import dayjs, { Dayjs } from 'dayjs'
-import maxBy from 'lodash/maxBy'
-import meanBy from 'lodash/meanBy'
-import sumBy from 'lodash/sumBy'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-
 import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -19,8 +12,14 @@ import {
   useFunctionsCombinedStatsQuery,
 } from 'data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import dayjs, { Dayjs } from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import maxBy from 'lodash/maxBy'
+import meanBy from 'lodash/meanBy'
+import sumBy from 'lodash/sumBy'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,

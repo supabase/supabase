@@ -1,7 +1,6 @@
+import { FeatureBanner } from 'components/ui/FeatureBanner'
 import { Github } from 'lucide-react'
 import { Button } from 'ui'
-
-import { FeatureBanner } from 'components/ui/FeatureBanner'
 
 export const SigningKeysComingSoonBanner = () => {
   return (

@@ -1,9 +1,3 @@
-import { Activity, BookOpen, HelpCircle, Mail, Wrench } from 'lucide-react'
-import Image from 'next/legacy/image'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import SVG from 'react-inlinesvg'
-
 import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -13,6 +7,11 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Activity, BookOpen, HelpCircle, Mail, Wrench } from 'lucide-react'
+import Image from 'next/legacy/image'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import SVG from 'react-inlinesvg'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -20,11 +19,11 @@ import {
   Button,
   ButtonGroup,
   ButtonGroupItem,
-  cn,
   Popover,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 export const HelpPopover = () => {

@@ -1,13 +1,11 @@
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import type { Sort } from 'components/grid/types'
 import { ArrowDown, ArrowUp, ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
-
-import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -16,6 +14,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 
 interface ColumnMenuProps {

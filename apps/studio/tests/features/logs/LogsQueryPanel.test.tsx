@@ -1,8 +1,7 @@
 import { screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
-
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 import { render } from 'tests/helpers'
+import { expect, test } from 'vitest'
 
 test('run and clear', async () => {
   render(

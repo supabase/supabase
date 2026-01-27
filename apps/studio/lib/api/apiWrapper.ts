@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-
 import { ResponseError, ResponseFailure } from 'types'
+
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
 

@@ -1,5 +1,20 @@
 import { Search, X } from 'lucide-react'
 import { SetStateAction } from 'react'
+import {
+  Button,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectSeparator_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { SpecificFilterColumn } from './Users.constants'
 
@@ -19,22 +34,6 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
       return 'Search users...'
   }
 }
-
-import {
-  Button,
-  cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface UsersSearchProps {
   search: string

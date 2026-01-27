@@ -1,7 +1,6 @@
+import SparkBar from 'components/ui/SparkBar'
 import { FileText, Loader } from 'lucide-react'
 import { DragEvent, useRef, useState } from 'react'
-
-import SparkBar from 'components/ui/SparkBar'
 import { Button } from 'ui'
 
 interface SpreadSheetFileUploadProps {

@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
 import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { handleError } from 'data/fetchers'
 import { createProjectSupabaseClient } from 'lib/project-supabase-client'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oauthServerAppKeys } from './keys'
 

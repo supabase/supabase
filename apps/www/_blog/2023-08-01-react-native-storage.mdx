@@ -116,6 +116,7 @@ We can now simply read those values from the environment variables and initializ
 
 ```ts
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import 'react-native-url-polyfill/auto'
 
 import { createClient } from '@supabase/supabase-js'
@@ -143,10 +144,11 @@ Currently, the app won't work as we have no entry point. Because we are using th
 On this page we will handle both login and registration, so let's start by creating a simple form with a few inputs and buttons inside the `app/index.tsx` file:
 
 ```tsx
-import { Alert, View, Button, TextInput, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
 import React from 'react'
+import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Spinner from 'react-native-loading-spinner-overlay'
+
 import { supabase } from '../config/initSupabase'
 
 const Login = () => {
@@ -256,8 +258,9 @@ We will wrap a Provider around our app, which will use the `onAuthStateChange` f
 For this, create a new file at `provider/AuthProvider.tsx` and add the following code:
 
 ```tsx
-import React, { useState, useEffect, createContext, PropsWithChildren } from 'react'
 import { Session, User } from '@supabase/supabase-js'
+import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
+
 import { supabase } from '../config/initSupabase'
 
 type AuthProps = {
@@ -316,6 +319,7 @@ To make this work with the Expo Router we can create a file at `app/_layout.tsx`
 ```tsx
 import { Slot, useRouter, useSegments } from 'expo-router'
 import { useEffect } from 'react'
+
 import { AuthProvider, useAuth } from '../provider/AuthProvider'
 
 // Makes sure the user is authenticated before accessing protected pages
@@ -367,11 +371,12 @@ Now that we have the authentication set up, we can start working on the file upl
 First, let's define another layout for this inside area so create a file at `/app/(auth)/_layout.tsx` and add the following code:
 
 ```tsx
+import { Ionicons } from '@expo/vector-icons'
 import { Stack } from 'expo-router'
-import { useAuth } from '../../provider/AuthProvider'
 import React from 'react'
 import { TouchableOpacity } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+
+import { useAuth } from '../../provider/AuthProvider'
 
 // Simple stack layout within the authenticated area
 const StackLayout = () => {
@@ -413,15 +418,16 @@ You won't have any files to show yet, but loading the files of a user is as easy
 Additionally, we add a little FAB (floating action button) to trigger the file picker, so create a file at `/app/(auth)/list.tsx` and add the following code:
 
 ```tsx
-import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
-import * as ImagePicker from 'expo-image-picker'
-import { useAuth } from '../../provider/AuthProvider'
-import * as FileSystem from 'expo-file-system'
-import { decode } from 'base64-arraybuffer'
-import { supabase } from '../../config/initSupabase'
 import { FileObject } from '@supabase/storage-js'
+import { decode } from 'base64-arraybuffer'
+import * as FileSystem from 'expo-file-system'
+import * as ImagePicker from 'expo-image-picker'
+import React, { useEffect, useState } from 'react'
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+
+import { supabase } from '../../config/initSupabase'
+import { useAuth } from '../../provider/AuthProvider'
 
 const list = () => {
   const { user } = useAuth()
@@ -495,11 +501,12 @@ To finally display them we will add a `ScrollView` component, which will render 
 Let's start by creating those component rows in another file, so create a `components/ImageItem.tsx` file and add the following code:
 
 ```tsx
-import { FileObject } from '@supabase/storage-js'
-import { Image, View, Text, TouchableOpacity } from 'react-native'
-import { supabase } from '../config/initSupabase'
-import { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
+import { FileObject } from '@supabase/storage-js'
+import { useState } from 'react'
+import { Image, Text, TouchableOpacity, View } from 'react-native'
+
+import { supabase } from '../config/initSupabase'
 
 // Image item component that displays the image from Supabase Storage and a delte button
 const ImageItem = ({

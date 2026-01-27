@@ -1,16 +1,15 @@
-import { AlertCircle } from 'lucide-react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import {
-  useCustomDomainsQuery,
   type CustomDomainsData,
+  useCustomDomainsQuery,
 } from 'data/custom-domains/custom-domains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { AlertCircle } from 'lucide-react'
 import { Card, CardContent } from 'ui'
 import {
   PageSection,
@@ -20,6 +19,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
 import CustomDomainVerify from './CustomDomainVerify'

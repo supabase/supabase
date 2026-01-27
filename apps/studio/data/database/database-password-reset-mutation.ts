@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { handleError, patch } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type DatabasePasswordResetVariables = {

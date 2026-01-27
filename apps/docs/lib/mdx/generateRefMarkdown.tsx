@@ -1,9 +1,9 @@
-import fs from 'fs'
-
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import fs from 'fs'
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
+
 import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {

@@ -1,11 +1,4 @@
 import { useParams } from 'common'
-import { AlertTriangle, Info } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-
 import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
@@ -14,8 +7,14 @@ import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { AlertTriangle, Info } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 /**
  * Variations of the Vercel integration flow.

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getOrgUsage } from './org-usage-query'
 
 vi.mock('data/fetchers', () => ({

@@ -1,17 +1,15 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
-import { DBSchema, IDBPDatabase, openDB } from 'idb'
-import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
-
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { constructHeaders } from 'data/fetchers'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { debounce } from 'lodash'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 type SuggestionsType = {
   title: string

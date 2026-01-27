@@ -1,14 +1,12 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-
+import EnterpriseLogos from 'components/Enterprise/EnterpriseLogos'
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
-import EnterpriseLogos from 'components/Enterprise/EnterpriseLogos'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-
-import content from 'data/enterprise'
 import { Solutions } from 'data/Solutions'
+import content from 'data/enterprise'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 
 const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
 const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))

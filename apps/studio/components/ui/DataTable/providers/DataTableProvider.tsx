@@ -7,9 +7,9 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
-import { createContext, ReactNode, useContext, useMemo } from 'react'
-
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { ReactNode, createContext, useContext, useMemo } from 'react'
+
 import { DataTableFilterField } from '../DataTable.types'
 import { ControlsProvider } from './ControlsProvider'
 

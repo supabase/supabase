@@ -1,5 +1,6 @@
 import { paths } from 'api-types'
 import { DOCS_URL } from 'lib/constants'
+
 import { executeQuery } from './query'
 
 interface GetLintsOptions {

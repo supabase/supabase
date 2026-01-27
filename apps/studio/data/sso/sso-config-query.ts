@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { get, handleError } from 'data/fetchers'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { orgSSOKeys } from './keys'
 
 export type OrgSSOConfigVariables = {

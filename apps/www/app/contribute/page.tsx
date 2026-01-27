@@ -1,7 +1,7 @@
+import { ContributeGuard } from './ContributeGuard'
 import { Hero } from '~/components/Contribute/Hero'
 import { UnansweredThreads } from '~/components/Contribute/UnansweredThreads'
 import DefaultLayout from '~/components/Layouts/Default'
-import { ContributeGuard } from './ContributeGuard'
 
 // eslint-disable-next-line no-restricted-exports
 export default async function ContributePage({

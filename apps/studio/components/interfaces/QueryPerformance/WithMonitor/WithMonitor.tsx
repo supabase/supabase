@@ -1,23 +1,24 @@
-import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
-import { LoadingLine } from 'ui'
-import { QueryPerformanceChart } from '../QueryPerformanceChart'
-import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
-import { useMemo, useState, useEffect } from 'react'
+import { useParams } from 'common'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getErrorMessage } from 'lib/get-error-message'
+import { useEffect, useMemo, useState } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { LoadingLine } from 'ui'
+
 import { getPgStatMonitorLogsQuery } from '../QueryPerformance.constants'
+import { captureQueryPerformanceError } from '../QueryPerformance.utils'
+import { QueryPerformanceChart } from '../QueryPerformanceChart'
+import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
+import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import {
+  aggregateLogsByQuery,
   parsePgStatMonitorLogs,
   transformLogsToChartData,
-  aggregateLogsByQuery,
 } from './WithMonitor.utils'
-import { useParams } from 'common'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { captureQueryPerformanceError } from '../QueryPerformance.utils'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { getErrorMessage } from 'lib/get-error-message'
 
 dayjs.extend(utc)
 

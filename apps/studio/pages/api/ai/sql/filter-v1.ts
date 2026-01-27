@@ -1,7 +1,5 @@
 import { generateObject } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
-
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import {
@@ -12,6 +10,7 @@ import {
   serializeOptions,
   validateFilterGroup,
 } from 'lib/api/filterHelpers'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

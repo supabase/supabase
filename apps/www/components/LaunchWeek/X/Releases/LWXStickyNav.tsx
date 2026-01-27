@@ -1,12 +1,12 @@
-import React, { FC, useEffect, useRef } from 'react'
+import { isBrowser } from 'common'
 import Image from 'next/image'
 import Link from 'next/link'
-import { WeekDayProps, mainDays as days } from './data'
+import React, { FC, useEffect, useRef } from 'react'
 import { cn } from 'ui'
-import { isBrowser } from 'common'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import Player from '../Album/Player'
+import { WeekDayProps, mainDays as days } from './data'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const LWXStickyNav: FC = () => {
   const OFFSET = 66

@@ -3,21 +3,20 @@
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { safeHistoryReplaceState } from '~/lib/historyUtils'
-
 import {
-  cn,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
+  cn,
 } from 'ui'
 
-import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
 import { type IApiEndPoint } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
+import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 /**
  * Wrap a reference section with client-side functionality:

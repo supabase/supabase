@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { components } from 'api-types'
 import { handleError, patch } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { configKeys } from './keys'
 
 type StorageConfigUpdatePayload = components['schemas']['UpdateStorageConfigBody']

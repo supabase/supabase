@@ -50,6 +50,7 @@ We're working on exposing these secrets and making them default in the future.
 
 ```ts
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SB_PUBLISHABLE_KEY')!)

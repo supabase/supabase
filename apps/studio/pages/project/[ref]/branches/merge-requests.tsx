@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -28,6 +22,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { partition } from 'lodash'
+import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,

@@ -1,29 +1,29 @@
-import { Lightbulb, ChevronsUpDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
-
 import { useFlag } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { formatSql } from 'lib/formatSql'
+import { useTrack } from 'lib/telemetry/track'
+import { ChevronsUpDown, Lightbulb } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
+  AiIconAnimation,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   cn,
-  AiIconAnimation,
 } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
+import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
-import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
 import { formatDuration } from './QueryPerformance.utils'
-import { useTrack } from 'lib/telemetry/track'
 
 interface QueryDetailProps {
   selectedRow?: QueryPerformanceRow

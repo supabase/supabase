@@ -1,16 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BarChart2 } from 'lucide-react'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BarChart2 } from 'lucide-react'
+import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -27,7 +25,6 @@ import {
   WarningIcon,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
@@ -37,6 +34,9 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 

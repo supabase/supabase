@@ -1,16 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Code, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { IS_PLATFORM, useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
+import { Check, Code, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   SnippetWithContent,
   useSnippetFolders,
@@ -47,6 +45,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import * as z from 'zod'
 
 interface MoveQueryModalProps {
   visible: boolean

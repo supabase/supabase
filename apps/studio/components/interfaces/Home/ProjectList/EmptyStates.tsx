@@ -1,9 +1,8 @@
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BoxPlus } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import {
   Button,
   Card,
@@ -16,6 +15,7 @@ import {
   TableRow,
 } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
+
 import { ShimmeringCard } from './ShimmeringCard'
 
 export const Header = () => {

@@ -8,11 +8,12 @@ import {
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { Fragment } from 'react'
+
 import { CustomDocument } from './CustomDocument'
 import { DPA } from './DPA'
 import { HIPAA } from './HIPAA'
-import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
+import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { TIA } from './TIA'
 
 export const Documents = () => {

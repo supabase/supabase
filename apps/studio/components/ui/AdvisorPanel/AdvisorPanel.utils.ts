@@ -1,9 +1,9 @@
-import dayjs from 'dayjs'
-import { Gauge, Inbox, Shield } from 'lucide-react'
-
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
+import dayjs from 'dayjs'
+import { Gauge, Inbox, Shield } from 'lucide-react'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
+
 import type { AdvisorItem } from './AdvisorPanel.types'
 
 export const formatItemDate = (timestamp: number): string => {

@@ -1,6 +1,4 @@
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { TableList } from 'components/interfaces/Database/Tables/TableList'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -8,6 +6,7 @@ import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanel
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
+import { useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'

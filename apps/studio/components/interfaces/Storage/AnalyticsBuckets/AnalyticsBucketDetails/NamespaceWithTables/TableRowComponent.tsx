@@ -1,9 +1,3 @@
-import { uniq } from 'lodash'
-import { Eye, Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import {
   convertKVStringArrayToJson,
@@ -21,9 +15,13 @@ import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor, TableEditor } from 'icons'
+import { uniq } from 'lodash'
+import { Eye, Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,8 +32,10 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { HIDE_REPLICATION_USER_FLOW } from '../AnalyticsBucketDetails.constants'
 import {
   getAnalyticsBucketFDWServerName,

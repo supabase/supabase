@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
+
 import { SITE_ORIGIN } from '~/lib/constants'
 
 export async function GET(request: Request) {

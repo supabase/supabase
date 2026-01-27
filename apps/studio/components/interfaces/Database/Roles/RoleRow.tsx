@@ -1,8 +1,11 @@
+import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
+import { PgRole } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Collapsible,
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +16,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 
-import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
-import { PgRole } from 'data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {

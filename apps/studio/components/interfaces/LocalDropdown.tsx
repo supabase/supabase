@@ -1,7 +1,6 @@
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { Command, FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
-
 import {
   Button,
   DropdownMenu,
@@ -13,10 +12,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  singleThemes,
   Theme,
+  singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const LocalDropdown = () => {

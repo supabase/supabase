@@ -1,16 +1,14 @@
-import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useEffect, useState } from 'react'
-
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
+import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,14 +18,16 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  copyToClipboard,
 } from 'ui'
+
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
-import { LogsWarning, LogTemplate } from './Logs.types'
+import { LogTemplate, LogsWarning } from './Logs.types'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]

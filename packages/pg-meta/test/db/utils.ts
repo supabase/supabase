@@ -1,5 +1,5 @@
-import pg, { Pool } from 'pg'
 import { randomUUID } from 'crypto'
+import pg, { Pool } from 'pg'
 import { parse as parseArray } from 'postgres-array'
 
 // Those types override are in sync with `postgres-meta` since the queries

@@ -1,6 +1,7 @@
 import { GraphQLObjectType, GraphQLString } from 'graphql'
+
 import { GraphQLInterfaceTypeSearchResult } from '../globalSearch/globalSearchSchema'
-import { createCollectionType, GraphQLCollectionBuilder } from '../utils/connections'
+import { GraphQLCollectionBuilder, createCollectionType } from '../utils/connections'
 import { GuideModel, SubsectionModel } from './guideModel'
 
 export const GraphQLObjectTypeSubsection = new GraphQLObjectType({

@@ -1,6 +1,3 @@
-import dayjs from 'dayjs'
-import { describe, expect, it, vi } from 'vitest'
-
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
@@ -9,6 +6,8 @@ import {
   buildLogQueryParams,
   resolveLogDateRange,
 } from 'components/interfaces/Settings/Logs/logsDateRange'
+import dayjs from 'dayjs'
+import { describe, expect, it, vi } from 'vitest'
 
 const lastHourHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
 

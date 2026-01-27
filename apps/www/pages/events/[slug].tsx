@@ -4,34 +4,30 @@ import {
   MicrophoneIcon,
   VideoCameraIcon,
 } from '@heroicons/react/solid'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import dayjs from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import matter from 'gray-matter'
+import authors from 'lib/authors.json'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import NextImage from 'next/image'
 import Link from 'next/link'
+import { Button, Image } from 'ui'
 
-import authors from 'lib/authors.json'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import { capitalize, isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-
-import advancedFormat from 'dayjs/plugin/advancedFormat'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
-
-import { Button, Image } from 'ui'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-
-import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import type Author from '~/types/author'
 
 dayjs.extend(utc)

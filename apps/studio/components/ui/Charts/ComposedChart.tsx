@@ -6,6 +6,7 @@ import {
   Area,
   Bar,
   CartesianGrid,
+  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -14,11 +15,10 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Customized,
 } from 'recharts'
-
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {

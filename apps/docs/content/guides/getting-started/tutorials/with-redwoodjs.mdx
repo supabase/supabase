@@ -249,8 +249,8 @@ Now, update the `Auth.js` component to contain:
 <$CodeTabs>
 
 ```jsx name=/web/src/components/Auth/Auth.js
-import { useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
+import { useState } from 'react'
 
 const Auth = () => {
   const { logIn } = useAuth()
@@ -326,8 +326,8 @@ And then update the file to contain:
 <$CodeTabs>
 
 ```jsx name=web/src/components/Account/Account.js
-import { useState, useEffect } from 'react'
 import { useAuth } from '@redwoodjs/auth'
+import { useEffect, useState } from 'react'
 
 const Account = () => {
   const { client: supabase, currentUser, logOut } = useAuth()
@@ -464,7 +464,6 @@ Now that we have all the components in place, let's update your `HomePage` page 
 ```jsx name=web/src/pages/HomePage/HomePage.js
 import { useAuth } from '@redwoodjs/auth'
 import { MetaTags } from '@redwoodjs/web'
-
 import Account from 'src/components/Account'
 import Auth from 'src/components/Auth'
 
@@ -523,8 +522,8 @@ Now, update your Avatar component to contain the following widget:
 <$CodeTabs>
 
 ```jsx name=web/src/components/Avatar/Avatar.js
-import { useEffect, useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
+import { useEffect, useState } from 'react'
 
 const Avatar = ({ url, size, onUpload }) => {
   const { client: supabase } = useAuth()

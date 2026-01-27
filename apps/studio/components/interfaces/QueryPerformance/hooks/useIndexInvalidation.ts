@@ -1,8 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryStates } from 'nuqs'
-import { useCallback } from 'react'
-
+import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
 import {
   QueryPerformanceSort,
   useQueryPerformanceQuery,
@@ -10,13 +7,16 @@ import {
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databaseKeys } from 'data/database/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
+import { useCallback } from 'react'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+
 import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
 
 export function useIndexInvalidation() {
   const router = useRouter()

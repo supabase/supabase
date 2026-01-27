@@ -1,21 +1,22 @@
+import { useTrack } from 'lib/telemetry/track'
+import { Columns3, Table2 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
   Button,
   Input_Shadcn_ as Input,
-  cn,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
-import { Columns3, Table2 } from 'lucide-react'
+
 import type { TableField } from '../TableEditor.types'
 import { AI_QUICK_IDEAS } from './constants'
 import type { TableSuggestion } from './types'
 import { useAITableGeneration } from './useAITableGeneration'
 import { convertTableSuggestionToTableField } from './utils'
-import { useTrack } from 'lib/telemetry/track'
 
 interface QuickstartAIWidgetProps {
   onSelectTable: (tableData: Partial<TableField>) => void

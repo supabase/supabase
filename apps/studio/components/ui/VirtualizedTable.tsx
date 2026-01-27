@@ -1,5 +1,6 @@
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { mergeRefs } from 'common'
 import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
 import {
   cloneElement,
@@ -11,10 +12,7 @@ import {
   useMemo,
   useRef,
 } from 'react'
-
-import { mergeRefs } from 'common'
 import {
-  cn,
   Table,
   TableBody,
   TableCaption,
@@ -23,6 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 
 type TableComponentProps = React.ComponentProps<typeof Table>

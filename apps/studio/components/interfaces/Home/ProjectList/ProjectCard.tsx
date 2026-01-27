@@ -1,15 +1,15 @@
-import { Github } from 'lucide-react'
-import InlineSVG from 'react-inlinesvg'
-
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
+import { OrgProject, getComputeSize } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
+import { Github } from 'lucide-react'
+import InlineSVG from 'react-inlinesvg'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 

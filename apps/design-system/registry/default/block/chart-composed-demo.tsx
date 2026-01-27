@@ -1,17 +1,17 @@
 'use client'
 
+import { BarChart2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   Chart,
   ChartCard,
   ChartContent,
-  ChartHeader,
   ChartEmptyState,
+  ChartHeader,
   ChartLoadingState,
   ChartMetric,
 } from 'ui-patterns/Chart'
-import { BarChart2 } from 'lucide-react'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import { useState, useEffect } from 'react'
 
 export default function ComposedChartDemo() {
   const [isLoading, setIsLoading] = useState(true)

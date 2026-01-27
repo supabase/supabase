@@ -1,8 +1,9 @@
-import styles from './features-grid.module.css'
 import React from 'react'
 import { cn } from 'ui'
-import Panel from '~/components/Panel'
+
 import SectionContainer from '../Layouts/SectionContainer'
+import styles from './features-grid.module.css'
+import Panel from '~/components/Panel'
 
 export default function FeaturesGrid(props: any) {
   const hasExtendedCards = props.features.some(

@@ -1,6 +1,3 @@
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import {
   ScaffoldActionsContainer,
@@ -15,8 +12,11 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { DOCS_URL } from 'lib/constants'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 

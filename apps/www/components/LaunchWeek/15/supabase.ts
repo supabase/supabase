@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js'
+
 import supabase from '~/lib/supabase'
 
 /**

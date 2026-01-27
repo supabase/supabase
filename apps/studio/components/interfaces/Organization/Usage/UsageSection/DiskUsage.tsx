@@ -1,7 +1,4 @@
 import MotionNumber from '@number-flow/react'
-import Link from 'next/link'
-import { useMemo } from 'react'
-
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
@@ -9,15 +6,18 @@ import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   CriticalIcon,
 } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 

@@ -1,8 +1,8 @@
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { isError } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { ClientSideExceptionHandler } from './ClientSideExceptionHandler'
 import { InsertBeforeRemoveChildErrorHandler } from './InsertBeforeRemoveChildErrorHandler'
 

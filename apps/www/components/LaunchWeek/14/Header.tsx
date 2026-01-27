@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { cn } from 'ui'
+
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketHeader = ({ children, hidden }: { children: ReactNode; hidden?: boolean }) => {

@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
+import { DOCS_URL } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import { has, includes } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-
-import { DOCS_URL } from 'lib/constants'
-import { tryParseJson } from 'lib/helpers'
 import { Button } from 'ui'
+
 import {
   MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
   UPLOAD_FILE_EXTENSIONS,

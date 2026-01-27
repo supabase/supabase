@@ -2,8 +2,9 @@ import type { AuthMFAUnenrollResponse, MFAUnenrollParams } from '@supabase/supab
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { toast } from 'sonner'
-import { profileKeys } from './keys'
 import { UseCustomMutationOptions } from 'types'
+
+import { profileKeys } from './keys'
 
 const mfaUnenroll = async (params: MFAUnenrollParams) => {
   const { error, data } = await auth.mfa.unenroll(params)

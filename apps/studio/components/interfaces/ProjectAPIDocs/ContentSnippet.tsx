@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PropsWithChildren } from 'react'
 import { SimpleCodeBlock } from 'ui'
+
 import { Markdown } from '../Markdown'
 
 interface ContentSnippetProps {

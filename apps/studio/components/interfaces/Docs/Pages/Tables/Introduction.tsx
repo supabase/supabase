@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import Link from 'next/link'
-
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import Link from 'next/link'
+
 import PublicSchemaNotEnabledAlert from '../../PublicSchemaNotEnabledAlert'
 
 interface IntroductionProps {

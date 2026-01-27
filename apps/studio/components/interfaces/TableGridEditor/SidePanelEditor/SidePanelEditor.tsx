@@ -1,13 +1,5 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty, isUndefined, noop } from 'lodash'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
-import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
-import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
-import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useParams } from 'common'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
@@ -32,16 +24,20 @@ import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isValidExperimentVariant } from 'hooks/misc/useTableCreateGeneratePolicies'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useTrack } from 'lib/telemetry/track'
+import { isEmpty, isUndefined, noop } from 'lodash'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot, type TableEditorState } from 'state/table-editor'
+import { type TableEditorState, useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import { ForeignRowSelector } from './RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -62,11 +58,15 @@ import {
 } from './SidePanelEditor.utils'
 import { SpreadsheetImport } from './SpreadsheetImport/SpreadsheetImport'
 import {
-  useTableApiAccessHandlerWithHistory,
   type TableApiAccessParams,
+  useTableApiAccessHandlerWithHistory,
 } from './TableEditor/ApiAccessToggle'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
+import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
+import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 
 export type SaveTableParams =
   | SaveTableParamsNew

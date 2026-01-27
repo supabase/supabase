@@ -3,6 +3,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge } from 'ui'
+
 import { CategoryAttribute } from './Usage.constants'
 
 export interface SectionContent {

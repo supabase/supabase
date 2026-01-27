@@ -3,6 +3,7 @@ import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import type { Organization } from 'types'
+
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'

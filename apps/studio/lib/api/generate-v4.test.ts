@@ -1,9 +1,10 @@
+import { UIMessage } from 'ai'
+import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import { expect, test, vi } from 'vitest'
+
 // End of third-party imports
 
 import generateV4 from '../../pages/api/ai/sql/generate-v4'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
-import { UIMessage } from 'ai'
 
 vi.mock('lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),

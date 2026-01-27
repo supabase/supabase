@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import { POST } from '../route'
 
 describe('/api/graphql error', () => {

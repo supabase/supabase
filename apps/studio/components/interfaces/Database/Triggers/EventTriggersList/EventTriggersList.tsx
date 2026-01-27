@@ -1,9 +1,3 @@
-import { DatabaseZap, Plus, Search } from 'lucide-react'
-import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
-import { EMPTY_ARR } from '@/lib/void'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DeleteEventTrigger } from 'components/interfaces/Database/Triggers/DeleteEventTrigger'
 import {
@@ -22,15 +16,21 @@ import {
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { DatabaseZap, Plus, Search } from 'lucide-react'
+import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { EventTriggerList } from './EventTriggerList'
 import { generateEventTriggerCreateSQL } from './EventTriggerList.utils'
 import { DEFAULT_EVENT_TRIGGER_SQL, EVENT_TRIGGER_TEMPLATES } from './EventTriggers.constants'
+import { EMPTY_ARR } from '@/lib/void'
 
 const DEFAULT_OWNER_FILTER = ['postgres']
 

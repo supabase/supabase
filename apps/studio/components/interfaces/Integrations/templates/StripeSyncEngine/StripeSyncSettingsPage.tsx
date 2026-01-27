@@ -1,5 +1,5 @@
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStripeSyncUninstallMutation } from 'data/database-integrations/stripe/stripe-sync-uninstall-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Loader2, Table2 } from 'lucide-react'
 import Link from 'next/link'

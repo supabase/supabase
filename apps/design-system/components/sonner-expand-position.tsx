@@ -1,4 +1,3 @@
-import { useConfig } from '@/hooks/use-config'
 import { ComponentProps } from 'react'
 import {
   SelectContent_Shadcn_,
@@ -11,6 +10,8 @@ import {
   SonnerToaster,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { useConfig } from '@/hooks/use-config'
 
 function SonnerPositionConfig() {
   const [config, setConfig] = useConfig()

@@ -1,7 +1,3 @@
-import { isEqual } from 'lodash'
-import { ChevronDown, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,6 +9,9 @@ import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-proje
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { ChevronDown, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -38,6 +37,7 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
+
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {

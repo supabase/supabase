@@ -2,9 +2,10 @@
  * @file events.ts
  * @description Unified api to fetch events from Luma and Filesystem.
  */
-import supabase from 'lib/supabase'
-import { getSortedPosts } from 'lib/posts'
 import authors from 'lib/authors.json'
+import { getSortedPosts } from 'lib/posts'
+import supabase from 'lib/supabase'
+
 import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
 /**

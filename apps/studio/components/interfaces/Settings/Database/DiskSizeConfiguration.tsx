@@ -1,13 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Info } from 'lucide-react'
-import Link from 'next/link'
-import { SetStateAction } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
@@ -18,14 +14,17 @@ import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { ExternalLink, Info } from 'lucide-react'
+import Link from 'next/link'
+import { SetStateAction } from 'react'
+import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
 import {
   PageSection,
+  PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionContent,
 } from 'ui-patterns'
 
 export interface DiskSizeConfigurationProps {

@@ -1,21 +1,22 @@
-import { compact } from 'lodash'
-import { Plus, X } from 'lucide-react'
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type RefObject,
-} from 'react'
-import { toast } from 'sonner'
 // End of third-party imports
 
 import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { compact } from 'lodash'
+import { Plus, X } from 'lucide-react'
+import {
+  type ChangeEvent,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { toast } from 'sonner'
 import { cn } from 'ui'
+
 import { createSupportStorageClient } from './support-storage-client'
 
 const MAX_ATTACHMENTS = 5

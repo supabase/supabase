@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -10,6 +7,8 @@ import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 import {
   Card,
   Table,
@@ -21,6 +20,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { apiAuthenticate } from './apiAuthenticate'
 
 const mocks = vi.hoisted(() => {

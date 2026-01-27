@@ -1,6 +1,6 @@
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Eye, GitBranch, Table2 } from 'lucide-react'
-import { cn, SQL_ICON } from 'ui'
+import { SQL_ICON, cn } from 'ui'
 
 interface EntityTypeIconProps {
   type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'

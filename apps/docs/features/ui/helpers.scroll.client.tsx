@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
+
 import { DOCS_CONTENT_CONTAINER_ID } from './helpers.constants'
 
 const useScrollTopOnPageChange = () => {

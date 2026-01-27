@@ -1,14 +1,14 @@
+import { isFeatureEnabled } from 'common'
 import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { isFeatureEnabled } from 'common'
 import { ContributingToc } from '~/app/contributing/ContributingToC'
+import Breadcrumbs from '~/components/Breadcrumbs'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
-import Breadcrumbs from '~/components/Breadcrumbs'
 
 export default async function ContributingPage() {
   if (!isFeatureEnabled('docs:contribution')) {

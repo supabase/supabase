@@ -1,9 +1,8 @@
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
-
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabaseQueueDeleteMutation } from 'data/database-queues/database-queues-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 
 interface DeleteQueueProps {
   queueName: string

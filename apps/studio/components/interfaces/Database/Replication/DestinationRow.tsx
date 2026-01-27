@@ -1,7 +1,3 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
@@ -12,6 +8,9 @@ import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { Minus } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -27,10 +26,11 @@ import {
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { PIPELINE_ERROR_MESSAGES, getStatusName } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'

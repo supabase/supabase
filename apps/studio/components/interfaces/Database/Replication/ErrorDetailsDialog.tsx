@@ -1,6 +1,5 @@
 import {
   Button,
-  cn,
   CodeBlock,
   Dialog,
   DialogClose,
@@ -10,6 +9,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  cn,
 } from 'ui'
 
 interface ErrorDetailsDialogProps {

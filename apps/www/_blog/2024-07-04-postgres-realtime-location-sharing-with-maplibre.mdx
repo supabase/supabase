@@ -46,6 +46,7 @@ You can find the production ready code for the Telegram Bot Supabase Edge Functi
 ```ts /supabase/functions/telegram-bot/index.ts
 import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.20.3/mod.ts'
 import { createClient } from 'jsr:@supabase/supabase-js@2.39.7'
+
 import { Database } from '../_shared/database.types.ts'
 
 const token = Deno.env.get('BOT_TOKEN')

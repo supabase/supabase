@@ -1,16 +1,16 @@
-import { AlertTriangle, BarChart2 } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo } from 'react'
-
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import SparkBar from 'components/ui/SparkBar'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { AlertTriangle, BarChart2 } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import type { ResponseError } from 'types'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {

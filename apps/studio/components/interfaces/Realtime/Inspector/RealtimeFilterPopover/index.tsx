@@ -1,14 +1,10 @@
-import { PlusCircle } from 'lucide-react'
-import Link from 'next/link'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { PlusCircle } from 'lucide-react'
+import Link from 'next/link'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
   Badge,
   Button,
@@ -23,9 +19,13 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig

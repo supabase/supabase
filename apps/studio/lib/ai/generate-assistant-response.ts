@@ -1,16 +1,15 @@
 import * as ai from 'ai'
 import {
-  convertToModelMessages,
-  isToolUIPart,
   type LanguageModel,
   type ModelMessage,
-  stepCountIs,
   type ToolSet,
   type UIMessage,
+  convertToModelMessages,
+  isToolUIPart,
+  stepCountIs,
 } from 'ai'
 import { wrapAISDK } from 'braintrust'
 import { source } from 'common-tags'
-
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import {
   CHAT_PROMPT,

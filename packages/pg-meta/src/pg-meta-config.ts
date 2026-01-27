@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { CONFIG_SQL } from './sql/config'
 
 const pgConfigZod = z.object({

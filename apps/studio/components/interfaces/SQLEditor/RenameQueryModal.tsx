@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
@@ -17,9 +14,12 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
+
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
 export interface RenameQueryModalProps {

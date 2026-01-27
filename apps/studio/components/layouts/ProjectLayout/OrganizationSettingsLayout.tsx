@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
+
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {

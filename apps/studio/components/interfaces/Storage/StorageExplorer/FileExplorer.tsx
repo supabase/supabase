@@ -1,8 +1,8 @@
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
-
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
+
 import { CONTEXT_MENU_KEYS, STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { ColumnContextMenu } from './ColumnContextMenu'

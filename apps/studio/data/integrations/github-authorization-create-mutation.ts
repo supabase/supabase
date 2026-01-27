@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { integrationKeys } from './keys'
 
 export type GitHubAuthorizationCreateVariables = {

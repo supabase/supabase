@@ -1,9 +1,3 @@
-import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, Github } from 'lucide-react'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
-import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
-
 import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type {
@@ -11,8 +5,13 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import dayjs from 'dayjs'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import { ArrowRight, ExternalLink, Github } from 'lucide-react'
+import Image from 'next/legacy/image'
+import Link from 'next/link'
+import { HTMLAttributes, ReactNode, RefAttributes, forwardRef } from 'react'
 import { Badge, Button, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2

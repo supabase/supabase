@@ -1,9 +1,9 @@
-import { noop } from 'lodash'
-import { ChevronLeft, FlaskConical } from 'lucide-react'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
+import { noop } from 'lodash'
+import { ChevronLeft, FlaskConical } from 'lucide-react'
 import { Button } from 'ui'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
 interface PolicyEditorModalTitleProps {

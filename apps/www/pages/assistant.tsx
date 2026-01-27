@@ -6,10 +6,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
+
+import { EASE_OUT } from '../lib/animations'
 import DotGrid from '~/components/AIDemo/DotGrid'
 import { AIDemoPanel } from '~/components/AIDemo/Panel'
 import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
-import { EASE_OUT } from '../lib/animations'
 
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
 const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))

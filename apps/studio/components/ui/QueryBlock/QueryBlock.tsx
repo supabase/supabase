@@ -1,14 +1,13 @@
+import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import dayjs from 'dayjs'
 import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
-
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-
-import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
+import { Badge, Button, ChartContainer, ChartTooltipContent, CodeBlock, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'

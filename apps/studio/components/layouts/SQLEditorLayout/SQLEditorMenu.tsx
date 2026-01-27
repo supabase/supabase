@@ -1,15 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
+import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -23,13 +22,14 @@ import {
   TooltipTrigger,
 } from 'ui'
 import {
-  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
-import { SearchList } from './SQLEditorNavV2/SearchList'
+
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { SearchList } from './SQLEditorNavV2/SearchList'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()

@@ -1,8 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import z from 'zod'
-
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -13,6 +9,8 @@ import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
   Card,
@@ -23,8 +21,10 @@ import {
   Form_Shadcn_,
   Switch,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { AttributeMapping } from './AttributeMapping'
 import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
 import { SSODomains } from './SSODomains'

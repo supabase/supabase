@@ -1,19 +1,19 @@
-import { UseFormReturn } from 'react-hook-form'
-
 import Panel from 'components/ui/Panel'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { PROVIDERS } from 'lib/constants'
+import { UseFormReturn } from 'react-hook-form'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface CloudProviderSelectorProps {

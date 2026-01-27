@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
 import { PostgresView } from '@supabase/postgres-meta'
 import { useQuery } from '@tanstack/react-query'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { foreignTableKeys } from './keys'
 
 export type ForeignTablesVariables = {

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
+import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+
 import { storageKeys } from './keys'
 
 type VectorBucketIndexCreateVariables = components['schemas']['CreateBucketIndexBody'] & {

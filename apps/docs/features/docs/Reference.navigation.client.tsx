@@ -1,14 +1,12 @@
 'use client'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
-
 import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren } from 'react'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-
 import { cn } from 'ui'
 
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'

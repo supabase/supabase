@@ -1,5 +1,12 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertCircle,
   Check,
@@ -12,15 +19,8 @@ import {
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
 export const UpgradingState = () => {

@@ -1,12 +1,12 @@
-import { UseFormReturn } from 'react-hook-form'
-
 import Panel from 'components/ui/Panel'
 import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
+import { UseFormReturn } from 'react-hook-form'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DATABASE_PASSWORD_REGEX } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'

@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Collapsible, Select } from 'ui'
+
 import throughputTable from '~/data/realtime/throughput.json'
 
 export default function RealtimeLimitsEstimater({}) {

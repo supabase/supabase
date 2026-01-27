@@ -1,11 +1,11 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import {
-  getEdgeFunctionBody,
   type EdgeFunctionBodyData,
+  getEdgeFunctionBody,
 } from 'data/edge-functions/edge-function-body-query'
 import {
-  useEdgeFunctionsQuery,
   type EdgeFunctionsData,
+  useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
 import { edgeFunctionsKeys } from 'data/edge-functions/keys'
 import { handleError } from 'data/fetchers'

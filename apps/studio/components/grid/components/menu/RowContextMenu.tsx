@@ -1,13 +1,13 @@
+import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
+import type { SupaRow } from 'components/grid/types'
 import { Copy, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
-
-import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
-import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { copyToClipboard, DialogSectionSeparator } from 'ui'
+import { DialogSectionSeparator, copyToClipboard } from 'ui'
+
 import { formatClipboardValue } from '../../utils/common'
 
 type RowContextMenuProps = {

@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { ResponseError } from 'types'
 
 type CaptureMessageOptions = {

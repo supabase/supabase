@@ -1,15 +1,15 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { Loader2, Search } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { useUnifiedLogsFacetCountQuery } from 'data/logs/unified-logs-facet-count-query'
-import { Checkbox_Shadcn_ as Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
+import { Loader2, Search } from 'lucide-react'
+import { useState } from 'react'
+import { Checkbox_Shadcn_ as Checkbox, Label_Shadcn_ as Label, Skeleton, cn } from 'ui'
+
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
-import { keepPreviousData } from '@tanstack/react-query'
 
 export function DataTableFilterCheckboxAsync<TData>({
   value: _value,

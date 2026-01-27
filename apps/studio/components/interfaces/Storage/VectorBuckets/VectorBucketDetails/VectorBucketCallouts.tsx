@@ -1,12 +1,11 @@
-import Link from 'next/link'
-import { toast } from 'sonner'
-
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 

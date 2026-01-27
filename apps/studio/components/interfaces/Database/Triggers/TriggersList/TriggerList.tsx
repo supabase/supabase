@@ -1,15 +1,14 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, sortBy } from 'lodash'
-import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { includes, sortBy } from 'lodash'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -23,6 +22,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
 interface TriggerListProps {

@@ -1,6 +1,3 @@
-import { Eye, EyeOff } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
@@ -14,17 +11,20 @@ import {
 } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Eye, EyeOff } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import {
-  Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
+  Accordion_Shadcn_,
   Card,
   CardFooter,
   CardHeader,
   CardTitle,
   CodeBlock,
 } from 'ui'
+
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 import { getPyicebergSnippet } from './CreateTableInstructions.constants'
 

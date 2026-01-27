@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from 'ui'
 import { AlertTriangle } from 'lucide-react'
+import { Button } from 'ui'
 
 export default function CopyConfirmations() {
   return (

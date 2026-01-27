@@ -1,5 +1,3 @@
-import { Smartphone } from 'lucide-react'
-
 import { TOTPFactors } from 'components/interfaces/Account/TOTPFactors'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -8,13 +6,14 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Smartphone } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  cn,
 } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {

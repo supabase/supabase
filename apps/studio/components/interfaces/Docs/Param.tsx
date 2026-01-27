@@ -1,8 +1,7 @@
-import { noop } from 'lodash'
-import { Badge } from 'ui'
-
 import Description from 'components/interfaces/Docs/Description'
+import { noop } from 'lodash'
 import { Code, Database } from 'lucide-react'
+import { Badge } from 'ui'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead

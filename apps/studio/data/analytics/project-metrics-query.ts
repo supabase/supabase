@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { z } from 'zod'
-
 import { fetchGet } from 'data/fetchers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { analyticsKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+import { z } from 'zod'
+
+import { analyticsKeys } from './keys'
 
 export type ProjectMetricsVariables = {
   projectRef?: string

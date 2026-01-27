@@ -1,21 +1,21 @@
+import { useFlag } from 'common'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
-
-import { useFlag } from 'common'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  cn,
 } from 'ui'
+
 import {
+  INTEGRATION_TYPES,
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
-  INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
 
 interface AddIntegrationDropdownProps {

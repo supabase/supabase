@@ -1,9 +1,10 @@
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { ChevronRight, ChevronDown } from 'lucide-react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { RowCountIndicator } from './ExplainVisualizer.RowCountIndicator'
-import type { ExplainNode } from './ExplainVisualizer.types'
 import { parseDetailLines } from './ExplainVisualizer.parser'
+import type { ExplainNode } from './ExplainVisualizer.types'
 import { formatNodeDuration, getScanBarColor, getScanBorderColor } from './ExplainVisualizer.utils'
 
 interface ExplainNodeRowProps {

@@ -1,14 +1,14 @@
-import { useMemo } from 'react'
-
 import type { ConnectionVars } from 'data/common.types'
 import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
-import { isApiAccessRole, isApiPrivilegeType, type ApiPrivilegesByRole } from 'lib/data-api-types'
+import { type ApiPrivilegesByRole, isApiAccessRole, isApiPrivilegeType } from 'lib/data-api-types'
 import type { Prettify } from 'lib/type-helpers'
+import { useMemo } from 'react'
 import type { UseCustomQueryOptions } from 'types'
+
 import {
-  useTablePrivilegesQuery,
   type TablePrivilegesData,
   type TablePrivilegesError,
+  useTablePrivilegesQuery,
 } from './table-privileges-query'
 
 // The contents of this array are never used, so any will allow

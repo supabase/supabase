@@ -1,7 +1,3 @@
-import { ChevronRight, Trash } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -10,18 +6,22 @@ import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
 import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronRight, Trash } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
   Card,
   CardContent,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'

@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { sqlKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
+import { sqlKeys } from './keys'
 
 type OngoingQuery = {
   pid: number

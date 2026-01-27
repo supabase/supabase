@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
-
 import { cn } from 'ui'
+
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import type {
   Feature,

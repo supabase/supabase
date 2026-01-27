@@ -1,16 +1,15 @@
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
-import { PropsWithChildren, useEffect } from 'react'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
+import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
+import { PropsWithChildren, useEffect } from 'react'
 import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const SIDEBAR_KEYS = {

@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { EmailTemplates } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates'
 import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'

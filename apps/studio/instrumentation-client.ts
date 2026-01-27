@@ -1,14 +1,12 @@
 // This file configures the initialization of Sentry on the client.
 // The config you add here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
 import * as Sentry from '@sentry/nextjs'
-import { match } from 'path-to-regexp'
-
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
+import { match } from 'path-to-regexp'
 
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {

@@ -1,7 +1,3 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { toast } from 'sonner'
-
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
@@ -11,6 +7,9 @@ import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-muta
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'

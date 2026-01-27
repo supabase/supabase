@@ -11,22 +11,22 @@ import {
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
-import { DefaultSeo } from 'next-seo'
-import type { AppProps } from 'next/app'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { SonnerToaster, themes, TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsentToast } from 'ui-patterns/consent'
-
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
-import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { DefaultSeo } from 'next-seo'
+import type { AppProps } from 'next/app'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { SonnerToaster, TooltipProvider, themes } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { useConsentToast } from 'ui-patterns/consent'
+
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
+import { WwwCommandMenu } from '~/components/CommandMenu'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()

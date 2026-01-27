@@ -1,34 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
-  cn,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -36,9 +33,12 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { z } from 'zod'
+
 import { urlRegex } from '../Auth/Auth.constants'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 

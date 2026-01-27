@@ -1,16 +1,15 @@
-import dayjs from 'dayjs'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -31,17 +30,18 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import { useServiceStats } from './ProjectUsageSection.utils'
-import type { StatsLike } from './ProjectUsageSection.utils'
+
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
+  computeChangePercent,
+  computeSuccessAndNonSuccessRates,
+  formatDelta,
+  sumErrors,
   sumTotal,
   sumWarnings,
-  sumErrors,
-  computeSuccessAndNonSuccessRates,
-  computeChangePercent,
-  formatDelta,
 } from './ProjectUsage.metrics'
+import { useServiceStats } from './ProjectUsageSection.utils'
+import type { StatsLike } from './ProjectUsageSection.utils'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 

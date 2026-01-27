@@ -1,11 +1,11 @@
 import { PGlite } from '@electric-sql/pglite'
 import { PostgresMetaBase, wrapError, wrapResult } from '@gregnr/postgres-meta/base'
+import { SchemaFlow } from 'components/interfaces/ProjectCreation/SchemaFlow'
 import { useEffect, useRef, useState } from 'react'
 import { Edge, Node, ReactFlowProvider } from 'reactflow'
 
-import { SchemaFlow } from 'components/interfaces/ProjectCreation/SchemaFlow'
-import { getGraphDataFromTables } from '../Database/Schemas/Schemas.utils'
 import { TableNodeData } from '../Database/Schemas/SchemaTableNode'
+import { getGraphDataFromTables } from '../Database/Schemas/Schemas.utils'
 
 export const TABLE_NODE_WIDTH = 640
 export const TABLE_NODE_ROW_HEIGHT = 80

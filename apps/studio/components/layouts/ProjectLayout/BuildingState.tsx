@@ -1,7 +1,3 @@
-import { ArrowRight, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
@@ -15,6 +11,9 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect } from 'react'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {

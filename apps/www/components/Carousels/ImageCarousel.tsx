@@ -1,16 +1,16 @@
 import { CornerRightUp } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Button, Tabs } from 'ui'
-
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, Tabs } from 'ui'
 
 // Import Swiper styles
 import 'swiper/css'
 
 import { useInView } from 'framer-motion'
 import Image from 'next/image'
+
 import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
 

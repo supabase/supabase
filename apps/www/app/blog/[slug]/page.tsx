@@ -1,12 +1,12 @@
-import BlogPostClient from './BlogPostClient'
-import { draftMode } from 'next/headers'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
-import { processCMSContent } from '~/lib/cms/processCMSContent'
-
-import type { Blog, BlogData, PostReturnType } from 'types/post'
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
+import type { Blog, BlogData, PostReturnType } from 'types/post'
+
+import BlogPostClient from './BlogPostClient'
+import { processCMSContent } from '~/lib/cms/processCMSContent'
+import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
 
 export const revalidate = 30
 

@@ -1,7 +1,7 @@
 import type { Column } from 'react-data-grid'
-
 import type { VaultSecret } from 'types'
 import { cn } from 'ui'
+
 import { SecretRow } from './SecretRow'
 import { SecretTableColumn } from './Secrets.types'
 

@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
+import { OrgProject, getComputeSize } from 'data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { Alert, Button, cn, Input, Modal } from 'ui'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { Alert, Button, Input, Modal, cn } from 'ui'
+
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {

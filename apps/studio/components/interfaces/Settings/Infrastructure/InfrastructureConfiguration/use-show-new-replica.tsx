@@ -1,4 +1,4 @@
-import { useQueryState, parseAsBoolean } from 'nuqs'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 export function useShowNewReplicaPanel() {
   const [showNewReplicaPanel, setShowNewReplicaPanel] = useQueryState(

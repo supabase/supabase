@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomMutationOptions } from 'types'

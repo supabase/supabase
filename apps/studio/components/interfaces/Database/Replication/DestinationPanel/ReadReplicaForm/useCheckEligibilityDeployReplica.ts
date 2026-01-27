@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import {
@@ -11,6 +9,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useMemo } from 'react'
 
 export const useCheckEligibilityDeployReplica = () => {
   const { ref: projectRef } = useParams()

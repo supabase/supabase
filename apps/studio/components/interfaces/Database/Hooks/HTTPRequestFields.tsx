@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Plus, X } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
@@ -10,9 +7,10 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
+import { ChevronDown, Plus, X } from 'lucide-react'
+import Link from 'next/link'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -21,7 +19,9 @@ import {
   Input,
   Listbox,
   SidePanel,
+  cn,
 } from 'ui'
+
 import { HTTPArgument } from './EditHookPanel'
 
 interface HTTPRequestFieldsProps {

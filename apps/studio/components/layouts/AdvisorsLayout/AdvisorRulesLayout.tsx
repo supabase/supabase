@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
 import DefaultLayout from '../DefaultLayout'
 import { PageLayout } from '../PageLayout/PageLayout'
 import AdvisorsLayout from './AdvisorsLayout'

@@ -1,7 +1,7 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
+
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
@@ -14,7 +14,9 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
+import { toast } from 'sonner'
 import type { Dashboards } from 'types'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'

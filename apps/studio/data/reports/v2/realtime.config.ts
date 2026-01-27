@@ -1,9 +1,10 @@
 import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
 import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
-  getInfraMonitoringAttributes,
   InfraMonitoringAttribute,
+  getInfraMonitoringAttributes,
 } from 'data/analytics/infra-monitoring-query'
+
 import { ReportConfig } from './reports.types'
 
 async function runInfraMonitoringQuery(

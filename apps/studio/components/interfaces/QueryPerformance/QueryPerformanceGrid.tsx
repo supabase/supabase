@@ -1,9 +1,10 @@
+import { useParams } from 'common'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
   CodeBlock,
@@ -21,15 +22,15 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Admonition } from 'ui-patterns'
-import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import {
   hasIndexRecommendations,
   queryInvolvesProtectedSchemas,
 } from './IndexAdvisor/index-advisor.utils'
-import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
@@ -39,8 +40,7 @@ import {
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
-import { parseAsString, parseAsArrayOf, parseAsJson, useQueryStates } from 'nuqs'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]

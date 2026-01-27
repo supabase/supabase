@@ -1,44 +1,45 @@
 'use client'
 
-import { useMemo } from 'react'
-import dynamic from 'next/dynamic'
 import { IS_PLATFORM, useFlag } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
+  Clock5,
   Code2,
   KeyRound,
+  Layers,
   ListChecks,
+  Lock,
   LockKeyhole,
+  Mail,
+  MessageCircle,
   Plus,
   Rows,
-  Vault,
   ShieldPlus,
+  Table2,
+  Telescope,
   UserCog,
   UserPlus,
+  Vault,
   Webhook,
   Zap,
-  Table2,
-  MessageCircle,
-  Mail,
-  Lock,
-  Telescope,
-  Clock5,
-  Layers,
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useMemo } from 'react'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
   useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
-import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import {
-  useCreateCommandsConfig,
-  getIntegrationRoute,
-  getIntegrationCommandName,
-} from './CreateCommands.utils'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import type { ICommand } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import {
+  getIntegrationCommandName,
+  getIntegrationRoute,
+  useCreateCommandsConfig,
+} from './CreateCommands.utils'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))

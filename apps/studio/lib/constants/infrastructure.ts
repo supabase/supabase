@@ -1,8 +1,7 @@
-import type { CloudProvider } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-
 import type { components } from 'data/api'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'

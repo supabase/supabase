@@ -1,25 +1,24 @@
 import 'swiper/css'
-import RealtimeStyles from '~/styles/realtime.module.css'
 
-import dynamic from 'next/dynamic'
+import ApiExamples from 'data/products/realtime/api-examples'
+import { Grid, Layers, Menu } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Grid, Layers, Menu } from 'lucide-react'
-import Image from 'next/image'
-
+import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button } from 'ui'
+
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
+import RealtimeShowcase from '~/components/Realtime/realtime-showcase'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import RealtimeShowcase from '~/components/Realtime/realtime-showcase'
-
-import ApiExamples from 'data/products/realtime/api-examples'
 import MainProducts from '~/data/MainProducts'
-import { PRODUCT_NAMES } from 'shared-data/products'
+import RealtimeStyles from '~/styles/realtime.module.css'
 
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 

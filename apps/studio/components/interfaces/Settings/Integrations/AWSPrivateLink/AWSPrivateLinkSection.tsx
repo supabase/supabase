@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import {
   ScaffoldContainer,
   ScaffoldSection,
@@ -14,8 +11,11 @@ import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Card, CardContent, cn } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
 import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'

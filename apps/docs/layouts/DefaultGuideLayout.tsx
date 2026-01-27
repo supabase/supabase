@@ -1,6 +1,7 @@
 import { FC } from 'react'
-import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+
 import GuideLayout from './guides'
+import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 interface Props {
   meta: {

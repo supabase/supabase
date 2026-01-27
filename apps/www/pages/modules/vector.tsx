@@ -1,13 +1,13 @@
 import 'swiper/css'
 
+import { useBreakpoint } from 'common'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import DefaultLayout from '~/components/Layouts/Default'
-
-import { useBreakpoint } from 'common'
-import vectorPageData from '~/data/products/modules/vector'
-import ModulesNav from '~/components/Modules/ModulesNav'
 import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
+
+import DefaultLayout from '~/components/Layouts/Default'
+import ModulesNav from '~/components/Modules/ModulesNav'
+import vectorPageData from '~/data/products/modules/vector'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))

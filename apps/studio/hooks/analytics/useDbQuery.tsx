@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { DEFAULT_QUERY_PARAMS } from 'components/interfaces/Reports/Reports.constants'
 import {
   BaseReportParams,

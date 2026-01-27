@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from 'ui'
+
 import type { LeaderboardRow } from '~/types/contribute'
 
 function getInitials(name: string | null): string {

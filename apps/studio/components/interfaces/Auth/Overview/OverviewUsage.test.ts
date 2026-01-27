@@ -1,12 +1,13 @@
 import { describe, expect, test } from 'vitest'
-import { RawAuthMetricsResponseSchema } from './OverviewUsage.schema'
+
 import {
-  getMetricValues,
+  type AuthMetricsResponse,
   calculatePercentageChange,
   getApiSuccessRates,
   getAuthSuccessRates,
-  type AuthMetricsResponse,
+  getMetricValues,
 } from './OverviewUsage.constants'
+import { RawAuthMetricsResponseSchema } from './OverviewUsage.schema'
 
 const validSample = {
   result: [

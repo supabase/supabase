@@ -1,6 +1,7 @@
-import { BASE_PATH } from 'lib/constants'
-import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { BASE_PATH } from 'lib/constants'
+
+import { PROVIDERS_SCHEMAS, PROVIDER_PHONE } from '../AuthProvidersFormValidation'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 

@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -12,7 +9,10 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+
 import { RealtimeConfig } from './useRealtimeMessages'
 
 interface RealtimeTokensPopoverProps {

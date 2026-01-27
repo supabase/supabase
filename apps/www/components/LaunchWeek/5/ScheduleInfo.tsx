@@ -1,5 +1,5 @@
-import { Button } from 'ui'
 import Link from 'next/link'
+import { Button } from 'ui'
 
 export function ScheduleInfo() {
   return (

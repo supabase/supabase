@@ -559,8 +559,8 @@ You can now use any Supabase features from your client or server code!
 <TabPanel id="react-router-loader" label="Loader">
 
 ```ts _index.tsx
-import { LoaderFunctionArgs } from 'react-router'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { LoaderFunctionArgs } from 'react-router'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const headers = new Headers()

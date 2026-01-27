@@ -1,7 +1,8 @@
-import React from 'react'
-import Link from 'next/link'
-import { buildDays, mainDays } from './data'
 import { Lock } from 'lucide-react'
+import Link from 'next/link'
+import React from 'react'
+
+import { buildDays, mainDays } from './data'
 
 const LW14Summary = () => {
   const days = mainDays()

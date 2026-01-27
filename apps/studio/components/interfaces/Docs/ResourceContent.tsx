@@ -1,5 +1,3 @@
-import { Table2 } from 'lucide-react'
-
 import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
@@ -9,6 +7,7 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
+import { Table2 } from 'lucide-react'
 
 interface ResourceContentProps {
   apiEndpoint: string

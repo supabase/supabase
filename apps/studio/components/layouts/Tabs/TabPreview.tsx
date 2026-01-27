@@ -1,7 +1,6 @@
-import { motion } from 'framer-motion'
-
 import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
+import { motion } from 'framer-motion'
 import { useTabsStateSnapshot } from 'state/tabs'
 
 export const TabPreview = ({ tab }: { tab: string }) => {

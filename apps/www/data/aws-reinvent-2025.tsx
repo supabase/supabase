@@ -1,9 +1,10 @@
-import { Calendar, MapPin, Users, Sparkles, Gift, MessageSquare, Timer, Check } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import { Calendar, Check, Gift, MapPin, MessageSquare, Sparkles, Timer, Users } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import MainProducts from './MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui'
+
+import MainProducts from './MainProducts'
 import { SITE_ORIGIN } from '~/lib/constants'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))

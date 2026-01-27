@@ -7,7 +7,6 @@
  *
  * Note: Run `pnpm prebuild` first to generate typeSpec.json
  */
-
 import { existsSync, readFileSync } from 'fs'
 import yaml from 'js-yaml'
 import { dirname, join } from 'path'

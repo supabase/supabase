@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
+
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
 import { databaseKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 export const getEntityDefinitionsSql = ({
   schemas,

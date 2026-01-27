@@ -1,5 +1,3 @@
-import { useEffect, type Dispatch, type MouseEventHandler } from 'react'
-import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
@@ -13,7 +11,10 @@ import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachm
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { type Dispatch, type MouseEventHandler, useEffect } from 'react'
+import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
+
 import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
@@ -31,11 +32,11 @@ import { SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessT
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
+  NO_ORG_MARKER,
+  NO_PROJECT_MARKER,
   formatMessage,
   formatStudioVersion,
   getOrgSubscriptionPlan,
-  NO_ORG_MARKER,
-  NO_PROJECT_MARKER,
 } from './SupportForm.utils'
 import {
   DASHBOARD_LOG_CATEGORIES,

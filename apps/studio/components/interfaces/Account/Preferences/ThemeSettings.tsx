@@ -1,27 +1,25 @@
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
-import SVG from 'react-inlinesvg'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import SVG from 'react-inlinesvg'
 import {
   Card,
   CardContent,
   Label_Shadcn_,
-  RadioGroup_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
-  Select_Shadcn_,
+  RadioGroup_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Separator,
-  singleThemes,
   Theme,
+  singleThemes,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
@@ -30,6 +28,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)

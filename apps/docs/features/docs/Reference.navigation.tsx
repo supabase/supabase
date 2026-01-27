@@ -1,6 +1,5 @@
 import { isFeatureEnabled } from 'common'
 import { Fragment, type PropsWithChildren } from 'react'
-
 import { cn } from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'

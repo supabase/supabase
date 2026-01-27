@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-
 import apiWrapper from 'lib/api/apiWrapper'
 import {
   DEFAULT_PROJECT,
@@ -7,6 +5,7 @@ import {
   PROJECT_ENDPOINT_PROTOCOL,
   PROJECT_REST_URL,
 } from 'lib/constants/api'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

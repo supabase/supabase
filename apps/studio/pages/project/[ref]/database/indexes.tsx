@@ -1,10 +1,9 @@
-import { ExternalLink } from 'lucide-react'
-
 import Indexes from 'components/interfaces/Database/Indexes/Indexes'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'

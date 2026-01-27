@@ -5,10 +5,10 @@ import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 import { ChartHeader } from './ChartHeader'
 import {
   CHART_COLORS,
-  DateTimeFormats,
   DEFAULT_STACK_COLORS,
-  genStackColorScales,
+  DateTimeFormats,
   ValidStackColor,
+  genStackColorScales,
 } from './Charts.constants'
 import type { CommonChartProps } from './Charts.types'
 import {

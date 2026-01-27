@@ -1,9 +1,3 @@
-import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
 import { PurgeQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
@@ -20,14 +14,19 @@ import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/databa
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   LoadingLine,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Separator,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'

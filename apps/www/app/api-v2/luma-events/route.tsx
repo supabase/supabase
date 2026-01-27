@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
+
 import { DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 
 export interface LumaGeoAddressJson {

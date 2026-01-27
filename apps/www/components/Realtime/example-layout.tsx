@@ -1,8 +1,9 @@
 'use client'
-import SandpackWrapper from './sandpack'
-import { Button, CodeBlock } from 'ui'
-import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Code, Eye } from 'lucide-react'
+import { useState } from 'react'
+import { Button, CodeBlock } from 'ui'
+
+import SandpackWrapper from './sandpack'
 
 export type ExampleLayoutProps = {
   appJsCode: string

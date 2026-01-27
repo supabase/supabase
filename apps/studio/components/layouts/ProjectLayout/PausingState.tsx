@@ -1,11 +1,10 @@
-import { Circle, Loader } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { Project, useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Circle, Loader } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Badge } from 'ui'
 
 export interface PausingStateProps {

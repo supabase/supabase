@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
-import remarkGfm from 'remark-gfm'
-
 import { Markdown } from 'components/interfaces/Markdown'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { useEffect, useState } from 'react'
+import remarkGfm from 'remark-gfm'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
 interface CellDetailPanelProps {

@@ -1,6 +1,3 @@
-import { ShieldCheck } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
@@ -12,8 +9,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTrack } from 'lib/telemetry/track'
+import { ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
+
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
 

@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 /**
  * If `paramName` exists in query string, then call `setEmail()` with the value

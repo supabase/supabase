@@ -1,9 +1,11 @@
-import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ReactNode, useEffect, useState } from 'react'
 import {
   NumericFilter,
   ReportsNumericFilter,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { ReactNode, useEffect, useState } from 'react'
+
 import { FilterInput } from './components/FilterInput'
 import { FilterPill } from './components/FilterPill'
 import { IndexAdvisorFilter } from './components/IndexAdvisorFilter'
@@ -11,7 +13,6 @@ import { RolesFilterDropdown } from './components/RolesFilterDropdown'
 import { SortIndicator } from './components/SortIndicator'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
 
 export const QueryPerformanceFilterBar = ({
   actions,

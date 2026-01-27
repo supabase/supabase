@@ -1,8 +1,3 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useMemo } from 'react'
-import { toast } from 'sonner'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
 import {
@@ -31,9 +26,14 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 

@@ -1,12 +1,13 @@
 import 'swiper/css'
 
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { FC } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { cn } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
+
 import content from '~/data/home/content'
-import Link from 'next/link'
 
 interface Tweet {
   text: string

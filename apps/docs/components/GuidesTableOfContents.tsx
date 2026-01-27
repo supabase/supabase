@@ -1,12 +1,13 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import { isFeatureEnabled } from 'common'
+import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
-import { Feedback } from '~/components/Feedback'
+import { TOCItems, TOCScrollArea, Toc } from 'ui-patterns/Toc'
+
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
+import { Feedback } from '~/components/Feedback'
 
 interface TOCHeader {
   id?: string

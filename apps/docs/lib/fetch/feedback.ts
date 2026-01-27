@@ -1,7 +1,7 @@
 import { type UseMutationOptions, useMutation } from '@tanstack/react-query'
 
-import { type ResponseError } from '~/types/fetch'
 import { post } from './fetchWrappers'
+import { type ResponseError } from '~/types/fetch'
 
 type SendFeedbackVariables = {
   title: string

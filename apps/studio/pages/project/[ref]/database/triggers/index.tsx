@@ -1,7 +1,6 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-
-import { useParams } from 'common'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseTriggersIndexPage: NextPageWithLayout = () => {

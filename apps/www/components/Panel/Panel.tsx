@@ -1,7 +1,7 @@
-import React, { PropsWithChildren, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { cn } from 'ui'
 import { detectBrowser, isBrowser } from 'common'
+import { motion } from 'framer-motion'
+import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   outerClassName?: string

@@ -1,4 +1,5 @@
 import { IS_PLATFORM } from 'common'
+
 import { ProjectSettingsVariables, useProjectSettingsV2Query } from './project-settings-v2-query'
 
 export const useProjectEndpointQuery = ({ projectRef }: ProjectSettingsVariables) => {

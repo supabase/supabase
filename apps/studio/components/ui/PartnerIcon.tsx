@@ -1,6 +1,7 @@
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import type { Organization } from 'types'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { PARTNER_TO_NAME } from './PartnerManagedResource'
 
 interface PartnerIconProps {

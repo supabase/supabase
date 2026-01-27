@@ -3,6 +3,7 @@ import { DataPoint } from 'data/analytics/constants'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'

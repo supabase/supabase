@@ -1,8 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-
 import { IS_PLATFORM } from 'common'
 import { InternalServerError } from 'lib/api/apiHelpers'
-import { getActiveIncidents, type IncidentInfo } from 'lib/api/incident-status'
+import { type IncidentInfo, getActiveIncidents } from 'lib/api/incident-status'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 /**
  * Cache on browser for 5 minutes

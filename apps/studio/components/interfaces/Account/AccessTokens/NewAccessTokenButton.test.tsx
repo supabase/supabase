@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
 import { screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { NewAccessTokenButton } from './NewAccessTokenButton'
 
 describe(`NewAccessTokenButton`, () => {

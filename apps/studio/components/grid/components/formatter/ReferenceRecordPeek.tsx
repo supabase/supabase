@@ -1,7 +1,4 @@
 import { PostgresTable } from '@supabase/postgres-meta'
-import { Key } from 'lucide-react'
-import DataGrid, { Column } from 'react-data-grid'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
@@ -13,7 +10,9 @@ import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePan
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Key } from 'lucide-react'
+import DataGrid, { Column } from 'react-data-grid'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface ReferenceRecordPeekProps {

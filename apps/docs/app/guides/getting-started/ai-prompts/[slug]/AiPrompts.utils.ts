@@ -2,12 +2,12 @@ import matter from 'gray-matter'
 import type { Code, Heading, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
-import { readdir, readFile, stat } from 'node:fs/promises'
+import { readFile, readdir, stat } from 'node:fs/promises'
 import { basename, extname, join } from 'node:path'
 import { cache } from 'react'
-import { visit, EXIT } from 'unist-util-visit'
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { EXIT, visit } from 'unist-util-visit'
 
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])

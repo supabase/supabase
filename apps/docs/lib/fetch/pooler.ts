@@ -1,7 +1,7 @@
 import { type UseQueryOptions, useQuery } from '@tanstack/react-query'
 
-import type { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
+import type { ResponseError } from '~/types/fetch'
 
 const poolerKeys = {
   supavisorConfig: (projectRef: string | undefined) => ['supavisor', 'config', projectRef] as const,

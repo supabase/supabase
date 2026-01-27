@@ -1,6 +1,3 @@
-import { ExternalLink } from 'lucide-react'
-import { type PropsWithChildren } from 'react'
-
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
@@ -8,7 +5,9 @@ import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { type PropsWithChildren } from 'react'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 
 const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()

@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'react'
 import {
   Activity,
   BarChart,
@@ -30,18 +29,20 @@ import {
   Smartphone,
   Terminal,
   UploadCloud,
-  Users,
   UserX,
+  Users,
   Zap,
 } from 'lucide-react'
-import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
+import type { LucideIcon } from 'lucide-react'
+import { FunctionComponent } from 'react'
 import {
   PRODUCT,
   PRODUCT_MODULE,
   PRODUCT_MODULES_SHORTNAMES,
   PRODUCT_SHORTNAMES,
 } from 'shared-data/products'
-import type { LucideIcon } from 'lucide-react'
+
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 
 enum ADDITIONAL_PRODUCTS {
   PLATFORM = 'platform',

@@ -1,21 +1,19 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
+import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
 import dayjs from 'dayjs'
+import { BASE_PATH } from 'lib/constants'
 import { Edit, Unlink } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
-import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
   Card,
   CardContent,
-  cn,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -23,6 +21,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
@@ -34,6 +33,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,

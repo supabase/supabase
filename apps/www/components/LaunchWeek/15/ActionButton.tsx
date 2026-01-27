@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { type VariantProps, cva } from 'class-variance-authority'
 import { KeyboardEvent, ReactNode, useRef } from 'react'
 import { useKey } from 'react-use'
 import { cn } from 'ui'

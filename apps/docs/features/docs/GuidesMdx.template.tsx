@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-
 import { cn } from 'ui'
 
 import Breadcrumbs from '~/components/Breadcrumbs'

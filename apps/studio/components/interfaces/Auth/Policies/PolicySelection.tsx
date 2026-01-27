@@ -1,9 +1,8 @@
-import { noop } from 'lodash'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
-
 import CardButton from 'components/ui/CardButton'
+import { noop } from 'lodash'
 import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
 
 interface PolicySelectionProps {
   description: string

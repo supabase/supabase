@@ -1,5 +1,6 @@
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { ResponseError } from 'types'
+
 import { PGMQ_EXTENSION_NAME } from './constants'
 
 export type DatabaseQueuesVersionVariables = {

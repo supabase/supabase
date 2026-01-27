@@ -1,6 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
-import supabase from '~/lib/supabaseMisc'
+
 import Error404 from '../404'
+import supabase from '~/lib/supabaseMisc'
 
 function PartnerPage() {
   // Should be redirected to ./experts/:slug or ./integrations/:slug

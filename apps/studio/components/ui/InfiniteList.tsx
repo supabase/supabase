@@ -1,9 +1,11 @@
 import { Virtualizer, useVirtualizer } from '@tanstack/react-virtual'
 import {
   CSSProperties,
+  type ComponentProps,
   ComponentPropsWithRef,
   ComponentType,
   ElementType,
+  type PropsWithChildren,
   ReactNode,
   Ref,
   createContext,
@@ -13,10 +15,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  type ComponentProps,
-  type PropsWithChildren,
 } from 'react'
-
 import { Skeleton, cn } from 'ui'
 
 // Regular memo erases generics, so this helper adds them back

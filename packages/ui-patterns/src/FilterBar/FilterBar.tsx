@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { cn } from 'ui'
-import { FilterBarRoot, useFilterBar, type FilterBarVariant } from './FilterBarContext'
+
+import { FilterBarRoot, type FilterBarVariant, useFilterBar } from './FilterBarContext'
 import { FilterGroup } from './FilterGroup'
 import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
 

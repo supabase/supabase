@@ -5,13 +5,14 @@ import { ChevronUp } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { Fragment, memo } from 'react'
 import { cn } from 'ui'
+
+import MenuIconPicker from './MenuIconPicker'
+import * as NavItems from './NavigationMenu.constants'
+import { deepFilterSections } from './NavigationMenu.utils'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 import { BASE_PATH } from '~/lib/constants'
-import MenuIconPicker from './MenuIconPicker'
-import * as NavItems from './NavigationMenu.constants'
-import { deepFilterSections } from './NavigationMenu.utils'
 
 const HeaderLink = memo(function HeaderLink(props: any) {
   return (

@@ -1,5 +1,5 @@
+import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useState } from 'react'
-
 import {
   Button,
   Dialog,
@@ -11,8 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-
-import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Admonition } from 'ui-patterns'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {

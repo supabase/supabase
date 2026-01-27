@@ -1,8 +1,8 @@
-import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
 import * as Sentry from '@sentry/nextjs'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { AlertCircle } from 'lucide-react'
 import { ErrorInfo } from 'react'
+import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface ErrorFallbackProps {
   error: Error

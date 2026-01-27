@@ -1,6 +1,3 @@
-import { ExternalLink, Settings } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -9,7 +6,10 @@ import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from 'ui'
+
 import { APIKeys } from './APIKeys'
 import { GetStartedHero } from './GetStartedHero'
 

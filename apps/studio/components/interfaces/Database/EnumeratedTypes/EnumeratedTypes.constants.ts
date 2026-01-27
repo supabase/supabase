@@ -2,7 +2,6 @@
 // Such that dashboard can work with _all_ native Postgres data types as listed here
 // https://supabase.com/docs/guides/database/tables#data-types
 // But for now, just make sure users cannot created enum types that share the same name as a native type
-
 import {
   DATE_TYPES,
   JSON_TYPES,

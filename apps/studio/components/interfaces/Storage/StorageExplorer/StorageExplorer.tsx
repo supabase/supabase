@@ -1,13 +1,13 @@
-import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
-
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { useLatest } from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
+import { compact, get, isEmpty, uniqBy } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'

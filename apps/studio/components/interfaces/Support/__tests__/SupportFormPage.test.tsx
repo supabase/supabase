@@ -1,7 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 // End of third-party imports
 
 import { API_URL } from 'lib/constants'
@@ -10,6 +9,8 @@ import { createMockOrganization, createMockProject } from 'tests/helpers'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'
 import { createMockProfileContext } from 'tests/lib/profile-helpers'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
 import { SupportFormPage } from '../SupportFormPage'
 

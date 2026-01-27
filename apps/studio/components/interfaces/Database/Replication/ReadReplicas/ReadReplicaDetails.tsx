@@ -1,17 +1,6 @@
+import { useFlag, useParams } from 'common'
 import { BarChart2 } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
-import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
-import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
-import { BASE_PATH } from '@/lib/constants'
-import { useFlag, useParams } from 'common'
 import { AWS_REGIONS } from 'shared-data'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import {
@@ -27,6 +16,17 @@ import {
 } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
+import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { BASE_PATH } from '@/lib/constants'
 
 export const ReadReplicaDetails = () => {
   const { ref: projectRef, replicaId } = useParams()

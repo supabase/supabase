@@ -1,16 +1,14 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
 import AIBuildersLogos from 'components/Solutions/AIBuildersLogos'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-
-import content from 'data/solutions/ai-builders'
 import { Solutions } from 'data/Solutions'
+import content from 'data/solutions/ai-builders'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const Quotes = dynamic(() => import('components/Solutions/Quotes'))
 const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))

@@ -1,11 +1,10 @@
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { useEffect, useState } from 'react'
-
 import { Markdown } from 'components/interfaces/Markdown'
 import { onErrorChat } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { useEffect, useState } from 'react'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
 
 interface SupabaseService {

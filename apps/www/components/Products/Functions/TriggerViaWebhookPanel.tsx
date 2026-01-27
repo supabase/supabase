@@ -1,4 +1,5 @@
 import React from 'react'
+
 import CodeWindow from '~/components/CodeWindow'
 
 const code = `create trigger "my_webhook" after insert

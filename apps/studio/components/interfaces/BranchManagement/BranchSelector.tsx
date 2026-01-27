@@ -1,8 +1,7 @@
-import { Check, GitMerge, Shield } from 'lucide-react'
-import { useState } from 'react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Branch } from 'data/branches/branches-query'
+import { Check, GitMerge, Shield } from 'lucide-react'
+import { useState } from 'react'
 import {
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,

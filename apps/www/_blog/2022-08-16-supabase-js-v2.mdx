@@ -207,7 +207,7 @@ For example, Auth has a config parameter called "storageKey", which was was ofte
 We've created error types for all of the sub-libraries in `supabase-js`. Here's a example for Edge Functions:
 
 ```ts
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 
 const { data: user, error } = await supabase.functions.invoke('hello')
 

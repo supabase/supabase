@@ -1,14 +1,13 @@
 import 'swiper/css'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { FC } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
-
 import type { Quote, Quotes } from '~/data/solutions/solutions.utils'
-import Image from 'next/image'
 
 const Quotes: FC<Quotes> = (props) => (
   <section id={props.id}>

@@ -1,17 +1,17 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
-import SolutionsStickyNav from 'components/SolutionsStickyNav'
-import useVibeCodersContent from 'data/solutions/vibe-coders'
-import { Solutions } from 'data/Solutions'
-import Quotes from '~/components/Solutions/Quotes'
-import PostGrid from '~/components/Solutions/PostGrid'
-import { getSortedPosts, type Post } from '~/lib/posts'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import AIBuildersLogos from 'components/Solutions/AIBuildersLogos'
+import SolutionsStickyNav from 'components/SolutionsStickyNav'
+import { Solutions } from 'data/Solutions'
+import useVibeCodersContent from 'data/solutions/vibe-coders'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import PostGrid from '~/components/Solutions/PostGrid'
+import Quotes from '~/components/Solutions/Quotes'
+import { type Post, getSortedPosts } from '~/lib/posts'
 
 const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))

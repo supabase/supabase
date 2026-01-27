@@ -1,8 +1,7 @@
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import { isEqual } from 'lodash'
 import { ChevronDown, Filter as FilterIcon, Plus, X } from 'lucide-react'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
-
-import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -18,9 +17,10 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+
+import type { ReportFilter, ReportFilterProperty } from './Reports.types'
 import { sizes } from 'ui/src/lib/commonCva'
 import defaultTheme from 'ui/src/lib/theme/defaultTheme'
-import type { ReportFilter, ReportFilterProperty } from './Reports.types'
 
 const FilterableInput = ({
   value,

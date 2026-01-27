@@ -1,16 +1,14 @@
 'use client'
 
-import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-
 import {
-  DocsSearchResultType as PageType,
-  useDocsSearch,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
+  DocsSearchResultType as PageType,
+  useDocsSearch,
 } from 'common'
+import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
@@ -26,6 +24,7 @@ import {
   useSetQuery,
 } from '../..'
 import { BASE_PATH } from '../shared/constants'
+import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 const questions = [
   'How do I get started with Supabase?',

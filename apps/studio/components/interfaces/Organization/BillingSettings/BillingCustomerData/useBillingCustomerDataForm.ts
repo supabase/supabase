@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { components } from 'api-types'
+import type { CustomerAddress } from 'data/organizations/types'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { BillingCustomerDataFormValues, BillingCustomerDataSchema } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxIdValue } from './TaxID.utils'
-import { components } from 'api-types'
-import type { CustomerAddress } from 'data/organizations/types'
 
 export type FormCustomerData = {
   address: CustomerAddress | undefined

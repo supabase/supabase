@@ -1,8 +1,9 @@
 import {
-  PRODUCT_MODULES_NAMES,
   PRODUCT_MODULES,
+  PRODUCT_MODULES_NAMES,
   PRODUCT_MODULES_SHORTNAMES,
 } from 'shared-data/products'
+
 import { ProductType } from './MainProducts'
 
 const ProductModules: ProductType = {

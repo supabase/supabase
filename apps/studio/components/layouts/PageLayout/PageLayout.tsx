@@ -1,9 +1,9 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
+import { Badge, Button, NavMenu, NavMenuItem, cn } from 'ui'
 
-import { useParams } from 'common'
-import { Badge, Button, cn, NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainer } from '../Scaffold'
 import { PageHeader } from './PageHeader'
 

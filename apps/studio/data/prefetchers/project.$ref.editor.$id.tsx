@@ -1,7 +1,4 @@
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback } from 'react'
-
 import {
   formatFilterURLParams,
   formatSortURLParams,
@@ -13,8 +10,11 @@ import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useCallback } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
+
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 interface PrefetchEditorTablePageArgs {

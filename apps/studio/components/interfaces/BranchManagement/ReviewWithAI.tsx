@@ -1,3 +1,4 @@
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Branch } from 'data/branches/branches-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
@@ -6,7 +7,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { tablesToSQL } from 'lib/helpers'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation } from 'ui'
 

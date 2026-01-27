@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { type FieldError } from 'react-hook-form'
-
 import { InlineLink } from 'components/ui/InlineLink'
 import { LARGEST_SIZE_LIMIT_BUCKETS_COUNT } from 'data/sql/queries/get-largest-size-limit-buckets'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import Link from 'next/link'
+import { type FieldError } from 'react-hook-form'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import {
   decodeBucketLimitErrorMessage,
   formatBytesForDisplay,

@@ -1,9 +1,10 @@
 'use client'
 
-import React, { Fragment } from 'react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { isFeatureEnabled } from 'common'
 import { Menu } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import React, { Fragment } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +20,8 @@ import {
   cn,
   themes,
 } from 'ui'
+
 import MenuIconPicker from './MenuIconPicker'
-import { isFeatureEnabled } from 'common'
 
 const menu = [
   [

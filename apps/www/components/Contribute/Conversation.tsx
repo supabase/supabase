@@ -2,12 +2,13 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Badge, Card, CardContent } from 'ui'
-import { getThreadRepliesById } from '~/data/contribute'
-import type { ThreadRow } from '~/types/contribute'
+
 import { HelpOnPlatformButton } from './HelpOnPlatformButton'
 import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
-import { markdownComponents } from './markdownComponents'
 import { RepliesList } from './RepliesList'
+import { markdownComponents } from './markdownComponents'
+import { getThreadRepliesById } from '~/data/contribute'
+import type { ThreadRow } from '~/types/contribute'
 
 export async function Conversation({ thread }: { thread: ThreadRow }) {
   const { question, replies } = await getThreadRepliesById(thread.thread_key)

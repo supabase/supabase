@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type PropsWithChildren } from 'react'
-
+import { type PropsWithChildren, useState } from 'react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 

@@ -1,7 +1,8 @@
-import { glob } from 'fs/promises'
 import _routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
-import { normalize, posix, sep, join } from 'path'
+import { join, normalize, posix, sep } from 'path'
+
+import { glob } from 'fs/promises'
 
 export const routerMock = _routerMock
 

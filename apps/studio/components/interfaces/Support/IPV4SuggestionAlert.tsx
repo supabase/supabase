@@ -1,7 +1,6 @@
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 export const IPV4SuggestionAlert = () => {
   return (

@@ -1,11 +1,3 @@
-import dayjs from 'dayjs'
-import { Auth, Database, Realtime, Storage } from 'icons'
-import sumBy from 'lodash/sumBy'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -15,10 +7,17 @@ import {
   UsageApiCounts,
   useProjectLogStatsQuery,
 } from 'data/analytics/project-log-stats-query'
+import dayjs from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Auth, Database, Realtime, Storage } from 'icons'
+import sumBy from 'lodash/sumBy'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import type { ChartIntervals } from 'types'
 import {
   Button,

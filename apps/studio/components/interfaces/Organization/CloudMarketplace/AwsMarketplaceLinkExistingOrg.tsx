@@ -1,14 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { cn } from '@ui/lib/utils'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
+import { cn } from '@ui/lib/utils'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -17,23 +9,31 @@ import {
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationLinkAwsMarketplaceMutation } from 'data/organizations/organization-link-aws-marketplace-mutation'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import type { Organization } from 'types'
 import {
   Button,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Form_Shadcn_,
+  Collapsible_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Skeleton,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { OrganizationCard } from '../OrganizationCard'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
-import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
-import { useCloudMarketplaceOnboardingInfoQuery } from './cloud-marketplace-query'
-import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 import AwsMarketplaceOnboardingPlaceholder from './AwsMarketplaceOnboardingPlaceholder'
+import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
+import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
+import { useCloudMarketplaceOnboardingInfoQuery } from './cloud-marketplace-query'
 
 interface AwsMarketplaceLinkExistingOrgProps {
   organizations?: Organization[] | undefined

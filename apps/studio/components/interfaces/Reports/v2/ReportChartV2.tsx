@@ -1,7 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
-
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
@@ -10,7 +7,10 @@ import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import { Card, CardContent, cn } from 'ui'
+
 import { ReportChartUpsell } from './ReportChartUpsell'
 
 export interface ReportChartV2Props {

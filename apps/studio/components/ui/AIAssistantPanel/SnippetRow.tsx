@@ -1,7 +1,8 @@
+import { X } from 'lucide-react'
 import React from 'react'
 import { Button, CodeBlock } from 'ui'
-import { HoverCard_Shadcn_, HoverCardTrigger_Shadcn_, HoverCardContent_Shadcn_ } from 'ui'
-import { X } from 'lucide-react'
+import { HoverCardContent_Shadcn_, HoverCardTrigger_Shadcn_, HoverCard_Shadcn_ } from 'ui'
+
 import { type SqlSnippet } from './AIAssistant.types'
 
 export const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {

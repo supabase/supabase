@@ -3,7 +3,8 @@
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
-import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, cn } from 'ui'
+
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
 

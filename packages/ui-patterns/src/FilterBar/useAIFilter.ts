@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup, isGroup } from './types'
+import { FilterGroup, FilterProperty, isGroup } from './types'
 import { updateGroupAtPath } from './utils'
 
 export function useAIFilter({

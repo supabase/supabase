@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
-import Link from 'next/link'
-
 import { useFlag, useParams } from 'common'
 import {
   ScaffoldSection,
@@ -19,9 +14,14 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { ExternalLink } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
 

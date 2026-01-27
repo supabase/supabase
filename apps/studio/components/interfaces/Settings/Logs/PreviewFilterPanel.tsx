@@ -1,15 +1,15 @@
-import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,

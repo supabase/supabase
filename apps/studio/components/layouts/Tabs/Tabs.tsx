@@ -6,24 +6,24 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable'
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
+import { type Tab, editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import {
-  cn,
-  ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  Tabs_Shadcn_,
+  ContextMenu_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
 } from 'ui'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'

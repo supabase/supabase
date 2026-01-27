@@ -1,24 +1,21 @@
 // @ts-nocheck
-
+import { SupabaseClient, createClient } from '@supabase/supabase-js'
+import classNames from 'classnames'
 import { ExternalLink } from 'lucide-react'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-
-import _days from '~/components/LaunchWeek/6/lw6_days.json'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import classNames from 'classnames'
 import { useTheme } from 'next-themes'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Accordion, Badge } from 'ui'
-import { SITE_ORIGIN } from '~/lib/constants'
-import type { WeekDayProps } from '~/types/launch-week-6'
 
 import styles from './styles/launchWeek6.module.css'
 import styleUtils from './styles/utils6.module.css'
+import _days from '~/components/LaunchWeek/6/lw6_days.json'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { SITE_ORIGIN } from '~/lib/constants'
+import type { WeekDayProps } from '~/types/launch-week-6'
 
 const days = _days as WeekDayProps[]
 const constellation = [

@@ -1,13 +1,13 @@
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
-import { useSearchParams } from 'next/navigation'
+import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useKey } from 'react-use'
 import type PostTypes from 'types/post'
-
 import {
   Button,
   DropdownMenu,
@@ -17,7 +17,6 @@ import {
   Input,
   cn,
 } from 'ui'
-import { ChevronDown, Search, X as CloseIcon } from 'lucide-react'
 
 interface Props {
   allEvents: PostTypes[]

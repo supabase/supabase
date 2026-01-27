@@ -1,9 +1,5 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, map as lodashMap, uniqBy } from 'lodash'
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,8 +9,12 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { noop } from 'lib/void'
+import { includes, map as lodashMap, uniqBy } from 'lodash'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 import { Input } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
 

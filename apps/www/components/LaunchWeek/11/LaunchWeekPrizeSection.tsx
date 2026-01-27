@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import React from 'react'
 import { cn } from 'ui'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import Image from 'next/image'
 import PrizeActions from './Releases/PrizeActions'
 
 export default function LaunchWeekPrizeSection({ className }: { className?: string }) {

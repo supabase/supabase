@@ -1,11 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { lintKeys } from 'data/lint/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { tableKeys } from './keys'
 import { CreateTableBody } from './table-create-mutation'
 

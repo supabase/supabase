@@ -1,6 +1,5 @@
 import { Box, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -14,6 +13,7 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+
 import { ConnectionType } from './Connect.constants'
 import { ConnectionIcon } from './ConnectionIcon'
 

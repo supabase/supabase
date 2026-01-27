@@ -1,7 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,

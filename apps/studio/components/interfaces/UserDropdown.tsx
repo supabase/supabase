@@ -1,12 +1,11 @@
+import { ProfileImage } from 'components/ui/ProfileImage'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProfileNameAndPicture } from 'lib/profile'
 import { Command, FlaskConical, Loader2, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { IS_PLATFORM } from 'lib/constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProfileNameAndPicture } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -23,6 +22,7 @@ import {
   singleThemes,
 } from 'ui'
 import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export function UserDropdown() {

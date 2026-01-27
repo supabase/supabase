@@ -1,18 +1,18 @@
 import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
+import type { UseCustomMutationOptions } from 'types'
 
+import type { ConnectionVars } from '../common.types'
+import { lintKeys } from '../lint/keys'
+import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import {
   API_ACCESS_ROLES,
   API_PRIVILEGE_TYPES,
   type ApiPrivilegesByRole,
 } from '@/lib/data-api-types'
 import type { DeepReadonly } from '@/lib/type-helpers'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { UseCustomMutationOptions } from 'types'
-import type { ConnectionVars } from '../common.types'
-import { lintKeys } from '../lint/keys'
-import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number

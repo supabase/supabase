@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
-
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { UpgradePlanButton } from './UpgradePlanButton'
 
 interface UpgradeToProProps {

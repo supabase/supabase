@@ -1,7 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, PropsWithChildren, SetStateAction } from 'react'
-
 import {
   Button,
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
 
 const ScopeDropdownCheckboxItem = ({

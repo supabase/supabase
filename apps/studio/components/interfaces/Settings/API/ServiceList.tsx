@@ -1,7 +1,3 @@
-import { AlertCircle } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
@@ -10,11 +6,15 @@ import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { AlertCircle } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Badge, Card, CardContent, CardHeader } from 'ui'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Badge, Card, CardContent, CardHeader } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+
 import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {

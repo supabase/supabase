@@ -3,31 +3,32 @@ import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-d
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import dayjs from 'dayjs'
 import { MoreVertical, Trash } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
   Card,
   CardContent,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Skeleton,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableHeadSort,
+  TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { parseAsStringLiteral, useQueryState } from 'nuqs'
 
 const ACCESS_TOKEN_SORT_VALUES = [
   'created_at:asc',

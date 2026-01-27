@@ -1,13 +1,12 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { PropsWithChildren, createContext, useContext } from 'react'
-import { proxy, useSnapshot } from 'valtio'
-
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import { PropsWithChildren, createContext, useContext } from 'react'
 import type { Dictionary } from 'types'
+import { proxy, useSnapshot } from 'valtio'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 

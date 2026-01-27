@@ -1,9 +1,10 @@
 import type { AuthMFAGetAuthenticatorAssuranceLevelResponse } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
+import { UseCustomQueryOptions } from 'types'
+
 import { profileKeys } from './keys'
 import type { Profile } from './types'
-import { UseCustomQueryOptions } from 'types'
 
 export type ProfileResponse = Profile
 

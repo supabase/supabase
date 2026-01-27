@@ -1,12 +1,4 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { useLatest } from 'react-use'
-import { toast } from 'sonner'
-import * as tus from 'tus-js-client'
-import { proxy, useSnapshot } from 'valtio'
-
-import { ResponseError } from '@/types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   inverseValidObjectKeyRegex,
@@ -27,8 +19,8 @@ import {
   StorageItemWithColumn,
 } from 'components/interfaces/Storage/Storage.types'
 import {
-  calculateTotalRemainingTime,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
+  calculateTotalRemainingTime,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
@@ -41,7 +33,7 @@ import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
-import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
+import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from 'data/storage/bucket-prefix-delete-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
@@ -50,7 +42,15 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { createProjectSupabaseClient } from 'lib/project-supabase-client'
+import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { useLatest } from 'react-use'
+import { toast } from 'sonner'
+import * as tus from 'tus-js-client'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { proxy, useSnapshot } from 'valtio'
+
+import { ResponseError } from '@/types'
 
 type UploadProgress = {
   percentage: number

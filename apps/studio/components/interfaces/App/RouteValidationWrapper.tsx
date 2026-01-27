@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
@@ -10,6 +6,9 @@ import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
+import { toast } from 'sonner'
 
 // Ideally these could all be within a _middleware when we use Next 12
 export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {

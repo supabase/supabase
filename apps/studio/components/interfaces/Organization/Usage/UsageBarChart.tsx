@@ -1,3 +1,4 @@
+import { DataPoint } from 'data/analytics/constants'
 import dayjs from 'dayjs'
 import {
   Bar,
@@ -9,9 +10,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-
-import { DataPoint } from 'data/analytics/constants'
 import { cn } from 'ui'
+
 import { Attribute, COLOR_MAP } from './Usage.constants'
 import { MultiAttributeTooltipContent, SingleAttributeTooltipContent } from './UsageChartTooltips'
 

@@ -1,12 +1,11 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { AlertCircle, Loader } from 'lucide-react'
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { AlertCircle, Loader } from 'lucide-react'
+import { PropsWithChildren } from 'react'
 import { Input } from 'ui'
 
 export const DisplayConfigSettings = () => {

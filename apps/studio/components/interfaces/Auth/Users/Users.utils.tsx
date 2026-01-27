@@ -1,19 +1,19 @@
+import { User } from 'data/auth/users-infinite-query'
 import dayjs from 'dayjs'
+import { BASE_PATH } from 'lib/constants'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
-
-import { User } from 'data/auth/users-infinite-query'
-import { BASE_PATH } from 'lib/constants'
 import {
   Checkbox_Shadcn_,
-  cn,
-  ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  ContextMenu_Shadcn_,
+  cn,
   copyToClipboard,
 } from 'ui'
+
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'

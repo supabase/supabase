@@ -1,5 +1,3 @@
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
@@ -13,6 +11,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useMemo, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 

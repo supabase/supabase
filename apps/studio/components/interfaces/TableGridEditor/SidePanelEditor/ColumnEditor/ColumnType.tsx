@@ -1,3 +1,4 @@
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -11,8 +12,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
-
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -36,6 +35,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,

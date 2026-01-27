@@ -1,26 +1,26 @@
-import React, { FC } from 'react'
-
-import { cn } from 'ui'
-import type { Feature } from '~/data/open-source/contributing/supasquad.utils'
 import {
   Award,
   Bot,
-  Zap,
-  MessageSquare,
   DollarSign,
   Gift,
-  TrendingUp,
   Heart,
-  Smartphone,
   LifeBuoy,
-  Wrench,
-  Shield,
   Lock,
-  Video,
-  Users,
+  MessageSquare,
   Mic,
+  Shield,
+  Smartphone,
   Tag,
+  TrendingUp,
+  Users,
+  Video,
+  Wrench,
+  Zap,
 } from 'lucide-react'
+import React, { FC } from 'react'
+import { cn } from 'ui'
+
+import type { Feature } from '~/data/open-source/contributing/supasquad.utils'
 
 const ICONS = {
   award: Award,

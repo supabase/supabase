@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
 import {
   ScaffoldSection,
@@ -12,6 +11,7 @@ import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection
 import NoPermission from 'components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+
 import { CreditTopUp } from './CreditTopUp'
 
 const CreditBalance = () => {

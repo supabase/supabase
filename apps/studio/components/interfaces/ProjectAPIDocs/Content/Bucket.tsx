@@ -1,10 +1,10 @@
-import { useParams } from 'common'
-import { Badge } from 'ui'
-
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useBucketInfoQueryPreferCached } from 'data/storage/buckets-query'
 import { formatBytes } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Badge } from 'ui'
+
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'

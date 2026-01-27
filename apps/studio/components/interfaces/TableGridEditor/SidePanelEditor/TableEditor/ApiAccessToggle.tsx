@@ -1,37 +1,22 @@
-import { Settings } from 'lucide-react'
-import Link from 'next/link'
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-} from 'react'
-import { usePreviousDistinct } from 'react-use'
-
-import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
-import {
-  API_ACCESS_ROLES,
-  API_PRIVILEGE_TYPES,
-  checkDataApiPrivilegesNonEmpty,
-  DEFAULT_DATA_API_PRIVILEGES,
-  EMPTY_DATA_API_PRIVILEGES,
-  isApiPrivilegeType,
-  type ApiAccessRole,
-  type ApiPrivilegesByRole,
-} from '@/lib/data-api-types'
-import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Switch } from 'ui'
+import { Settings } from 'lucide-react'
+import Link from 'next/link'
+import {
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { usePreviousDistinct } from 'react-use'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -42,6 +27,21 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+
+import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import {
+  API_ACCESS_ROLES,
+  API_PRIVILEGE_TYPES,
+  type ApiAccessRole,
+  type ApiPrivilegesByRole,
+  DEFAULT_DATA_API_PRIVILEGES,
+  EMPTY_DATA_API_PRIVILEGES,
+  checkDataApiPrivilegesNonEmpty,
+  isApiPrivilegeType,
+} from '@/lib/data-api-types'
+import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const ROLE_LABELS: Record<ApiAccessRole, string> = {
   anon: 'Anonymous (anon)',

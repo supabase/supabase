@@ -1,11 +1,10 @@
 import type { ChangeEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-
 import {
-  Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
+  Accordion_Shadcn_,
   Badge,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -13,6 +12,7 @@ import {
   PrePostTab,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DestinationType } from '../DestinationPanel.types'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 

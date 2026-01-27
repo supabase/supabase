@@ -1,24 +1,24 @@
+import { IS_PROD } from 'common'
 import matter from 'gray-matter'
 import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { isValidGuideFrontmatter } from '~/lib/docs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
-import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
-import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
-import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import {
   terraformDocsBranch,
   terraformDocsDocsDir,
   terraformDocsOrg,
   terraformDocsRepo,
 } from '../terraformConstants'
-import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-import { IS_PROD } from 'common'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
+import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { getEmptyArray } from '~/features/helpers.fn'
+import { isValidGuideFrontmatter } from '~/lib/docs'
+import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
+import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
+import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // Each external docs page is mapped to a local page
 const pageMap = [

@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { GitHubStatus } from 'components/interfaces/Settings/Integrations/GithubIntegration/GitHubStatus'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 import { generateBranchMenu } from './BranchLayout.utils'
 

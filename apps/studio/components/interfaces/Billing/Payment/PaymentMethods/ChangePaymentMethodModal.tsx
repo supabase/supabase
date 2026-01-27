@@ -1,8 +1,7 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
+import { toast } from 'sonner'
 import { Button, Modal } from 'ui'
 
 export interface ChangePaymentMethodModalProps {

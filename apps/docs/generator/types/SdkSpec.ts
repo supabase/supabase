@@ -1,5 +1,6 @@
-import { SpecLink } from './Spec'
 import { Url } from 'url'
+
+import { SpecLink } from './Spec'
 
 export type SdkInfo = {
   id: string

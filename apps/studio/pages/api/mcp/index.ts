@@ -1,5 +1,5 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
-import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
+import { SupabasePlatform, createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { stripIndent } from 'common-tags'
 import { commaSeparatedStringIntoArray, fromNodeHeaders, zBooleanString } from 'lib/api/apiHelpers'
 import {

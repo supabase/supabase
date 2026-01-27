@@ -1,11 +1,10 @@
-import { useCallback } from 'react'
-
 import type {
-  CommandMenuOpenedEvent,
   CommandMenuCommandClickedEvent,
+  CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from 'lib/telemetry'
+import { useCallback } from 'react'
 
 export function useWwwCommandMenuTelemetry() {
   const sendTelemetryEvent = useSendTelemetryEvent()

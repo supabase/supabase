@@ -1,8 +1,9 @@
-import React, { PropsWithChildren } from 'react'
-import Link from 'next/link'
-import { cn, TextLink } from 'ui'
-import Panel from './Panel'
 import { ChevronRightIcon, VideoCameraIcon } from '@heroicons/react/solid'
+import Link from 'next/link'
+import React, { PropsWithChildren } from 'react'
+import { TextLink, cn } from 'ui'
+
+import Panel from './Panel'
 
 interface Props {
   className?: string

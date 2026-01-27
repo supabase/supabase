@@ -1,10 +1,10 @@
-import { noop } from 'lodash'
-import { Button, Checkbox, cn, Modal } from 'ui'
-
 import { PolicyName } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
 import { PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
 import SqlEditor from 'components/ui/SqlEditor'
 import { DOCS_URL } from 'lib/constants'
+import { noop } from 'lodash'
+import { Button, Checkbox, Modal, cn } from 'ui'
+
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
 

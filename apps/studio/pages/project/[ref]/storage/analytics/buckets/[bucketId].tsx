@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails'
 import { useSelectedAnalyticsBucket } from 'components/interfaces/Storage/AnalyticsBuckets/useSelectedAnalyticsBucket'
@@ -12,6 +8,9 @@ import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {

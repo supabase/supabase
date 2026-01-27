@@ -1,4 +1,5 @@
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+
 import { lintInfoMap } from '../Linter/Linter.utils'
 import { AdvisorRuleItem } from './AdvisorRuleItem'
 

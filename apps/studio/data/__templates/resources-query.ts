@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-
 import { get, handleError } from 'data/fetchers'
+import { useCallback } from 'react'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { resourceKeys } from './keys'
 
 export type ResourcesVariables = {

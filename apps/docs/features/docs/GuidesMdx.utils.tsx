@@ -7,17 +7,17 @@ import { notFound } from 'next/navigation'
 import { readdir } from 'node:fs/promises'
 import { extname, join, relative, sep } from 'node:path'
 
-import { extractMessageFromAnyError, FileNotFoundError } from '~/app/api/utils'
+import { newEditLink } from './GuidesMdx.template'
+import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
+import { FileNotFoundError, extractMessageFromAnyError } from '~/app/api/utils'
 import { pluckPromise } from '~/features/helpers.fn'
 import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
-import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
-import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
-import { newEditLink } from './GuidesMdx.template'
-import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { GUIDES_DIRECTORY, type GuideFrontmatter, isValidGuideFrontmatter } from '~/lib/docs'
+import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 

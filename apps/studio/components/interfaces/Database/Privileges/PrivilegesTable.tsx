@@ -1,6 +1,7 @@
 import Table from 'components/to-be-cleaned/Table'
 import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
 import { Switch } from 'ui'
+
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,

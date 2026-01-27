@@ -1,6 +1,5 @@
 import { XCircle } from 'lucide-react'
 import { FC, PropsWithChildren, useState } from 'react'
-
 import { Badge } from 'ui'
 
 interface IOptions {

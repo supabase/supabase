@@ -1,11 +1,11 @@
-import { Loader2 } from 'lucide-react'
-import type { EdgeProps } from 'reactflow'
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow'
-
 import { useParams } from 'common'
 import { useReplicationLagQuery } from 'data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { Loader2 } from 'lucide-react'
+import type { EdgeProps } from 'reactflow'
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 
 export const SmoothstepEdge = ({

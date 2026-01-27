@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router'
-
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useRouter } from 'next/router'
 import { TimestampInfo } from 'ui-patterns'
+
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 /**
  * Used to display urgent notices that apply for all users, such as maintenance windows.

@@ -1,15 +1,16 @@
 'use client'
 
-import { useMemo } from 'react'
-import { EdgeFunctions } from 'icons'
-import { Loader2 } from 'lucide-react'
 import { useParams } from 'common'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { EdgeFunctions } from 'icons'
+import { Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
+
 import {
-  SkeletonResults,
   EmptyState,
   ResultsList,
   type SearchResult,
+  SkeletonResults,
 } from './ContextSearchResults.shared'
 
 interface EdgeFunctionSearchResultsProps {

@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { tableKeys } from './keys'
 
 export type TablesVariables = {

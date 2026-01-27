@@ -1,9 +1,9 @@
 import type { UserIdentity } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
-
 import { auth } from 'lib/gotrue'
-import { profileKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { profileKeys } from './keys'
 
 export async function getProfileIdentities() {
   // getSession() uses a cached user object, which is almost never stale as the

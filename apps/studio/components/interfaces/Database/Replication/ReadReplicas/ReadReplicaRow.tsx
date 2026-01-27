@@ -1,15 +1,8 @@
+import { useParams } from 'common'
+import { Database as DatabaseIcon } from 'icons'
 import { Loader2, Minus, MoreVertical, RotateCcw, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-
-import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { type Database } from '@/data/read-replicas/replicas-query'
-import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
-import { useParams } from 'common'
-import { Database as DatabaseIcon } from 'icons'
 import { AWS_REGIONS } from 'shared-data'
 import {
   Badge,
@@ -23,7 +16,14 @@ import {
   TableRow,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
+
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
+import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { type Database } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 interface ReadReplicaRow {
   replica: Database

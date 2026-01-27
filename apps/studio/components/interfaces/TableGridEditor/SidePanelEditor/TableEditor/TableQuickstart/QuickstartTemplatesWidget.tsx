@@ -1,13 +1,13 @@
+import { useTrack } from 'lib/telemetry/track'
 import { Columns3, Layers, Table2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { TableField } from '../TableEditor.types'
 import { tableTemplates } from './templates'
 import type { TableSuggestion } from './types'
 import { convertTableSuggestionToTableField } from './utils'
-import { useTrack } from 'lib/telemetry/track'
 
 interface QuickstartTemplatesWidgetProps {
   onSelectTemplate: (tableData: Partial<TableField>) => void

@@ -106,8 +106,9 @@ export const countRows = async (db, table) => {
 In your `App.jsx` file, set up the state and reference variables to set up the database:
 
 ```js App.jsx
-import { getDB, initSchema, countRows } from './utils/db'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { countRows, getDB, initSchema } from './utils/db'
 
 export default function App() {
   const [content, setContent] = useState([])
@@ -264,8 +265,9 @@ self.addEventListener('message', async (event) => {
 In our `App.jsx` we set up a reference worker variable as well as the event listeners:
 
 ```js App.jsx
-import { getDB, initSchema, countRows, seedDb, search } from './utils/db'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { countRows, getDB, initSchema, search, seedDb } from './utils/db'
 
 export default function App() {
   // Keep track of the classification result and the model loading status.

@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
@@ -11,6 +10,7 @@ import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+
 import {
   getAnalyticsBucketPublicationName,
   getAnalyticsBucketS3KeyName,

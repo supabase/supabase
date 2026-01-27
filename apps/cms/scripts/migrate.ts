@@ -1,4 +1,5 @@
 import payload from 'payload'
+
 // Use a minimal config for migrations to avoid importing the full app graph during build
 import payloadConfig from '../src/payload.migrate.config.ts'
 

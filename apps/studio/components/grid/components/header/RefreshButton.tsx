@@ -1,10 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { RefreshCw } from 'lucide-react'
-
 import { useParams } from 'common'
 import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { tableRowKeys } from 'data/table-rows/keys'
+import { RefreshCw } from 'lucide-react'
 
 export type RefreshButtonProps = {
   tableId?: number

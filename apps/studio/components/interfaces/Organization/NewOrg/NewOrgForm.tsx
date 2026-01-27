@@ -2,16 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { groupBy } from 'lodash'
-import { HelpCircle } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -32,20 +22,30 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import { groupBy } from 'lodash'
+import { HelpCircle } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 
 const ORG_KIND_TYPES = {

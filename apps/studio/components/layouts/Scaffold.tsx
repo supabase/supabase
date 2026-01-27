@@ -1,4 +1,4 @@
-import { forwardRef, HTMLAttributes } from 'react'
+import { HTMLAttributes, forwardRef } from 'react'
 import { cn } from 'ui'
 
 export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'

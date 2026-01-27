@@ -1,17 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
-import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatCurrency } from 'lib/helpers'
+import { ChevronRight } from 'lucide-react'
+import { useMemo } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
   Button,
   ButtonProps,
@@ -32,6 +31,7 @@ import {
   TableRow,
   WarningIcon,
 } from 'ui'
+
 import { DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
 import {

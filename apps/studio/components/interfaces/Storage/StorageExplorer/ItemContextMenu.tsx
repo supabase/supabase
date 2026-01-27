@@ -1,11 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight, Copy, Download, Edit, Move, Trash2 } from 'lucide-react'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
+
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useParams } from 'common'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'

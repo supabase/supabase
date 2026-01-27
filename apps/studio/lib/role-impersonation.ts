@@ -1,5 +1,6 @@
 import type { User } from 'data/auth/users-infinite-query'
 import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
+
 import { uuidv4 } from './helpers'
 
 type PostgrestImpersonationRole =

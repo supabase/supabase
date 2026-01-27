@@ -1,5 +1,6 @@
-import { stripIndent } from 'common-tags'
 import { someFilter } from '@supabase/sql-to-rest'
+import { stripIndent } from 'common-tags'
+
 import { ResultBundle } from './util'
 
 export type Faq = {

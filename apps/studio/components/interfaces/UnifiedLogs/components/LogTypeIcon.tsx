@@ -1,7 +1,7 @@
-import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
-
 import { Auth, EdgeFunctions, Storage } from 'icons'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { type LOG_TYPES } from '../UnifiedLogs.constants'
 
 interface LogTypeIconProps {

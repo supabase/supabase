@@ -1,11 +1,11 @@
-import Link from 'next/link'
-
-import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
 import { useFlag, useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()

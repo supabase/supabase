@@ -1,4 +1,3 @@
-import fs from 'fs/promises'
 import { compact, sortBy } from 'lodash'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
@@ -6,6 +5,7 @@ import { z } from 'zod'
 
 import { generateDeterministicUuid } from './snippets.browser'
 import { SNIPPETS_DIR } from './snippets.constants'
+import fs from 'fs/promises'
 
 type DeepPartial<T> = T extends object
   ? {

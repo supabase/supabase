@@ -1,10 +1,10 @@
-import { PropsWithChildren } from 'react'
-import InlineSVG from 'react-inlinesvg'
-
 import { useParams } from 'common'
 import { BASE_PATH } from 'lib/constants'
-import IntegrationWindowLayout from './IntegrationWindowLayout'
+import { PropsWithChildren } from 'react'
+import InlineSVG from 'react-inlinesvg'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
+
+import IntegrationWindowLayout from './IntegrationWindowLayout'
 
 const VERCEL_ICON = (
   <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center text-white">

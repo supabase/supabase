@@ -1,5 +1,6 @@
 import rangeParser from 'parse-numeric-range'
 import { useMemo } from 'react'
+
 import CodeBlock, { CodeBlockProps } from './CodeBlock/CodeBlock'
 
 interface ScrollableCodeBlockProps extends CodeBlockProps {

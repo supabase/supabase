@@ -1,4 +1,5 @@
 import { cn } from 'ui'
+
 import { EventGalleryFilters } from './EventGalleryFilters'
 import { EventList } from './EventList'
 import { EventTimeline } from './EventTimeline'

@@ -1,10 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { clientSecretKeys } from './keys'
 
-import { components } from 'api-types'
+import { clientSecretKeys } from './keys'
 
 export type Secret =
   components['schemas']['ListOAuthAppClientSecretsResponse']['client_secrets'][0] & {

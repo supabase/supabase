@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
-import { ReactNode, useState } from 'react'
-import { toast } from 'sonner'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
@@ -22,6 +18,9 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
+import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
+import { ReactNode, useState } from 'react'
+import { toast } from 'sonner'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -30,17 +29,18 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
-  cn,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  cn,
+  copyToClipboard,
 } from 'ui'
+
 import { ExportDialog } from './ExportDialog'
-import { FilterPopoverNew } from './filter/FilterPopoverNew'
 import { formatRowsForCSV } from './Header.utils'
+import { FilterPopoverNew } from './filter/FilterPopoverNew'
 import { SortPopover } from './sort/SortPopover'
 
 export type HeaderProps = {

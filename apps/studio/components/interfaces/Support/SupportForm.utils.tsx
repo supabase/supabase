@@ -1,12 +1,3 @@
-import { Book, Github, Hash, MessageSquare } from 'lucide-react'
-import {
-  createLoader,
-  createParser,
-  createSerializer,
-  type inferParserType,
-  parseAsString,
-  type UseQueryStatesKeysMap,
-} from 'nuqs'
 // End of third-party imports
 
 import {
@@ -17,7 +8,17 @@ import {
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
 import { DOCS_URL } from 'lib/constants'
+import { Book, Github, Hash, MessageSquare } from 'lucide-react'
+import {
+  type UseQueryStatesKeysMap,
+  createLoader,
+  createParser,
+  createSerializer,
+  type inferParserType,
+  parseAsString,
+} from 'nuqs'
 import type { Organization } from 'types'
+
 import { CATEGORY_OPTIONS } from './Support.constants'
 
 export const NO_PROJECT_MARKER = 'no-project'

@@ -1,5 +1,4 @@
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef } from 'react'
-
 import { Button, ExpandingTextArea } from 'ui'
 
 interface AskAIWidgetProps {

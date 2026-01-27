@@ -1,9 +1,10 @@
+import { SupabaseClient } from '@supabase/supabase-js'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { cn } from 'ui'
+
 import useConfData from '../hooks/use-conf-data'
-import { SupabaseClient } from '@supabase/supabase-js'
-import { ArrowRight } from 'lucide-react'
 
 export interface Meetup {
   id?: any

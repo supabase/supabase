@@ -1,10 +1,7 @@
-import { useState } from 'react'
-
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useFlag, useParams } from 'common'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useState } from 'react'
 import {
-  cn,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -12,12 +9,15 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  cn,
 } from 'ui'
+
 import { EnableReplicationCallout } from '../EnableReplicationCallout'
 import { DestinationForm } from './DestinationForm'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 
 interface DestinationPanelProps {
   visible: boolean

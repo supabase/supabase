@@ -1,6 +1,5 @@
 import { Github } from 'lucide-react'
 import Link from 'next/link'
-
 import { cn } from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'

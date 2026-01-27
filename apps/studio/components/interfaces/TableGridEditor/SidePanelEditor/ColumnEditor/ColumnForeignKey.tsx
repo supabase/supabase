@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-import { useState } from 'react'
-import { Button } from 'ui'
-
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useState } from 'react'
+import { Button } from 'ui'
+
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'

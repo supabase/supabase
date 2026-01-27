@@ -1,6 +1,5 @@
-import { snakeCase } from 'lodash'
-
 import { ReplicationPublication } from 'data/replication/publications-query'
+import { snakeCase } from 'lodash'
 
 export const inferPostgresTableFromNamespaceTable = ({
   publication,

@@ -1,9 +1,8 @@
 import { usePrevious } from '@uidotdev/usehooks'
+import SqlEditor from 'components/ui/SqlEditor'
 import { noop } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useEffect } from 'react'
-
-import SqlEditor from 'components/ui/SqlEditor'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface PolicyDefinitionProps {

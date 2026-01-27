@@ -1,8 +1,10 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from './SidePanelEditor.types'
+// Import after mocks are set up
+import { createTable } from './SidePanelEditor.utils'
 
 // Define mock functions at module level
 const mockExecuteSql = vi.fn()
@@ -50,9 +52,6 @@ vi.mock('sonner', () => ({
 vi.mock('components/ui/SparkBar', () => ({
   default: () => null,
 }))
-
-// Import after mocks are set up
-import { createTable } from './SidePanelEditor.utils'
 
 // Helper to create a column field with defaults
 const createColumnField = (overrides: Partial<ColumnField> = {}): ColumnField => ({

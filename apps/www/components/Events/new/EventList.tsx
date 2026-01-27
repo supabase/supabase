@@ -3,6 +3,7 @@
 import { Rows3Icon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, cn } from 'ui'
+
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
 

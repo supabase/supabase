@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getAnalyticsBucketFDWName,
@@ -14,6 +13,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 
 export const useIcebergWrapperCreateMutation = () => {

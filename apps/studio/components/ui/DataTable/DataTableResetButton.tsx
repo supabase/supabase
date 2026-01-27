@@ -1,7 +1,7 @@
-import { X } from 'lucide-react'
-
 import { useHotKey } from 'hooks/ui/useHotKey'
+import { X } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
 

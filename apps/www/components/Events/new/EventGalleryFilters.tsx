@@ -3,6 +3,7 @@
 import { Input } from '@ui/components/shadcn/ui/input'
 import { SearchIcon } from 'lucide-react'
 import { Badge } from 'ui'
+
 import { useEvents } from '~/app/events/context'
 
 const CATEGORIES_FILTERS = [

@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
 // End of third-party imports
 
 import type { ExtendedSupportCategories } from 'components/interfaces/Support/Support.constants'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type sendSupportTicketVariables = {

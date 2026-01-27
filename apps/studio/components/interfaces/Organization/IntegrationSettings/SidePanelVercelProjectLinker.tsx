@@ -1,7 +1,3 @@
-import { keyBy } from 'lodash'
-import { useCallback, useMemo } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
 import ProjectLinker, {
@@ -15,6 +11,9 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
+import { keyBy } from 'lodash'
+import { useCallback, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { SidePanel } from 'ui'
 

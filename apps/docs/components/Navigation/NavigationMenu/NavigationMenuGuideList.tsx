@@ -1,13 +1,13 @@
 'use client'
 
 import * as Accordion from '@radix-ui/react-accordion'
-
-import { type NavMenuSection } from '../Navigation.types'
-import * as NavItems from './NavigationMenu.constants'
-import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
+
+import { type NavMenuSection } from '../Navigation.types'
 import { MenuId } from './NavigationMenu'
+import * as NavItems from './NavigationMenu.constants'
+import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 
 const NavigationMenuGuideList = ({
   id,

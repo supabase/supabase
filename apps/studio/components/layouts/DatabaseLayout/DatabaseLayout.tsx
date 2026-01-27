@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { ProductMenu } from 'components/ui/ProductMenu'
@@ -9,6 +6,9 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 

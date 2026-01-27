@@ -1,8 +1,8 @@
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { ReactNode, useMemo } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { formatCompactNumber } from './DataTable.utils'
 import { DataTableFilterControlsDrawer } from './DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableResetButton } from './DataTableResetButton'

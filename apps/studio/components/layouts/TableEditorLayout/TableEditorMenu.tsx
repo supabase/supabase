@@ -1,12 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Filter, Plus } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { SupaTable } from 'components/grid/types'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
@@ -23,6 +20,8 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { Filter, Plus } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
@@ -39,6 +38,7 @@ import {
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
+
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'

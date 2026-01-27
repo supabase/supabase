@@ -2,8 +2,9 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { cn, Menu } from 'ui'
+import { Menu, cn } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+
 import type { SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {

@@ -1,9 +1,5 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -13,9 +9,13 @@ import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import dayjs from 'dayjs'
+import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 
 export const AuditLogs = () => {

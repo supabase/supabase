@@ -1,21 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState, type ReactNode } from 'react'
-import { SubmitHandler, useForm, type UseFormReturn } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useParams } from 'common'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { ProjectSecret } from 'data/secrets/secrets-query'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Eye, EyeOff, X } from 'lucide-react'
+import { type ReactNode, useEffect, useState } from 'react'
+import { SubmitHandler, type UseFormReturn, useForm } from 'react-hook-form'
 import { useLatest } from 'react-use'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input,
   Input_Shadcn_,
   Separator,
@@ -26,9 +23,11 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
 const FORM_ID = 'edit-secret-sidepanel'
 

@@ -1,11 +1,11 @@
-import { Clock5, Layers, Timer, Vault, Webhook, Receipt } from 'lucide-react'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { Clock5, Layers, Receipt, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
-
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'

@@ -1,13 +1,13 @@
 import { useParams } from 'common'
-import { type ReactNode } from 'react'
-
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useBucketInfoQueryPreferCached } from 'data/storage/buckets-query'
 import { DOCS_URL } from 'lib/constants'
+import { type ReactNode } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
+
 import { API_DOCS_CATEGORIES } from './ProjectAPIDocs.constants'
-import { SecondLevelNavLayout, type MenuItemFilter } from './SecondLevelNav.Layout'
+import { type MenuItemFilter, SecondLevelNavLayout } from './SecondLevelNav.Layout'
 import { ResourcePickerList } from './SecondLevelNav.ResourcePicker'
 import { StorageResourceList } from './SecondLevelNav.StoragePicker'
 

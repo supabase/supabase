@@ -1,15 +1,15 @@
+import AlertError from 'components/ui/AlertError'
+import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
 import dayjs from 'dayjs'
 import { TextSearch } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-
-import AlertError from 'components/ui/AlertError'
-import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
 import type { ResponseError } from 'types'
 import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
 
 interface QueueDataGridProps {

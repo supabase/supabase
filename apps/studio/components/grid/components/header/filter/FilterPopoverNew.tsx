@@ -1,10 +1,9 @@
-import { format } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
 import { useDebounce } from '@uidotdev/usehooks'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { Filter } from 'components/grid/types'
 import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
+import { format } from 'date-fns'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Calendar } from 'ui'
 import {
@@ -13,10 +12,11 @@ import {
   FilterGroup,
   FilterOption,
   FilterProperty,
-  isGroup,
   SerializableFilterProperty,
+  isGroup,
   updateGroupAtPath,
 } from 'ui-patterns'
+
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 
 export interface FilterPopoverProps {

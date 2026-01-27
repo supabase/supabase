@@ -1,7 +1,8 @@
+import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
+
 import ProductIcon from '../ProductIcon'
-import { BookOpen } from 'lucide-react'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type subheader = string

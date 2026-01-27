@@ -93,6 +93,7 @@ You can supply the type definitions to `supabase-js` like so:
 
 ```ts ./index.tsx
 import { createClient } from '@supabase/supabase-js'
+
 import { Database } from './database.types'
 
 const supabase = createClient<Database>(
@@ -117,7 +118,9 @@ export interface Database {
 
 ```ts ./database.types.ts
 import { MergeDeep } from 'type-fest'
+
 import { Database as DatabaseGenerated } from './database-generated.types'
+
 export { Json } from './database-generated.types'
 
 // Override the type for a specific column in a view:
@@ -154,6 +157,7 @@ You can extend your generated database types to include custom JSON schemas usin
 
 ```ts ./database.types.ts
 import { MergeDeep } from 'type-fest'
+
 import { Database as DatabaseGenerated } from './database-generated.types'
 
 // Define your custom JSON type
@@ -274,7 +278,7 @@ create table cities (
 We can get the nested `CountriesWithCities` type like this:
 
 ```ts
-import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+import { QueryData, QueryError, QueryResult } from '@supabase/supabase-js'
 
 const countriesWithCitiesQuery = supabase.from('countries').select(`
   id,

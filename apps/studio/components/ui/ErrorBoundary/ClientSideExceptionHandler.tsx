@@ -1,10 +1,10 @@
-import { ExternalLink } from 'lucide-react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import CopyButton from '../CopyButton'
 import { InlineLinkClassName } from '../InlineLink'
 

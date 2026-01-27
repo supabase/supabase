@@ -1,10 +1,3 @@
-import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
@@ -16,6 +9,12 @@ import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPol
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,

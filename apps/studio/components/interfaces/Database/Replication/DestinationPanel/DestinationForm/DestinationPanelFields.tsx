@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { useState } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
-
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -10,23 +6,27 @@ import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
+  Select_Shadcn_,
   TextArea_Shadcn_,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 

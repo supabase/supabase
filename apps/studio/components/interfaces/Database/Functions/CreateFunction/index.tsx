@@ -1,11 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { Plus, Trash } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -13,8 +6,13 @@ import { useDatabaseFunctionCreateMutation } from 'data/database-functions/datab
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
+import { Plus, Trash } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -43,6 +41,8 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'

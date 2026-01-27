@@ -1,10 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { formatWrapperTables } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
@@ -16,6 +10,10 @@ import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { fdwKeys } from 'data/fdw/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -26,11 +24,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { getDecryptedParameters } from '../../Storage.utils'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 

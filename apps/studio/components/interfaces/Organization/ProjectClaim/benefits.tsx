@@ -1,8 +1,8 @@
-import { CheckCircle2 } from 'lucide-react'
-
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
+import { CheckCircle2 } from 'lucide-react'
 import { Button } from 'ui'
+
 import { ProjectClaimLayout } from './layout'
 
 export const ProjectClaimBenefits = ({

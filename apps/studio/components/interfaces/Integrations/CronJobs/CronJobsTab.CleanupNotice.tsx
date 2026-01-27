@@ -1,18 +1,17 @@
+import { getScheduleDeleteCronJobRunDetailsSql } from 'data/sql/queries/delete-cron-job-run-details'
 import { CheckCircle2, RefreshCw, XCircle } from 'lucide-react'
-
 import {
   Button,
   CodeBlock,
   Progress,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { getScheduleDeleteCronJobRunDetailsSql } from 'data/sql/queries/delete-cron-job-run-details'
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
 import type { BatchDeletionProgress, CleanupState } from './CronJobsTab.useCleanupActions'
 

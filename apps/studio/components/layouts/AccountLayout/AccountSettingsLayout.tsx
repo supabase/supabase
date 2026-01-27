@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
-
 import { Button, cn } from 'ui'
+
 import { ScaffoldContainerLegacy } from '../Scaffold'
 
 export const AccountSettingsLayout = ({ children }: PropsWithChildren) => {

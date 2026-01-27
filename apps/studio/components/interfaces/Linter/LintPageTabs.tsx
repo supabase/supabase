@@ -1,7 +1,8 @@
-import { MessageSquareMore } from 'lucide-react'
-
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-
+import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
+import { Lint } from 'data/lint/lint-query'
+import { MessageSquareMore } from 'lucide-react'
+import { useRouter } from 'next/router'
 import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -11,10 +12,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-
-import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
-import { Lint } from 'data/lint/lint-query'
-import { useRouter } from 'next/router'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface LintPageTabsProps {

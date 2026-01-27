@@ -1,7 +1,10 @@
-import React from 'react'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { opacityVariant4, scaleOpacityVariant2 } from '.'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { motion } from 'framer-motion'
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+
 import {
   ArrowTopRightSvg,
   CartTitle,
@@ -10,12 +13,8 @@ import {
   SectionButtons,
   StyledArticleBadge,
 } from './components'
-
-import { WeekDayProps } from '~/components/LaunchWeek/7/lw7_days'
-import { opacityVariant4, scaleOpacityVariant2 } from '.'
-
 import styles from './day5.module.css'
-import Link from 'next/link'
+import { WeekDayProps } from '~/components/LaunchWeek/7/lw7_days'
 
 const getDay5Motion = (index: number) => {
   switch (index) {

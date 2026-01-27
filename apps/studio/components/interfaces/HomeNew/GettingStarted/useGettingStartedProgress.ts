@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
@@ -12,6 +10,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useMemo } from 'react'
 
 type GettingStartedStatuses = {
   hasTables: boolean

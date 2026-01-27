@@ -1,4 +1,5 @@
 import { FDW, FDWTable } from 'data/fdw/fdws-query'
+
 import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
 import type { WrapperMeta } from './Wrappers.types'
 

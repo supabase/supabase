@@ -1,8 +1,9 @@
-import { cn } from 'ui'
-import SectionContainer from '../Layouts/SectionContainer'
-import { getSortedPosts } from '~/lib/posts'
 import Image from 'next/image'
 import Link from 'next/link'
+import { cn } from 'ui'
+
+import SectionContainer from '../Layouts/SectionContainer'
+import { getSortedPosts } from '~/lib/posts'
 
 interface PostGridProps {
   id?: string

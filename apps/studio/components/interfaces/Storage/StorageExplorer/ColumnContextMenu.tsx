@@ -1,11 +1,13 @@
 import { compact, uniqBy } from 'lodash'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
+
 import 'react-contexify/dist/ReactContexify.css'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ChevronRight, ChevronsDown, ChevronsUp, Copy, Eye, FolderPlus } from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import {
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,

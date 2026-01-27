@@ -1,11 +1,10 @@
-import dayjs from 'dayjs'
-import { Check, Loader2, X } from 'lucide-react'
-
 import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
 import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DATETIME_FORMAT } from 'lib/constants'
+import { Check, Loader2, X } from 'lucide-react'
 
 export interface QueueWithMetrics extends PostgresQueue {
   id: string // Add unique id for DataGrid

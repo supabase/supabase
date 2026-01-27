@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Key } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Key } from 'lucide-react'
+import { useMemo } from 'react'
 import {
   Button,
   DropdownMenu,

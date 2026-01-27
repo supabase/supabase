@@ -1,13 +1,12 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
 import Quotes from 'components/Solutions/Quotes'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-
 import getContent from 'data/solutions/no-code'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+
 import { getSortedPosts } from '~/lib/posts'
 import { PostTypes } from '~/types/post'
 

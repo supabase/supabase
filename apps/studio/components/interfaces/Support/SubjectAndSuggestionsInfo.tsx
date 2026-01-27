@@ -1,11 +1,12 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import type { UseFormReturn } from 'react-hook-form'
 import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DocsSuggestions } from './DocsSuggestions'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'

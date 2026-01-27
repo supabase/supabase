@@ -1,8 +1,8 @@
 import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { type ExecuteSqlError, executeSql } from 'data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { authKeys } from './keys'
 
 type UsersIndexStatusesVariables = {

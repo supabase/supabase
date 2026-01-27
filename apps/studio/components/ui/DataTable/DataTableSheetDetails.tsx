@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo } from 'react'
+import { Button, Separator, Skeleton, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
-import { Button, cn, Separator, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
 

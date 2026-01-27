@@ -1,6 +1,7 @@
-import React from 'react'
-import SectionContainer from '../../../Layouts/SectionContainer'
 import Image from 'next/image'
+import React from 'react'
+
+import SectionContainer from '../../../Layouts/SectionContainer'
 
 const LWXHeader = () => {
   return (

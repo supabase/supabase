@@ -1,6 +1,7 @@
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
 import { Skeleton } from 'ui'
+
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
 import { BlockFieldProps } from '../../types'
 import { TruncatedTextWithPopover } from './TruncatedTextWithPopover'

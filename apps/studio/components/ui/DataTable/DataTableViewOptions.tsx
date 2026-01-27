@@ -1,6 +1,5 @@
 import { GripVertical, Settings2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
 import {
   Checkbox_Shadcn_,
   Command_Shadcn_ as Command,
@@ -13,6 +12,7 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { Sortable, SortableDragHandle, SortableItem } from './primitives/Sortable'
 import { useDataTable } from './providers/DataTableProvider'

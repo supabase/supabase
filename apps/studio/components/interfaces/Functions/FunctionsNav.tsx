@@ -1,5 +1,5 @@
-import { Tabs } from 'ui'
 import { useRouter } from 'next/router'
+import { Tabs } from 'ui'
 
 const FunctionsNav = ({ item }: any) => {
   const router = useRouter()

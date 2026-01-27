@@ -1,11 +1,12 @@
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { BASE_PATH } from 'lib/constants'
-import { Admonition } from 'ui-patterns'
-import { EnableIndexAdvisorButton } from './EnableIndexAdvisorButton'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { BASE_PATH } from 'lib/constants'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
+
+import { EnableIndexAdvisorButton } from './EnableIndexAdvisorButton'
 
 export const IndexAdvisorNotice = () => {
   const { ref } = useParams()

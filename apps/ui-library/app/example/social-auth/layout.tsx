@@ -1,6 +1,7 @@
-import { ThemeProvider } from '@/app/Providers'
 import { Metadata } from 'next'
+
 import { BaseInjector } from './../base-injector'
+import { ThemeProvider } from '@/app/Providers'
 
 export const metadata: Metadata = {
   title: 'Social Auth Example',

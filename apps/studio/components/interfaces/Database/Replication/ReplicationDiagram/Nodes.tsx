@@ -1,6 +1,13 @@
+import { useParams } from 'common'
+import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { PropsWithChildren, useMemo } from 'react'
 import { Handle, Position } from 'reactflow'
+import { AWS_REGIONS } from 'shared-data'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
+import { getStatusName } from '../Pipeline.utils'
+import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
+import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -8,13 +15,6 @@ import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-s
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
-import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { AWS_REGIONS } from 'shared-data'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { getStatusName } from '../Pipeline.utils'
-import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
-import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 
 export const NODE_WIDTH = 480
 

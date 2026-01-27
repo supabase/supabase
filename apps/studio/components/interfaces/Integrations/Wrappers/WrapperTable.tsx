@@ -1,13 +1,11 @@
-import { useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 import {
   Card,
-  cn,
   Table,
   TableBody,
   TableCell,
@@ -15,7 +13,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
+
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'

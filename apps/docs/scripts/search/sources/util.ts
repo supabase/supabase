@@ -1,5 +1,6 @@
-import { readdir, stat } from 'fs/promises'
 import { basename, dirname, join } from 'path'
+
+import { readdir, stat } from 'fs/promises'
 
 export type WalkEntry = {
   path: string

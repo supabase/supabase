@@ -4,12 +4,6 @@ import type {
   OAuthClient,
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
-import { Plus, Trash2, Upload, X } from 'lucide-react'
-import { type ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -18,6 +12,10 @@ import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-se
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
 import { DOCS_URL } from 'lib/constants'
+import { Plus, Trash2, Upload, X } from 'lucide-react'
+import { type ChangeEvent, useEffect, useRef, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   FormControl_Shadcn_,
@@ -42,6 +40,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean

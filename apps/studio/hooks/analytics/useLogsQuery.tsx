@@ -1,6 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-
 import { IS_PLATFORM } from 'common'
 import {
   EXPLORER_DATEPICKER_HELPERS,
@@ -18,6 +16,7 @@ import {
 import { get } from 'data/fetchers'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams

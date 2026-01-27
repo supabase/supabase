@@ -1,14 +1,14 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { compact } from 'lodash'
-import { useEffect, useMemo } from 'react'
-import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
-
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { BASE_PATH } from 'lib/constants'
+import { compact } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { useEffect, useMemo } from 'react'
+import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 import { copyToClipboard } from 'ui'
+
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'

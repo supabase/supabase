@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { constructHeaders } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type GenerateAttachmentURLsResponse = {

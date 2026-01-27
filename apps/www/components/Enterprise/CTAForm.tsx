@@ -1,9 +1,9 @@
 import React, { FC } from 'react'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { CustomerLogo, CustomerQuote } from '../../pages/contact/sales'
 import EnterpriseFormQuotes from '../EnterpriseFormQuotes'
 import RequestADemoForm from '../Forms/RequestADemoForm'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {}
 

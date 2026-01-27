@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
-
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useEffect } from 'react'
 import { Card, CardContent, CardFooter, Form_Shadcn_ } from 'ui'
+
 import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 
 export const DataPrivacyForm = () => {

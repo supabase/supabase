@@ -1,8 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { FormActions } from 'components/ui/Forms/FormActions'
 import type {
   EnvironmentTargets,
@@ -13,6 +9,8 @@ import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-conn
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -27,6 +25,7 @@ import {
   Input_Shadcn_,
   Switch,
 } from 'ui'
+import * as z from 'zod'
 
 const VercelIntegrationConnectionForm = ({
   disabled,

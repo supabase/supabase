@@ -2,19 +2,19 @@
 
 import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect } from 'react'
-
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
+import Image from 'next/image'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
-import supabase from '~/lib/supabase'
+
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+import supabase from '~/lib/supabase'
 
 interface Props {
   className?: string

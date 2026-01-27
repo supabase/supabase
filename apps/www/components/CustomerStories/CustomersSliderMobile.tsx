@@ -1,12 +1,12 @@
 'use client'
 
 import 'swiper/css'
-import React from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { cn } from 'ui'
 import { CompositionCol } from '.'
 import type { CompositionColType } from '.'
+import React from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { cn } from 'ui'
 
 interface Props {
   className?: string

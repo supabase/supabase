@@ -1,11 +1,12 @@
-import { useInView } from 'react-intersection-observer'
-import { FC, PropsWithChildren } from 'react'
-import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { useRouter } from 'next/compat/router'
+import Image from 'next/legacy/image'
+import { FC, PropsWithChildren } from 'react'
+import { useInView } from 'react-intersection-observer'
+import { cn } from 'ui'
+
+import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
-import Image from 'next/legacy/image'
-import { cn } from 'ui'
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 interface ISectionContainer {

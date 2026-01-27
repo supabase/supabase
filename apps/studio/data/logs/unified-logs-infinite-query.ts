@@ -1,5 +1,4 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
   PageParam,
@@ -7,6 +6,7 @@ import {
 } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50

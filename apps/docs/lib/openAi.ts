@@ -1,10 +1,12 @@
 import OpenAI from 'openai'
+
 import 'server-only'
+
 import {
-  convertUnknownToApiError,
-  InvalidRequestError,
   type ApiError,
   type ApiErrorGeneric,
+  InvalidRequestError,
+  convertUnknownToApiError,
 } from '~/app/api/utils'
 import { Result } from '~/features/helpers.fn'
 

@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
+import Link from 'next/link'
+import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
-
 import { Button, cn } from 'ui'
+
 import Panel from '../Panel'
+import ComputePricingCalculator from './ComputePricingCalculator'
 import ComputePricingTable from './ComputePricingTable'
 import PricingComputeAnimation from './PricingComputeAnimation'
-import ComputePricingCalculator from './ComputePricingCalculator'
 
 const PricingComputeSection = () => {
   const ref = useRef<HTMLDivElement>(null)

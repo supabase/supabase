@@ -140,6 +140,7 @@ Listen to the `sync`, `join`, and `leave` events triggered whenever any client j
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -380,6 +381,7 @@ You can stop tracking presence using the `untrack()` method. This will trigger t
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 const roomOne = supabase.channel('room_01')
 
@@ -461,6 +463,7 @@ By default, Presence will generate a unique `UUIDv1` key on the server to track 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY')
 
 const channelC = supabase.channel('test', {

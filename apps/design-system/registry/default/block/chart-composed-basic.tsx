@@ -1,19 +1,19 @@
 'use client'
 
+import { BarChart2, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   Chart,
   ChartActions,
+  ChartBar,
   ChartCard,
   ChartContent,
-  ChartHeader,
-  ChartTitle,
   ChartEmptyState,
-  ChartLoadingState,
-  ChartBar,
+  ChartHeader,
   ChartLine,
+  ChartLoadingState,
+  ChartTitle,
 } from 'ui-patterns/Chart'
-import { BarChart2, ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
 
 export default function ComposedChartBasic() {
   const [isLoading, setIsLoading] = useState(true)

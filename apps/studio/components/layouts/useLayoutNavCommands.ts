@@ -1,5 +1,7 @@
 import { useIsLoggedIn } from 'common'
 import { useApiDocsGotoCommands } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs.Commands'
+
+import { useStorageGotoCommands } from '../interfaces/Storage/Storage.Commands'
 import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
@@ -9,7 +11,6 @@ import { useLogsGotoCommands } from './LogsLayout/Logs.Commands'
 import { useProjectSettingsGotoCommands } from './ProjectSettingsLayout/ProjectSettings.Commands'
 import { useReportsGotoCommands } from './ReportsLayout/Reports.Commands'
 import { useSqlEditorGotoCommands } from './SQLEditorLayout/SqlEditor.Commands'
-import { useStorageGotoCommands } from '../interfaces/Storage/Storage.Commands'
 import { useTableEditorGotoCommands } from './TableEditorLayout/TableEditor.Commands'
 
 export function useLayoutNavCommands() {

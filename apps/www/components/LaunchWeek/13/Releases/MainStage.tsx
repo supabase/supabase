@@ -1,10 +1,10 @@
-import React from 'react'
-import { mainDays } from './data'
-
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import DaySection from './components/DaySection'
-import { cn } from 'ui'
 import { useTheme } from 'next-themes'
+import React from 'react'
+import { cn } from 'ui'
+
+import DaySection from './components/DaySection'
+import { mainDays } from './data'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const MainStage = ({ className }: { className?: string }) => {
   const { resolvedTheme } = useTheme()

@@ -1,14 +1,14 @@
-import { ArrowUp, Eye, Code, HelpCircle } from 'lucide-react'
-
 import { useFlag } from 'common'
-import { AiIconAnimation, Button } from 'ui'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ArrowUp, Code, Eye, HelpCircle } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { AiIconAnimation, Button } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { buildExplainPrompt } from './ExplainVisualizer.ai'
 import type { QueryPlanRow } from './ExplainVisualizer.types'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export interface ExplainSummary {
   totalTime: number

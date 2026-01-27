@@ -1,11 +1,5 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronUp, Loader2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   isExplainQuery,
@@ -32,6 +26,11 @@ import { formatSql } from 'lib/formatSql'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { ChevronUp, Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -43,7 +42,6 @@ import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -55,12 +53,13 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
-import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
-  generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
+  generateSnippetTitle,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
@@ -72,8 +71,9 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
-import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+import { useAddDefinitions } from './useAddDefinitions'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })

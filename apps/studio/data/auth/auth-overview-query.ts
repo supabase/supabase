@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
 import {
-  RawAuthMetricsResponseSchema,
   type RawAuthMetricsResponse,
+  RawAuthMetricsResponseSchema,
 } from 'components/interfaces/Auth/Overview/OverviewUsage.schema'
+import { get, handleError } from 'data/fetchers'
 import type { UseCustomQueryOptions } from 'types'
+
 import { authKeys } from './keys'
 
 export type AuthOverviewVariables = {

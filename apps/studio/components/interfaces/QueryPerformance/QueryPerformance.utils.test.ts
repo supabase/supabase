@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { formatDuration } from './QueryPerformance.utils'
 import { calculatePercentilesFromHistogram } from './WithMonitor/WithMonitor.utils'
 

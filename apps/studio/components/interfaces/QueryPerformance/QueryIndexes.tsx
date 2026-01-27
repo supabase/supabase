@@ -1,17 +1,15 @@
-import { Check, Table2, Lightbulb } from 'lucide-react'
-import { useState, useEffect } from 'react'
-
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { Admonition } from 'ui-patterns'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { Check, Lightbulb, Table2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -26,18 +24,20 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+
 import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
+import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
+import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import {
   calculateImprovement,
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
-import { QueryPerformanceRow } from './QueryPerformance.types'
-import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
-import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
+import { QueryPerformanceRow } from './QueryPerformance.types'
+import { useIndexInvalidation } from './hooks/useIndexInvalidation'
 
 interface QueryIndexesProps {
   selectedRow: Pick<QueryPerformanceRow, 'query'>

@@ -1,10 +1,10 @@
+import { isFeatureEnabled } from 'common'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { type ComponentProps } from 'react'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 
-import { isFeatureEnabled } from 'common'
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { components } from '~/features/docs/MdxBase.shared'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'

@@ -1,4 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
@@ -14,17 +17,12 @@ import {
   Music,
   Trash2,
 } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
-
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import type { CSSProperties } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -37,7 +35,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
+
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
@@ -45,7 +45,7 @@ import {
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
-import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { type StorageItem, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'

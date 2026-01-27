@@ -1,13 +1,14 @@
 import authors from 'lib/authors.json'
+import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
+
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { generateReadingTime } from '~/lib/helpers'
-import { MDXRemote } from 'next-mdx-remote'
 
 interface Props {
   components: React.ReactNode

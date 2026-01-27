@@ -1,6 +1,5 @@
 import { UIMessage } from '@ai-sdk/react'
 import { useMutation } from '@tanstack/react-query'
-
 import type { RateMessageResponse } from 'components/ui/AIAssistantPanel/Message.utils'
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'

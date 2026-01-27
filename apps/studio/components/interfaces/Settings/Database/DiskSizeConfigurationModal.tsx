@@ -1,18 +1,16 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { ExternalLink, Info } from 'lucide-react'
-import Link from 'next/link'
-import { SetStateAction } from 'react'
-import { toast } from 'sonner'
-import { number, object } from 'yup'
-
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import dayjs from 'dayjs'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Info } from 'lucide-react'
+import Link from 'next/link'
+import { SetStateAction } from 'react'
+import { toast } from 'sonner'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,6 +23,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { number, object } from 'yup'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean

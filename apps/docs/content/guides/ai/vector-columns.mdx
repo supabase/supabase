@@ -73,6 +73,7 @@ In this example we'll generate a vector using Transformers.js, then store it in 
 
 ```js
 import { pipeline } from '@huggingface/transformers'
+
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'

@@ -9,6 +9,7 @@ import {
   GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
 import { ResponseError } from 'types'
+
 import { generateTypescriptTypes } from './generate-types'
 import { getLints } from './lints'
 import { getLogQuery, retrieveAnalyticsData } from './logs'

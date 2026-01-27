@@ -1,19 +1,18 @@
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
 import { useKey } from 'react-use'
-
-import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Accordion, Button, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 

@@ -1,11 +1,9 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
-
 import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 import { Bucket } from 'data/storage/buckets-query'
-
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { forwardRef, type CSSProperties } from 'react'
+import { noop } from 'lodash'
+import { type CSSProperties, forwardRef } from 'react'
 import {
   Badge,
   Button,

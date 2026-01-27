@@ -1,16 +1,15 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import DefaultLayout from 'components/Layouts/Default'
+import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
+import BlogFilters from 'components/Blog/BlogFilters'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import BlogFilters from 'components/Blog/BlogFilters'
 import FeaturedThumb from 'components/Blog/FeaturedThumb'
-import { cn } from 'ui'
-import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
+import DefaultLayout from 'components/Layouts/Default'
 import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
-
+import { useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
+import { cn } from 'ui'
 
 export type BlogView = 'list' | 'grid'
 

@@ -1,7 +1,8 @@
 'use client'
-import { useEffect, useState, useRef, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { motion } from 'framer-motion'
+import { ChevronsUpDown } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -9,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { ChevronsUpDown } from 'lucide-react'
+
 import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 

@@ -1,6 +1,5 @@
 import { Plus, Trash } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
-
 import {
   Button,
   FormControl_Shadcn_,
@@ -10,6 +9,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {

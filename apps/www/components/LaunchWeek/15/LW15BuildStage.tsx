@@ -1,10 +1,9 @@
-import React, { FC } from 'react'
-import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
-import { cn } from 'ui'
-
 import { buildDays as days } from 'components/LaunchWeek/15/data'
 import SectionContainer from 'components/Layouts/SectionContainer'
+import { motion, useInView } from 'framer-motion'
+import Link from 'next/link'
+import React, { FC } from 'react'
+import { cn } from 'ui'
 
 const LW15BuildStage: FC = () => {
   const ref = React.useRef(null)

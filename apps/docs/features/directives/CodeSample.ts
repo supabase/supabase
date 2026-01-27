@@ -30,7 +30,6 @@
  *   convertToJs={true} // Optional, strips TypeScript types to produce JavaScript
  * />
  */
-
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
 import amaro from 'amaro'
@@ -42,12 +41,12 @@ import { join } from 'node:path'
 import prettier from 'prettier'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
-import { z, type SafeParseError } from 'zod'
+import { type SafeParseError, z } from 'zod'
 
+import { getAttributeValue, getAttributeValueExpression } from './utils.server'
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { IS_PLATFORM } from '~/lib/constants'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
-import { getAttributeValue, getAttributeValueExpression } from './utils.server'
 
 const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, ...string[]]
 

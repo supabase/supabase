@@ -1,9 +1,9 @@
+import { isFeatureEnabled } from 'common'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { cn, IconBackground, TextLink } from 'ui'
+import { IconBackground, TextLink, cn } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
-import { isFeatureEnabled } from 'common'
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import { MIGRATION_PAGES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'

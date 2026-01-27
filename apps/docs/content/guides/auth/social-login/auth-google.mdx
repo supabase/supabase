@@ -238,6 +238,7 @@ To use your own application code for the signin button, call the `signInWithOAut
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('url', 'anonKey')
 
 // ---cut---
@@ -262,6 +263,7 @@ Google does not send out a refresh token by default, so you will need to pass pa
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
 // ---cut---
@@ -366,10 +368,11 @@ If you're integrating Google One-Tap with your Next.js application, you can refe
 ```tsx
 'use client'
 
-import Script from 'next/script'
-import { createClient } from '@/utils/supabase/client'
-import type { accounts, CredentialResponse } from 'google-one-tap'
+import type { CredentialResponse, accounts } from 'google-one-tap'
 import { useRouter } from 'next/navigation'
+import Script from 'next/script'
+
+import { createClient } from '@/utils/supabase/client'
 
 declare const google: { accounts: accounts }
 
@@ -459,6 +462,7 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin'
+
 import { supabase } from '../utils/supabase'
 
 export default function () {

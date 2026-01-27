@@ -80,6 +80,7 @@ Set up an `src/components/Auth.vue` component to manage logins and sign ups. We'
 ```vue name=/src/components/Auth.vue
 <script setup>
 import { ref } from 'vue'
+
 import { supabase } from '../supabase'
 
 const loading = ref(false)
@@ -135,8 +136,9 @@ Create a new `src/components/Account.vue` component to handle this.
 
 ```vue name=src/components/Account.vue
 <script setup>
-import { supabase } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
+
+import { supabase } from '../supabase'
 
 const props = defineProps(['session'])
 const { session } = toRefs(props)
@@ -253,6 +255,7 @@ Now that we have all the components in place, let's update `App.vue`:
 ```vue name=src/App.vue
 <script setup>
 import { onMounted, ref } from 'vue'
+
 import Account from './components/Account.vue'
 import Auth from './components/Auth.vue'
 import { supabase } from './supabase'
@@ -303,6 +306,7 @@ Create a new `src/components/Avatar.vue` component that allows users to upload p
 ```vue name=src/components/Avatar.vue
 <script setup>
 import { ref, toRefs, watchEffect } from 'vue'
+
 import { supabase } from '../supabase'
 
 const prop = defineProps(['path', 'size'])
@@ -392,6 +396,7 @@ And then we can add the widget to the Account page in `src/components/Account.vu
 <script>
 // Import the new component
 import Avatar from './Avatar.vue'
+
 //...
 const avatar_url = ref('')
 //...

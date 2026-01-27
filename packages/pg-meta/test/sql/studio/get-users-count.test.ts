@@ -1,7 +1,8 @@
-import { expect, test, afterAll } from 'vitest'
-import { createTestDatabase, cleanupRoot, createDatabaseWithAuthSchema } from '../../db/utils'
-import { getUsersCountSQL } from '../../../src/sql/studio/get-users-count'
 import { randomUUID } from 'crypto'
+import { afterAll, expect, test } from 'vitest'
+
+import { getUsersCountSQL } from '../../../src/sql/studio/get-users-count'
+import { cleanupRoot, createDatabaseWithAuthSchema, createTestDatabase } from '../../db/utils'
 
 afterAll(async () => {
   await cleanupRoot()

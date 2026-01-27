@@ -1,8 +1,7 @@
-import { Book, Github, Loader2 } from 'lucide-react'
-
-import { useDocsSearch, type DocsSearchResult } from 'common'
+import { type DocsSearchResult, useDocsSearch } from 'common'
 import { useChangedSync } from 'hooks/misc/useChanged'
 import { DOCS_URL } from 'lib/constants'
+import { Book, Github, Loader2 } from 'lucide-react'
 import { cn } from 'ui'
 
 function useDocsSuggestions(subject: string) {

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { get, handleError } from 'data/fetchers'
-import { platformKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { platformKeys } from './keys'
 
 export type PlatformStatusResponse = {
   isHealthy: boolean

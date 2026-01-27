@@ -1,5 +1,6 @@
 import { BucketPlus } from 'icons'
 import { EmptyStatePresentational } from 'ui-patterns'
+
 import { CreateBucketButton } from './NewBucketButton'
 import { BUCKET_TYPES } from './Storage.constants'
 

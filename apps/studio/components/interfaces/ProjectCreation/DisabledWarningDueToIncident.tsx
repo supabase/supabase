@@ -1,7 +1,6 @@
-import { AlertCircle } from 'lucide-react'
-
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
+import { AlertCircle } from 'lucide-react'
 
 interface DisabledWarningDueToIncidentProps {
   title: string

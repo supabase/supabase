@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
@@ -12,7 +8,11 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { hasMultipleOwners } from './TeamSettings.utils'
 
 export const LeaveTeamButton = () => {

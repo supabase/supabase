@@ -1,7 +1,6 @@
+import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { FileKey } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import {
   Button,
   DialogFooter,

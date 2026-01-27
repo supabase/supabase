@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Badge, Button, Menu } from 'ui'
+
 import { ProductMenuGroupItem } from './ProductMenu.types'
 
 interface ProductMenuItemProps {

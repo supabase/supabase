@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { useState } from 'react'
-
 import { GeneralContent } from 'components/interfaces/Docs/GeneralContent'
 import { LangSelector } from 'components/interfaces/Docs/LangSelector'
 import { ResourceContent } from 'components/interfaces/Docs/ResourceContent'
@@ -11,6 +9,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
+import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const PageConfig: NextPageWithLayout = () => {

@@ -4,15 +4,16 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  cn,
+  copyToClipboard,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'

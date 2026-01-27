@@ -1,12 +1,12 @@
-import Link from 'next/link'
-
 import { ComputeUsageMetric, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo } from 'react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+
 import { formatUsage } from '../helpers'
 import { Metric } from './BillingBreakdown.constants'
 

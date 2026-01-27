@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+
 import { formatRowsForInsert } from './SidePanelEditor.utils'
 
 describe('SidePanelEditor.utils.test.ts', () => {

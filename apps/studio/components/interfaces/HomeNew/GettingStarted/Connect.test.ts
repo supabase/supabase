@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import {
   getContentFilePath,
   inferConnectTabFromParentKey,
 } from 'components/interfaces/Connect/Connect.utils'
-import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { describe, expect, it } from 'vitest'
 
 describe('Connect.utils helpers', () => {
   it('inferConnectTabFromParentKey returns frameworks for nextjs', () => {

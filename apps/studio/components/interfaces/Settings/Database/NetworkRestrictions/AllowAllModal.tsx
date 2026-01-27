@@ -1,7 +1,6 @@
-import { Button, Modal } from 'ui'
-
 import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { Button, Modal } from 'ui'
 
 interface AllowAllModalProps {
   visible: boolean

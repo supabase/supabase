@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 import { ProgressBar } from './DecorativeProgressBar'
 
 interface StateOfStartupsHeaderProps {

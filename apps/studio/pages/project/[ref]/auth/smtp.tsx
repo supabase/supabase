@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { SmtpForm } from 'components/interfaces/Auth/SmtpForm/SmtpForm'
 import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'

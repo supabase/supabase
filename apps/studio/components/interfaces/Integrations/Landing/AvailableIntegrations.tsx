@@ -1,12 +1,12 @@
-import { Search } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-
 import AlertError from 'components/ui/AlertError'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Search } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, buttonVariants, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 

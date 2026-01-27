@@ -1,14 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { isEqual } from 'lodash'
-import { AlertCircle, Book, Check } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -22,31 +12,41 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { AlertCircle, Book, Check } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
-  cn,
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Form_Shadcn_,
+  Command_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
+import * as z from 'zod'
+
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [

@@ -3,19 +3,20 @@ import {
   GraphQLError,
   GraphQLInt,
   GraphQLNonNull,
-  GraphQLString,
   type GraphQLResolveInfo,
+  GraphQLString,
 } from 'graphql'
+
+import { GraphQLCollectionBuilder, createCollectionType } from '../utils/connections'
+import { graphQLFields } from '../utils/fields'
+import { SearchResultModel } from './globalSearchModel'
+import { GRAPHQL_FIELD_SEARCH_GLOBAL, GraphQLInterfaceTypeSearchResult } from './globalSearchSchema'
 import {
   type RootQueryTypeSearchDocsArgs,
   type SearchResultCollection,
 } from '~/__generated__/graphql'
-import { convertUnknownToApiError, type ApiErrorGeneric } from '~/app/api/utils'
+import { type ApiErrorGeneric, convertUnknownToApiError } from '~/app/api/utils'
 import { Result } from '~/features/helpers.fn'
-import { createCollectionType, GraphQLCollectionBuilder } from '../utils/connections'
-import { graphQLFields } from '../utils/fields'
-import { SearchResultModel } from './globalSearchModel'
-import { GRAPHQL_FIELD_SEARCH_GLOBAL, GraphQLInterfaceTypeSearchResult } from './globalSearchSchema'
 
 async function resolveSearch(
   parent: unknown,

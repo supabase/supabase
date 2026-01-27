@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
-
 import { getErrorMessage } from 'lib/get-error-message'
 
 dayjs.extend(duration)

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { databaseEventTriggerKeys } from './keys'
 
 export type DatabaseEventTriggersVariables = {

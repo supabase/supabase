@@ -1,25 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Label } from '@ui/components/shadcn/ui/label'
+import { useParams } from 'common'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { Label } from '@ui/components/shadcn/ui/label'
-import { useParams } from 'common'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import {
   Button,
-  cn,
   DialogSectionSeparator,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Modal,
   ScrollArea,
+  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { urlRegex } from '../Auth.constants'
 
 const MAX_URLS_LENGTH = 2 * 1024

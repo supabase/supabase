@@ -1,5 +1,6 @@
 import type { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Dictionary } from 'types'
+
 import { GridForeignKey } from './base'
 
 export interface SupaColumn {

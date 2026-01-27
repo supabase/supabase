@@ -8,6 +8,7 @@ import {
   InnerSideMenuCollapsibleTrigger,
 } from 'ui-patterns'
 import { InnerSideMenuDataItem } from 'ui-patterns/InnerSideMenu'
+
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 
 const OPTIONS = ['templates', 'quickstarts'] as const

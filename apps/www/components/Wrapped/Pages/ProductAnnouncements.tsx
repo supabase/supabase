@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { cn } from 'ui'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 type Announcement = {

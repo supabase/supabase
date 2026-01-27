@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { products } from 'shared-data/products'
+
 import ProductModules from '../../../../../data/ProductModules'
 
 type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'

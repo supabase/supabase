@@ -9,7 +9,7 @@ This package contains custom Supabase icons that can be used alongside other ico
 ## Quick start
 
 ```jsx
-import { BucketAdd, Database, Auth } from 'icons'
+import { Auth, BucketAdd, Database } from 'icons'
 
 function MyComponent() {
   return (

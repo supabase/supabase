@@ -87,6 +87,7 @@ You can use Drizzle together with [Postgres.js](https://github.com/porsager/post
 ```ts supabase/functions/drizzle/index.ts
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+
 import { countries } from '../_shared/schema.ts'
 
 const connectionString = Deno.env.get('SUPABASE_DB_URL')!

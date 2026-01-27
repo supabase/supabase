@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -14,6 +10,9 @@ import {
 } from 'data/third-party-auth/integrations-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { cn } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -26,6 +25,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
@@ -34,9 +34,9 @@ import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { CreateWorkOSIntegrationDialog } from './CreateWorkOSDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
+  INTEGRATION_TYPES,
   getIntegrationType,
   getIntegrationTypeLabel,
-  INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
 
 export const ThirdPartyAuthForm = () => {

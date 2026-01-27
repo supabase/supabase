@@ -1,20 +1,20 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useRef, useState, Suspense, useCallback, useMemo } from 'react'
-
-import { useBreakpoint } from 'common'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Input_Shadcn_,
-  cn,
   Button_Shadcn_,
   Collapsible_Shadcn_ as Collapsible,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
+  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
+  Input_Shadcn_,
+  cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { MultiSelector } from 'ui-patterns/multi-select'
+
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
   TROUBLESHOOTING_CONTAINER_ID,

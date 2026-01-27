@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import { toast } from 'sonner'
-
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { User } from 'data/auth/users-infinite-query'
+import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteUserModalProps {

@@ -1,22 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { captureCriticalError } from 'lib/error-reporting'
+import { auth, getReturnToPath } from 'lib/gotrue'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, getReturnToPath } from 'lib/gotrue'
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
+  Form_Shadcn_,
   Input,
 } from 'ui'
+import { z } from 'zod'
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 

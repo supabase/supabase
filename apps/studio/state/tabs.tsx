@@ -3,7 +3,7 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 export const editorEntityTypes = {

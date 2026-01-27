@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Key } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Key } from 'lucide-react'
+import { useMemo } from 'react'
+import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
@@ -14,9 +14,9 @@ import {
   useSetCommandMenuOpen,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
-import { toast } from 'sonner'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 

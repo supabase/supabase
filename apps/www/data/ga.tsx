@@ -1,7 +1,7 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
+import { companyStats } from 'data/company-stats'
 import { Activity } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
-import { companyStats } from 'data/company-stats'
 
 export const data = (isDark: boolean) => ({
   hero: {

@@ -7,20 +7,20 @@ import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Re
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
+  RequestsByCountryMapRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
-  RequestsByCountryMapRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()

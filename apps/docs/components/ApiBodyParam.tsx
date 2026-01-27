@@ -1,7 +1,7 @@
-import Options from '~/components/Options'
-import Param from '~/components/Params'
 import ApiSchema from '~/components/ApiSchema'
 import ApiSchemaOptions from '~/components/ApiSchemaOption'
+import Options from '~/components/Options'
+import Param from '~/components/Params'
 
 type IParamProps = any
 

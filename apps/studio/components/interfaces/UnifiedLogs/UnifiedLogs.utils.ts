@@ -1,7 +1,7 @@
 import { type Table as TTable } from '@tanstack/react-table'
-
 import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { cn } from 'ui'
+
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 
 export const logEventBus = {

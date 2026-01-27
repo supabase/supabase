@@ -1,6 +1,6 @@
-import React from 'react'
-import Image from 'next/image'
 import { range } from 'lib/helpers'
+import Image from 'next/image'
+import React from 'react'
 import { cn } from 'ui'
 
 interface Props {

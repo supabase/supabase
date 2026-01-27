@@ -1,5 +1,4 @@
-import { forwardRef, HTMLAttributes, ReactNode } from 'react'
-
+import { HTMLAttributes, ReactNode, forwardRef } from 'react'
 import { Card } from 'ui'
 
 export interface ResourceListProps extends HTMLAttributes<HTMLDivElement> {

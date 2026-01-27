@@ -1,10 +1,10 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
 import { getTableEditorSql } from './table-editor-query-sql'
 import { Entity } from './table-editor-types'
-import { UseCustomQueryOptions } from 'types'
 
 type TableEditorArgs = {
   id?: number

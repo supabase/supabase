@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
 import { MenuItem } from './menuItems'
 import { FilterGroup, FilterProperty } from './types'

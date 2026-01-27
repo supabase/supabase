@@ -1,15 +1,15 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
+
 import { WithSidebar } from './WithSidebar'
 
 export interface AccountLayoutProps {

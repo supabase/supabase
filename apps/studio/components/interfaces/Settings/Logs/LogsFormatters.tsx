@@ -3,13 +3,13 @@
  *
  * for http response codes
  */
-
 import CopyButton from 'components/ui/CopyButton'
-import React from 'react'
-import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
-import { AlertCircle, Info } from 'lucide-react'
 import dayjs from 'dayjs'
+import { AlertCircle, Info } from 'lucide-react'
+import React from 'react'
 import { cn } from 'ui'
+
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>

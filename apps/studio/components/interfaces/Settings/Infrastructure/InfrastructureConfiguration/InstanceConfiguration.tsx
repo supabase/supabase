@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
 import { useParams } from 'common'
@@ -34,6 +35,7 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
+
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'

@@ -1,10 +1,10 @@
+import { Markdown } from 'components/interfaces/Markdown'
+import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Markdown } from 'components/interfaces/Markdown'
-import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 interface NotificationDetailProps {
   notification: Notification

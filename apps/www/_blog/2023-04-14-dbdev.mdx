@@ -115,8 +115,8 @@ create extension "langchain-hybrid_search" schema public version '1.0.0';
 That creates the relevant `documents` table and associated search functions. Then, you can immediately hit it from your front end for best-in-class document search.
 
 ```jsx
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { createClient } from '@supabase/supabase-js'
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { SupabaseHybridSearch } from 'langchain/retrievers/supabase'
 
 const privateKey = process.env.SUPABASE_PRIVATE_KEY

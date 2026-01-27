@@ -5,18 +5,18 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { useMemo } from 'react'
-
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { MAX_RETRY_FAILURE_COUNT } from 'data/query-client'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useMemo } from 'react'
 import {
   ResponseError,
   type UseCustomInfiniteQueryOptions,
   type UseCustomQueryOptions,
 } from 'types'
+
 import { getBucketNumberEstimate, getBucketNumberEstimateKey } from './buckets-max-size-limit-query'
 import { storageKeys } from './keys'
 

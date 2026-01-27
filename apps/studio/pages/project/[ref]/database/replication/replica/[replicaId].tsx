@@ -1,7 +1,15 @@
+import { useParams } from 'common'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import { Database } from 'icons'
 import { Loader2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { AWS_REGIONS } from 'shared-data'
+import type { NextPageWithLayout } from 'types'
+import { Badge, Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { ReadReplicaDetails } from '@/components/interfaces/Database/Replication/ReadReplicas/ReadReplicaDetails'
 import {
@@ -20,14 +28,6 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from '@/data/read-replicas/replicas-status-query'
-import { useParams } from 'common'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { Database } from 'icons'
-import { AWS_REGIONS } from 'shared-data'
-import type { NextPageWithLayout } from 'types'
-import { Badge, Button } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 
 const DatabaseReadReplicaPage: NextPageWithLayout = () => {
   const router = useRouter()

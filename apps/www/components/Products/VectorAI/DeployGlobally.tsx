@@ -1,5 +1,5 @@
-import React from 'react'
 import { useTheme } from 'next-themes'
+import React from 'react'
 
 function getRandomNumber(min: number, max: number) {
   var range = max - min

@@ -1,10 +1,9 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-
 import { createClient } from '@supabase/supabase-js'
 import { revalidateTag } from 'next/cache'
 import { headers } from 'next/headers'
 import { NextRequest } from 'next/server'
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
+import { type Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { _handleRevalidateRequest } from './route.utils'
 

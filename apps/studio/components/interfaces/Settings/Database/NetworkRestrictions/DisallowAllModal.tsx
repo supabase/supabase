@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import { Button, Modal } from 'ui'
-
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { Button, Modal } from 'ui'
 
 interface DisallowAllModalProps {
   visible: boolean

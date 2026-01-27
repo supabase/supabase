@@ -3,7 +3,6 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button_Shadcn_ as Button,
-  cn,
   Command_Shadcn_ as Command,
   CommandGroup_Shadcn_ as CommandGroup,
   CommandInput_Shadcn_ as CommandInput,
@@ -13,8 +12,10 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
   ScrollArea,
+  cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 
 export interface ComboBoxOption {

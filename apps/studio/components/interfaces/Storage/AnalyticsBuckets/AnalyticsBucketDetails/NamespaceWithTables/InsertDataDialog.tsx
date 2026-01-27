@@ -6,7 +6,6 @@ import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import {
   Button,
-  cn,
   CodeBlock,
   Dialog,
   DialogContent,
@@ -16,6 +15,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  cn,
 } from 'ui'
 
 interface InsertDataDialogProps {

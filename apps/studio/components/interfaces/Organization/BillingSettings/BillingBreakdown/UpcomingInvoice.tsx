@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import AlertError from 'components/ui/AlertError'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import {
@@ -8,10 +6,12 @@ import {
 } from 'data/invoices/org-invoice-upcoming-query'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import Link from 'next/link'
 import React from 'react'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {

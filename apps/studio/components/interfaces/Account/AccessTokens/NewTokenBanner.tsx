@@ -1,7 +1,6 @@
+import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'

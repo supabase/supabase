@@ -1,10 +1,9 @@
-import Image from 'next/image'
-
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import Image from 'next/image'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
 export const CLSPreview = () => {

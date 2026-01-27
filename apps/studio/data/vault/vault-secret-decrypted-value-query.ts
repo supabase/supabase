@@ -1,6 +1,7 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { executeSql } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 

@@ -1,8 +1,9 @@
-import React from 'react'
-import { cn, Image } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Badge } from 'ui'
 import { Check, X } from 'lucide-react'
+import React from 'react'
+import { Image, cn } from 'ui'
+import { Badge } from 'ui'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Feature {
   id?: string

@@ -1,7 +1,3 @@
-import { Code, Table2 } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useCallback, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -9,9 +5,13 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { Code, Table2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useCallback, useMemo, useState } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
+
 import { FrameworkSelector } from './FrameworkSelector'
 import { GettingStarted } from './GettingStarted'
 import {

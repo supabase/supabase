@@ -1,9 +1,8 @@
-import { motion } from 'framer-motion'
-import { MoreVertical } from 'lucide-react'
-
 import { useFlag } from 'common'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
+import { motion } from 'framer-motion'
+import { MoreVertical } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -13,6 +12,7 @@ import {
   TableRow,
 } from 'ui'
 import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
 

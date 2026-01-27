@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react'
 import { RealtimeChannel } from '@supabase/supabase-js'
-
-import useConfData, { type UserTicketData } from './use-conf-data'
 import { LW15_URL } from 'lib/constants'
-import supabase from '../supabase'
+import { useCallback, useEffect, useRef } from 'react'
+
 import { BG_COLORS, TYPO_COLORS } from '../Ticketing/colors'
+import supabase from '../supabase'
 import { fetchGitHubUser } from '../utils/github-api'
+import useConfData, { type UserTicketData } from './use-conf-data'
 
 function subscribeToTicketChanges(
   username: string,

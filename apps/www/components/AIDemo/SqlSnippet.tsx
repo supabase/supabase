@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Code, Play, DatabaseIcon } from 'lucide-react'
-import { Button, cn, ChartContainer, ChartTooltip, ChartTooltipContent, SQL_ICON } from 'ui'
-import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'
+import { Code, DatabaseIcon, Play } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
+import { Button, ChartContainer, ChartTooltip, ChartTooltipContent, SQL_ICON, cn } from 'ui'
+
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 interface SqlSnippetProps {

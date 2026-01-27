@@ -1,6 +1,7 @@
 import { useTheme } from 'next-themes'
 import React from 'react'
 import { cn } from 'ui'
+
 import Panel from '~/components/Panel'
 
 export default function LaunchWeekPrizeCard({

@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
-import { replicaKeys } from '@/data/read-replicas/keys'
 import { useParams } from 'common'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import type { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { replicaKeys } from '@/data/read-replicas/keys'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database

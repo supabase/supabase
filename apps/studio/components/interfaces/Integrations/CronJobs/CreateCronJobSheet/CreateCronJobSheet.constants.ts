@@ -1,7 +1,7 @@
+import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { toString as CronToString } from 'cronstrue'
 import z from 'zod'
 
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { cronPattern, secondsPattern } from '../CronJobs.constants'
 
 const convertCronToString = (schedule: string) => {

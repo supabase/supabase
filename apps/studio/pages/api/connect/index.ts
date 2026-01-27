@@ -1,6 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import { NextApiRequest, NextApiResponse } from 'next'
+import path from 'path'
 
 function getFilePaths(folderPath: string, baseFolder = ''): string[] {
   const filepaths: string[] = []

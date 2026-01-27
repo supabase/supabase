@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -10,11 +6,17 @@ import { NoPermission } from 'components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import dayjs from 'dayjs'
 import { useLogsQuery } from 'hooks/analytics/useLogsQuery'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 import { Card } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { APIKeyRow } from './APIKeyRow'
+import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
 import {
   Table,
   TableBody,
@@ -22,8 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import { APIKeyRow } from './APIKeyRow'
-import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
 
 interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }

@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+
 import { ident, literal } from '../src/pg-format'
 
 describe('pg-format', () => {

@@ -1,7 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import dayjs from 'dayjs'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
+import type { VaultSecret } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -9,14 +15,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
-import type { VaultSecret } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { SecretTableColumn } from './Secrets.types'
 
 interface SecretRowProps {

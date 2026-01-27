@@ -1,6 +1,6 @@
 import { Database, Import } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { SchemaGenerator } from './SchemaGenerator'
 
 interface SupabaseService {

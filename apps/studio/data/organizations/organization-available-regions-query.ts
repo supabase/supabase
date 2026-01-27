@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
 
 export type DesiredInstanceSizeForAvailableRegions =

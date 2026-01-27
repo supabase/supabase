@@ -1,18 +1,18 @@
 import { screen, waitFor } from '@testing-library/react'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import userEvent from '@testing-library/user-event'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
   LogsPreviewer,
   calculateBarClickTimeRange,
 } from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { customRender, customRenderHook } from 'tests/lib/custom-render'
-import userEvent from '@testing-library/user-event'
-
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { LOGS_API_MOCKS } from './logs.mocks'
+import { customRender, customRenderHook } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
+import { LOGS_API_MOCKS } from './logs.mocks'
 
 dayjs.extend(utc)
 

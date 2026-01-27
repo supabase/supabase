@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getWrapperMetaForWrapper,
@@ -7,6 +5,8 @@ import {
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useMemo } from 'react'
+
 import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
 
 export const useAnalyticsBucketWrapperInstance = (

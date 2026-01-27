@@ -1,25 +1,23 @@
 'use client'
 
-import type {
-  Branch,
-  Org,
-  Variable,
-} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
+import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
-import { Button_Shadcn_ as Button, cn, Input_Shadcn_ as Input } from 'ui'
 
 import {
   ComboBox,
   ComboBoxOption,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
+import type {
+  Branch,
+  Org,
+  Variable,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 import {
   fromBranchValue,
   fromOrgProjectValue,
@@ -32,11 +30,11 @@ import { useCopy } from '~/hooks/useCopy'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
-import { useSupavisorConfigQuery, type SupavisorConfigData } from '~/lib/fetch/pooler'
+import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
 import { useProjectKeysQuery, useProjectSettingsQuery } from '~/lib/fetch/projectApi'
 import {
-  isProjectPaused,
   ProjectInfoInfinite,
+  isProjectPaused,
   useProjectsInfiniteQuery,
 } from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'

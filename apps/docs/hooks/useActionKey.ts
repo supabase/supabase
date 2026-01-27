@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const ACTION_KEY_DEFAULT = ['Ctrl ', 'Control'] as const
 const ACTION_KEY_APPLE = ['⌘', 'Command'] as const

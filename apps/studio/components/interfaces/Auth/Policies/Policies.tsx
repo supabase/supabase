@@ -1,9 +1,4 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { isEmpty } from 'lodash'
-import Link from 'next/link'
-import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import {
   PolicyTableRow,
@@ -14,6 +9,10 @@ import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { isEmpty } from 'lodash'
+import Link from 'next/link'
+import { useCallback, useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 

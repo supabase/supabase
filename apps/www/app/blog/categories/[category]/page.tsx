@@ -1,11 +1,10 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import DefaultLayout from 'components/Layouts/Default'
 import BlogGridItem from 'components/Blog/BlogGridItem'
-
+import DefaultLayout from 'components/Layouts/Default'
 import { getAllCMSPosts } from 'lib/get-cms-posts'
 import { capitalize } from 'lib/helpers'
-import { getSortedPosts, getAllCategories } from 'lib/posts'
+import { getAllCategories, getSortedPosts } from 'lib/posts'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 import type PostTypes from 'types/post'
 
 type Params = { category: string }

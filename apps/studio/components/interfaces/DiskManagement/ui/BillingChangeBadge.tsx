@@ -1,8 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
-
 import { formatCurrency } from 'lib/helpers'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ChevronRight } from 'lucide-react'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number

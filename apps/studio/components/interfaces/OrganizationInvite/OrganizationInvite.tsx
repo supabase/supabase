@@ -1,15 +1,15 @@
-import { CheckSquare } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
-
 import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
+import { CheckSquare } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import { Button, cn } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+
 import { OrganizationInviteError } from './OrganizationInviteError'
 
 export const OrganizationInvite = () => {

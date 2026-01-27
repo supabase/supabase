@@ -1,8 +1,8 @@
+import { Eye, EyeOff, HelpCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Input } from 'ui'
 
-import { Eye, EyeOff, HelpCircle, Loader } from 'lucide-react'
 import type { ServerOption } from './Wrappers.types'
 
 interface InputFieldProps {

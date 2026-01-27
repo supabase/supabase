@@ -1,9 +1,9 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { projectKeys } from './keys'
 
 const DEFAULT_LIMIT = 100

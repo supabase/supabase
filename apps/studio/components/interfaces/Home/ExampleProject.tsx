@@ -1,11 +1,10 @@
-import { ChevronRight } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
+import { ChevronRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { cn } from 'ui'
 
 interface ExampleProjectProps {

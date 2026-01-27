@@ -90,7 +90,7 @@ You can use any `.ts`, `.js`, `.tsx`, `.jsx` or `.mjs` file as the `entrypoint` 
 The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:
 
 ```js
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 
 const { data, error } = await supabase.functions.invoke('hello', {
   headers: { 'my-custom-header': 'my-custom-header-value' },

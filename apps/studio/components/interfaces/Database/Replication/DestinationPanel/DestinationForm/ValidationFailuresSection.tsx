@@ -1,9 +1,9 @@
 import type { ValidationFailure } from 'data/replication/validate-destination-mutation'
 import {
-  Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
+  Accordion_Shadcn_,
   Badge,
   Card,
 } from 'ui'

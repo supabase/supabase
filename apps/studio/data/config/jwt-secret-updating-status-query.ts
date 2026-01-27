@@ -1,9 +1,9 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-
 import { get, handleError } from 'data/fetchers'
+import { useEffect } from 'react'
 import { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {

@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
+
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
   BedrockModel,

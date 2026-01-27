@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react'
+
 import { ActiveInput, useFilterBarState, useOptionsCache } from './hooks'
 import { MenuItem } from './menuItems'
 import { FilterBarAction, FilterGroup, FilterOptionObject, FilterProperty } from './types'

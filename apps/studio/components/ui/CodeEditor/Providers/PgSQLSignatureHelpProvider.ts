@@ -1,6 +1,7 @@
-import { RefObject } from 'react'
-import BackwardIterator from './BackwardIterator'
 import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { RefObject } from 'react'
+
+import BackwardIterator from './BackwardIterator'
 
 // [Joshen] Needs to be fixed
 

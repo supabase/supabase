@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+
 import { Query } from '../../src/query/Query'
 import * as QueryUtils from '../../src/query/Query.utils'
 import { QueryAction } from '../../src/query/QueryAction'

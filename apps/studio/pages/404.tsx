@@ -1,10 +1,10 @@
+import { BASE_PATH } from 'lib/constants'
 import { NextPage } from 'next'
+import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { useTheme } from 'next-themes'
-import { BASE_PATH } from 'lib/constants'
 
 const Error404: NextPage = ({}) => {
   const { resolvedTheme } = useTheme()

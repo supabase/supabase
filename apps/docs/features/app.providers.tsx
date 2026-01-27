@@ -1,15 +1,15 @@
-import type { PropsWithChildren } from 'react'
-
 import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
+import type { PropsWithChildren } from 'react'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import SiteLayout from '~/layouts/SiteLayout'
-import { API_URL } from '~/lib/constants'
+
 import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu, DocsCommandProvider } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
+import SiteLayout from '~/layouts/SiteLayout'
+import { API_URL } from '~/lib/constants'
 
 /**
  * Global providers that wrap the entire app

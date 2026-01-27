@@ -1,11 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
-import { useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
+import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
 import {
   ReportsSelectFilter,
   selectFilterSchema,
@@ -24,7 +21,13 @@ import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQuer
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { Search } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
+import { useRef } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
@@ -37,13 +40,9 @@ import {
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
-
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
-import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 
 const createFunctionSnippet = `create function function_name()
 returns void

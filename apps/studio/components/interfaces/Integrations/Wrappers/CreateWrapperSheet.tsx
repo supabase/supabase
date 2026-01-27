@@ -1,9 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty } from 'lodash'
-import { Edit, Trash } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
@@ -12,6 +7,10 @@ import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { isEmpty } from 'lodash'
+import { Edit, Trash } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Form,
@@ -24,10 +23,11 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
+
 import InputField from './InputField'
+import WrapperTableEditor from './WrapperTableEditor'
 import { WrapperMeta } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
 
 const FORM_ID = 'create-wrapper-form'
 

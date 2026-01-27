@@ -1,8 +1,8 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-
 import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10

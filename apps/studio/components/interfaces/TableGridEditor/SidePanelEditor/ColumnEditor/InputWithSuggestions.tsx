@@ -4,12 +4,10 @@
 // For now a couple of things are a bit hacky like width derivation, z-index, selection of suggestion
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
-
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { noop } from 'lodash'
 import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +17,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
+
 import type { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3

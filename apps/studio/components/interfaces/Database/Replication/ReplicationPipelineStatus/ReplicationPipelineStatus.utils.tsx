@@ -1,10 +1,10 @@
-import dayjs from 'dayjs'
-import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
-
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
+import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
+import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { Badge } from 'ui'
+
 import { getPipelineStateMessages } from '../Pipeline.utils'
 import { RetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 

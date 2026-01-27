@@ -1,13 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { VaultSecret } from 'types'
 import {
   Button,
@@ -18,13 +16,14 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
 interface EditSecretModalProps {
   visible: boolean

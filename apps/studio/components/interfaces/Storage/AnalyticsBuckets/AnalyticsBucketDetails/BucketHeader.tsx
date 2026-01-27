@@ -1,11 +1,11 @@
-import { noop } from 'lodash'
-
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import {
   ScaffoldHeader,
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+import { noop } from 'lodash'
+
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { CreateTableInstructionsDialog } from './CreateTable/CreateTableInstructionsDialog'

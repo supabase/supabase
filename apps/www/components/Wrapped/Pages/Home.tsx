@@ -1,9 +1,10 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
-import { useBreakpoint } from 'common'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 const stats = [

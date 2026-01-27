@@ -1,15 +1,14 @@
-import { uniqBy } from 'lodash'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import {
   DatabaseFunctionsData,
   useDatabaseFunctionsQuery,
 } from 'data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uniqBy } from 'lodash'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { detectBrowser, isBrowser } from 'common'
+import Image from 'next/image'
+import React, { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 interface Props {

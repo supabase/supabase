@@ -1,3 +1,12 @@
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
+import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
   Activity,
   ArrowUpCircle,
@@ -16,16 +25,6 @@ import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -46,12 +45,13 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
 import {
-  getStatusName,
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
+  getStatusName,
 } from '../Pipeline.utils'
 import { PipelineStatus } from '../PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'

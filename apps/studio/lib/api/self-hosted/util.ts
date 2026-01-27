@@ -1,13 +1,14 @@
 import crypto from 'crypto-js'
 import { IS_PLATFORM } from 'lib/constants'
+
 import {
   ENCRYPTION_KEY,
   POSTGRES_DATABASE,
   POSTGRES_HOST,
   POSTGRES_PASSWORD,
   POSTGRES_PORT,
-  POSTGRES_USER_READ_WRITE,
   POSTGRES_USER_READ_ONLY,
+  POSTGRES_USER_READ_WRITE,
 } from './constants'
 
 /**

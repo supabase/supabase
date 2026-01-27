@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCallback } from 'react'
-import { toast } from 'sonner'
-
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import { VercelSection } from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
@@ -28,8 +25,11 @@ import {
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
 } from 'lib/github'
 import { useRouter } from 'next/router'
+import { useCallback } from 'react'
+import { toast } from 'sonner'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { GenericSkeletonLoader } from 'ui-patterns'
+
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 

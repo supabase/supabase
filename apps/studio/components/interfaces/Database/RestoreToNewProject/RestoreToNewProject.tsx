@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/PITRForm'
 import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
 import { ConfirmRestoreDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/ConfirmRestoreDialog'
@@ -27,9 +23,13 @@ import {
 } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { PreviousRestoreItem } from './PreviousRestoreItem'
 
 export const RestoreToNewProject = () => {

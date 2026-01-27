@@ -89,10 +89,10 @@ Deno.serve(async (req) => {
 
 ```jsx
 import { drizzle } from 'npm:drizzle-orm@0.33.0/node-postgres'
-import pg from 'npm:pg@8.12.0'
-const { Client } = pg
-
 import { pgTable, serial, text, varchar } from 'npm:drizzle-orm@0.33.0/pg-core'
+import pg from 'npm:pg@8.12.0'
+
+const { Client } = pg
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),

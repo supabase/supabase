@@ -1,10 +1,9 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { navData as DevelopersData } from 'data/Solutions'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeftRight, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useWindowSize } from 'react-use'
-
-import { navData as DevelopersData } from 'data/Solutions'
 
 type LinkProps = {
   text: string

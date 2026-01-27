@@ -1,9 +1,3 @@
-import { MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import {
   ScaffoldContainer,
@@ -16,6 +10,11 @@ import AlertError from 'components/ui/AlertError'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { SqlEditor, TableEditor } from 'icons'
+import { MoreVertical, Search, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
   Card,
@@ -34,6 +33,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { CreateVectorTableSheet } from '../CreateVectorTableSheet'
 import { DeleteVectorBucketModal } from '../DeleteVectorBucketModal'
 import { DeleteVectorTableModal } from '../DeleteVectorTableModal'

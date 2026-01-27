@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
@@ -11,6 +7,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Input } from 'ui'
 
 export const DeleteProjectModal = ({

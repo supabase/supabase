@@ -1,24 +1,12 @@
 'use client'
 
-import * as React from 'react'
+import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMDXComponent } from 'next-contentlayer2/hooks'
+import * as React from 'react'
 // import { NpmCommands } from 'types/unist'
 // import { Event } from '@/lib/events'
 import { cn } from 'ui'
-import { useConfig } from '@/hooks/use-config'
-import { Callout } from '@/components/callout'
-import { CodeBlockWrapper } from '@/components/code-block-wrapper'
-import { ComponentExample } from '@/components/component-example'
-import { ComponentPreview } from '@/components/component-preview'
-import { ComponentSource } from '@/components/component-source'
-import {
-  CopyButton,
-  // CopyNpmCommandButton
-} from '@/components/copy-button'
-// import { FrameworkDocs } from '@/components/framework-docs'
-import { StyleWrapper } from './style-wrapper'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -37,15 +25,28 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { ComponentProps } from './component-props'
-import { Style } from '@/registry/styles'
-import { Colors } from '@/components/colors'
-import { Icons } from '@/components/icons'
-import { ThemeSettings } from '@/components/theme-settings'
-import { CodeFragment } from '@/components/code-fragment'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
 import { SonnerPositionConfig } from './sonner-expand-position'
+// import { FrameworkDocs } from '@/components/framework-docs'
+import { StyleWrapper } from './style-wrapper'
+import { Callout } from '@/components/callout'
+import { CodeBlockWrapper } from '@/components/code-block-wrapper'
+import { CodeFragment } from '@/components/code-fragment'
+import { Colors } from '@/components/colors'
+import { ComponentExample } from '@/components/component-example'
+import { ComponentPreview } from '@/components/component-preview'
+import { ComponentSource } from '@/components/component-source'
+import {
+  CopyButton,
+  // CopyNpmCommandButton
+} from '@/components/copy-button'
+import { Icons } from '@/components/icons'
+import { ThemeSettings } from '@/components/theme-settings'
+import { useConfig } from '@/hooks/use-config'
+import { Style } from '@/registry/styles'
 
 const components = {
   Accordion,

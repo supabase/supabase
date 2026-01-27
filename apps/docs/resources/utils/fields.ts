@@ -7,7 +7,6 @@
  * Reproduced here to avoid taking on another dependency for a relatively short
  * piece of code.
  */
-
 import {
   type DirectiveNode,
   type FieldNode,

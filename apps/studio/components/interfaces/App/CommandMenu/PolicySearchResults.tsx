@@ -1,16 +1,17 @@
 'use client'
 
-import { useMemo } from 'react'
-import { Auth } from 'icons'
-import { Loader2 } from 'lucide-react'
 import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Auth } from 'icons'
+import { Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
+
 import {
-  SkeletonResults,
   EmptyState,
   ResultsList,
   type SearchResult,
+  SkeletonResults,
 } from './ContextSearchResults.shared'
 
 interface PolicySearchResultsProps {

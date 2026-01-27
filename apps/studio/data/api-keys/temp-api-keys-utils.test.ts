@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  type TemporaryApiKey,
   createTemporaryApiKey,
   isTemporaryApiKeyValid,
-  type TemporaryApiKey,
 } from './temp-api-keys-utils'
 
 describe('createTemporaryUploadKey', () => {

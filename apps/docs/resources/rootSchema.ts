@@ -5,7 +5,7 @@ import {
   GraphQLString,
   printSchema,
 } from 'graphql'
-import { RootQueryTypeResolvers } from '~/__generated__/graphql'
+
 import { errorRoot, errorsRoot } from './error/errorResolver'
 import { searchRoot } from './globalSearch/globalSearchResolver'
 import { GraphQLObjectTypeGuide } from './guide/guideSchema'
@@ -13,6 +13,7 @@ import { GraphQLObjectTypeReferenceCLICommand } from './reference/referenceCLISc
 import { GraphQLObjectTypeReferenceManagementApi } from './reference/referenceManagementApiSchema'
 import { GraphQLObjectTypeReferenceSDKFunction } from './reference/referenceSDKSchema'
 import { GraphQLObjectTypeTroubleshooting } from './troubleshooting/troubleshootingSchema'
+import { RootQueryTypeResolvers } from '~/__generated__/graphql'
 
 const GRAPHQL_FIELD_INTROSPECT = 'schema' as const
 

@@ -1,16 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/compat/router'
-import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
 import { debounce } from 'lib/helpers'
+import { Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Checkbox, Input, cn } from 'ui'
 
-import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
-
 import { features } from '~/data/features'
 
 function FeaturesPage() {

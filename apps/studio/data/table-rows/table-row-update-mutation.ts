@@ -1,11 +1,11 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { Query } from '@supabase/pg-meta/src/query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { toast } from 'sonner'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { tableRowKeys } from './keys'
 
 export type TableRowUpdateVariables = {

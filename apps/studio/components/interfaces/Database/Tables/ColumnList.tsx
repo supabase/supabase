@@ -1,10 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { Check, ChevronLeft, Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-
 import { PostgresColumn } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -15,6 +10,10 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { noop } from 'lodash'
+import { Check, ChevronLeft, Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -27,6 +26,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {

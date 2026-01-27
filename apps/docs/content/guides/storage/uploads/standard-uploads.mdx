@@ -29,7 +29,6 @@ Though you can upload up to 5GB files using the standard upload method, we recom
 
 ```javascript
 // @noImplicitAny: false
-
 // ---cut---
 import { createClient } from '@supabase/supabase-js'
 
@@ -113,6 +112,7 @@ If you want to overwrite a file on a specific path you can set the `upsert` opti
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
+
 const file = new Blob()
 
 // ---cut---
@@ -201,6 +201,7 @@ By default, Storage will assume the content type of an asset from the file exten
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
+
 const file = new Blob()
 
 // ---cut---

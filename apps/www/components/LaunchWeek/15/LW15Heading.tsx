@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react'
 import { createTimeline } from 'animejs'
-
 import SectionContainer from 'components/Layouts/SectionContainer'
+import React, { useEffect, useRef } from 'react'
+
 import { FifteenSVG, LW15ThemeSwitcher, LWSVG } from './lw15.components'
 
 const LW15Heading = () => {

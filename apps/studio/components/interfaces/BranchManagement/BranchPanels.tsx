@@ -1,13 +1,13 @@
-import dayjs from 'dayjs'
-import { Github } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, ReactNode } from 'react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { Branch } from 'data/branches/branches-query'
+import dayjs from 'dayjs'
+import { Github } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, ReactNode } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { WorkflowLogs } from './WorkflowLogs'
 
 interface BranchManagementSectionProps {

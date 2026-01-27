@@ -4,6 +4,7 @@ import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { StorageItem } from '../Storage.types'
 
 const DEFAULT_EXPIRY = 7 * 24 * 60 * 60 // in seconds, default to 1 week

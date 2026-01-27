@@ -1,21 +1,20 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { Home } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
+import { METRICS, METRIC_CATEGORIES, Metric } from 'lib/constants/metrics'
+import { Home } from 'lucide-react'
+import { useState } from 'react'
 import type { Dashboards } from 'types'
 import {
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Command_Shadcn_,
   DropdownMenuCheckboxItem,
   DropdownMenuPortal,
   DropdownMenuSub,
@@ -24,6 +23,7 @@ import {
   SQL_ICON,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DEPRECATED_REPORTS } from './Reports.constants'
 
 interface MetricOptionsProps {

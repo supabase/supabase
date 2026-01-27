@@ -1,4 +1,5 @@
 import { fetchHeadWithTimeout } from 'data/fetchers'
+
 import { API_URL } from './constants'
 
 const DEFAULT_TIMEOUT_MILLISECONDS = 2000

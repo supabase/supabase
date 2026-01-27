@@ -1,9 +1,3 @@
-import { type RootQueryTypeSearchDocsArgs } from '~/__generated__/graphql'
-import { convertPostgrestToApiError, type ApiErrorGeneric } from '~/app/api/utils'
-import { Result } from '~/features/helpers.fn'
-import { openAI } from '~/lib/openAi'
-import { supabase, type DatabaseCorrected } from '~/lib/supabase'
-
 import { isFeatureEnabled } from '../../../../packages/common/enabled-features'
 import { GuideModel } from '../guide/guideModel'
 import {
@@ -14,6 +8,11 @@ import { ReferenceManagementApiModel } from '../reference/referenceManagementApi
 import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
 import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
 import { SearchResultInterface } from './globalSearchInterface'
+import { type RootQueryTypeSearchDocsArgs } from '~/__generated__/graphql'
+import { type ApiErrorGeneric, convertPostgrestToApiError } from '~/app/api/utils'
+import { Result } from '~/features/helpers.fn'
+import { openAI } from '~/lib/openAi'
+import { type DatabaseCorrected, supabase } from '~/lib/supabase'
 
 type SearchFunction = 'search_content' | 'search_content_nimbus'
 type SearchHybridFunction = 'search_content_hybrid' | 'search_content_hybrid_nimbus'

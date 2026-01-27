@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { cronPattern, secondsPattern } from './CronJobs.constants'
 import { parseCronJobCommand } from './CronJobs.utils'
 

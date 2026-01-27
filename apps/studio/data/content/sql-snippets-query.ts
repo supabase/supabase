@@ -1,7 +1,7 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { get } from 'data/fetchers'
 import { UseCustomInfiniteQueryOptions } from 'types'
+
 import { Content } from './content-query'
 import { contentKeys } from './keys'
 import { SNIPPET_PAGE_LIMIT } from './sql-folders-query'

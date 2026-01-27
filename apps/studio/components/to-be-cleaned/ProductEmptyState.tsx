@@ -1,8 +1,7 @@
-import { ExternalLink } from 'lucide-react'
-import { PropsWithChildren } from 'react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { PropsWithChildren } from 'react'
 import { Button } from 'ui'
 
 interface ProductEmptyStateProps {

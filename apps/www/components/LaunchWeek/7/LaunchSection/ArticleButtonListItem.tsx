@@ -1,4 +1,5 @@
 import Link from 'next/link'
+
 import { Article } from '../../types'
 
 const ArticleButtonListItem = (props: Article) => {

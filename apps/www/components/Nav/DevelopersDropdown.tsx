@@ -1,8 +1,7 @@
+import staticContent from '.generated/staticContent/_index.json'
+import { data as DevelopersData } from 'data/Developers'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-
-import { data as DevelopersData } from 'data/Developers'
-import staticContent from '.generated/staticContent/_index.json'
 
 type LinkProps = {
   text: string

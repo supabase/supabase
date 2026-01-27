@@ -1,5 +1,8 @@
 'use client'
 
+import { Send } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { ChatMessageItem } from '@/registry/default/blocks/realtime-chat/components/chat-message'
 import { useChatScroll } from '@/registry/default/blocks/realtime-chat/hooks/use-chat-scroll'
@@ -9,8 +12,6 @@ import {
 } from '@/registry/default/blocks/realtime-chat/hooks/use-realtime-chat'
 import { Button } from '@/registry/default/components/ui/button'
 import { Input } from '@/registry/default/components/ui/input'
-import { Send } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
 
 interface RealtimeChatProps {
   roomName: string

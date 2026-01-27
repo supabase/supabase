@@ -1,10 +1,10 @@
-import React, { FC } from 'react'
-import { buildDays as days } from '~/components/LaunchWeek/X/Releases/data'
-
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import AdventCard from './components/AdventCard'
 import { motion, useInView } from 'framer-motion'
+import React, { FC } from 'react'
 import { cn } from 'ui'
+
+import AdventCard from './components/AdventCard'
+import { buildDays as days } from '~/components/LaunchWeek/X/Releases/data'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const BuildStage: FC = () => {
   const ref = React.useRef(null)

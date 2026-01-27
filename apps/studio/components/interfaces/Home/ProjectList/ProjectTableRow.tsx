@@ -1,16 +1,16 @@
-import { Github } from 'lucide-react'
-import { useRouter } from 'next/router'
-import InlineSVG from 'react-inlinesvg'
-
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
+import { OrgProject, getComputeSize } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
 import { createNavigationHandler } from 'lib/navigation'
+import { Github } from 'lucide-react'
+import { useRouter } from 'next/router'
+import InlineSVG from 'react-inlinesvg'
 import type { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 

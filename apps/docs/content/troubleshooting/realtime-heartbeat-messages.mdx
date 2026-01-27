@@ -28,8 +28,8 @@ Without heartbeats, your application might appear connected while being unable t
 You can monitor heartbeat lifecycle events using the `onHeartbeat` method:
 
 ```tsx
-import { useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { useEffect } from 'react'
 
 function MyComponent() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -72,8 +72,8 @@ If you're seeing frequent `timeout` status in your heartbeat callback:
 The client automatically attempts reconnection with exponential backoff (1s, 2s, 5s, 10s). If you need to manually reconnect:
 
 ```tsx
-import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
 function ConnectionStatus() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -164,8 +164,8 @@ If the worker fails to start, check:
 Display connection status with a simple indicator:
 
 ```tsx
-import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
 function ConnectionIndicator() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -196,9 +196,9 @@ function ConnectionIndicator() {
 Ensure connection is active when user opens your app:
 
 ```tsx
+import { createClient } from '@supabase/supabase-js'
 import { useEffect } from 'react'
 import { AppState } from 'react-native'
-import { createClient } from '@supabase/supabase-js'
 
 function App() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)

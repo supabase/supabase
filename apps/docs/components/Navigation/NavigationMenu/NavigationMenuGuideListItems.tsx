@@ -1,9 +1,9 @@
 import * as Accordion from '@radix-ui/react-accordion'
-import { usePathname } from 'next/navigation'
-import { useTheme } from 'next-themes'
 import { ChevronDown } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React, { useEffect, useRef } from 'react'
 
 import MenuIconPicker from './MenuIconPicker'

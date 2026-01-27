@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableKeys } from 'data/tables/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueCreateVariables = {

@@ -1,15 +1,13 @@
 'use client'
 
 import type { StaticImageData } from 'next/image'
-
-import { cn } from '@/utilities/ui'
 import NextImage from 'next/image'
 import React from 'react'
 
 import type { Props as MediaProps } from '../types'
-
 import { cssVariables } from '@/cssVariables'
 import { getClientSideURL } from '@/utilities/getURL'
+import { cn } from '@/utilities/ui'
 
 const { breakpoints } = cssVariables
 

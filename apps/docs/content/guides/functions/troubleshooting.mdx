@@ -221,11 +221,10 @@ Use selective imports to minimize overhead:
 ```tsx
 // ✅ Import specific submodules
 import { Sheets } from 'npm:@googleapis/sheets'
+import * as googleAuth from 'npm:google-auth-library'
 import { JWT } from 'npm:google-auth-library/build/src/auth/jwtclient'
-
 // ❌ Import entire package
 import * as googleapis from 'npm:googleapis'
-import * as googleAuth from 'npm:google-auth-library'
 ```
 
 - **Tree-shake aggressively:** Only import what you actually use

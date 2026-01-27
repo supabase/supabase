@@ -1,6 +1,6 @@
 'use client'
 
-import { lazy, Suspense } from 'react'
+import { Suspense, lazy } from 'react'
 
 const ExtensionsInternal = lazy(() => import('./Extensions'))
 

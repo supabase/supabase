@@ -1,10 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useForm } from 'react-hook-form'
 import {
   Card,
   CardContent,
@@ -14,7 +12,6 @@ import {
   KeyboardShortcut,
   Switch,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
@@ -23,6 +20,8 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 const HotkeySchema = z.object({
   commandMenuEnabled: z.boolean(),

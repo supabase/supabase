@@ -3,7 +3,6 @@ import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import {
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -18,7 +17,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
+
 import { useGetReplicaCost } from './useGetReplicaCost'
 
 export const ReadReplicaPricingDialog = () => {

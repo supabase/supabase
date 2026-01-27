@@ -1,10 +1,11 @@
+import { PlayCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import styles from '~/styles/animations.module.css'
+
 import AnnouncementBadge from '../Announcement/Badge'
 import ProductIcon from '../ProductIcon'
-import { PlayCircle } from 'lucide-react'
+import styles from '~/styles/animations.module.css'
 
 interface Types {
   h1: string | React.ReactNode

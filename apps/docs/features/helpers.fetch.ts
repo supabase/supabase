@@ -5,7 +5,6 @@
  * options for `fetch`, for example when it needs to be passed to a
  * third-party API.
  */
-
 import { ONE_DAY_IN_SECONDS } from './helpers.time'
 
 export const REVALIDATION_TAGS = {

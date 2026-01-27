@@ -2,7 +2,6 @@ import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
-
 import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2

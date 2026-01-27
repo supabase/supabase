@@ -6,7 +6,7 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
-import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
+import { REFERENCES, clientSdkIds, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'

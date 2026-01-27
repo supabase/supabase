@@ -1,13 +1,14 @@
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from '~/data/MainProducts'
 import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button, Image } from 'ui'
+
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import FeatureColumn from '~/components/FeatureColumn'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -15,7 +16,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import ProductsNav from '~/components/Products/ProductsNav'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import dynamic from 'next/dynamic'
+import Solutions from '~/data/MainProducts'
 
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))

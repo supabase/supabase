@@ -1,6 +1,6 @@
 import type { Datum } from 'components/ui/Charts/Charts.types'
-import React from 'react'
 import type { PlanId } from 'data/subscriptions/types'
+import React from 'react'
 
 interface Metadata {
   [key: string]: string | number | Object | Object[] | any

@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
-
-import { WithMonitor } from './WithMonitor/WithMonitor'
-import { WithStatements } from './WithStatements/WithStatements'
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { useEffect } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+
 import { PresetHookResult } from '../Reports/Reports.utils'
+import { WithMonitor } from './WithMonitor/WithMonitor'
+import { WithStatements } from './WithStatements/WithStatements'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult

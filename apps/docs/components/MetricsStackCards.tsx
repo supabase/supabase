@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { Datadog, Grafana } from 'icons'
 import { Flame } from 'lucide-react'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 interface MetricsStackOption {

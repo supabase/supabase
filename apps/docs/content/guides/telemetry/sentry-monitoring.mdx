@@ -57,8 +57,8 @@ You can supply either the Supabase Client constructor or an already-initiated in
 
 ```ts
 import * as Sentry from '@sentry/browser'
-import { SupabaseClient } from '@supabase/supabase-js'
 import { supabaseIntegration } from '@supabase/sentry-js-integration'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -78,8 +78,8 @@ Sentry.init({
 
 ```ts
 import * as Sentry from '@sentry/browser'
-import { createClient } from '@supabase/supabase-js'
 import { supabaseIntegration } from '@supabase/sentry-js-integration'
+import { createClient } from '@supabase/supabase-js'
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
 
@@ -107,8 +107,8 @@ If you're already monitoring HTTP errors in Sentry, for example with the HTTP, F
 
 ```ts
 import * as Sentry from '@sentry/browser'
-import { SupabaseClient } from '@supabase/supabase-js'
 import { supabaseIntegration } from '@supabase/sentry-js-integration'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -163,8 +163,8 @@ See this example for a setup with Next.js to cover browser, server, and edge env
 
 ```ts sentry.client.config.ts
 import * as Sentry from '@sentry/nextjs'
-import { SupabaseClient } from '@supabase/supabase-js'
 import { supabaseIntegration } from '@supabase/sentry-js-integration'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -195,8 +195,8 @@ Sentry.init({
 
 ```ts sentry.server.config.ts
 import * as Sentry from '@sentry/nextjs'
-import { SupabaseClient } from '@supabase/supabase-js'
 import { supabaseIntegration } from '@supabase/sentry-js-integration'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -227,8 +227,8 @@ Sentry.init({
 
 ```js sentry.edge.config.ts
 import * as Sentry from '@sentry/nextjs'
-import { SupabaseClient } from '@supabase/supabase-js'
 import { supabaseIntegration } from '@supabase/sentry-js-integration'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 Sentry.init({
   dsn: SENTRY_DSN,

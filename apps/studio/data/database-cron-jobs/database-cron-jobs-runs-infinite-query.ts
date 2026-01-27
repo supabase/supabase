@@ -1,8 +1,8 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import { last } from 'lodash'
-
 import { executeSql } from 'data/sql/execute-sql-query'
+import { last } from 'lodash'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobRunsVariables = {

@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useState } from 'react'
+
 import { DeleteProjectModal } from './DeleteProjectModal'
 
 export interface DeleteProjectButtonProps {

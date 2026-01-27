@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { fetchHandler } from 'data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { miscKeys } from './keys'
 
 // Warn if the clock skew is greater than 2 minutes

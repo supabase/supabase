@@ -1,11 +1,11 @@
+import * as Accordion from '@radix-ui/react-accordion'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { REFERENCES } from '~/content/navigation.references'
 
-import * as Accordion from '@radix-ui/react-accordion'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
+import { REFERENCES } from '~/content/navigation.references'
 
 const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
   const pathname = usePathname()

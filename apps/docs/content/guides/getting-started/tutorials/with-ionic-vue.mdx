@@ -100,22 +100,23 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 </template>
 
 <script lang="ts">
-  import { supabase } from '../supabase'
   import {
+    IonButton,
     IonContent,
     IonHeader,
+    IonInput,
+    IonItem,
+    IonLabel,
+    IonList,
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
-    toastController,
     loadingController,
+    toastController,
   } from '@ionic/vue'
   import { defineComponent, ref } from 'vue'
+
+  import { supabase } from '../supabase'
 
   export default defineComponent({
     name: 'LoginPage',
@@ -210,22 +211,23 @@ Let's create a new component for that called `Account.vue`.
 
 <script lang="ts">
   import {
-    IonPage,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
+    IonButton,
     IonContent,
+    IonHeader,
+    IonInput,
     IonItem,
     IonLabel,
-    IonInput,
-    IonButton,
-    toastController,
+    IonPage,
+    IonTitle,
+    IonToolbar,
     loadingController,
+    toastController,
   } from '@ionic/vue'
+  import type { User } from '@supabase/supabase-js'
   import { defineComponent, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+
   import { supabase } from '@/supabase'
-  import type { User } from '@supabase/supabase-js'
 
   export default defineComponent({
     name: 'AccountPage',
@@ -359,8 +361,10 @@ Now that we have all the components in place, let's update `App.vue` and our rou
 ```ts name=src/router.index.ts
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
-import LoginPage from '../views/Login.vue'
+
 import AccountPage from '../views/Account.vue'
+import LoginPage from '../views/Login.vue'
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -391,7 +395,8 @@ export default router
 
 <script lang="ts">
   import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue'
-  import { defineComponent, ref, onMounted } from 'vue'
+  import { defineComponent, onMounted, ref } from 'vue'
+
   import { supabase } from './supabase'
 
   export default defineComponent({
@@ -458,18 +463,19 @@ With those packages installed we can update our `main.ts` to include an addition
 <$CodeTabs>
 
 ```ts name=src/main.tsx
+import { IonicVue } from '@ionic/vue'
 import { createApp } from 'vue'
+
 import App from './App.vue'
 import router from './router'
 
-import { IonicVue } from '@ionic/vue'
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/ionic.bundle.css'
-
 /* Theme variables */
 import './theme/variables.css'
 
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
+
 defineCustomElements(window)
 const app = createApp(App).use(IonicVue).use(router)
 
@@ -495,11 +501,13 @@ Then create an `AvatarComponent`.
 </template>
 
 <script lang="ts">
-  import { ref, toRefs, watch, defineComponent } from 'vue'
-  import { supabase } from '../supabase'
   import { Camera, CameraResultType } from '@capacitor/camera'
   import { IonIcon } from '@ionic/vue'
   import { person } from 'ionicons/icons'
+  import { defineComponent, ref, toRefs, watch } from 'vue'
+
+  import { supabase } from '../supabase'
+
   export default defineComponent({
     name: 'AppAvatar',
     props: { path: String },

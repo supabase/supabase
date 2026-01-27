@@ -3,10 +3,12 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
 import { BASE_PATH } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
+
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [

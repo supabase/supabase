@@ -1,7 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { Button, Collapsible, SidePanel, cn } from 'ui'
 
-import { Button, cn, Collapsible, SidePanel } from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {

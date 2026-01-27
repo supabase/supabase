@@ -2,6 +2,7 @@ import { TextFormatter } from 'components/interfaces/Settings/Logs/LogsFormatter
 import Table from 'components/to-be-cleaned/Table'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { Fragment } from 'react'
+
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 
 export const CacheHitRateChartRenderer = (

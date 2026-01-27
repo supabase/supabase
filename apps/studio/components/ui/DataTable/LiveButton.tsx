@@ -1,10 +1,10 @@
 import type { FetchPreviousPageOptions } from '@tanstack/react-query'
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { CirclePause, CirclePlay } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { Button, cn } from 'ui'
+
 import { useDataTable } from './providers/DataTableProvider'
 
 const REFRESH_INTERVAL = 10_000

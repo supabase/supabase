@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { prefetchProjectDetail } from 'data/projects/project-detail-query'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
-import { prefetchProjectDetail } from 'data/projects/project-detail-query'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 export function usePrefetchProjectIndexPage() {

@@ -1,5 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { get, handleError } from 'data/fetchers'
 import { UseCustomQueryOptions } from 'types'
+
 import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
 

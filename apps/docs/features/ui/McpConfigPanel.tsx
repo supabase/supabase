@@ -7,24 +7,25 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
-  cn,
-  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
+  Command_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import {
-  createMcpCopyHandler,
-  McpConfigPanel as McpConfigPanelBase,
   type McpClient,
+  McpConfigPanel as McpConfigPanelBase,
+  createMcpCopyHandler,
 } from 'ui-patterns/McpUrlBuilder'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
 import { useDebounce } from '~/hooks/useDebounce'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'

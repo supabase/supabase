@@ -1,6 +1,7 @@
-import React from 'react'
-import { StyledArticleBadge } from './Releases/components'
 import Image from 'next/image'
+import React from 'react'
+
+import { StyledArticleBadge } from './Releases/components'
 
 const LWArchive = () => {
   return (

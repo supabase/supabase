@@ -3,8 +3,8 @@
 import type { User } from '@supabase/supabase-js'
 import { isFeatureEnabled, logOut } from 'common'
 import { Database, Globe, Home, LifeBuoy, LogOut, Settings, UserIcon } from 'lucide-react'
-
 import type { menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
+
 import { IconGitHub } from './MenuIcons'
 
 const useDropdownMenu = (user: User | null) => {

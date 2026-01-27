@@ -1,5 +1,6 @@
 import { SparklesIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
+
 import { Article } from '../../types'
 
 export const ProductButtonListItem = (props: Article) => {

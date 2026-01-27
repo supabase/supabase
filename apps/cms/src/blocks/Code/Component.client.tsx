@@ -1,6 +1,7 @@
 'use client'
 import { Highlight, themes } from 'prism-react-renderer'
 import React from 'react'
+
 import { CopyButton } from './CopyButton'
 
 type Props = {

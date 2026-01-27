@@ -1,30 +1,30 @@
 'use client'
 
 import { useDebounce } from '@uidotdev/usehooks'
-import { Loader2 } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
-
 import { useParams } from 'common'
 import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from 'data/config/project-storage-config-query'
 import {
-  useAnalyticsBucketsQuery,
   type AnalyticsBucket,
+  useAnalyticsBucketsQuery,
 } from 'data/storage/analytics-buckets-query'
 import {
+  type Bucket,
   useBucketNumberEstimateQuery,
   usePaginatedBucketsQuery,
-  type Bucket,
 } from 'data/storage/buckets-query'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { AnalyticsBucket as AnalyticsBucketIcon, FilesBucket, Storage, VectorBucket } from 'icons'
+import { Loader2 } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+
 import {
   EmptyState,
   ResultsList,
-  SkeletonResults,
   type SearchResult,
+  SkeletonResults,
 } from './ContextSearchResults.shared'
 
 interface StorageSearchResultsProps {

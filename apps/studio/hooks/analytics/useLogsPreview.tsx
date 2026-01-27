@@ -1,7 +1,4 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { useCallback, useMemo, useState } from 'react'
-
 import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
@@ -22,6 +19,9 @@ import {
   genDefaultQuery,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import dayjs from 'dayjs'
+import { useCallback, useMemo, useState } from 'react'
+
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import { useLogsUrlState } from './useLogsUrlState'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'

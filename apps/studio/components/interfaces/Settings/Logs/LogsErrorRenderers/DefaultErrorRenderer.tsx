@@ -1,4 +1,5 @@
 import { CodeBlock } from 'ui'
+
 import type { LogQueryError } from '../Logs.types'
 
 export interface ErrorRendererProps {

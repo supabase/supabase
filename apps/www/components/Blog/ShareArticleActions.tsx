@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { cn, IconLinkedinSolid, IconTwitterX, IconYCombinator } from 'ui'
+import { IconLinkedinSolid, IconTwitterX, IconYCombinator, cn } from 'ui'
 
 const ShareArticleActions = ({
   title,

@@ -1,7 +1,7 @@
+import React from 'react'
+
 import { useCommonSections, useSpec } from './NavigationMenu.utils'
 import NavigationMenuRefListItems from './NavigationMenuRefListItems'
-
-import React from 'react'
 
 interface NavigationMenuRefListProps {
   id: string

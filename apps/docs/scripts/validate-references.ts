@@ -8,7 +8,6 @@
  *
  * Usage: pnpm tsx scripts/validate-references.ts
  */
-
 import { readFileSync } from 'fs'
 import yaml from 'js-yaml'
 import { dirname, join } from 'path'

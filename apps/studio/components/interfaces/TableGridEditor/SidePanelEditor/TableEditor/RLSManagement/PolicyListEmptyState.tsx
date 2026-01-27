@@ -1,6 +1,3 @@
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import {
   type GeneratedPolicy,
   generateStartingPoliciesForTable,
@@ -14,7 +11,10 @@ import {
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTrack } from 'lib/telemetry/track'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Card, CardContent, cn } from 'ui'
+
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { ColumnField } from '../../SidePanelEditor.types'
 

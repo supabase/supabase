@@ -1,11 +1,11 @@
 import matter from 'gray-matter'
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
-
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
+
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { SITE_ORIGIN } from '~/lib/constants'

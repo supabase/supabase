@@ -5,9 +5,10 @@ import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvide
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo } from 'react'
 import { Badge, Button, Separator } from 'ui'
-import { LogTypeIcon } from '../../components/LogTypeIcon'
+
 import { ColumnSchema } from '../../UnifiedLogs.schema'
 import { getStatusLevel } from '../../UnifiedLogs.utils'
+import { LogTypeIcon } from '../../components/LogTypeIcon'
 import { TruncatedTextWithPopover } from './shared/TruncatedTextWithPopover'
 
 interface ServiceFlowHeaderProps {

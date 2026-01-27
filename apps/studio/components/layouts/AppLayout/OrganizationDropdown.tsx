@@ -1,13 +1,12 @@
-import { Boxes, Check, ChevronsUpDown, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Boxes, Check, ChevronsUpDown, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Badge,
   Button,

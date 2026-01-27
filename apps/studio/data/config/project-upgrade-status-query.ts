@@ -1,10 +1,10 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-
 import { get, handleError } from 'data/fetchers'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useEffect } from 'react'
 import { UseCustomQueryOptions } from 'types'
+
 import { configKeys } from './keys'
 
 export type ProjectUpgradingStatusVariables = {

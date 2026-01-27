@@ -1,3 +1,4 @@
+import { copyToClipboard } from 'ui'
 import { v4 as _uuidV4 } from 'uuid'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -26,8 +27,6 @@ import {
   tryParseJson,
   uuidv4,
 } from './helpers'
-
-import { copyToClipboard } from 'ui'
 
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid'),

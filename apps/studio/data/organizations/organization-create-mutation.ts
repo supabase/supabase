@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { organizationKeys } from './keys'
 import { castOrganizationResponseToOrganization } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'

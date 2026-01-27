@@ -1,6 +1,6 @@
 import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
-import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, cn } from 'ui'
 
 type Props = {
   label: string

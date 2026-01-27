@@ -1,6 +1,4 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-
 import type { ConnectionVars } from 'data/common.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import {
@@ -11,6 +9,7 @@ import {
   getLiveTupleEstimate,
   getLiveTupleEstimateKey,
 } from 'data/sql/queries/get-live-tuple-stats'
+import { useCallback } from 'react'
 
 export const THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS = 10_000
 

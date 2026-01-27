@@ -1,8 +1,8 @@
 import type { Row } from '@tanstack/react-table'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { Button, ResizableHandle, ResizablePanel, cn } from 'ui'
 
-import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
 import { LogsList } from './LogsList'
 
 export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {

@@ -1,10 +1,9 @@
 import { useParams } from 'common'
+import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
+import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
-
-import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
-import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Admonition } from 'ui-patterns'
 
 export interface RevokeAppModalProps {

@@ -1,11 +1,12 @@
 import 'swiper/css'
 
-import React, { useState, useEffect, useRef } from 'react'
-import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
-import { cn } from 'ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import Panel from '../Panel'
 import { useBreakpoint } from 'common'
+import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
+import React, { useEffect, useRef, useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { cn } from 'ui'
+
+import Panel from '../Panel'
 
 interface PanelProps {
   id: string

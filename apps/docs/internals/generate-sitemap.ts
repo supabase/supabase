@@ -2,7 +2,6 @@
  * kudos to leerob from vercel
  * https://leerob.io/blog/nextjs-sitemap-robots
  */
-
 import fs from 'fs'
 import { globby } from 'globby'
 import matter from 'gray-matter'

@@ -1,15 +1,15 @@
 import { type FetchNextPageOptions } from '@tanstack/react-query'
 import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, memo, ReactNode, UIEvent, useCallback, useRef } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
+import { Fragment, ReactNode, UIEvent, memo, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
+
 import { formatCompactNumber } from './DataTable.utils'
-import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
+import { useDataTable } from './providers/DataTableProvider'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, TMeta> {

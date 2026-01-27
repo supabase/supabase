@@ -1,7 +1,6 @@
 import { Code, GripHorizontal } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
-
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 interface ReportBlockContainerProps {
   icon?: ReactNode

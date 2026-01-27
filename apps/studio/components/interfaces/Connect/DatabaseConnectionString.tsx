@@ -1,7 +1,3 @@
-import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
@@ -15,6 +11,9 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
+import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -33,6 +32,7 @@ import {
   cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,

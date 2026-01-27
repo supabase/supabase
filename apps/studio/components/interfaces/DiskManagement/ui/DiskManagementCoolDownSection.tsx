@@ -1,7 +1,6 @@
+import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
 
 export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {

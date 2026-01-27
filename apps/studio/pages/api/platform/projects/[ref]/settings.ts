@@ -1,8 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-
 import { components } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
 import { getProjectSettings } from 'lib/api/self-hosted/settings'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
   protocol?: string

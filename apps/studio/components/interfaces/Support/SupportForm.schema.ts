@@ -1,7 +1,7 @@
-import { z } from 'zod'
-
 import { isFeatureEnabled } from 'common'
 import { PLAN_REQUEST_EMPTY_PLACEHOLDER } from 'components/ui/UpgradePlanButton'
+import { z } from 'zod'
+
 import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 
 const createFormSchema = (showClientLibraries: boolean) => {

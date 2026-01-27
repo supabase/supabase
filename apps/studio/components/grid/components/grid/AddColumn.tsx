@@ -1,8 +1,8 @@
 import { Plus } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
-
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button } from 'ui'
+
 import { ADD_COLUMN_KEY } from '../../constants'
 import { DefaultFormatter } from '../formatter/DefaultFormatter'
 

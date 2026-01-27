@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { Button } from 'ui'
-
 import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useState } from 'react'
 import type { ResponseError } from 'types'
+import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ForeignKeySelector } from '../../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import type { TableField } from '../TableEditor.types'

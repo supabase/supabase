@@ -1,12 +1,11 @@
-import React from 'react'
+import { useBreakpoint } from 'common'
+import type { FrameworkLinkProps } from 'data/solutions/solutions.utils'
 import Link from 'next/link'
+import React from 'react'
+import { cn } from 'ui'
 
 import SectionContainer from '../Layouts/SectionContainer'
 import APISection, { type APIExample } from '../Sections/APISection'
-import { cn } from 'ui'
-import { useBreakpoint } from 'common'
-
-import type { FrameworkLinkProps } from 'data/solutions/solutions.utils'
 
 export interface MPCSectionProps {
   id: string

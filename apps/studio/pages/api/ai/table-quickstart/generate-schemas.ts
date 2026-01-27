@@ -1,10 +1,9 @@
 import { streamObject } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
 import { LIMITS } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/constants'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 export const maxDuration = 30
 

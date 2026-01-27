@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { documentKeys } from './keys'
 
 export type DocType = 'standard-security-questionnaire' | 'soc2-type-2-report'

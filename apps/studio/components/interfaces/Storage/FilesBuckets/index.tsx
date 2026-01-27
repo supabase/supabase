@@ -1,7 +1,4 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { ArrowDownNarrowWide, Search } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -9,7 +6,9 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { ArrowDownNarrowWide, Search } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useCallback, useMemo, useState } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -25,6 +24,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'

@@ -1,4 +1,4 @@
-import { Loader, ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader } from 'lucide-react'
 import { Button } from 'ui'
 
 export interface PaginationProps {

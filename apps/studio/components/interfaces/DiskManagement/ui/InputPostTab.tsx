@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode } from 'react'
+import { ReactNode, forwardRef } from 'react'
 
 interface InputPostTabProps {
   children: ReactNode

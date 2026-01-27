@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
 import { ProtectionAuthSettingsForm } from 'components/interfaces/Auth/ProtectionAuthSettingsForm/ProtectionAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'

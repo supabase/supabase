@@ -1,15 +1,16 @@
+// End of third-party imports
+
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import { Command, Menu, Search } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
-// End of third-party imports
-
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
-import { isFeatureEnabled } from 'common/enabled-features'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
+
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'

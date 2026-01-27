@@ -49,6 +49,7 @@ We need to pass an instance of `react-native-async-storage` to supabase-js to ma
 
 ```ts lib/supabase.ts
 import 'react-native-url-polyfill/auto'
+
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 
@@ -90,10 +91,12 @@ Implement a `LargeSecureStore` class to pass in as Auth storage for the `supabas
 
 ```ts lib/supabase.ts
 import 'react-native-url-polyfill/auto'
-import { createClient } from '@supabase/supabase-js'
+
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as SecureStore from 'expo-secure-store'
+import { createClient } from '@supabase/supabase-js'
 import * as aesjs from 'aes-js'
+import * as SecureStore from 'expo-secure-store'
+
 import 'react-native-get-random-values'
 
 // As Expo's SecureStore does not support values larger than 2048
@@ -171,10 +174,11 @@ npm install @rneui/themed
 Set up a simple email form component:
 
 ```tsx components/EmailForm.tsx
+import { Button, Input } from '@rneui/themed'
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
+
 import { supabase } from '../lib/supabase'
-import { Button, Input } from '@rneui/themed'
 
 export default function EmailForm() {
   const [email, setEmail] = useState('')
@@ -281,12 +285,12 @@ In your project's [auth settings](https://supabase.com/dashboard/project/_/auth/
 Finally, implement the OAuth and linking handlers. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
 
 ```tsx ./components/Auth.tsx
-import { Button } from 'react-native'
+import { supabase } from 'app/utils/supabase'
 import { makeRedirectUri } from 'expo-auth-session'
 import * as QueryParams from 'expo-auth-session/build/QueryParams'
-import * as WebBrowser from 'expo-web-browser'
 import * as Linking from 'expo-linking'
-import { supabase } from 'app/utils/supabase'
+import * as WebBrowser from 'expo-web-browser'
+import { Button } from 'react-native'
 
 WebBrowser.maybeCompleteAuthSession() // required for web only
 const redirectTo = makeRedirectUri()

@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import {
   ScaffoldContainer,
@@ -17,13 +13,17 @@ import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSe
 import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import dayjs from 'dayjs'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { Check, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import { useQueryState } from 'nuqs'
-import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import { useMemo, useState } from 'react'
+import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { Restriction } from '../BillingSettings/Restriction'
 import ActiveCompute from './ActiveCompute'
 import Activity from './Activity'

@@ -7,6 +7,7 @@ import type {
 import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { useMemo } from 'react'
+
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 function isNumericConfig(

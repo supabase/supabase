@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
+import type { ProjectMetricsRow } from 'data/analytics/project-metrics-query'
+import { describe, expect, it, vi } from 'vitest'
 
 import { toServiceStatsMap } from './ProjectUsageSection.utils'
-import type { ProjectMetricsRow } from 'data/analytics/project-metrics-query'
 
 const mkRow = (
   n: number,

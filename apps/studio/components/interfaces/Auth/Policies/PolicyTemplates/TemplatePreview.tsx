@@ -1,5 +1,6 @@
 import SqlEditor from 'components/ui/SqlEditor'
 import { isEmpty } from 'lodash'
+
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
 interface TemplatePreviewProps {

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
 import Transition from 'lib/Transition'
+import React, { useEffect } from 'react'
 
 type Props = {
   title?: string

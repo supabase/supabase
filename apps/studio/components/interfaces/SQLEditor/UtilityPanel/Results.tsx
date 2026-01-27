@@ -1,16 +1,16 @@
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { Copy, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
-
-import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import {
-  cn,
-  ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  ContextMenu_Shadcn_,
+  cn,
   copyToClipboard,
 } from 'ui'
+
 import { CellDetailPanel } from './CellDetailPanel'
 
 function formatClipboardValue(value: any) {

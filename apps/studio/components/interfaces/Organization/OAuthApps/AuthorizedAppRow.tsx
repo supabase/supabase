@@ -1,8 +1,7 @@
-import { Trash } from 'lucide-react'
-
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
+import { Trash } from 'lucide-react'
 import { Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 

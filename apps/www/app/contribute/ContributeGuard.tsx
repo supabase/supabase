@@ -1,8 +1,8 @@
 'use client'
 
 import { useFlag } from 'common'
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 /**
  * TODO: Deprecate this once the contribute page is launched.

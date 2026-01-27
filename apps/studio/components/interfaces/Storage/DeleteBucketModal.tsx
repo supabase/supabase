@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
@@ -8,6 +5,9 @@ import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
+
 import { extractBucketNameFromDefinition } from './Storage.utils'
 
 export interface DeleteBucketModalProps {

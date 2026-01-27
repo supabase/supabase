@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import {
-  applyNodeChanges,
   Background,
   BackgroundVariant,
   Edge,
@@ -8,6 +7,7 @@ import {
   NodeChange,
   NodeProps,
   ReactFlow,
+  applyNodeChanges,
   useEdgesState,
   useNodesState,
   useReactFlow,

@@ -1,10 +1,11 @@
+import dayjs from 'dayjs'
 import blogAuthors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import type PostTypes from '~/types/post'
-import dayjs from 'dayjs'
 import { Badge } from 'ui'
+
+import type PostTypes from '~/types/post'
 import type { CMSPostTypes } from '~/types/post'
 
 interface Props {

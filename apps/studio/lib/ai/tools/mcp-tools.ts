@@ -2,6 +2,7 @@ import type { ToolSet } from 'ai'
 // End of third-party imports
 
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
 

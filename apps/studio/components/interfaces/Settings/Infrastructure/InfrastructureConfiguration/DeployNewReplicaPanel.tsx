@@ -1,8 +1,3 @@
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
@@ -31,8 +26,12 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
+import { toast } from 'sonner'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -52,6 +51,7 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
+
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually

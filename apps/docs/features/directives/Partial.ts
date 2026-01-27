@@ -32,7 +32,6 @@
  * Here is the partial content, with replacement of variable {{ .product }}
  * ```
  */
-
 import { type Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { readFile } from 'node:fs/promises'
@@ -40,8 +39,8 @@ import { join } from 'node:path'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 
-import { PARTIALS_DIRECTORY } from '~/lib/docs'
 import { fromDocsMarkdown, getAttributeValue, getAttributeValueExpression } from './utils.server'
+import { PARTIALS_DIRECTORY } from '~/lib/docs'
 
 export function partialsRemark() {
   return async function transform(tree: Root) {

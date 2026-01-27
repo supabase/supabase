@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '../Panel'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import type { Testimonials } from '~/data/solutions/solutions.utils'
 
 export type Story = {

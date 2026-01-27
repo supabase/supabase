@@ -1,16 +1,16 @@
-import { useRouter } from 'next/router'
-
 import { useFlag, useParams } from 'common'
 import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Button, cn, ResizablePanel } from 'ui'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React from 'react'
+import { Button, ResizablePanel, cn } from 'ui'
+
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
-import Link from 'next/link'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import React from 'react'
 
 interface FilterSideBarProps {
   dateRangeDisabled?: DateRangeDisabled

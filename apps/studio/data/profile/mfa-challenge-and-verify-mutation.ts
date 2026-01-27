@@ -1,11 +1,11 @@
 import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/supabase-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { captureCriticalError } from 'lib/error-reporting'
 import { auth } from 'lib/gotrue'
-import { profileKeys } from './keys'
+import { toast } from 'sonner'
 import { UseCustomMutationOptions } from 'types'
+
+import { profileKeys } from './keys'
 
 interface MFAChallengeAndVerifyVariables extends MFAChallengeAndVerifyParams {
   refreshFactors?: boolean

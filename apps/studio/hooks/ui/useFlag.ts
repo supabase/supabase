@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { trackFeatureFlag } from 'lib/posthog'

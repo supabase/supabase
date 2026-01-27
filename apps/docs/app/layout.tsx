@@ -6,9 +6,9 @@ import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
 import { TelemetryTagManager } from 'common'
-
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
+
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'

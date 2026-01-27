@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface UseInfiniteScrollOptions {
   /** Threshold for triggering the callback (0-1) */

@@ -1,10 +1,10 @@
+import { useParams } from 'common'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
+
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 

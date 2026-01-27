@@ -1,4 +1,11 @@
 import {
+  ARRAY_DELIMITER,
+  LEVELS,
+  RANGE_DELIMITER,
+  SLIDER_DELIMITER,
+  SORT_DELIMITER,
+} from 'components/ui/DataTable/DataTable.constants'
+import {
   createParser,
   parseAsArrayOf,
   parseAsBoolean,
@@ -7,14 +14,6 @@ import {
   parseAsStringLiteral,
   parseAsTimestamp,
 } from 'nuqs'
-
-import {
-  ARRAY_DELIMITER,
-  LEVELS,
-  RANGE_DELIMITER,
-  SLIDER_DELIMITER,
-  SORT_DELIMITER,
-} from 'components/ui/DataTable/DataTable.constants'
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const

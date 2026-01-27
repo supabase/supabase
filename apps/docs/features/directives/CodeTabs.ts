@@ -18,8 +18,7 @@
  * <$/CodeTabs>
  * ````
  */
-
-import { type Parent, type Code, type Root } from 'mdast'
+import { type Code, type Parent, type Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { SKIP, visitParents } from 'unist-util-visit-parents'
 

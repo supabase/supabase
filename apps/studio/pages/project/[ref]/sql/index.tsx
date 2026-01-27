@@ -1,12 +1,11 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 

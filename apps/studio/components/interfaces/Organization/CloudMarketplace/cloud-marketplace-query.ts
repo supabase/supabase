@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { get, handleError } from '../../../../data/fetchers'
 import { useProfile } from '../../../../lib/profile'
 import { cloudMarketplaceKeys } from './keys'

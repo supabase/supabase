@@ -1,8 +1,3 @@
-import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import {
@@ -16,7 +11,11 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
+import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ReactNode, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,

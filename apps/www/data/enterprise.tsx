@@ -1,3 +1,5 @@
+import RequestADemoForm from 'components/Forms/RequestADemoForm'
+import { companyStats } from 'data/company-stats'
 import {
   Activity,
   ArrowLeftRight,
@@ -13,11 +15,9 @@ import {
   ShieldAlert,
   ShieldCheck,
   Timer,
-  Users,
   UserX,
+  Users,
 } from 'lucide-react'
-import RequestADemoForm from 'components/Forms/RequestADemoForm'
-import { companyStats } from 'data/company-stats'
 
 export default {
   metadata: {

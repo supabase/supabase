@@ -1,10 +1,10 @@
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import type { FDW } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { MutableRefObject } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import type { FDW } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getWrapperMetaForWrapper } from './Wrappers.utils'
 
 interface DeleteWrapperModalProps {

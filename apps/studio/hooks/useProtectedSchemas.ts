@@ -1,6 +1,3 @@
-import { uniq, uniqBy } from 'lodash'
-import { useMemo } from 'react'
-
 import {
   SUPABASE_TARGET_SCHEMA_OPTION,
   WRAPPERS,
@@ -11,6 +8,9 @@ import {
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { QUEUES_SCHEMA } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { uniq, uniqBy } from 'lodash'
+import { useMemo } from 'react'
+
 import { useSelectedProjectQuery } from './misc/useSelectedProject'
 
 /**

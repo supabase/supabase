@@ -1,9 +1,9 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-
 import { get, handleError } from 'data/fetchers'
-import { resourceKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { resourceKeys } from './keys'
 
 export type ApiAuthorizationVariables = {
   id?: string

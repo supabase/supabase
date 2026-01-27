@@ -1,6 +1,6 @@
+import { type VariantProps, cva } from 'class-variance-authority'
 import { Ref, forwardRef } from 'react'
 import { cn } from 'ui'
-import { cva, type VariantProps } from 'class-variance-authority'
 
 const sectionContainerVariants = cva('max-w-7xl relative mx-auto px-6', {
   variants: {

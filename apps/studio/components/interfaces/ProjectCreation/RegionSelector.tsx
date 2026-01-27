@@ -1,5 +1,3 @@
-import { UseFormReturn } from 'react-hook-form'
-
 import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
@@ -7,6 +5,7 @@ import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import type { DesiredInstanceSize } from 'data/projects/new-project.constants'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
+import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -25,6 +24,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
 

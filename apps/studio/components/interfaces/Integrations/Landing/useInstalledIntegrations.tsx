@@ -1,16 +1,16 @@
-import { useMemo } from 'react'
-
+import { useFlag } from 'common'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFlag } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from 'lib/void'
+import { useMemo } from 'react'
 import {
   INSTALLATION_INSTALLED_SUFFIX,
   STRIPE_SCHEMA_COMMENT_PREFIX,
 } from 'stripe-experiment-sync/supabase'
+
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
 

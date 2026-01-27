@@ -8,6 +8,7 @@ import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
 import type { VaultSecret } from 'types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import EditSecretModal from '../EditSecretModal'
 
 const secret: VaultSecret = {

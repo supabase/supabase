@@ -1,8 +1,7 @@
-import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
-
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { DOCS_URL } from 'lib/constants'
+import { AlertCircle } from 'lucide-react'
+import Link from 'next/link'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface RAMWarningsProps {

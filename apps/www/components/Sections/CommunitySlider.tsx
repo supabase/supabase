@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
-
-import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore from 'swiper'
 import { Autoplay } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 import 'swiper/css'
-import SectionContainer from '../Layouts/SectionContainer'
+
 import { useBreakpoint } from 'common'
 import { TweetCard } from 'ui-patterns/TweetCard'
+
+import SectionContainer from '../Layouts/SectionContainer'
 
 SwiperCore.use([Autoplay])
 

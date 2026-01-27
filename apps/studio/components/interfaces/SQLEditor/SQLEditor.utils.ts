@@ -1,6 +1,7 @@
 import { generateUuid } from 'lib/api/snippets.browser'
 import { removeCommentsFromSql } from 'lib/helpers'
 import type { SnippetWithContent } from 'state/sql-editor-v2'
+
 import {
   NEW_SQL_SNIPPET_SKELETON,
   destructiveSqlRegex,

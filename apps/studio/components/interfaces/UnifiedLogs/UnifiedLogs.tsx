@@ -1,21 +1,18 @@
 import {
   ColumnFiltersState,
+  Row,
+  RowSelectionState,
+  SortingState,
+  Table,
+  VisibilityState,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   getFacetedMinMaxValues as getTTableFacetedMinMaxValues,
   getFacetedUniqueValues as getTTableFacetedUniqueValues,
-  Row,
-  RowSelectionState,
-  SortingState,
-  Table,
   useReactTable,
-  VisibilityState,
 } from '@tanstack/react-table'
-import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
-
 import { useDebounce, useParams } from 'common'
 import { arrSome, inDateRange } from 'components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from 'components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
@@ -26,31 +23,34 @@ import { DataTableToolbar } from 'components/ui/DataTable/DataTableToolbar'
 import { FilterSideBar } from 'components/ui/DataTable/FilterSideBar'
 import { LiveButton } from 'components/ui/DataTable/LiveButton'
 import { LiveRow } from 'components/ui/DataTable/LiveRow'
-import { DataTableProvider } from 'components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
+import { DataTableProvider } from 'components/ui/DataTable/providers/DataTableProvider'
 import { useUnifiedLogsChartQuery } from 'data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useQueryStates } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ChartConfig,
-  cn,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
   Separator,
+  cn,
 } from 'ui'
+
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
-import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
-import { DownloadLogsButton } from './components/DownloadLogsButton'
-import { LogsListPanel } from './components/LogsListPanel'
-import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import { UNIFIED_LOGS_COLUMNS, generateDynamicColumns } from './components/Columns'
+import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogsListPanel } from './components/LogsListPanel'
+import { TooltipLabel } from './components/TooltipLabel'
 
 export const CHART_CONFIG = {
   success: {

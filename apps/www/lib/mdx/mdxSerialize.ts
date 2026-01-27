@@ -1,9 +1,9 @@
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { serialize } from 'next-mdx-remote/serialize'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
 
 // mdx2 needs self-closing tags.

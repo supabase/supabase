@@ -1,8 +1,7 @@
-import { ArrowUpRight } from 'lucide-react'
-
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ArrowUpRight } from 'lucide-react'
 import type { Organization } from 'types'
 
 export const generateSettingsMenu = (

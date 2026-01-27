@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import { useState } from 'react'
-
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 import { Button, Select, cn } from 'ui'
+
+import UpgradePlan from './UpgradePlan'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import Solutions from '~/data/MainProducts'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import UpgradePlan from './UpgradePlan'
 
 const MobileHeader = ({
   description,

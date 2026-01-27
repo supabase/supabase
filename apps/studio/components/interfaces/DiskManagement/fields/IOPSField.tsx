@@ -1,10 +1,10 @@
-import { UseFormReturn } from 'react-hook-form'
-
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { Button, cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
+import { UseFormReturn } from 'react-hook-form'
+import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
   calculateComputeSizeRequiredForIops,

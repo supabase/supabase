@@ -2,10 +2,12 @@ import dagre from '@dagrejs/dagre'
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
+
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
 
 const NODE_SEP = 25

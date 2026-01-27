@@ -1,11 +1,11 @@
-import { Plug } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import type { ICommand } from 'ui-patterns/CommandMenu'
-import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
+import { Plug } from 'lucide-react'
+import { useRouter } from 'next/router'
+import type { ICommand } from 'ui-patterns/CommandMenu'
+import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 export function useConnectCommands() {
   const router = useRouter()

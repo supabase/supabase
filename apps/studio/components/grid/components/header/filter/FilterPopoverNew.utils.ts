@@ -1,5 +1,3 @@
-import { format } from 'date-fns'
-
 import type { SupaColumn } from 'components/grid/types'
 import {
   isBoolColumn,
@@ -8,7 +6,9 @@ import {
   isEnumColumn,
   isTimeColumn,
 } from 'components/grid/utils/types'
+import { format } from 'date-fns'
 import type { FilterProperty } from 'ui-patterns'
+
 import { FilterOperatorOptions } from './Filter.constants'
 
 // Check if column is a date/datetime/time type

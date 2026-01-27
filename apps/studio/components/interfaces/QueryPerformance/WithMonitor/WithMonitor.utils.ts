@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { transformLogsToJSON } from '../QueryPerformance.utils'
+
 import { QueryPerformanceRow } from '../QueryPerformance.types'
+import { transformLogsToJSON } from '../QueryPerformance.utils'
 
 dayjs.extend(utc)
 

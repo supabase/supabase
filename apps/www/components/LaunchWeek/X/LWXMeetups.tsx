@@ -1,8 +1,9 @@
+import { SupabaseClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { TextLink, cn } from 'ui'
+
 import useConfData from '../hooks/use-conf-data'
-import { SupabaseClient } from '@supabase/supabase-js'
 
 export interface Meetup {
   id?: any

@@ -1,13 +1,12 @@
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor/TableGridEditor'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { TableEditorLayout } from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEditorMenu'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useEffect } from 'react'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 

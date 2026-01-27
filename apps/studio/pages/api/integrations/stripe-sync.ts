@@ -1,8 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-import { install, uninstall } from 'stripe-experiment-sync/supabase'
-import { VERSION } from 'stripe-experiment-sync'
 import { waitUntil } from '@vercel/functions'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { VERSION } from 'stripe-experiment-sync'
+import { install, uninstall } from 'stripe-experiment-sync/supabase'
+import { z } from 'zod'
 
 const ENABLE_FLAG_KEY = 'enableStripeSyncEngineIntegration'
 

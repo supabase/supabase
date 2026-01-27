@@ -1,6 +1,6 @@
 import { Fragment, type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
-import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
+import { type BundledLanguage, type ThemedToken, bundledLanguages, createHighlighter } from 'shiki'
+import { type ExtraFiles, type NodeHover, createTwoslasher } from 'twoslash'
 import { cn } from 'ui'
 
 import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'

@@ -1,15 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { createContext, useContext, PropsWithChildren, useState, useCallback } from 'react'
-
 import { QueryIndexes } from 'components/interfaces/QueryPerformance/QueryIndexes'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { databaseKeys } from 'data/database/keys'
 import {
-  useTableIndexAdvisorQuery,
-  TableIndexAdvisorData,
   IndexAdvisorSuggestion,
+  TableIndexAdvisorData,
+  useTableIndexAdvisorQuery,
 } from 'data/database/table-index-advisor-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PropsWithChildren, createContext, useCallback, useContext, useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
 interface TableIndexAdvisorContextValue {

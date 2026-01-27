@@ -1,8 +1,3 @@
-import { Loader2, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
@@ -18,12 +13,17 @@ import type { Filter, Sort } from 'components/grid/types'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import {
   RoleImpersonationState,
   useRoleImpersonationStateSnapshot,
 } from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
+
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'

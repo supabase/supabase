@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useFlag, useParams } from 'common'
 import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
@@ -21,8 +14,13 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2, Plus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -34,14 +32,16 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Progress,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import z from 'zod'
+
 import {
   getAnalyticsBucketPublicationName,
   getAnalyticsBucketsDestinationName,

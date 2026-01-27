@@ -1,6 +1,7 @@
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { isEqual } from 'lodash'
+
+import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 
 export const checkIfRelationChanged = (existing: ForeignKeyConstraint, state: ForeignKey) => {
   const stateSourceColumns = state.columns.map((x) => x.source)

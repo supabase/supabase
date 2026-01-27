@@ -1,10 +1,10 @@
 import dagre from '@dagrejs/dagre'
-import { groupBy } from 'lodash'
-import { Edge, Node, Position } from 'reactflow'
-
 import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
 import type { Database } from 'data/read-replicas/replicas-query'
+import { groupBy } from 'lodash'
+import { Edge, Node, Position } from 'reactflow'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
+
 import {
   AVAILABLE_REPLICA_REGIONS,
   AWS_REGIONS_COORDINATES,

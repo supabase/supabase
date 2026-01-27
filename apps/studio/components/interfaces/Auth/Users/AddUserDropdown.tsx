@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Mail, UserPlus } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { ChevronDown, Mail, UserPlus } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 

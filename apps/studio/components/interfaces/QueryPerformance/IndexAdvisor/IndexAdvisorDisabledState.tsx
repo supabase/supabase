@@ -1,13 +1,13 @@
-import Link from 'next/link'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+
 import { Markdown } from '../../Markdown'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
 

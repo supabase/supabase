@@ -1,10 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import randomBytes from 'randombytes'
-import { useEffect, useMemo } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -16,6 +10,10 @@ import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import randomBytes from 'randombytes'
+import { useEffect, useMemo } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   FormControl_Shadcn_,
@@ -35,6 +33,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import * as z from 'zod'
+
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 

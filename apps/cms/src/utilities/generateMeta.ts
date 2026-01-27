@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 
-import type { Media, Post, Config } from '../payload-types'
-
-import { mergeOpenGraph } from './mergeOpenGraph.ts'
+import type { Config, Media, Post } from '../payload-types'
 import { getServerSideURL } from './getURL.ts'
+import { mergeOpenGraph } from './mergeOpenGraph.ts'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL()

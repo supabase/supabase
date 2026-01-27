@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
 interface TruncatedTextWithPopoverProps {
   text: string

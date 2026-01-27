@@ -1,13 +1,11 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-
-import content from 'data/solutions/agencies'
 import { Solutions } from 'data/Solutions'
+import content from 'data/solutions/agencies'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 
 const Quotes = dynamic(() => import('components/Solutions/Quotes'))
 const FeaturesSection = dynamic(() => import('components/Solutions/FeaturesSection'))

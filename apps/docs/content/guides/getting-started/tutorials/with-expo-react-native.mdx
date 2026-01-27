@@ -175,10 +175,11 @@ Users would be able to sign in with their email and password.
 <$CodeTabs>
 
 ```tsx name=components/Auth.tsx
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState } from 'react-native'
-import { supabase } from '../lib/supabase'
 import { Button, Input } from '@rneui/themed'
+import React, { useState } from 'react'
+import { Alert, AppState, StyleSheet, View } from 'react-native'
+
+import { supabase } from '../lib/supabase'
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -291,11 +292,12 @@ Let's create a new component for that called `Account.tsx`.
 <$CodeTabs>
 
 ```tsx name=components/Account.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
+import { Alert, StyleSheet, View } from 'react-native'
+
+import { supabase } from '../lib/supabase'
 
 export default function Account({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true)
@@ -422,12 +424,13 @@ Now that we have all the components in place, let's update `App.tsx`:
 <$CodeTabs>
 
 ```tsx name=App.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
-import Auth from './components/Auth'
-import Account from './components/Account'
-import { View } from 'react-native'
 import { Session } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
+import { View } from 'react-native'
+
+import Account from './components/Account'
+import Auth from './components/Auth'
+import { supabase } from './lib/supabase'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -481,10 +484,11 @@ We can start by creating a new component:
 <$CodeTabs>
 
 ```tsx name=components/Avatar.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
+import { useEffect, useState } from 'react'
+import { Alert, Button, Image, StyleSheet, View } from 'react-native'
+
+import { supabase } from '../lib/supabase'
 
 interface Props {
   size: number

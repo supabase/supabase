@@ -5,6 +5,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Badge, Button, Card, CardContent, CardFooter } from 'ui'
+
 import { markdownComponents } from './markdownComponents'
 
 interface Reply {

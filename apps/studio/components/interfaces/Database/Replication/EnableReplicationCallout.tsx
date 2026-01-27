@@ -1,14 +1,9 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
-import { DocsButton } from '@/components/ui/DocsButton'
-import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
-import { DOCS_URL } from '@/lib/constants'
 import { useParams } from 'common'
 import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -17,8 +12,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { DOCS_URL } from '@/lib/constants'
 
 const EnableReplicationModal = () => {
   const { ref: projectRef } = useParams()

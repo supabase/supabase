@@ -1,8 +1,8 @@
+import { takeBreadcrumbSnapshot } from 'lib/breadcrumbs'
 import Link from 'next/link'
 import type { ComponentProps, PropsWithChildren } from 'react'
 
-import { takeBreadcrumbSnapshot } from 'lib/breadcrumbs'
-import { createSupportFormUrl, type SupportFormUrlKeys } from './SupportForm.utils'
+import { type SupportFormUrlKeys, createSupportFormUrl } from './SupportForm.utils'
 
 export const SupportLink = ({
   children,

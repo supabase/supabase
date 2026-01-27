@@ -1,8 +1,7 @@
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
-
-import { useAppStateSnapshot } from 'state/app-state'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useBreakpoint } from 'common'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { useAppStateSnapshot } from 'state/app-state'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
   const { showSidebar, setShowSidebar, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()

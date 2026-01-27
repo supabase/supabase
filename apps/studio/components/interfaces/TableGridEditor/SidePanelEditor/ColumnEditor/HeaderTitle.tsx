@@ -1,4 +1,4 @@
-import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
   table: PostgresTable

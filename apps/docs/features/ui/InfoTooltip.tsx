@@ -1,5 +1,7 @@
 'use client'
 
+import { useBreakpoint } from 'common'
+import { InfoIcon, XIcon } from 'lucide-react'
 import React, {
   type PropsWithChildren,
   useCallback,
@@ -8,12 +10,9 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { InfoIcon, XIcon } from 'lucide-react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useBreakpoint } from 'common'
 import {
   Button,
-  cn,
   CommandEmpty_Shadcn_,
   Sheet,
   SheetContent,
@@ -21,6 +20,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 
 interface PopUpProps extends PropsWithChildren {

@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { AlertCircle, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo } from 'react'
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo } from 'react'
+import { toast } from 'sonner'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 
 export const DisplayApiSettings = ({

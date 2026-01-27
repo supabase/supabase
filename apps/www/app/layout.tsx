@@ -3,9 +3,10 @@ import 'config/code-hike.scss'
 import '../styles/index.css'
 
 import { Metadata } from 'next'
-import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
-import Providers from './providers'
 import type { Viewport } from 'next'
+
+import Providers from './providers'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 
 const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
 

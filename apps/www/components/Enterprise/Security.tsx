@@ -1,8 +1,8 @@
+import type { LucideIcon } from 'lucide-react'
 import React, { FC } from 'react'
 import { TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 
-import type { LucideIcon } from 'lucide-react'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 export interface SecuritySectionProps {
   id: string

@@ -1,11 +1,9 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
-
 import { data as content } from 'data/open-source/contributing/supasquad'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import { Separator } from 'ui'
 
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))

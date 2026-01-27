@@ -1,5 +1,4 @@
 import { Search, X } from 'lucide-react'
-
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 

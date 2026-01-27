@@ -5,9 +5,9 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { OrganizationDeletePanel } from './OrganizationDeletePanel'
 
 import { DataPrivacyForm } from './DataPrivacyForm'
+import { OrganizationDeletePanel } from './OrganizationDeletePanel'
 import { OrganizationDetailsForm } from './OrganizationDetailsForm'
 
 export const GeneralSettings = () => {

@@ -7,24 +7,21 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AddressElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import {
+  type SetupIntent,
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
-  type SetupIntent,
 } from '@stripe/stripe-js'
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { Form } from '@ui/components/shadcn/ui/form'
 import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { getURL } from 'lib/helpers'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,
-  cn,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
@@ -39,8 +36,10 @@ import {
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),

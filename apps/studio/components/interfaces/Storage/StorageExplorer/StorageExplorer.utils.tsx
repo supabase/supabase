@@ -1,7 +1,7 @@
-import { toast } from 'sonner'
-
 import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
+
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 

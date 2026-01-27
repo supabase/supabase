@@ -1,12 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isEqual } from 'lodash'
-import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
-import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -21,7 +13,15 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
+
+import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()

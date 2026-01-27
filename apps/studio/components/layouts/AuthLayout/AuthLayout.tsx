@@ -1,11 +1,11 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { useFlag, useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 

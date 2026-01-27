@@ -1,9 +1,9 @@
 import { Table } from '@tanstack/react-table'
-import { HTMLAttributes, memo } from 'react'
-
 import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
-import { cn, Skeleton } from 'ui'
+import { HTMLAttributes, memo } from 'react'
+import { Skeleton, cn } from 'ui'
+
 import { SheetField } from '../UnifiedLogs.types'
 
 interface SheetDetailsContentSkeletonProps<TData, TMeta> {

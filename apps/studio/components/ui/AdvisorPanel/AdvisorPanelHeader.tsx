@@ -1,7 +1,7 @@
-import { ChevronLeft, X } from 'lucide-react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ChevronLeft, X } from 'lucide-react'
 import { Badge } from 'ui'
+
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,

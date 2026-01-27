@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { del, handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { storageKeys } from './keys'
+
 import { pollUntilBucketEmpty } from './bucket-util'
+import { storageKeys } from './keys'
 
 type BucketDeleteVariables = {
   projectRef: string

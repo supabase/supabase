@@ -1,8 +1,7 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { toast } from 'sonner'
 import { Button, Form, Input, Modal } from 'ui'
 
 type CustomReport = { name: string; description?: string }

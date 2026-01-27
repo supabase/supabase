@@ -1,7 +1,6 @@
-import Link from 'next/link'
-
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { Badge, NavMenu, NavMenuItem } from 'ui'
 
 type Props = {

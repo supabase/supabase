@@ -347,13 +347,11 @@ _supabase/functions/embed/index.ts_:
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
-// We'll use the OpenAI API to generate embeddings
-import OpenAI from 'jsr:@openai/openai'
-
-import { z } from 'npm:zod'
-
 // We'll make a direct Postgres connection to update the document
 import postgres from 'https://deno.land/x/postgresjs@v3.4.5/mod.js'
+// We'll use the OpenAI API to generate embeddings
+import OpenAI from 'jsr:@openai/openai'
+import { z } from 'npm:zod'
 
 // Initialize OpenAI client
 const openai = new OpenAI({

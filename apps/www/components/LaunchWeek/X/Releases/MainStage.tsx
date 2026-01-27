@@ -1,9 +1,9 @@
 import React, { FC } from 'react'
-import { mainDays as days } from './data'
-
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import DaySection from './components/DaySection'
 import { TextLink } from 'ui'
+
+import DaySection from './components/DaySection'
+import { mainDays as days } from './data'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const MainStage: FC = () => (
   <SectionContainer className="relative !max-w-none !py-0 lg:!container" id="main-stage">

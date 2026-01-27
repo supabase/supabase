@@ -1,8 +1,9 @@
-import template from './templates/ApiTemplate'
-import { slugify, toArrayWithKey, toTitle, writeToDisk } from './helpers'
-import type { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
-import * as fs from 'fs'
 import * as ejs from 'ejs'
+import * as fs from 'fs'
+import type { OpenAPIV2, OpenAPIV3 } from 'openapi-types'
+
+import { slugify, toArrayWithKey, toTitle, writeToDisk } from './helpers'
+import template from './templates/ApiTemplate'
 
 export default async function gen(inputFileName: string, outputDir: string, apiUrl: string) {
   const specRaw = fs.readFileSync(inputFileName, 'utf8')

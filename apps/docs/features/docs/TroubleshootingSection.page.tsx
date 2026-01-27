@@ -1,6 +1,6 @@
 import { type Metadata } from 'next'
 
-import { TroubleshootingHeader, TroubleshootingEntries } from '~/features/docs/Troubleshooting.ui'
+import { TroubleshootingEntries, TroubleshootingHeader } from '~/features/docs/Troubleshooting.ui'
 import {
   TroubleshootingFilterEmptyState,
   TroubleshootingListController,

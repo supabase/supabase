@@ -1,9 +1,8 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
+import { isFeatureEnabled } from 'common/enabled-features'
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
-
-import { isFeatureEnabled } from 'common/enabled-features'
 
 export const runtime = 'edge'
 /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that

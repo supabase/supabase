@@ -4,9 +4,9 @@
  *
  * Deno Releases: https://github.com/denoland/deno/releases
  */
+import path from 'path'
 
 import fs from 'fs/promises'
-import path from 'path'
 
 const DENO_VERSION = 'v1.45.0'
 const SUPABASE_FUNCTIONS_JS_VERSION = '2.4.4'

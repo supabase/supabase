@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
-
 import { Button } from 'ui'
 
 export function InputResetButton({ isDirty, onClick }: { isDirty: boolean; onClick: () => void }) {

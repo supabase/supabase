@@ -1,9 +1,9 @@
+import { type DocsSearchResult as Page, type DocsSearchResultSection as PageSection } from 'common'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-
-import { type DocsSearchResult as Page, type DocsSearchResultSection as PageSection } from 'common'
 import { cn } from 'ui'
 import { TextHighlighterBase as TextHighlighter } from 'ui-patterns/CommandMenu'
+
 import { formatSectionUrl, generateLink, getPageIcon } from './SupportForm.utils'
 
 const cardBaseClasses =

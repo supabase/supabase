@@ -1,12 +1,10 @@
-import { useMemo } from 'react'
-
 import { useFlag, useParams } from 'common'
 import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
 import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
 import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
 import {
-  type IntegrationDefinition,
   INTEGRATIONS,
+  type IntegrationDefinition,
 } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -17,6 +15,7 @@ import {
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useMemo } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSetPage } from 'ui-patterns/CommandMenu'

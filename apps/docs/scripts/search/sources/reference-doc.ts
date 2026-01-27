@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
-import { readFile } from 'fs/promises'
 import yaml from 'js-yaml'
 import type { OpenAPIV3 } from 'openapi-types'
+
 import type {
   ICommonItem,
   ICommonSection,
@@ -13,6 +13,7 @@ import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
 import { flattenSections } from '../../../lib/helpers.js'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers.js'
 import { BaseLoader, BaseSource } from './base.js'
+import { readFile } from 'fs/promises'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   type = 'reference' as const

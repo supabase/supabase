@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { supabase } from '~/lib/supabase'
+
 import { POST } from '../route'
+import { supabase } from '~/lib/supabase'
 
 describe('/api/graphql errors collection', () => {
   it('returns a list of errors with pagination info', async () => {

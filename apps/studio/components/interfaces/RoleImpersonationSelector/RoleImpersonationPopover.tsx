@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-
+import { RoleImpersonationSelector } from '.'
 import type { User } from 'data/auth/users-infinite-query'
 import { ChevronDown, User as IconUser } from 'lucide-react'
+import { useState } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { RoleImpersonationSelector } from '.'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 
 export interface RoleImpersonationPopoverProps {

@@ -1,4 +1,5 @@
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'

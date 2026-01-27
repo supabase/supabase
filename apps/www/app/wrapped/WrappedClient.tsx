@@ -1,14 +1,14 @@
 'use client'
 
 import DefaultLayout from '~/components/Layouts/Default'
+import ProductsCta from '~/components/Sections/ProductsCta2'
+import { CustomerStories } from '~/components/Wrapped/Pages/CustomerStories'
+import { Devs } from '~/components/Wrapped/Pages/Devs'
 import { Home } from '~/components/Wrapped/Pages/Home'
 import { Intro } from '~/components/Wrapped/Pages/Intro'
-import { YearOfAI } from '~/components/Wrapped/Pages/YearOfAI'
-import { Devs } from '~/components/Wrapped/Pages/Devs'
-import { SupabaseSelect } from '~/components/Wrapped/Pages/SupabaseSelect'
-import { CustomerStories } from '~/components/Wrapped/Pages/CustomerStories'
 import { ProductAnnouncements } from '~/components/Wrapped/Pages/ProductAnnouncements'
-import ProductsCta from '~/components/Sections/ProductsCta2'
+import { SupabaseSelect } from '~/components/Wrapped/Pages/SupabaseSelect'
+import { YearOfAI } from '~/components/Wrapped/Pages/YearOfAI'
 
 export default function WrappedClient() {
   return (

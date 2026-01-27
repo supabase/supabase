@@ -1,5 +1,6 @@
 import { proxy } from 'valtio'
-import { type IViewState, type DialogSize, type ITouchHandlers } from './viewState.types'
+
+import { type DialogSize, type ITouchHandlers, type IViewState } from './viewState.types'
 
 const initViewState = () => {
   const state: IViewState = proxy({

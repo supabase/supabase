@@ -1,8 +1,7 @@
-import dayjs from 'dayjs'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
+import dayjs from 'dayjs'
 import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
@@ -13,17 +12,18 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   SimpleCodeBlock,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 
 export const LocalVersionPopover = () => {

@@ -1,5 +1,19 @@
 import * as Sentry from '@sentry/nextjs'
 import { GraphQLError, GraphQLNonNull, GraphQLResolveInfo, GraphQLString } from 'graphql'
+
+import {
+  type CollectionFetch,
+  GraphQLCollectionBuilder,
+  createCollectionType,
+  paginationArgs,
+} from '../utils/connections'
+import { ErrorModel } from './errorModel'
+import {
+  GRAPHQL_FIELD_ERRORS_GLOBAL,
+  GRAPHQL_FIELD_ERROR_GLOBAL,
+  GraphQLEnumTypeService,
+  GraphQLObjectTypeError,
+} from './errorSchema'
 import type {
   ErrorCollection,
   RootQueryTypeErrorArgs,
@@ -8,19 +22,6 @@ import type {
 } from '~/__generated__/graphql'
 import { ApiError, convertUnknownToApiError, extractMessageFromAnyError } from '~/app/api/utils'
 import { Result } from '~/features/helpers.fn'
-import {
-  createCollectionType,
-  GraphQLCollectionBuilder,
-  paginationArgs,
-  type CollectionFetch,
-} from '../utils/connections'
-import { ErrorModel } from './errorModel'
-import {
-  GRAPHQL_FIELD_ERROR_GLOBAL,
-  GRAPHQL_FIELD_ERRORS_GLOBAL,
-  GraphQLEnumTypeService,
-  GraphQLObjectTypeError,
-} from './errorSchema'
 
 /**
  * Encodes a string to base64

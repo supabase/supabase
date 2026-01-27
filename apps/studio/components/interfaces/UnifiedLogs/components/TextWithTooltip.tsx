@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { cn, Tooltip, TooltipContent, TooltipPortal, TooltipProvider, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipPortal, TooltipProvider, TooltipTrigger, cn } from 'ui'
 
 interface TextWithTooltipProps {
   text: string | number

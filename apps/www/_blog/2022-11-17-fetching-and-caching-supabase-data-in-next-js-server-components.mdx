@@ -127,6 +127,7 @@ Let’s modify this component to render out a collection of `<Link />` component
 
 ```tsx title="app/static/page.tsx"
 import Link from 'next/link'
+
 import supabase from '../../utils/supabase'
 
 export default async function Posts() {
@@ -149,8 +150,9 @@ export default async function Posts() {
 Let’s create a dynamic route to handle displaying an individual post. Create a new file at `app/static/[id]/page.tsx` and populate with the following:
 
 ```tsx title="app/static/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export default async function Post({ params: { id } }: { params: { id: string } }) {
   const { data } = await supabase.from('posts').select().match({ id }).single()
@@ -182,8 +184,9 @@ export async function generateStaticParams() {
 The full component should look something like this:
 
 ```tsx title="app/static/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export async function generateStaticParams() {
   const { data: posts } = await supabase.from('posts').select('id')
@@ -224,6 +227,7 @@ The `Posts` component should now look like this:
 
 ```tsx title="app/static-with-revalidate/page.tsx"
 import Link from 'next/link'
+
 import supabase from '../../utils/supabase'
 
 export const revalidate = 60
@@ -246,8 +250,9 @@ export default async function Posts() {
 And the `Post` component should look like this:
 
 ```tsx title="app/static-with-revalidate/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export const revalidate = 60
 
@@ -282,6 +287,7 @@ If we want fresh data to be fetched on every single request, we can simply set o
 
 ```tsx title="app/server-rendered/page.tsx"
 import Link from 'next/link'
+
 import supabase from '../../utils/supabase'
 
 export const revalidate = 0
@@ -304,8 +310,9 @@ export default async function Posts() {
 **Single Post Component**
 
 ```tsx title="app/server-rendered/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export const revalidate = 0
 
@@ -358,6 +365,7 @@ Let’s implement client-side data fetching.
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import supabase from '../../utils/supabase'
 
 export default function ClientPosts() {
@@ -408,6 +416,7 @@ export default async function Realtime() {
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import supabase from '../../utils/supabase'
 
 export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {

@@ -1,6 +1,7 @@
-import { IconPanel } from 'ui-patterns/IconPanel'
-import providers from '../data/authProviders'
 import Link from 'next/link'
+import { IconPanel } from 'ui-patterns/IconPanel'
+
+import providers from '../data/authProviders'
 
 export default function AuthProviders({ type }: { type: string }) {
   const filterProviders = providers.filter((item) => item.authType === type)

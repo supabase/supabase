@@ -1,11 +1,11 @@
-import { createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-
 import { useConstant } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import useLatest from 'hooks/misc/useLatest'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
+import { ImpersonationRole, getPostgrestClaims } from 'lib/role-impersonation'
+import { PropsWithChildren, createContext, useCallback, useContext, useEffect } from 'react'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+
 import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
 
 export function createRoleImpersonationState(

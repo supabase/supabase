@@ -1,5 +1,6 @@
 import { ComponentPropsWithRef, forwardRef } from 'react'
 import { cn } from 'ui'
+
 import {
   Table as ShadcnTable,
   TableBody as ShadcnTableBody,

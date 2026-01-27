@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import { quoteLiteral } from 'lib/pg-format'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions, VaultSecret } from 'types'
+
 import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretCreateVariables = {

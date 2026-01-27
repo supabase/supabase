@@ -1,7 +1,7 @@
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 
 export const useResetFocus = () => {

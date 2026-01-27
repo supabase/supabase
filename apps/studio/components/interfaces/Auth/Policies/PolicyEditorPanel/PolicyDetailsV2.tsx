@@ -1,12 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   CommandEmpty_Shadcn_,

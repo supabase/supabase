@@ -9,6 +9,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { DeleteProjectButton } from './DeleteProjectButton'
 
 export const DeleteProjectPanel = () => {

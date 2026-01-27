@@ -2,16 +2,17 @@
 
 import type { AuthError, Session } from '@supabase/supabase-js'
 import {
-  createContext,
   PropsWithChildren,
+  createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from 'react'
+
 import { clearLocalStorage } from './constants/local-storage'
-import { gotrueClient, type User } from './gotrue'
+import { type User, gotrueClient } from './gotrue'
 
 export type { User }
 

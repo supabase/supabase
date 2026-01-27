@@ -1,14 +1,12 @@
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
-import { useRouter } from 'next/router'
-
-import DefaultLayout from 'components/Layouts/Default'
+import type { LumaEvent } from 'app/api-v2/luma-events/route'
 import LW15Heading from 'components/LaunchWeek/15/LW15Heading'
 import LW15MainStage from 'components/LaunchWeek/15/LW15MainStage'
-
+import DefaultLayout from 'components/Layouts/Default'
+import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
 import type { GetServerSideProps } from 'next'
-import type { LumaEvent } from 'app/api-v2/luma-events/route'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
 
 const LW15BuildStage = dynamic(() => import('components/LaunchWeek/15/LW15BuildStage'))
 const LW15Hackathon = dynamic(() => import('components/LaunchWeek/15/LW15Hackathon'))

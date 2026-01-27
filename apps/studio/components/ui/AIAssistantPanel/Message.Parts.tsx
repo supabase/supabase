@@ -1,11 +1,10 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
-import { Tool } from './elements/Tool'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import {
   deployEdgeFunctionInputSchema,
@@ -13,6 +12,7 @@ import {
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
+import { Tool } from './elements/Tool'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()

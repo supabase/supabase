@@ -1,8 +1,8 @@
 import { Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
-
 import { AiIconAnimation, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOptInModal } from './AIOptInModal'

@@ -1,9 +1,9 @@
 // This file configures the initialization of Sentry on the client.
 // The added config here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
 import * as Sentry from '@sentry/nextjs'
-import { hasConsented, IS_PLATFORM } from 'common'
+import { IS_PLATFORM, hasConsented } from 'common'
+
 import { IS_DEV } from './lib/constants'
 
 if (!IS_DEV) {

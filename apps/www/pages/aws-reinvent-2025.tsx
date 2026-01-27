@@ -1,13 +1,12 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-import { Calendar, MapPin, Clock, Users, ChevronRight, CheckCircle } from 'lucide-react'
-import Link from 'next/link'
-import { Button, Badge } from 'ui'
-
 import Layout from 'components/Layouts/Default'
 import SectionContainer from 'components/Layouts/SectionContainer'
 import data from 'data/aws-reinvent-2025'
+import { Calendar, CheckCircle, ChevronRight, Clock, MapPin, Users } from 'lucide-react'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import { Badge, Button } from 'ui'
 
 const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))

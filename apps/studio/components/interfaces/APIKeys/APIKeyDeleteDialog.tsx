@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Trash2 } from 'lucide-react'
-
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Trash2 } from 'lucide-react'
 
 interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>

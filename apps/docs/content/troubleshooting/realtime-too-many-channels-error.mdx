@@ -64,8 +64,8 @@ Why this fails:
 
 ```tsx
 // ✅ CORRECT - Properly manages channel lifecycle
-import { useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { useEffect } from 'react'
 
 // Create client outside component (singleton)
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)

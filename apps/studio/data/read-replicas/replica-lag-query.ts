@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { replicaKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
+import { replicaKeys } from './keys'
 
 export const replicationLagSql = () => {
   const sql = /* SQL */ `

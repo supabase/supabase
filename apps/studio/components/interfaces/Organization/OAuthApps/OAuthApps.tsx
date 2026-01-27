@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, X } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
@@ -13,8 +10,11 @@ import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-app
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Check, X } from 'lucide-react'
+import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'

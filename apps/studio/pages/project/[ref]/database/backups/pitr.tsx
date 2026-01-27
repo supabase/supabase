@@ -1,6 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle } from 'lucide-react'
-
 import { useParams } from 'common'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNotice'
@@ -16,8 +14,9 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
+import { AlertCircle } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {

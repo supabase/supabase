@@ -3,6 +3,7 @@ import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { Button, Card, cn } from 'ui'
+
 import { AnimatedLogos } from './AnimatedLogos'
 import { VoteLink } from './VoteLink'
 

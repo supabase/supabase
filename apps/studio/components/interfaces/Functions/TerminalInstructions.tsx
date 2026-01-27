@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
-
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -12,12 +8,16 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import {
   Button,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
 } from 'ui'
+
 import type { Commands } from './Functions.types'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {

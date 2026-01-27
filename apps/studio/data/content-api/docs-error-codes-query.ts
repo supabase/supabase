@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { executeGraphQL } from 'data/graphql/execute'
 import { graphql } from 'data/graphql/gql'
 import { Service } from 'data/graphql/graphql'
-import { contentApiKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { contentApiKeys } from './keys'
 
 const ErrorCodeQuery = graphql(`
   query ErrorCodeQuery($code: String!, $service: Service) {

@@ -1,10 +1,9 @@
-import { AlertTriangleIcon } from 'lucide-react'
-
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { DOCS_URL } from 'lib/constants'
+import { AlertTriangleIcon } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {

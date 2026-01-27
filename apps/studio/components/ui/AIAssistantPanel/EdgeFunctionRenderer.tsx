@@ -1,12 +1,12 @@
-import { type PropsWithChildren, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { type PropsWithChildren, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { ConfirmFooter } from './ConfirmFooter'
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@supabase/supabase-js'
+import { type Database, useConstant, useIsLoggedIn } from 'common'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import {
@@ -11,15 +12,13 @@ import {
   useRef,
   useState,
 } from 'react'
-
-import { type Database, useConstant, useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
+import { getLinearTeam, getSanitizedTabParams } from './Feedback.utils'
+import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 import { IS_PLATFORM } from '~/lib/constants'
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { getLinearTeam, getSanitizedTabParams } from './Feedback.utils'
-import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,

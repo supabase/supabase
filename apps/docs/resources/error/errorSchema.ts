@@ -5,6 +5,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql'
+
 import { SERVICES } from './errorModel'
 
 export const GRAPHQL_FIELD_ERROR_GLOBAL = 'error' as const

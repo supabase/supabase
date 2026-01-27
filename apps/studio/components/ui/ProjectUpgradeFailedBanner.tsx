@@ -1,14 +1,14 @@
-import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import dayjs from 'dayjs'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
+import dayjs from 'dayjs'
 import { IS_PLATFORM } from 'lib/constants'
+import { X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Alert, Button } from 'ui'
+
 import { InlineLink } from './InlineLink'
 
 // [Joshen] Think twice about the category though - it doesn't correspond

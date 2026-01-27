@@ -1,17 +1,17 @@
-import type { AnalyticsInterval } from 'data/analytics/constants'
-
-import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
-import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { fetchLogs } from 'data/reports/report.utils'
-import z from 'zod'
+import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformCategoricalCountData,
   transformStatusCodeData,
 } from 'components/interfaces/Reports/Reports.utils'
-import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import type { AnalyticsInterval } from 'data/analytics/constants'
+import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
+import { fetchLogs } from 'data/reports/report.utils'
+import z from 'zod'
+
+import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
 
 const AUTH_ERROR_CODE_LIST = Object.entries(AUTH_ERROR_CODES).map(([key, value]) => ({
   key,

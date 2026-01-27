@@ -1,8 +1,3 @@
-import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -12,9 +7,13 @@ import {
   ServiceHealthResponse,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
+import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import {
   Button,
   InfoIcon,

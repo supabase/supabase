@@ -1,9 +1,3 @@
-import { isEqual } from 'lodash'
-import { HelpCircle, Settings } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -20,6 +14,11 @@ import {
 } from 'data/privileges/table-privileges-revoke-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { isEqual } from 'lodash'
+import { HelpCircle, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Sheet,
@@ -41,8 +40,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { getQueueFunctionsMapping } from './Queue.utils'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']

@@ -1,12 +1,10 @@
 'use client'
 
+import { VariantProps, cva } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 import React, { useEffect } from 'react'
-
-import { VariantProps, cva } from 'class-variance-authority'
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
-
 import { Badge, cn, useOnClickOutside } from 'ui'
+
 import {
   Command,
   CommandEmpty,
@@ -14,6 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from 'ui/src/components/shadcn/ui/command'
+import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
   values: string[]

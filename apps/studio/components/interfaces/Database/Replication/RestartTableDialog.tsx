@@ -1,7 +1,6 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,

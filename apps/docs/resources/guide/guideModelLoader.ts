@@ -2,13 +2,13 @@ import matter from 'gray-matter'
 import { promises as fs } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
-import { extractMessageFromAnyError, FileNotFoundError, MultiError } from '~/app/api/utils'
+import { GuideModel } from './guideModel'
+import { FileNotFoundError, MultiError, extractMessageFromAnyError } from '~/app/api/utils'
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 import { Both, Result } from '~/features/helpers.fn'
 import { GUIDES_DIRECTORY } from '~/lib/docs'
 import { processMdx } from '~/scripts/helpers.mdx'
-import { GuideModel } from './guideModel'
 
 /**
  * Determines if a file is hidden.

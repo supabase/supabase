@@ -1,11 +1,10 @@
-import { useMemo, useRef, useState } from 'react'
-
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import type { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { ChevronDown } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
 import type { Organization } from 'types'
 import {
   Badge,

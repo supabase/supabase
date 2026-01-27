@@ -1,12 +1,12 @@
 import { RealtimeChannel, RealtimeClient } from '@supabase/realtime-js'
-import { sortBy, take } from 'lodash'
-import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
+import { sortBy, take } from 'lodash'
+import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
+import { toast } from 'sonner'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+
 import type { LogData } from './Messages.types'
 
 const DEFAULT_HEADERS = { 'X-Client-Info': 'supabase-js-web/studio' }

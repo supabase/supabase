@@ -1,10 +1,7 @@
-import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-
 import { useParams } from 'common'
+import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
-import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
   PRESET_CONFIG,
   REPORT_DATERANGE_HELPER_LABELS,
@@ -12,6 +9,7 @@ import {
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
@@ -20,6 +18,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 

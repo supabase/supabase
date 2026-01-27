@@ -5,9 +5,10 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
+
 import useConfData from '../hooks/use-conf-data'
-import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 import supabase from '../supabase'
+import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 
 export default function LW15TicketShare() {
   const { resolvedTheme } = useTheme()

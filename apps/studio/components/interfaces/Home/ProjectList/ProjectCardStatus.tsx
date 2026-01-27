@@ -1,9 +1,9 @@
-import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
-
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {

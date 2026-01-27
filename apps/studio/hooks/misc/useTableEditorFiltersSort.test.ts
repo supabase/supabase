@@ -2,6 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import { withNuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
+
 import { useTableEditorFiltersSort } from './useTableEditorFiltersSort'
 
 beforeAll(() => {

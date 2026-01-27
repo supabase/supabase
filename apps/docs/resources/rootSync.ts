@@ -2,6 +2,7 @@ import '../scripts/utils/dotenv'
 
 import { fileURLToPath } from 'node:url'
 import { styleText } from 'node:util'
+
 import { syncErrorCodes } from './error/errorSync'
 
 async function sync(): Promise<void> {

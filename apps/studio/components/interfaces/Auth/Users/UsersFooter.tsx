@@ -1,15 +1,15 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
-import { keepPreviousData } from '@tanstack/react-query'
-import { HelpCircle, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { formatEstimatedCount } from 'components/grid/components/footer/pagination/Pagination.utils'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { HelpCircle, Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import type { Filter, SpecificFilterColumn } from './Users.constants'
 
 interface UsersFooterProps {

@@ -1,10 +1,9 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {

@@ -29,12 +29,13 @@ import {
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
-import { Alert } from 'ui/src/components/shadcn/ui/alert'
+
 import { assumptions } from './assumptions'
 import { BaseUrlDialog } from './base-url-dialog'
 import { faqs } from './faqs'
 import { transformRenderer } from './syntax-highlighter/transform-renderer'
 import { ResultBundle } from './util'
+import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 export interface SqlToRestProps {
   defaultValue?: string

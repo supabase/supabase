@@ -1,6 +1,7 @@
 import fs from 'fs'
-import path from 'path'
 import matter from 'gray-matter'
+import path from 'path'
+
 import { generateReadingTime } from './helpers'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'

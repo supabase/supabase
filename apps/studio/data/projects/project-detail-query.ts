@@ -1,9 +1,9 @@
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-
 import type { components } from 'data/api'
 import { get, handleError, isValidConnString } from 'data/fetchers'
+import { useCallback } from 'react'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 

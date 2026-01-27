@@ -1,9 +1,8 @@
+import { useParams } from 'common'
+import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import {
   Button,
   Dialog,
@@ -15,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
 

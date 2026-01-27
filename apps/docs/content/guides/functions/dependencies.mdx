@@ -16,13 +16,11 @@ Supabase Edge Functions support several ways to import dependencies:
 
 ```ts
 // NPM packages (recommended)
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
-// Node.js built-ins
-import process from 'node:process'
-
 // JSR modules (Deno's registry)
 import path from 'jsr:@std/path@1.0.8'
+// Node.js built-ins
+import process from 'node:process'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 ```
 
 ### Using `deno.json` (recommended)

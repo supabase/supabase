@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router'
-import { useContext, useEffect } from 'react'
-
 import { FeatureFlagContext, useParams } from 'common'
 import { ReplicationPipelineStatus } from 'components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
@@ -8,6 +5,8 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useRouter } from 'next/router'
+import { useContext, useEffect } from 'react'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
 

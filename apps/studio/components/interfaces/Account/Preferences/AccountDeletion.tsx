@@ -7,6 +7,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { DeleteAccountButton } from './DeleteAccountButton'
 
 export const AccountDeletion = () => {

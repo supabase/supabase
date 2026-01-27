@@ -1,11 +1,10 @@
+import { BASE_PATH } from 'lib/constants'
 import { RefreshCw } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
-
-import { BASE_PATH } from 'lib/constants'
+import { useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Button, cn } from 'ui'
-import { useMemo } from 'react'
 
 const MaintenancePage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()

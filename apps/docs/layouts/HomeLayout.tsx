@@ -1,8 +1,8 @@
 import { type PropsWithChildren } from 'react'
 
-import HomePageCover from '~/components/HomePageCover'
 import { LayoutMainContent } from './DefaultLayout'
 import { SidebarSkeleton } from './MainSkeleton'
+import HomePageCover from '~/components/HomePageCover'
 
 const HomeLayout = ({ children }: PropsWithChildren) => {
   return (

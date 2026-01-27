@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type DpaRequestVariables = {

@@ -1,9 +1,8 @@
-import { Lock } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
+import { Lock } from 'lucide-react'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
 

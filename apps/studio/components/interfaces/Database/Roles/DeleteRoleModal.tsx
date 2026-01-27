@@ -1,8 +1,7 @@
 import type { PostgresRole } from '@supabase/postgres-meta'
-import { toast } from 'sonner'
-
 import { useDatabaseRoleDeleteMutation } from 'data/database-roles/database-role-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 interface DeleteRoleModalProps {

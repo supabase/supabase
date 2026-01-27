@@ -1,5 +1,6 @@
 import { Clock } from 'lucide-react'
 import { memo } from 'react'
+
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
 import { StyledIcon } from '../shared/TimelineStep'
 

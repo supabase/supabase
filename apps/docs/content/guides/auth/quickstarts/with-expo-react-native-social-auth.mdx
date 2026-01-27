@@ -199,10 +199,11 @@ Next, create a provider component to manage the authentication session throughou
 <$CodeTabs>
 
 ```tsx name=providers/auth-provider.tsx
-import { AuthContext } from '@/hooks/use-auth-context'
-import { supabase } from '@/lib/supabase'
 import type { Session } from '@supabase/supabase-js'
 import { PropsWithChildren, useEffect, useState } from 'react'
+
+import { AuthContext } from '@/hooks/use-auth-context'
+import { supabase } from '@/lib/supabase'
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | undefined | null>()
@@ -289,8 +290,9 @@ Create a `SplashScreenController` component to display the [Expo `SplashScreen`]
 <$CodeTabs>
 
 ```tsx name=components/splash-screen-controller.tsx
-import { useAuthContext } from '@/hooks/use-auth-context'
 import { SplashScreen } from 'expo-router'
+
+import { useAuthContext } from '@/hooks/use-auth-context'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -314,9 +316,10 @@ Create a logout button component to handle user sign-out:
 <$CodeTabs>
 
 ```tsx name=components/social-auth-buttons/sign-out-button.tsx
-import { supabase } from '@/lib/supabase'
 import React from 'react'
 import { Button } from 'react-native'
+
+import { supabase } from '@/lib/supabase'
 
 async function onSignOutButtonPress() {
   const { error } = await supabase.auth.signOut()
@@ -343,9 +346,9 @@ import { StyleSheet } from 'react-native'
 
 import { HelloWave } from '@/components/hello-wave'
 import ParallaxScrollView from '@/components/parallax-scroll-view'
+import SignOutButton from '@/components/social-auth-buttons/sign-out-button'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import SignOutButton from '@/components/social-auth-buttons/sign-out-button'
 import { useAuthContext } from '@/hooks/use-auth-context'
 
 export default function HomeScreen() {
@@ -454,10 +457,10 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
+
 import 'react-native-reanimated'
 
 import { SplashScreenController } from '@/components/splash-screen-controller'
-
 import { useAuthContext } from '@/hooks/use-auth-context'
 import { useColorScheme } from '@/hooks/use-color-scheme'
 import AuthProvider from '@/providers/auth-provider'

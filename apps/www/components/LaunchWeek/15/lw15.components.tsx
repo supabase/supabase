@@ -1,11 +1,11 @@
+import { Music } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
-import { Music } from 'lucide-react'
-
-import Link from 'next/link'
-import { StepLink } from './data/lw15_data'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import { useTheme } from 'next-themes'
+
+import { StepLink } from './data/lw15_data'
 
 export const LWSVG = (props: React.SVGProps<SVGSVGElement>) => {
   return (

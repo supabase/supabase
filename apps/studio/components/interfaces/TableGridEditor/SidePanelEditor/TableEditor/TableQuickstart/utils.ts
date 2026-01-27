@@ -1,6 +1,6 @@
-import type { TableSuggestion, TableField } from './types'
 import type { ColumnField } from '../../SidePanelEditor.types'
 import type { TableField as EditorTableField } from '../TableEditor.types'
+import type { TableField, TableSuggestion } from './types'
 
 export const DEFAULT_SCHEMA = 'public' as const
 

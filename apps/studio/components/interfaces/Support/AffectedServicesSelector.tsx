@@ -1,10 +1,11 @@
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import type { UseFormReturn } from 'react-hook-form'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { type ExtendedSupportCategories, SERVICE_OPTIONS } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 

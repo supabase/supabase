@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import { integrationKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
+
+import { integrationKeys } from './keys'
 
 export type VercelProjectsVariables = {
   organization_integration_id: string | undefined

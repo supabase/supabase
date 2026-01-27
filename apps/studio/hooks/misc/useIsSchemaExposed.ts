@@ -1,9 +1,8 @@
-import { useMemo } from 'react'
-
 import {
   parseDbSchemaString,
   useProjectPostgrestConfigQuery,
 } from 'data/config/project-postgrest-config-query'
+import { useMemo } from 'react'
 
 type UseIsSchemaExposedParams = {
   projectRef?: string

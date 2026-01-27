@@ -1,5 +1,4 @@
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-
 import { Badge } from 'ui'
 
 type IParamProps = any

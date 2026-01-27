@@ -85,9 +85,10 @@ Cal.com's Platforms Starter Kit runs their authentication on Next.js' [Auth.js](
 To facilitate this, we can create an API route in Next.js to generate these signed URLs:
 
 ```ts src/app/api/supabase/storage/route.ts
+import { createClient } from '@supabase/supabase-js'
+
 import { auth } from '@/auth'
 import { env } from '@/env'
-import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic' // defaults to auto
 export async function GET(request: Request) {
@@ -123,11 +124,12 @@ The `createSignedUploadUrl` method returns a `token` which we can then use on th
 ```tsx src/app/dashboard/settings/_components/supabase-react-dropzone.tsx
 'use client'
 
-import { env } from '@/env'
 import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+
+import { env } from '@/env'
 
 export default function SupabaseReactDropzone({ userId }: { userId?: string } = {}) {
   const supabaseBrowserClient = createClient(

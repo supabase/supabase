@@ -1,12 +1,13 @@
-import React, { PropsWithChildren, useState, useRef, useCallback, useEffect } from 'react'
-import { cn } from 'ui'
+import { LumaEvent } from 'app/api-v2/luma-events/route'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import { motion, useInView } from 'framer-motion'
+import { DEFAULT_EASE } from 'lib/animations'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
+import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import { cn } from 'ui'
+
 import { FifteenSVG, LWSVG } from './lw15.components'
-import SectionContainer from 'components/Layouts/SectionContainer'
-import { DEFAULT_EASE } from 'lib/animations'
-import { LumaEvent } from 'app/api-v2/luma-events/route'
 
 interface Props {
   className?: string

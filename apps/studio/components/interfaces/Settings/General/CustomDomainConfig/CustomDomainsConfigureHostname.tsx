@@ -1,8 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -11,6 +8,7 @@ import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domain
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Card,
@@ -25,6 +23,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
 const schema = z.object({
   domain: z.string().trim().min(1, 'A value for your custom domain is required'),

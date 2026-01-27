@@ -81,6 +81,7 @@ Create and edit `src/Auth.jsx`:
 
 ```jsx name=src/Auth.jsx
 import { useState } from 'react'
+
 import { supabase } from './supabaseClient'
 
 export default function Auth() {
@@ -140,7 +141,8 @@ Let's create a new component for that called `src/Account.jsx`.
 <$CodeTabs>
 
 ```jsx name=src/Account.jsx
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
 import { supabase } from './supabaseClient'
 
 export default function Account({ session }) {
@@ -257,10 +259,12 @@ Now that we have all the components in place, let's update `src/App.jsx`:
 
 ```jsx name=src/App.jsx
 import './App.css'
-import { useState, useEffect } from 'react'
-import { supabase } from './supabaseClient'
-import Auth from './Auth'
+
+import { useEffect, useState } from 'react'
+
 import Account from './Account'
+import Auth from './Auth'
+import { supabase } from './supabaseClient'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -311,6 +315,7 @@ Create and edit `src/Avatar.jsx`:
 
 ```jsx name=src/Avatar.jsx
 import { useEffect, useState } from 'react'
+
 import { supabase } from './supabaseClient'
 
 export default function Avatar({ url, size, onUpload }) {

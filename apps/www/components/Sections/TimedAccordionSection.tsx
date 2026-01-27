@@ -1,10 +1,10 @@
 import 'swiper/css'
 
-import React, { useState, useEffect, useRef } from 'react'
-import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
-import { cn } from 'ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import { useBreakpoint } from 'common'
+import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
+import React, { useEffect, useRef, useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { cn } from 'ui'
 
 interface TabProps {
   label: string | React.ReactNode

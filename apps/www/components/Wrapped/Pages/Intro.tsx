@@ -1,10 +1,11 @@
 'use client'
 
 import * as Scrollytelling from '@bsmnt/scrollytelling'
-import { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence, useInView } from 'framer-motion'
-import { Dots, Stripes } from '../Visuals'
+import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
+
+import { Dots, Stripes } from '../Visuals'
 
 const titles = [
   'Thank you to our community.',

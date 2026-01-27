@@ -1,14 +1,14 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+import { DayLink } from '.'
 import { ArrowRightIcon } from '@heroicons/react/outline'
-import { cn, Skeleton } from 'ui'
-import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
+import { Edit } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+import { Skeleton, cn } from 'ui'
+import CountdownComponent from 'ui-patterns/Banners/Countdown'
 
 import { WeekDayProps } from '../data'
-import { DayLink } from '.'
-import CountdownComponent from 'ui-patterns/Banners/Countdown'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint('sm')

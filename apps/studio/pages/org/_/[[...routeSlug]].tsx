@@ -1,6 +1,3 @@
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-
 import {
   Header,
   LoadingCardView,
@@ -11,6 +8,8 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
+import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
 // [Joshen] Thinking we can deprecate this page in favor of /organizations

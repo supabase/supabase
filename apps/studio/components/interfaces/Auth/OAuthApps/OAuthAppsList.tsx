@@ -1,10 +1,4 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -15,6 +9,11 @@ import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-se
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -28,21 +27,22 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableHeadSort,
+  TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { NewOAuthAppBanner } from './NewOAuthAppBanner'
 import {
-  filterOAuthApps,
   OAUTH_APP_CLIENT_TYPE_OPTIONS,
   OAUTH_APP_REGISTRATION_TYPE_OPTIONS,
+  filterOAuthApps,
 } from './oauthApps.utils'
 
 const OAUTH_APPS_SORT_VALUES = [

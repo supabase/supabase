@@ -1,11 +1,11 @@
 import { toString as CronToString } from 'cronstrue'
-import { Column } from 'react-data-grid'
-
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { Column } from 'react-data-grid'
 import { cn } from 'ui'
+
 import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
-import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 import { CronJobTableCell } from './CronJobTableCell'
+import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 
 export function buildCronQuery(name: string, schedule: string, command: string) {
   const escapedName = name.replace(/'/g, "''")

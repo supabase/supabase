@@ -1,10 +1,10 @@
-import jsonLogic from 'json-logic-js'
-import { useMemo } from 'react'
-
 import { useIsLoggedIn, useParams } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import jsonLogic from 'json-logic-js'
 import { IS_PLATFORM } from 'lib/constants'
+import { useMemo } from 'react'
 import type { Permission } from 'types'
+
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
 

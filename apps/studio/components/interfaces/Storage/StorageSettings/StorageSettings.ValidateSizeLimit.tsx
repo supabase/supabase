@@ -1,12 +1,12 @@
-import { useEffect, useReducer, useState } from 'react'
-import { useWatch, type FieldError } from 'react-hook-form'
-
 import {
-  THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS,
   type BucketWithSizeLimit,
+  THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS,
 } from 'data/storage/buckets-max-size-limit-query'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { useEffect, useReducer, useState } from 'react'
+import { type FieldError, useWatch } from 'react-hook-form'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { StorageFileSizeLimitErrorMessage } from './StorageFileSizeLimitErrorMessage'
 import { StorageSizeUnits } from './StorageSettings.constants'
 import { convertToBytes, encodeBucketLimitErrorMessage } from './StorageSettings.utils'

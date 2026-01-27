@@ -1,4 +1,9 @@
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { Link, Menu, Plus, Settings, X } from 'lucide-react'
+import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -15,11 +20,6 @@ import {
   cn,
 } from 'ui'
 
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
-import { useState } from 'react'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'

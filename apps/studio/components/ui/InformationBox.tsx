@@ -1,7 +1,6 @@
 import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 import Link from 'next/link'
-import { forwardRef, ReactNode, useState } from 'react'
-
+import { ReactNode, forwardRef, useState } from 'react'
 import { Button } from 'ui'
 
 interface InformationBoxProps {

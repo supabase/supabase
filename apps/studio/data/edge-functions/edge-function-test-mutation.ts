@@ -1,9 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { ResponseData } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type EdgeFunctionTestResponse = {

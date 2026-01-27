@@ -1,19 +1,18 @@
-import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import type { NextPageWithLayout } from 'types'
-
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/JwtSecrets/jwt.constants'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
+import type { NextPageWithLayout } from 'types'
 
 const JWTKeysLegacyPage: NextPageWithLayout = () => {
   const client = useQueryClient()

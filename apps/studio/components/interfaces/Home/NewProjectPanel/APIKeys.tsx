@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { Loader } from 'lucide-react'
-
 import { useParams } from 'common'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
@@ -12,6 +10,7 @@ import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-statu
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Loader } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'

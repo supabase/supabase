@@ -1,7 +1,7 @@
+import Link from 'next/link'
 import { Badge } from 'ui'
 
 import styles from '../styles/launchWeek7.module.css'
-import Link from 'next/link'
 
 export const PencilSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">

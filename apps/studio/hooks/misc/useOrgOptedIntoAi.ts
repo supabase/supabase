@@ -1,11 +1,10 @@
-import { z } from 'zod'
-
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { z } from 'zod'
 
 export const aiOptInLevelSchema = z.enum([
   'disabled',

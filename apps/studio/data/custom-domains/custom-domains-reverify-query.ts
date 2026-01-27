@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-
 import { handleError, post } from 'data/fetchers'
 import { useEffect } from 'react'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { customDomainKeys } from './keys'
 
 export type CustomDomainReverifyVariables = {

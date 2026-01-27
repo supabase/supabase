@@ -1,11 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { sortBy } from 'lodash'
-import { RefreshCw, Search, X } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import DataGrid, { Row } from 'react-data-grid'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -14,18 +7,25 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { sortBy } from 'lodash'
+import { RefreshCw, Search, X } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import DataGrid, { Row } from 'react-data-grid'
+import { toast } from 'sonner'
 import type { VaultSecret } from 'types'
 import {
   Button,
-  cn,
   Input,
   LoadingLine,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
+  cn,
 } from 'ui'
+
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'

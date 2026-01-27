@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { del, handleError } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { organizationKeys } from './keys'
 
 export type OrganizationDeleteVariables = {

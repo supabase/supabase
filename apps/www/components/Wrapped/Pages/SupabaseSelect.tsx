@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 // All available images from Supabase Select event

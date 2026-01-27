@@ -1,12 +1,11 @@
 'use client'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { useBreakpoint } from 'common'
+import useDragToClose from 'common/hooks/useDragToClose'
 import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-
-import { useBreakpoint } from 'common'
-import useDragToClose from 'common/hooks/useDragToClose'
 import {
   Button,
   Command_Shadcn_,

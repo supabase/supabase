@@ -1,17 +1,17 @@
+import { Command, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
+import { questions } from 'shared-data'
 import Typed from 'typed.js'
 import { Button, ButtonProps, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
-import { questions } from 'shared-data'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 import data from '~/data/support'
-import { Search, Command } from 'lucide-react'
 
 const Index = () => {
   const router = useRouter()

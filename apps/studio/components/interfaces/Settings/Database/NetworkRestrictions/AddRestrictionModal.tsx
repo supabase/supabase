@@ -1,12 +1,12 @@
 import { useParams } from 'common'
-import { toast } from 'sonner'
-import { Button, Form, Input, Modal, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 import { DOCS_URL } from 'lib/constants'
 import { HelpCircle } from 'lucide-react'
+import { toast } from 'sonner'
+import { Button, Form, Input, Modal, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import {
   checkIfPrivate,
   getAddressEndRange,

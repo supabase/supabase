@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, FileArchive, Send } from 'lucide-react'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState, type PropsWithChildren } from 'react'
-import { toast } from 'sonner'
-
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -18,7 +13,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
+import { Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { type PropsWithChildren, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -27,9 +26,9 @@ import {
   Button,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Separator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -42,6 +41,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 

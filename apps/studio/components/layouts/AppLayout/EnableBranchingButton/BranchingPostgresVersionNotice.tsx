@@ -1,9 +1,8 @@
+import { useParams } from 'common'
 import { AlertCircleIcon } from 'lucide-react'
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-
-import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 export const BranchingPostgresVersionNotice = () => {
   const { ref } = useParams()

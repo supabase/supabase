@@ -1,18 +1,18 @@
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import type { PostgresTrigger } from '@supabase/postgres-meta'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Form, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { FormContents } from './FormContents'
 
 export interface EditHookPanelProps {

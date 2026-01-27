@@ -1,12 +1,13 @@
+import Image from 'next/image'
 import React, { useEffect, useRef } from 'react'
 import { cn } from 'ui'
-import useLw15ConfData, { UserTicketData } from '../hooks/use-conf-data'
-import { FifteenSVG, LWSVG } from '../lw15.components'
-import Image from 'next/image'
-import { TYPO_COLORS, BG_COLORS } from './colors'
-import useTicketBg from '../hooks/use-ticket-bg'
 import VanillaTilt from 'vanilla-tilt'
+
+import useLw15ConfData, { UserTicketData } from '../hooks/use-conf-data'
+import useTicketBg from '../hooks/use-ticket-bg'
 import useUserPresence from '../hooks/useUserPresence'
+import { FifteenSVG, LWSVG } from '../lw15.components'
+import { BG_COLORS, TYPO_COLORS } from './colors'
 
 const LW15Ticket = ({
   user: userFromProps,

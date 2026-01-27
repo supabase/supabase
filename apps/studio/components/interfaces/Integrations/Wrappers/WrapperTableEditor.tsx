@@ -1,30 +1,30 @@
-import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { ActionBar } from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   Button,
-  cn,
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Command_Shadcn_,
   Form,
   Input,
   Label_Shadcn_,
   Listbox,
   Modal,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   ScrollArea,
   SidePanel,
+  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'

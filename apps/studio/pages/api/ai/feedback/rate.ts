@@ -1,14 +1,13 @@
 import { generateObject } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
 import { IS_PLATFORM } from 'common'
+import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
-import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 export const maxDuration = 30
 

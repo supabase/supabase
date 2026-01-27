@@ -1,11 +1,10 @@
-import React, { FC } from 'react'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import { motion, useInView } from 'framer-motion'
+import { DEFAULT_EASE } from 'lib/animations'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
+import React, { FC } from 'react'
 import { Button, cn } from 'ui'
-
-import SectionContainer from 'components/Layouts/SectionContainer'
-import { DEFAULT_EASE } from 'lib/animations'
 
 const MotionImage = motion(Image)
 

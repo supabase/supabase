@@ -1,47 +1,47 @@
-import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
-import { Fragment, useRef, useState } from 'react'
-import * as z from 'zod'
-
 import { useParams } from 'common'
+import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
-  jsonSyntaxHighlight,
+  MAP_CHART_THEME,
+  buildCountsByIso2,
+  computeMarkerRadius,
+  extractIso2FromFeatureProps,
+  getFillColor,
+  getFillOpacity,
+  isKnownCountryCode,
+  isMicroCountry,
+  iso2ToCountryName,
+} from 'components/interfaces/Reports/utils/geo'
+import {
   TextFormatter,
+  jsonSyntaxHighlight,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import BarChart from 'components/ui/Charts/BarChart'
+import { geoCentroid } from 'd3-geo'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { BASE_PATH } from 'lib/constants'
+import sumBy from 'lodash/sumBy'
+import { ChevronRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Fragment, useRef, useState } from 'react'
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import type { ResponseError } from 'types'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Collapsible,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { queryParamsToObject } from '../Reports.utils'
+import * as z from 'zod'
+
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import { BASE_PATH } from 'lib/constants'
-import { geoCentroid } from 'd3-geo'
-import {
-  buildCountsByIso2,
-  getFillColor,
-  getFillOpacity,
-  isMicroCountry,
-  isKnownCountryCode,
-  computeMarkerRadius,
-  MAP_CHART_THEME,
-  extractIso2FromFeatureProps,
-  iso2ToCountryName,
-} from 'components/interfaces/Reports/utils/geo'
-import { useTheme } from 'next-themes'
+import { queryParamsToObject } from '../Reports.utils'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{

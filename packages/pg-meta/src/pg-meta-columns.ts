@@ -1,8 +1,9 @@
+import { z } from 'zod'
+
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { ident, literal } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
-import { z } from 'zod'
 
 const pgColumnZod = z.object({
   id: z.string(),

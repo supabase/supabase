@@ -1,4 +1,3 @@
-import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { useParams } from 'common'
 import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
 import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
@@ -12,6 +11,8 @@ import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
+
+import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const { ref } = useParams()

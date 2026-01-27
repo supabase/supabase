@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence } from 'framer-motion'
-import { AlertCircle, RotateCw, Timer } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
@@ -12,8 +7,12 @@ import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signin
 import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { AnimatePresence } from 'framer-motion'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { AlertCircle, RotateCw, Timer } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -39,6 +38,7 @@ import {
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'

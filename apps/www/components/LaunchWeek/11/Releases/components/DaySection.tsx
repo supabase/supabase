@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+import { DayLink } from '.'
 import { ArrowRightIcon } from '@heroicons/react/outline'
-import { cn } from 'ui'
-import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
+import { Edit } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 import { WeekDayProps } from '../data'
-import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint(639)

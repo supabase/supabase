@@ -1,5 +1,4 @@
 // see apps/www/components/LaunchWeek/X/Releases/data/lwx_advent_days.tsx for reference
-
 import { ReactNode } from 'react'
 
 export interface AdventDay {

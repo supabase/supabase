@@ -1,7 +1,6 @@
 import { ChevronRight, Loader } from 'lucide-react'
 import Link from 'next/link'
-import React, { cloneElement, PropsWithChildren } from 'react'
-
+import React, { PropsWithChildren, cloneElement } from 'react'
 import { cn } from 'ui'
 
 interface CardButtonProps {

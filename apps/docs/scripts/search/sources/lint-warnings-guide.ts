@@ -1,6 +1,7 @@
 import { Octokit } from '@octokit/core'
-import { BaseLoader, BaseSource } from './base.js'
 import { createHash } from 'node:crypto'
+
+import { BaseLoader, BaseSource } from './base.js'
 
 const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 

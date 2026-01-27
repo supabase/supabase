@@ -1,9 +1,9 @@
 'use client'
 
 import Nav from 'components/Nav/index'
+import { useForceDeepDark } from 'lib/theme.utils'
 import dynamic from 'next/dynamic'
 import { cn } from 'ui'
-import { useForceDeepDark } from 'lib/theme.utils'
 
 const Footer = dynamic(() => import('components/Footer/index'))
 

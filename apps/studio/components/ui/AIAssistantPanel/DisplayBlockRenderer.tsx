@@ -1,8 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
-import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { entityTypeKeys } from 'data/entity-types/keys'
@@ -14,6 +11,9 @@ import { useChangedSync } from 'hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
+import { type DragEvent, type PropsWithChildren, useRef, useState } from 'react'
+
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
 import { identifyQueryType } from './AIAssistant.utils'
 import { ConfirmFooter } from './ConfirmFooter'

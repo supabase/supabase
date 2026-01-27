@@ -9,11 +9,10 @@ import {
   Badge,
   Button,
   Card,
-  cn,
   Input_Shadcn_,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Table,
   TableBody,
   TableCaption,
@@ -21,11 +20,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 
-import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
 import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import type { ThreadRow } from '~/types/contribute'
 
 interface TabConfig {
   id: string

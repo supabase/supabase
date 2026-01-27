@@ -1,11 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
-import type React from 'react'
-import { useState } from 'react'
-
 // End of third-party imports
 
 import { ProjectInfoInfinite } from 'data/projects/projects-infinite-query'
+import type React from 'react'
+import { useState } from 'react'
 import type { Organization } from 'types'
 import { TooltipProvider } from 'ui'
 

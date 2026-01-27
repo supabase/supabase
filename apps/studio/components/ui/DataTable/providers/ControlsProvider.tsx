@@ -1,5 +1,5 @@
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { createContext, Dispatch, SetStateAction, useContext } from 'react'
+import { Dispatch, SetStateAction, createContext, useContext } from 'react'
 
 interface ControlsContextType {
   open: boolean

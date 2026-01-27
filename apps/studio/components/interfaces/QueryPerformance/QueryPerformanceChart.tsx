@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformance.constants'
-import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { Loader2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+
+import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformance.constants'
 import type { ChartDataPoint } from './WithMonitor/WithMonitor.utils'
 import { calculatePercentilesFromHistogram } from './WithMonitor/WithMonitor.utils'
 

@@ -1,9 +1,8 @@
 import * as Sentry from '@sentry/nextjs'
-import { useEffect } from 'react'
-
 import { LOCAL_STORAGE_KEYS, PageTelemetry, useUser } from 'common'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { useEffect } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
 const getAnonId = async (id: string) => {

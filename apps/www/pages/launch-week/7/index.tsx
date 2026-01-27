@@ -1,12 +1,11 @@
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 
-import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
-
+import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
+import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
-import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
+import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
 
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/7/Releases'))
 const LaunchWeekPrizeSection = dynamic(

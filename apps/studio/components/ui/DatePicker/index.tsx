@@ -1,9 +1,8 @@
+import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
 import { ArrowRight, Calendar } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-
-import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
   Calendar as CalendarPicker,
@@ -12,8 +11,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { ButtonProps } from 'ui/src/components/Button/Button'
+
 import { TimeSplitInput } from './TimeSplitInput'
+import { ButtonProps } from 'ui/src/components/Button/Button'
 
 interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void

@@ -80,6 +80,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
+
     const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
     // ---cut---
@@ -100,6 +101,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
+
     const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
     // ---cut---
@@ -123,6 +125,7 @@ For passwordless signin via email or phone, check for users with verified email 
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -163,6 +166,7 @@ Both columns are accessible from the admin user methods. To create a user with c
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---

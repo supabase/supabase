@@ -1,7 +1,3 @@
-import { useCallback, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
-import type { ConnectionVars } from '@/data/common.types'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import {
   CTID_BATCH_PAGE_SIZE,
@@ -12,7 +8,11 @@ import {
   getScheduleDeleteCronJobRunDetailsKey,
   getScheduleDeleteCronJobRunDetailsSql,
 } from 'data/sql/queries/delete-cron-job-run-details'
+import { useCallback, useRef, useState } from 'react'
+import { toast } from 'sonner'
+
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
+import type { ConnectionVars } from '@/data/common.types'
 
 // Delay between batches to allow other queries to proceed (in milliseconds)
 const BATCH_DELAY_MS = 100

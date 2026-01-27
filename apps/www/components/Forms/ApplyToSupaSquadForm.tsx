@@ -4,13 +4,13 @@ import { FC, memo, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
   TextArea_Shadcn_,
@@ -22,6 +22,8 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+
+import { CountrySelector } from '../Supasquad/CountrySelector'
 import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
 import {
   AlertDialog,
@@ -36,7 +38,6 @@ import {
   SupaSquadApplication,
   supaSquadApplicationSchema,
 } from '~/data/open-source/contributing/supasquad.utils'
-import { CountrySelector } from '../Supasquad/CountrySelector'
 
 interface FormItem_Shadcn_ {
   type: 'text' | 'textarea'

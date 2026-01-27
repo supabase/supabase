@@ -1,5 +1,6 @@
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { useEffect, useState } from 'react'
+
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 export const useCurrentUserName = () => {
   const [name, setName] = useState<string | null>(null)

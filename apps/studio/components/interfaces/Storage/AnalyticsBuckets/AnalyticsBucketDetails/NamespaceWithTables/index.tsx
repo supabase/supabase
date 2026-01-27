@@ -1,7 +1,3 @@
-import { ChevronRight, Info, Loader2, MoreVertical, Plus, RefreshCw, Trash } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
@@ -12,6 +8,9 @@ import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-nam
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { ChevronRight, Info, Loader2, MoreVertical, Plus, RefreshCw, Trash } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -33,6 +32,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { HIDE_REPLICATION_USER_FLOW } from '../AnalyticsBucketDetails.constants'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { InitializeForeignSchemaDialog } from '../InitializeForeignSchemaDialog'

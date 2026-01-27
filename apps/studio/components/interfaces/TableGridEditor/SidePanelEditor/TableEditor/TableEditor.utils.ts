@@ -1,7 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { some } from 'lodash'
 
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import {
   generateColumnField,
   generateColumnFieldFromPostgresColumn,

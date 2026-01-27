@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -12,6 +9,8 @@ import { useDpaRequestMutation } from 'data/documents/dpa-request-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 
 export const DPA = () => {

@@ -1,21 +1,19 @@
-import fs from 'fs'
-
-import { useRouter } from 'next/router'
-import Head from 'next/head'
-
-import { NextSeo } from 'next-seo'
-import { generateRss } from '~/lib/rss'
-import { getSortedPosts } from '~/lib/posts'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import type PostTypes from '~/types/post'
 import { motion } from 'framer-motion'
-import styles from '~/styles/customers.module.css'
+import fs from 'fs'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
-import { GlassPanel } from 'ui-patterns/GlassPanel'
-import CustomersFilters from '../components/CustomerStories/CustomersFilters'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+
+import CustomersFilters from '../components/CustomerStories/CustomersFilters'
+import DefaultLayout from '~/components/Layouts/Default'
+import { getSortedPosts } from '~/lib/posts'
+import { generateRss } from '~/lib/rss'
+import styles from '~/styles/customers.module.css'
+import type PostTypes from '~/types/post'
 
 export async function getStaticProps() {
   const allPostsData: any[] = getSortedPosts({ directory: '_customers' })

@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-
 import { sendTelemetryEvent } from 'common'
 import { TelemetryEvent } from 'common/telemetry-constants'
 import { handleError } from 'data/fetchers'

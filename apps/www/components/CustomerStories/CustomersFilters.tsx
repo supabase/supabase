@@ -1,9 +1,12 @@
 'use client'
 
-import { useRouter } from 'next/compat/router'
+import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import { startCase } from 'lib/helpers'
+import { ChevronDown, X as CloseIcon } from 'lucide-react'
+import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import type PostTypes from '~/types/post'
 import {
   Button,
   DropdownMenu,
@@ -12,10 +15,8 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import { ChevronDown, X as CloseIcon } from 'lucide-react'
-import { startCase } from 'lib/helpers'
-import { useBreakpoint } from 'common'
-import { usePathname } from 'next/navigation'
+
+import type PostTypes from '~/types/post'
 
 interface Props {
   allCustomers: PostTypes[]

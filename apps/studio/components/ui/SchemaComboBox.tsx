@@ -1,8 +1,7 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
-
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

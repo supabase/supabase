@@ -1,5 +1,5 @@
-import type { DatabaseEventTrigger } from 'data/database-event-triggers/database-event-triggers-query'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
+import type { DatabaseEventTrigger } from 'data/database-event-triggers/database-event-triggers-query'
 
 interface DeleteEventTriggerProps {
   trigger?: DatabaseEventTrigger

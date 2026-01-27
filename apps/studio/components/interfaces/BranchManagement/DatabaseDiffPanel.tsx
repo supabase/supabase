@@ -1,9 +1,9 @@
 import { CircleAlert, Database, Download, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
 
 import { DiffEditor } from '@/components/ui/DiffEditor'
-import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string

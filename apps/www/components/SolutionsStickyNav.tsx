@@ -1,23 +1,22 @@
-import React from 'react'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import {
+  SolutionTypes,
+  migrationSolutions,
+  skillBasedSolutions,
+  useCaseSolutions,
+} from 'data/Solutions'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React from 'react'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  cn,
 } from 'ui'
-
-import SectionContainer from 'components/Layouts/SectionContainer'
-import {
-  SolutionTypes,
-  skillBasedSolutions,
-  useCaseSolutions,
-  migrationSolutions,
-} from 'data/Solutions'
 
 interface Props {
   activeItem: SolutionTypes

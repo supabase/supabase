@@ -1,9 +1,3 @@
-import { ChevronDown, Loader2, RefreshCw, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { forwardRef, useCallback, useState } from 'react'
-import { toast } from 'sonner'
-
 import {
   IntegrationConnection,
   IntegrationConnectionProps,
@@ -13,6 +7,11 @@ import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integratio
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronDown, Loader2, RefreshCw, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { forwardRef, useCallback, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,

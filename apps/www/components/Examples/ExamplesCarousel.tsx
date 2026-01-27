@@ -1,16 +1,16 @@
 import 'swiper/css'
 
-import { useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { Button, cn } from 'ui'
 import Link from 'next/link'
-import { CTA } from '~/types/common'
-
-import ExampleCard from '~/components/ExampleCard'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { useRef } from 'react'
 // import Swiper core and required modules
 import SwiperCore from 'swiper'
 import { Navigation, Pagination } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, cn } from 'ui'
+
+import ExampleCard from '~/components/ExampleCard'
+import { CTA } from '~/types/common'
 
 // install Swiper modules
 SwiperCore.use([Navigation, Pagination])

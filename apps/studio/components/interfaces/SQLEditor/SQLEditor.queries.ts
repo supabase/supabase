@@ -1,4 +1,5 @@
 import { DOCS_URL } from 'lib/constants'
+
 import type { SQLTemplate } from './SQLEditor.types'
 
 export const SQL_TEMPLATES: SQLTemplate[] = [

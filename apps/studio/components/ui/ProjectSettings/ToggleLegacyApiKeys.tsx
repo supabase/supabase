@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
@@ -11,6 +8,8 @@ import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-si
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
+
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {

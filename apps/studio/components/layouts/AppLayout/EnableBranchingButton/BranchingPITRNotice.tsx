@@ -1,10 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Clock } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Clock } from 'lucide-react'
+import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
 

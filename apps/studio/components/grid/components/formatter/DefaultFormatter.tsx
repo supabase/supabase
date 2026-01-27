@@ -1,7 +1,7 @@
+import { SupaRow } from 'components/grid/types'
 import { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
-import { SupaRow } from 'components/grid/types'
 import { EmptyValue } from '../common/EmptyValue'
 import { NullValue } from '../common/NullValue'
 

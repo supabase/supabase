@@ -1,5 +1,5 @@
 import type { LogData } from './Messages.types'
-import { jsonSyntaxHighlight, SelectionDetailedTimestampRow } from './MessagesFormatters'
+import { SelectionDetailedTimestampRow, jsonSyntaxHighlight } from './MessagesFormatters'
 
 const LogsDivider = () => {
   return (

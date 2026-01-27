@@ -1,8 +1,7 @@
-import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { DOCS_URL } from 'lib/constants'
+import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
 import { Alert } from 'ui'
 
 export function RLSDisableModalContent() {

@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
 import {
@@ -7,6 +5,7 @@ import {
   useUnifiedLogInspectionQuery,
 } from 'data/logs/unified-log-inspection-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useState } from 'react'
 import {
   CodeBlock,
   ResizableHandle,
@@ -18,6 +17,7 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
   cn,
 } from 'ui'
+
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,

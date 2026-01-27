@@ -1,18 +1,18 @@
-import { ChevronLeft, Code } from 'lucide-react'
-import { useMemo, useState, type PropsWithChildren, type ReactNode } from 'react'
-
 import { DocsButton } from 'components/ui/DocsButton'
+import { ChevronLeft, Code } from 'lucide-react'
+import { type PropsWithChildren, type ReactNode, useMemo, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
-  cn,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
 } from 'ui'
+
 import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'

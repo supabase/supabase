@@ -1,11 +1,10 @@
-import { BookOpen } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { BookOpen } from 'lucide-react'
+import Link from 'next/link'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 
 const GrafanaPromoBanner = () => (
   <Alert_Shadcn_ className="relative overflow-hidden">

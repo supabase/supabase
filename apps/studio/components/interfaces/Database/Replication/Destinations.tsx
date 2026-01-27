@@ -1,8 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,26 +9,30 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from 'lib/constants'
+import { Plus, Search, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
-  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationCallout } from './EnableReplicationCallout'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()

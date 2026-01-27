@@ -1,5 +1,5 @@
 import { BASE_PATH } from 'lib/constants'
-import { Terminal, ChevronDown } from 'lucide-react'
+import { ChevronDown, Terminal } from 'lucide-react'
 import { useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import {

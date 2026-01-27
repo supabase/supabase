@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
 import { mswServer } from 'tests/lib/msw'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import handler from '../../../../pages/api/mcp/index'
 
 describe('/api/mcp', () => {

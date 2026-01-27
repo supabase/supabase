@@ -1,23 +1,22 @@
-import { ChevronDown, RefreshCw, Unlink } from 'lucide-react'
-import Image from 'next/image'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useGitHubAuthorizationDeleteMutation } from 'data/integrations/github-authorization-delete-mutation'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import { ChevronDown, RefreshCw, Unlink } from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
   Card,
   CardContent,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {

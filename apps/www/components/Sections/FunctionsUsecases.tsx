@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 // Import Swiper React components
 import Link from 'next/link'
+import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button } from 'ui'
+
 import CodeBlock from '../CodeBlock/CodeBlock'
-import { ArrowUpRight } from 'lucide-react'
 
 interface Example {
   lang: 'js' | 'py' | 'sql'

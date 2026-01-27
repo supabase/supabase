@@ -5,16 +5,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
-import { Badge, Button, buttonVariants, cn, Separator } from 'ui'
+import { Badge, Button, Separator, buttonVariants, cn } from 'ui'
 import { z } from 'zod'
-import Styles from '~/styles/career.module.css'
 
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-
 import career from '~/data/career.json'
-import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import { JobItemProps, PLACEHOLDER_JOB_ID, filterGenericJob, groupJobsByTeam } from '~/lib/careers'
+import Styles from '~/styles/career.module.css'
 
 const ContributorSchema = z.object({
   login: z.string(),

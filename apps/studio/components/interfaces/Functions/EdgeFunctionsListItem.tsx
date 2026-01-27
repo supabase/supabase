@@ -1,15 +1,14 @@
-import dayjs from 'dayjs'
-import { Check, Copy } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { useParams } from 'common/hooks'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { copyToClipboard, TableCell, TableRow } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import dayjs from 'dayjs'
 import { createNavigationHandler } from 'lib/navigation'
+import { Check, Copy } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { TableCell, TableRow, copyToClipboard } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse

@@ -1,5 +1,6 @@
 import { DiskAttributesData } from 'data/config/disk-attributes-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
+
 import {
   DISK_LIMITS,
   DISK_PRICING,

@@ -1,10 +1,9 @@
-import { BookOpen, Check, Copy, ExternalLink, List, X } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
 import Table from 'components/to-be-cleaned/Table'
 import { DOCS_URL } from 'lib/constants'
+import { BookOpen, Check, Copy, ExternalLink, List, X } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Button,
@@ -15,6 +14,7 @@ import {
   TooltipTrigger,
   copyToClipboard,
 } from 'ui'
+
 import { DocsButton } from '../DocsButton'
 
 export interface LogsExplorerHeaderProps {

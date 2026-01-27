@@ -1,12 +1,12 @@
 import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { viewKeys } from 'data/views/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { tableKeys } from './keys'
 
 export type TableDeleteVariables = {

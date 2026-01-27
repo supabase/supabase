@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { get } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { integrationKeys } from './keys'
 
 // FIXME(kamil): Do not retry, a single check is fine.

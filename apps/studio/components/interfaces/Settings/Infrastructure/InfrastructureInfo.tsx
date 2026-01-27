@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import { useFlag, useParams } from 'common'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import {
@@ -15,9 +13,11 @@ import { useProjectServiceVersionsQuery } from 'data/projects/project-service-ve
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'

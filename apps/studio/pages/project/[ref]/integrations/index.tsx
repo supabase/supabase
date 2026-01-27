@@ -1,7 +1,4 @@
-import { Search } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
-
+import { useFlag } from 'common'
 import {
   IntegrationCard,
   IntegrationLoadingCard,
@@ -13,6 +10,9 @@ import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { DOCS_URL } from 'lib/constants'
+import { Search } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -25,7 +25,6 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
-import { useFlag } from 'common'
 
 const FEATURED_INTEGRATIONS = ['cron', 'queues'] // + either stripe_sync_engine or stripe_wrapper depending on feature flag
 

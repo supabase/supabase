@@ -1,7 +1,6 @@
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-
-import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { Button, Card, cn } from 'ui'
 
 interface ReportsChartUpsellProps {

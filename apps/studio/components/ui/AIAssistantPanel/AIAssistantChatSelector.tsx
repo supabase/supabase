@@ -1,22 +1,21 @@
 import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
-
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
-  cn,
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
+  Command_Shadcn_,
   Input_Shadcn_,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 
 interface AIAssistantChatSelectorProps {

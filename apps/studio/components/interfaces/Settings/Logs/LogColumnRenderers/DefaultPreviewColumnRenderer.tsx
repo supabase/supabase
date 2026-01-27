@@ -1,7 +1,8 @@
 import { Column, RenderCellProps } from 'react-data-grid'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import type { LogData } from '../Logs.types'
 import { RowLayout, TextFormatter } from '../LogsFormatters'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 export const defaultRenderCell = (props: RenderCellProps<LogData, unknown>) => (
   <RowLayout>

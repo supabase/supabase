@@ -1,11 +1,3 @@
-import { AnimatePresence, motion, MotionProps } from 'framer-motion'
-import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
-
-import { PROJECT_STATUS } from '@/lib/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
@@ -15,6 +7,7 @@ import {
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { AnimatePresence, MotionProps, motion } from 'framer-motion'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
@@ -22,10 +15,14 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
+import { isUndefined } from 'lodash'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -41,13 +38,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   Sidebar as SidebarPrimitive,
+  cn,
   useSidebar,
 } from 'ui'
+
 import { Route } from '../ui/ui.types'
 import {
   useIsAPIDocsSidePanelEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5

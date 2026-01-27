@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import * as fetchers from 'data/fetchers'
 import * as common from 'common'
+import * as fetchers from 'data/fetchers'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as constants from './constants'
 import { trackFeatureFlag } from './posthog'
 

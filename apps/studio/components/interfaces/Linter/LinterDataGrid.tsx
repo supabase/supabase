@@ -1,8 +1,3 @@
-import { X } from 'lucide-react'
-import { useRef } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-import ReactMarkdown from 'react-markdown'
-
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
@@ -12,12 +7,17 @@ import {
   lintInfoMap,
 } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
-import { useRouter } from 'next/router'
 import { useTrack } from 'lib/telemetry/track'
+import { X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useRef } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import ReactMarkdown from 'react-markdown'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { EntityTypeIcon } from './Linter.utils'
+
 import LintDetail from './LintDetail'
+import { EntityTypeIcon } from './Linter.utils'
 
 interface LinterDataGridProps {
   isLoading: boolean

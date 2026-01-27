@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-
 import {
   getFacetCountCTE,
   getUnifiedLogsCTE,
@@ -8,11 +7,12 @@ import { Option } from 'components/ui/DataTable/DataTable.types'
 import { handleError, post } from 'data/fetchers'
 import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { logsKeys } from './keys'
 import {
-  getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  getUnifiedLogsISOStartEnd,
 } from './unified-logs-infinite-query'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {

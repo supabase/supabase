@@ -1,8 +1,8 @@
-import { useState } from 'react'
-
 import { PostgrestRole } from 'lib/role-impersonation'
+import { useState } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { DropdownMenuSeparator, cn } from 'ui'
+
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import RoleImpersonationRadio from './RoleImpersonationRadio'
 import UserImpersonationSelector from './UserImpersonationSelector'

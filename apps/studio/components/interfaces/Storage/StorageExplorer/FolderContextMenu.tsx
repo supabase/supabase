@@ -1,10 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Copy, Download, Edit, Trash2 } from 'lucide-react'
 import { Item, Menu, Separator } from 'react-contexify'
+
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import { copyPathToFolder } from './StorageExplorer.utils'
 
 interface FolderContextMenuProps {

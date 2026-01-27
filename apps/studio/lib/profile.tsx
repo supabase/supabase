@@ -1,8 +1,4 @@
 import * as Sentry from '@sentry/nextjs'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
-import { toast } from 'sonner'
-
 import { useIsLoggedIn, useUser } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
@@ -10,7 +6,11 @@ import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+
 import { useSignOut } from './auth'
 import { getGitHubProfileImgUrl } from './github'
 

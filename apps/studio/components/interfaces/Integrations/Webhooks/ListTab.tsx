@@ -1,9 +1,5 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef } from 'react'
-import { toast } from 'sonner'
-
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import { EditHookPanel } from 'components/interfaces/Database/Hooks/EditHookPanel'
 import { HooksList } from 'components/interfaces/Database/Hooks/HooksList/HooksList'
@@ -12,6 +8,9 @@ import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef } from 'react'
+import { toast } from 'sonner'
 
 export const WebhooksListTab = () => {
   const { data: project } = useSelectedProjectQuery()

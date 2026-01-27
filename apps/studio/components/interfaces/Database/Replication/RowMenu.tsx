@@ -1,6 +1,3 @@
-import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
@@ -8,6 +5,8 @@ import { Pipeline } from 'data/replication/pipelines-query'
 import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -22,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,

@@ -1,4 +1,4 @@
-import { Compass, Globe, DollarSign, TrendingUp } from 'lucide-react'
+import { Compass, DollarSign, Globe, TrendingUp } from 'lucide-react'
 
 export default {
   metaTitle: 'Partner with Supabase',

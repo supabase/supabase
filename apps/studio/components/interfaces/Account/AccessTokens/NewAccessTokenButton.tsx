@@ -1,6 +1,5 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   Button,
   DropdownMenu,
@@ -8,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { NewAccessTokenDialog } from './NewAccessTokenDialog'
 
 export interface NewAccessTokenButtonProps {

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { useFlag } from 'common'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
@@ -11,6 +10,7 @@ import { getDistanceLatLonKM, tryParseJson } from 'lib/helpers'
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { miscKeys } from './keys'
 
 export type DefaultRegionVariables = {

@@ -1,8 +1,8 @@
+import AdminAccessData from 'data/home/admin-access.json'
 import React from 'react'
+
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import AdminAccessData from 'data/home/admin-access.json'
 
 const AdminAccess = () => {
   return (

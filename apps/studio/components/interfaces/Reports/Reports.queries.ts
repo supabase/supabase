@@ -1,4 +1,5 @@
 import useDbQuery from 'hooks/analytics/useDbQuery'
+
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 

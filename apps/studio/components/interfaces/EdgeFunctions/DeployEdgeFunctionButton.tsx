@@ -1,11 +1,12 @@
-import { ChevronDown, Code, Terminal } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronDown, Code, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -14,8 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()

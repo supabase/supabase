@@ -1,6 +1,7 @@
-import * as fs from 'fs'
 import * as ejs from 'ejs'
+import * as fs from 'fs'
 import * as yaml from 'js-yaml'
+
 import { writeToDisk } from './helpers'
 import template from './templates/CliTemplate'
 import type { CliSpec } from './types/CliSpec'

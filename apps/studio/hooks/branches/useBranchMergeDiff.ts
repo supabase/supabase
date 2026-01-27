@@ -1,7 +1,8 @@
 import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useMemo } from 'react'
-import { useEdgeFunctionsDiff, type EdgeFunctionsDiffResult } from './useEdgeFunctionsDiff'
+
+import { type EdgeFunctionsDiffResult, useEdgeFunctionsDiff } from './useEdgeFunctionsDiff'
 
 interface UseBranchMergeDiffProps {
   currentBranchRef?: string

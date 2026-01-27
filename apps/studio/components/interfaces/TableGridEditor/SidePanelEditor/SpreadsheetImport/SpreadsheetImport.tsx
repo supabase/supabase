@@ -1,14 +1,14 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { debounce, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useChanged } from 'hooks/misc/useChanged'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { debounce, noop } from 'lodash'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SidePanel, Tabs } from 'ui'
+
 import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'

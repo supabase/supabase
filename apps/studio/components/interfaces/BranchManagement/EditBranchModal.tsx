@@ -1,14 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from '@uidotdev/usehooks'
-import { Check, Github, Loader2 } from 'lucide-react'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from 'components/ui/AlertError'
@@ -19,6 +10,12 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { Check, Github, Loader2 } from 'lucide-react'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -36,8 +33,11 @@ import {
   Label_Shadcn_ as Label,
   cn,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { InlineLink } from '@/components/ui/InlineLink'
 
 interface EditBranchModalProps {
   branch?: Branch

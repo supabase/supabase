@@ -5,6 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension']

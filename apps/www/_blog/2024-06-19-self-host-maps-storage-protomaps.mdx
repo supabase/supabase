@@ -213,10 +213,13 @@ To render a React component to the DOM, add the 'use dom' directive to the top o
 'use dom'
 
 import 'text-encoding-polyfill'
+
+import maplibregl from 'maplibre-gl'
 import { useEffect } from 'react'
 import Map from 'react-map-gl'
-import maplibregl from 'maplibre-gl'
+
 import 'maplibre-gl/dist/maplibre-gl.css'
+
 import { Protocol } from 'pmtiles'
 
 export default function MapBox(_) {
@@ -264,6 +267,7 @@ Inside the native component file, import the web component to use it:
 ```jsx App.jsx
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View } from 'react-native'
+
 import Map from './Map.jsx'
 
 export default function App() {

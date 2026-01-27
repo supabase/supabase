@@ -1,6 +1,6 @@
 import { BarChart2 } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { useChartSize } from './Charts.utils'
 

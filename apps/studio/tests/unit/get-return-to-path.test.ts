@@ -1,5 +1,5 @@
-import { getReturnToPath, DEFAULT_FALLBACK_PATH } from 'lib/gotrue'
-import { describe, it, expect } from 'vitest'
+import { DEFAULT_FALLBACK_PATH, getReturnToPath } from 'lib/gotrue'
+import { describe, expect, it } from 'vitest'
 
 describe(`getReturnToPath`, () => {
   it(`returns to ${DEFAULT_FALLBACK_PATH} when no fallback is provided`, () => {

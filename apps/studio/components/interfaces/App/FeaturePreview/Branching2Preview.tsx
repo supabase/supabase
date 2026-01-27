@@ -1,7 +1,6 @@
-import Image from 'next/image'
-
 import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import Image from 'next/image'
 
 export const Branching2Preview = () => {
   return (

@@ -111,7 +111,7 @@ create table instruments (
 We can get the nested `SectionsWithInstruments` type like this:
 
 ```ts
-import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+import { QueryData, QueryError, QueryResult } from '@supabase/supabase-js'
 
 const sectionsWithInstrumentsQuery = supabase.from('orchestral_sections').select(`
   id,

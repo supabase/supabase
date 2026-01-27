@@ -1,4 +1,5 @@
-import { expect, test, describe } from 'vitest'
+import { describe, expect, test } from 'vitest'
+
 import { prefixToUUID, stringRange } from '../../../src/sql/studio/get-users-common'
 
 describe('prefixToUUID', () => {

@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Badge } from 'ui'
+
+import Loading from '../../app/contribute/t/[id]/loading'
 import { Conversation } from '~/components/Contribute/Conversation'
 import { HelpOnPlatformButton } from '~/components/Contribute/HelpOnPlatformButton'
 import { getThreadById } from '~/data/contribute'
-import Loading from '../../app/contribute/t/[id]/loading'
 
 export async function ThreadContent({ id }: { id: string }) {
   const thread = await getThreadById(id)

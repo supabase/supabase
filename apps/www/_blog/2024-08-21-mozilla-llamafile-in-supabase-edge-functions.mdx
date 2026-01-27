@@ -67,6 +67,7 @@ Then, update the `supabase/functions/llamafile/index.ts` file to look like this:
 
 ```ts supabase/functions/llamafile/index.ts
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
 const session = new Supabase.ai.Session('LLaMA_CPP')
 
 Deno.serve(async (req: Request) => {

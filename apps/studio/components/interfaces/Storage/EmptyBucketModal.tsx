@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import { toast } from 'sonner'
-
 import { useBucketEmptyMutation } from 'data/storage/bucket-empty-mutation'
 import type { Bucket } from 'data/storage/buckets-query'
+import { toast } from 'sonner'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,

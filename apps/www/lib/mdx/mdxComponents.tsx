@@ -1,20 +1,21 @@
 'use client'
 
 import { CH } from '@code-hike/mdx/components'
-import dynamic from 'next/dynamic'
 import { ArrowUpRight, Triangle } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import type { PropsWithChildren } from 'react'
 import {
   Badge,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   Heading,
   Image,
   Mermaid,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import type { PropsWithChildren } from 'react'
+
 import type { ImageProps } from 'ui/src/components/Image/Image'
 
 const Avatar = dynamic(() => import('~/components/Avatar'))

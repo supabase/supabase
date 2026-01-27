@@ -1,6 +1,7 @@
 import { FilterPopover } from 'components/ui/FilterPopover'
+
+import { type RoleWithDescription, useRolesFilter } from '../hooks/useRolesFilter'
 import { RoleTooltip } from './RoleTooltip'
-import { useRolesFilter, type RoleWithDescription } from '../hooks/useRolesFilter'
 
 interface RolesFilterDropdownProps {
   activeOptions: string[]

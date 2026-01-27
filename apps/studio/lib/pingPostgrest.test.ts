@@ -1,5 +1,6 @@
 import * as fetchModule from 'data/fetchers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import pingPostgrest from './pingPostgrest'
 
 vi.mock('./constants', () => ({ API_URL: 'https://api.example.com' }))

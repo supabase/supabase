@@ -1,8 +1,8 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
-
 import type { UseCustomQueryOptions, VaultSecret } from 'types'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 
 export const getVaultSecretsSql = () => {

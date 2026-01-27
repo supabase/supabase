@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSortedPosts } from 'lib/posts'
 import { getAllCMSPosts } from 'lib/get-cms-posts'
+import { getSortedPosts } from 'lib/posts'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const revalidate = 30
 

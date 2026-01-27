@@ -5,8 +5,8 @@ import { z } from 'zod'
 import {
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
-  filterToolsByOptInLevel,
   createPrivacyMessageTool,
+  filterToolsByOptInLevel,
   toolSetValidationSchema,
 } from './tool-filter'
 

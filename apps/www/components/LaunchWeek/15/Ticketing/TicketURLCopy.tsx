@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
 import { LW14_URL } from 'lib/constants'
 import { Check, Copy } from 'lucide-react'
-import { UserTicketData } from '../hooks/use-conf-data'
+import { useRef, useState } from 'react'
 import { cn } from 'ui'
+
+import { UserTicketData } from '../hooks/use-conf-data'
 
 export default function TicketURLCopy({
   user,

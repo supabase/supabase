@@ -12,13 +12,14 @@ import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changel
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
 import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsSearch'
 import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/ThemeSwitcher'
+
 import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
-import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
-import { useSupportCommands } from './Support'
-import { orderCommandSectionsByPriority } from './ordering'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
+import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgProjectSwitcher'
+import { useSupportCommands } from './Support'
+import { orderCommandSectionsByPriority } from './ordering'
 
 export default function StudioCommandMenu() {
   useApiKeysCommands()

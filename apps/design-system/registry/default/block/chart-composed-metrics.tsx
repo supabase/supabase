@@ -1,17 +1,17 @@
 'use client'
 
+import { ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Skeleton } from 'ui'
 import {
   Chart,
-  ChartCard,
-  ChartHeader,
   ChartActions,
+  ChartCard,
   ChartContent,
+  ChartHeader,
   ChartMetric,
   ChartSparkline,
 } from 'ui-patterns/Chart'
-import { ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { Skeleton } from 'ui'
 
 export default function ChartComposedMetrics() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])

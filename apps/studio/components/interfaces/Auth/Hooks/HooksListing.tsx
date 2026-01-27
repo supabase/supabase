@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -9,6 +6,8 @@ import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { cn } from 'ui'
 import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -20,6 +19,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'

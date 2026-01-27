@@ -1,10 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Mail } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Mail } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button, Form, Input, Modal } from 'ui'
 
 export type InviteUserModalProps = {

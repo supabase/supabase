@@ -66,13 +66,13 @@ void main() {
 Types are usually defined within the codebase and resolved from there. In the TypeScript example below, the Language Server first has to compile `foo.ts` and launch a database containing `Foo` so it can resolve the type of `bar`.
 
 ```typescript
+// bar.ts
+import { Foo } from './foo'
+
 // foo.ts
 export type Foo = {
   bar: string
 }
-
-// bar.ts
-import { Foo } from './foo'
 
 const bar: Foo = { bar: 'I am a string' }
 ```

@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
 import { Label_Shadcn_ as Label } from 'ui'
+
 import type { DataTableInputFilterField } from '../DataTable.types'
 import { useDebounce } from '../hooks/useDebounce'
 import { InputWithAddons } from '../primitives/InputWithAddons'

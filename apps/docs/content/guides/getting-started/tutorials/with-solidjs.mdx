@@ -140,6 +140,7 @@ Let's create a new component for that called `Account.tsx`.
 ```tsx name=src/Account.tsx
 import { AuthSession } from '@supabase/supabase-js'
 import { Component, createEffect, createSignal } from 'solid-js'
+
 import { supabase } from './supabaseClient'
 
 interface Props {

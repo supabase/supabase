@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  enforceAndLogicalOperator,
   FilterGroupType,
+  enforceAndLogicalOperator,
   isFilterGroup,
   serializeOperators,
   serializeOptions,

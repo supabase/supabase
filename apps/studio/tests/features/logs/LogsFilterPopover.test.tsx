@@ -1,6 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import LogsFilterPopover from 'components/interfaces/Settings/Logs/LogsFilterPopover'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('LogsFilterPopover', () => {
   const mockOptions = {

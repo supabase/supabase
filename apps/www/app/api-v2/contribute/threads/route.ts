@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { getUnansweredThreads } from '~/data/contribute'
 
 export async function GET(request: NextRequest) {

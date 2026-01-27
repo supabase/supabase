@@ -1,22 +1,20 @@
 'use client'
 
+import { useIsLoggedIn, useUser } from 'common'
+import { getMenu } from 'data/nav'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-
-import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
-
-import { getMenu } from 'data/nav'
-import { usePathname } from 'next/navigation'
 
 const MenuItem = dynamic(() => import('./MenuItem'))
 const MobileMenu = dynamic(() => import('./MobileMenu'))

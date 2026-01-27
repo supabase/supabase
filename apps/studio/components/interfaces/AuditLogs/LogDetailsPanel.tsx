@@ -1,7 +1,6 @@
-import dayjs from 'dayjs'
-
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
+import dayjs from 'dayjs'
 import { Input, SidePanel } from 'ui'
 
 export interface LogDetailsPanelProps {

@@ -1,18 +1,15 @@
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-import { useDebounce } from 'use-debounce'
-
 import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
+import { motion } from 'framer-motion'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useEffect, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
-  Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
+  Accordion_Shadcn_,
   Button,
-  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -21,8 +18,11 @@ import {
   Input_Shadcn_,
   SheetSection,
   Switch,
+  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useDebounce } from 'use-debounce'
+
 import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
 import CronSyntaxChart from '../CronSyntaxChart'
 import { type CreateCronJobForm } from './CreateCronJobSheet.constants'

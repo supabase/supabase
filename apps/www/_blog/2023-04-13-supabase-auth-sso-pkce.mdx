@@ -162,8 +162,8 @@ Then prepare an endpoint for the sign in process. The redirect URL is set to `/a
 
 ```tsx
 // api/auth/login
-import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Create the Supabase Client
@@ -195,8 +195,8 @@ Now we can set up the callback API endpoint:
 
 ```tsx
 // api/auth/callback
-import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Create authenticated Supabase Client

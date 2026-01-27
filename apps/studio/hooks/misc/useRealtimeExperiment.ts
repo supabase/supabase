@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react'
-
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { useEffect, useMemo, useRef } from 'react'
 
 export enum RealtimeButtonVariant {
   CONTROL = 'control',

@@ -1,8 +1,3 @@
-import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   useFeaturePreviewModal,
@@ -17,22 +12,27 @@ import { useContentQuery } from 'data/content/content-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 import {
   Badge,
   Button,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   Separator,
+  cn,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
-  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
+  InnerSideBarFilters,
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 
 const SupaIcon = ({ className }: { className?: string }) => {

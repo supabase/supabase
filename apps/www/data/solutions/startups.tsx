@@ -1,4 +1,14 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
+import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { frameworks } from 'components/Hero/HeroFrameworks'
+import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
+import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
+import type { MPCSectionProps } from 'components/Solutions/MPCSection'
+import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   Check,
   ClipboardCheck,
@@ -12,36 +22,24 @@ import {
   ShieldCheck,
   Sparkles,
   Timer,
-  Users,
   UserX,
+  Users,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { cn, IconPartners, Image } from 'ui'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { IconPartners, Image, cn } from 'ui'
 
 import MainProducts from '../MainProducts'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
+import { companyStats } from '../company-stats'
 import {
+  type FeaturesSection,
   FrameworkLink,
   type FrameworkLinkProps,
-  type FeaturesSection,
   type HeroSection,
   type Metadata,
   getEditors,
 } from './solutions.utils'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
-import { companyStats } from '../company-stats'
+import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))

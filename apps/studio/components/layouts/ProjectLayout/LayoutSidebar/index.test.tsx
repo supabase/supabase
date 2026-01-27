@@ -1,12 +1,12 @@
 import { act, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { sidebarManagerState } from 'state/sidebar-manager-state'
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
 import { ResizablePanel, ResizablePanelGroup } from 'ui'
-import { LayoutSidebar } from './index'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
+import { LayoutSidebar } from './index'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,

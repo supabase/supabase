@@ -642,8 +642,8 @@ supabase functions deploy send-email --no-verify-jwt
 Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email

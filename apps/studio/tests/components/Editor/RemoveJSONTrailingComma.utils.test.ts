@@ -1,5 +1,5 @@
 import { removeJSONTrailingComma } from 'lib/helpers'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 describe('removeJSONTrailingComma', () => {
   it('should handle an empty object', () => {

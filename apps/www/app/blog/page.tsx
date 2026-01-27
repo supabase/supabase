@@ -1,7 +1,8 @@
-import BlogClient from './BlogClient'
-import { getSortedPosts } from 'lib/posts'
 import { getAllCMSPosts } from 'lib/get-cms-posts'
+import { getSortedPosts } from 'lib/posts'
 import type { Metadata } from 'next'
+
+import BlogClient from './BlogClient'
 
 export const revalidate = 30
 

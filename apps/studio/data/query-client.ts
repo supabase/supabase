@@ -1,8 +1,7 @@
 import { QueryClient, onlineManager } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { match } from 'path-to-regexp'
 import { useState } from 'react'
-
-import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 
 // When running locally we don't need the internet

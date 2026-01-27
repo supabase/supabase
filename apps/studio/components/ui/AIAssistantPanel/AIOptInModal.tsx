@@ -1,12 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
-
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useEffect } from 'react'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -15,6 +13,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Form_Shadcn_,
+  cn,
 } from 'ui'
 
 interface AIOptInModalProps {

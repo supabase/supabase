@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import apiWrapper from './apiWrapper'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { apiAuthenticate } from './apiAuthenticate'
+import apiWrapper from './apiWrapper'
 
 vi.mock('lib/constants', () => ({
   IS_PLATFORM: true,

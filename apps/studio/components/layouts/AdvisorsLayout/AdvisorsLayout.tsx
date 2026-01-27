@@ -1,7 +1,7 @@
+import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
 import { AdvisorsSidebarMenu } from './AdvisorsSidebarMenu'
 

@@ -1,16 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { useParams } from 'common'
 import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -22,6 +20,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import { z } from 'zod'
 
 interface NewPublicationPanelProps {
   visible: boolean

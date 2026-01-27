@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
-import { useEffect } from 'react'
-
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { SupportLink } from '../Support/SupportLink'
 
 interface SessionTimeoutModalProps {

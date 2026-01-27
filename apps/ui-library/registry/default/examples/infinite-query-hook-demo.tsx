@@ -1,5 +1,7 @@
 'use client'
 
+import * as React from 'react'
+
 import { cn } from '@/lib/utils'
 import {
   SupabaseQueryHandler,
@@ -9,7 +11,6 @@ import {
 } from '@/registry/default/blocks/infinite-query-hook/hooks/use-infinite-query'
 import { Checkbox } from '@/registry/default/components/ui/checkbox'
 import { Database } from '@/registry/default/fixtures/database.types'
-import * as React from 'react'
 
 interface InfiniteListProps<TableName extends SupabaseTableName> {
   tableName: TableName

@@ -1,7 +1,7 @@
+import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import React from 'react'
-import { useTheme } from 'next-themes'
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
 const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
   const { resolvedTheme } = useTheme()

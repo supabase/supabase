@@ -1,12 +1,11 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 export const HomeIcon = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()

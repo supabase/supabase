@@ -1,7 +1,8 @@
+import { motion } from 'framer-motion'
 import React from 'react'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import { motion } from 'framer-motion'
 
 export default function LaunchWeekPrizeSection({
   className,

@@ -116,14 +116,15 @@ The following component abstracts the hook into a component. It includes few uti
 ```tsx
 'use client'
 
-import { cn } from '@/lib/utils'
+import * as React from 'react'
+
 import {
   SupabaseQueryHandler,
   SupabaseTableData,
   SupabaseTableName,
   useInfiniteQuery,
 } from '@/hooks/use-infinite-query'
-import * as React from 'react'
+import { cn } from '@/lib/utils'
 
 interface InfiniteListProps<TableName extends SupabaseTableName> {
   tableName: TableName
@@ -229,8 +230,8 @@ Ensure the [Checkbox](https://ui.shadcn.com/docs/components/checkbox) component 
 ```tsx
 'use client'
 
-import { Checkbox } from '@/components/ui/checkbox'
 import { InfiniteList } from './infinite-component'
+import { Checkbox } from '@/components/ui/checkbox'
 import { SupabaseQueryHandler } from '@/hooks/use-infinite-query'
 import { Database } from '@/lib/supabase.types'
 

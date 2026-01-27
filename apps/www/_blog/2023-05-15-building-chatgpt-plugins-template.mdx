@@ -89,6 +89,7 @@ Next, we create our `/functions/chatgpt-plugin/index.ts` [file](https://github.c
 ```ts
 // /functions/chatgpt-plugin/index.ts
 import { Application, Router } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
+
 import openapi from './openapi.json' with { type: 'json' }
 
 console.log('Hello from `chatgpt-plugin` Function!')
@@ -178,6 +179,7 @@ Now we can easily add them to all our `chatgpt-plugin` routes a middleware for o
 ```ts
 // /functions/chatgpt-plugin/index.ts
 import { Application, Router } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
+
 import { corsHeaders } from '../_shared/cors.ts'
 
 // [...]

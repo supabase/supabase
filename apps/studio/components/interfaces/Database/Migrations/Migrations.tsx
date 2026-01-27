@@ -1,6 +1,3 @@
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -9,10 +6,11 @@ import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { parseMigrationVersion } from 'lib/migration-utils'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 import {
   Button,
   Card,
-  cn,
   SidePanel,
   Table,
   TableBody,
@@ -23,10 +21,12 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {

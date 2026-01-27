@@ -1,13 +1,8 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
-import dayjs from 'dayjs'
-import type { editor } from 'monaco-editor'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
@@ -15,14 +10,16 @@ import {
   getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import { LogData, LogTemplate, LogsWarning } from 'components/interfaces/Settings/Logs/Logs.types'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
   maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import {
+  buildLogQueryParams,
+  resolveLogDateRange,
+} from 'components/interfaces/Settings/Logs/logsDateRange'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -33,6 +30,7 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
+import dayjs from 'dayjs'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
@@ -41,11 +39,11 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import type { editor } from 'monaco-editor'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import {
-  buildLogQueryParams,
-  resolveLogDateRange,
-} from 'components/interfaces/Settings/Logs/logsDateRange'
 import {
   Button,
   Form,

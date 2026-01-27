@@ -1,6 +1,15 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { PaymentMethod, StripeElementsOptions, loadStripe } from '@stripe/stripe-js'
+import { useParams } from 'common'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
+import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Loader, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -13,18 +22,9 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Checkbox_Shadcn_, Listbox } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,

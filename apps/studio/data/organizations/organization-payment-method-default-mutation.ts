@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodDefaultVariables = {

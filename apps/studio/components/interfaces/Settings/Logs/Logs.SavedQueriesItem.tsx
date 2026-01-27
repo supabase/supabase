@@ -1,15 +1,15 @@
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { SqlEditor } from 'icons'
+import { Edit, Trash } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { DropdownMenuItem, DropdownMenuSeparator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
-import { Edit, Trash } from 'lucide-react'
-import { SqlEditor } from 'icons'
 import { LogsSidebarItem } from './SidebarV2/SidebarItem'
 
 interface SavedQueriesItemProps {

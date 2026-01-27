@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
+
 import tunnelImage from './assets/tunnel-bg.png'
 
 interface TunnelProps {

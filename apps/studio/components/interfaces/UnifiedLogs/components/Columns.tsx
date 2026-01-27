@@ -1,9 +1,9 @@
 import { ColumnDef } from '@tanstack/react-table'
-
 import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
 import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'

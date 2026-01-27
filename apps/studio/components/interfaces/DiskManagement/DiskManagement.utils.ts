@@ -1,6 +1,7 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+
 import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,

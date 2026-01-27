@@ -1,13 +1,13 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
-
 import { Markdown } from 'components/interfaces/Markdown'
 import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
+import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
 import { SimpleCodeBlock } from 'ui'
+
 import {
   getGeneralPolicyTemplates,
   getQueuePolicyTemplates,

@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [

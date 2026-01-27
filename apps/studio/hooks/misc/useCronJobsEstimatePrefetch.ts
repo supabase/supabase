@@ -1,9 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-
 import { prefetchCronJobRunDetailsEstimate } from 'data/database-cron-jobs/database-cron-job-run-details-estimate-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
+import { useEffect } from 'react'
 
 /**
  * Prefetches the cron job run details estimate when on a Cron integration page.

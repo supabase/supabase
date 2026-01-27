@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { MutableRefObject, useState } from 'react'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { partition } from 'lodash'
+import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { MutableRefObject, useState } from 'react'
 import {
   Badge,
   Sheet,
@@ -18,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import DeleteWrapperModal from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'

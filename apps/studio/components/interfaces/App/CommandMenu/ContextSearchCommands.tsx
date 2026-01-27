@@ -1,26 +1,27 @@
 'use client'
 
-import { useMemo } from 'react'
-import { Database } from 'lucide-react'
+import { IS_PLATFORM, useFlag } from 'common'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Auth, EdgeFunctions, Storage } from 'icons'
+import { Database } from 'lucide-react'
+import { useMemo } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   CommandHeader,
   CommandInput,
   CommandWrapper,
   PageType,
+  useQuery,
   useRegisterCommands,
   useRegisterPage,
   useSetPage,
-  useQuery,
 } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
-import { useFlag, IS_PLATFORM } from 'common'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { SearchContextValue } from './SearchContext.types'
+import { orderCommandSectionsByPriority } from './ordering'
 
 interface SearchContextOption {
   value: SearchContextValue

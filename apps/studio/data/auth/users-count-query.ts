@@ -1,9 +1,9 @@
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { getUsersCountSQL } from '@supabase/pg-meta/src/sql/studio/get-users-count'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { useQuery } from '@tanstack/react-query'
-
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { type ExecuteSqlError, executeSql } from 'data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
 

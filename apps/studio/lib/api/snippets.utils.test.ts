@@ -1,8 +1,9 @@
-import fs from 'fs/promises'
 import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { generateDeterministicUuid } from './snippets.browser'
 import {
+  type Snippet,
   createFolder,
   deleteFolder,
   deleteSnippet,
@@ -12,8 +13,8 @@ import {
   getSnippets,
   saveSnippet,
   updateSnippet,
-  type Snippet,
 } from './snippets.utils'
+import fs from 'fs/promises'
 
 // Mock fs/promises
 vi.mock('fs/promises')

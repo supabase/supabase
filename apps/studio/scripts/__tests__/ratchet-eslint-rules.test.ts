@@ -2,6 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { runRatchet } from '../ratchet-eslint-rules'
 
 const studioRoot = path.resolve(__dirname, '../..')

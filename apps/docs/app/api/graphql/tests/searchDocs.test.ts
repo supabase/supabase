@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { Result } from '~/features/helpers.fn'
-import { type OpenAIClientInterface } from '~/lib/openAi'
+
 import { ApiError } from '../../utils'
 import { POST } from '../route'
+import { Result } from '~/features/helpers.fn'
+import { type OpenAIClientInterface } from '~/lib/openAi'
 
 const contentEmbeddingMock = vi
   .fn()

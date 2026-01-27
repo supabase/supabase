@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router'
-
 import type { NextPageWithLayout } from 'types'
+
+import AwsMarketplaceContractNotLinkable from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceContractNotLinkable'
 import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
 import { AwsMarketplaceLinkExistingOrg } from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
 import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
+import { useCloudMarketplaceContractLinkingEligibilityQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
 import {
   ScaffoldContainer,
@@ -12,8 +14,6 @@ import {
   ScaffoldTitle,
 } from '../components/layouts/Scaffold'
 import { useOrganizationsQuery } from '../data/organizations/organizations-query'
-import { useCloudMarketplaceContractLinkingEligibilityQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
-import AwsMarketplaceContractNotLinkable from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceContractNotLinkable'
 
 const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   const {

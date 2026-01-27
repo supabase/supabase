@@ -2,15 +2,16 @@ import { isEqual } from 'lodash-es'
 import { ChevronRight, XCircle } from 'lucide-react'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
-
 import {
   Badge,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  cn,
 } from 'ui'
 
+import { IApiEndPoint, type ISchema, getTypeDisplayFromSchema } from './Reference.api.utils'
+import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
@@ -23,8 +24,6 @@ import type {
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
-import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
-import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 
 interface SectionProps extends PropsWithChildren {
   link: string

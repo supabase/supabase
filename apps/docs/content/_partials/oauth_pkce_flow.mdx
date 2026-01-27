@@ -69,6 +69,7 @@ Create a new file at `app/auth/callback/route.ts` and populate with the followin
 
 ```ts name=app/auth/callback/route.ts
 import { NextResponse } from 'next/server'
+
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/utils/supabase/server'
 
@@ -184,7 +185,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
 Create a new file at `app/routes/auth.callback.tsx` and populate with the following:
 
 ```ts name=app/routes/auth.callback.tsx
-import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function loader({ request }: LoaderFunctionArgs) {

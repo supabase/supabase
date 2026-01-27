@@ -1,20 +1,20 @@
-import { BarChart2, Settings2, Table } from 'lucide-react'
-
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox_Shadcn_,
   Label_Shadcn_,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Select_Shadcn_,
+  Popover_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
+  Select_Shadcn_,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 
 interface BlockViewConfigurationProps {

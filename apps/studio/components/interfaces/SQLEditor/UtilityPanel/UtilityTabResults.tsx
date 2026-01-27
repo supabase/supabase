@@ -1,7 +1,3 @@
-import { ExternalLink, Loader2 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { forwardRef } from 'react'
-
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import CopyButton from 'components/ui/CopyButton'
@@ -10,9 +6,13 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Loader2 } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { forwardRef } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import Results from './Results'
 
 export type UtilityTabResultsProps = {

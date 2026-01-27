@@ -1,10 +1,9 @@
 import type { PropsWithChildren } from 'react'
-
 import {
-  cn,
   Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
+  cn,
 } from 'ui'
 
 type ToolProps = PropsWithChildren<{

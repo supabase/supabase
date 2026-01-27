@@ -1,21 +1,21 @@
 import './utils/dotenv.js'
-
 import 'dotenv/config'
+
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
 import { isFeatureEnabled } from '../../../packages/common/enabled-features/index.js'
 import { getCustomContent } from '../lib/custom-content/getCustomContent.js'
 import {
-  fetchCliLibReferenceSource,
+  type SearchSource,
   fetchCSharpLibReferenceSource,
+  fetchCliLibReferenceSource,
   fetchDartLibReferenceSource,
   fetchGuideSources,
   fetchJsLibReferenceSource,
   fetchKtLibReferenceSource,
   fetchPythonLibReferenceSource,
   fetchSwiftLibReferenceSource,
-  type SearchSource,
 } from './search/sources/index.js'
 
 interface Source {

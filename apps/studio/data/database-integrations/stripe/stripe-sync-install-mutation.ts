@@ -1,11 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
+import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getAccessToken } from 'common'
 import { databaseKeys } from 'data/database/keys'
 import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+
 import { stripeSyncKeys } from './keys'
 
 export type StripeSyncInstallVariables = {

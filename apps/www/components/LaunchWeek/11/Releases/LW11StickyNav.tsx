@@ -1,12 +1,12 @@
-import React, { FC, useEffect, useRef } from 'react'
-import Link from 'next/link'
-import { WeekDayProps, mainDays } from './data'
-import { cn } from 'ui'
 import { isBrowser } from 'common'
-
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import useConfData from '../../hooks/use-conf-data'
 import Image from 'next/image'
+import Link from 'next/link'
+import React, { FC, useEffect, useRef } from 'react'
+import { cn } from 'ui'
+
+import useConfData from '../../hooks/use-conf-data'
+import { WeekDayProps, mainDays } from './data'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const LWXStickyNav: FC = () => {
   const days = mainDays()

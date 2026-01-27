@@ -1,10 +1,10 @@
-import { Doc } from '@/.contentlayer/generated'
-import Link from 'next/link'
-import { forwardRef } from 'react'
-
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { forwardRef } from 'react'
 import { Button } from 'ui'
+
+import { Doc } from '@/.contentlayer/generated'
 import { cn } from 'ui/src/lib/utils/cn'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(

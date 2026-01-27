@@ -1,12 +1,11 @@
-import { includes, sortBy } from 'lodash'
-import { useMemo } from 'react'
-import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { SUPABASE_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { DatabaseEventTrigger } from 'data/database-event-triggers/database-event-triggers-query'
+import { includes, sortBy } from 'lodash'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import {
   Badge,
   Button,

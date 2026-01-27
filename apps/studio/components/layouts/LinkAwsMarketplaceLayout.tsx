@@ -5,6 +5,7 @@ import Head from 'next/head'
 import Image from 'next/legacy/image'
 import type { PropsWithChildren } from 'react'
 import { Separator } from 'ui'
+
 import { withAuth } from '../../hooks/misc/withAuth'
 
 export interface LinkAwsMarketplaceLayoutProps {}

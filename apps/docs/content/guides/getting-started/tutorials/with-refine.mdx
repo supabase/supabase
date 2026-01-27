@@ -116,7 +116,9 @@ import routerProvider, {
 } from '@refinedev/react-router'
 import { dataProvider, liveProvider } from '@refinedev/supabase'
 import { BrowserRouter, Route, Routes } from 'react-router'
+
 import './App.css'
+
 import authProvider from './authProvider'
 import { supabaseClient } from './utility'
 
@@ -445,10 +447,11 @@ import { dataProvider, liveProvider } from '@refinedev/supabase'
 import { BrowserRouter, Outlet, Route, Routes } from 'react-router'
 
 import './App.css'
+
 import authProvider from './authProvider'
-import { supabaseClient } from './utility'
 import Account from './components/account'
 import Auth from './components/auth'
+import { supabaseClient } from './utility'
 
 function App() {
   return (
@@ -519,6 +522,7 @@ Create and edit `src/components/avatar.tsx`:
 
 ```tsx name=src/components/avatar.tsx
 import { useEffect, useState } from 'react'
+
 import { supabaseClient } from '../utility/supabaseClient'
 
 type TAvatarProps = {

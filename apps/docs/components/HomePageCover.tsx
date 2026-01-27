@@ -1,13 +1,14 @@
 'use client'
 
-import { ChevronRight, Play, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
 // End of third-party imports
 
 import { isFeatureEnabled, useBreakpoint } from 'common'
-import { cn, IconBackground } from 'ui'
+import { ChevronRight, Play, Sparkles } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { IconBackground, cn } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 

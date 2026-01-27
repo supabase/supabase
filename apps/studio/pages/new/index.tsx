@@ -1,11 +1,10 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useCallback, useEffect, useState } from 'react'
-
 import { NewOrgForm } from 'components/interfaces/Organization/NewOrg/NewOrgForm'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'
 import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import { useCallback, useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 /**

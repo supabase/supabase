@@ -1,6 +1,5 @@
-import { PropsWithChildren } from 'react'
-
 import { withAuth } from 'hooks/misc/withAuth'
+import { PropsWithChildren } from 'react'
 
 const WizardLayout = ({ children }: PropsWithChildren<{}>) => {
   return (

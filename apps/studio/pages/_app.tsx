@@ -23,22 +23,11 @@ import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
-import Head from 'next/head'
-import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, useCallback } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
-
 import {
   FeatureFlagProvider,
-  getFlags,
   TelemetryTagManager,
   ThemeProvider,
+  getFlags,
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -51,12 +40,22 @@ import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidatio
 import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
+import Head from 'next/head'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
+import { ErrorInfo, useCallback } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'

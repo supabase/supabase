@@ -1,20 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { partition } from 'lodash'
-import {
-  Clock,
-  ExternalLink,
-  Infinity,
-  MoreVertical,
-  Pencil,
-  RefreshCw,
-  Shield,
-  Trash2,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
@@ -29,6 +14,20 @@ import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import { partition } from 'lodash'
+import {
+  Infinity,
+  Clock,
+  ExternalLink,
+  MoreVertical,
+  Pencil,
+  RefreshCw,
+  Shield,
+  Trash2,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -38,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'

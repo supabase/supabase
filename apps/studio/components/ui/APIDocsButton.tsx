@@ -1,8 +1,9 @@
-import { BookOpenText } from 'lucide-react'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { BookOpenText } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
+
 import { ButtonTooltip } from './ButtonTooltip'
 
 interface APIDocsButtonProps {

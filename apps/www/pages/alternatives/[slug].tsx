@@ -1,5 +1,6 @@
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
+
 import LayoutComparison from '~/layouts/comparison'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'

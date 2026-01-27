@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { invalidateRolesQuery } from './database-roles-query'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]

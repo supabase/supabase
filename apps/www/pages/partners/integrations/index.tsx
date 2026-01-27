@@ -4,13 +4,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Input } from 'ui'
 import { useDebounce } from 'use-debounce'
+
+import TileGrid from '../../../components/Partners/TileGrid'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
-import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
   const { data: partners } = await supabase

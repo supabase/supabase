@@ -1,12 +1,12 @@
-import dayjs from 'dayjs'
-import { AnimatePresence, motion } from 'framer-motion'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import dayjs from 'dayjs'
+import { AnimatePresence, motion } from 'framer-motion'
+import Link from 'next/link'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 
 export function RecentItems() {

@@ -2,6 +2,7 @@ import type { DatabaseFunction } from 'data/database-functions/database-function
 import type { Schema } from 'data/database/schemas-query'
 import type { TableColumn } from 'data/database/table-columns-query'
 import type { RefObject } from 'react'
+
 import BackwardIterator from './BackwardIterator'
 
 // [Joshen] Needs to be fixed

@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { ActionCard } from 'components/layouts/Tabs/ActionCard'
@@ -11,8 +7,12 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
+import { partition } from 'lodash'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { cn, SQL_ICON } from 'ui'
+import { SQL_ICON, cn } from 'ui'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
 const SQLQuickstarts = () => {
