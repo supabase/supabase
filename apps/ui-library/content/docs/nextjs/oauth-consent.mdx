@@ -1,0 +1,100 @@
+---
+title: OAuth Consent Page
+description: OAuth 2.1 consent page block for Next.js
+---
+
+<BlockPreview name="oauth-consent/oauth/consent" />
+
+<Callout className="mt-4">
+  This block uses GitHub as the default OAuth provider, but can be easily switched by changing the
+  `provider` parameter in the `signInWithOAuth` call.
+</Callout>
+
+## Installation
+
+<BlockItem
+  name="oauth-consent-nextjs"
+  description="OAuth 2.1 consent page for MCP server authorization"
+/>
+
+## Folder structure
+
+This block includes the [Supabase client](/ui/docs/nextjs/client). If you already have one installed, you can skip overwriting it.
+
+<RegistryBlock itemName="oauth-consent-nextjs" />
+
+## Usage
+
+Once you install the block in your Next.js project, you'll have an OAuth consent page that users see when authorizing MCP clients or other OAuth applications.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=nextjs) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+### Setting up OAuth server
+
+1. Enable OAuth 2.1 server in [Authentication > OAuth Server](https://supabase.com/dashboard/project/_/auth/oauth-server) in your Supabase dashboard.
+2. Set the **Authorization Path** to `/oauth/consent` (or wherever you deploy this page).
+3. Enable **Allow dynamic registration** if you want MCP clients to register themselves automatically.
+
+### Configuring the sign-in provider
+
+This block uses GitHub as the default sign-in provider. To switch providers:
+
+1. Update the `provider` field in the `signInWithOAuth` call in `consent-form.tsx`:
+
+```tsx
+const { error } = await supabase.auth.signInWithOAuth({
+  provider: 'google', // Change to your preferred provider
+  options: {
+    redirectTo: currentUrl,
+  },
+})
+```
+
+2. Enable the provider you want to use under [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers) in the Supabase Dashboard and add the necessary credentials.
+
+We support a wide variety of social providers. The full list is available in the [Social Login documentation](https://supabase.com/docs/guides/auth/social-login).
+
+### Deploying the consent page
+
+Deploy this page to any hosting platform that supports Next.js:
+
+- [Vercel](https://vercel.com)
+- [Netlify](https://netlify.com)
+- [Render](https://render.com)
+- [Cloudflare Pages](https://pages.cloudflare.com)
+
+After deploying, update the **Authorization Path** in your Supabase dashboard to point to your deployed consent page URL.
+
+<Callout type="info">
+
+You can use this block with the Pages router by simply moving the routes from the `app` folder into the `pages` folder and renaming them. For example, instead of `app/oauth/consent/page.tsx`, you'd create a `pages/oauth/consent.tsx` file.
+
+</Callout>
+
+## How it works
+
+When an MCP client or OAuth application requests authorization:
+
+1. The user is redirected to this consent page with an `authorization_id` parameter
+2. If the user is not logged in, they're redirected to sign in with the configured provider
+3. After sign-in, the page displays the requesting application's name and requested scopes
+4. The user can **Allow** or **Deny** the authorization request
+5. Supabase Auth handles the redirect back to the requesting application
+
+## Further reading
+
+- [Deploy MCP servers](/docs/guides/getting-started/byo-mcp)
+- [OAuth 2.1 Server](/docs/guides/auth/oauth-server)
+- [MCP Authentication](/docs/guides/auth/oauth-server/mcp-authentication)
+- [Social login providers](/docs/guides/auth/social-login)

@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-11-20T11:14:14.146Z
+Last updated: 2025-12-31T11:28:17.894Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -21,6 +21,8 @@ Library of components for your project. The components integrate with Supabase a
     - Supabase Auth-aware avatar
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/nextjs/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
+- [OAuth Consent Page](https://supabase.com/ui/docs/nextjs/oauth-consent)
+    - OAuth 2.1 consent page block for Next.js
 - [Password-based Authentication](https://supabase.com/ui/docs/nextjs/password-based-auth)
     - Password-based authentication block for Next.js
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/nextjs/realtime-avatar-stack)
