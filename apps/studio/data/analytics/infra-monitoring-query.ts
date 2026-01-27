@@ -54,7 +54,6 @@ export type InfraMonitoringMultiResponse = {
 // API returns different shapes based on attribute count
 export type InfraMonitoringResponse = InfraMonitoringSingleResponse | InfraMonitoringMultiResponse
 
-// Extended interval type that includes '2m' for infra-monitoring (handled internally)
 type InfraMonitoringInterval = AnalyticsInterval | '2m'
 
 export type InfraMonitoringMultiVariables = {
@@ -103,7 +102,6 @@ export async function getInfraMonitoringAttributes(
 
   if (error) handleError(error)
 
-  // Store original interval for aggregation
   const response = data as unknown as InfraMonitoringResponse & { _originalInterval?: '2m' }
   if (is2MinInterval) {
     response._originalInterval = '2m'
