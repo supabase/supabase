@@ -1,9 +1,8 @@
 ---
 title = "How to bypass modification limits"
-topics = [
-"platform"
-]
-keywords = ["modification limits", "disk resize"]
+topics = [ "platform" ]
+keywords = [ "modification limits", "disk resize" ]
+database_id = "6f6a34a6-ac3f-4fba-9c70-4f4b8c7aeda7"
 ---
 
 This limit is not a Supabase limitation. It is rooted in how Amazon EBS (the underlying storage for our databases) manages volume modifications. AWS allows up to four modifications per volume within a rolling 24-hour window. While you can start a new modification immediately after a previous one completes, AWS enforces a quota that prevents a fifth modification within that 24-hour period to ensure data integrity and volume stability.
