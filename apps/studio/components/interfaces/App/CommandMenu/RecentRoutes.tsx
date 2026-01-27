@@ -1,39 +1,126 @@
 import { History } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { useParams } from 'common'
 import { useRecentRoutes } from 'hooks/misc/useRecentRoutes'
-import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import {
+  PageType,
+  useRegisterCommands,
+  useRegisterPage,
+  useSetCommandMenuOpen,
+  useSetPage,
+} from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+
+const RECENTS_PAGE_NAME = 'Recent Pages'
+const VISIBLE_RECENTS_COUNT = 3
 
 export function useRecentRoutesCommands() {
   const router = useRouter()
   const { ref } = useParams()
   const setIsOpen = useSetCommandMenuOpen()
+  const setPage = useSetPage()
   const { recentRoutes } = useRecentRoutes()
 
-  const commands = useMemo(() => {
+  // Stable navigation function
+  const navigateTo = useCallback(
+    (link: string) => {
+      router.push(link)
+      setIsOpen(false)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+
+  // Stable page navigation
+  const goToAllRecents = useCallback(() => {
+    setPage(RECENTS_PAGE_NAME)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Create command objects from recent routes - only depend on the route data, not callbacks
+  const allCommands = useMemo(() => {
     return recentRoutes.map((route) => ({
       id: `recent-${route.key}`,
       name: route.childName,
-      // Include parent label in value for search
       value: route.parentLabel ? `${route.childName} ${route.parentLabel}` : route.childName,
-      action: () => {
-        router.push(route.link)
-        setIsOpen(false)
-      },
+      link: route.link,
+      parentLabel: route.parentLabel,
+    }))
+  }, [recentRoutes])
+
+  // Commands shown in the main menu (first 3)
+  const visibleCommands = useMemo(() => {
+    return allCommands.slice(0, VISIBLE_RECENTS_COUNT)
+  }, [allCommands])
+
+  // Convert to ICommand format with actions
+  const allCommandsWithActions = useMemo(() => {
+    return allCommands.map((cmd) => ({
+      id: cmd.id,
+      name: cmd.name,
+      value: cmd.value,
+      action: () => navigateTo(cmd.link),
       icon: () => <History size={18} />,
-      badge: route.parentLabel
-        ? () => <span className="text-xs text-foreground-muted">{route.parentLabel}</span>
+      badge: cmd.parentLabel
+        ? () => <span className="text-xs text-foreground-muted">{cmd.parentLabel}</span>
         : undefined,
     }))
-  }, [recentRoutes, router, setIsOpen])
+  }, [allCommands, navigateTo])
 
-  useRegisterCommands(COMMAND_MENU_SECTIONS.RECENTS, commands, {
-    enabled: !!ref && commands.length > 0,
-    deps: [commands],
+  const visibleCommandsWithActions = useMemo(() => {
+    return visibleCommands.map((cmd) => ({
+      id: cmd.id,
+      name: cmd.name,
+      value: cmd.value,
+      action: () => navigateTo(cmd.link),
+      icon: () => <History size={18} />,
+      badge: cmd.parentLabel
+        ? () => <span className="text-xs text-foreground-muted">{cmd.parentLabel}</span>
+        : undefined,
+    }))
+  }, [visibleCommands, navigateTo])
+
+  // Register the "All recents" subpage with all commands
+  useRegisterPage(
+    RECENTS_PAGE_NAME,
+    {
+      type: PageType.Commands,
+      sections: [
+        {
+          id: 'all-recents',
+          name: 'Recent Pages',
+          commands: allCommandsWithActions,
+        },
+      ],
+    },
+    { deps: [allCommandsWithActions], enabled: !!ref && allCommands.length > VISIBLE_RECENTS_COUNT }
+  )
+
+  // Register the visible commands + "All recents..." link
+  const commandsWithAllRecents = useMemo(() => {
+    const commands = [...visibleCommandsWithActions]
+
+    // Add "All recents..." command if there are more than visible
+    if (allCommands.length > VISIBLE_RECENTS_COUNT) {
+      commands.push({
+        id: 'all-recents',
+        name: 'All recents...',
+        value: 'All recents recent pages history',
+        action: goToAllRecents,
+        icon: () => <History size={18} />,
+        badge: undefined,
+      })
+    }
+
+    return commands
+  }, [visibleCommandsWithActions, allCommands.length, goToAllRecents])
+
+  useRegisterCommands(COMMAND_MENU_SECTIONS.RECENTS, commandsWithAllRecents, {
+    enabled: !!ref && commandsWithAllRecents.length > 0,
+    deps: [commandsWithAllRecents],
     orderSection: orderCommandSectionsByPriority,
     sectionMeta: { priority: 1 },
   })

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useLocalStorageQuery } from './useLocalStorage'
 
 export type RecentRoute = {
@@ -12,7 +12,7 @@ export type RecentRoute = {
   visitedAt: number // Timestamp for ordering
 }
 
-const MAX_RECENT_ROUTES = 5
+const MAX_RECENT_ROUTES = 15
 const EXCLUDED_ROUTE_KEYS = ['HOME'] // Don't track Project Overview since it's always visible
 
 const DEFAULT_RECENT_ROUTES: RecentRoute[] = []
@@ -20,12 +20,19 @@ const DEFAULT_RECENT_ROUTES: RecentRoute[] = []
 export const useRecentRoutes = () => {
   const { ref } = useParams()
   const lastTrackedKeyRef = useRef<string | null>(null)
+  const recentRoutesRef = useRef<RecentRoute[]>(DEFAULT_RECENT_ROUTES)
 
   const [recentRoutes, setRecentRoutes, { isSuccess }] = useLocalStorageQuery<RecentRoute[]>(
     LOCAL_STORAGE_KEYS.RECENT_SIDEBAR_ROUTES(ref ?? ''),
     DEFAULT_RECENT_ROUTES
   )
 
+  // Keep ref in sync with latest routes
+  useEffect(() => {
+    recentRoutesRef.current = recentRoutes
+  }, [recentRoutes])
+
+  // Stable trackRoute that uses ref for current routes
   const trackRoute = useCallback(
     (route: {
       key: string
@@ -51,13 +58,15 @@ export const useRecentRoutes = () => {
       }
       lastTrackedKeyRef.current = route.key
 
+      const currentRoutes = recentRoutesRef.current
+
       // Check if this route is already at the top - if so, don't update
-      if (recentRoutes.length > 0 && recentRoutes[0].key === route.key) {
+      if (currentRoutes.length > 0 && currentRoutes[0].key === route.key) {
         return
       }
 
       // Remove existing entry with the same key (to update visitedAt)
-      const filteredRoutes = recentRoutes.filter((r) => r.key !== route.key)
+      const filteredRoutes = currentRoutes.filter((r) => r.key !== route.key)
 
       // Add new entry at the beginning
       const newRoute: RecentRoute = {
@@ -74,7 +83,7 @@ export const useRecentRoutes = () => {
       const newRoutes = [newRoute, ...filteredRoutes].slice(0, MAX_RECENT_ROUTES)
       setRecentRoutes(newRoutes)
     },
-    [recentRoutes, setRecentRoutes]
+    [setRecentRoutes]
   )
 
   // Sort by visitedAt descending (most recent first)
