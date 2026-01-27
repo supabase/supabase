@@ -40,18 +40,12 @@ export type OverviewData = {
   isLoading: boolean
 }
 
-/**
- * Calculate error rate percentage from chart data
- */
 export const calculateErrorRate = (data: LogsBarChartDatum[]): number => {
   const total = sumTotal(data)
   const errors = sumErrors(data)
   return total > 0 ? (errors / total) * 100 : 0
 }
 
-/**
- * Calculate success rate percentage from chart data
- */
 export const calculateSuccessRate = (data: LogsBarChartDatum[]): number => {
   const total = sumTotal(data)
   const warnings = sumWarnings(data)
@@ -83,9 +77,6 @@ export const getHealthStatus = (
   return { status: 'healthy', color: 'brand' }
 }
 
-/**
- * Transform service stats into health data for a single service
- */
 const transformServiceStats = (stats: StatsLike): ServiceHealthData => {
   const data = stats.eventChartData
   const total = sumTotal(data)
@@ -114,11 +105,13 @@ const transformServiceStats = (stats: StatsLike): ServiceHealthData => {
  */
 export const useObservabilityOverviewData = (
   projectRef: string,
-  interval: '1hr' | '1day' | '7day'
+  interval: '1hr' | '1day' | '7day',
+  refreshKey: number
 ): OverviewData => {
   const statsByService = useServiceStats(projectRef, interval)
 
-  // Calculate date range for PostgREST query
+  // refreshKey forces date recalculation when user clicks refresh button
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate } = useMemo(() => {
     const now = dayjs()
     const end = now.toISOString()
@@ -139,9 +132,8 @@ export const useObservabilityOverviewData = (
     }
 
     return { startDate: start, endDate: end }
-  }, [interval])
+  }, [interval, refreshKey])
 
-  // Fetch PostgREST data separately (uses logs API, not metrics API)
   const {
     data: postgrestData,
     isLoading: postgrestLoading,
@@ -154,7 +146,6 @@ export const useObservabilityOverviewData = (
     interval,
   })
 
-  // Transform PostgREST data
   const postgrestStats = useMemo((): ServiceHealthData => {
     const data = postgrestData ? transformPostgrestMetrics(postgrestData) : []
     const total = sumTotal(data)
@@ -178,7 +169,6 @@ export const useObservabilityOverviewData = (
     }
   }, [postgrestData, postgrestLoading, postgrestError, postgrestRefetch])
 
-  // Transform each service from metrics API
   const services: Record<ServiceKey, ServiceHealthData> = {
     db: transformServiceStats(statsByService.db.current),
     functions: transformServiceStats(statsByService.functions.current),
@@ -188,7 +178,6 @@ export const useObservabilityOverviewData = (
     postgrest: postgrestStats,
   }
 
-  // Calculate aggregated metrics across all enabled services
   const totalRequests = Object.values(services).reduce((sum, s) => sum + s.total, 0)
   const totalErrors = Object.values(services).reduce((sum, s) => sum + s.errorCount, 0)
   const totalWarnings = Object.values(services).reduce((sum, s) => sum + s.warningCount, 0)
@@ -196,7 +185,6 @@ export const useObservabilityOverviewData = (
   const { successRate: overallSuccessRate, nonSuccessRate: overallErrorRate } =
     computeSuccessAndNonSuccessRates(totalRequests, totalWarnings, totalErrors)
 
-  // Determine if any service is still loading
   const isLoading = Object.values(services).some((s) => s.isLoading)
 
   return {

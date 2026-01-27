@@ -83,7 +83,7 @@ export const ObservabilityOverview = () => {
     return { datetimeFormat: format }
   }, [selectedInterval])
 
-  const overviewData = useObservabilityOverviewData(projectRef!, interval)
+  const overviewData = useObservabilityOverviewData(projectRef!, interval, refreshKey)
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
