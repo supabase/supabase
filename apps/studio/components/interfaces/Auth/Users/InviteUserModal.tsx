@@ -16,7 +16,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
   const handleToggle = () => setVisible(!visible)
-  const { mutate: inviteUser, isLoading: isInviting } = useUserInviteMutation({
+  const { mutate: inviteUser, isPending: isInviting } = useUserInviteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Sent invite email to ${variables.email}`)
       setVisible(false)

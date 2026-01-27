@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 import type { CustomerAddress } from './types'
 
@@ -43,7 +43,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationCustomerProfileUpdateData,
     ResponseError,
     OrganizationCustomerProfileUpdateVariables
@@ -62,14 +62,17 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
       const { address, slug, billing_name } = variables
 
       // We do not invalidate here as GET endpoint data is stale for 1-2 seconds, so we handle state manually
-      queryClient.setQueriesData(organizationKeys.customerProfile(slug), (prev: any) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          billing_name,
-          address,
+      queryClient.setQueriesData(
+        { queryKey: organizationKeys.customerProfile(slug) },
+        (prev: any) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            billing_name,
+            address,
+          }
         }
-      })
+      )
 
       await onSuccess?.(data, variables, context)
     },

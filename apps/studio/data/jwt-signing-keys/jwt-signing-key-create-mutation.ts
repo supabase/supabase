@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { JWTAlgorithm } from './jwt-signing-keys-query'
 import { jwtSigningKeysKeys } from './keys'
 
@@ -38,7 +38,7 @@ export const useJWTSigningKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>,
+  UseCustomMutationOptions<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -48,7 +48,7 @@ export const useJWTSigningKeyCreateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jwtSigningKeysKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

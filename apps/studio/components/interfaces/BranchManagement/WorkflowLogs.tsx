@@ -45,23 +45,21 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const {
     data: workflowRuns,
     isSuccess: isWorkflowRunsSuccess,
-    isLoading: isWorkflowRunsLoading,
+    isPending: isWorkflowRunsLoading,
     isError: isWorkflowRunsError,
     error: workflowRunsError,
   } = useActionsQuery({ ref: projectRef }, { enabled: isOpen })
 
-  const [selectedWorkflowRun, setSelectedWorkflowRun] = useState<ActionRunData | undefined>(
-    undefined
-  )
+  const [selectedWorkflowRun, setSelectedWorkflowRun] = useState<ActionRunData>()
 
   const {
     data: workflowRunLogs,
     isSuccess: isWorkflowRunLogsSuccess,
-    isLoading: isWorkflowRunLogsLoading,
+    isPending: isWorkflowRunLogsLoading,
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
   } = useActionRunLogsQuery(
-    { ref: projectRef, run_id: selectedWorkflowRun?.id ?? '' },
+    { projectRef, runId: selectedWorkflowRun?.id },
     { enabled: isOpen && Boolean(selectedWorkflowRun) }
   )
 
@@ -108,6 +106,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                       <li key={workflowRun.id} className="py-3">
                         <button
                           type="button"
+                          disabled={workflowRun.id === projectRef}
                           onClick={() => setSelectedWorkflowRun(workflowRun)}
                           className="flex items-center gap-2 w-full justify-between"
                         >
@@ -121,7 +120,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                               {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
                             </span>
                           </div>
-                          <ArrowRight size={16} />
+                          {workflowRun.id !== projectRef && <ArrowRight size={16} />}
                         </button>
                       </li>
                     ))}

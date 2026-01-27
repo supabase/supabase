@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<$Partial path="project_setup.mdx" />
+<$Partial path="project_setup.mdx" variables={{ "framework": "sveltekit", "tab": "frameworks" }} />
 
 ## Building the app
 
@@ -73,7 +73,7 @@ meta="name=src/lib/Auth.svelte"
 After a user is signed in, allow them to edit their profile details and manage their account.
 Create a new component for that called `Account.svelte`.
 
-<$CodeSample  
+<$CodeSample
 path="/user-management/svelte-user-management/src/lib/Account.svelte"
 lines={[[1, 4], [7, 11], [14, 33], [34,53], [55,73], [75,-1]]}
 meta="src/lib/Account.svelte"
@@ -121,7 +121,7 @@ meta="name=src/lib/Avatar.svelte"
 
 And then you can add the widget to the Account page:
 
-<$CodeSample  
+<$CodeSample
 path="/user-management/svelte-user-management/src/lib/Account.svelte"
 lines={[[1,1], [5,5], [71,73], [74,74], [92,-1]]}
 meta="src/lib/Account.svelte"

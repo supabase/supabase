@@ -124,11 +124,9 @@ export const ProjectCreationFooter = ({
                       <TableRow>
                         <TableCell className="w-[170px] flex gap-2">
                           <span className="truncate">
-                            {form.getValues('projectName') ?? 'New project'}
+                            {form.getValues('projectName') || 'New project'}
                           </span>
-                          <Badge size={'small'} variant={'default'}>
-                            NEW
-                          </Badge>
+                          <Badge variant="success">New</Badge>
                         </TableCell>
                         <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
                         <TableCell className="text-right">

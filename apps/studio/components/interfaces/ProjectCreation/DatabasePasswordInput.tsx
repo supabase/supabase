@@ -1,10 +1,8 @@
-import { debounce } from 'lodash'
-import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import Panel from 'components/ui/Panel'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import passwordStrength from 'lib/password-strength'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -15,37 +13,34 @@ import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'
 
 interface DatabasePasswordInputProps {
   form: UseFormReturn<CreateProjectForm>
-  passwordStrengthMessage: string
-  setPasswordStrengthMessage: (value: string) => void
-  setPasswordStrengthWarning: (value: string) => void
 }
 
-export const DatabasePasswordInput = ({
-  form,
-  passwordStrengthMessage,
-  setPasswordStrengthMessage,
-  setPasswordStrengthWarning,
-}: DatabasePasswordInputProps) => {
-  async function checkPasswordStrength(value: any) {
-    const { message, warning, strength } = await passwordStrength(value)
+const updatePasswordStrength = async (form: UseFormReturn<CreateProjectForm>, value: string) => {
+  try {
+    const { warning, message, strength } = await passwordStrength(value)
+    form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
+    form.setValue('dbPassStrengthMessage', message ?? '', {
+      shouldValidate: false,
+      shouldDirty: false,
+    })
+    form.setValue('dbPassStrengthWarning', warning ?? '', {
+      shouldValidate: false,
+      shouldDirty: false,
+    })
 
-    form.setValue('dbPassStrength', strength)
-    form.trigger('dbPassStrength')
     form.trigger('dbPass')
-
-    setPasswordStrengthWarning(warning)
-    setPasswordStrengthMessage(message)
+  } catch (error) {
+    console.error(error)
   }
+}
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
+export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
-  function generatePassword() {
+  async function generatePassword() {
     const password = generateStrongPassword()
     form.setValue('dbPass', password)
-    delayedCheckPasswordStrength(password)
+
+    updatePasswordStrength(form, password)
   }
 
   return (
@@ -67,7 +62,7 @@ export const DatabasePasswordInput = ({
                   <PasswordStrengthBar
                     passwordStrengthScore={form.getValues('dbPassStrength')}
                     password={field.value}
-                    passwordStrengthMessage={passwordStrengthMessage}
+                    passwordStrengthMessage={form.getValues('dbPassStrengthMessage')}
                     generateStrongPassword={generatePassword}
                   />
                 </>
@@ -81,15 +76,10 @@ export const DatabasePasswordInput = ({
                   {...field}
                   autoComplete="off"
                   onChange={async (event) => {
+                    const newValue = event.target.value
                     field.onChange(event)
-                    form.trigger('dbPassStrength')
-                    const value = event.target.value
-                    if (event.target.value === '') {
-                      await form.setValue('dbPassStrength', 0)
-                      await form.trigger('dbPass')
-                    } else {
-                      await delayedCheckPasswordStrength(value)
-                    }
+
+                    updatePasswordStrength(form, newValue)
                   }}
                 />
               </FormControl_Shadcn_>

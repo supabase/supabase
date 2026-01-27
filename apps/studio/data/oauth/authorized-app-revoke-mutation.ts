@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type AuthorizedAppRevokeVariables = {
@@ -29,7 +29,7 @@ export const useAuthorizedAppRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>,
+  UseCustomMutationOptions<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -38,7 +38,7 @@ export const useAuthorizedAppRevokeMutation = ({
     mutationFn: (vars) => revokeAuthorizedApp(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(oauthAppKeys.authorizedApps(slug))
+      await queryClient.invalidateQueries({ queryKey: oauthAppKeys.authorizedApps(slug) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

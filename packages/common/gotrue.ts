@@ -115,6 +115,9 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
+/**
+ * Reference to a function that captures exceptions for debugging purposes to be sent to Sentry.
+ */
 let captureException: ((e: any) => any) | null = null
 
 export function setCaptureException(fn: typeof captureException) {
@@ -144,10 +147,32 @@ async function debuggableNavigatorLock<R>(
       }
 
       console.error(
-        `Waited for over 10s to acquire an Auth client lock`,
+        `Waited for over 10s to acquire an Auth client lock, will steal the lock to unblock`,
         await navigator.locks.query(),
         stackException
       )
+
+      // quickly steal the lock and release it so that others can acquire it,
+      // while leaving the code that was holding it to continue running
+      navigator.locks
+        .request(
+          name,
+          {
+            steal: true,
+          },
+          async () => {
+            await new Promise((accept) => {
+              setTimeout(accept, 0)
+            })
+
+            console.error('Lock was stolen and now released', stackException)
+          }
+        )
+        .catch((e: any) => {
+          if (captureException) {
+            captureException(e)
+          }
+        })
     })()
   }, 10000)
 
@@ -175,27 +200,12 @@ async function debuggableNavigatorLock<R>(
   }
 }
 
-// Wrap fetch with 30-second timeout to prevent indefinite hangs
-const fetchWithTimeout: typeof fetch = async (input, init) => {
-  const timeoutSignal = AbortSignal.timeout(30000) // 30 seconds
-  const existingSignal = init?.signal
-  const combinedSignal = existingSignal
-    ? AbortSignal.any([existingSignal, timeoutSignal])
-    : timeoutSignal
-
-  return fetch(input, {
-    ...init,
-    signal: combinedSignal,
-  })
-}
-
 export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? debuggableNavigatorLock : undefined,
-  fetch: fetchWithTimeout,
   ...('localStorage' in globalThis
     ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
     : null),

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
@@ -33,7 +33,7 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -41,14 +41,16 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
     mutationFn: (args) => deleteConnection(args),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationKeys.integrationsList()),
-        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-        queryClient.invalidateQueries(
-          integrationKeys.vercelProjectList(variables.organization_integration_id)
-        ),
-        queryClient.invalidateQueries(
-          integrationKeys.vercelConnectionsList(variables.organization_integration_id)
-        ),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.integrationsList() }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.integrationsListWithOrg(variables.orgSlug),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.vercelProjectList(variables.organization_integration_id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.vercelConnectionsList(variables.organization_integration_id),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

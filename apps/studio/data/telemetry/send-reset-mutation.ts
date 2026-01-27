@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export async function sendReset() {
   if (!IS_PLATFORM) return undefined
@@ -18,7 +18,7 @@ export const useSendResetMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<SendResetData, ResponseError>, 'mutationFn'> = {}) => {
+}: Omit<UseCustomMutationOptions<SendResetData, ResponseError>, 'mutationFn'> = {}) => {
   return useMutation<SendResetData, ResponseError>({
     mutationFn: () => sendReset(),
     async onSuccess(data, variables, context) {

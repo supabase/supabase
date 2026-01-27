@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
+import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 
 export type ProjectTransferVariables = {
   projectRef?: string
@@ -36,21 +37,22 @@ export const useProjectTransferMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectTransferData, ResponseError, ProjectTransferVariables>,
+  UseCustomMutationOptions<ProjectTransferData, ResponseError, ProjectTransferVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>({
     mutationFn: (vars) => transferProject(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, targetOrganizationSlug } = variables
       await Promise.all([
-        queryClient.invalidateQueries(
-          projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug)
-        ),
-        queryClient.invalidateQueries(projectKeys.detail(projectRef)),
-        queryClient.invalidateQueries(projectKeys.list()),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
+        }),
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) }),
+        invalidateProjectsQuery(),
       ])
       await onSuccess?.(data, variables, context)
     },

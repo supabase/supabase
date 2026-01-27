@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { BannedIPKeys } from './keys'
 
 export type IPDeleteVariables = {
@@ -29,14 +29,17 @@ export const useBannedIPsDeleteMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseCustomMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
   return useMutation<IPDeleteData, ResponseError, IPDeleteVariables>({
     mutationFn: (vars) => deleteBannedIPs(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(BannedIPKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: BannedIPKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

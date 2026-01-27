@@ -1289,7 +1289,7 @@ functions:
     description: |
       Links an oauth identity to an existing user. This method supports the PKCE flow.
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
     params:
@@ -1331,7 +1331,7 @@ functions:
         type: UserIdentity
         description: The user identity to unlink.
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -1357,7 +1357,7 @@ functions:
     description: |
       Links an identity to an existing user using an ID token obtained from a third-party OAuth provider. This allows linking identities using native OAuth flows (Google, Apple, Facebook, etc.) similar to `signInWithIdToken()` but for linking rather than signing in.
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentityWithIdToken()`.
       - Supports the same OAuth providers as `signInWithIdToken()`: Google, Apple, Facebook, Kakao, and Keycloak.
       - If the candidate identity is already linked to another user, the operation will fail.
@@ -2428,7 +2428,7 @@ functions:
   - id: generate-link
     title: 'generateLink()'
     notes: |
-      Generates email links and OTPs to be sent via a custom email provider.
+      Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality.
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `emailChangeCurrent`, `emailChangeNew`, `phoneChange`.
       - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
       - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
@@ -3901,6 +3901,18 @@ functions:
             }
           }
           ```
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
+  # - id: analytics-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Analytics Buckets.
+  # - id: vector-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Vector Buckets.
 
   - id: list-buckets
     description: |
@@ -5501,7 +5513,7 @@ functions:
               (2, 'viola'),
               (3, 'cello');
             ```
-        reponse: |
+        response: |
           ```json
           [
             {

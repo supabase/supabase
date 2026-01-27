@@ -21,7 +21,7 @@ import {
 
 import { useBreakpoint } from 'common'
 import { useSendTelemetryEvent } from 'lib/telemetry'
-import { tweets } from 'shared-data'
+import { topTweets } from 'shared-data'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
@@ -495,7 +495,7 @@ const data: () => {
           </Link>
         </Button>
       ),
-      tweets: tweets.slice(0, 18),
+      tweets: topTweets,
     },
     platformStarterSection: {
       id: 'platform-starter',

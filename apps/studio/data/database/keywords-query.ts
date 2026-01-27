@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export const getKeywordsSql = () => {
   const sql = /* SQL */ `
@@ -34,7 +35,7 @@ export type KeywordsError = ExecuteSqlError
 
 export const useKeywordsQuery = <TData = KeywordsData>(
   { projectRef, connectionString }: KeywordsVariables,
-  { enabled = true, ...options }: UseQueryOptions<KeywordsData, KeywordsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<KeywordsData, KeywordsError, TData> = {}
 ) =>
   useQuery<KeywordsData, KeywordsError, TData>({
     queryKey: databaseKeys.keywords(projectRef),

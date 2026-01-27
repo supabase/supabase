@@ -10,12 +10,12 @@ import { z } from 'zod'
 import { useFlag, useParams } from 'common'
 import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from 'components/interfaces/Markdown'
+import { extractPostgresVersionDetails } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
-import { ReleaseChannel } from 'data/projects/new-project.constants'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -43,22 +43,8 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-interface PostgresVersionDetails {
-  postgresEngine: string
-  releaseChannel: ReleaseChannel
-}
-
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
   return `${postgres_version}|${release_channel}`
-}
-
-export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails | null => {
-  if (!value) {
-    return null
-  }
-
-  const [postgresEngine, releaseChannel] = value.split('|')
-  return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
 export const ProjectUpgradeAlert = () => {
@@ -84,7 +70,7 @@ export const ProjectUpgradeAlert = () => {
   const durationEstimateHours = data?.duration_estimate_hours || 1
   const legacyAuthCustomRoles = data?.legacy_auth_custom_roles || []
 
-  const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
+  const { mutate: upgradeProject, isPending: isUpgrading } = useProjectUpgradeMutation({
     onSuccess: (res, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.UPGRADING })
       toast.success('Upgrading project')
@@ -99,6 +85,7 @@ export const ProjectUpgradeAlert = () => {
 
     const versionDetails = extractPostgresVersionDetails(postgresVersionSelection)
     if (!versionDetails) return toast.error('Invalid Postgres version')
+    if (!versionDetails.postgresEngine) return toast.error('Missing target version')
 
     upgradeProject({
       ref,
@@ -133,14 +120,13 @@ export const ProjectUpgradeAlert = () => {
           Your project can be upgraded to the latest version of Postgres
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          <p className="mb-3">
-            The latest version of Postgres ({latestPgVersion}) is available for your project.
-          </p>
+          <p>The latest version of Postgres ({latestPgVersion}) is available for your project.</p>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
                 type="primary"
+                className="mt-2"
                 onClick={() => setShowUpgradeModal(true)}
                 disabled={projectUpgradeDisabled}
               >
@@ -275,9 +261,7 @@ export const ProjectUpgradeAlert = () => {
                                     <div className="flex items-center gap-3">
                                       <span className="text-foreground">{postgresVersion}</span>
                                       {value.release_channel !== 'ga' && (
-                                        <Badge variant="warning" className="mr-1 capitalize">
-                                          {value.release_channel}
-                                        </Badge>
+                                        <Badge variant="warning">{value.release_channel}</Badge>
                                       )}
                                     </div>
                                   </SelectItem_Shadcn_>

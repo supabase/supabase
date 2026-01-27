@@ -9,9 +9,8 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
-import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -25,12 +24,13 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards } from 'types'
-import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import type { Dashboards } from 'types'
+import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
@@ -43,7 +43,7 @@ const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
   const router = useRouter()
-  const { id, ref } = useParams()
+  const { id: reportId, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
@@ -62,13 +62,13 @@ const Reports = () => {
 
   const {
     data: userContents,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isSaving } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       setHasEdits(false)
       if (vars.payload.type === 'report') toast.success('Successfully saved report!')
@@ -79,7 +79,7 @@ const Reports = () => {
   })
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const currentReport = userContents?.content.find((report) => report.id === id)
+  const currentReport = userContents?.content.find((report) => report.id === reportId)
   const currentReportContent = currentReport?.content as Dashboards.Content
 
   const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -274,15 +274,15 @@ const Reports = () => {
       (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
     )
     monitoringCharts?.forEach((x) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoring(ref, {
           attribute: x.attribute,
           startDate,
           endDate,
           interval: config?.interval,
           databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+        }),
+      })
     })
     setTimeout(() => setIsRefreshing(false), 1000)
   }
@@ -312,16 +312,22 @@ const Reports = () => {
     if (!label || !sql) return console.error('SQL and Label required')
 
     const toastId = toast.loading(`Creating new query: ${label}`)
-    const id = uuidv4()
+
+    const payload = createSqlSnippetSkeletonV2({
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
 
     const updatedLayout = [...config.layout]
     updatedLayout.push({
-      id,
+      id: payload.id,
       label,
       x: 0,
       y: 0,
       chart_type: 'bar',
-      attribute: `new_snippet_${id}` as Dashboards.ChartType,
+      attribute: `new_snippet_${payload.id}` as Dashboards.ChartType,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
       chartConfig: { ...DEFAULT_CHART_CONFIG, ...(sqlConfig ?? {}) },
@@ -330,22 +336,14 @@ const Reports = () => {
 
     setConfig({ ...config, layout: [...updatedLayout] })
 
-    const payload = createSqlSnippetSkeletonV2({
-      id,
-      name: label,
-      sql,
-      owner_id: profile?.id,
-      project_id: project?.id,
-    }) as UpsertContentPayload
-
     upsertContent(
       { projectRef: ref, payload },
       {
         onSuccess: () => {
           toast.success(`Successfully created new query: ${label}`, { id: toastId })
           const finalLayout = updatedLayout.map((x) => {
-            if (x.id === id) {
-              return { ...x, attribute: `snippet_${id}` as Dashboards.ChartType }
+            if (x.id === payload.id) {
+              return { ...x, attribute: `snippet_${payload.id}` as Dashboards.ChartType }
             } else return x
           })
           setConfig({ ...config, layout: finalLayout })
@@ -392,7 +390,7 @@ const Reports = () => {
   }, [hasEdits, confirmNavigate, router])
 
   if (isLoading || isLoadingPermissions) {
-    return <Loading />
+    return <LogoLoader />
   }
 
   if (!canReadReport) {
@@ -551,8 +549,13 @@ const Reports = () => {
         confirmLabel="Confirm"
         onConfirm={() => {
           setConfirmNavigate(true)
+          let urlToNavigate = navigateUrl ?? '/'
+          if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
+            urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
+          }
+          if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
           setNavigateUrl(undefined)
-          router.push(navigateUrl ?? '/')
+          router.push(urlToNavigate)
         }}
         onCancel={() => setNavigateUrl(undefined)}
       >

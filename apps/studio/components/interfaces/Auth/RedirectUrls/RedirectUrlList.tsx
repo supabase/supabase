@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Globe, Trash } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { EmptyListState } from 'components/ui/States'
+import { EmptyListState } from 'components/ui/EmptyListState'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, Checkbox_Shadcn_ } from 'ui'
 import { ValueContainer } from './ValueContainer'

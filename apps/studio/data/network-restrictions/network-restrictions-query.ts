@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { networkRestrictionKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type NetworkRestrictionsVariables = { projectRef?: string }
 
@@ -53,7 +54,7 @@ export const useNetworkRestrictionsQuery = <TData = NetworkRestrictionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<NetworkRestrictionsData, NetworkRestrictionsError, TData> = {}
+  }: UseCustomQueryOptions<NetworkRestrictionsData, NetworkRestrictionsError, TData> = {}
 ) =>
   useQuery<NetworkRestrictionsData, NetworkRestrictionsError, TData>({
     queryKey: networkRestrictionKeys.list(projectRef),

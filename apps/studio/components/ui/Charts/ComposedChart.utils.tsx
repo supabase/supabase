@@ -1,11 +1,11 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
-import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -42,6 +42,10 @@ export type MultiAttribute = {
   color?: {
     light: string
     dark: string
+  }
+  fill?: {
+    light?: string
+    dark?: string
   }
   statusCode?: string
   grantType?: string
@@ -129,7 +133,7 @@ export const calculateTotalChartAggregate = (
     ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
     .reduce((acc, curr) => acc + curr.value, 0)
 
-const CustomTooltip = ({
+export const CustomTooltip = ({
   active,
   payload,
   label,
@@ -158,7 +162,9 @@ const CustomTooltip = ({
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
+    const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+    const shouldFormatBytes = isBytesFormat || isRamChart || isDBSizeChart || isNetworkChart
+    const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -180,6 +186,13 @@ const CustomTooltip = ({
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
 
+    const formatNumeric = (value: number) => {
+      if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
+      return shouldFormatBytes
+        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
+        : numberFormatter(value, valuePrecision)
+    }
+
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
       const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
@@ -192,9 +205,7 @@ const CustomTooltip = ({
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {shouldFormatBytes
-              ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
-              : numberFormatter(entry.value, valuePrecision)}
+            {formatNumeric(entry.value) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
             {isPercentage ? '%' : ''}
             {format === 'ms' ? 'ms' : ''}
 
@@ -225,9 +236,8 @@ const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {shouldFormatBytes
-                    ? formatBytes(total as number, valuePrecision)
-                    : numberFormatter(total as number, valuePrecision)}
+                  {formatNumeric(total as number) +
+                    (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
                   {isPercentage ? '%' : ''}
                   {format === 'ms' ? 'ms' : ''}
                 </span>
@@ -259,7 +269,7 @@ interface CustomLabelProps {
   hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({
+export const CustomLabel = ({
   payload,
   attributes,
   showMaxValue,
@@ -341,5 +351,3 @@ const CustomLabel = ({
     </div>
   )
 }
-
-export { CustomLabel, CustomTooltip }

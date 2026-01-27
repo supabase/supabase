@@ -55,7 +55,7 @@ create table documents (
   id serial primary key,
   title text not null,
   body text not null,
-  embedding vector(384)
+  embedding extensions.vector(384)
 );
 ```
 
@@ -72,7 +72,7 @@ In general, embeddings with fewer dimensions perform best. See our [analysis on 
 In this example we'll generate a vector using Transformers.js, then store it in the database using the Supabase JavaScript client.
 
 ```js
-import { pipeline } from '@xenova/transformers'
+import { pipeline } from '@huggingface/transformers'
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'
@@ -113,7 +113,7 @@ Supabase client libraries like `supabase-js` connect to your Postgres instance v
 
 ```sql
 create or replace function match_documents (
-  query_embedding vector(384),
+  query_embedding extensions.vector(384),
   match_threshold float,
   match_count int
 )

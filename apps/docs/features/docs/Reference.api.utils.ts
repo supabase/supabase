@@ -186,4 +186,9 @@ export function getTypeDisplayFromSchema(schema: ISchema) {
       displayName: 'object',
     }
   }
+
+  // Default fallback for unhandled schema types
+  return {
+    displayName: 'unknown',
+  }
 }

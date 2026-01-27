@@ -1,4 +1,7 @@
-import { useParams } from 'common'
+import Link from 'next/link'
+
+import { useFlag, useParams } from 'common'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -7,34 +10,23 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
-import {
-  ObjectsToBeDroppedWarning,
-  ReadReplicasWarning,
-  UnsupportedExtensionsWarning,
-  UserDefinedObjectsInInternalSchemasWarning,
-} from './UpgradeWarnings'
+import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
 
-const InfrastructureInfo = () => {
+export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const unifiedReplication = useFlag('unifiedReplication')
 
   const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
     useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
@@ -42,7 +34,7 @@ const InfrastructureInfo = () => {
   const {
     data,
     error,
-    isLoading: isLoadingUpgradeEligibility,
+    isPending: isLoadingUpgradeEligibility,
     isError: isErrorUpgradeEligibility,
     isSuccess: isSuccessUpgradeEligibility,
   } = useProjectUpgradeEligibilityQuery({
@@ -52,7 +44,7 @@ const InfrastructureInfo = () => {
   const {
     data: serviceVersions,
     error: serviceVersionsError,
-    isLoading: isLoadingServiceVersions,
+    isPending: isLoadingServiceVersions,
     isError: isErrorServiceVersions,
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })
@@ -76,38 +68,53 @@ const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
-  const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
-  const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
+  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
 
   return (
     <>
       <ScaffoldDivider />
-      {project?.cloud_provider !== 'FLY' && (
-        <>
-          <InstanceConfiguration />
-          <ScaffoldDivider />
-        </>
-      )}
+      {project?.cloud_provider !== 'FLY' &&
+        (unifiedReplication ? (
+          <ScaffoldContainer>
+            <ScaffoldSection isFullWidth>
+              <NoticeBar
+                visible={true}
+                type="default"
+                title="Management of read replicas has moved"
+                description="Read replicas is now managed under Replication in the Database section."
+                actions={
+                  <Button type="default" asChild>
+                    <Link href={`/project/${ref}/database/replication`} className="!no-underline">
+                      Go to Replication
+                    </Link>
+                  </Button>
+                }
+              />
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        ) : (
+          <>
+            <InstanceConfiguration />
+            <ScaffoldDivider />
+          </>
+        ))}
 
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <h4 className="text-base capitalize m-0">Service versions</h4>
             <p className="text-foreground-light text-sm pr-8 mt-1">
               Service versions and upgrade eligibility for your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             {isInactive ? (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_>
-                  Service versions cannot be retrieved while project is paused
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Restoring the project will update Postgres to the newest version
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              <Admonition
+                type="note"
+                showIcon={false}
+                title="Service versions cannot be retrieved while project is paused"
+                description="Restoring the project will update Postgres to the newest version"
+              />
             ) : (
               <>
                 {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
@@ -149,7 +156,7 @@ const InfrastructureInfo = () => {
                             isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="warning" className="mr-1 capitalize">
+                                  <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
@@ -174,7 +181,7 @@ const InfrastructureInfo = () => {
                             isOnLatestVersion && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="brand" className="mr-1">
+                                  <Badge variant="success" className="mr-1">
                                     Latest
                                   </Badge>
                                 </TooltipTrigger>
@@ -189,7 +196,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {showDatabaseUpgrades && data.eligible ? (
+                    {showDatabaseUpgrades && data && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -197,20 +204,8 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && !data.eligible ? (
-                      hasObjectsToBeDropped ? (
-                        <ObjectsToBeDroppedWarning
-                          objectsToBeDropped={data.objects_to_be_dropped}
-                        />
-                      ) : hasUnsupportedExtensions ? (
-                        <UnsupportedExtensionsWarning
-                          unsupportedExtensions={data.unsupported_extensions}
-                        />
-                      ) : hasObjectsInternalSchema ? (
-                        <UserDefinedObjectsInInternalSchemasWarning
-                          objects={data.user_defined_objects_in_internal_schemas}
-                        />
-                      ) : null
+                    {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
                     ) : null}
                   </>
                 )}
@@ -222,5 +217,3 @@ const InfrastructureInfo = () => {
     </>
   )
 }
-
-export default InfrastructureInfo

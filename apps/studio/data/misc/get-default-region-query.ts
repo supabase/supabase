@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { useFlag } from 'common'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
@@ -10,7 +10,7 @@ import { fetchHandler } from 'data/fetchers'
 import { getDistanceLatLonKM, tryParseJson } from 'lib/helpers'
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { miscKeys } from './keys'
 
 export type DefaultRegionVariables = {
@@ -70,7 +70,10 @@ export type DefaultRegionError = ResponseError
 
 export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   { cloudProvider, useRestrictedPool }: DefaultRegionVariables,
-  { enabled = true, ...options }: UseQueryOptions<DefaultRegionData, DefaultRegionError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DefaultRegionData, DefaultRegionError, TData> = {}
 ) => {
   // [Joshen] Flag allows us to specify restricted regions for users based on percentage
   const restrictedPoolFlag = useFlag('defaultRegionRestrictedPool')

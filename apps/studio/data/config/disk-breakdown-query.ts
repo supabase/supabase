@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import type { ResponseError } from 'types'
-import { configKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { configKeys } from './keys'
 
 export type DiskBreakdownVariables = {
   projectRef?: string
@@ -50,7 +50,10 @@ export type DiskBreakdownError = ResponseError
 
 export const useDiskBreakdownQuery = <TData = DiskBreakdownData>(
   { projectRef, connectionString }: DiskBreakdownVariables,
-  { enabled = true, ...options }: UseQueryOptions<DiskBreakdownData, DiskBreakdownError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DiskBreakdownData, DiskBreakdownError, TData> = {}
 ) =>
   useQuery<DiskBreakdownData, DiskBreakdownError, TData>({
     queryKey: configKeys.diskBreakdown(projectRef),

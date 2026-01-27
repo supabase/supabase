@@ -3,11 +3,11 @@ import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constant
 import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import { Loading } from 'components/ui/Loading'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -24,7 +24,7 @@ export const LogPage: NextPageWithLayout = () => {
 
   // Prevent showing logs while checking plan or loading config
   if (isOrgPlanLoading || isFreePlan) {
-    return <Loading />
+    return <LogoLoader />
   }
 
   return (

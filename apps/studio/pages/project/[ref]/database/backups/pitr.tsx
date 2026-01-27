@@ -3,16 +3,14 @@ import { AlertCircle } from 'lucide-react'
 
 import { useParams } from 'common'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
+import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNotice'
+import { PITRSelection } from 'components/interfaces/Database/Backups/PITR/PITRSelection'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -21,22 +19,40 @@ import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <div className="space-y-6">
-            <FormHeader className="!mb-0" title="Database Backups" />
-            <DatabaseBackupsNav active="pitr" />
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Backups</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+        <PageHeaderNavigationTabs>
+          <DatabaseBackupsNav active="pitr" />
+        </PageHeaderNavigationTabs>
+      </PageHeader>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
             <div className="space-y-8">
               <PITR />
             </div>
-          </div>
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 
@@ -51,9 +67,16 @@ const PITR = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const isOrioleDbInAws = useIsOrioleDbInAws()
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const {
+    data: backups,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef })
 
   const plan = organization?.plan?.id
+  const isFreePlan = plan === 'free'
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -86,12 +109,13 @@ const PITR = () => {
         <>
           {!isEnabled ? (
             <UpgradeToPro
-              addon="pitr"
+              addon={isFreePlan ? undefined : 'pitr'}
               source="pitr"
-              primaryText="Point in Time Recovery is a Pro Plan add-on."
+              featureProposition="enable Point in Time Recovery"
+              primaryText="Point in Time Recovery is a Pro Plan add-on"
               secondaryText={
-                plan === 'free'
-                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge — PITR is an optional upgrade that starts at $100/month.'
+                isFreePlan
+                  ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
             />
