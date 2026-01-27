@@ -27,7 +27,7 @@ interface ConnectionPanelProps {
   description: string
   contentFooter?: ReactNode
   connectionString: string
-  ipv4Status: {
+  ipv4Status?: {
     type: 'error' | 'success'
     title: string
     description?: string | ReactNode
@@ -123,7 +123,7 @@ export const ConnectionPanel = ({
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
   const isSessionMode = poolingConfiguration?.pool_mode === 'session'
 
-  const links = ipv4Status.links ?? []
+  const links = ipv4Status?.links ?? []
 
   const isTransactionDedicatedPooler = type === 'transaction' && badge === 'Dedicated Pooler'
 
@@ -189,7 +189,7 @@ export const ConnectionPanel = ({
           )}
         </div>
         <div className="flex flex-col -space-y-px w-full">
-          {IS_PLATFORM && (
+          {IS_PLATFORM && ipv4Status && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
                 <IPv4StatusIcon active={ipv4Status.type === 'success'} />
@@ -219,7 +219,7 @@ export const ConnectionPanel = ({
             </div>
           )}
 
-          {type === 'session' && (
+          {IS_PLATFORM && type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
               <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
                 <WarningIcon />
@@ -234,7 +234,7 @@ export const ConnectionPanel = ({
             </div>
           )}
 
-          {IS_PLATFORM && ipv4Status.type === 'error' && (
+          {IS_PLATFORM && ipv4Status?.type === 'error' && (
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild

@@ -1,5 +1,6 @@
 import { components } from 'api-types'
-import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'lib/constants/api'
+import { PROJECT_DB_HOST, PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'lib/constants/api'
+import { POSTGRES_PORT } from './constants'
 import { assertSelfHosted } from './util'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
@@ -28,10 +29,10 @@ export function getProjectSettings() {
     },
     cloud_provider: 'AWS',
     db_dns_name: '-',
-    db_host: 'localhost',
+    db_host: PROJECT_DB_HOST,
     db_ip_addr_config: 'legacy' as const,
     db_name: 'postgres',
-    db_port: 5432,
+    db_port: POSTGRES_PORT,
     db_user: 'postgres',
     inserted_at: '2021-08-02T06:40:40.646Z',
     jwt_secret:
