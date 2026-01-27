@@ -3,7 +3,7 @@
     "react-hooks/exhaustive-deps": 216,
     "import/no-anonymous-default-export": 57,
     "@tanstack/query/exhaustive-deps": 14,
-    "@typescript-eslint/no-explicit-any": 1294
+    "@typescript-eslint/no-explicit-any": 1291
   },
   "ruleFiles": {
     "react-hooks/exhaustive-deps": {
@@ -350,8 +350,6 @@
       "components/interfaces/HomeNew/ProjectUsageSection.tsx": 1,
       "components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet.tsx": 1,
       "components/interfaces/Integrations/CronJobs/CronJobTableCell.tsx": 2,
-      "components/interfaces/Integrations/CronJobs/CronJobs.utils.tsx": 1,
-      "components/interfaces/Integrations/CronJobs/CronJobsTab.tsx": 1,
       "components/interfaces/Integrations/CronJobs/PreviousRunsTab.tsx": 2,
       "components/interfaces/Integrations/GraphQL/GraphiQLTab.tsx": 1,
       "components/interfaces/Integrations/Landing/Integrations.constants.tsx": 1,
@@ -744,7 +742,6 @@
       "pages/project/[ref]/api/index.tsx": 3,
       "pages/project/[ref]/auth/templates/[templateId].tsx": 1,
       "pages/project/[ref]/functions/[functionSlug]/index.tsx": 3,
-      "pages/project/[ref]/merge.tsx": 1,
       "pages/project/[ref]/settings/log-drains.tsx": 1,
       "pages/project/[ref]/storage/files/buckets/[bucketId].tsx": 1,
       "state/ai-assistant-state.tsx": 4,
