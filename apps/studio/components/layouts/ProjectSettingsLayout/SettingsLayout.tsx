@@ -52,7 +52,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
-    legacyJwtKeys: legacyJWTKeysEnabled,
     logDrains: projectSettingsLogDrains,
     billing: billingAll,
   })

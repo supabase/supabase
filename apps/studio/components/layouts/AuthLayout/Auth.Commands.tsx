@@ -120,6 +120,13 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/url-configuration`,
         defaultHidden: true,
       },
+      {
+        id: 'nav-auth-jwt',
+        name: 'JWT',
+        value: 'Auth: JWT',
+        route: `/project/${ref}/auth/jwt`,
+        defaultHidden: true,
+      },
       ...(authenticationAttackProtection
         ? [
             {

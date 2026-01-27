@@ -340,7 +340,7 @@ const JWTSettings = () => {
                               icon={<ExternalLink className="size-4" />}
                               asChild
                             >
-                              <Link href={`/project/${projectRef}/settings/jwt/signing-keys`}>
+                              <Link href={`/project/${projectRef}/auth/jwt`}>
                                 Go to JWT Signing Keys
                               </Link>
                             </Button>

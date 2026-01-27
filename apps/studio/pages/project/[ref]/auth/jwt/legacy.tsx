@@ -1,7 +1,7 @@
 import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from 'types'
 
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
@@ -51,7 +51,7 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
   }, [jwtSecretUpdateStatus])
 
   if (!projectSettingsLegacyJwtKeys) {
-    return <UnknownInterface urlBack={`/project/${projectRef}/settings/jwt/signing-keys`} />
+    return <UnknownInterface urlBack={`/project/${projectRef}/auth/jwt`} />
   }
 
   return (
@@ -63,7 +63,7 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
 
 JWTKeysLegacyPage.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>{page}</SettingsLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

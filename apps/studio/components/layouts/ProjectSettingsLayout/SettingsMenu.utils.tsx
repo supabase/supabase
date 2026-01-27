@@ -15,7 +15,6 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    legacyJwtKeys?: boolean
     logDrains?: boolean
     billing?: boolean
   }
@@ -42,7 +41,6 @@ export const generateSettingsMenu = (
   const authProvidersEnabled = features?.authProviders ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
-  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const billingEnabled = features?.billing ?? true
 
   return [
@@ -87,15 +85,6 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/api-keys/new`,
           items: [],
         },
-        {
-          name: 'JWT Keys',
-          key: 'jwt',
-          url: legacyJwtKeysEnabled
-            ? `/project/${ref}/settings/jwt`
-            : `/project/${ref}/settings/jwt/signing-keys`,
-          items: [],
-        },
-
         {
           name: `Log Drains`,
           key: `log-drains`,
