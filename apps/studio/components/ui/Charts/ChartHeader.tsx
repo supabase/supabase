@@ -102,12 +102,10 @@ export const ChartHeader = ({
       return formatBytes(bytesValue, valuePrecision)
     }
 
-<<<<<<< HEAD
     if (format === '%') {
       return formatPercentage(value, valuePrecision)
     }
-    return numberFormatter(value, valuePrecision)
-=======
+
     const formattedValue = numberFormatter(value, valuePrecision)
 
     if (typeof format === 'string' && format) {
@@ -115,7 +113,6 @@ export const ChartHeader = ({
     }
 
     return formattedValue
->>>>>>> 670b29461596470603a4df0ad2d921ed6f81dbbb
   }
 
   useEffect(() => {
