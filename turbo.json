@@ -155,6 +155,7 @@
         "NEXT_PUBLIC_UI_LIBRARY_URL",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "MISC_USE_SERVICE_ROLE_KEY",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_API_URL",
@@ -208,7 +209,9 @@
         "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY"
+        "CUSTOMERIO_APP_API_KEY",
+        "HUBSPOT_API_KEY",
+        "HUBSPOT_PARTNER_WORKFLOW_ID"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

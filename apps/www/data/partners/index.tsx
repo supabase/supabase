@@ -40,7 +40,7 @@ export default {
     ),
     cta: {
       label: 'Become a Partner',
-      link: 'https://forms.supabase.com/partner',
+      link: '/partners/apply',
     },
   },
   oAuthApp: {
