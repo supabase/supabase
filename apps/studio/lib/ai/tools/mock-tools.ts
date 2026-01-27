@@ -169,9 +169,7 @@ function createMockedRenderingTools() {
   ) as typeof renderingTools
 }
 
-function createMockListTablesTool(
-  overrideData?: Record<string, typeof MOCK_TABLES_DATA>
-) {
+function createMockListTablesTool(overrideData?: Record<string, typeof MOCK_TABLES_DATA>) {
   return tool({
     description: 'Lists tables and columns for the provided schemas.',
     inputSchema: listTablesInputSchema,
