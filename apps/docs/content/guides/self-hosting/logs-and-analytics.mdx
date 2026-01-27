@@ -1,0 +1,94 @@
+---
+id: logs-and-analytics
+title: Logs and Analytics
+description: Step-by-step guide to setting up Logs and Analytics in self-hosted Supabase.
+---
+
+This guide provides a step-by-step process for setting up the Analytics and Logging stack in a self-hosted Supabase environment.
+
+## Overview
+
+The Supabase Analytics stack consists of:
+
+- **Studio**: The dashboard interface for viewing logs.
+- **Analytics (Logflare)**: The ingestion and query engine.
+- **Vector**: The log forwarding pipeline that collects logs from Docker containers and sends them to Analytics.
+- **Database**: Either Postgres or BigQuery for storing the logs.
+
+By default, the self-hosted setup uses a Postgres backend for logs.
+
+## 1. Enable services in Docker compose
+
+Ensure that the `analytics` and `vector` services are enabled in your `docker-compose.yml` file.
+
+In the [official Supabase Docker example](https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml), these services are included by default.
+
+- `analytics`: Runs the `supabase/logflare` image.
+- `vector`: Runs the `timberio/vector` image with a custom configuration.
+
+## 2. Set required environment variables
+
+You need to configure the API keys used by Vector to communicate with the Analytics server. Update your `.env` file with the following variables:
+
+```bash
+# These should be long, secure strings. They cannot be the same value.
+LOGFLARE_PUBLIC_ACCESS_TOKEN=your-super-secret-public-token
+LOGFLARE_PRIVATE_ACCESS_TOKEN=your-super-secret-private-token
+```
+
+Refer to the [docker/.env.example](https://github.com/supabase/supabase/blob/master/docker/.env.example) for other necessary variables.
+
+## 3. Ingestion pipeline (Vector)
+
+Vector collects logs from your Docker containers, transforms them into the format expected by Studio, and forwards them to the Analytics server.
+
+The default configuration is located at [docker/volumes/logs/vector.yml](https://github.com/supabase/supabase/blob/master/docker/volumes/logs/vector.yml).
+
+If you are using a custom logging pipeline, ensure your payloads match the expected schema structure.
+
+## 4. Send test logs (curl)
+
+You can verify that your ingestion pipeline is working by sending a test log event directly to the Analytics server or through the Kong proxy.
+
+### Example: Send a Postgres log event via kong
+
+Note that for Postgres logs, Studio expects `project: "default"` and `metadata.parsed.error_severity` to be present.
+
+```bash
+curl -X POST "http://localhost:8000/analytics/v1/api/logs?source_name=postgres.logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your-super-secret-public-token" \
+  -d '{
+    "project": "default",
+    "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",
+    "event_message": "test connection",
+    "metadata": {
+      "host": "db-default",
+      "parsed": {
+        "error_severity": "INFO"
+      }
+    }
+  }'
+```
+
+## 5. Verify in Studio
+
+1. Open Supabase Studio (usually at `http://localhost:8000`).
+2. Navigate to **Logs** in the sidebar.
+3. You should see the logs appearing in the **Logs Explorer**.
+
+### Field reference
+
+The Field Reference panel in the Logs Explorer is based on the definitions in [packages/shared-data/logConstants.ts](https://github.com/supabase/supabase/blob/master/packages/shared-data/logConstants.ts). If you add custom metadata, it must match the paths defined in this file to be searchable in Studio.
+
+## 6. Custom sink checklist
+
+If you are not using Vector and want to send logs from another source:
+
+- **Top-level fields**: Ensure `project`, `timestamp`, `event_message`, and `metadata` are present.
+- **Project field**: Preserve the `project` field (set to `"default"` for docker-compose/local), otherwise Studio may not display logs.
+- **Metadata structure**: Match the nested paths in `logConstants.ts`.
+- **Source names**: Use known source names like `postgres.logs`, `gotrue.logs.prod`, etc.
+- **Authentication**: Use the `x-api-key` header with your `LOGFLARE_PUBLIC_ACCESS_TOKEN`.
+
+For more details on the Analytics server configuration, see the [Self-hosting Analytics Reference](/docs/reference/self-hosting-analytics/introduction).
