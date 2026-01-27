@@ -22,6 +22,7 @@ import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 // Convert the existing yup passwordSchema to Zod
 const passwordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
   password: z
     .string()
     .min(1, 'Password is required')
@@ -44,18 +45,23 @@ const ResetPasswordForm = () => {
   const router = useRouter()
   const [showConditions, setShowConditions] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
+  const [currentPasswordHidden, setCurrentPasswordHidden] = useState(true)
 
   const form = useForm<FormData>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
       password: '',
+      currentPassword: '',
     },
     mode: 'onChange',
   })
 
   const onResetPassword = async (data: FormData) => {
     const toastId = toast.loading('Saving password...')
-    const { error } = await auth.updateUser({ password: data.password })
+    const { error } = await auth.updateUser({
+      password: data.password,
+      currentPassword: data.currentPassword,
+    })
 
     if (!error) {
       toast.success('Password saved successfully!', { id: toastId })
@@ -74,28 +80,59 @@ const ResetPasswordForm = () => {
       <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
         <FormField_Shadcn_
           control={form.control}
+          name="currentPassword"
+          render={({ field }) => (
+            <FormItem_Shadcn_>
+              <FormControl_Shadcn_>
+                <div onBlur={() => setCurrentPasswordHidden(true)}>
+                  <Input
+                    id="currentPassword"
+                    type={currentPasswordHidden ? 'password' : 'text'}
+                    label="Current password"
+                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                    disabled={form.formState.isSubmitting}
+                    actions={
+                      <Button
+                        icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
+                        type="default"
+                        className="!mr-1"
+                        onClick={() => setCurrentPasswordHidden((prev) => !prev)}
+                      />
+                    }
+                    {...field}
+                  />
+                </div>
+              </FormControl_Shadcn_>
+              <FormMessage_Shadcn_ />
+            </FormItem_Shadcn_>
+          )}
+        />
+        <FormField_Shadcn_
+          control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem_Shadcn_>
               <FormControl_Shadcn_>
-                <Input
-                  id="password"
-                  type={passwordHidden ? 'password' : 'text'}
-                  label="Password"
-                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                  disabled={form.formState.isSubmitting}
-                  onFocus={() => setShowConditions(true)}
-                  autoComplete="new-password"
-                  actions={
-                    <Button
-                      icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      type="default"
-                      className="!mr-1"
-                      onClick={() => setPasswordHidden((prev) => !prev)}
-                    />
-                  }
-                  {...field}
-                />
+                <div onBlur={() => setPasswordHidden(true)}>
+                  <Input
+                    id="password"
+                    type={passwordHidden ? 'password' : 'text'}
+                    label="Password"
+                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                    disabled={form.formState.isSubmitting}
+                    onFocus={() => setShowConditions(true)}
+                    autoComplete="new-password"
+                    actions={
+                      <Button
+                        icon={passwordHidden ? <Eye /> : <EyeOff />}
+                        type="default"
+                        className="!mr-1"
+                        onClick={() => setPasswordHidden((prev) => !prev)}
+                      />
+                    }
+                    {...field}
+                  />
+                </div>
               </FormControl_Shadcn_>
               <FormMessage_Shadcn_ />
             </FormItem_Shadcn_>
