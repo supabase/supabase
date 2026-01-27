@@ -178,7 +178,6 @@ export function mapResponseToAnalyticsData(
         }
       })
 
-      // Aggregate 1m data to 2m if needed
       if (needs2MinAggregation) {
         dataPoints = aggregate1MinTo2Min(dataPoints)
       }
@@ -210,7 +209,6 @@ export function mapResponseToAnalyticsData(
     }
   })
 
-  // Aggregate 1m data to 2m if needed
   if (needs2MinAggregation) {
     dataPoints = aggregate1MinTo2Min(dataPoints)
   }
