@@ -4,11 +4,11 @@ import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const useBucketPolicyCount = () => {
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
+  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({
     projectRef: project?.ref,
   })
-  const { data: policiesData = [], isLoading: isLoadingPolicies } = useDatabasePoliciesQuery({
+  const { data: policiesData = [], isPending: isLoadingPolicies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'storage',

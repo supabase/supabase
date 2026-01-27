@@ -22,6 +22,7 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (
@@ -166,6 +167,9 @@ const PostgrestReport = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

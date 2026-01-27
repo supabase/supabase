@@ -716,7 +716,7 @@ function createStorageExplorerState({
           })
         }
 
-        if (state.openedFolders[columnIndex].name === folder.name) {
+        if (state.openedFolders[columnIndex]?.name === folder.name) {
           state.setSelectedFilePreview(undefined)
           state.popOpenedFoldersAtIndex(columnIndex - 1)
         }
@@ -987,7 +987,7 @@ function createStorageExplorerState({
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
-        .find(configKeys.storage(state.projectRef))?.state.data as
+        .find({ queryKey: configKeys.storage(state.projectRef) })?.state.data as
         | ProjectStorageConfigResponse
         | undefined
       const fileSizeLimit = storageConfiguration?.fileSizeLimit

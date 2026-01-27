@@ -1,9 +1,9 @@
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useAnalyticsBucketDeleteCleanUp } from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 
 export interface DeleteAnalyticsBucketModalProps {

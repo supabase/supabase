@@ -17,7 +17,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const store = useTabsStateSnapshot()
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedTable, isLoading } = useTableEditorQuery({
+  const { data: selectedTable, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,

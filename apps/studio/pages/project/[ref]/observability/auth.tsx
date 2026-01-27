@@ -38,6 +38,7 @@ import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateR
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -243,7 +244,7 @@ const AuthUsage = () => {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-8 pb-24">
+        <div className="mt-8 flex flex-col gap-8 pb-8">
           <div className="flex flex-col gap-4" id="usage">
             <div>
               <ReportSectionHeader
@@ -363,6 +364,9 @@ const AuthUsage = () => {
           </div>
         </div>
       </ReportStickyNav>
+      <div className="pb-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

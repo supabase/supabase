@@ -66,7 +66,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const {
     data: branches = [],
     error: branchesError,
-    isLoading: isLoadingBranches,
+    isPending: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })

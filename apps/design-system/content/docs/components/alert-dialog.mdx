@@ -1,15 +1,18 @@
 ---
 title: Alert Dialog
-description: A modal dialog that interrupts the user with important content and expects a response.
-featured: true
+description: A modal dialog for critical confirmations and acknowledgements that require an explicit user decision.
 component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/alert-dialog
   api: https://www.radix-ui.com/docs/primitives/components/alert-dialog#api-reference
 source:
-  radix: true
   shadcn: true
+  radix: true
 ---
+
+Alert Dialog interrupts the user’s workflow to communicate critical information or confirm an action that cannot be taken lightly. It presents a short, focused message and requires the user to explicitly confirm or cancel before proceeding.
+
+Use Alert Dialog for actions such as deleting data, performing irreversible changes, or acknowledging important warnings where dismissal without a decision would be unsafe.
 
 <ComponentPreview name="alert-dialog-demo" peekCode wide />
 
@@ -85,3 +88,32 @@ import {
   </AlertDialogContent>
 </AlertDialog>
 ```
+
+## Behavior
+
+Unlike a generic [Dialog](../components/dialog), an Alert Dialog cannot be dismissed by clicking outside the modal. The user must take an explicit action by confirming, cancelling, or pressing Escape.
+
+This enforced decision helps prevent accidental dismissal of critical warnings or destructive actions.
+
+## Guidelines
+
+- **Keep content concise:** AlertDialogDescription renders as a single paragraph and must not contain block-level elements such as lists, multiple paragraphs, or complex layouts.
+- **Use for critical decisions only:** Reserve Alert Dialog for destructive or irreversible actions, or for warnings that require explicit acknowledgement.
+- **Always provide a cancel action:** Include AlertDialogCancel so users can safely back out, in addition to supporting the Escape key.
+- **Avoid rich content:** If the dialog requires detailed explanations, callouts, or form inputs, use [Confirmation Modal](../fragments/confirmation-modal) or [Dialog](../components/dialog) instead.
+
+See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
+
+## Examples
+
+### Close only
+
+<ComponentPreview name="alert-dialog-close-only" />
+
+### Warning
+
+<ComponentPreview name="alert-dialog-warning" />
+
+### Destructive
+
+<ComponentPreview name="alert-dialog-destructive" />

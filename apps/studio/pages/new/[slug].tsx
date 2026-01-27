@@ -51,17 +51,12 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  DOCS_URL,
-  PROJECT_STATUS,
-  PROVIDERS,
-  useDefaultProvider,
-} from 'lib/constants'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
-import { Button, Form_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -88,10 +83,10 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const isHomeNew = useFlag('homeNew')
+  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-  const isNotOnTeamOrEnterprisePlan = !['team', 'enterprise'].includes(currentOrg?.plan.id ?? '')
+  const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -103,20 +98,8 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
-  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
-  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
-
-  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
-    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      refinementContext.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dbPass'],
-        message: passwordStrengthWarning || 'Password not secure enough',
-      })
-    }
-  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -128,6 +111,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
+      dbPassStrengthMessage: '',
       dbRegion: undefined,
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
@@ -136,7 +120,12 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
-  const { instanceSize: watchedInstanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  const {
+    instanceSize: watchedInstanceSize,
+    cloudProvider,
+    dbRegion,
+    organization,
+  } = useWatch_Shadcn_({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -162,10 +151,10 @@ const Wizard: NextPageWithLayout = () => {
   const hasOAuthApps = approvedOAuthApps.length > 0
 
   const { data: allOverdueInvoices = [] } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
+    enabled: isNotOnHigherPlan,
   })
   const overdueInvoices = allOverdueInvoices.filter((x) => x.organization_id === currentOrg?.id)
-  const hasOutstandingInvoices = isNotOnTeamOrEnterprisePlan && overdueInvoices.length > 0
+  const hasOutstandingInvoices = isNotOnHigherPlan && overdueInvoices.length > 0
 
   const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
   const allOrgProjects = useMemo(
@@ -224,16 +213,18 @@ const Wizard: NextPageWithLayout = () => {
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
 
-  const dbRegionExact = smartRegionToExactRegion(dbRegion)
+  const dbRegionExact = smartRegionToExactRegion(dbRegion ?? '')
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
+      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion ?? '',
       organizationSlug: organization,
     },
     { enabled: currentOrg !== null }
   )
+
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
 
   const {
     mutate: createProject,
@@ -245,6 +236,9 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          dataApiEnabled: form.getValues('dataApi'),
+          useApiSchema: form.getValues('useApiSchema'),
+          useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
           project: res.ref,
@@ -420,12 +414,7 @@ const Wizard: NextPageWithLayout = () => {
 
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
-                    <DatabasePasswordInput
-                      form={form}
-                      passwordStrengthMessage={passwordStrengthMessage}
-                      setPasswordStrengthMessage={setPasswordStrengthMessage}
-                      setPasswordStrengthWarning={setPasswordStrengthWarning}
-                    />
+                    <DatabasePasswordInput form={form} />
 
                     <RegionSelector
                       form={form}
@@ -456,6 +445,23 @@ const Wizard: NextPageWithLayout = () => {
                     {showAdvancedConfig && !!availableOrioleVersion && (
                       <AdvancedConfiguration form={form} />
                     )}
+
+                    {shouldShowFreeProjectInfo ? (
+                      <Admonition
+                        className="rounded-none border-0"
+                        type="note"
+                        title="Need a free project?"
+                        description={
+                          <p>
+                            You can have up to 2 free projects across all organizations.{' '}
+                            <Link className="underline text-foreground" href="/new">
+                              Create a free organization
+                            </Link>{' '}
+                            to use them.
+                          </p>
+                        }
+                      />
+                    ) : null}
                   </>
                 )}
 

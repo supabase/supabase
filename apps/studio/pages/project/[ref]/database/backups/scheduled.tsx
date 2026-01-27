@@ -10,7 +10,6 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
@@ -26,11 +25,18 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const {
+    data: backups,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef })
 
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled
@@ -75,7 +81,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                   <>
                     {!isPitrEnabled && (
                       <p className="text-sm text-foreground-light">
-                        Projects are backed up daily around midnight of your project's region and
+                        Projects are backed up daily around midnight of your project’s region and
                         can be restored at any time.
                       </p>
                     )}

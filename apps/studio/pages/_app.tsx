@@ -15,12 +15,13 @@ import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/typography.scss'
 import 'styles/ui.scss'
+import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -41,13 +42,13 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
+import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
@@ -56,6 +57,7 @@ import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
+import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 
@@ -120,7 +122,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
-          <Hydrate state={pageProps.dehydratedState}>
+          <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
               <FeatureFlagProvider
                 API_URL={API_URL}
@@ -139,6 +141,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
                       }}
                     />
+                    {/* Speed up initial API loading times by pre-connecting to the API domain */}
+                    {IS_PLATFORM && (
+                      <link
+                        rel="preconnect"
+                        href={new URL(API_URL).origin}
+                        crossOrigin="use-credentials"
+                      />
+                    )}
                   </Head>
                   <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                   <TooltipProvider delayDuration={0}>
@@ -149,28 +159,30 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         enableSystem
                         disableTransitionOnChange
                       >
-                        <AppBannerContextProvider>
+                        <AiAssistantStateContextProvider>
                           <CommandProvider>
                             <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
+                              <MainScrollContainerProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                              </MainScrollContainerProvider>
                               <StudioCommandMenu />
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>
                             <SonnerToaster position="top-right" />
                             <MonacoThemeProvider />
                           </CommandProvider>
-                        </AppBannerContextProvider>
+                        </AiAssistantStateContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
                   <Telemetry />
                   {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                   )}
                 </ProfileProvider>
               </FeatureFlagProvider>
             </AuthProvider>
-          </Hydrate>
+          </HydrationBoundary>
         </NuqsAdapter>
       </QueryClientProvider>
       <TelemetryTagManager />

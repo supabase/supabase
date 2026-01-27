@@ -287,7 +287,7 @@ export interface paths {
      * Gets all projects for the given organization
      * @description Returns a paginated list of projects for the specified organization.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['v1-get-all-projects-for-organization']
     put?: never
@@ -308,6 +308,8 @@ export interface paths {
     /**
      * List all projects
      * @description Returns a list of all projects you've previously created.
+     *
+     *     Use `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.
      */
     get: operations['v1-list-all-projects']
     put?: never
@@ -2094,6 +2096,10 @@ export interface components {
       external_workos_enabled: boolean | null
       external_workos_secret: string | null
       external_workos_url: string | null
+      external_x_client_id: string | null
+      external_x_email_optional: boolean | null
+      external_x_enabled: boolean | null
+      external_x_secret: string | null
       external_zoom_client_id: string | null
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
@@ -2171,6 +2177,9 @@ export interface components {
       nimbus_oauth_client_id: string | null
       nimbus_oauth_client_secret: string | null
       nimbus_oauth_email_optional: boolean | null
+      oauth_server_allow_dynamic_registration: boolean
+      oauth_server_authorization_path: string | null
+      oauth_server_enabled: boolean
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -3113,9 +3122,9 @@ export interface components {
           name: string
         }[]
         /** @enum {string} */
-        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         /** @enum {string|null} */
-        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
         valid: boolean
         warnings: {
           key: string
@@ -3283,6 +3292,10 @@ export interface components {
       eligible: boolean
       latest_app_version: string
       legacy_auth_custom_roles: string[]
+      /**
+       * @deprecated
+       * @description Use validation_errors instead.
+       */
       objects_to_be_dropped: string[]
       target_upgrade_versions: {
         app_version: string
@@ -3291,8 +3304,68 @@ export interface components {
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
+      /**
+       * @deprecated
+       * @description Use validation_errors instead.
+       */
       unsupported_extensions: string[]
+      /**
+       * @deprecated
+       * @description Use validation_errors instead.
+       */
       user_defined_objects_in_internal_schemas: string[]
+      validation_errors: (
+        | {
+            dependents: string[]
+            /** @enum {string} */
+            type: 'objects_depending_on_pg_cron'
+          }
+        | {
+            index_name: string
+            schema_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'indexes_referencing_ll_to_earth'
+          }
+        | {
+            function_name: string
+            lang_name: string
+            schema_name: string
+            /** @enum {string} */
+            type: 'function_using_obsolete_lang'
+          }
+        | {
+            extension_name: string
+            /** @enum {string} */
+            type: 'unsupported_extension'
+          }
+        | {
+            fdw_handler_name: string
+            fdw_name: string
+            /** @enum {string} */
+            type: 'unsupported_fdw_handler'
+          }
+        | {
+            schema_name: string
+            sequence_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'unlogged_table_with_persistent_sequence'
+          }
+        | {
+            obj_name: string
+            /** @enum {string} */
+            obj_type: 'table' | 'function'
+            schema_name: string
+            /** @enum {string} */
+            type: 'user_defined_objects_in_internal_schemas'
+          }
+        | {
+            slot_name: string
+            /** @enum {string} */
+            type: 'active_replication_slot'
+          }
+      )[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
@@ -3676,6 +3749,10 @@ export interface components {
       external_workos_enabled?: boolean | null
       external_workos_secret?: string | null
       external_workos_url?: string | null
+      external_x_client_id?: string | null
+      external_x_email_optional?: boolean | null
+      external_x_enabled?: boolean | null
+      external_x_secret?: string | null
       external_zoom_client_id?: string | null
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
@@ -3752,6 +3829,9 @@ export interface components {
       mfa_web_authn_verify_enabled?: boolean | null
       nimbus_oauth_client_id?: string | null
       nimbus_oauth_client_secret?: string | null
+      oauth_server_allow_dynamic_registration?: boolean | null
+      oauth_server_authorization_path?: string | null
+      oauth_server_enabled?: boolean | null
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -4352,7 +4432,7 @@ export interface components {
         | 'AI_LOG_GENERATOR_OPT_IN'
       )[]
       /** @enum {string} */
-      plan?: 'free' | 'pro' | 'team' | 'enterprise'
+      plan?: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
     }
     V1PatchMigrationBody: {
       name?: string
@@ -4559,6 +4639,10 @@ export interface components {
     }
     V1ServiceHealthResponse: {
       error?: string
+      /**
+       * @deprecated
+       * @description Deprecated. Use `status` instead.
+       */
       healthy: boolean
       info?:
         | {
@@ -4570,6 +4654,10 @@ export interface components {
         | {
             connected_cluster: number
             db_connected: boolean
+            /**
+             * @deprecated
+             * @description Deprecated. Use `status` instead.
+             */
             healthy: boolean
           }
         | {

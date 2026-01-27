@@ -48,7 +48,7 @@ export const usePrimaryDatabase = ({ projectRef }: { projectRef?: string }) => {
   const {
     data: databases = [],
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useReadReplicasQuery({ projectRef })

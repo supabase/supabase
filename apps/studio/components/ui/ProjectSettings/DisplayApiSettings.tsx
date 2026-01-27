@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -28,12 +28,12 @@ export const DisplayApiSettings = ({
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
@@ -51,12 +51,19 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
-    projectRef!
-  )
+  const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
+  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery({
+    projectRef: projectRef ?? '',
+    enabled: showApiKeyLastUsed,
+  })
 
   const lastUsedAPIKeys = useMemo(() => {
-    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
+    if (
+      apiKeys.length < 1 ||
+      !lastUsedLogData ||
+      lastUsedLogData.length < 1 ||
+      !showApiKeyLastUsed
+    ) {
       return {}
     }
 
@@ -67,7 +74,7 @@ export const DisplayApiSettings = ({
       console.error(e)
       return {}
     }
-  }, [lastUsedLogData, apiKeys])
+  }, [lastUsedLogData, apiKeys, showApiKeyLastUsed])
 
   return (
     <Panel
@@ -199,14 +206,16 @@ export const DisplayApiSettings = ({
               />
             </FormLayout>
 
-            <div
-              className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
-              data-invisible={isLoadingLastUsed}
-            >
-              {lastUsedAPIKeys[x.api_key]
-                ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                : 'No requests in the past 24 hours.'}
-            </div>
+            {showApiKeyLastUsed && (
+              <div
+                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                data-invisible={isLoadingLastUsed}
+              >
+                {lastUsedAPIKeys[x.api_key]
+                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                  : 'No requests in the past 24 hours.'}
+              </div>
+            )}
           </Panel.Content>
         ))
       )}
