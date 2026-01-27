@@ -39,18 +39,22 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   })
 
   const diskBreakdownBytes = useMemo(() => {
+    const fsUsedBytes = diskUtil?.metrics.fs_used_bytes ?? 0
+    const dbSizeBytes = Math.max(0, diskBreakdown?.db_size_bytes ?? 0)
+    const walSizeBytes = Math.max(0, diskBreakdown?.wal_size_bytes ?? 0)
+    const otherBytes = Math.max(
+      0,
+      fsUsedBytes - dbSizeBytes - walSizeBytes
+    )
+
     return {
       availableBytes: diskUtil?.metrics.fs_avail_bytes ?? 0,
-      totalUsedBytes: diskUtil?.metrics.fs_used_bytes ?? 0,
+      totalUsedBytes: fsUsedBytes,
       totalDiskSizeBytes: diskUtil?.metrics.fs_size_bytes,
-      dbSizeBytes: Math.max(0, diskBreakdown?.db_size_bytes ?? 0),
-      walSizeBytes: Math.max(0, diskBreakdown?.wal_size_bytes ?? 0),
-      systemBytes: Math.max(
-        0,
-        (diskUtil?.metrics.fs_used_bytes ?? 0) -
-          (diskBreakdown?.db_size_bytes ?? 0) -
-          (diskBreakdown?.wal_size_bytes ?? 0)
-      ),
+      dbSizeBytes,
+      walSizeBytes,
+      systemBytes: otherBytes,
+      otherBytes,
     }
   }, [diskUtil, diskBreakdown])
 
@@ -59,7 +63,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
 
   const totalSize = formState.defaultValues?.totalSize || 0
   const usedSizeTotal = Math.round(((diskBreakdownBytes?.totalUsedBytes ?? 0) / GB) * 100) / 100
-  const usedTotalPercentage = Math.min((usedSizeTotal / totalSize) * 100, 100)
+  const usedTotalPercentage = totalSize > 0 ? Math.min((usedSizeTotal / totalSize) * 100, 100) : 0
 
   const usedSizeDatabase = Math.round(((diskBreakdownBytes?.dbSizeBytes ?? 0) / GB) * 100) / 100
   const usedPercentageDatabase =
@@ -224,7 +228,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
             name="System"
             size={diskBreakdownBytes.systemBytes}
             color="bg-destructive-500"
-            description="Reserved space for the system to ensure your database runs smoothly. You cannot modify this."
+            description="Reserved space for the system, temp files, and other objects to ensure your database runs smoothly. You cannot modify this."
           />
 
           <LegendItem
@@ -241,8 +245,9 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
         <span>{formatBytes(diskBreakdownBytes?.dbSizeBytes, 2, 'GB')}</span>), additional files like
         the write-ahead log (currently{' '}
         <span>{formatBytes(diskBreakdownBytes?.walSizeBytes, 2, 'GB')}</span>), and other system
-        resources (currently <span>{formatBytes(diskBreakdownBytes?.systemBytes, 2, 'GB')}</span>).
-        Data can take 5 minutes to refresh.
+        resources including temp files (currently{' '}
+        <span>{formatBytes(diskBreakdownBytes?.systemBytes, 2, 'GB')}</span>). The percentage shown
+        matches the exported metrics and accounts for all disk usage. Data can take 5 minutes to refresh.
       </p>
     </div>
   )
