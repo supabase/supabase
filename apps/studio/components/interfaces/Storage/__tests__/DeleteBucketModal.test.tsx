@@ -63,7 +63,7 @@ describe(`DeleteBucketModal`, () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // useBucketsQuery
+    // usePaginatedBucketsQuery
     addAPIMock({
       method: `get`,
       path: `/platform/storage/:ref/buckets`,
