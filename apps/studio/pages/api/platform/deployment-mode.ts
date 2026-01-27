@@ -2,8 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -14,6 +12,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.setHeader('Allow', ['GET'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
+}
+
+export default function deploymentMode(req: NextApiRequest, res: NextApiResponse) {
+  return apiWrapper(req, res, handler)
 }
 
 type ResponseData = {
