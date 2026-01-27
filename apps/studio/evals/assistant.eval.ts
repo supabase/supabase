@@ -26,7 +26,9 @@ Eval('Assistant', {
     const result = await generateAssistantResponse({
       model: openai('gpt-5-mini'),
       messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input.prompt }] }],
-      tools: await getMockTools(input.mockToolOutputs),
+      tools: await getMockTools(
+        input.mockTables ? { list_tables: input.mockTables } : undefined
+      ),
     })
 
     const finishReason = await result.finishReason

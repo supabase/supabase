@@ -11,13 +11,14 @@ const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
 type Input = {
   prompt: string
-  mockToolOutputs?: {
-    list_tables?: Array<{
+  mockTables?: Record<
+    string,
+    Array<{
       name: string
       rls_enabled: boolean
       columns: Array<{ name: string; data_type: string }>
     }>
-  }
+  >
 }
 
 type Output = {
@@ -285,7 +286,6 @@ export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = a
     return null
   }
 
-  const tables = input.mockToolOutputs?.list_tables ?? MOCK_TABLES_DATA
   const errors: string[] = []
   let totalNeedingQuotes = 0
   let properlyQuoted = 0

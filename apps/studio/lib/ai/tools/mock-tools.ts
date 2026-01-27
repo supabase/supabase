@@ -169,7 +169,9 @@ function createMockedRenderingTools() {
   ) as typeof renderingTools
 }
 
-function createMockListTablesTool(overrideData?: typeof MOCK_TABLES_DATA) {
+function createMockListTablesTool(
+  overrideData?: Record<string, typeof MOCK_TABLES_DATA>
+) {
   return tool({
     description: 'Lists tables and columns for the provided schemas.',
     inputSchema: listTablesInputSchema,
@@ -177,7 +179,7 @@ function createMockListTablesTool(overrideData?: typeof MOCK_TABLES_DATA) {
       const effectiveSchemas = schemas?.length ? schemas : ['public']
       return effectiveSchemas.map((schema) => ({
         schema,
-        tables: overrideData ?? MOCK_TABLES_DATA,
+        tables: overrideData?.[schema] ?? MOCK_TABLES_DATA,
       }))
     },
   })
@@ -294,7 +296,7 @@ function createMockListPoliciesTool() {
 }
 
 export type MockToolOverrides = {
-  list_tables?: typeof MOCK_TABLES_DATA
+  list_tables?: Record<string, typeof MOCK_TABLES_DATA>
 }
 
 /**

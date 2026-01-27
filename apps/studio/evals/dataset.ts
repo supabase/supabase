@@ -67,8 +67,8 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt: 'Select all rows from the locations table where locationType is "office"',
-      mockToolOutputs: {
-        list_tables: [
+      mockTables: {
+        public: [
           {
             name: 'locations',
             rls_enabled: false,
@@ -77,6 +77,28 @@ export const dataset: AssistantEvalCase[] = [
               { name: 'locationType', data_type: 'text' },
               { name: 'locationName', data_type: 'text' },
               { name: 'createdAt', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+    },
+    metadata: { category: ['sql_generation'] },
+  },
+  {
+    input: {
+      prompt: 'Select all rows from the MySchema.products table',
+      mockTables: {
+        MySchema: [
+          {
+            name: 'products',
+            rls_enabled: false,
+            columns: [
+              { name: 'id', data_type: 'bigint' },
+              { name: 'name', data_type: 'text' },
+              { name: 'price', data_type: 'numeric' },
             ],
           },
         ],
