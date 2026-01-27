@@ -40,7 +40,7 @@ export function useInfraMonitoringQueries(
   endDate: string,
   interval: AnalyticsInterval,
   databaseIdentifier: string | undefined,
-  data: AnalyticsData | undefined,
+  data: unknown,
   isVisible: boolean
 ) {
   const shouldFetch = data === undefined && isVisible
