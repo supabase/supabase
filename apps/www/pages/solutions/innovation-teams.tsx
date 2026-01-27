@@ -229,7 +229,10 @@ const InnovationTeams: NextPage = () => {
                     <h3 className="text-lg text-foreground font-medium mb-4">{customer.name}</h3>
                     <ul className="space-y-3 mb-6 flex-grow">
                       {customer.highlights.map((highlight: string, i: number) => (
-                        <li key={i} className="flex items-start gap-3 text-foreground-lighter text-sm">
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 text-foreground-lighter text-sm"
+                        >
                           <Check className="w-4 h-4 text-brand shrink-0 mt-0.5" />
                           <span>{highlight}</span>
                         </li>
@@ -313,10 +316,7 @@ const InnovationTeams: NextPage = () => {
                       <p className="text-foreground-lighter text-sm mb-6 flex-grow">
                         {option.description}
                       </p>
-                      <Button
-                        type={index === 0 ? 'primary' : 'default'}
-                        asChild
-                      >
+                      <Button type={index === 0 ? 'primary' : 'default'} asChild>
                         <Link href={option.cta.href}>{option.cta.label}</Link>
                       </Button>
                     </div>
