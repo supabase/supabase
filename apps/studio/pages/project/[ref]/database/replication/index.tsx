@@ -6,7 +6,6 @@ import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -37,10 +36,6 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
                   analytics platforms in real-time
                 </p>
               </div>
-              <AlphaNotice
-                entity="Replication"
-                feedbackUrl="https://github.com/orgs/supabase/discussions/39416"
-              />
             </ScaffoldSection>
           </ScaffoldContainer>
 
