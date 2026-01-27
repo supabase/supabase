@@ -80,8 +80,11 @@ export function getIntegrationCommandName(integration: IntegrationDefinition): s
 }
 
 export function useCreateCommandsConfig() {
-  let { ref } = useParams()
-  ref ||= '_'
+  const { ref: urlRef } = useParams()
+
+  // Use '_' as fallback for route building, but keep undefined for API queries
+  const ref = urlRef ?? '_'
+
   const setPage = useSetPage()
   const { openSidebar } = useSidebarManagerSnapshot()
   const snap = useAiAssistantStateSnapshot()
@@ -107,7 +110,7 @@ export function useCreateCommandsConfig() {
     data: authConfig,
     isError: isAuthConfigError,
     isPending: isAuthConfigLoading,
-  } = useAuthConfigQuery({ projectRef: ref })
+  } = useAuthConfigQuery({ projectRef: urlRef })
 
   const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
   const entitledHookSet = getEntitledHookSet()
@@ -155,8 +158,8 @@ export function useCreateCommandsConfig() {
   // Storage
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan.id === 'free'
-  const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
-  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
+  const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: urlRef })
+  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: urlRef })
 
   // Integrations
   const { installedIntegrations } = useInstalledIntegrations()
