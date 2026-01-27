@@ -320,6 +320,309 @@
       }
     },
     {
+      "name": "passwordless-auth-nextjs",
+      "type": "registry:block",
+      "title": "Passwordless Auth for Next.js and Supabase",
+      "description": "Passwordless authentication for Next.js using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/components/magic-link-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/components/otp-request-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/components/otp-verify-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/components/passwordless-login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/auth/magic-link/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/magic-link/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/auth/otp/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/otp/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/auth/verify-otp/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/verify-otp/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/auth/passwordless/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/passwordless/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/auth/confirm/route.ts",
+          "type": "registry:page",
+          "target": "app/auth/confirm/route.ts"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/auth/error/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/error/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/app/protected/page.tsx",
+          "type": "registry:page",
+          "target": "app/protected/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-nextjs/middleware.ts",
+          "type": "registry:file",
+          "target": "middleware.ts"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "passwordless-auth-react",
+      "type": "registry:block",
+      "title": "Passwordless Auth for React and Supabase",
+      "description": "Passwordless authentication for React using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods. Components only, no routing included.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/passwordless-auth-react/components/passwordless-login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react/components/magic-link-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react/components/otp-request-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react/components/otp-verify-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "passwordless-auth-react-router",
+      "type": "registry:block",
+      "title": "Passwordless Auth for React Router and Supabase",
+      "description": "Passwordless authentication for React Router using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@react-router/dev@latest",
+        "@react-router/fs-routes@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/components/passwordless-login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/components/magic-link-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/components/otp-request-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/components/otp-verify-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/auth.confirm.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.confirm.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/auth.error.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/passwordless.tsx",
+          "type": "registry:file",
+          "target": "app/routes/passwordless.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/verify-otp.tsx",
+          "type": "registry:file",
+          "target": "app/routes/verify-otp.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/protected.tsx",
+          "type": "registry:file",
+          "target": "app/routes/protected.tsx"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "passwordless-auth-tanstack",
+      "type": "registry:block",
+      "title": "Passwordless Auth for TanStack and Supabase",
+      "description": "Passwordless authentication for TanStack using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/components/passwordless-login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/components/magic-link-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/components/otp-request-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/components/otp-verify-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/__root.tsx",
+          "type": "registry:file",
+          "target": "routes/__root.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/index.tsx",
+          "type": "registry:file",
+          "target": "routes/index.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/passwordless.tsx",
+          "type": "registry:file",
+          "target": "routes/passwordless.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/auth/error.tsx",
+          "type": "registry:file",
+          "target": "routes/auth/error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/_protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/_protected/protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/auth/confirm.ts",
+          "type": "registry:file",
+          "target": "routes/auth/confirm.ts"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routes/verify-otp.tsx",
+          "type": "registry:file",
+          "target": "routes/verify-otp.tsx"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/blocks/passwordless-auth-tanstack/routeTree.gen.ts",
+          "type": "registry:file",
+          "target": "routeTree.gen.ts"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
       "name": "social-auth-nextjs",
       "type": "registry:block",
       "title": "Social Auth flow for Nextjs and Supabase",

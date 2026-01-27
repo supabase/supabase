@@ -1,0 +1,55 @@
+{
+  "name": "passwordless-auth-react-router",
+  "type": "registry:block",
+  "title": "Passwordless Auth for React Router and Supabase",
+  "description": "Passwordless authentication for React Router using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods.",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@react-router/dev@latest",
+    "@react-router/fs-routes@latest"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/components/passwordless-login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/components/magic-link-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/components/otp-request-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/components/otp-verify-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/auth.confirm.tsx",
+      "type": "registry:file",
+      "target": "app/routes/auth.confirm.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/auth.error.tsx",
+      "type": "registry:file",
+      "target": "app/routes/auth.error.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/passwordless.tsx",
+      "type": "registry:file",
+      "target": "app/routes/passwordless.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/verify-otp.tsx",
+      "type": "registry:file",
+      "target": "app/routes/verify-otp.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react-router/app/routes/protected.tsx",
+      "type": "registry:file",
+      "target": "app/routes/protected.tsx"
+    }
+  ]
+}
