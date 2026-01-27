@@ -167,6 +167,7 @@ export const ProjectTableRow = ({
                 <Button
                   type="default"
                   icon={<MoreVertical />}
+                  aria-label="More actions"
                   className="w-7"
                   onClick={(e) => e.stopPropagation()}
                 />
