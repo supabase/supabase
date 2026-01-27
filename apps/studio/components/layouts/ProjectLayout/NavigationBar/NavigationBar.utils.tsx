@@ -11,8 +11,7 @@ import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEdito
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 // Helper to safely build project URLs when ref might be undefined
-const projectUrl = (ref: string | undefined, path: string) =>
-  ref ? `/project/${ref}/${path}` : ''
+const projectUrl = (ref: string | undefined, path: string) => (ref ? `/project/${ref}/${path}` : '')
 
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
