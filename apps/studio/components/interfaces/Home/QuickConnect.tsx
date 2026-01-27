@@ -93,9 +93,9 @@ const QuickConnect = () => {
           </Button>
         </div>
 
-        <div className="flex flex-wrap gap-7 md:gap-5">
+        <div className="flex flex-col gap-7 md:flex-row md:gap-5">
           {QUICK_CONNECT_LEFT_CONFIG.columns.map((column) => (
-            <div key={column.id} className="flex-1 flex flex-col basis-[150px] gap-7">
+            <div key={column.id} className="flex-1 flex flex-col gap-7">
               {column.sections.map((section) => (
                 <div key={section.id} className="flex flex-col gap-2.5">
                   <p className="text-xs font-mono text-foreground-lighter">{section.label}</p>
@@ -126,22 +126,21 @@ const QuickConnect = () => {
         </div>
       </div>
 
-      <div>
+      <div className="">
         <div className="pb-3">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
+          <div className="flex items-end justify-between gap-3">
             <div className="space-y-1">
               <div className="text-sm">{QUICK_CONNECT_RIGHT_CARD_CONFIG.title}</div>
               <p className="text-xs text-foreground-light">
                 {QUICK_CONNECT_RIGHT_CARD_CONFIG.description}
               </p>
             </div>
-            <div className="flex items-center flex-1 md:flex-[0]">
-              <div className="inline-flex flex-1 items-center gap-0.5 rounded-lg border border-border-strong bg-surface-100 p-0.5">
+            <div className="flex items-center">
+              <div className="inline-flex items-center gap-0.5 rounded-lg border border-border-strong bg-surface-100 p-0.5">
                 <Button
                   type={selectedApiTab === 'api-keys' ? 'secondary' : 'text'}
                   size="tiny"
                   className="h-6 px-3 text-xs"
-                  block
                   onClick={() => setSelectedApiTab('api-keys')}
                 >
                   API Keys
@@ -150,7 +149,6 @@ const QuickConnect = () => {
                   type={selectedApiTab === 'connection-string' ? 'secondary' : 'text'}
                   size="tiny"
                   className="h-6 px-3 text-xs"
-                  block
                   onClick={() => setSelectedApiTab('connection-string')}
                 >
                   Connection String

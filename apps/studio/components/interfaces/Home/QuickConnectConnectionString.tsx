@@ -11,7 +11,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import type { Database } from 'data/read-replicas/replicas-query'
 import { DOCS_URL } from 'lib/constants'
 import { BookOpen, Plug } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -27,6 +27,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const QuickConnectConnectionString = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
 
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
@@ -84,6 +85,23 @@ export const QuickConnectConnectionString = () => {
     } else {
       setQuerySource(databaseId)
     }
+  }
+
+  const handleOpenConnectDialog = () => {
+    const { pathname, query } = router
+
+    const nextQuery: Record<string, string> = {
+      ...Object.fromEntries(Object.entries(query).map(([key, value]) => [key, String(value)])),
+      showConnect: 'true',
+      connectTab: 'direct',
+    }
+
+    // Ensure type, source, and method are set from current state
+    if (type) nextQuery.type = type
+    if (querySource) nextQuery.source = querySource
+    if (method) nextQuery.method = method
+
+    router.push({ pathname, query: nextQuery }, undefined, { shallow: true })
   }
 
   const selectedDatabase = useMemo<Database | undefined>(() => {
@@ -245,13 +263,13 @@ export const QuickConnectConnectionString = () => {
       </div>
 
       <Button
-        asChild
         type="default"
         size="tiny"
         icon={<Plug className="rotate-90" />}
         className="mt-1 h-7 justify-center px-3 text-xs"
+        onClick={handleOpenConnectDialog}
       >
-        <Link href={`/project/${projectRef}/database/settings`}>View connection settings</Link>
+        View connection settings
       </Button>
     </div>
   )
