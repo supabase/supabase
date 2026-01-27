@@ -94,4 +94,14 @@ export const dataset: AssistantEvalCase[] = [
         'Uses quotes around schema/table/columns with capital letters, special characters, and reserved keywords.',
     },
   },
+  {
+    input: { prompt: 'Where can I go to create a support ticket?' },
+    expected: {
+      correctAnswer: 'https://supabase.com/dashboard/support/new',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Verifies AI provides valid support ticket URL',
+    },
+  },
 ]

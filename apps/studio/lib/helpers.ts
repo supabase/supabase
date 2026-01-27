@@ -258,6 +258,23 @@ export const isValidHttpUrl = (value: string) => {
 }
 
 /**
+ * Extract URLs from text using regex for URL detection
+ * Matches URLs with protocols (http/https) and common domain patterns
+ * @param text - The text to extract URLs from
+ * @returns Array of extracted URLs with trailing punctuation removed
+ */
+export const extractUrls = (text: string): string[] => {
+  // Regex matches URLs with protocols (http/https)
+  // Handles: domains, ports, paths, query params, and fragments
+  // Pattern: https?://domain(:port)?(/path)?(?query)?(#fragment)?
+  const urlRegex = /https?:\/\/(?:[-\w.])+(?::\d+)?(?:\/(?:[\w\/_.~!*'();:@&=+$,?#[\]%-])*)?/gi
+  const matches = text.match(urlRegex)
+  if (!matches) return []
+  // Remove trailing punctuation that might have been captured (common in text)
+  return matches.map((url) => url.replace(/[.,;:!?)]+$/, ''))
+}
+
+/**
  * Helper function to remove comments from SQL.
  * Disclaimer: Doesn't work as intended for nested comments.
  */

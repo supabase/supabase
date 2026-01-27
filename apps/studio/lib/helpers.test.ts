@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   detectBrowser,
   detectOS,
+  extractUrls,
   formatBytes,
   formatCurrency,
   getDatabaseMajorVersion,
@@ -308,6 +309,103 @@ describe('isValidHttpUrl', () => {
     const result = isValidHttpUrl('not a url')
 
     expect(result).toBe(false)
+  })
+})
+
+describe('extractUrls', () => {
+  it('should extract basic http URLs', () => {
+    const result = extractUrls('Visit http://example.com for more info')
+    expect(result).toEqual(['http://example.com'])
+  })
+
+  it('should extract basic https URLs', () => {
+    const result = extractUrls('Check out https://supabase.com')
+    expect(result).toEqual(['https://supabase.com'])
+  })
+
+  it('should extract URLs with ports', () => {
+    const result = extractUrls('Connect to http://localhost:3000')
+    expect(result).toEqual(['http://localhost:3000'])
+  })
+
+  it('should extract URLs with paths', () => {
+    const result = extractUrls('Go to https://example.com/path/to/page')
+    expect(result).toEqual(['https://example.com/path/to/page'])
+  })
+
+  it('should extract URLs with query parameters', () => {
+    const result = extractUrls('Visit https://example.com/search?q=test&page=1')
+    expect(result).toEqual(['https://example.com/search?q=test&page=1'])
+  })
+
+  it('should extract URLs with fragments', () => {
+    const result = extractUrls('See https://example.com/page#section')
+    expect(result).toEqual(['https://example.com/page#section'])
+  })
+
+  it('should extract URLs with complex paths, query params, and fragments', () => {
+    const result = extractUrls('Check https://example.com/api/v1/users?id=123&name=test#details')
+    expect(result).toEqual(['https://example.com/api/v1/users?id=123&name=test#details'])
+  })
+
+  it('should extract multiple URLs from text', () => {
+    const result = extractUrls('Visit http://example.com and https://supabase.com for more info')
+    expect(result).toEqual(['http://example.com', 'https://supabase.com'])
+  })
+
+  it('should remove trailing punctuation from URLs', () => {
+    const result = extractUrls('Visit https://example.com.')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should remove multiple trailing punctuation marks', () => {
+    const result = extractUrls('Check https://example.com!!!')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should remove trailing punctuation including parentheses', () => {
+    const result = extractUrls('See (https://example.com)')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should handle URLs with trailing commas and periods', () => {
+    const result = extractUrls('Visit https://example.com, and https://supabase.com.')
+    expect(result).toEqual(['https://example.com', 'https://supabase.com'])
+  })
+
+  it('should return empty array when no URLs are found', () => {
+    const result = extractUrls('This is just plain text with no URLs')
+    expect(result).toEqual([])
+  })
+
+  it('should return empty array for empty string', () => {
+    const result = extractUrls('')
+    expect(result).toEqual([])
+  })
+
+  it('should handle URLs in parentheses', () => {
+    const result = extractUrls('Check out (https://example.com) for details')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should be case insensitive for protocol', () => {
+    const result = extractUrls('Visit HTTP://EXAMPLE.COM and HTTPS://SUPABASE.COM')
+    expect(result).toEqual(['HTTP://EXAMPLE.COM', 'HTTPS://SUPABASE.COM'])
+  })
+
+  it('should handle URLs with special characters in path', () => {
+    const result = extractUrls('Visit https://example.com/path_with_underscores/file-name.txt')
+    expect(result).toEqual(['https://example.com/path_with_underscores/file-name.txt'])
+  })
+
+  it('should handle URLs with encoded characters', () => {
+    const result = extractUrls('Visit https://example.com/search?q=hello%20world')
+    expect(result).toEqual(['https://example.com/search?q=hello%20world'])
+  })
+
+  it('should handle URLs with subdomains', () => {
+    const result = extractUrls('Visit https://www.example.com and https://api.example.com')
+    expect(result).toEqual(['https://www.example.com', 'https://api.example.com'])
   })
 })
 
