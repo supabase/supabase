@@ -66,68 +66,19 @@ export const dataset: AssistantEvalCase[] = [
   },
   {
     input: {
-      prompt: 'Select all rows from the locations table where locationType is "office"',
-      mockTables: {
-        public: [
-          {
-            name: 'locations',
-            rls_enabled: false,
-            columns: [
-              { name: 'id', data_type: 'bigint' },
-              { name: 'locationType', data_type: 'text' },
-              { name: 'locationName', data_type: 'text' },
-              { name: 'createdAt', data_type: 'timestamp with time zone' },
-            ],
-          },
-        ],
-      },
-    },
-    expected: {
-      requiredTools: ['execute_sql'],
-    },
-    metadata: {
-      category: ['sql_generation'],
-      description: 'Uses quotes around column name with capital letter',
-    },
-  },
-  {
-    input: {
-      prompt: 'Select all rows from the MySchema.products table',
+      prompt:
+        'Show me customer name, order date, order, and user from the order history table in MySchema where order is not null',
       mockTables: {
         MySchema: [
-          {
-            name: 'products',
-            rls_enabled: false,
-            columns: [
-              { name: 'id', data_type: 'bigint' },
-              { name: 'name', data_type: 'text' },
-              { name: 'price', data_type: 'numeric' },
-            ],
-          },
-        ],
-      },
-    },
-    expected: {
-      requiredTools: ['execute_sql'],
-    },
-    metadata: {
-      category: ['sql_generation'],
-      description: 'Uses quotes around schema name with capital letter',
-    },
-  },
-  {
-    input: {
-      prompt: 'Select all rows from the order-history table where the order column is not null',
-      mockTables: {
-        public: [
           {
             name: 'order-history',
             rls_enabled: false,
             columns: [
               { name: 'id', data_type: 'bigint' },
-              { name: 'order', data_type: 'uuid' },
               { name: 'customerName', data_type: 'text' },
               { name: 'order-date', data_type: 'timestamp with time zone' },
+              { name: 'order', data_type: 'uuid' },
+              { name: 'user', data_type: 'text' },
               { name: 'total', data_type: 'numeric' },
             ],
           },
@@ -139,7 +90,8 @@ export const dataset: AssistantEvalCase[] = [
     },
     metadata: {
       category: ['sql_generation'],
-      description: 'Uses quotes around table name with special character',
+      description:
+        'Uses quotes around schema/table/columns with capital letters, special characters, and reserved keywords.',
     },
   },
 ]
