@@ -24,6 +24,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -548,8 +549,13 @@ const Reports = () => {
         confirmLabel="Confirm"
         onConfirm={() => {
           setConfirmNavigate(true)
+          let urlToNavigate = navigateUrl ?? '/'
+          if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
+            urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
+          }
+          if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
           setNavigateUrl(undefined)
-          router.push(navigateUrl ?? '/')
+          router.push(urlToNavigate)
         }}
         onCancel={() => setNavigateUrl(undefined)}
       >

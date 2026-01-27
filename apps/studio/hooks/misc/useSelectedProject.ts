@@ -10,7 +10,10 @@ export function useSelectedProjectQuery({ enabled = true } = {}) {
     {
       enabled,
       select: (data) => {
-        return { ...data, parentRef: data.parent_project_ref ?? data.ref }
+        return {
+          ...data,
+          parentRef: data.parent_project_ref ?? data.ref,
+        }
       },
     }
   )
