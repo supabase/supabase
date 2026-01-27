@@ -88,7 +88,7 @@ type DataPointWithFormatted = DataPoint & {
   periodStartFormatted: string
 }
 
-const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithFormatted[] => {
+export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithFormatted[] => {
   const aggregated = new Map<string, AggregatedBucket>()
   const valueKeys = new Set<string>()
 
