@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.12.17-sha-43f4f7f
+    image: supabase/studio:2025.12.23-sha-f3af2c3
     restart: unless-stopped
     healthcheck:
       test:
@@ -59,7 +59,10 @@ services:
       NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
       # Uncomment to use Big Query backend for analytics
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
-
+      SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
+    volumes:
+      - ./volumes/snippets:/app/snippets:Z
+  
   kong:
     container_name: supabase-kong
     image: kong:2.8.1
@@ -232,6 +235,7 @@ services:
       APP_NAME: realtime
       SEED_SELF_HOST: "true"
       RUN_JANITOR: "true"
+      DISABLE_HEALTHCHECK_LOGGING: "true"
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
