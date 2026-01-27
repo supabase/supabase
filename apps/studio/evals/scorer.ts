@@ -47,6 +47,7 @@ export type AssistantEvalCaseCategory =
 
 export type AssistantEvalCaseMetadata = {
   category?: AssistantEvalCaseCategory[]
+  description?: string
 }
 
 export type AssistantEvalCase = EvalCase<Input, Expected, AssistantEvalCaseMetadata>

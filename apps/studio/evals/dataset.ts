@@ -85,7 +85,10 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredTools: ['execute_sql'],
     },
-    metadata: { category: ['sql_generation'] },
+    metadata: {
+      category: ['sql_generation'],
+      description: 'Uses quotes around column name with capital letter',
+    },
   },
   {
     input: {
@@ -107,6 +110,36 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredTools: ['execute_sql'],
     },
-    metadata: { category: ['sql_generation'] },
+    metadata: {
+      category: ['sql_generation'],
+      description: 'Uses quotes around schema name with capital letter',
+    },
+  },
+  {
+    input: {
+      prompt: 'Select all rows from the order-history table where the order column is not null',
+      mockTables: {
+        public: [
+          {
+            name: 'order-history',
+            rls_enabled: false,
+            columns: [
+              { name: 'id', data_type: 'bigint' },
+              { name: 'order', data_type: 'uuid' },
+              { name: 'customerName', data_type: 'text' },
+              { name: 'order-date', data_type: 'timestamp with time zone' },
+              { name: 'total', data_type: 'numeric' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+    },
+    metadata: {
+      category: ['sql_generation'],
+      description: 'Uses quotes around table name with special character',
+    },
   },
 ]
