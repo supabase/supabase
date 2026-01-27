@@ -196,6 +196,25 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 
 [Reference.](/docs/reference/javascript/storage-from-download)
 
+<Admonition type="note">
+
+The `download` method may return stale data if the file was recently updated, due to caching.
+To ensure you get the latest version, create a signed URL and fetch it with `cache: 'no-store'`:
+
+```js
+const { data } = await supabase.storage
+  .from('avatars')
+  .createSignedUrl('public/avatar1.png', 60) // URL valid for 60 seconds
+
+if (data) {
+  const response = await fetch(data.signedUrl, { cache: 'no-store' })
+  const blob = await response.blob()
+  // Use blob as needed (e.g., create object URL, read as text, etc.)
+}
+```
+
+</Admonition>
+
 </TabPanel>
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
