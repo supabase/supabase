@@ -4,6 +4,8 @@ import { RowsChangeData } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { SupaRow } from 'components/grid/types'
+import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -15,11 +17,14 @@ import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export function useOnRowsChange(rows: SupaRow[]) {
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorTableStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
@@ -88,8 +93,6 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       if (!previousRow || !changedColumn) return
 
-      const updatedData = { [changedColumn]: rowData[changedColumn] }
-
       const enumArrayColumns = snap.originalTable.columns
         ?.filter((column) => {
           return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
@@ -106,7 +109,6 @@ export function useOnRowsChange(rows: SupaRow[]) {
               : previousRow[column.name]
         })
 
-      const configuration = { identifiers }
       if (Object.keys(identifiers).length === 0) {
         return toast('Unable to update row as table has no primary keys', {
           description: (
@@ -123,16 +125,46 @@ export function useOnRowsChange(rows: SupaRow[]) {
         })
       }
 
-      mutateUpdateTableRow({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        table: snap.originalTable,
-        configuration,
-        payload: updatedData,
-        enumArrayColumns,
-        roleImpersonationState: getImpersonatedRoleState(),
-      })
+      const configuration = { identifiers }
+
+      if (isQueueOperationsEnabled) {
+        queueCellEditWithOptimisticUpdate({
+          queryClient,
+          queueOperation: tableEditorSnap.queueOperation,
+          projectRef: project.ref,
+          tableId: snap.table.id,
+          table: snap.originalTable,
+          rowIdentifiers: identifiers,
+          columnName: changedColumn,
+          oldValue: previousRow[changedColumn],
+          newValue: rowData[changedColumn],
+          enumArrayColumns,
+        })
+      } else {
+        // Default behavior: immediately save the change
+        const updatedData = { [changedColumn]: rowData[changedColumn] }
+
+        mutateUpdateTableRow({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: snap.originalTable,
+          configuration,
+          payload: updatedData,
+          enumArrayColumns,
+          roleImpersonationState: getImpersonatedRoleState(),
+        })
+      }
     },
-    [getImpersonatedRoleState, mutateUpdateTableRow, project, rows, snap.originalTable]
+    [
+      getImpersonatedRoleState,
+      isQueueOperationsEnabled,
+      mutateUpdateTableRow,
+      project,
+      rows,
+      snap.originalTable,
+      snap.table.id,
+      tableEditorSnap,
+      queryClient,
+    ]
   )
 }

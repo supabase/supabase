@@ -22,7 +22,13 @@ Choose your Supabase platform, project, and MCP client and follow the installati
 
 ### Next steps
 
-Your AI tool is now connected to your Supabase project or account using remote MCP. Try asking the AI tool to query your database using natural language commands.
+Your MCP client automatically redirects you to log in to Supabase during setup. This opens a browser window where you can log in to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with.
+
+After you log in, check that the MCP server is connected. For instance, in Cursor, navigate to **Settings > Cursor Settings > Tools & MCP**. Depending on the client, you may need to restart it to connect and detect all tools after authorization.
+
+To verify the client has access to the MCP server tools, try asking it to query your project or database using natural language. For example: "What tables are there in the database? Use MCP tools."
+
+For curated, ready-to-use prompts that work well with IDEs and AI agents, see our [AI Prompts](/guides/getting-started/ai-prompts) collection.
 
 ## Manual authentication
 
@@ -106,3 +112,7 @@ We recommend the following best practices to mitigate security risks when using 
 - **Project scoping**: Scope your MCP server to a [specific project](https://github.com/supabase-community/supabase-mcp#project-scoped-mode), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
 - **Feature groups**: The server allows you to enable or disable specific [tool groups](https://github.com/supabase-community/supabase-mcp#feature-groups), so you can control which tools are available to the LLM. This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
+
+## On GitHub
+
+The MCP server repository is available at [github.com/supabase-community/supabase-mcp](https://github.com/supabase-community/supabase-mcp).

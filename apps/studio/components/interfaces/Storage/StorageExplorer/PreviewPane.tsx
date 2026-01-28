@@ -145,7 +145,10 @@ export const PreviewPane = () => {
       leaveFrom="transform opacity-100"
       leaveTo="transform opacity-0"
     >
-      <div className="h-full border-l border-overlay bg-surface-100 p-4" style={{ width }}>
+      <div
+        className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
+        style={{ width }}
+      >
         {/* Preview Header */}
         <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
           <X

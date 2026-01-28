@@ -109,6 +109,13 @@ const PageSectionDescription = ({ className, children, ...props }: PageSectionDe
     <div
       data-slot="page-section-description"
       className={cn('text-sm text-foreground-light', className)}
+      // Optically align with bottom of PageSectionAside
+      // trim-end is not available in Tailwind CSS
+      style={
+        {
+          textBoxTrim: 'trim-end',
+        } as React.CSSProperties
+      }
       {...props}
     >
       {children}
@@ -132,7 +139,12 @@ const PageSectionAside = ({ className, ...props }: PageSectionAsideProps) => {
   return (
     <div
       data-slot="page-section-aside"
-      className={cn('flex items-center gap-2', className)}
+      className={cn(
+        'flex items-center gap-2',
+        // Align with bottom of PageSectionDescription
+        '@xl:self-end',
+        className
+      )}
       {...props}
     />
   )
@@ -159,6 +171,8 @@ const PageSectionMeta = ({ className, children, ...props }: PageSectionMetaProps
         className={cn(
           'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
           '[&>[data-slot="page-section-summary"]]:flex-1',
+          // Center alignment with PageSectionAside in case no PageSectionDescription present
+          '[&>[data-slot="page-section-summary"]]:@xl:self-center',
           '[&>[data-slot="page-section-aside"]]:shrink-0',
           className
         )}

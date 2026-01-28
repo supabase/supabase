@@ -1,7 +1,10 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { Badge, RadioGroupStacked, RadioGroupStackedItem, cn } from 'ui'
+
+import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 type DestinationTypeSelectionProps = {
   editMode: boolean
@@ -14,6 +17,7 @@ export const DestinationTypeSelection = ({
   selectedType,
   setSelectedType,
 }: DestinationTypeSelectionProps) => {
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
   const etlEnableBigQuery = useFlag('etlEnableBigQuery')
   const etlEnableIceberg = useFlag('etlEnableIceberg')
@@ -66,7 +70,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <BigQuery size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>BigQuery</p>
+                <div className="flex items-center gap-x-2">
+                  <p>BigQuery</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Google Cloud's data warehouse for analytics and business intelligence
                 </p>
@@ -85,7 +92,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <AnalyticsBucket size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>Analytics Bucket</p>
+                <div className="flex items-center gap-x-2">
+                  <p>Analytics Bucket</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics
                   workflows
@@ -95,6 +105,15 @@ export const DestinationTypeSelection = ({
           </RadioGroupStackedItem>
         )}
       </RadioGroupStacked>
+
+      {selectedType !== 'Read Replica' && enablePgReplicate && (
+        <p className="mt-3 text-sm text-foreground-light">
+          Replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
+          <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+            Leave feedback
+          </InlineLink>
+        </p>
+      )}
     </div>
   )
 }

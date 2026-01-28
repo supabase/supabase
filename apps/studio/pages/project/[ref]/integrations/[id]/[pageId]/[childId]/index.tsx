@@ -6,6 +6,7 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { useCronJobsEstimatePrefetch } from 'hooks/misc/useCronJobsEstimatePrefetch'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -22,6 +23,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
+
+  useCronJobsEstimatePrefetch(id)
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()

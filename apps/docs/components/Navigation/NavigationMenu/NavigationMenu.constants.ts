@@ -1483,6 +1483,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Generating Python Types',
+      url: '/guides/api/rest/generating-python-types',
+      items: [],
+    },
+    {
       name: 'Tools',
       url: '/guides/api',
       items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
@@ -1845,6 +1850,10 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Realtime Reports',
+          url: '/guides/realtime/reports' as `/${string}`,
+        },
+        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes' as `/${string}`,
         },
@@ -1866,7 +1875,7 @@ export const realtime: NavMenuConstant = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Quotas', url: '/guides/realtime/quotas', enabled: billingEnabled },
+        { name: 'Limits', url: '/guides/realtime/limits', enabled: billingEnabled },
         {
           name: 'Pricing',
           url: '/guides/realtime/pricing' as `/${string}`,

@@ -8,6 +8,7 @@ import { useInstalledIntegrations } from 'components/interfaces/Integrations/Lan
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useCronJobsEstimatePrefetch } from 'hooks/misc/useCronJobsEstimatePrefetch'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -42,6 +43,8 @@ const IntegrationPage: NextPageWithLayout = () => {
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
   const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
+
+  useCronJobsEstimatePrefetch(id)
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
