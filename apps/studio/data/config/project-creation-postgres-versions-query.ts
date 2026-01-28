@@ -58,7 +58,7 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
 
 export const useAvailableOrioleImageVersion = (
   { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
-  { enabled = true }: { enabled?: boolean }
+  { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { data } = useProjectCreationPostgresVersionsQuery(
     {
