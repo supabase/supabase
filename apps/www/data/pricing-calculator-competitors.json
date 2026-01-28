@@ -1,0 +1,71 @@
+{
+  "as_of": "2026-01-21",
+  "currency": "USD",
+  "assumptions": [
+    "All costs are monthly list prices and exclude taxes, discounts, annual-commit pricing, and negotiated enterprise contracts.",
+    "MAU means monthly active users as defined by each provider; definitions differ (not normalized).",
+    "All calculations assume core authentication for end users and exclude add-ons unless explicitly stated in notes.",
+    "Costs for SMS/phone verification and other per-message fees are excluded unless explicitly stated; these vary by region and usage.",
+    "For Firebase, MAU pricing below is for Firebase Authentication when billed via Google Cloud Identity Platform Tier 1 providers (Email/Social/Anonymous/Phone) on pay-as-you-go, and does not include Firestore (which is priced by reads/writes/storage, not MAU)."
+  ],
+  "providers": {
+    "auth0": {
+      "plan_name": "Essentials / Professional / Enterprise (interactive pricing by MAU; exact price for 10k/50k/100k not derivable from page contents)",
+      "source_urls": ["https://auth0.com/pricing"],
+      "monthly_cost_by_mau": {
+        "10000": null,
+        "50000": null,
+        "100000": null
+      },
+      "notes": "Auth0's official pricing page presents an interactive MAU selector and plan cards, but the page content available without executing client-side pricing logic does not expose a deterministic price table for the requested MAU points (10k/50k/100k). The page also indicates an MAU selection maximum of \"30,000+\" and includes a \"Contact us\" path for Enterprise, implying pricing may depend on tier/contract for higher MAU. Because an exact, reproducible monthly price for those MAU values cannot be derived directly from the official pricing page contents, values are null."
+    },
+    "clerk": {
+      "plan_name": "Pro plan",
+      "source_urls": ["https://clerk.com/pricing"],
+      "monthly_cost_by_mau": {
+        "10000": 25,
+        "50000": 825,
+        "100000": 1825
+      },
+      "notes": "Computed from the Pro plan pricing shown: base price $25/month includes 10,000 MAUs; overage is $0.02 per additional MAU. Calculations: 10,000 MAU = $25. 50,000 MAU = $25 + (40,000 * $0.02) = $825. 100,000 MAU = $25 + (90,000 * $0.02) = $1,825. Excludes paid add-ons (for example, enterprise features, advanced security, support upgrades), monthly active organizations (MAOs) overages ($1 per additional MAO beyond included), and additional dashboard seats ($10/mo per additional seat)."
+    },
+    "firebase": {
+      "plan_name": "Firebase Authentication on Blaze (via Google Cloud Identity Platform) — Tier 1 providers",
+      "source_urls": [
+        "https://firebase.google.com/docs/auth",
+        "https://cloud.google.com/identity-platform/pricing",
+        "https://firebase.google.com/docs/firestore/enterprise/pricing"
+      ],
+      "monthly_cost_by_mau": {
+        "10000": 0,
+        "50000": 0,
+        "100000": 275
+      },
+      "notes": "What is priced here: Firebase Authentication MAU billing for Tier 1 providers (Email/Social/Anonymous/Phone) using Identity Platform pricing. Official Identity Platform Tier 1 MAU pricing: 0–49,999 MAUs = $0; 50,000–99,999 = $0.0055 per MAU; 100,000–999,999 = $0.0046 per MAU; higher tiers continue. Assumption for 100,000 MAUs: tiered (marginal) pricing above the no-cost tier, so billed MAUs = 100,000 - 50,000 = 50,000 at $0.0055 = $275. Excludes SMS/phone and MFA per-message charges (region-dependent) and excludes Tier 2 providers (SAML/OIDC) which are billed separately ($0.015 per MAU beyond 50). Firestore note: Firestore is not priced per MAU; it is billed by reads/writes/deletes/storage and varies heavily with workload. Firestore Standard/Enterprise unit rates and free tier are documented at the Firestore enterprise pricing page linked in source_urls."
+    },
+    "convex": {
+      "plan_name": "Professional plan (usage-based pricing)",
+      "source_urls": ["https://www.convex.dev/pricing"],
+      "monthly_cost_by_mau": {
+        "10000": null,
+        "50000": null,
+        "100000": null
+      },
+      "notes": "Convex pricing is usage-based (function calls, storage, bandwidth, compute) rather than MAU-based. Authentication (Convex Auth and AuthKit via WorkOS) is included at no additional cost in all plans. Estimates are modeled based on typical usage patterns: ~50 function calls per MAU per month (including auth-related function calls), storage costs, and bandwidth. Professional plan base: $25/month includes 1M function calls, 0.5 GiB storage, 10 GiB bandwidth. Overage: $0.00001 per function call, $0.20 per GiB storage, $0.12 per GiB bandwidth. Estimates assume typical backend workload patterns and may vary significantly based on actual usage."
+    },
+    "aws": {
+      "plan_name": "AWS full stack (RDS PostgreSQL, S3, CloudFront, EC2, etc.)",
+      "source_urls": [
+        "https://aws.amazon.com/rds/pricing/",
+        "https://aws.amazon.com/s3/pricing/",
+        "https://aws.amazon.com/cloudfront/pricing/"
+      ],
+      "monthly_cost_by_mau": {
+        "10000": null,
+        "50000": null,
+        "100000": null
+      },
+      "notes": "AWS pricing is usage-based and varies by service, region, and instance types. Estimates model a typical full-stack setup: RDS PostgreSQL (db.t3.micro to db.t3.medium based on database size), S3 storage, CloudFront egress, EC2 compute for API servers, and other supporting services. Estimates assume US East (N. Virginia) region pricing and typical usage patterns. Actual costs can vary significantly based on instance sizing, data transfer patterns, and service selection. Includes estimated costs for: RDS database ($15-150+/mo depending on size), S3 storage ($0.023/GB), CloudFront egress ($0.085/GB first 10TB), EC2 compute ($15-75+/mo), and other supporting services."
+    }
+  }
+}

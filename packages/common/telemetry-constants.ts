@@ -781,6 +781,62 @@ export interface WwwPricingPlanCtaClickedEvent {
 }
 
 /**
+ * User changed stage in the pricing calculator.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing-calculator
+ */
+export interface WwwPricingCalculatorStageChangedEvent {
+  action: 'www_pricing_calculator_stage_changed'
+  properties: {
+    stage: 'stage1' | 'stage2' | 'stage3' | 'stage4'
+  }
+}
+
+/**
+ * User copied the shareable link in the pricing calculator.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing-calculator
+ */
+export interface WwwPricingCalculatorShareLinkCopiedEvent {
+  action: 'www_pricing_calculator_share_link_copied'
+  properties: {
+    stage: 'stage1' | 'stage2' | 'stage3' | 'stage4'
+  }
+}
+
+/**
+ * User viewed the final report section in the pricing calculator.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing-calculator
+ */
+export interface WwwPricingCalculatorReportViewedEvent {
+  action: 'www_pricing_calculator_report_viewed'
+  properties: {
+    recommendedPlan: string
+  }
+}
+
+/**
+ * User clicked talk-to-sales CTA in the pricing calculator.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing-calculator
+ */
+export interface WwwPricingCalculatorTalkToSalesClickedEvent {
+  action: 'www_pricing_calculator_talk_to_sales_clicked'
+  properties: {
+    recommendedPlan: string
+  }
+}
+
+/**
  * User clicked the main CTA button in an event page.
  *
  * @group Events
@@ -2786,6 +2842,10 @@ export type TelemetryEvent =
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
+  | WwwPricingCalculatorStageChangedEvent
+  | WwwPricingCalculatorShareLinkCopiedEvent
+  | WwwPricingCalculatorReportViewedEvent
+  | WwwPricingCalculatorTalkToSalesClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
