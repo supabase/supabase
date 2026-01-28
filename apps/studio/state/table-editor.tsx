@@ -1,7 +1,4 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { PropsWithChildren, createContext, useContext } from 'react'
-import { proxy, useSnapshot } from 'valtio'
-
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
 import {
@@ -11,17 +8,19 @@ import {
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import { PropsWithChildren, createContext, useContext } from 'react'
 import type { Dictionary } from 'types'
+import { proxy, useSnapshot } from 'valtio'
 
 import {
-  NewQueuedOperation,
-  QueuedOperationType,
   type AddRowPayload,
   type DeleteRowPayload,
   type EditCellContentPayload,
+  NewQueuedOperation,
   type OperationQueueState,
-  type QueuedOperation,
   type QueueStatus,
+  type QueuedOperation,
+  QueuedOperationType,
 } from './table-editor-operation-queue.types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
@@ -428,48 +427,6 @@ export const createTableEditorState = () => {
         rowIdentifiers,
       })
       return state.operationQueue.operations.some((op) => op.id === key)
-    },
-
-    /**
-     * Check if a row is pending deletion
-     */
-    hasPendingRowDeletion: (tableId: number, rowIdentifiers: Record<string, unknown>): boolean => {
-      return state.operationQueue.operations.some((op) => {
-        if (op.type === QueuedOperationType.DELETE_ROW && op.tableId === tableId) {
-          const deletePayload = op.payload as DeleteRowPayload
-          return Object.entries(rowIdentifiers).every(
-            ([key, value]) => deletePayload.rowIdentifiers[key] === value
-          )
-        }
-        return false
-      })
-    },
-
-    /**
-     * Get all pending ADD_ROW operations for a table
-     */
-    getPendingAddRows: (tableId: number): AddRowPayload[] => {
-      return state.operationQueue.operations
-        .filter((op) => op.type === QueuedOperationType.ADD_ROW && op.tableId === tableId)
-        .map((op) => op.payload as AddRowPayload)
-    },
-
-    /**
-     * Get operation counts by type, optionally filtered by tableId
-     */
-    getOperationCounts: (
-      tableId?: number
-    ): { edits: number; adds: number; deletes: number; total: number } => {
-      const operations = tableId
-        ? state.operationQueue.operations.filter((op) => op.tableId === tableId)
-        : state.operationQueue.operations
-
-      return {
-        edits: operations.filter((op) => op.type === QueuedOperationType.EDIT_CELL_CONTENT).length,
-        adds: operations.filter((op) => op.type === QueuedOperationType.ADD_ROW).length,
-        deletes: operations.filter((op) => op.type === QueuedOperationType.DELETE_ROW).length,
-        total: operations.length,
-      }
     },
   })
 
