@@ -28,6 +28,8 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+const attribute = 'physical_replication_lag_physical_replication_lag_seconds'
+
 export const ReadReplicaDetails = () => {
   const { ref: projectRef, replicaId } = useParams()
   const reportGranularityV2 = useFlag('reportGranularityV2')
@@ -64,7 +66,7 @@ export const ReadReplicaDetails = () => {
     useInfraMonitoringAttributesQuery(
       {
         projectRef,
-        attributes: ['physical_replication_lag_physical_replica_lag_seconds'],
+        attributes: [attribute],
         databaseIdentifier: identifier,
         startDate: selectedDateRange.period_start.date,
         endDate: selectedDateRange.period_end.date,
@@ -73,26 +75,24 @@ export const ReadReplicaDetails = () => {
       { enabled: !!replica }
     )
 
-  // [Joshen] Temporarily hardcoding the data as the query to retrieve replication lag doesn't seem to be working
-  // https://linear.app/supabase/issue/INDATA-325/investigate-infra-monitoring-for-physical-replication-lag-physical
-  const chartData = useMemo(() => {
-    return Array.from({ length: 46 }, (_, i) => {
-      const date = new Date()
-      date.setMinutes(date.getMinutes() - i * 5) // Each point 5 minutes apart
-
-      return {
-        timestamp: date.toISOString(),
-        replication_lag: Math.floor(Math.random() * 100),
-      }
-    }).reverse()
-  }, [])
+  const chartData = useMemo(
+    () =>
+      infraMonitoringData?.data.map((x) => ({
+        timestamp: x.period_start,
+        [attribute]: (x as Record<string, string | number>)[attribute],
+      })) ?? [],
+    [infraMonitoringData?.data]
+  )
 
   return (
     <>
       <Chart className="mt-6" isLoading={isLoadingLag || isFetchingInfraMonitoring}>
         <ChartCard className="rounded-none border-x-0">
           <ChartHeader className="px-10">
-            <ChartMetric label="Replication lag" value={!!lagDuration ? `${lagDuration}s` : '-'} />
+            <ChartMetric
+              label="Replication lag"
+              value={lagDuration !== undefined ? `${lagDuration}s` : '-'}
+            />
           </ChartHeader>
           <ChartContent
             isEmpty={chartData.length === 0}
@@ -103,19 +103,22 @@ export const ReadReplicaDetails = () => {
                 description="It may take up to 24 hours for data to refresh"
               />
             }
-            loadingState={<ChartLoadingState />}
+            loadingState={<ChartLoadingState className="h-[228px]" />}
           >
             <div className="h-56 px-5">
               <ChartLine
+                showGrid
+                showYAxis
+                isFullHeight
                 data={chartData}
-                dataKey="replication_lag"
-                showGrid={true}
-                showYAxis={true}
+                dataKey={attribute}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}s`,
                   width: 80,
                 }}
-                isFullHeight={true}
+                config={{
+                  [attribute]: { label: 'Replication lag' },
+                }}
               />
             </div>
           </ChartContent>
