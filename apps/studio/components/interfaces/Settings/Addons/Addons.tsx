@@ -250,11 +250,21 @@ export const Addons = () => {
                       title="Compute size has moved"
                       description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
                       actions={
-                        <Button type="default" asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                            Go to Compute and Disk
-                          </Link>
-                        </Button>
+                        <ProjectUpdateDisabledTooltip
+                          projectUpdateDisabled={projectUpdateDisabled}
+                          projectNotActive={!isProjectActive}
+                        >
+                          <Button
+                            asChild
+                            type="default"
+                            className="pointer-events-auto"
+                            disabled={projectUpdateDisabled || !isProjectActive}
+                          >
+                            <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                              Go to Compute and Disk
+                            </Link>
+                          </Button>
+                        </ProjectUpdateDisabledTooltip>
                       }
                     />
 
@@ -393,24 +403,21 @@ export const Addons = () => {
                             ? 'Dedicated IPv4 address is enabled'
                             : 'Dedicated IPv4 address is not enabled'}
                         </p>
-                        <ButtonTooltip
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('ipv4')}
-                          disabled={
-                            !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
-                          }
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !(canUpdateIPv4 || ipv4)
-                                ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
-                                : undefined,
-                            },
-                          }}
+                        <ProjectUpdateDisabledTooltip
+                          projectUpdateDisabled={projectUpdateDisabled}
+                          projectNotActive={!isProjectActive}
                         >
-                          Change dedicated IPv4 address
-                        </ButtonTooltip>
+                          <Button
+                            type="default"
+                            className="mt-2 pointer-events-auto"
+                            onClick={() => setPanel('ipv4')}
+                            disabled={
+                              !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                            }
+                          >
+                            Change dedicated IPv4 address
+                          </Button>
+                        </ProjectUpdateDisabledTooltip>
                       </div>
                     </div>
                   </ScaffoldSectionContent>
