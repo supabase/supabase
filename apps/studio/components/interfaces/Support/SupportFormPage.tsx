@@ -131,7 +131,7 @@ function SupportFormHeader() {
   const { data: allStatusPageEvents, isPending: isLoading, isError } = useIncidentStatusQuery()
   const { incidents = [], maintenanceEvents = [] } = allStatusPageEvents ?? {}
   const isMaintenance = maintenanceEvents.length > 0
-  const isHealthy = incidents.length === 0
+  const isIncident = incidents.length > 0
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
@@ -158,10 +158,10 @@ function SupportFormHeader() {
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
-                ) : isHealthy ? (
-                  <div className="h-2 w-2 bg-brand rounded-full" />
                 ) : (
-                  <div className="h-2 w-2 bg-warning rounded-full" />
+                  <div
+                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                  />
                 )
               }
             >
@@ -170,11 +170,11 @@ function SupportFormHeader() {
                   ? 'Checking status'
                   : isError
                     ? 'Failed to check status'
-                    : isMaintenance
-                      ? 'Scheduled maintenance'
-                      : isHealthy
-                        ? 'All systems operational'
-                        : 'Active incident ongoing'}
+                    : isIncident
+                      ? 'Active incident ongoing'
+                      : isMaintenance
+                        ? 'Scheduled maintenance'
+                        : 'All systems operational'}
               </Link>
             </Button>
           </TooltipTrigger>
