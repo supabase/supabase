@@ -40,5 +40,6 @@ Some of the more important options to be aware of are:
 - `max_slot_wal_keep_size` - Maximum size of WAL files that replication slots are allowed to retain
 - `wal_keep_size` - Minimum number of past WAL files to keep for standby servers
 - `max_wal_senders` - Maximum number of concurrent connections from standby servers or streaming backup clients
+- `wal_sender_timeout` - Maximum time to wait for WAL sender to send WAL
 
 These settings help ensure your replication slots don't run out of space and that replicas can reconnect without requiring a full re-sync.
