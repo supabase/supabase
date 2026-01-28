@@ -1,14 +1,11 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
-import { queueRowDeleteWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { Entity, TableLike } from 'data/table-editor/table-editor-types'
+import { TableLike } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
@@ -28,11 +25,9 @@ const DeleteConfirmationDialogs = ({
   selectedTable,
   onTableDeleted,
 }: DeleteConfirmationDialogsProps) => {
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { filters, onApplyFilters } = useTableFilter()
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     columnName,
@@ -191,31 +186,6 @@ const DeleteConfirmationDialogs = ({
         })
       }
     } else {
-      // Queue delete operations if queue mode is enabled and table has primary keys
-      if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
-        for (const row of selectedRowsToDelete) {
-          const rowIdentifiers: Record<string, unknown> = {}
-          selectedTable.primary_keys.forEach((pk) => {
-            rowIdentifiers[pk.name] = row[pk.name]
-          })
-
-          queueRowDeleteWithOptimisticUpdate({
-            queryClient,
-            queueOperation: snap.queueOperation,
-            projectRef: project.ref,
-            tableId: selectedTable.id,
-            table: selectedTable as unknown as Entity,
-            rowIdentifiers,
-            originalRow: row,
-          })
-        }
-
-        // Clear selection and close dialog
-        snap.confirmationDialog.callback?.()
-        snap.closeConfirmationDialog()
-        return
-      }
-
       deleteRows({
         projectRef: project.ref,
         connectionString: project.connectionString,

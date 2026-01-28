@@ -1,18 +1,18 @@
 import type { QueryClient } from '@tanstack/react-query'
-
-import type { Entity } from 'data/table-editor/table-editor-types'
+import { type Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
+import type { Dictionary } from 'types'
+
+import { SupaRow } from '../types'
 import {
-  NewQueuedOperation,
-  QueuedOperation,
-  QueuedOperationType,
   type AddRowPayload,
   type DeleteRowPayload,
   type EditCellContentPayload,
+  NewQueuedOperation,
+  QueuedOperation,
+  QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
-import type { Dictionary } from 'types'
-import { SupaRow } from '../types'
 
 interface GenerateTableChangeKeyArgs {
   type: QueuedOperationType
@@ -109,7 +109,7 @@ export function applyCellEdit(
 }
 
 /**
- * Apply ADD_ROW optimistic update - add row with __tempId marker
+ * Apply ADD_ROW optimistic update - add row with __tempId marker at the top
  */
 export function applyRowAdd(
   rows: SupaRow[],
@@ -119,7 +119,7 @@ export function applyRowAdd(
   // Check if row with this tempId already exists
   const existingIndex = rows.findIndex((row) => row.__tempId === tempId)
   if (existingIndex >= 0) {
-    // Update existing row
+    // Update existing row in place
     return rows.map((row, index) => {
       if (index === existingIndex) {
         return { ...row, ...rowData, __tempId: tempId }
@@ -128,22 +128,19 @@ export function applyRowAdd(
     })
   }
 
-  // Add new row at the end
+  // Add new row at the top of the table
   const newRow: SupaRow = {
-    idx: rows.length,
+    idx: -1, // Use -1 to indicate it's a pending row (not yet in DB)
     ...rowData,
     __tempId: tempId,
   }
-  return [...rows, newRow]
+  return [newRow, ...rows]
 }
 
 /**
  * Apply DELETE_ROW optimistic update - mark row with __isDeleted marker
  */
-export function markRowAsDeleted(
-  rows: SupaRow[],
-  rowIdentifiers: Dictionary<unknown>
-): SupaRow[] {
+export function markRowAsDeleted(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
   return rows.map((row) => {
     const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
     if (rowMatches) {
@@ -360,4 +357,58 @@ export function reapplyOptimisticUpdates({
 
     return { ...old, rows }
   })
+}
+
+interface QueueRowDeletesParams {
+  rows: SupaRow[]
+  table: Entity
+  queryClient: QueryClient
+  queueOperation: (operation: NewQueuedOperation) => void
+  projectRef: string | undefined
+}
+
+/**
+ * Queue multiple row delete operations with optimistic updates.
+ * Caller is responsible for checking if queue mode is enabled before calling.
+ */
+export function queueRowDeletesWithOptimisticUpdate({
+  rows,
+  table,
+  queryClient,
+  queueOperation,
+  projectRef,
+}: QueueRowDeletesParams): void {
+  // [Ali] We can handle these better in the future
+  // right now this is a pretty abnormal case of this occurring
+  if (!projectRef) {
+    console.error('Cannot queue row deletes: projectRef is required')
+    return
+  }
+
+  if (!isTableLike(table)) {
+    console.error('Cannot queue row deletes: table must be a TableLike entity')
+    return
+  }
+
+  if (table.primary_keys.length === 0) {
+    console.error('Cannot queue row deletes: table has no primary keys')
+    return
+  }
+
+  for (const row of rows) {
+    const rowIdentifiers: Record<string, unknown> = {}
+    table.primary_keys.forEach((pk) => {
+      rowIdentifiers[pk.name] = row[pk.name]
+    })
+
+    queueRowDeleteWithOptimisticUpdate({
+      queryClient,
+      queueOperation,
+      projectRef,
+      tableId: table.id,
+      table: table,
+      rowIdentifiers,
+      originalRow: row,
+    })
+  }
 }
