@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
@@ -17,8 +10,8 @@ import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreat
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
-  extractPostgresVersionDetails,
   PostgresVersionSelector,
+  extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
@@ -51,13 +44,20 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
-import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, FormField_Shadcn_, Form_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
+import { z } from 'zod'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -82,7 +82,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const isHomeNew = useFlag('homeNew')
+  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -223,6 +223,8 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
+
   const {
     mutate: createProject,
     isPending: isCreatingNewProject,
@@ -233,6 +235,9 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          dataApiEnabled: form.getValues('dataApi'),
+          useApiSchema: form.getValues('useApiSchema'),
+          useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
           project: res.ref,
@@ -439,6 +444,23 @@ const Wizard: NextPageWithLayout = () => {
                     {showAdvancedConfig && !!availableOrioleVersion && (
                       <AdvancedConfiguration form={form} />
                     )}
+
+                    {shouldShowFreeProjectInfo ? (
+                      <Admonition
+                        className="rounded-none border-0"
+                        type="note"
+                        title="Need a free project?"
+                        description={
+                          <p>
+                            You can have up to 2 free projects across all organizations.{' '}
+                            <Link className="underline text-foreground" href="/new">
+                              Create a free organization
+                            </Link>{' '}
+                            to use them.
+                          </p>
+                        }
+                      />
+                    ) : null}
                   </>
                 )}
 

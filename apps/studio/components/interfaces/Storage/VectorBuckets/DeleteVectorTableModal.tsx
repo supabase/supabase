@@ -1,26 +1,30 @@
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useVectorBucketIndexDeleteMutation } from 'data/storage/vector-bucket-index-delete-mutation'
-import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
+import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
-interface DeleteVectorTableModalProps {
-  visible: boolean
-  table?: VectorBucketIndex
-  onClose: () => void
-}
-
-export const DeleteVectorTableModal = ({
-  visible,
-  table,
-  onClose,
-}: DeleteVectorTableModalProps) => {
-  const { bucketId } = useParams()
+export const DeleteVectorTableModal = () => {
+  const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const [selectedTableIdToDelete, setSelectedTableIdToDelete] = useQueryState(
+    'deleteTable',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { data, isSuccess: isSuccessIndexes } = useVectorBucketsIndexesQuery({
+    projectRef,
+    vectorBucketName: bucketId,
+  })
+  const allIndexes = data?.indexes ?? []
+  const table = allIndexes.find((index) => index.indexName === selectedTableIdToDelete)
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
   const foreignTable = wrapperInstance?.tables?.find((x) => x.name === table?.indexName)
@@ -29,7 +33,11 @@ export const DeleteVectorTableModal = ({
     onError: () => {},
   })
 
-  const { mutate: deleteIndex, isPending: isDeleting } = useVectorBucketIndexDeleteMutation({
+  const {
+    mutate: deleteIndex,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useVectorBucketIndexDeleteMutation({
     onSuccess: (_, vars) => {
       try {
         if (!!foreignTable) {
@@ -41,7 +49,7 @@ export const DeleteVectorTableModal = ({
           })
         }
         toast.success(`Table "${vars.indexName}" deleted successfully`)
-        onClose()
+        setSelectedTableIdToDelete(null)
       } catch (error: any) {
         toast.success(
           `Table "${vars.indexName}" deleted successfully, but its corresponding foreign table failed to clean up: ${error.message}`
@@ -61,14 +69,27 @@ export const DeleteVectorTableModal = ({
     })
   }
 
+  useEffect(() => {
+    if (!!selectedTableIdToDelete && isSuccessIndexes && !table && !isSuccessDelete) {
+      toast(`Table ${selectedTableIdToDelete} cannot be found in your bucket`)
+      setSelectedTableIdToDelete(null)
+    }
+  }, [
+    isSuccessIndexes,
+    selectedTableIdToDelete,
+    table,
+    setSelectedTableIdToDelete,
+    isSuccessDelete,
+  ])
+
   return (
     <ConfirmationModal
-      visible={visible}
+      visible={!!table}
       loading={isDeleting}
       variant="destructive"
       title={`Confirm to delete table "${table?.indexName}"`}
       onConfirm={onConfirmDelete}
-      onCancel={onClose}
+      onCancel={() => setSelectedTableIdToDelete(null)}
     >
       {/* [Joshen] Can probably beef up more details here - what are potential side effects of deleting a table */}
       <p className="text-sm">This action cannot be undone.</p>

@@ -1,32 +1,32 @@
 'use client'
 
-import * as React from 'react'
-import { useContext, useState, useMemo, useRef } from 'react'
 import { Slot } from '@radix-ui/react-slot'
+import dayjs from 'dayjs'
+import { HelpCircle, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import * as React from 'react'
+import { useContext, useMemo, useRef, useState } from 'react'
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  Tooltip as RechartsTooltip,
+  TooltipProps as RechartsTooltipProps,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import {
   Button,
   Card,
+  ChartContainer,
+  cn,
+  Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Skeleton,
-  ChartContainer,
-  cn,
 } from 'ui'
-import { HelpCircle, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-  Tooltip as RechartsTooltip,
-  TooltipProps as RechartsTooltipProps,
-} from 'recharts'
-import dayjs from 'dayjs'
 
 /* Chart Config */
 export type ChartConfig = {
@@ -61,6 +61,8 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   isDisabled?: boolean
   className?: string
 }
+
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-6 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-6 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
   ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
@@ -138,7 +140,7 @@ const ChartTitle = React.forwardRef<HTMLDivElement, ChartTitleProps>(
                 className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
               />
             </TooltipTrigger>
-            <TooltipContent>{tooltip}</TooltipContent>
+            <TooltipContent className="max-w-72">{tooltip}</TooltipContent>
           </Tooltip>
         )}
       </h3>
@@ -280,7 +282,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
                     className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
                   />
                 </TooltipTrigger>
-                <TooltipContent>{tooltip}</TooltipContent>
+                <TooltipContent className="max-w-72">{tooltip}</TooltipContent>
               </Tooltip>
             )}
           </h3>
@@ -336,7 +338,7 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
     }
 
     return (
-      <div ref={ref} className={cn('px-6 pt-4 pb-6', className)} {...props}>
+      <div ref={ref} className={cn('px-6 pt-4 pb-6', chartTableClasses, className)} {...props}>
         {content}
       </div>
     )
@@ -377,9 +379,14 @@ const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
 ChartEmptyState.displayName = 'ChartEmptyState'
 
 /* Chart Loading State */
-const ChartLoadingState = () => {
+const ChartLoadingState = ({ className }: { className?: string }) => {
   return (
-    <div className="h-40 border border-dashed border-control items-center justify-center flex flex-col">
+    <div
+      className={cn(
+        'h-40 border border-dashed border-control items-center justify-center flex flex-col',
+        className
+      )}
+    >
       <Loader2 size={20} className="animate-spin text-foreground-muted" />
     </div>
   )
@@ -478,7 +485,6 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
 ChartDisabledState.displayName = 'ChartDisabledState'
 
 /* Chart Footer */
-const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 interface ChartFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -591,21 +597,21 @@ const ChartSparkline = React.forwardRef<HTMLDivElement, ChartSparklineProps>(
 ChartSparkline.displayName = 'ChartSparkline'
 
 /* Exports */
+export { ChartBar, type ChartBarProps, type ChartBarTick } from './charts/chart-bar'
+export { ChartLine, type ChartLineProps, type ChartLineTick } from './charts/chart-line'
 export {
   Chart,
-  ChartCard,
-  ChartHeader,
-  ChartTitle,
   ChartActions,
-  ChartMetric,
+  ChartCard,
   ChartContent,
-  ChartEmptyState,
-  ChartLoadingState,
   ChartDisabledState,
+  ChartEmptyState,
   ChartFooter,
-  ChartValueDifferential,
-  ChartSparklineTooltip,
+  ChartHeader,
+  ChartLoadingState,
+  ChartMetric,
   ChartSparkline,
+  ChartSparklineTooltip,
+  ChartTitle,
+  ChartValueDifferential,
 }
-export { ChartBar, type ChartBarTick, type ChartBarProps } from './charts/chart-bar'
-export { ChartLine, type ChartLineTick, type ChartLineProps } from './charts/chart-line'

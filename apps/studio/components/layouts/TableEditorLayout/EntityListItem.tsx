@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
+import { formatSql } from '@/lib/formatSql'
 import { useFlag, useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
@@ -18,7 +19,6 @@ import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/tabl
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationState,
@@ -104,10 +104,18 @@ export const EntityListItem = ({
     projectRef: project?.ref,
   })
 
-  const tableHasLints: boolean = getEntityLintDetails(
+  const tableHasRlsDisabledLint: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const tableHasRlsEnabledNoPolicyLint: boolean = getEntityLintDetails(
+    entity.name,
+    'rls_enabled_no_policy',
+    ['ERROR', 'WARN', 'INFO'],
     lints,
     selectedSchema
   ).hasLint
@@ -212,7 +220,8 @@ export const EntityListItem = ({
           </span>
           <EntityTooltipTrigger
             entity={entity}
-            tableHasLints={tableHasLints}
+            tableHasRlsDisabledLint={tableHasRlsDisabledLint}
+            tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
             viewHasLints={viewHasLints}
             materializedViewHasLints={materializedViewHasLints}
             foreignTableHasLints={foreignTableHasLints}
@@ -254,23 +263,22 @@ export const EntityListItem = ({
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
-                    const tableDefinition = await getTableDefinition({
+                    const formattedSchema = getTableDefinition({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
+                    }).then((tableDefinition) => {
+                      if (!tableDefinition) {
+                        throw new Error('Failed to get table schema')
+                      }
+                      return formatSql(tableDefinition)
                     })
-                    if (!tableDefinition) {
-                      return toast.error('Failed to get table schema', { id: toastId })
-                    }
 
                     try {
-                      const formatted = formatSql(tableDefinition)
-                      await copyToClipboard(formatted)
+                      await copyToClipboard(formattedSchema)
                       toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
-                      toast.error('Failed to copy schema: ' + (err.message || err), {
-                        id: toastId,
-                      })
+                      toast.error('Failed to copy schema: ' + (err.message || err), { id: toastId })
                     }
                   }}
                 >
@@ -380,14 +388,16 @@ export const EntityListItem = ({
 
 const EntityTooltipTrigger = ({
   entity,
-  tableHasLints,
+  tableHasRlsDisabledLint,
+  tableHasRlsEnabledNoPolicyLint,
   viewHasLints,
   materializedViewHasLints,
   foreignTableHasLints,
   apiAccessData,
 }: {
   entity: Entity
-  tableHasLints: boolean
+  tableHasRlsDisabledLint: boolean
+  tableHasRlsEnabledNoPolicyLint: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
@@ -408,10 +418,11 @@ const EntityTooltipTrigger = ({
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
-      if (tableHasLints) {
+      if (tableHasRlsDisabledLint) {
         tooltipContent = (
           <>
-            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+            This table can be accessed by anyone via the Data API as RLS is disabled. {learnMoreCTA}
+            .
           </>
         )
       }
@@ -460,13 +471,33 @@ const EntityTooltipTrigger = ({
     )
   }
 
-  if (isDataApiExposedBadgeEnabled && apiAccessData?.hasApiAccess) {
+  const isRlsEnabledNoPolicies =
+    entity.type === ENTITY_TYPE.TABLE &&
+    apiAccessData?.apiAccessType === 'access' &&
+    tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isRlsEnabledNoPolicies) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
           <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
-        <TooltipContent side="right">This table is exposed via the Data API</TooltipContent>
+        <TooltipContent side="right" className="max-w-52">
+          This table can be accessed via the Data API but no RLS policies exist so no data will be
+          returned
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  const isApiExposedWithRlsAndPolicies =
+    apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
+  if (isDataApiExposedBadgeEnabled && isApiExposedWithRlsAndPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
       </Tooltip>
     )
   }
