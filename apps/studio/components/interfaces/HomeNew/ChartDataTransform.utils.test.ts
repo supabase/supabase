@@ -1,4 +1,6 @@
 import dayjs from 'dayjs'
+import { describe, expect, it } from 'vitest'
+
 import { normalizeChartBuckets } from './ChartDataTransform.utils'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 
