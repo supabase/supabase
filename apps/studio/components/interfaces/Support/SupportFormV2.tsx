@@ -1,7 +1,4 @@
-import { useEffect, type Dispatch, type MouseEventHandler } from 'react'
-import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
@@ -13,7 +10,10 @@ import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachm
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { type Dispatch, type MouseEventHandler } from 'react'
+import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
+
 import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
@@ -27,15 +27,15 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
-import { SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
+  NO_ORG_MARKER,
+  NO_PROJECT_MARKER,
   formatMessage,
   formatStudioVersion,
   getOrgSubscriptionPlan,
-  NO_ORG_MARKER,
-  NO_PROJECT_MARKER,
 } from './SupportForm.utils'
 import {
   DASHBOARD_LOG_CATEGORIES,
@@ -128,12 +128,12 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
     const payload = {
       ...values,
-      category,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess: SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-        ? values.allowSupportAccess
-        : false,
+      allowSupportAccess:
+        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+          ? values.allowSupportAccess
+          : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
@@ -179,15 +179,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     handleFormSubmit(event)
   }
 
-  useEffect(() => {
-    if (simplifiedSupportForm) {
-      form.setValue('category', 'Others')
-    } else {
-      form.setValue('category', '' as any)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [simplifiedSupportForm])
-
   return (
     <Form_Shadcn_ {...form}>
       <form id="support-form" className="flex flex-col gap-y-6">
@@ -202,14 +193,12 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             subscriptionPlanId={subscriptionPlanId}
             category={category}
           />
-          {!simplifiedSupportForm && (
-            <CategoryAndSeverityInfo
-              form={form}
-              category={category}
-              severity={severity}
-              projectRef={projectRef}
-            />
-          )}
+          <CategoryAndSeverityInfo
+            form={form}
+            category={category}
+            severity={severity}
+            projectRef={projectRef}
+          />
         </div>
 
         <DialogSectionSeparator />
@@ -235,7 +224,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           </>
         )}
 
-        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
             <SupportAccessToggle form={form} />
             <DialogSectionSeparator />
