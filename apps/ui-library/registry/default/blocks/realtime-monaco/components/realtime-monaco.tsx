@@ -1,12 +1,13 @@
 'use client'
 
 import { Editor } from '@monaco-editor/react'
+import { SupabaseProvider } from '@tiagoantunespt/y-supabase'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef } from 'react'
 import { MonacoBinding } from 'y-monaco'
-import { SupabaseProvider } from '@tiagoantunespt/y-supabase'
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import * as Y from 'yjs'
+
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 type RealtimeMonacoProps = {
   channel: string
@@ -36,7 +37,7 @@ const RealtimeMonaco = ({
       const doc = new Y.Doc()
       const yText = doc.getText('monaco')
       const supabase = createClient()
-      const provider = new SupabaseProvider(channel, doc, supabase)
+      const provider = new SupabaseProvider(channel, doc, supabase as any)
 
       docRef.current = doc
       providerRef.current = provider
