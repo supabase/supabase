@@ -108,9 +108,6 @@ export function applyCellEdit(
   })
 }
 
-/**
- * Apply ADD_ROW optimistic update - add row with __tempId marker at the top
- */
 export function applyRowAdd(
   rows: SupaRow[],
   tempId: string,
@@ -128,7 +125,6 @@ export function applyRowAdd(
     }) as PendingAddRow[]
   }
 
-  // Add new row at the top of the table
   const newRow: PendingAddRow = {
     idx: -1, // Use -1 to indicate it's a pending row (not yet in DB)
     ...rowData,
@@ -137,9 +133,6 @@ export function applyRowAdd(
   return [newRow, ...rows]
 }
 
-/**
- * Apply DELETE_ROW optimistic update - mark row with __isDeleted marker
- */
 export function markRowAsDeleted(
   rows: SupaRow[],
   rowIdentifiers: Dictionary<unknown>
@@ -148,30 +141,6 @@ export function markRowAsDeleted(
     const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
     if (rowMatches) {
       return { ...row, __isDeleted: true }
-    }
-    return row
-  })
-}
-
-/**
- * Remove a row from the list (used when cancelling ADD_ROW)
- */
-export function removeRowByTempId(rows: SupaRow[], tempId: string): SupaRow[] {
-  return rows.filter((row) => !isPendingAddRow(row) || row.__tempId !== tempId)
-}
-
-/**
- * Unmark a row as deleted (used when cancelling DELETE_ROW)
- */
-export function unmarkRowAsDeleted(
-  rows: SupaRow[],
-  rowIdentifiers: Dictionary<unknown>
-): SupaRow[] {
-  return rows.map((row) => {
-    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
-    if (rowMatches) {
-      const { __isDeleted, ...rest } = row as PendingDeleteRow
-      return rest
     }
     return row
   })
