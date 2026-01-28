@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import { RowsChangeData } from 'react-data-grid'
 import { toast } from 'sonner'
 
-import { SupaRow } from 'components/grid/types'
+import { isPendingAddRow, SupaRow } from 'components/grid/types'
 import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
@@ -100,6 +100,12 @@ export function useOnRowsChange(rows: SupaRow[]) {
         .map((column) => column.name)
 
       const identifiers = {} as Dictionary<any>
+
+      // Include __tempId for pending add rows so edits merge into ADD_ROW operation
+      if (isPendingAddRow(previousRow)) {
+        identifiers.__tempId = previousRow.__tempId
+      }
+
       isTableLike(snap.originalTable) &&
         snap.originalTable.primary_keys.forEach((column) => {
           const col = snap.originalTable.columns.find((c) => c.name === column.name)
