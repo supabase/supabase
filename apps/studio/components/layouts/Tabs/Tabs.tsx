@@ -136,24 +136,6 @@ export const EditorTabs = () => {
 
   const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
 
-  useEffect(() => {
-    if (!tabsListRef.current) return
-
-    if (tabs.activeTab) {
-      const activeTabElement = tabsListRef.current.querySelector(
-        `[data-state="active"]`
-      ) as HTMLElement
-
-      if (activeTabElement) {
-        activeTabElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'nearest',
-        })
-      }
-    }
-  }, [tabs.activeTab, tabsListRef])
-
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <Tabs_Shadcn_
