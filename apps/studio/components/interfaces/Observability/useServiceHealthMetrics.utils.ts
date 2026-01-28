@@ -38,9 +38,9 @@ export const calculateDateRange = (
 
 type RawChartData = {
   timestamp: string | number
-  ok_count?: number
-  warning_count?: number
-  error_count?: number
+  ok_count?: number | null
+  warning_count?: number | null
+  error_count?: number | null
 }
 
 /**
