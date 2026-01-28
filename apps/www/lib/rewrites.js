@@ -30,11 +30,11 @@ const rewrites = [
     destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
   },
   {
-    source: '/design',
+    source: '/design-system',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}`,
   },
   {
-    source: '/design/:path*',
+    source: '/design-system/:path*',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
   },
 

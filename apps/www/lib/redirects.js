@@ -3040,8 +3040,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/design-system',
-    destination: '/design',
+    source: '/design',
+    destination: '/design-system',
   },
 
   // marketing
