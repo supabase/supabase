@@ -21,6 +21,10 @@ export const SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
   SupportCategories.PERFORMANCE_ISSUES,
   SupportCategories.PROBLEM,
   SupportCategories.DASHBOARD_BUG,
+  SupportCategories.LOGIN_ISSUES,
+  SupportCategories.ABUSE,
+  SupportCategories.BILLING,
+  SupportCategories.REFUND,
 ]
 
 interface SupportAccessToggleProps {
