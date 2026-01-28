@@ -94,9 +94,6 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
             )}
           >
             <span className="flex items-center gap-2 flex-1 min-w-0">
-              {item.requiresAuth && (
-                <Lock className="w-3 h-3 text-foreground-muted flex-shrink-0" />
-              )}
               {item.title}
               {item.new && (
                 <Badge variant="default" className="capitalize flex-shrink-0">
@@ -135,9 +132,6 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
             className={itemClasses}
           >
             <span className="flex items-center gap-2">
-              {item.requiresAuth && (
-                <Lock className="w-3 h-3 text-foreground-muted flex-shrink-0" />
-              )}
               <span className="truncate">{item.title}</span>
               {item.new && (
                 <Badge variant="default" className="capitalize flex-shrink-0">
