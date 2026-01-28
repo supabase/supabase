@@ -1,16 +1,15 @@
-import dayjs from 'dayjs'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -31,15 +30,16 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+
 import { useServiceHealthMetrics } from '../Observability/useServiceHealthMetrics'
+import { normalizeChartBuckets } from './ChartDataTransform.utils'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
+  computeSuccessAndNonSuccessRates,
+  sumErrors,
   sumTotal,
   sumWarnings,
-  sumErrors,
-  computeSuccessAndNonSuccessRates,
 } from './ProjectUsage.metrics'
-import { normalizeChartBuckets } from './ChartDataTransform.utils'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 
@@ -113,11 +113,11 @@ export const ProjectUsageSection = () => {
     return { datetimeFormat: format }
   }, [selectedInterval])
 
-  const { services: healthServices, isLoading: isHealthLoading } = useServiceHealthMetrics(
-    projectRef!,
-    interval,
-    refreshKey
-  )
+  const {
+    services: healthServices,
+    isLoading: isHealthLoading,
+    endDate,
+  } = useServiceHealthMetrics(projectRef!, interval, refreshKey)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -163,8 +163,12 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const healthData = healthServices[s.key]
-        // Normalize chart data to consistent bucket sizes
-        const normalizedData = normalizeChartBuckets(healthData.eventChartData, interval)
+        // Normalize chart data to consistent bucket sizes using the same endDate from the query
+        const normalizedData = normalizeChartBuckets(
+          healthData.eventChartData,
+          interval,
+          new Date(endDate)
+        )
         const total = sumTotal(normalizedData)
         const warn = sumWarnings(normalizedData)
         const err = sumErrors(normalizedData)
@@ -178,7 +182,7 @@ export const ProjectUsageSection = () => {
           error: healthData.error,
         }
       }),
-    [serviceBase, healthServices, interval]
+    [serviceBase, healthServices, interval, endDate]
   )
 
   const isLoading = isHealthLoading
