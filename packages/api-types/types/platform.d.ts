@@ -1020,6 +1020,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/invoices/{invoice_id}/receipt': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the receipt PDF URL for a paid invoice */
+    get: operations['OrgInvoicesController_getInvoiceReceipt']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     parameters: {
       query?: never
@@ -3543,27 +3560,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Rollback pipeline table state (deprecated)
-     * @deprecated
-     * @description Deprecated: Use POST /pipelines/{pipeline_id}/rollback-tables instead. Rollback a table state for the pipeline. Requires bearer auth and an active, healthy project.
-     */
-    post: operations['ReplicationPipelinesController_rollbackTableState']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables': {
     parameters: {
       query?: never
@@ -5475,7 +5471,11 @@ export interface components {
         | 'organization_projects_create'
         | 'project_admin_read'
         | 'project_admin_write'
+        | 'action_runs_read'
+        | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_logs_read'
+        | 'analytics_usage_read'
         | 'api_gateway_keys_read'
         | 'api_gateway_keys_write'
         | 'auth_config_read'
@@ -5496,6 +5496,8 @@ export interface components {
         | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
+        | 'database_jit_read'
+        | 'database_jit_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
@@ -5524,8 +5526,8 @@ export interface components {
         | 'storage_write'
         | 'storage_config_read'
         | 'storage_config_write'
-        | 'telemetry_logs_read'
-        | 'telemetry_usage_read'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
       )[]
       project_refs?: string[]
     }
@@ -6868,6 +6870,10 @@ export interface components {
     InvoicePaymentLinkResponse: {
       redirectUrl: string
     }
+    InvoiceReceiptResponse: {
+      /** Format: uri */
+      receipt_pdf: string
+    }
     LFAccessToken: {
       description: string | null
       id: number
@@ -7010,8 +7016,12 @@ export interface components {
           key:
             | 'instances.compute_update_available_sizes'
             | 'instances.read_replicas'
+            | 'instances.disk_modifications'
             | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.image_transformations'
+            | 'storage.vector_buckets'
+            | 'storage.iceberg_catalog'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
@@ -8986,73 +8996,6 @@ export interface components {
         table_id: number
       }[]
     }
-    RollbackTableStateBody: {
-      /**
-       * @description Rollback type
-       * @example individual
-       * @enum {string}
-       */
-      rollback_type: 'individual' | 'full'
-      /**
-       * @description Table id (Postgres OID)
-       * @example 16408
-       */
-      table_id: number
-    }
-    RollbackTableStateResponse: {
-      /** @description Table replication state */
-      new_state:
-        | {
-            /** @enum {string} */
-            name: 'queued'
-          }
-        | {
-            /** @enum {string} */
-            name: 'copying_table'
-          }
-        | {
-            /** @enum {string} */
-            name: 'copied_table'
-          }
-        | {
-            /** @enum {string} */
-            name: 'following_wal'
-          }
-        | {
-            /** @enum {string} */
-            name: 'error'
-            reason: string
-            retry_policy:
-              | {
-                  /** @enum {string} */
-                  policy: 'no_retry'
-                }
-              | {
-                  /** @enum {string} */
-                  policy: 'manual_retry'
-                }
-              | {
-                  /**
-                   * @description Next retry time (RFC 3339 timestamp)
-                   * @example 2025-01-02T03:04:05Z
-                   */
-                  next_retry: string
-                  /** @enum {string} */
-                  policy: 'timed_retry'
-                }
-            solution?: string
-          }
-      /**
-       * @description Pipeline id
-       * @example 1012
-       */
-      pipeline_id: number
-      /**
-       * @description Table id (Postgres OID)
-       * @example 16408
-       */
-      table_id: number
-    }
     RunLintByNameResponse: {
       lints: {
         cache_key: string
@@ -9133,7 +9076,9 @@ export interface components {
       allowSupportAccess?: boolean
       browserInformation?: string
       category: string
+      dashboardLogs?: string
       dashboardSentryIssueId?: string
+      dashboardStudioVersion?: string
       library?: string
       message: string
       organizationSlug?: string
@@ -13630,6 +13575,71 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve invoice payment link */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgInvoicesController_getInvoiceReceipt: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        invoice_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['InvoiceReceiptResponse']
+        }
+      }
+      /** @description Receipt not available for this invoice type or status */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Invoice or receipt not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve receipt */
       500: {
         headers: {
           [name: string]: unknown
@@ -20960,7 +20970,7 @@ export interface operations {
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
           | 'disk_fs_used_system'
-          | 'physical_replication_lag_physical_replica_lag_seconds'
+          | 'physical_replication_lag_physical_replication_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'max_db_connections'
         attributes?: (
@@ -21016,7 +21026,7 @@ export interface operations {
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
           | 'disk_fs_used_system'
-          | 'physical_replication_lag_physical_replica_lag_seconds'
+          | 'physical_replication_lag_physical_replication_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'max_db_connections'
         )[]
@@ -23250,63 +23260,6 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while retrieving replication status. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationPipelinesController_rollbackTableState: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Pipeline id */
-        pipeline_id: number
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RollbackTableStateBody']
-      }
-    }
-    responses: {
-      /** @description New table state after rollback. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['RollbackTableStateResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unexpected error while rolling back table state. */
       500: {
         headers: {
           [name: string]: unknown

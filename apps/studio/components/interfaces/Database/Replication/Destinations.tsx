@@ -3,10 +3,6 @@ import { Plus, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import {
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from '@/data/read-replicas/replicas-status-query'
 import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -15,7 +11,7 @@ import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
@@ -41,8 +37,8 @@ import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isPaidPlan = organization?.plan.id !== 'free'
+  const { hasAccess: hasETLReplicationAccess, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('replication.etl')
 
   const unifiedReplication = useFlag('unifiedReplication')
 
@@ -57,19 +53,13 @@ export const Destinations = () => {
     isPending: isDatabasesLoading,
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
-    refetch: refetchDatabases,
-  } = useReadReplicasQuery({
-    projectRef,
-  })
+  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
   const readReplicas = databases.filter((x) => x.identifier !== projectRef)
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
       ? readReplicas
       : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
-
-  const { data: statuses = [], isSuccess: isSuccessReplicasStatuses } =
-    useReadReplicasStatusesQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
 
   const {
     data: sourcesData,
@@ -93,7 +83,7 @@ export const Destinations = () => {
     projectRef,
   })
   const destinations = destinationsData?.destinations ?? []
-  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
       ? destinations ?? []
@@ -111,7 +101,8 @@ export const Destinations = () => {
     projectRef,
   })
 
-  const isLoading = isSourcesLoading || isDestinationsLoading || isDatabasesLoading
+  const isLoading =
+    isSourcesLoading || isDestinationsLoading || isDatabasesLoading || isLoadingEntitlement
   const hasErrorsFetchingData = isSourcesError || isDestinationsError || isDatabasesError
 
   useEffect(() => {
@@ -136,7 +127,7 @@ export const Destinations = () => {
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   useEffect(() => {
-    if (!isSuccessReplicasStatuses) return
+    if (!isDatabasesSuccess) return
 
     const pollReplicas = async () => {
       const fixedStatuses = [
@@ -144,27 +135,16 @@ export const Destinations = () => {
         REPLICA_STATUS.ACTIVE_UNHEALTHY,
         REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
       ]
-      const replicasInTransition = statuses.filter((db) => {
-        const { status } = db.replicaInitializationStatus || {}
-        return (
-          !fixedStatuses.includes(db.status) || status === ReplicaInitializationStatus.InProgress
-        )
-      })
+
+      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
       const hasTransientStatus = replicasInTransition.length > 0
 
-      // If any replica's status has changed, refetch databases
-      if (statuses.length !== databases.length) {
-        await refetchDatabases()
-      }
-
       // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus && statuses.length === databases.length) {
-        setStatusRefetchInterval(false)
-      }
+      if (!hasTransientStatus) setStatusRefetchInterval(false)
     }
 
     pollReplicas()
-  }, [databases.length, isSuccessReplicasStatuses, refetchDatabases, statuses])
+  }, [isDatabasesSuccess, readReplicas])
 
   return (
     <>
@@ -191,7 +171,7 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            {!!sourceId && (
+            {(unifiedReplication || !!sourceId) && (
               <Button
                 type="default"
                 icon={<Plus />}
@@ -205,7 +185,7 @@ export const Destinations = () => {
         </div>
       </div>
 
-      <div className="w-full overflow-hidden overflow-x-auto">
+      <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (
           <AlertError
             error={sourcesError || destinationsError || databasesError}
@@ -216,7 +196,7 @@ export const Destinations = () => {
         {isLoading ? (
           <GenericSkeletonLoader />
         ) : !unifiedReplication && replicationNotEnabled ? (
-          <EnableReplicationCallout />
+          <EnableReplicationCallout hasAccess={hasETLReplicationAccess} />
         ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
           <Card>
             <CardContent className="p-0">
@@ -240,12 +220,10 @@ export const Destinations = () => {
                 <TableBody>
                   {unifiedReplication &&
                     filteredReplicas.map((replica) => {
-                      const status = statuses.find((x) => x.identifier === replica.identifier)
                       return (
                         <ReadReplicaRow
                           key={replica.identifier}
                           replica={replica}
-                          replicaStatus={status}
                           onUpdateReplica={() => setStatusRefetchInterval(5000)}
                         />
                       )

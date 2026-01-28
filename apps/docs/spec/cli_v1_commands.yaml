@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.62.10
+  version: 2.72.7
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1096,6 +1096,9 @@ commands:
         description: Select a region close to you for the best performance.
         default_value: ''
         accepted_values:
+          - id: ap-east-1
+            name: ap-east-1
+            type: string
           - id: ap-northeast-1
             name: ap-northeast-1
             type: string
@@ -1117,6 +1120,12 @@ commands:
           - id: eu-central-1
             name: eu-central-1
             type: string
+          - id: eu-central-2
+            name: eu-central-2
+            type: string
+          - id: eu-north-1
+            name: eu-north-1
+            type: string
           - id: eu-west-1
             name: eu-west-1
             type: string
@@ -1131,6 +1140,9 @@ commands:
             type: string
           - id: us-east-1
             name: us-east-1
+            type: string
+          - id: us-east-2
+            name: us-east-2
             type: string
           - id: us-west-1
             name: us-west-1
@@ -1628,7 +1640,7 @@ commands:
 
       Creates a new migration file locally.
 
-      A `supabase/migrations` directory will be created if it does not already exists in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
+      A `supabase/migrations` directory will be created if it does not already exist in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
 
       Outputs from other commands like `db diff` may be piped to `migration new <name>` via stdin.
     examples:
@@ -2345,17 +2357,13 @@ commands:
         name: --force
         description: Overwrite existing supabase/config.toml.
         default_value: 'false'
+      - id: interactive
+        name: -i, --interactive
+        description: Enables interactive mode to configure IDE settings.
+        default_value: 'false'
       - id: use-orioledb
         name: --use-orioledb
         description: Use OrioleDB storage engine for Postgres.
-        default_value: 'false'
-      - id: with-intellij-settings
-        name: --with-intellij-settings
-        description: Generate IntelliJ IDEA settings for Deno.
-        default_value: 'false'
-      - id: with-vscode-settings
-        name: --with-vscode-settings
-        description: Generate VS Code settings for Deno.
         default_value: 'false'
   - id: supabase-gen
     title: supabase gen
@@ -2390,19 +2398,22 @@ commands:
         description: Generate types from a database url.
         default_value: ''
       - id: lang
-        name: --lang <[ typescript | go | swift ]>
+        name: --lang <[ typescript | go | swift | python ]>
         description: Output language of the generated types.
         default_value: typescript
         accepted_values:
           - id: typescript
             name: typescript
-            type: '[ typescript | go | swift ]'
+            type: '[ typescript | go | swift | python ]'
           - id: go
             name: go
-            type: '[ typescript | go | swift ]'
+            type: '[ typescript | go | swift | python ]'
           - id: swift
             name: swift
-            type: '[ typescript | go | swift ]'
+            type: '[ typescript | go | swift | python ]'
+          - id: python
+            name: python
+            type: '[ typescript | go | swift | python ]'
       - id: linked
         name: --linked
         description: Generate types from the linked project.
@@ -2993,6 +3004,8 @@ commands:
 
       Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
 
+      > Note this command requires Docker Desktop (or a running Docker daemon), as it starts a local Postgres container to diff your remote schema.
+
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
       If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
@@ -3313,6 +3326,10 @@ commands:
         name: --use-migra
         description: Use migra to generate schema diff.
         default_value: 'true'
+      - id: use-pg-delta
+        name: --use-pg-delta
+        description: Use pg-delta to generate schema diff.
+        default_value: 'false'
       - id: use-pg-schema
         name: --use-pg-schema
         description: Use pg-schema-diff to generate schema diff.
@@ -3624,6 +3641,9 @@ commands:
         description: Select a region to deploy the branch database.
         default_value: ''
         accepted_values:
+          - id: ap-east-1
+            name: ap-east-1
+            type: string
           - id: ap-northeast-1
             name: ap-northeast-1
             type: string
@@ -3645,6 +3665,12 @@ commands:
           - id: eu-central-1
             name: eu-central-1
             type: string
+          - id: eu-central-2
+            name: eu-central-2
+            type: string
+          - id: eu-north-1
+            name: eu-north-1
+            type: string
           - id: eu-west-1
             name: eu-west-1
             type: string
@@ -3659,6 +3685,9 @@ commands:
             type: string
           - id: us-east-1
             name: us-east-1
+            type: string
+          - id: us-east-2
+            name: us-east-2
             type: string
           - id: us-west-1
             name: us-west-1

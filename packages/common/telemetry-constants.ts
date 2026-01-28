@@ -278,6 +278,24 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    */
   properties: {
     instanceSize?: string
+    /**
+     * Whether Data API is enabled.
+     * true = "Data API + Connection String" (default)
+     * false = "Only Connection String"
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Data API schema configuration. Only relevant when dataApiEnabled is true.
+     * true = "Use dedicated API schema for Data API"
+     * false = "Use public schema for Data API" (default)
+     */
+    useApiSchema?: boolean
+    /**
+     * Postgres engine type selection.
+     * true = "Postgres with OrioleDB" (alpha)
+     * false = "Postgres" (default)
+     */
+    useOrioleDb?: boolean
   }
   groups: TelemetryGroups
 }
@@ -1716,18 +1734,12 @@ export interface HomeActivityStatClickedEvent {
 export interface RealtimeExperimentExposedEvent {
   action: 'realtime_experiment_exposed'
   properties: {
-    /**
-     * The experiment variant shown to the user
-     */
+    /** The PostHog experiment/feature flag name */
+    experiment_id: 'realtimeButtonVariant'
+    /** The experiment variant shown to the user */
     variant: 'control' | 'hide-button' | 'triggers'
-    /**
-     * Whether the table already has realtime enabled
-     */
+    /** Whether the table already has realtime enabled */
     table_has_realtime_enabled: boolean
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
   }
   groups: TelemetryGroups
 }

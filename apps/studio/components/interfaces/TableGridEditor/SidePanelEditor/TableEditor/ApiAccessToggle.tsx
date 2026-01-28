@@ -319,9 +319,10 @@ export const ApiAccessToggle = ({
             <p className="text-sm text-foreground flex items-center gap-1.5">
               Data API Access
               <InfoTooltip side="top" className="max-w-80">
-                This controls which operations the <code className="text-xs">anon</code> and{' '}
-                <code className="text-xs">authenticated</code> roles can perform on this table via
-                the Data API. Unselected privileges are revoked from these roles.
+                This controls which operations the <code className="text-code-inline">anon</code>{' '}
+                and <code className="text-code-inline whitespace-nowrap">authenticated</code> roles
+                can perform on this table via the Data API. Unselected privileges are revoked from
+                these roles.
               </InfoTooltip>
             </p>
             <p className="text-sm text-foreground-lighter">
@@ -334,7 +335,11 @@ export const ApiAccessToggle = ({
               onOpenChange={setIsPrivilegesPopoverOpen}
             >
               <PopoverTrigger_Shadcn_ asChild disabled={isDisabled || !hasNonEmptyPrivileges}>
-                <Button type="text" className="w-6 h-6 p-0 text-foreground-light">
+                <Button
+                  type="text"
+                  className="w-6 h-6 p-0 text-foreground-light"
+                  aria-label="Configure API privileges"
+                >
                   <Settings strokeWidth={1.5} size={16} />
                   {hasPartialPrivileges && (
                     <span className="absolute right-0 top-0 h-1.5 w-1.5 rounded-full bg-foreground shadow-sm" />

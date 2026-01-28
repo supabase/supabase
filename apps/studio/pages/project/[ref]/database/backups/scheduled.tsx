@@ -81,7 +81,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                   <>
                     {!isPitrEnabled && (
                       <p className="text-sm text-foreground-light">
-                        Projects are backed up daily around midnight of your project's region and
+                        Projects are backed up daily around midnight of your project’s region and
                         can be restored at any time.
                       </p>
                     )}

@@ -1,13 +1,16 @@
 name: Authorize Vercel Deploys
 
+# This workflow is triggered by the validate-pr workflow. When it's triggered, it will run the
+# authorize-vercel-deploys.yml in master branch. If you want to change it, you'll have to merge it into master.
 on:
-  pull_request:
-    branches:
-      - 'master'
+  # only run this workflow when the validate-pr workflow completes (successfully or not)
+  workflow_run:
+    workflows: ['Validate pull request']
+    types: [completed]
 
-# Cancel old builds on new commit for same workflow + branch/PR
+# Cancel old builds on new commit for same workflow + branch/PR.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -18,9 +21,11 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
+      # Checkout the master branch from the supabase repo and run that script to authorize Vercel deploys
       - name: Check out repo
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
+          ref: master
           # fetch only the root files and scripts folder
           sparse-checkout: |
             scripts
@@ -41,3 +46,5 @@ jobs:
           pnpm run authorize-vercel-deploys
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          # The SHA of the commit that triggered the validate-pr workflow
+          HEAD_COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}

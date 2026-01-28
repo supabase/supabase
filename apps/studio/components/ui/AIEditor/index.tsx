@@ -1,4 +1,4 @@
-import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
+import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'
@@ -9,6 +9,7 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { constructHeaders } from 'data/fetchers'
 import { detectOS } from 'lib/helpers'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -38,7 +39,7 @@ interface AIEditorProps {
 // Can we try to de-dupe accordingly? Perhaps the SQL Editor could use this AIEditor
 // We have a tendency to create multiple versions of the monaco editor like RLSCodeEditor
 // so hoping to prevent that from snowballing
-const AIEditor = ({
+export const AIEditor = ({
   language = 'javascript',
   value,
   defaultValue = '',
@@ -200,18 +201,24 @@ const AIEditor = ({
       diagnosticCodesToIgnore: [2792],
     })
 
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
-      .then((response) => response.text())
-      .then((code) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
-      })
-
-    // Add edge runtime types to the TS language service
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
-      .then((response) => response.text())
-      .then((code) => {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
-      })
+    if (language === 'javascript' || language === 'typescript') {
+      // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
+      // Monaco editor.
+      import('public/deno/edge-runtime.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno edge-runtime typings:', error)
+        })
+      import('public/deno/lib.deno.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno lib typings:', error)
+        })
+    }
 
     if (!!executeQueryRef.current) {
       editor.addAction({
@@ -369,17 +376,12 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="supabase"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}
             onMount={(editor: monacoEditor.IStandaloneDiffEditor) => {
               diffEditorRef.current = editor
               setIsDiffEditorMounted(true)
-            }}
-            options={{
-              ...defaultOptions,
-              renderSideBySide: false,
             }}
           />
           {isDiffEditorMounted && (
@@ -458,5 +460,3 @@ const AIEditor = ({
     </div>
   )
 }
-
-export default AIEditor

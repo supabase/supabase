@@ -7,7 +7,10 @@ import { dataset } from './dataset'
 import {
   completenessScorer,
   concisenessScorer,
+  correctnessScorer,
+  docsFaithfulnessScorer,
   goalCompletionScorer,
+  sqlIdentifierQuotingScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
 } from './scorer'
@@ -22,23 +25,22 @@ Eval('Assistant', {
   task: async (input) => {
     const result = await generateAssistantResponse({
       model: openai('gpt-5-mini'),
-      messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input }] }],
-      tools: await getMockTools(),
+      messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input.prompt }] }],
+      tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
     })
+
+    const finishReason = await result.finishReason
 
     // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
     const steps = await result.steps
 
-    const stepsSerialized = steps
-      .map((step) => {
-        const toolCalls = step.toolCalls
-          ?.map((call) => JSON.stringify({ tool: call.toolName, input: call.input }))
-          .join('\n')
-
-        const text = step.text
-        return toolCalls ? `${text}\n${toolCalls}` : text
-      })
-      .join('\n')
+    const simplifiedSteps = steps.map((step) => ({
+      text: step.text,
+      toolCalls: step.toolCalls.map((call) => ({
+        toolName: call.toolName,
+        input: call.input,
+      })),
+    }))
 
     const toolNames: string[] = []
     const sqlQueries: string[] = []
@@ -65,7 +67,8 @@ Eval('Assistant', {
     }
 
     return {
-      stepsSerialized,
+      finishReason,
+      steps: simplifiedSteps,
       toolNames,
       sqlQueries,
       docs,
@@ -74,9 +77,12 @@ Eval('Assistant', {
   scores: [
     toolUsageScorer,
     sqlSyntaxScorer,
+    sqlIdentifierQuotingScorer,
     goalCompletionScorer,
     concisenessScorer,
     completenessScorer,
+    docsFaithfulnessScorer,
+    correctnessScorer,
   ],
 })
 

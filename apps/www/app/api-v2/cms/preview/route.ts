@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 export async function GET(request: Request) {
   const draft = await draftMode()
@@ -31,5 +32,16 @@ export async function GET(request: Request) {
   draft.enable()
 
   // Redirect to the path from the fetched post
-  redirect(`/${path}/${slug}`)
+  const redir = `/${path}/${slug}`
+
+  try {
+    const parsed = new URL(redir, SITE_ORIGIN)
+    // Only allow paths that stay on the origin
+    if (parsed.origin === SITE_ORIGIN) {
+      redirect(parsed.pathname)
+    }
+  } catch {
+    // Invalid URL
+  }
+  redirect(SITE_ORIGIN)
 }
