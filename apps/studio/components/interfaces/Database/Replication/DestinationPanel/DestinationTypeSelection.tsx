@@ -1,7 +1,9 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { Badge, RadioGroupStacked, RadioGroupStackedItem, cn } from 'ui'
+
 import { DestinationType } from './DestinationPanel.types'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 type DestinationTypeSelectionProps = {
   editMode: boolean
@@ -101,6 +103,15 @@ export const DestinationTypeSelection = ({
           </RadioGroupStackedItem>
         )}
       </RadioGroupStacked>
+
+      {selectedType !== 'Read Replica' && (
+        <p className="mt-3 text-sm text-foreground-light">
+          Replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
+          <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+            Leave feedback
+          </InlineLink>
+        </p>
+      )}
     </div>
   )
 }
