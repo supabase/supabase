@@ -5,8 +5,9 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { components } from 'api-types'
 import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions'
 
-export default (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
+export default function apiHandler(req: NextApiRequest, res: NextApiResponse) {
+  return apiWrapper(req, res, handler, { withAuth: true })
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
