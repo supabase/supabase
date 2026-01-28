@@ -66,7 +66,7 @@ const fetchServiceHealthMetrics = async (
       iso_timestamp_start: startDate,
       iso_timestamp_end: endDate,
     },
-    {} // No additional filters
+    {}
   )
 
   const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
@@ -184,5 +184,6 @@ export const useServiceHealthMetrics = (
     services,
     aggregated,
     isLoading,
+    endDate,
   }
 }
