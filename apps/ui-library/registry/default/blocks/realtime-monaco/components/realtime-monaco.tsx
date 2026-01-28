@@ -1,13 +1,7 @@
 'use client'
 
 import { Editor } from '@monaco-editor/react'
-import { SupabaseProvider } from '@tiagoantunespt/y-supabase'
-import type { editor as MonacoEditor } from 'monaco-editor'
-import { useCallback, useEffect, useRef } from 'react'
-import { MonacoBinding } from 'y-monaco'
-import * as Y from 'yjs'
-
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
+import { useConnectOnMount } from '../hooks/use-connect-on-mount'
 
 type RealtimeMonacoProps = {
   channel: string
@@ -26,47 +20,14 @@ const RealtimeMonaco = ({
   theme,
   ...rest
 }: RealtimeMonacoProps) => {
-  const docRef = useRef<Y.Doc | null>(null)
-  const providerRef = useRef<SupabaseProvider | null>(null)
-  const bindingRef = useRef<MonacoBinding | null>(null)
-
-  const handleMount = useCallback(
-    (editor: MonacoEditor.IStandaloneCodeEditor) => {
-      if (bindingRef.current) return
-
-      const doc = new Y.Doc()
-      const yText = doc.getText('monaco')
-      const supabase = createClient()
-      const provider = new SupabaseProvider(channel, doc, supabase as any)
-
-      docRef.current = doc
-      providerRef.current = provider
-
-      const model = editor.getModel()
-      if (!model) return
-
-      bindingRef.current = new MonacoBinding(yText, model, new Set([editor]))
-    },
-    [channel]
-  )
-
-  useEffect(() => {
-    return () => {
-      bindingRef.current?.destroy()
-      bindingRef.current = null
-      providerRef.current?.destroy()
-      providerRef.current = null
-      docRef.current?.destroy()
-      docRef.current = null
-    }
-  }, [])
+  const { connectOnMount } = useConnectOnMount({ channel })
 
   return (
     <Editor
       height={height}
       language={language}
       theme={theme === 'dark' ? 'vs-dark' : 'light'}
-      onMount={handleMount}
+      onMount={connectOnMount}
       {...rest}
     />
   )
