@@ -99,11 +99,11 @@ const useServiceHealthQuery = (
   enabled: boolean
 ) => {
   const config = SERVICE_CONFIG[serviceKey]
+  const table = config.table
 
   const queryResult = useQuery({
-    queryKey: ['service-health-metrics', projectRef, serviceKey, startDate, endDate],
-    queryFn: ({ signal }) =>
-      fetchServiceHealthMetrics(projectRef, config.table, startDate, endDate, signal),
+    queryKey: ['service-health-metrics', projectRef, serviceKey, startDate, endDate, table],
+    queryFn: ({ signal }) => fetchServiceHealthMetrics(projectRef, table, startDate, endDate, signal),
     enabled: enabled && config.enabled && Boolean(projectRef),
     staleTime: 1000 * 60, // 1 minute
   })
@@ -147,8 +147,8 @@ export const useServiceHealthMetrics = (
   interval: '1hr' | '1day' | '7day',
   refreshKey: number
 ) => {
-  // Calculate date range based on interval and refreshKey
-  // refreshKey forces recalculation when user clicks refresh
+  // Calculate date range based on interval
+  // refreshKey is intentionally included to force recalculation when user refreshes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate } = useMemo(() => calculateDateRange(interval), [interval, refreshKey])
 
@@ -162,14 +162,17 @@ export const useServiceHealthMetrics = (
   const realtime = useServiceHealthQuery(projectRef, 'realtime', startDate, endDate, enabled)
   const postgrest = useServiceHealthQuery(projectRef, 'postgrest', startDate, endDate, enabled)
 
-  const services: Record<ServiceKey, ServiceHealthData> = {
-    db,
-    auth,
-    functions,
-    storage,
-    realtime,
-    postgrest,
-  }
+  const services: Record<ServiceKey, ServiceHealthData> = useMemo(
+    () => ({
+      db,
+      auth,
+      functions,
+      storage,
+      realtime,
+      postgrest,
+    }),
+    [db, auth, functions, storage, realtime, postgrest]
+  )
 
   // Calculate aggregated metrics
   const aggregated = useMemo(() => calculateAggregatedMetrics(Object.values(services)), [services])
