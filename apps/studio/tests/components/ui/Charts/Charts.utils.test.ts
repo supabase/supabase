@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import {
+  formatPercentage,
   isFloat,
   numberFormatter,
   precisionFormatter,
@@ -84,6 +85,23 @@ describe('precisionFormatter', () => {
 
   it('should format exactly zero normally', () => {
     expect(precisionFormatter(0, 2)).toBe('0.00')
+  })
+})
+
+describe('formatPercentage', () => {
+  it('should format 100 without decimals', () => {
+    expect(formatPercentage(100, 2)).toBe('100%')
+    expect(formatPercentage(100, 0)).toBe('100%')
+  })
+
+  it('should keep decimals for non-100 values', () => {
+    expect(formatPercentage(99.99, 2)).toBe('99.99%')
+    expect(formatPercentage(0.5, 2)).toBe('0.50%')
+  })
+
+  it('should use numberFormatter for integers below 100', () => {
+    expect(formatPercentage(50, 2)).toBe('50%')
+    expect(formatPercentage(1, 2)).toBe('1%')
   })
 })
 
