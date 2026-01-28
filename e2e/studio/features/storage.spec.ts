@@ -358,3 +358,11 @@ test.describe('Storage Settings - Self Hosted', () => {
     ).toBeVisible()
   })
 })
+
+test('shows storage tiering lifecycle generator in storage settings', async ({ page, ref }) => {
+  // Navigate to Storage settings page
+  await page.goto(`/project/${ref}/storage/files/settings`)
+
+  await expect(page.getByText('Storage tiering (AWS lifecycle rules)')).toBeVisible()
+  await expect(page.getByTestId('storage-tiering-json')).toBeVisible()
+})

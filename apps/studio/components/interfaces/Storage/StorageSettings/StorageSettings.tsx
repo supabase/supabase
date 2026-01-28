@@ -42,6 +42,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { StorageFileSizeLimitErrorMessage } from './StorageFileSizeLimitErrorMessage'
+import { StorageTieringGenerator } from './StorageTieringGenerator'
 import {
   StorageListV2MigratingCallout,
   StorageListV2MigrationCallout,
@@ -459,6 +460,16 @@ export const StorageSettings = () => {
                         </CardFooter>
                       </Card>
                     </form>
+
+                    <div className="space-y-2">
+                      <div>
+                        <h3 className="text-base font-medium">Storage tiering (AWS lifecycle rules)</h3>
+                        <p className="text-sm text-foreground-light">
+                          Generate S3 lifecycle/tiering rules for cost savings (manual apply).
+                        </p>
+                      </div>
+                      <StorageTieringGenerator />
+                    </div>
                   </>
                 )}
               </>
