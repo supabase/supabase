@@ -2,7 +2,7 @@
 
 This example demonstrates how to use Supabase Auth with React Native and Expo.
 
-## Getting Started
+## Getting started
 
 ### 1. Create a Supabase project
 
@@ -10,13 +10,9 @@ This example demonstrates how to use Supabase Auth with React Native and Expo.
 
 ### 2. Configure environment variables
 
-Copy the `.env.example` file to `.env`:
+Create a `.env` file and populate with your Supabase connection variables:
 
-```bash
-cp .env.example .env
-```
-
-Then update the values with your Supabase project URL and anon key. You can find these in your [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) under Settings > API.
+You can find these in your [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) under Settings > API.
 
 ### 3. Install dependencies
 
@@ -32,7 +28,7 @@ npm start
 
 Follow the instructions in the terminal to open the app on your device or emulator.
 
-## Project Structure
+## Project structure
 
 ```
 ├── App.tsx                 # Main app component
@@ -52,7 +48,7 @@ Follow the instructions in the terminal to open the app on your device or emulat
 - Session persistence with AsyncStorage
 - Automatic token refresh
 
-## Learn More
+## Learn more
 
 - [Supabase Auth Documentation](https://supabase.com/docs/guides/auth)
 - [React Native Quickstart](https://supabase.com/docs/guides/auth/quickstarts/react-native)
