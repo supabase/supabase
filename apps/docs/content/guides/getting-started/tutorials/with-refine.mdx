@@ -236,9 +236,9 @@ const authProvider: AuthProvider = {
   check: async () => {
     try {
       const { data } = await supabaseClient.auth.getUser()
-      const { User } = data
+      const { user } = data
 
-      if (!User) {
+      if (!user) {
         return {
           authenticated: false,
           error: {
