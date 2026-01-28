@@ -122,6 +122,7 @@ allow_list = [
     "[Ss]erverside",
     "[Ss]itekeys?",
     "[Ss]tateful",
+    "[Ss]treamable",
     "[Ss]tructs?",
     "[Ss]ubcommands?",
     "[Ss]ubdomains?",

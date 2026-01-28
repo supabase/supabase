@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
+import { PROJECT_STATUS } from '@/lib/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
@@ -42,6 +43,7 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
+import { Route } from '../ui/ui.types'
 import {
   useIsAPIDocsSidePanelEnabled,
   useUnifiedLogsPreview,
@@ -162,7 +164,7 @@ export function SideBarNavLink({
   disabled,
   ...props
 }: {
-  route: any
+  route: Route
   active?: boolean
   disabled?: boolean
   onClick?: () => void
@@ -228,6 +230,8 @@ const ProjectLinks = () => {
   const showReports = useIsFeatureEnabled('reports:all')
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
@@ -278,6 +282,7 @@ const ProjectLinks = () => {
         {toolRoutes.map((route, i) => (
           <SideBarNavLink
             key={`tools-routes-${i}`}
+            disabled={!isProjectActive}
             route={route}
             active={activeRoute === route.key}
           />
@@ -288,6 +293,7 @@ const ProjectLinks = () => {
         {productRoutes.map((route, i) => (
           <SideBarNavLink
             key={`product-routes-${i}`}
+            disabled={route.key !== 'functions' && !isProjectActive}
             route={route}
             active={activeRoute === route.key}
           />
@@ -326,33 +332,28 @@ const ProjectLinks = () => {
                     : route
                 }
                 active={activeRoute === route.key}
+                disabled={!isProjectActive}
                 onClick={handleApiClick}
               />
             )
           } else if (route.key === 'advisors') {
             return (
               <div className="relative" key={route.key}>
-                {ActiveDot(errorLints, securityLints)}
+                {isProjectActive && ActiveDot(errorLints, securityLints)}
                 <SideBarNavLink
                   key={`other-routes-${i}`}
                   route={route}
+                  disabled={!isProjectActive}
                   active={activeRoute === route.key}
                 />
               </div>
-            )
-          } else if (route.key === 'logs') {
-            return (
-              <SideBarNavLink
-                key={`other-routes-${i}`}
-                route={route}
-                active={activeRoute === route.key}
-              />
             )
           } else {
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
                 route={route}
+                disabled={!isProjectActive}
                 active={activeRoute === route.key}
               />
             )
