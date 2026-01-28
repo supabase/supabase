@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PropsWithChildren } from 'react'
 
+import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
@@ -19,5 +20,10 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  return children
+  return (
+    <>
+      {children}
+      <SaveQueueActionBar />
+    </>
+  )
 }
