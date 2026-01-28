@@ -187,8 +187,9 @@ export const ProjectUsageSection = () => {
 
   const isLoading = isHealthLoading
 
-  const handleBarClick = (logRoute: string, serviceKey: ServiceKey) => (datum: any) => {
-    if (!datum?.timestamp) return
+  const handleBarClick =
+    (logRoute: string, serviceKey: ServiceKey) => (datum: LogsBarChartDatum) => {
+      if (!datum?.timestamp) return
 
     const datumTimestamp = dayjs(datum.timestamp).toISOString()
     const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
