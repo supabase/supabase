@@ -392,13 +392,9 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     setIsExporting(false)
   }
 
-  function deselectRows() {
-    snap.resetSelectedRows()
-  }
-
   useSubscribeToImpersonatedRole(() => {
     if (snap.allRowsSelected || snap.selectedRows.size > 0) {
-      deselectRows()
+      snap.resetSelectedRows()
     }
   })
 
