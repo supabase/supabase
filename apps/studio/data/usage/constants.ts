@@ -1,6 +1,7 @@
 export const VIOLATION_TYPE_LABELS: Record<string, string> = {
   exceed_db_size_quota: 'DB Size Exceeded',
   exceed_egress_quota: 'Egress Exceeded',
+  exceed_cached_egress_quota: 'Cached Egress Exceeded',
   exceed_edge_functions_count_quota: 'Edge Functions Count Exceeded',
   exceed_edge_functions_invocations_quota: 'Edge Functions Invocations Exceeded',
   exceed_monthly_active_users_quota: 'Monthly Active Users Exceeded',

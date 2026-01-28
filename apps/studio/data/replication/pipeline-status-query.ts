@@ -6,7 +6,8 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId?: number }
-type ReplicationPipelineStatusResponse = components['schemas']['ReplicationPipelineStatusResponse']
+export type ReplicationPipelineStatusResponse =
+  components['schemas']['ReplicationPipelineStatusResponse']
 export type ReplicationPipelineStatus = ReplicationPipelineStatusResponse['status']['name']
 
 async function fetchReplicationPipelineStatus(

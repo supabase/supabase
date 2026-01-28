@@ -1,26 +1,30 @@
-import { PropsWithChildren } from 'react'
-
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useFlag } from 'common'
 import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 import { IncidentBanner } from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
+import { PropsWithChildren } from 'react'
+
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
+import { MaintenanceBanner } from '@/components/layouts/AppLayout/MaintenanceBanner'
+import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const { data: incidents } = useIncidentStatusQuery()
+  const { data: allStatusPageEvents } = useIncidentStatusQuery()
+  const { maintenanceEvents = [], incidents = [] } = allStatusPageEvents ?? {}
 
   const ongoingIncident =
     useFlag('ongoingIncident') ||
     process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true' ||
-    (incidents?.length ?? 0) > 0
+    incidents.length > 0
+  const ongoingMaintenance = maintenanceEvents.length > 0
+
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
     <div className="flex flex-col">
       <div className="flex-shrink-0">
-        {ongoingIncident && <IncidentBanner />}
+        {ongoingIncident ? <IncidentBanner /> : ongoingMaintenance ? <MaintenanceBanner /> : null}
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}

@@ -1,9 +1,10 @@
-import { useState } from 'react'
-
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useFlag, useParams } from 'common'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 import {
-  cn,
+  Button,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -11,12 +12,18 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  cn,
 } from 'ui'
+
 import { EnableReplicationCallout } from '../EnableReplicationCallout'
+import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationForm } from './DestinationForm'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -40,7 +47,9 @@ export const DestinationPanel = ({
   onSuccessCreateReadReplica,
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
+  const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
   const [selectedType, setSelectedType] = useState<DestinationType>(
     type || (unifiedReplication ? 'Read Replica' : 'BigQuery')
@@ -82,9 +91,42 @@ export const DestinationPanel = ({
 
             {selectedType === 'Read Replica' ? (
               <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
+            ) : unifiedReplication && !enablePgReplicate ? (
+              <SheetSection>
+                <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
+                  <div className="flex flex-col gap-y-1">
+                    <h4>Replicate data to external destinations in real-time</h4>
+                    <p className="text-sm text-foreground-light">
+                      We are currently in <span className="text-foreground">private alpha</span> and
+                      slowly onboarding new customers to ensure stable data pipelines. Request
+                      access below to join the waitlist. Read replicas are available now.
+                    </p>
+                  </div>
+                  <div className="flex gap-x-2">
+                    <Button
+                      asChild
+                      type="secondary"
+                      iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
+                    >
+                      <Link
+                        href="https://forms.supabase.com/pg_replicate"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Request alpha access
+                      </Link>
+                    </Button>
+                    <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
+                  </div>
+                </div>
+              </SheetSection>
             ) : unifiedReplication && replicationNotEnabled ? (
               <SheetSection>
-                <EnableReplicationCallout className="!p-6" type={selectedType} />
+                <EnableReplicationCallout
+                  className="!p-6"
+                  type={selectedType}
+                  hasAccess={hasETLReplicationAccess}
+                />
               </SheetSection>
             ) : (
               <DestinationForm

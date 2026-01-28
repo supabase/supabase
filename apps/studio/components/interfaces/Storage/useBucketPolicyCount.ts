@@ -1,24 +1,35 @@
-import { formatPoliciesForStorage } from 'components/interfaces/Storage/Storage.utils'
+import { useCallback, useMemo } from 'react'
+
+import { extractBucketNameFromDefinition } from 'components/interfaces/Storage/Storage.utils'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
-export const useBucketPolicyCount = () => {
-  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
-  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({
-    projectRef: project?.ref,
-  })
-  const { data: policiesData = [], isPending: isLoadingPolicies } = useDatabasePoliciesQuery({
+export function useBucketPolicyCount() {
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
+  const { data: policiesData = [], isPending: isPoliciesPending } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'storage',
   })
-  const storageObjectsPolicies = policiesData.filter((policy: any) => policy.table === 'objects')
-  const formattedPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
 
-  const getPolicyCount = (bucketName: string) => {
-    return formattedPolicies.find((x) => x.name === bucketName)?.policies.length ?? 0
-  }
+  const policyCountByBucket = useMemo(() => {
+    const countMap = new Map<string, number>()
+    for (const policy of policiesData) {
+      if (policy.table !== 'objects') continue
+      const bucketName =
+        extractBucketNameFromDefinition(policy.definition) ??
+        extractBucketNameFromDefinition(policy.check)
+      if (bucketName) {
+        countMap.set(bucketName, (countMap.get(bucketName) ?? 0) + 1)
+      }
+    }
+    return countMap
+  }, [policiesData])
 
-  return { getPolicyCount, isLoading: isLoadingProject || isLoadingBuckets || isLoadingPolicies }
+  const getPolicyCount = useCallback(
+    (bucketName: string) => policyCountByBucket.get(bucketName) ?? 0,
+    [policyCountByBucket]
+  )
+
+  return { getPolicyCount, isLoading: isProjectPending || isPoliciesPending }
 }

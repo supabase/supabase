@@ -6,6 +6,7 @@ import { Fragment, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
+import { IS_PLATFORM } from 'lib/constants'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -123,11 +124,15 @@ const ObservabilityMenu = () => {
       title: 'Performance Reports',
       key: 'performance-reports',
       items: [
-        {
-          name: 'API Gateway',
-          key: 'api-overview',
-          url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'API Gateway',
+                key: 'api-overview',
+                url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
+              },
+            ]
+          : []),
         {
           name: 'Query Performance',
           key: 'query-performance',
@@ -157,11 +162,15 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/observability/database${preservedQueryParams}`,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Database',
+                key: 'database',
+                url: `/project/${ref}/observability/database${preservedQueryParams}`,
+              },
+            ]
+          : []),
         ...(edgeFnEnabled
           ? [
               {
@@ -203,86 +212,88 @@ const ObservabilityMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-y-6">
-          <div className="mx-2">
-            <Menu.Group
-              title={
-                <span className="flex w-full items-center justify-between relative h-6">
-                  <span className="uppercase font-mono">Custom Reports</span>
-                  {reportMenuItems.length > 0 && (
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      icon={<Plus />}
-                      disabled={!canCreateCustomReport}
-                      className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
-                      onClick={() => {
-                        setShowNewReportModal(true)
+          {IS_PLATFORM && (
+            <div className="mx-2">
+              <Menu.Group
+                title={
+                  <span className="flex w-full items-center justify-between relative h-6">
+                    <span className="uppercase font-mono">Custom Reports</span>
+                    {reportMenuItems.length > 0 && (
+                      <ButtonTooltip
+                        type="default"
+                        size="tiny"
+                        icon={<Plus />}
+                        disabled={!canCreateCustomReport}
+                        className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
+                        onClick={() => {
+                          setShowNewReportModal(true)
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canCreateCustomReport
+                              ? 'You need additional permissions to create custom reports'
+                              : undefined,
+                          },
+                        }}
+                      />
+                    )}
+                  </span>
+                }
+              />
+              {reportMenuItems.length === 0 ? (
+                <div className="px-2">
+                  <InnerSideBarEmptyPanel
+                    title="No custom reports yet"
+                    description="Create and save custom reports to track your project metrics"
+                    actions={
+                      <ButtonTooltip
+                        type="default"
+                        icon={<Plus />}
+                        disabled={!canCreateCustomReport}
+                        onClick={() => {
+                          setShowNewReportModal(true)
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canCreateCustomReport
+                              ? 'You need additional permissions to create custom reports'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        New custom report
+                      </ButtonTooltip>
+                    }
+                  />
+                </div>
+              ) : (
+                <>
+                  {reportMenuItems.map((item) => (
+                    <ObservabilityMenuItem
+                      key={item.id}
+                      item={item as any}
+                      pageKey={pageKey}
+                      onSelectEdit={() => {
+                        setSelectedReportToUpdate(item.report)
                       }}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateCustomReport
-                            ? 'You need additional permissions to create custom reports'
-                            : undefined,
-                        },
+                      onSelectDelete={() => {
+                        setSelectedReportToDelete(item.report)
+                        setDeleteModalOpen(true)
                       }}
                     />
-                  )}
-                </span>
-              }
-            />
-            {reportMenuItems.length === 0 ? (
-              <div className="px-2">
-                <InnerSideBarEmptyPanel
-                  title="No custom reports yet"
-                  description="Create and save custom reports to track your project metrics"
-                  actions={
-                    <ButtonTooltip
-                      type="default"
-                      icon={<Plus />}
-                      disabled={!canCreateCustomReport}
-                      onClick={() => {
-                        setShowNewReportModal(true)
-                      }}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateCustomReport
-                            ? 'You need additional permissions to create custom reports'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      New custom report
-                    </ButtonTooltip>
-                  }
-                />
-              </div>
-            ) : (
-              <>
-                {reportMenuItems.map((item) => (
-                  <ObservabilityMenuItem
-                    key={item.id}
-                    item={item as any}
-                    pageKey={pageKey}
-                    onSelectEdit={() => {
-                      setSelectedReportToUpdate(item.report)
-                    }}
-                    onSelectDelete={() => {
-                      setSelectedReportToDelete(item.report)
-                      setDeleteModalOpen(true)
-                    }}
-                  />
-                ))}
-              </>
-            )}
-          </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
 
           {menuItems.map((item, idx) => (
             <Fragment key={idx}>
               <div className="h-px w-full bg-border-overlay first:hidden" />
               <div>
-                {item.items ? (
+                {item.items && item.items.length > 0 ? (
                   <div className="px-2">
                     <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
                     <div key={item.key} className="flex flex-col">
