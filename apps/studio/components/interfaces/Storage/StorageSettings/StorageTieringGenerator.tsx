@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { Bucket, usePaginatedBucketsQuery } from 'data/storage/buckets-query'
 import {
   Button,
   Card,
@@ -23,14 +23,40 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const FormSchema = z.object({
-  bucket: z.string().trim().min(1, 'Select a bucket'),
-  prefix: z.string().trim().optional(),
-  transitionToIAAfterDays: z.coerce.number().int().min(0).optional(),
-  transitionToGlacierAfterDays: z.coerce.number().int().min(0).optional(),
-  expireAfterDays: z.coerce.number().int().min(0).optional(),
-  abortMultipartAfterDays: z.coerce.number().int().min(0).default(7),
-})
+const FormSchema = z
+  .object({
+    bucket: z.string().trim().min(1, 'Select a bucket'),
+    prefix: z.string().trim().optional(),
+    transitionToIAAfterDays: z.coerce.number().int().min(0).optional(),
+    transitionToGlacierAfterDays: z.coerce.number().int().min(0).optional(),
+    expireAfterDays: z.coerce.number().int().min(0).optional(),
+    abortMultipartAfterDays: z.coerce.number().int().min(0).default(7),
+  })
+  .superRefine((data, ctx) => {
+    const { transitionToIAAfterDays, transitionToGlacierAfterDays, expireAfterDays } = data
+
+    if (
+      typeof transitionToIAAfterDays === 'number' &&
+      typeof transitionToGlacierAfterDays === 'number' &&
+      transitionToGlacierAfterDays <= transitionToIAAfterDays
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'GLACIER_IR transition must be after STANDARD_IA transition',
+        path: ['transitionToGlacierAfterDays'],
+      })
+    }
+
+    if (typeof expireAfterDays === 'number' && typeof transitionToGlacierAfterDays === 'number') {
+      if (expireAfterDays <= transitionToGlacierAfterDays) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Expiration must be after GLACIER_IR transition',
+          path: ['expireAfterDays'],
+        })
+      }
+    }
+  })
 
 type FormValues = z.infer<typeof FormSchema>
 
@@ -45,7 +71,7 @@ type FormValues = z.infer<typeof FormSchema>
 export const StorageTieringGenerator = () => {
   const { ref: projectRef } = useParams()
 
-  const { data: buckets, isFetching } = useBucketsQuery({ projectRef })
+  const { data: buckets, isFetching } = usePaginatedBucketsQuery({ projectRef, limit: 1000 })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -61,11 +87,20 @@ export const StorageTieringGenerator = () => {
 
   const values = form.watch()
 
+  type LifecycleRule = {
+    ID: string
+    Status: 'Enabled' | 'Disabled'
+    Filter: { Prefix?: string }
+    AbortIncompleteMultipartUpload: { DaysAfterInitiation: number }
+    Transitions?: Array<{ Days: number; StorageClass: string }>
+    Expiration?: { Days: number }
+  }
+
   const lifecycleJson = useMemo(() => {
     const prefix = values.prefix?.trim() || undefined
 
     // Build a single rule. Keep this minimal and explicit.
-    const rule: any = {
+    const rule: LifecycleRule = {
       ID: 'supabase-studio-tiering-rule',
       Status: 'Enabled',
       Filter: prefix ? { Prefix: prefix } : {},
@@ -105,7 +140,10 @@ export const StorageTieringGenerator = () => {
     }
   }
 
-  const bucketOptions = (buckets ?? []).map((b) => ({ id: b.id, name: b.name }))
+  const bucketOptions = (buckets?.pages.flatMap((page) => page) ?? []).map((b: Bucket) => ({
+    id: b.id,
+    name: b.name,
+  }))
 
   return (
     <Card>
@@ -173,6 +211,7 @@ export const StorageTieringGenerator = () => {
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ type="number" min={0} {...field} />
                     </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
@@ -185,6 +224,7 @@ export const StorageTieringGenerator = () => {
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ type="number" min={0} {...field} />
                     </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
@@ -201,6 +241,7 @@ export const StorageTieringGenerator = () => {
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ type="number" min={0} {...field} value={field.value ?? ''} />
                     </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
@@ -225,7 +266,7 @@ export const StorageTieringGenerator = () => {
             <FormItemLayout
               label="Generated AWS S3 LifecycleConfiguration JSON"
               description="Apply this in AWS S3 (Bucket → Management → Lifecycle rules) or via the AWS CLI/SDK."
-              layout="flex-col"
+              layout="vertical"
             >
               <pre
                 data-testid="storage-tiering-json"
