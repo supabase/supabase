@@ -10,7 +10,7 @@ import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachm
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { type Dispatch, type MouseEventHandler, useEffect } from 'react'
+import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
 
@@ -128,7 +128,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
     const payload = {
       ...values,
-      category,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
       allowSupportAccess:
@@ -180,15 +179,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     handleFormSubmit(event)
   }
 
-  useEffect(() => {
-    if (simplifiedSupportForm) {
-      form.setValue('category', 'Others')
-    } else {
-      form.setValue('category', '' as any)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [simplifiedSupportForm])
-
   return (
     <Form_Shadcn_ {...form}>
       <form id="support-form" className="flex flex-col gap-y-6">
@@ -203,14 +193,12 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             subscriptionPlanId={subscriptionPlanId}
             category={category}
           />
-          {!simplifiedSupportForm && (
-            <CategoryAndSeverityInfo
-              form={form}
-              category={category}
-              severity={severity}
-              projectRef={projectRef}
-            />
-          )}
+          <CategoryAndSeverityInfo
+            form={form}
+            category={category}
+            severity={severity}
+            projectRef={projectRef}
+          />
         </div>
 
         <DialogSectionSeparator />
