@@ -31,16 +31,13 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import { useServiceStats } from './ProjectUsageSection.utils'
-import type { StatsLike } from './ProjectUsageSection.utils'
+import { useServiceHealthMetrics } from '../Observability/useServiceHealthMetrics'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
   sumTotal,
   sumWarnings,
   sumErrors,
   computeSuccessAndNonSuccessRates,
-  computeChangePercent,
-  formatDelta,
 } from './ProjectUsage.metrics'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
@@ -89,7 +86,8 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  stats: StatsLike
+  isLoading: boolean
+  error: unknown | null
 }
 
 export const ProjectUsageSection = () => {
@@ -105,6 +103,7 @@ export const ProjectUsageSection = () => {
 
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
@@ -113,7 +112,11 @@ export const ProjectUsageSection = () => {
     return { datetimeFormat: format }
   }, [selectedInterval])
 
-  const statsByService = useServiceStats(projectRef!, interval)
+  const { services: healthServices, isLoading: isHealthLoading } = useServiceHealthMetrics(
+    projectRef!,
+    interval,
+    refreshKey
+  )
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -158,17 +161,25 @@ export const ProjectUsageSection = () => {
   const services: ServiceComputed[] = useMemo(
     () =>
       serviceBase.map((s) => {
-        const currentStats = statsByService[s.key].current
-        const data = currentStats.eventChartData
+        const healthData = healthServices[s.key]
+        const data = healthData.eventChartData
         const total = sumTotal(data)
         const warn = sumWarnings(data)
         const err = sumErrors(data)
-        return { ...s, stats: currentStats, data, total, warn, err }
+        return {
+          ...s,
+          data,
+          total,
+          warn,
+          err,
+          isLoading: healthData.isLoading,
+          error: healthData.error,
+        }
       }),
-    [serviceBase, statsByService]
+    [serviceBase, healthServices]
   )
 
-  const isLoading = services.some((s) => s.stats.isLoading)
+  const isLoading = isHealthLoading
 
   const handleBarClick = (logRoute: string, serviceKey: ServiceKey) => (datum: any) => {
     if (!datum?.timestamp) return
@@ -203,31 +214,11 @@ export const ProjectUsageSection = () => {
   const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
   const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
   const totalWarnings = enabledServices.reduce((sum, s) => sum + (s.warn || 0), 0)
-  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
+  const { successRate } = computeSuccessAndNonSuccessRates(
     totalRequests,
     totalWarnings,
     totalErrors
   )
-
-  const prevServiceTotals = useMemo(
-    () =>
-      serviceBase.map((s) => {
-        const previousStats = statsByService[s.key].previous
-        const data = previousStats.eventChartData
-        return {
-          enabled: s.enabled,
-          total: sumTotal(data),
-        }
-      }),
-    [serviceBase, statsByService]
-  )
-
-  const enabledPrev = prevServiceTotals.filter((s) => s.enabled)
-  const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
-
-  const totalRequestsChangePct = computeChangePercent(totalRequests, prevTotalRequests)
-  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand-link' : 'text-destructive'
-  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   return (
     <div className="space-y-6">
@@ -236,14 +227,12 @@ export const ProjectUsageSection = () => {
           <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={cn('text-sm', totalDeltaClass)}>
-              {formatDelta(totalRequestsChangePct)}
-            </span>
           </div>
           <div className="flex items-start gap-2 heading-section text-foreground-light">
-            <span className="text-foreground">{successRate.toFixed(1)}%</span>
+            <span className="text-foreground">
+              {successRate === 100 ? '100' : successRate.toFixed(1)}%
+            </span>
             <span>Success Rate</span>
-            <span className={cn('text-sm', nonSuccessClass)}>{formatDelta(nonSuccessRate)}</span>
           </div>
         </div>
         <DropdownMenu>
