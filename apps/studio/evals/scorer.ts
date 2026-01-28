@@ -326,7 +326,7 @@ export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = a
 
 export const urlValidityScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
   const responseText = extractTextOnly(output.steps)
-  const urls = extractUrls(responseText)
+  const urls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
 
   // Skip if no URLs found
   if (urls.length === 0) {

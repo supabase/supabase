@@ -116,4 +116,15 @@ export const dataset: AssistantEvalCase[] = [
       description: 'Verifies AI provides valid support ticket URL',
     },
   },
+  {
+    input: { prompt: 'What is my OAuth callback URL for setting up GitHub authentication?' },
+    expected: {
+      requiredTools: ['search_docs'],
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Verifies template URLs like https://<project-ref>.supabase.co/auth/v1/callback are excluded from URL validity scoring',
+    },
+  },
 ]

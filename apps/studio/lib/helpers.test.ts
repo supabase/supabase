@@ -22,6 +22,7 @@ import {
   removeCommentsFromSql,
   removeJSONTrailingComma,
   snakeToCamel,
+  stripMarkdownCodeBlocks,
   tablesToSQL,
   timeout,
   tryParseInt,
@@ -410,6 +411,95 @@ describe('extractUrls', () => {
   it('should handle URLs with subdomains', () => {
     const result = extractUrls('Visit https://www.example.com and https://api.example.com')
     expect(result).toEqual(['https://www.example.com', 'https://api.example.com'])
+  })
+
+  describe('with excludeCodeBlocks option', () => {
+    it('should exclude URLs in fenced code blocks', () => {
+      const text = 'Visit https://real.com\n```\nhttps://code.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs in fenced code blocks with language specifier', () => {
+      const text = 'Visit https://real.com\n```sql\nSELECT * FROM https://code.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs in inline code', () => {
+      const text = 'Use `https://code.com` for the endpoint, or visit https://real.com'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should handle multiple code blocks', () => {
+      const text =
+        'https://first.com\n```\nhttps://code1.com\n```\nhttps://second.com\n```\nhttps://code2.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual([
+        'https://first.com',
+        'https://second.com',
+      ])
+    })
+
+    it('should not exclude code blocks by default', () => {
+      const text = 'Visit https://real.com\n```\nhttps://code.com\n```'
+      expect(extractUrls(text)).toEqual(['https://real.com', 'https://code.com'])
+    })
+  })
+
+  describe('with excludeTemplates option', () => {
+    it('should not extract URLs with angle brackets in subdomain', () => {
+      // Angle brackets in subdomain prevent the URL from being extracted at all
+      const text = 'Visit https://real.com or https://<project-ref>.supabase.co'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs truncated at angle brackets in path', () => {
+      // The regex stops at angle brackets - exclude the whole truncated URL
+      const text = 'Visit https://real.com or https://example.com/api/<project-id>/data'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual(['https://real.com'])
+    })
+
+    it('should keep URLs without angle brackets', () => {
+      const text = 'Visit https://example.com/path_with_underscores'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual([
+        'https://example.com/path_with_underscores',
+      ])
+    })
+  })
+
+  describe('with both options', () => {
+    it('should exclude both code blocks and template URLs', () => {
+      const text =
+        'Visit https://real.com\n```\nhttps://code.com\n```\nOr https://<project-ref>.supabase.co'
+      expect(extractUrls(text, { excludeCodeBlocks: true, excludeTemplates: true })).toEqual([
+        'https://real.com',
+      ])
+    })
+  })
+})
+
+describe('stripMarkdownCodeBlocks', () => {
+  it('should remove fenced code blocks', () => {
+    const text = 'Before\n```\ncode here\n```\nAfter'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Before\n\nAfter')
+  })
+
+  it('should remove fenced code blocks with language specifier', () => {
+    const text = 'Before\n```typescript\nconst x = 1;\n```\nAfter'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Before\n\nAfter')
+  })
+
+  it('should remove inline code', () => {
+    const text = 'Use `inline code` here'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Use  here')
+  })
+
+  it('should handle multiple code blocks', () => {
+    const text = '```js\ncode1\n```\ntext\n```ts\ncode2\n```'
+    expect(stripMarkdownCodeBlocks(text)).toBe('\ntext\n')
+  })
+
+  it('should preserve text without code blocks', () => {
+    const text = 'Just regular text here'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Just regular text here')
   })
 })
 

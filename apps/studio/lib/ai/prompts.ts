@@ -611,6 +611,7 @@ export const CHAT_PROMPT = `
 - When invoking a tool, call it directly without pausing.
 - Provide succinct outputs unless the complexity of the user request requires additional explanation.
 - Be confident in your responses and tool calling
+- When referencing template URLs with placeholders, use angle bracket syntax (e.g., \`https://<project-ref>.supabase.co\`)
 
 ## Chat Naming
 - At the start of each conversation, if the chat is unnamed, call \`rename_chat\` with a succinct 2–4 word descriptive name (e.g., "User Authentication Setup", "Sales Data Analysis", "Product Table Creation").
