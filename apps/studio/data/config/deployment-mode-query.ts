@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { handleError } from 'data/fetchers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
@@ -11,7 +12,7 @@ export async function getDeploymentMode(signal?: AbortSignal): Promise<Deploymen
   const response = await fetch(`${API_URL}/platform/deployment-mode`, { signal })
 
   if (!response.ok) {
-    throw new Error('Failed to fetch deployment mode')
+    handleError(await response.json())
   }
 
   return response.json()

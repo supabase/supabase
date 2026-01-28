@@ -70,7 +70,7 @@ export const DatabaseConnectionString = () => {
   const state = useDatabaseSelectorStateSnapshot()
 
   // Fetch deployment mode (CLI vs self-hosted) for non-platform environments
-  const { data: deploymentMode } = useDeploymentModeQuery()
+  const { data: deploymentMode, isPending: isLoadingDeploymentMode } = useDeploymentModeQuery()
   const isCliMode = deploymentMode?.is_cli_mode ?? false
 
   // Determine which connection methods are available based on environment
@@ -196,7 +196,7 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingDeploymentMode
   const isError = isErrorPoolerConfig || isErrorReadReplicas
   const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
 
@@ -434,30 +434,47 @@ export const DatabaseConnectionString = () => {
               </div>
             )}
             <div className="px-4 md:px-7 py-8">
-              {selectedMethod === 'direct' && (IS_PLATFORM || isCliMode) && (
+              {selectedMethod === 'direct' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="direct"
+                  env="platform"
                   title={connectionStringMethodOptions.direct.label}
                   contentType={contentType}
                   lang={lang}
                   fileTitle={fileTitle}
                   description={connectionStringMethodOptions.direct.description}
                   connectionString={connectionStrings['direct'][selectedTab]}
-                  ipv4Status={
-                    IS_PLATFORM
-                      ? {
-                          type: !ipv4Addon ? 'error' : 'success',
-                          title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
-                          description:
-                            !sharedPoolerPreferred && !ipv4Addon
-                              ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                              : sharedPoolerPreferred
-                                ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
-                                : IPV4_ADDON_TEXT,
-                          links: buttonLinks,
-                        }
-                      : undefined
-                  }
+                  ipv4Status={{
+                    type: !ipv4Addon ? 'error' : 'success',
+                    title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+                    description:
+                      !sharedPoolerPreferred && !ipv4Addon
+                        ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                        : sharedPoolerPreferred
+                          ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
+                          : IPV4_ADDON_TEXT,
+                    links: buttonLinks,
+                  }}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
+                    { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+                    { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'direct')}
+                />
+              )}
+
+              {selectedMethod === 'direct' && isCliMode && (
+                <ConnectionPanel
+                  type="direct"
+                  env="cli"
+                  title={connectionStringMethodOptions.direct.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={connectionStringMethodOptions.direct.description}
+                  connectionString={connectionStrings['direct'][selectedTab]}
                   parameters={[
                     { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
                     { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
@@ -471,6 +488,7 @@ export const DatabaseConnectionString = () => {
               {selectedMethod === 'transaction' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="transaction"
+                  env="platform"
                   title={connectionStringMethodOptions.transaction.label}
                   contentType={contentType}
                   lang={lang}
@@ -556,6 +574,7 @@ export const DatabaseConnectionString = () => {
               {selectedMethod === 'transaction' && isSelfHosted && (
                 <ConnectionPanel
                   type="transaction"
+                  env="self-hosted"
                   title={connectionStringMethodOptions.transaction.label}
                   contentType={contentType}
                   lang={lang}
@@ -580,6 +599,7 @@ export const DatabaseConnectionString = () => {
               {selectedMethod === 'session' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="session"
+                  env="platform"
                   title={connectionStringMethodOptions.session.label}
                   contentType={contentType}
                   lang={lang}
@@ -613,6 +633,7 @@ export const DatabaseConnectionString = () => {
               {selectedMethod === 'session' && isSelfHosted && (
                 <ConnectionPanel
                   type="session"
+                  env="self-hosted"
                   title={connectionStringMethodOptions.session.label}
                   contentType={contentType}
                   lang={lang}
