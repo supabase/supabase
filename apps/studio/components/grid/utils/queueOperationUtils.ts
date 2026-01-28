@@ -240,47 +240,6 @@ export function queueRowAddWithOptimisticUpdate({
   })
 }
 
-interface QueueRowDeleteParams {
-  queryClient: QueryClient
-  queueOperation: (operation: NewQueuedOperation) => void
-  projectRef: string
-  tableId: number
-  table: Entity
-  rowIdentifiers: Dictionary<unknown>
-  originalRow: Dictionary<unknown>
-}
-
-export function queueRowDeleteWithOptimisticUpdate({
-  queryClient,
-  queueOperation,
-  projectRef,
-  tableId,
-  table,
-  rowIdentifiers,
-  originalRow,
-}: QueueRowDeleteParams) {
-  // Queue the operation
-  queueOperation({
-    type: QueuedOperationType.DELETE_ROW,
-    tableId,
-    payload: {
-      rowIdentifiers,
-      originalRow,
-      table,
-    },
-  })
-
-  // Apply optimistic update to the UI
-  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
-  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
-    if (!old) return old
-    return {
-      ...old,
-      rows: markRowAsDeleted(old.rows, rowIdentifiers),
-    }
-  })
-}
-
 interface ReapplyOptimisticUpdatesParams {
   queryClient: QueryClient
   projectRef: string
@@ -373,14 +332,25 @@ export function queueRowDeletesWithOptimisticUpdate({
       rowIdentifiers[pk.name] = row[pk.name]
     })
 
-    queueRowDeleteWithOptimisticUpdate({
-      queryClient,
-      queueOperation,
-      projectRef,
+    // Queue the operation
+    queueOperation({
+      type: QueuedOperationType.DELETE_ROW,
       tableId: table.id,
-      table: table,
-      rowIdentifiers,
-      originalRow: row,
+      payload: {
+        rowIdentifiers,
+        originalRow: row,
+        table,
+      },
+    })
+
+    // Apply optimistic update to the UI
+    const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
+    queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+      if (!old) return old
+      return {
+        ...old,
+        rows: markRowAsDeleted(old.rows, rowIdentifiers),
+      }
     })
   }
 }
