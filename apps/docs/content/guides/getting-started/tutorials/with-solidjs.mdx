@@ -138,28 +138,31 @@ Let's create a new component for that called `Account.tsx`.
 <$CodeTabs>
 
 ```tsx name=src/Account.tsx
-import { AuthSession } from '@supabase/supabase-js'
-import { Component, createEffect, createSignal } from 'solid-js'
+import { User } from '@supabase/supabase-js'
+import { Component, createSignal, onMount } from 'solid-js'
 import { supabase } from './supabaseClient'
 
+
 interface Props {
-  session: AuthSession
+  user: User
 }
 
-const Account: Component<Props> = ({ session }) => {
+const Account: Component<Props> = ({ user }) => {
   const [loading, setLoading] = createSignal(true)
   const [username, setUsername] = createSignal<string | null>(null)
   const [website, setWebsite] = createSignal<string | null>(null)
   const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null)
 
-  createEffect(() => {
+  
+
+  onMount(() => {
     getProfile()
   })
 
   const getProfile = async () => {
     try {
       setLoading(true)
-      const { user } = session
+      
 
       const { data, error, status } = await supabase
         .from('profiles')
@@ -190,7 +193,7 @@ const Account: Component<Props> = ({ session }) => {
 
     try {
       setLoading(true)
-      const { user } = session
+      
 
       const updates = {
         id: user.id,
@@ -217,7 +220,7 @@ const Account: Component<Props> = ({ session }) => {
   return (
     <div aria-live="polite">
       <form onSubmit={updateProfile} class="form-widget">
-        <div>Email: {session.user.email}</div>
+        <div>Email: {user.email}</div>
         <div>
           <label for="username">Name</label>
           <input
@@ -261,28 +264,35 @@ Now that we have all the components in place, let's update `App.tsx`:
 <$CodeTabs>
 
 ```jsx name=src/App.tsx
-import { Component, createEffect, createSignal } from 'solid-js'
+import { Component, onMount, createSignal, onCleanup } from 'solid-js'
 import { supabase } from './supabaseClient'
-import { AuthSession } from '@supabase/supabase-js'
+import { User } from '@supabase/supabase-js'
 import Account from './Account'
 import Auth from './Auth'
 
 const App: Component = () => {
-  const [session, setSession] = createSignal<AuthSession | null>(null)
+  const [user, setUser] = createSignal<User | null>(null)
 
-  createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
+  onMount(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null)
+      }
+    )
+    onCleanup(() => {
+      authListener.subscription.unsubscribe()
     })
+
+    
   })
 
   return (
     <div class="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session() ? <Auth /> : <Account session={session()!} />}
+      {!user() ? <Auth /> : <Account user={user()!} />}
     </div>
   )
 }
@@ -437,7 +447,7 @@ return (
       }}
     />
     {/* ... */}
-  </div>
+  </form>
 )
 ```
 
