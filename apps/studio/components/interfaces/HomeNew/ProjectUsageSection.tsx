@@ -191,31 +191,31 @@ export const ProjectUsageSection = () => {
     (logRoute: string, serviceKey: ServiceKey) => (datum: LogsBarChartDatum) => {
       if (!datum?.timestamp) return
 
-    const datumTimestamp = dayjs(datum.timestamp).toISOString()
-    const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-    const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+      const datumTimestamp = dayjs(datum.timestamp).toISOString()
+      const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
+      const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
 
-    const queryParams = new URLSearchParams({
-      iso_timestamp_start: start,
-      iso_timestamp_end: end,
-    })
-
-    router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
-
-    if (projectRef && organization?.slug) {
-      sendEvent({
-        action: 'home_project_usage_chart_clicked',
-        properties: {
-          service_type: serviceKey,
-          bar_timestamp: datum.timestamp,
-        },
-        groups: {
-          project: projectRef,
-          organization: organization.slug,
-        },
+      const queryParams = new URLSearchParams({
+        iso_timestamp_start: start,
+        iso_timestamp_end: end,
       })
+
+      router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
+
+      if (projectRef && organization?.slug) {
+        sendEvent({
+          action: 'home_project_usage_chart_clicked',
+          properties: {
+            service_type: serviceKey,
+            bar_timestamp: datum.timestamp,
+          },
+          groups: {
+            project: projectRef,
+            organization: organization.slug,
+          },
+        })
+      }
     }
-  }
 
   const enabledServices = services.filter((s) => s.enabled)
   const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
