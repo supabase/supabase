@@ -512,7 +512,12 @@ export const DatabaseConnectionString = () => {
                   }}
                   notice={['Does not support PREPARE statements']}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                    {
+                      ...CONNECTION_PARAMETERS.host,
+                      value: isReplicaSelected
+                        ? connectionInfo.db_host
+                        : poolingConfiguration?.db_host ?? '',
+                    },
                     {
                       ...CONNECTION_PARAMETERS.port,
                       value: poolingConfiguration?.db_port.toString() ?? '6543',
