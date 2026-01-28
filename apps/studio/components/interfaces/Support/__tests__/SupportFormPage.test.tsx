@@ -86,9 +86,7 @@ const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoist
   }
 })
 
-const supportVersionInfo = `\n\n---\nSupabase Studio version: SHA ${mockCommitSha} deployed at ${dayjs(
-  mockCommitTime
-).format('YYYY-MM-DD HH:mm:ss Z')}`
+const mockStudioVersion = `SHA ${mockCommitSha} deployed at ${dayjs(mockCommitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
 
 vi.mock('react-inlinesvg', () => ({
   __esModule: true,
@@ -810,10 +808,9 @@ describe('SupportFormPage', () => {
       siteUrl: 'https://project-1.example.com',
       additionalRedirectUrls: 'https://project-1.example.com/callbacks',
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
-    const expectedMessage =
-      'Requests return status 500 when calling the RPC endpoint' + supportVersionInfo
-    expect(payload.message).toBe(expectedMessage)
+    expect(payload.message).toBe('Requests return status 500 when calling the RPC endpoint')
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
@@ -901,9 +898,9 @@ describe('SupportFormPage', () => {
       siteUrl: 'https://project-2.supabase.dev',
       additionalRedirectUrls: 'https://project-2.supabase.dev/redirect',
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
-    const expectedMessage = 'MFA challenge fails with an unknown error code' + supportVersionInfo
-    expect(payload.message).toBe(expectedMessage)
+    expect(payload.message).toBe('MFA challenge fails with an unknown error code')
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
@@ -1002,10 +999,10 @@ describe('SupportFormPage', () => {
       siteUrl: 'https://project-3.apps.supabase.co',
       additionalRedirectUrls: 'https://project-3.apps.supabase.co/auth',
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
     expect(payload.message).toBe(
-      'Connections time out after 30 seconds\n\nError: Connection timeout detected' +
-        supportVersionInfo
+      'Connections time out after 30 seconds\n\nError: Connection timeout detected'
     )
 
     await waitFor(() => {
@@ -1381,10 +1378,9 @@ describe('SupportFormPage', () => {
     })
 
     const payload = submitSpy.mock.calls[0]?.[0]
-    expect(payload.message).toContain('Navigation menu does not respond after latest deploy')
-    expect(payload.message).toMatch(
-      /Dashboard logs: https:\/\/storage\.example\.com\/signed\/.+\.json/
-    )
+    expect(payload.message).toBe('Navigation menu does not respond after latest deploy')
+    expect(payload.dashboardLogs).toMatch(/^https:\/\/storage\.example\.com\/signed\/.+\.json$/)
+    expect(payload.dashboardStudioVersion).toBe(mockStudioVersion)
   })
 
   test('shows toast on submission error and allows form re-editing and resubmission', async () => {
@@ -1455,10 +1451,9 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
-    expect(payload.message).toMatch(
-      'Settings page shows 500 error - updated description' + supportVersionInfo
-    )
-    expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
+    expect(payload.message).toBe('Settings page shows 500 error - updated description')
+    expect(payload.dashboardLogs).toMatch(/^https:\/\/storage\.example\.com\/signed\/.+\.json$/)
+    expect(payload.dashboardStudioVersion).toBe(mockStudioVersion)
 
     await waitFor(() => {
       expect(toastSuccessSpy).toHaveBeenCalledWith('Support request sent. Thank you!')
@@ -1684,9 +1679,9 @@ describe('SupportFormPage', () => {
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
-    const expectedMessage = 'I need help accessing my Supabase account' + supportVersionInfo
-    expect(payload.message).toBe(expectedMessage)
+    expect(payload.message).toBe('I need help accessing my Supabase account')
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
