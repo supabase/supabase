@@ -103,7 +103,8 @@ const useServiceHealthQuery = (
 
   const queryResult = useQuery({
     queryKey: ['service-health-metrics', projectRef, serviceKey, startDate, endDate, table],
-    queryFn: ({ signal }) => fetchServiceHealthMetrics(projectRef, table, startDate, endDate, signal),
+    queryFn: ({ signal }) =>
+      fetchServiceHealthMetrics(projectRef, table, startDate, endDate, signal),
     enabled: enabled && config.enabled && Boolean(projectRef),
     staleTime: 1000 * 60, // 1 minute
   })
