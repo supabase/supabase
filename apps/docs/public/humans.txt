@@ -12,11 +12,14 @@ Aleksi Immonen
 Alexander Korotkov
 Ali Waseem
 Allan S
+Amir Issaei
 Amy Q
+Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
 Anna Weihl
+Ant Evans
 Ant Wilson
 Ariuna K
 Artur Zakirov
@@ -41,6 +44,7 @@ Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
+Clayton Kast
 Craig Cannon
 Cuong Do
 Danny White
@@ -50,6 +54,7 @@ David A. Ventimiglia
 David Weitzman
 Deepthi Sigireddi
 Deji I
+Dennis Senn
 Div Arora
 Divit D
 Douglas Hunley
@@ -68,6 +73,7 @@ Fatuma Abdullahi
 Felipe Stival
 Francesco Sansalvadore
 Garrett Crowell
+Gerardo Estaba
 Greg Kress
 Greg P
 Greg Richardson
@@ -75,6 +81,7 @@ Gregor Vand
 Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
+Haritabh Gupta
 Haydn Maley
 Hieu Pham
 Ignacio Dobronich
@@ -119,9 +126,11 @@ Leonardo Santiago
 Liam Cloud Hogan
 Long Hoang
 Luca Forstner
+Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
+Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Marouane Souda
@@ -129,6 +138,8 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Mert Yerekapan
+Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -138,6 +149,7 @@ Nick Nowlan
 Nyannyacha
 Oli R
 Pamela Chia
+Patrick Crane
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -179,7 +191,9 @@ Terry Sutton
 Thomas E
 Thor Schaeff
 Tim Frietas
+Tim Palmer
 Timothy Lim
+Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo
