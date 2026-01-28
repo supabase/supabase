@@ -174,6 +174,14 @@ vi.mock(import('lib/gotrue'), async (importOriginal) => {
   }
 })
 
+vi.mock(import('lib/constants'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    IS_PLATFORM: true,
+  }
+})
+
 const renderSupportFormPage = (options?: Parameters<typeof customRender>[1]) =>
   customRender(<SupportFormPage />, {
     profileContext: createMockProfileContext(),
@@ -398,11 +406,9 @@ describe('SupportFormPage', () => {
       },
     })
 
-    addAPIMock({
-      method: 'get',
-      path: '/platform/status',
-      response: { is_healthy: true } as any,
-    })
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/incident-status`, () => HttpResponse.json([], { status: 200 }))
+    )
 
     addAPIMock({
       method: 'get',
@@ -460,11 +466,6 @@ describe('SupportFormPage', () => {
   })
 
   test('shows system status: not healthy', async () => {
-    // addAPIMock({
-    //   method: 'get',
-    //   path: '/platform/status',
-    //   response: { is_healthy: false } as any,
-    // })
     mswServer.use(
       http.get(`${BASE_PATH}/api/incident-status`, () =>
         HttpResponse.json(
