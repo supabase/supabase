@@ -7,7 +7,8 @@ import type { Dictionary } from 'types'
  */
 export enum QueuedOperationType {
   EDIT_CELL_CONTENT = 'edit_cell_content',
-  // Future: DELETE_ROW, ADD_ROW, EDIT_COLUMN, etc.
+  ADD_ROW = 'add_row',
+  DELETE_ROW = 'delete_row',
 }
 
 /**
@@ -24,10 +25,29 @@ export interface EditCellContentPayload {
 }
 
 /**
+ * Payload for ADD_ROW operations
+ */
+export interface AddRowPayload {
+  tempId: string // Client-generated UUID (row has no PK yet)
+  rowData: Dictionary<unknown> // Column values for the new row
+  table: Entity
+  enumArrayColumns?: string[]
+}
+
+/**
+ * Payload for DELETE_ROW operations
+ */
+export interface DeleteRowPayload {
+  rowIdentifiers: Dictionary<unknown> // Primary key values
+  originalRow: Dictionary<unknown> // Full row for display/undo
+  table: Entity
+}
+
+/**
  * Union type for all operation payloads.
  * Extend this as new operation types are added.
  */
-export type QueuedOperationPayload = EditCellContentPayload
+export type QueuedOperationPayload = EditCellContentPayload | AddRowPayload | DeleteRowPayload
 
 /**
  * Individual queued operation

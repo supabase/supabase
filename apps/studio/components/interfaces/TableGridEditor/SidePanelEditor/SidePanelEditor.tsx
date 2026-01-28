@@ -4,7 +4,10 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import {
+  queueCellEditWithOptimisticUpdate,
+  queueRowAddWithOptimisticUpdate,
+} from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
@@ -271,6 +274,28 @@ export const SidePanelEditor = ({
 
     let saveRowError: Error | undefined
     if (isNewRecord) {
+      // Queue the ADD_ROW operation if queue operations feature is enabled
+      if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
+        const tempId = crypto.randomUUID()
+
+        queueRowAddWithOptimisticUpdate({
+          queryClient,
+          queueOperation: snap.queueOperation,
+          projectRef: project.ref,
+          tableId: selectedTable.id,
+          table: selectedTable as unknown as Entity,
+          tempId,
+          rowData: payload,
+          enumArrayColumns,
+        })
+
+        // Close panel immediately without error
+        onComplete()
+        setIsEdited(false)
+        snap.closeSidePanel()
+        return
+      }
+
       try {
         await createTableRows({
           projectRef: project.ref,

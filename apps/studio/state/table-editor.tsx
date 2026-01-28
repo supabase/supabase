@@ -16,6 +16,8 @@ import type { Dictionary } from 'types'
 import {
   NewQueuedOperation,
   QueuedOperationType,
+  type AddRowPayload,
+  type DeleteRowPayload,
   type EditCellContentPayload,
   type OperationQueueState,
   type QueuedOperation,
@@ -234,8 +236,122 @@ export const createTableEditorState = () => {
     /**
      * Queue a new operation for later processing.
      * If an operation with the same key already exists, it will be overwritten.
+     * Handles conflict resolution:
+     * - DELETE_ROW on a row: remove any pending EDIT_CELL ops for that row
+     * - EDIT_CELL on a row pending deletion: reject (console.warn)
+     * - EDIT_CELL on a newly added row: merge edit into ADD_ROW's rowData
+     * - DELETE_ROW on a newly added row: cancel both operations
      */
     queueOperation: (operation: NewQueuedOperation) => {
+      // Conflict resolution for DELETE_ROW operations
+      if (operation.type === QueuedOperationType.DELETE_ROW) {
+        const deletePayload = operation.payload as DeleteRowPayload
+        const rowIdentifiers = deletePayload.rowIdentifiers
+
+        // Check if this row was newly added (by tempId)
+        const tempId = (deletePayload.originalRow as any)?.__tempId
+        if (tempId) {
+          // If deleting a newly added row, just remove the ADD_ROW operation
+          const addRowKey = generateTableChangeKey({
+            type: QueuedOperationType.ADD_ROW,
+            tableId: operation.tableId,
+            tempId,
+          })
+          state.operationQueue.operations = state.operationQueue.operations.filter(
+            (op) => op.id !== addRowKey
+          )
+
+          // Also remove any EDIT_CELL operations for this temp row
+          state.operationQueue.operations = state.operationQueue.operations.filter((op) => {
+            if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+              const editPayload = op.payload as EditCellContentPayload
+              // Check if this edit is for the same temp row
+              const editTempId = (editPayload.rowIdentifiers as any)?.__tempId
+              return editTempId !== tempId
+            }
+            return true
+          })
+
+          // Update status if queue is now empty
+          if (state.operationQueue.operations.length === 0) {
+            state.operationQueue.status = 'idle'
+          } else if (state.operationQueue.status === 'idle') {
+            state.operationQueue.status = 'pending'
+          }
+          return // Don't add the DELETE operation for newly added rows
+        }
+
+        // Remove any pending EDIT_CELL operations for the row being deleted
+        state.operationQueue.operations = state.operationQueue.operations.filter((op) => {
+          if (
+            op.type === QueuedOperationType.EDIT_CELL_CONTENT &&
+            op.tableId === operation.tableId
+          ) {
+            const editPayload = op.payload as EditCellContentPayload
+            // Check if the row identifiers match
+            const identifiersMatch = Object.entries(rowIdentifiers).every(
+              ([key, value]) => editPayload.rowIdentifiers[key] === value
+            )
+            return !identifiersMatch
+          }
+          return true
+        })
+      }
+
+      // Conflict resolution for EDIT_CELL_CONTENT operations
+      if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+        const editPayload = operation.payload as EditCellContentPayload
+        const rowIdentifiers = editPayload.rowIdentifiers
+
+        // Check if this row is pending deletion
+        const isPendingDeletion = state.operationQueue.operations.some((op) => {
+          if (op.type === QueuedOperationType.DELETE_ROW && op.tableId === operation.tableId) {
+            const deletePayload = op.payload as DeleteRowPayload
+            return Object.entries(deletePayload.rowIdentifiers).every(
+              ([key, value]) => rowIdentifiers[key] === value
+            )
+          }
+          return false
+        })
+
+        if (isPendingDeletion) {
+          console.warn(
+            'Cannot edit a cell on a row that is pending deletion. Remove the delete operation first.'
+          )
+          return
+        }
+
+        // Check if this edit is on a newly added row (by tempId)
+        const tempId = (rowIdentifiers as any)?.__tempId
+        if (tempId) {
+          // Find the ADD_ROW operation
+          const addRowIndex = state.operationQueue.operations.findIndex((op) => {
+            if (op.type === QueuedOperationType.ADD_ROW && op.tableId === operation.tableId) {
+              const addPayload = op.payload as AddRowPayload
+              return addPayload.tempId === tempId
+            }
+            return false
+          })
+
+          if (addRowIndex >= 0) {
+            // Merge the edit into the ADD_ROW's rowData
+            const addOp = state.operationQueue.operations[addRowIndex]
+            const addPayload = addOp.payload as AddRowPayload
+            addPayload.rowData[editPayload.columnName] = editPayload.newValue
+            state.operationQueue.operations[addRowIndex] = {
+              ...addOp,
+              payload: addPayload,
+              timestamp: Date.now(),
+            }
+
+            if (state.operationQueue.status === 'idle') {
+              state.operationQueue.status = 'pending'
+            }
+            return // Don't add a separate EDIT_CELL operation
+          }
+        }
+      }
+
       const operationKey = generateTableChangeKeyFromOperation(operation)
       const existingOpIndex = state.operationQueue.operations.findIndex(
         (op) => op.id === operationKey
@@ -251,8 +367,9 @@ export const createTableEditorState = () => {
         // [Ali] Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
         // When a user edits the same cell multiple times before saving, we need to preserve the original "before edit" value, not the intermediate value from the previous queued edit
         if (newOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-          newOperation.payload.oldValue =
-            state.operationQueue.operations[existingOpIndex].payload.oldValue
+          const existingPayload = state.operationQueue.operations[existingOpIndex]
+            .payload as EditCellContentPayload
+          ;(newOperation.payload as EditCellContentPayload).oldValue = existingPayload.oldValue
         }
         state.operationQueue.operations[existingOpIndex] = newOperation
       } else {
@@ -311,6 +428,48 @@ export const createTableEditorState = () => {
         rowIdentifiers,
       })
       return state.operationQueue.operations.some((op) => op.id === key)
+    },
+
+    /**
+     * Check if a row is pending deletion
+     */
+    hasPendingRowDeletion: (tableId: number, rowIdentifiers: Record<string, unknown>): boolean => {
+      return state.operationQueue.operations.some((op) => {
+        if (op.type === QueuedOperationType.DELETE_ROW && op.tableId === tableId) {
+          const deletePayload = op.payload as DeleteRowPayload
+          return Object.entries(rowIdentifiers).every(
+            ([key, value]) => deletePayload.rowIdentifiers[key] === value
+          )
+        }
+        return false
+      })
+    },
+
+    /**
+     * Get all pending ADD_ROW operations for a table
+     */
+    getPendingAddRows: (tableId: number): AddRowPayload[] => {
+      return state.operationQueue.operations
+        .filter((op) => op.type === QueuedOperationType.ADD_ROW && op.tableId === tableId)
+        .map((op) => op.payload as AddRowPayload)
+    },
+
+    /**
+     * Get operation counts by type, optionally filtered by tableId
+     */
+    getOperationCounts: (
+      tableId?: number
+    ): { edits: number; adds: number; deletes: number; total: number } => {
+      const operations = tableId
+        ? state.operationQueue.operations.filter((op) => op.tableId === tableId)
+        : state.operationQueue.operations
+
+      return {
+        edits: operations.filter((op) => op.type === QueuedOperationType.EDIT_CELL_CONTENT).length,
+        adds: operations.filter((op) => op.type === QueuedOperationType.ADD_ROW).length,
+        deletes: operations.filter((op) => op.type === QueuedOperationType.DELETE_ROW).length,
+        total: operations.length,
+      }
     },
   })
 

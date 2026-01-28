@@ -187,6 +187,33 @@ export const Grid = memo(
         })
       }, [snap.gridColumns, snap.originalTable, snap.table.id, tableEditorSnap])
 
+      // Compute rowClass function to style pending add/delete rows
+      const computedRowClass = useMemo(() => {
+        return (row: SupaRow) => {
+          const classes: string[] = []
+
+          // Call the original rowClass if provided
+          if (rowClass) {
+            const originalClass = rowClass(row)
+            if (originalClass) {
+              classes.push(originalClass)
+            }
+          }
+
+          // Check for newly added rows (has __tempId marker)
+          if ((row as any).__tempId) {
+            classes.push('rdg-row--added')
+          }
+
+          // Check for deleted rows (has __isDeleted marker)
+          if ((row as any).__isDeleted) {
+            classes.push('rdg-row--deleted')
+          }
+
+          return classes.length > 0 ? classes.join(' ') : undefined
+        }
+      }, [rowClass])
+
       return (
         <div
           className={cn('flex flex-col relative transition-colors', containerClass)}
@@ -295,7 +322,7 @@ export const Grid = memo(
           <DataGrid
             ref={ref}
             className={`${gridClass} flex-grow`}
-            rowClass={rowClass}
+            rowClass={computedRowClass}
             columns={columnsWithDirtyCellClass}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}

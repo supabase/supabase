@@ -7,6 +7,8 @@ import {
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
+  type AddRowPayload,
+  type DeleteRowPayload,
   type EditCellContentPayload,
 } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from 'types'
@@ -17,15 +19,35 @@ interface GenerateTableChangeKeyArgs {
   tableId: number
   columnName?: string
   rowIdentifiers?: Record<string, unknown>
+  tempId?: string
 }
 
 export function generateTableChangeKeyFromOperation(operation: NewQueuedOperation): string {
   if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+    const payload = operation.payload as EditCellContentPayload
     return generateTableChangeKey({
       type: operation.type,
       tableId: operation.tableId,
-      columnName: operation.payload.columnName,
-      rowIdentifiers: operation.payload.rowIdentifiers,
+      columnName: payload.columnName,
+      rowIdentifiers: payload.rowIdentifiers,
+    })
+  }
+
+  if (operation.type === QueuedOperationType.ADD_ROW) {
+    const payload = operation.payload as AddRowPayload
+    return generateTableChangeKey({
+      type: operation.type,
+      tableId: operation.tableId,
+      tempId: payload.tempId,
+    })
+  }
+
+  if (operation.type === QueuedOperationType.DELETE_ROW) {
+    const payload = operation.payload as DeleteRowPayload
+    return generateTableChangeKey({
+      type: operation.type,
+      tableId: operation.tableId,
+      rowIdentifiers: payload.rowIdentifiers,
     })
   }
 
@@ -38,7 +60,23 @@ export function generateTableChangeKey({
   columnName,
   tableId,
   type,
+  tempId,
 }: GenerateTableChangeKeyArgs): string {
+  // For ADD_ROW, use tempId
+  if (type === QueuedOperationType.ADD_ROW && tempId) {
+    return `${type}:${tableId}:${tempId}`
+  }
+
+  // For DELETE_ROW, use rowIdentifiers only (no columnName)
+  if (type === QueuedOperationType.DELETE_ROW) {
+    const rowIdentifiersKey = Object.entries(rowIdentifiers ?? {})
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}:${value}`)
+      .join('|')
+    return `${type}:${tableId}:${rowIdentifiersKey}`
+  }
+
+  // For EDIT_CELL_CONTENT, use columnName and rowIdentifiers
   const rowIdentifiersKey = Object.entries(rowIdentifiers ?? {})
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => `${key}:${value}`)
@@ -65,6 +103,75 @@ export function applyCellEdit(
     const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
     if (rowMatches) {
       return { ...row, [columnName]: newValue }
+    }
+    return row
+  })
+}
+
+/**
+ * Apply ADD_ROW optimistic update - add row with __tempId marker
+ */
+export function applyRowAdd(
+  rows: SupaRow[],
+  tempId: string,
+  rowData: Dictionary<unknown>
+): SupaRow[] {
+  // Check if row with this tempId already exists
+  const existingIndex = rows.findIndex((row) => row.__tempId === tempId)
+  if (existingIndex >= 0) {
+    // Update existing row
+    return rows.map((row, index) => {
+      if (index === existingIndex) {
+        return { ...row, ...rowData, __tempId: tempId }
+      }
+      return row
+    })
+  }
+
+  // Add new row at the end
+  const newRow: SupaRow = {
+    idx: rows.length,
+    ...rowData,
+    __tempId: tempId,
+  }
+  return [...rows, newRow]
+}
+
+/**
+ * Apply DELETE_ROW optimistic update - mark row with __isDeleted marker
+ */
+export function markRowAsDeleted(
+  rows: SupaRow[],
+  rowIdentifiers: Dictionary<unknown>
+): SupaRow[] {
+  return rows.map((row) => {
+    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
+    if (rowMatches) {
+      return { ...row, __isDeleted: true }
+    }
+    return row
+  })
+}
+
+/**
+ * Remove a row from the list (used when cancelling ADD_ROW)
+ */
+export function removeRowByTempId(rows: SupaRow[], tempId: string): SupaRow[] {
+  return rows.filter((row) => row.__tempId !== tempId)
+}
+
+/**
+ * Unmark a row as deleted (used when cancelling DELETE_ROW)
+ */
+export function unmarkRowAsDeleted(
+  rows: SupaRow[],
+  rowIdentifiers: Dictionary<unknown>
+): SupaRow[] {
+  return rows.map((row) => {
+    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
+    if (rowMatches) {
+      const { __isDeleted, ...rest } = row
+      return rest as SupaRow
     }
     return row
   })
@@ -120,6 +227,91 @@ export function queueCellEditWithOptimisticUpdate({
   })
 }
 
+interface QueueRowAddParams {
+  queryClient: QueryClient
+  queueOperation: (operation: NewQueuedOperation) => void
+  projectRef: string
+  tableId: number
+  table: Entity
+  tempId: string
+  rowData: Dictionary<unknown>
+  enumArrayColumns?: string[]
+}
+
+export function queueRowAddWithOptimisticUpdate({
+  queryClient,
+  queueOperation,
+  projectRef,
+  tableId,
+  table,
+  tempId,
+  rowData,
+  enumArrayColumns,
+}: QueueRowAddParams) {
+  // Queue the operation
+  queueOperation({
+    type: QueuedOperationType.ADD_ROW,
+    tableId,
+    payload: {
+      tempId,
+      rowData,
+      table,
+      enumArrayColumns,
+    },
+  })
+
+  // Apply optimistic update to the UI
+  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
+  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+    if (!old) return old
+    return {
+      ...old,
+      rows: applyRowAdd(old.rows, tempId, rowData),
+    }
+  })
+}
+
+interface QueueRowDeleteParams {
+  queryClient: QueryClient
+  queueOperation: (operation: NewQueuedOperation) => void
+  projectRef: string
+  tableId: number
+  table: Entity
+  rowIdentifiers: Dictionary<unknown>
+  originalRow: Dictionary<unknown>
+}
+
+export function queueRowDeleteWithOptimisticUpdate({
+  queryClient,
+  queueOperation,
+  projectRef,
+  tableId,
+  table,
+  rowIdentifiers,
+  originalRow,
+}: QueueRowDeleteParams) {
+  // Queue the operation
+  queueOperation({
+    type: QueuedOperationType.DELETE_ROW,
+    tableId,
+    payload: {
+      rowIdentifiers,
+      originalRow,
+      table,
+    },
+  })
+
+  // Apply optimistic update to the UI
+  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
+  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+    if (!old) return old
+    return {
+      ...old,
+      rows: markRowAsDeleted(old.rows, rowIdentifiers),
+    }
+  })
+}
+
 interface ReapplyOptimisticUpdatesParams {
   queryClient: QueryClient
   projectRef: string
@@ -147,6 +339,16 @@ export function reapplyOptimisticUpdates({
           const { rowIdentifiers, columnName, newValue } =
             operation.payload as EditCellContentPayload
           rows = applyCellEdit(rows, columnName, rowIdentifiers, newValue)
+          break
+        }
+        case QueuedOperationType.ADD_ROW: {
+          const { tempId, rowData } = operation.payload as AddRowPayload
+          rows = applyRowAdd(rows, tempId, rowData)
+          break
+        }
+        case QueuedOperationType.DELETE_ROW: {
+          const { rowIdentifiers } = operation.payload as DeleteRowPayload
+          rows = markRowAsDeleted(rows, rowIdentifiers)
           break
         }
         default: {

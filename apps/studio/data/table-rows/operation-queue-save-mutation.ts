@@ -6,13 +6,18 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import {
+  AddRowPayload,
+  DeleteRowPayload,
   EditCellContentPayload,
   QueuedOperation,
   QueuedOperationType,
 } from 'state/table-editor-operation-queue.types'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
+import { getTableRowCreateSql } from './table-row-create-mutation'
+import { getTableRowDeleteSql } from './table-row-delete-mutation'
 import { getTableRowUpdateSql } from './table-row-update-mutation'
+import type { SupaRow } from 'components/grid/types'
 
 export type OperationQueueSaveVariables = {
   projectRef: string
@@ -41,9 +46,47 @@ function getOperationSql(operation: QueuedOperation): string {
         returning: false,
       })
     }
+    case QueuedOperationType.ADD_ROW: {
+      const payload = operation.payload as AddRowPayload
+      // Clean internal fields before SQL generation
+      const { __tempId, idx, ...cleanRowData } = payload.rowData as any
+      return getTableRowCreateSql({
+        table: { id: payload.table.id, name: payload.table.name, schema: payload.table.schema },
+        payload: cleanRowData,
+        enumArrayColumns: payload.enumArrayColumns ?? [],
+        returning: false,
+      })
+    }
+    case QueuedOperationType.DELETE_ROW: {
+      const payload = operation.payload as DeleteRowPayload
+      // Create a mock row with the row identifiers for the delete SQL
+      const mockRow = { idx: 0, ...payload.rowIdentifiers } as SupaRow
+      return getTableRowDeleteSql({
+        table: payload.table,
+        rows: [mockRow],
+      })
+    }
     default:
       throw new Error(`Unknown operation type: ${(operation as QueuedOperation).type}`)
   }
+}
+
+/**
+ * Sort operations for optimal execution order:
+ * 1. DELETE_ROW first (free FK constraints)
+ * 2. ADD_ROW second
+ * 3. EDIT_CELL_CONTENT last
+ */
+function sortOperations(operations: readonly QueuedOperation[]): QueuedOperation[] {
+  const operationOrder: Record<QueuedOperationType, number> = {
+    [QueuedOperationType.DELETE_ROW]: 0,
+    [QueuedOperationType.ADD_ROW]: 1,
+    [QueuedOperationType.EDIT_CELL_CONTENT]: 2,
+  }
+
+  return [...operations].sort((a, b) => {
+    return operationOrder[a.type] - operationOrder[b.type]
+  })
 }
 
 /**
@@ -60,8 +103,11 @@ export async function saveOperationQueue({
     return { result: [] }
   }
 
+  // Sort operations for optimal execution order
+  const sortedOperations = sortOperations(operations)
+
   // Generate SQL for each operation, stripping trailing semicolons to avoid double semicolons when joining
-  const statements = operations.map((op) => {
+  const statements = sortedOperations.map((op) => {
     const sql = getOperationSql(op)
     return sql.endsWith(';') ? sql.slice(0, -1) : sql
   })
