@@ -522,4 +522,60 @@ describe('createTable', () => {
       }),
     })
   })
+
+  it('should wrap table creation in a transaction for atomicity', async () => {
+    const columns: ColumnField[] = [
+      createColumnField({
+        id: 'col-1',
+        name: 'id',
+        format: 'int8',
+        isNullable: false,
+        isIdentity: true,
+        isPrimaryKey: true,
+      }),
+    ]
+
+    await createTable({
+      projectRef,
+      connectionString,
+      toastId,
+      payload: basePayload,
+      columns,
+      foreignKeyRelations: [],
+      isRLSEnabled: false,
+    })
+
+    const sqlCall = mockExecuteSql.mock.calls[0][0]
+    expect(sqlCall.sql).toMatch(/^BEGIN;/)
+    expect(sqlCall.sql).toMatch(/COMMIT;$/)
+  })
+
+  it('should rollback entire table creation if any statement fails', async () => {
+    mockExecuteSql.mockRejectedValue(new Error('Column constraint violation'))
+
+    const columns: ColumnField[] = [
+      createColumnField({
+        id: 'col-1',
+        name: 'invalid_column',
+        format: 'int8',
+        defaultValue: "'not_a_number'",
+      }),
+    ]
+
+    await expect(
+      createTable({
+        projectRef,
+        connectionString,
+        toastId,
+        payload: basePayload,
+        columns,
+        foreignKeyRelations: [],
+        isRLSEnabled: false,
+      })
+    ).rejects.toThrow('Column constraint violation')
+
+    const sqlCall = mockExecuteSql.mock.calls[0][0]
+    expect(sqlCall.sql).toMatch(/^BEGIN;/)
+    expect(sqlCall.sql).toMatch(/COMMIT;$/)
+  })
 })
