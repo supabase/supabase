@@ -1,13 +1,15 @@
-import { common, dirname, relative } from '@std/path/posix'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEqual } from 'lodash'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
@@ -59,12 +61,26 @@ const CodePage = () => {
       refetchIntervalInBackground: false,
     }
   )
-  const [files, setFiles] = useState<EdgeFunctionFile[]>([])
+  const [files, setFiles] = useState<FileData[]>([])
+
+  const initialFiles = useMemo(() => {
+    return !!functionBody
+      ? formatFunctionBodyToFiles({
+          functionBody,
+          entrypointPath: selectedFunction?.entrypoint_path,
+        })
+      : []
+  }, [functionBody, selectedFunction?.entrypoint_path])
 
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
+      setFiles((files) =>
+        files.map((f) => {
+          return { ...f, state: 'unchanged' }
+        })
+      )
     },
   })
 
@@ -102,25 +118,6 @@ const CodePage = () => {
     }
   }
 
-  function getBasePath(entrypoint: string | undefined, fileNames: string[]): string {
-    if (!entrypoint) {
-      return '/'
-    }
-
-    let candidate = fileNames.find((name) => entrypoint.endsWith(name))
-
-    if (candidate) {
-      return dirname(candidate)
-    } else {
-      try {
-        return dirname(new URL(entrypoint).pathname)
-      } catch (e) {
-        console.error('Failed to parse entrypoint', entrypoint)
-        return '/'
-      }
-    }
-  }
-
   const handleDeployClick = () => {
     if (files.length === 0 || isLoadingFiles) return
     setShowDeployWarning(true)
@@ -145,54 +142,31 @@ const CodePage = () => {
   }
 
   useEffect(() => {
-    if (!functionBody) {
-      return
-    }
+    if (initialFiles.length === 0) return
+    setFiles(initialFiles)
+  }, [initialFiles])
 
-    const entrypoint_path =
-      functionBody.metadata?.deno2_entrypoint_path ?? selectedFunction?.entrypoint_path
-
-    // Set files from API response when available
-    if (entrypoint_path) {
-      const base_path = getBasePath(
-        entrypoint_path,
-        functionBody.files.map((file) => file.name)
+  // [Joshen] Probably a candidate for useStaticEffectEvent
+  const filesRef = useLatest(files)
+  const initialFilesRef = useLatest(initialFiles)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const normalizeFiles = (list: FileData[]) =>
+        list.map(({ id, name, content }) => ({ id, name, content }))
+      const hasUnsavedChanges = !isEqual(
+        normalizeFiles(initialFilesRef.current),
+        normalizeFiles(filesRef.current)
       )
-      const filesWithRelPath = functionBody.files
-        // set file paths relative to entrypoint
-        .map((file: { name: string; content: string }) => {
-          try {
-            // if the current file and base path doesn't share a common path,
-            // return unmodified file
-            const common_path = common([base_path, file.name])
-            if (common_path === '' || common_path === '/tmp/') {
-              return file
-            }
 
-            // prepend "/" to turn relative paths to absolute
-            file.name = relative('/' + base_path, '/' + file.name)
-            return file
-          } catch (e) {
-            console.error(e)
-            // return unmodified file
-            return file
-          }
-        })
-
-      setFiles((prev) => {
-        return filesWithRelPath.map((file: { name: string; content: string }, index: number) => {
-          const prevState = prev.find((x) => x.name === file.name)
-          return {
-            id: index + 1,
-            name: file.name,
-            content: file.content,
-            selected: prevState?.selected ?? index === 0,
-          }
-        })
-      })
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
     }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [functionBody])
+  }, [])
 
   return (
     <div className="flex flex-col h-full">
@@ -219,7 +193,20 @@ const CodePage = () => {
         <>
           <FileExplorerAndEditor
             files={files}
-            onFilesChange={setFiles}
+            onFilesChange={(files) => {
+              const formattedFiles: FileData[] = files.map((f) => {
+                const originalFile = initialFiles.find((x) => x.id === f.id)
+                if (!originalFile) {
+                  return f
+                } else if (originalFile.name !== f.name) {
+                  return { ...f, state: 'new' }
+                } else if (originalFile.content !== f.content) {
+                  return { ...f, state: 'modified' }
+                }
+                return { ...f, state: 'unchanged' }
+              })
+              setFiles(formattedFiles)
+            }}
             aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,

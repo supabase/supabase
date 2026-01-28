@@ -6,7 +6,7 @@ import { ProjectLayout } from 'components/layouts/ProjectLayout'
 import AlertError from 'components/ui/AlertError'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { ProductMenuItem } from 'components/ui/ProductMenu/ProductMenuItem'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -88,14 +88,7 @@ const IntegrationsLayout = ({ children }: PropsWithChildren) => {
             {isSuccess && (
               <div>
                 {installedIntegrationItems.map((item) => (
-                  <ProductMenuItem
-                    key={item.key}
-                    url={item.url}
-                    name={item.name}
-                    icon={item.icon}
-                    isActive={page === item.key}
-                    label={item.label}
-                  />
+                  <ProductMenuItem key={item.key} isActive={page === item.key} item={item} />
                 ))}
               </div>
             )}

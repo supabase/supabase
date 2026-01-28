@@ -3,7 +3,8 @@ import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-ki
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { ProjectUsageSection as ProjectUsageSectionV1 } from 'components/interfaces/Home/ProjectUsageSection'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -18,7 +19,7 @@ import { AdvisorSection } from './AdvisorSection'
 import { CustomReportSection } from './CustomReportSection'
 import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
-import { ProjectUsageSection } from './ProjectUsageSection'
+import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
 
 export const HomeV2 = () => {
   const { enableBranching } = useParams()
@@ -26,6 +27,8 @@ export const HomeV2 = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -42,6 +45,8 @@ export const HomeV2 = () => {
     `home-getting-started-${project?.ref || 'default'}`,
     'empty'
   )
+
+  const UsageSection = showHomepageUsageV2 ? ProjectUsageSectionV2 : ProjectUsageSectionV1
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -104,7 +109,7 @@ export const HomeV2 = () => {
                     return (
                       <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
                         <SortableSection id={id}>
-                          <ProjectUsageSection />
+                          <UsageSection />
                         </SortableSection>
                       </div>
                     )
