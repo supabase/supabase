@@ -276,15 +276,12 @@ export const SidePanelEditor = ({
     if (isNewRecord) {
       // Queue the ADD_ROW operation if queue operations feature is enabled
       if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
-        const tempId = crypto.randomUUID()
-
         queueRowAddWithOptimisticUpdate({
           queryClient,
           queueOperation: snap.queueOperation,
           projectRef: project.ref,
           tableId: selectedTable.id,
           table: selectedTable as unknown as Entity,
-          tempId,
           rowData: payload,
           enumArrayColumns,
         })

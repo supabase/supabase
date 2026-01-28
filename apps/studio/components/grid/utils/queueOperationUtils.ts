@@ -111,6 +111,7 @@ export function applyCellEdit(
 export function applyRowAdd(
   rows: SupaRow[],
   tempId: string,
+  idx: number,
   rowData: Dictionary<unknown>
 ): (PendingAddRow | SupaRow)[] {
   // Check if row with this tempId already exists
@@ -126,7 +127,7 @@ export function applyRowAdd(
   }
 
   const newRow: PendingAddRow = {
-    idx: -1, // Use -1 to indicate it's a pending row (not yet in DB)
+    idx,
     ...rowData,
     __tempId: tempId,
   }
@@ -202,7 +203,6 @@ interface QueueRowAddParams {
   projectRef: string
   tableId: number
   table: Entity
-  tempId: string
   rowData: Dictionary<unknown>
   enumArrayColumns?: string[]
 }
@@ -213,10 +213,13 @@ export function queueRowAddWithOptimisticUpdate({
   projectRef,
   tableId,
   table,
-  tempId,
   rowData,
   enumArrayColumns,
 }: QueueRowAddParams) {
+  // Generate unique idx and tempId for this pending row
+  const idx = -Date.now()
+  const tempId = String(idx)
+
   // Queue the operation
   queueOperation({
     type: QueuedOperationType.ADD_ROW,
@@ -235,7 +238,7 @@ export function queueRowAddWithOptimisticUpdate({
     if (!old) return old
     return {
       ...old,
-      rows: applyRowAdd(old.rows, tempId, rowData),
+      rows: applyRowAdd(old.rows, tempId, idx, rowData),
     }
   })
 }
@@ -271,7 +274,9 @@ export function reapplyOptimisticUpdates({
         }
         case QueuedOperationType.ADD_ROW: {
           const { tempId, rowData } = operation.payload as AddRowPayload
-          rows = applyRowAdd(rows, tempId, rowData)
+          // Derive idx from tempId (tempId is stringified negative timestamp)
+          const idx = Number(tempId)
+          rows = applyRowAdd(rows, tempId, idx, rowData)
           break
         }
         case QueuedOperationType.DELETE_ROW: {
