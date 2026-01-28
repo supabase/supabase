@@ -24,7 +24,7 @@
     "@babel/core": "^7.28.6",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.2.0",
-        "@types/react": "~19.1.0",
+    "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
   },
   "private": true
