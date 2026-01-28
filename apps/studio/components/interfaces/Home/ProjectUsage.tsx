@@ -1,11 +1,3 @@
-import dayjs from 'dayjs'
-import { Auth, Database, Realtime, Storage } from 'icons'
-import sumBy from 'lodash/sumBy'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -15,10 +7,17 @@ import {
   UsageApiCounts,
   useProjectLogStatsQuery,
 } from 'data/analytics/project-log-stats-query'
+import dayjs from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Auth, Database, Realtime, Storage } from 'icons'
+import sumBy from 'lodash/sumBy'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -88,20 +87,20 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  const { data: charts } = useFillTimeseriesSorted(
-    data?.result || [],
-    'timestamp',
-    [
+  const { data: charts } = useFillTimeseriesSorted({
+    data: data?.result || [],
+    timestampKey: 'timestamp',
+    valueKey: [
       'total_auth_requests',
       'total_rest_requests',
       'total_storage_requests',
       'total_realtime_requests',
     ],
-    0,
-    startDateLocal.toISOString(),
-    endDateLocal.toISOString(),
-    5
-  )
+    defaultValue: 0,
+    startDate: startDateLocal.toISOString(),
+    endDate: endDateLocal.toISOString(),
+    minPointsToFill: 5,
+  })
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
   const handleBarClick = (
