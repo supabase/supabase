@@ -36,12 +36,19 @@ export const calculateDateRange = (
   return { startDate: start, endDate: end }
 }
 
+type RawChartData = {
+  timestamp: string | number
+  ok_count?: number
+  warning_count?: number
+  error_count?: number
+}
+
 /**
  * Transforms raw chart query results to LogsBarChartDatum format
  */
-export const transformToBarChartData = (data: any[]): LogsBarChartDatum[] => {
-  return data.map((row: any) => ({
-    timestamp: row.timestamp,
+export const transformToBarChartData = (data: RawChartData[]): LogsBarChartDatum[] => {
+  return data.map((row) => ({
+    timestamp: typeof row.timestamp === 'string' ? row.timestamp : String(row.timestamp),
     ok_count: row.ok_count || 0,
     warning_count: row.warning_count || 0,
     error_count: row.error_count || 0,

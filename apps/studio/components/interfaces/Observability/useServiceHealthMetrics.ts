@@ -91,13 +91,19 @@ const fetchServiceHealthMetrics = async (
 /**
  * Hook to fetch health metrics for a single service
  */
-const useServiceHealthQuery = (
-  projectRef: string,
-  serviceKey: ServiceKey,
-  startDate: string,
-  endDate: string,
+const useServiceHealthQuery = ({
+  projectRef,
+  serviceKey,
+  startDate,
+  endDate,
+  enabled,
+}: {
+  projectRef: string
+  serviceKey: ServiceKey
+  startDate: string
+  endDate: string
   enabled: boolean
-) => {
+}) => {
   const config = SERVICE_CONFIG[serviceKey]
   const table = config.table
 
@@ -156,12 +162,42 @@ export const useServiceHealthMetrics = (
   const enabled = Boolean(projectRef)
 
   // Fetch metrics for each service
-  const db = useServiceHealthQuery(projectRef, 'db', startDate, endDate, enabled)
-  const auth = useServiceHealthQuery(projectRef, 'auth', startDate, endDate, enabled)
-  const functions = useServiceHealthQuery(projectRef, 'functions', startDate, endDate, enabled)
-  const storage = useServiceHealthQuery(projectRef, 'storage', startDate, endDate, enabled)
-  const realtime = useServiceHealthQuery(projectRef, 'realtime', startDate, endDate, enabled)
-  const postgrest = useServiceHealthQuery(projectRef, 'postgrest', startDate, endDate, enabled)
+  const db = useServiceHealthQuery({ projectRef, serviceKey: 'db', startDate, endDate, enabled })
+  const auth = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'auth',
+    startDate,
+    endDate,
+    enabled,
+  })
+  const functions = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'functions',
+    startDate,
+    endDate,
+    enabled,
+  })
+  const storage = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'storage',
+    startDate,
+    endDate,
+    enabled,
+  })
+  const realtime = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'realtime',
+    startDate,
+    endDate,
+    enabled,
+  })
+  const postgrest = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'postgrest',
+    startDate,
+    endDate,
+    enabled,
+  })
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
     () => ({
