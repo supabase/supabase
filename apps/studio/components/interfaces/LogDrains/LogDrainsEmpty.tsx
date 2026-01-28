@@ -12,7 +12,7 @@ export const LogDrainsEmpty = () => {
       step: 1,
       title: 'Pricing',
       description:
-        'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $60 per month.',
+        'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $10 per month.',
       label: 'See our pricing',
       link: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
     },

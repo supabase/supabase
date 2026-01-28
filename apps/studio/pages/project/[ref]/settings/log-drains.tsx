@@ -169,7 +169,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           </p>
           {IS_PLATFORM && (
             <p>
-              This will incur an additional <span className="text-foreground">$60 per month</span>{' '}
+              This will incur an additional <span className="text-foreground">$10 per month</span>{' '}
               charge to your subscription.
             </p>
           )}
@@ -221,7 +221,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                           <div className="space-y-1">
                             <p className="block text-foreground">{drainType.name}</p>
                             {IS_PLATFORM && (
-                              <p className="text-xs text-foreground-lighter">Additional $60</p>
+                              <p className="text-xs text-foreground-lighter">Additional $10</p>
                             )}
                           </div>
                         </div>
