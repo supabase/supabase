@@ -30,14 +30,14 @@ Your Supabase project starts on a Small compute instance. It handles your MVP, y
 
 Here is the quick version:
 
-| If this is you... | Do this |
-| --- | --- |
-| Database is slow and CPU (user processes) is consistently above 70% | Upgrade compute |
-| Analytics queries are hurting production | Add a Read Replica |
-| Users in Europe or Asia have high latency | Add a Read Replica in their region |
-| I am maxed out at 16XL and need more read capacity | Add Read Replicas |
-| My workload is mostly writes | Upgrade compute (replicas only help reads) |
-| I want the simplest solution with no code changes | Upgrade compute |
+| If this is you...                                                   | Do this                                    |
+| ------------------------------------------------------------------- | ------------------------------------------ |
+| Database is slow and CPU (user processes) is consistently above 70% | Upgrade compute                            |
+| Analytics queries are hurting production                            | Add a Read Replica                         |
+| Users in Europe or Asia have high latency                           | Add a Read Replica in their region         |
+| I am maxed out at 16XL and need more read capacity                  | Add Read Replicas                          |
+| My workload is mostly writes                                        | Upgrade compute (replicas only help reads) |
+| I want the simplest solution with no code changes                   | Upgrade compute                            |
 
 The rest of this post explains how to diagnose your specific situation and make the right call with real numbers.
 
@@ -75,8 +75,10 @@ select
   sum(seq_tup_read + idx_tup_fetch) as reads,
   sum(n_tup_ins + n_tup_upd + n_tup_del) as writes,
   round(
-    100.0 * sum(seq_tup_read + idx_tup_fetch) /
-    nullif(sum(seq_tup_read + idx_tup_fetch + n_tup_ins + n_tup_upd + n_tup_del), 0),
+    100.0 * sum(seq_tup_read + idx_tup_fetch) / nullif(
+      sum(seq_tup_read + idx_tup_fetch + n_tup_ins + n_tup_upd + n_tup_del),
+      0
+    ),
     1
   ) as read_percentage
 from pg_stat_user_tables;
@@ -105,12 +107,12 @@ Read Replicas cannot help with writes. All INSERT, UPDATE, and DELETE operations
 
 Supabase offers [compute tiers](https://supabase.com/docs/guides/platform/compute-and-disk) from Micro ($10/month) to 16XL ($3,730/month). If you are on Medium and experiencing slowdowns, upgrading to Large or XL is straightforward and immediate.
 
-| Current tier | Next tier | Monthly cost increase | What you get |
-| --- | --- | --- | --- |
-| Small ($15) | Medium ($60) | +$45 | 2x RAM (2GB to 4GB) |
-| Medium ($60) | Large ($110) | +$50 | 2x RAM, dedicated CPU |
-| Large ($110) | XL ($210) | +$100 | 2x CPU cores, 2x RAM |
-| XL ($210) | 2XL ($410) | +$200 | 2x CPU cores, 2x RAM |
+| Current tier | Next tier    | Monthly cost increase | What you get          |
+| ------------ | ------------ | --------------------- | --------------------- |
+| Small ($15)  | Medium ($60) | +$45                  | 2x RAM (2GB to 4GB)   |
+| Medium ($60) | Large ($110) | +$50                  | 2x RAM, dedicated CPU |
+| Large ($110) | XL ($210)    | +$100                 | 2x CPU cores, 2x RAM  |
+| XL ($210)    | 2XL ($410)   | +$200                 | 2x CPU cores, 2x RAM  |
 
 ### Your queries are already optimized
 
@@ -197,12 +199,12 @@ Deploy a Read Replica in `eu-west-1`. Supabase's API load balancer automatically
 
 Compare the cost of adding read capacity:
 
-| Approach | Starting point | Monthly cost | Read capacity added |
-| --- | --- | --- | --- |
-| Upgrade compute | XL ($210) | $410 (+$200) | ~2x on same instance |
-| Add replica | XL ($210) | $420 (+$210) | 2x across two instances |
-| Upgrade compute | 4XL ($960) | $1,870 (+$910) | ~2x on same instance |
-| Add replica | 4XL ($960) | $1,920 (+$960) | 2x across two instances |
+| Approach        | Starting point | Monthly cost   | Read capacity added     |
+| --------------- | -------------- | -------------- | ----------------------- |
+| Upgrade compute | XL ($210)      | $410 (+$200)   | ~2x on same instance    |
+| Add replica     | XL ($210)      | $420 (+$210)   | 2x across two instances |
+| Upgrade compute | 4XL ($960)     | $1,870 (+$910) | ~2x on same instance    |
+| Add replica     | 4XL ($960)     | $1,920 (+$960) | 2x across two instances |
 
 At lower tiers, the costs are similar. At higher tiers, replicas become more cost-effective for read scaling because you can add a smaller replica instead of doubling your primary.
 
@@ -330,12 +332,12 @@ Read the full setup guide in [the documentation](https://supabase.com/docs/guide
 
 ## Summary
 
-| Factor | Choose bigger compute | Choose Read Replicas |
-| --- | --- | --- |
-| Workload | Write-heavy or balanced | Read-heavy (80%+) |
-| Current tier | Below 16XL | At or approaching 16XL |
-| Complexity tolerance | Want simplicity | Can handle routing |
-| Use case | General scaling | Analytics isolation, geo-distribution |
-| Code changes | None required | Minimal (connection strings for analytics) |
+| Factor               | Choose bigger compute   | Choose Read Replicas                       |
+| -------------------- | ----------------------- | ------------------------------------------ |
+| Workload             | Write-heavy or balanced | Read-heavy (80%+)                          |
+| Current tier         | Below 16XL              | At or approaching 16XL                     |
+| Complexity tolerance | Want simplicity         | Can handle routing                         |
+| Use case             | General scaling         | Analytics isolation, geo-distribution      |
+| Code changes         | None required           | Minimal (connection strings for analytics) |
 
 Both paths work. The right choice depends on where your bottleneck actually is. Diagnose first, then scale appropriately.

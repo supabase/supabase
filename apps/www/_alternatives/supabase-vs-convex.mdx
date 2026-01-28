@@ -52,14 +52,14 @@ If AI assistance levels the playing field on developer experience, the remaining
 
 The fundamental architectural difference shapes everything else in this comparison.
 
-| Feature | Supabase | Convex |
-| --- | --- | --- |
-| Database engine | PostgreSQL 15+ | Custom document store (Rust) |
-| Data model | Relational (tables, rows, columns) | Document (nested objects) |
-| Query language | SQL | TypeScript functions |
-| Schema | Explicit, enforced | Schema-validated documents |
-| Concurrency model | MVCC with pessimistic locking | Optimistic concurrency control |
-| Transaction isolation | Serializable available | Serializable by default |
+| Feature               | Supabase                           | Convex                         |
+| --------------------- | ---------------------------------- | ------------------------------ |
+| Database engine       | PostgreSQL 15+                     | Custom document store (Rust)   |
+| Data model            | Relational (tables, rows, columns) | Document (nested objects)      |
+| Query language        | SQL                                | TypeScript functions           |
+| Schema                | Explicit, enforced                 | Schema-validated documents     |
+| Concurrency model     | MVCC with pessimistic locking      | Optimistic concurrency control |
+| Transaction isolation | Serializable available             | Serializable by default        |
 
 **PostgreSQL gives Supabase decades of battle-tested reliability.** You can model complex data relationships naturally with foreign keys and joins. You can move complexity into the database using views, database functions, and constraints, instead of re-implementing the same logic across your application.
 
@@ -71,13 +71,13 @@ The tradeoff becomes clear as applications grow. Relational data modeling handle
 
 Both platforms offer real-time capabilities, but with different implementation approaches.
 
-| Feature | Supabase | Convex |
-| --- | --- | --- |
-| Real-time protocol | Postgres LISTEN/NOTIFY via WebSocket | Custom subscription protocol |
-| Default behavior | Opt-in per table | Enabled by default |
-| Granularity | Row-level changes | Query result changes |
-| Configuration required | Requires enabling Realtime on tables | None |
-| Bandwidth model | Sends only changed rows | Sends full query results |
+| Feature                | Supabase                             | Convex                       |
+| ---------------------- | ------------------------------------ | ---------------------------- |
+| Real-time protocol     | Postgres LISTEN/NOTIFY via WebSocket | Custom subscription protocol |
+| Default behavior       | Opt-in per table                     | Enabled by default           |
+| Granularity            | Row-level changes                    | Query result changes         |
+| Configuration required | Requires enabling Realtime on tables | None                         |
+| Bandwidth model        | Sends only changed rows              | Sends full query results     |
 
 **Supabase requires explicit configuration but offers precise control.** You enable Realtime on specific tables and subscribe to changes in your client code. Row-level security policies filter which changes each client receives. The subscription model sends only the rows that changed, not entire result sets. If you update one row in a table with 10,000 rows, subscribers receive that one row.
 
@@ -98,16 +98,16 @@ The bandwidth difference matters at scale. Supabase's row-level change tracking 
 
 Understanding each platform's architectural limits helps you anticipate where you might hit ceilings.
 
-| Constraint | Supabase | Convex |
-| --- | --- | --- |
-| Documents/rows per query | Limited by available memory | 32,000 documents per transaction |
-| Data per transaction | Limited by available memory | 16 MiB read or written |
-| Query/mutation timeout | Configurable (minutes to hours) | 1 second hard limit |
-| Action timeout | 150 seconds (Edge Functions) | 10 minutes |
-| Concurrent queries | Configurable connection pooling | 16 (Free) / 256 (Pro) |
-| Full-text search results | PostgreSQL FTS (configurable) | 1,024 results maximum |
-| Vector search results | pgvector (configurable) | 256 results maximum |
-| Documents written per transaction | Limited by transaction size | 16,000 documents |
+| Constraint                        | Supabase                        | Convex                           |
+| --------------------------------- | ------------------------------- | -------------------------------- |
+| Documents/rows per query          | Limited by available memory     | 32,000 documents per transaction |
+| Data per transaction              | Limited by available memory     | 16 MiB read or written           |
+| Query/mutation timeout            | Configurable (minutes to hours) | 1 second hard limit              |
+| Action timeout                    | 150 seconds (Edge Functions)    | 10 minutes                       |
+| Concurrent queries                | Configurable connection pooling | 16 (Free) / 256 (Pro)            |
+| Full-text search results          | PostgreSQL FTS (configurable)   | 1,024 results maximum            |
+| Vector search results             | pgvector (configurable)         | 256 results maximum              |
+| Documents written per transaction | Limited by transaction size     | 16,000 documents                 |
 
 **PostgreSQL handles billions of rows.** You can add read replicas, partition tables, and scale vertically or horizontally. Connection pooling via PgBouncer or Supavisor handles thousands of concurrent connections. Analytical queries, aggregations, and complex joins work without artificial ceilings.
 
@@ -119,12 +119,12 @@ For applications that stay within these limits, Convex performs well. For applic
 
 How each platform handles concurrent writes affects application behavior under load.
 
-| Aspect | Supabase | Convex |
-| --- | --- | --- |
-| Locking strategy | Pessimistic (lock rows during transaction) | Optimistic (validate at commit) |
-| Conflict handling | Waits for lock release | Retries transaction |
-| High-contention behavior | Predictable latency, ordered writes | Retry storms possible |
-| Counter/increment patterns | Native support via FOR UPDATE | Documented conflict risk |
+| Aspect                     | Supabase                                   | Convex                          |
+| -------------------------- | ------------------------------------------ | ------------------------------- |
+| Locking strategy           | Pessimistic (lock rows during transaction) | Optimistic (validate at commit) |
+| Conflict handling          | Waits for lock release                     | Retries transaction             |
+| High-contention behavior   | Predictable latency, ordered writes        | Retry storms possible           |
+| Counter/increment patterns | Native support via FOR UPDATE              | Documented conflict risk        |
 
 **PostgreSQL's pessimistic locking handles contention gracefully.** When multiple transactions target the same rows, they queue and execute in order. Latency increases predictably. The database handles the coordination.
 
@@ -136,13 +136,13 @@ For most applications, this distinction does not matter. For applications with h
 
 Both platforms support TypeScript, but the depth of integration differs.
 
-| Feature | Supabase | Convex |
-| --- | --- | --- |
-| Type generation | CLI generates from database schema | Native, no generation step |
-| Query type safety | Via generated types | Compile-time checked |
-| Mutation type safety | Via generated types | Compile-time checked |
-| Schema source of truth | Database | TypeScript files |
-| API layer | PostgREST (auto-generated REST API) | Custom RPC protocol |
+| Feature                | Supabase                            | Convex                     |
+| ---------------------- | ----------------------------------- | -------------------------- |
+| Type generation        | CLI generates from database schema  | Native, no generation step |
+| Query type safety      | Via generated types                 | Compile-time checked       |
+| Mutation type safety   | Via generated types                 | Compile-time checked       |
+| Schema source of truth | Database                            | TypeScript files           |
+| API layer              | PostgREST (auto-generated REST API) | Custom RPC protocol        |
 
 **Supabase generates types from your database schema.** You run `supabase gen types typescript` to generate TypeScript definitions. The supabase-js client uses [PostgREST](https://postgrest.org), which automatically generates a REST API from your Postgres schema. The generated types provide autocomplete and type checking for all your queries. You regenerate types after schema changes, but this integrates into standard CI/CD workflows.
 
@@ -159,9 +159,7 @@ The following examples illustrate the complexity difference for common operation
 **Supabase**
 
 ```tsx
-const { count } = await supabase
-  .from('tasks')
-  .select('*', { count: 'exact', head: true })
+const { count } = await supabase.from('tasks').select('*', { count: 'exact', head: true })
 ```
 
 **Convex**
@@ -171,36 +169,36 @@ Convex has no built-in count function. The recommended approach requires install
 First, configure the component in `convex/convex.config.ts`:
 
 ```tsx
-import { defineApp } from "convex/server";
-import aggregate from "@convex-dev/aggregate/convex.config";
+import { defineApp } from 'convex/server'
+import aggregate from '@convex-dev/aggregate/convex.config'
 
-const app = defineApp();
-app.use(aggregate, { name: "aggregateTasks" });
+const app = defineApp()
+app.use(aggregate, { name: 'aggregateTasks' })
 
-export default app;
+export default app
 ```
 
 Then create the aggregate in your queries file:
 
 ```tsx
-import { components } from "./_generated/api";
-import { DataModel } from "./_generated/dataModel";
-import { TableAggregate } from "@convex-dev/aggregate";
+import { components } from './_generated/api'
+import { DataModel } from './_generated/dataModel'
+import { TableAggregate } from '@convex-dev/aggregate'
 
 const aggregateTasks = new TableAggregate<{
-  Key: number;
-  DataModel: DataModel;
-  TableName: "tasks";
+  Key: number
+  DataModel: DataModel
+  TableName: 'tasks'
 }>(components.aggregateTasks, {
   sortKey: (doc) => doc._creationTime,
-});
+})
 
 export const countTasks = query({
   args: {},
   handler: async (ctx) => {
-    return await aggregateTasks.count(ctx, {});
+    return await aggregateTasks.count(ctx, {})
   },
-});
+})
 ```
 
 Without the component, you must fetch all documents and count in JavaScript, which scans every document and hits Convex's 8,192 document read limit on larger tables.
@@ -225,40 +223,40 @@ Convex schemas validate types only, not values. You must write validation logic 
 
 ```tsx
 // convex/schema.ts - only type validation
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from 'convex/server'
+import { v } from 'convex/values'
 
 export default defineSchema({
   users: defineTable({
     username: v.string(),
     age: v.number(),
   }),
-});
+})
 
 // convex/users.ts - manual validation in mutation
 export const createUser = mutation({
   args: { username: v.string(), age: v.number() },
   handler: async (ctx, args) => {
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    const usernameRegex = /^[a-zA-Z0-9_]+$/
     if (!usernameRegex.test(args.username)) {
-      throw new Error("Username must contain only letters, numbers, and underscores");
+      throw new Error('Username must contain only letters, numbers, and underscores')
     }
     if (args.username.length <= 3 || args.username.length >= 15) {
-      throw new Error("Username must be between 4 and 14 characters");
+      throw new Error('Username must be between 4 and 14 characters')
     }
     if (args.age < 18) {
-      throw new Error("Must be 18 or older");
+      throw new Error('Must be 18 or older')
     }
     const existing = await ctx.db
-      .query("users")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .first();
+      .query('users')
+      .withIndex('by_username', (q) => q.eq('username', args.username))
+      .first()
     if (existing) {
-      throw new Error("Username already taken");
+      throw new Error('Username already taken')
     }
-    return await ctx.db.insert("users", args);
+    return await ctx.db.insert('users', args)
   },
-});
+})
 ```
 
 This validation must be repeated in every mutation that writes to the table. Postgres constraints are enforced at the database level regardless of how data enters.
@@ -287,29 +285,29 @@ export default defineSchema({
   tasks: defineTable({
     title: v.string(),
     status: v.string(),
-    user_id: v.id("users"),
+    user_id: v.id('users'),
   })
-    .index("by_status", ["status"])
-    .index("by_user_and_status", ["user_id", "status"]),
-});
+    .index('by_status', ['status'])
+    .index('by_user_and_status', ['user_id', 'status']),
+})
 ```
 
 Then query using the index:
 
 ```tsx
 export const getCompletedTasks = query({
-  args: { userId: v.id("users") },
+  args: { userId: v.id('users') },
   handler: async (ctx, args) => {
     const tasks = await ctx.db
-      .query("tasks")
-      .withIndex("by_user_and_status", (q) => 
-        q.eq("user_id", args.userId).eq("status", "completed")
+      .query('tasks')
+      .withIndex('by_user_and_status', (q) =>
+        q.eq('user_id', args.userId).eq('status', 'completed')
       )
-      .order("desc")
-      .take(10);
-    return tasks;
+      .order('desc')
+      .take(10)
+    return tasks
   },
-});
+})
 ```
 
 Filtering without an index causes full table scans, which count against Convex's document read limits and can cause unexpected billing.
@@ -341,11 +339,7 @@ group by u.id, u.name, o.name, o.plan;
 Then query it:
 
 ```tsx
-const { data } = await supabase
-  .from('user_dashboard')
-  .select('*')
-  .eq('user_id', userId)
-  .single()
+const { data } = await supabase.from('user_dashboard').select('*').eq('user_id', userId).single()
 ```
 
 **Convex (multiple dependent queries, client-side assembly)**
@@ -355,54 +349,52 @@ Convex has no views. You must fetch each piece separately and assemble on the cl
 ```tsx
 // Query 1: Get the user
 export const getUser = query({
-  args: { userId: v.id("users") },
+  args: { userId: v.id('users') },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    return await ctx.db.get(args.userId)
   },
-});
+})
 
 // Query 2: Get the organization (depends on user.org_id)
 export const getOrganization = query({
-  args: { orgId: v.id("organizations") },
+  args: { orgId: v.id('organizations') },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.orgId);
+    return await ctx.db.get(args.orgId)
   },
-});
+})
 
 // Query 3: Get team members (depends on org_id)
 export const getTeamMembers = query({
-  args: { orgId: v.id("organizations") },
+  args: { orgId: v.id('organizations') },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("users")
-      .withIndex("by_org", (q) => q.eq("org_id", args.orgId))
-      .collect();
+      .query('users')
+      .withIndex('by_org', (q) => q.eq('org_id', args.orgId))
+      .collect()
   },
-});
+})
 
 // Query 4: Get recent activity (depends on user_id)
 export const getRecentActivity = query({
-  args: { userId: v.id("users") },
+  args: { userId: v.id('users') },
   handler: async (ctx, args) => {
-    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
     return await ctx.db
-      .query("activity")
-      .withIndex("by_user", (q) => q.eq("user_id", args.userId))
-      .filter((q) => q.gte(q.field("created_at"), weekAgo))
-      .collect();
+      .query('activity')
+      .withIndex('by_user', (q) => q.eq('user_id', args.userId))
+      .filter((q) => q.gte(q.field('created_at'), weekAgo))
+      .collect()
   },
-});
+})
 ```
 
 In your React component, you call these sequentially and combine the results:
 
 ```tsx
-const user = useQuery(api.users.getUser, { userId });
-const org = useQuery(api.orgs.getOrganization, 
-  user ? { orgId: user.org_id } : "skip");
-const team = useQuery(api.users.getTeamMembers,
-  org ? { orgId: org._id } : "skip");
-const activity = useQuery(api.activity.getRecentActivity, { userId });
+const user = useQuery(api.users.getUser, { userId })
+const org = useQuery(api.orgs.getOrganization, user ? { orgId: user.org_id } : 'skip')
+const team = useQuery(api.users.getTeamMembers, org ? { orgId: org._id } : 'skip')
+const activity = useQuery(api.activity.getRecentActivity, { userId })
 ```
 
 Four round trips instead of one. Each query counts against bandwidth. The client assembles what the database should have joined.
@@ -411,13 +403,13 @@ Four round trips instead of one. Each query counts against bandwidth. The client
 
 Both platforms provide serverless compute, with different execution models.
 
-| Feature | Supabase | Convex |
-| --- | --- | --- |
-| Runtime | Deno (V8 isolates) | V8 isolates |
-| Language | TypeScript/JavaScript | TypeScript |
-| Cold start | ~200-500ms typical | Fast (sub-100ms typical) |
-| Execution limit | 150 seconds (wall clock) | Variable based on plan |
-| Database access | Via Supabase client or direct connection | Native, transactional |
+| Feature         | Supabase                                 | Convex                   |
+| --------------- | ---------------------------------------- | ------------------------ |
+| Runtime         | Deno (V8 isolates)                       | V8 isolates              |
+| Language        | TypeScript/JavaScript                    | TypeScript               |
+| Cold start      | ~200-500ms typical                       | Fast (sub-100ms typical) |
+| Execution limit | 150 seconds (wall clock)                 | Variable based on plan   |
+| Database access | Via Supabase client or direct connection | Native, transactional    |
 
 **Supabase Edge Functions run at the edge, separate from the database.** They connect to Postgres like any other client. This separation means you can call external APIs, run long computations, or handle webhooks without blocking database operations. You manage transactions explicitly when needed.
 
@@ -429,17 +421,17 @@ Supabase's separation enables more flexibility for non-database workloads. Conve
 
 Both platforms provide authentication with different architectural approaches.
 
-| Feature | Supabase | Convex |
-| --- | --- | --- |
-| Built-in auth | Yes, full auth system | Integrations only (Clerk, Auth0, etc.) |
-| Third-party auth providers | Supported (Clerk, Auth0, Firebase Auth, AWS Cognito) | Required |
-| Social providers | 20+ built-in | Via third-party integration |
-| Enterprise SSO | SAML 2.0 built-in | Via third-party integration |
-| Email/password | Built-in | Via integration |
-| Magic links | Built-in | Via integration |
-| Phone/SMS | Built-in (Twilio, MessageBird, Vonage) | Via integration |
-| Anonymous auth | Built-in | Via integration |
-| Row-level security | Native database integration | Manual checks in function code |
+| Feature                    | Supabase                                             | Convex                                 |
+| -------------------------- | ---------------------------------------------------- | -------------------------------------- |
+| Built-in auth              | Yes, full auth system                                | Integrations only (Clerk, Auth0, etc.) |
+| Third-party auth providers | Supported (Clerk, Auth0, Firebase Auth, AWS Cognito) | Required                               |
+| Social providers           | 20+ built-in                                         | Via third-party integration            |
+| Enterprise SSO             | SAML 2.0 built-in                                    | Via third-party integration            |
+| Email/password             | Built-in                                             | Via integration                        |
+| Magic links                | Built-in                                             | Via integration                        |
+| Phone/SMS                  | Built-in (Twilio, MessageBird, Vonage)               | Via integration                        |
+| Anonymous auth             | Built-in                                             | Via integration                        |
+| Row-level security         | Native database integration                          | Manual checks in function code         |
 
 **Supabase Auth works out of the box.** Built-in social providers include Apple, Azure, Bitbucket, Discord, Facebook, Figma, GitHub, GitLab, Google, Kakao, Keycloak, LinkedIn, Notion, Slack, Spotify, Twitch, Twitter, WorkOS, and Zoom. Enterprise customers get SAML 2.0 single sign-on. Phone authentication works with Twilio, MessageBird, or Vonage. Anonymous sign-ins let users try your app before creating an account. For React and TypeScript developers, [supabase.com/ui](https://supabase.com/ui) provides one-command auth component installation.
 
@@ -465,15 +457,15 @@ For teams with existing auth infrastructure, Convex's approach provides flexibil
 
 Postgres has a large extension ecosystem. Supabase supports over 50 extensions, though not all Postgres extensions are available.
 
-| Capability | Supabase | Convex |
-| --- | --- | --- |
-| Geospatial queries | PostGIS, pgRouting | Not available |
-| Vector/AI embeddings | pgvector | Built-in vector search (256 result limit) |
-| Time-series data | Not available (TimescaleDB deprecated) | Not available |
-| Full-text search | PostgreSQL FTS, pgroonga | Built-in search (1,024 result limit) |
-| Graph queries | Not available | Not available |
-| Foreign data wrappers | Wrappers extension (Stripe, Firebase, S3, BigQuery, and others) | Not applicable |
-| Scheduled jobs | pg_cron | Built-in scheduling |
+| Capability            | Supabase                                                        | Convex                                    |
+| --------------------- | --------------------------------------------------------------- | ----------------------------------------- |
+| Geospatial queries    | PostGIS, pgRouting                                              | Not available                             |
+| Vector/AI embeddings  | pgvector                                                        | Built-in vector search (256 result limit) |
+| Time-series data      | Not available (TimescaleDB deprecated)                          | Not available                             |
+| Full-text search      | PostgreSQL FTS, pgroonga                                        | Built-in search (1,024 result limit)      |
+| Graph queries         | Not available                                                   | Not available                             |
+| Foreign data wrappers | Wrappers extension (Stripe, Firebase, S3, BigQuery, and others) | Not applicable                            |
+| Scheduled jobs        | pg_cron                                                         | Built-in scheduling                       |
 
 **Supabase provides access to 50+ Postgres extensions.** PostGIS handles geospatial workloads. pgvector powers AI embeddings and similarity search. pg_cron schedules recurring jobs. The Wrappers extension connects to external data sources like Stripe, Firebase, S3, and BigQuery. Some extensions like TimescaleDB have been deprecated on newer Postgres versions.
 
@@ -485,12 +477,12 @@ For geospatial workloads or AI applications with large result sets, Supabase's e
 
 Understanding pricing models helps avoid surprises at scale.
 
-| Aspect | Supabase | Convex |
-| --- | --- | --- |
-| Free tier | 500 MB database, 1 GB storage | 1M function calls/month |
-| Pricing model | Resource-based (compute, storage, bandwidth) | Usage-based (function calls, bandwidth, storage) |
-| Predictability | Fixed costs for provisioned resources | Variable based on usage patterns |
-| Bandwidth costs | Included in plan tiers | $0.20 per GB |
+| Aspect          | Supabase                                     | Convex                                           |
+| --------------- | -------------------------------------------- | ------------------------------------------------ |
+| Free tier       | 500 MB database, 1 GB storage                | 1M function calls/month                          |
+| Pricing model   | Resource-based (compute, storage, bandwidth) | Usage-based (function calls, bandwidth, storage) |
+| Predictability  | Fixed costs for provisioned resources        | Variable based on usage patterns                 |
+| Bandwidth costs | Included in plan tiers                       | $0.20 per GB                                     |
 
 **Supabase pricing is primarily resource-based.** You pay for database compute (instance size), storage, and bandwidth at defined rates. Costs are predictable because they scale with provisioned resources, not request patterns.
 
@@ -502,13 +494,13 @@ The bandwidth amplification issue documented in Convex's GitHub (issue #95) show
 
 The philosophical difference matters for long-term planning.
 
-| Aspect | Supabase | Convex |
-| --- | --- | --- |
-| License | Apache 2.0 (open source) | FSL Apache 2.0 (source-available) |
-| Self-hosting | Full platform self-hostable | Available (backend only) |
-| Data export | Standard pg_dump, any SQL client | API-based export |
-| Vendor lock-in | Low (portable Postgres) | Moderate (proprietary data format) |
-| Community contributions | Open to PRs | GitHub issues and PRs accepted |
+| Aspect                  | Supabase                         | Convex                             |
+| ----------------------- | -------------------------------- | ---------------------------------- |
+| License                 | Apache 2.0 (open source)         | FSL Apache 2.0 (source-available)  |
+| Self-hosting            | Full platform self-hostable      | Available (backend only)           |
+| Data export             | Standard pg_dump, any SQL client | API-based export                   |
+| Vendor lock-in          | Low (portable Postgres)          | Moderate (proprietary data format) |
+| Community contributions | Open to PRs                      | GitHub issues and PRs accepted     |
 
 **Supabase is fully open source under Apache 2.0.** You can self-host the entire platform, inspect the code, and contribute improvements. Your data lives in standard Postgres, exportable with any SQL tool and importable to any Postgres host.
 
@@ -522,13 +514,13 @@ For hobbyist projects, vendor lock-in may not matter. For businesses building co
 
 Existing tooling compatibility affects development workflows.
 
-| Tool category | Supabase | Convex |
-| --- | --- | --- |
-| SQL clients | All (DataGrip, TablePlus, psql, etc.) | None |
-| BI tools | All SQL-compatible tools | Requires data export |
-| ETL/ELT | Fivetran, Airbyte, dbt, etc. | Limited integration |
-| ORM support | Prisma, Drizzle, TypeORM, etc. | Convex client only |
-| Database migrations | Standard tools (Flyway, Liquibase, etc.) | Convex CLI only |
+| Tool category       | Supabase                                 | Convex               |
+| ------------------- | ---------------------------------------- | -------------------- |
+| SQL clients         | All (DataGrip, TablePlus, psql, etc.)    | None                 |
+| BI tools            | All SQL-compatible tools                 | Requires data export |
+| ETL/ELT             | Fivetran, Airbyte, dbt, etc.             | Limited integration  |
+| ORM support         | Prisma, Drizzle, TypeORM, etc.           | Convex client only   |
+| Database migrations | Standard tools (Flyway, Liquibase, etc.) | Convex CLI only      |
 
 **Supabase works with the entire SQL ecosystem.** Connect any SQL client for queries and administration. Use any BI tool for analytics. Integrate with any ETL pipeline. Choose your preferred ORM or query builder.
 
