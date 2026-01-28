@@ -110,7 +110,7 @@ const useServiceHealthQuery = (
   })
 
   // Convert unix microseconds to ISO timestamps
-  const normalizedData = useTimeseriesUnixToIso(queryResult.data || [], 'timestamp')
+  const normalizedData = useTimeseriesUnixToIso(queryResult.data ?? [], 'timestamp')
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted(
