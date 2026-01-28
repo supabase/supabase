@@ -1,23 +1,24 @@
-import { ChevronRight } from 'lucide-react'
-import { UseFormReturn } from 'react-hook-form'
-
+import { useFlag } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronRight } from 'lucide-react'
+import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface AdvancedConfigurationProps {
@@ -31,6 +32,8 @@ export const AdvancedConfiguration = ({
   layout = 'horizontal',
   collapsible = true,
 }: AdvancedConfigurationProps) => {
+  const disableOrioleProjectCreation = useFlag('disableOrioleProjectCreation')
+
   const content = (
     <>
       <FormField_Shadcn_
@@ -80,8 +83,11 @@ export const AdvancedConfiguration = ({
                         description="Not recommended for production workloads"
                         className={cn(
                           '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
-                          form.getValues('useOrioleDb') ? '!rounded-b-none' : ''
+                          form.getValues('useOrioleDb') || disableOrioleProjectCreation
+                            ? '!rounded-b-none'
+                            : ''
                         )}
+                        disabled={disableOrioleProjectCreation}
                       />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
@@ -96,6 +102,14 @@ export const AdvancedConfiguration = ({
                 >
                   <DocsButton className="mt-2" href={`${DOCS_URL}/guides/database/orioledb`} />
                 </Admonition>
+              )}
+              {disableOrioleProjectCreation && (
+                <Admonition
+                  type="warning"
+                  className="rounded-t-none [&>div]:text-xs"
+                  title="OrioleDB is not available"
+                  description="OrioleDB is temporarily disabled for new projects. Please try again later."
+                />
               )}
             </FormItemLayout>
           </>
