@@ -378,6 +378,7 @@ export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
   { key: 'mobiles', label: 'Mobile Frameworks', obj: MOBILES },
   { key: 'orms', label: 'ORMs', obj: ORMS },
+  { key: 'api-keys', label: 'API Keys', obj: [] },
   { key: 'mcp', label: 'MCP', obj: [] },
 ]
 
