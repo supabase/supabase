@@ -94,4 +94,16 @@ export const dataset: AssistantEvalCase[] = [
         'Uses quotes around schema/table/columns with capital letters, special characters, and reserved keywords.',
     },
   },
+  {
+    input: {
+      prompt: 'Generate sample data for a blog with users, posts, and comments tables',
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+    },
+    metadata: {
+      category: ['sql_generation', 'schema_design'],
+      description: 'Invokes `execute_sql` from default "Generate sample data" prompt',
+    },
+  },
 ]
