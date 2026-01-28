@@ -206,7 +206,7 @@ functions:
 
         This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/supabase-js/blob/master/packages/core/auth-js/src/lib/types.ts#L1053).
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
-      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/auth/providers). A refresh token never expires and can only be used once.
 
     examples:
       - id: create-auth-client
@@ -1720,7 +1720,7 @@ functions:
     title: 'linkIdentity()'
     $ref: '@supabase/auth-js.GoTrueClient.linkIdentity'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
       - If `linkIdentity` is run in the browser, the user is automatically redirected to the returned URL. On the server, you should handle the redirect.
@@ -1748,7 +1748,7 @@ functions:
     title: 'unlinkIdentity()'
     $ref: '@supabase/auth-js.GoTrueClient.unlinkIdentity'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -7449,7 +7449,7 @@ functions:
       This section contains methods for working with File Buckets.
   - id: list-buckets
     title: listBuckets()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
+    $ref: '@supabase/storage-js.StorageClient.listBuckets'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7458,7 +7458,7 @@ functions:
 
   - id: get-bucket
     title: getBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
+    $ref: '@supabase/storage-js.StorageClient.getBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7467,7 +7467,7 @@ functions:
 
   - id: create-bucket
     title: createBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
+    $ref: '@supabase/storage-js.StorageClient.createBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
@@ -7476,7 +7476,7 @@ functions:
 
   - id: empty-bucket
     title: emptyBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
+    $ref: '@supabase/storage-js.StorageClient.emptyBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7485,7 +7485,7 @@ functions:
 
   - id: update-bucket
     title: updateBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
+    $ref: '@supabase/storage-js.StorageClient.updateBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
@@ -7494,7 +7494,7 @@ functions:
 
   - id: delete-bucket
     title: deleteBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
+    $ref: '@supabase/storage-js.StorageClient.deleteBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
@@ -7506,7 +7506,7 @@ functions:
     notes: |
       This section contains methods for working with Analytics Buckets.
   - id: storageanalytics-from
-    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.from'
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.constructor'
 
   - id: storageanalytics-createbucket
     $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.createBucket'
@@ -7953,22 +7953,22 @@ functions:
     $ref: '@supabase/storage-js.index.StorageClient.updateBucket'
 
   - id: storagevectors-create-bucket
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.createBucket'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.createBucket'
 
   - id: storagevectors-delete-bucket
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.deleteBucket'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.deleteBucket'
 
   - id: storagevectors-get-bucket
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.getBucket'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.getBucket'
 
   - id: storagevectors-list-buckets
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.listBuckets'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.listBuckets'
 
   - id: storagevectors-from
-    $ref: '@supabase/storage-js.StorageVectorsClient.from'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.from'
 
   - id: vectorbucket-index
-    $ref: '@supabase/storage-js.index.VectorBucketScope.index'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.index'
 
   - id: storagefile-exists
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
@@ -7989,34 +7989,34 @@ functions:
 
   - id: vectorbucket-createindex
     title: VectorBucketScope.createIndex()
-    $ref: '@supabase/storage-js.VectorBucketScope.createIndex'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.createIndex'
 
   - id: vectorbucket-deleteindex
     title: VectorBucketScope.deleteIndex()
-    $ref: '@supabase/storage-js.VectorBucketScope.deleteIndex'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.deleteIndex'
 
   - id: vectorbucket-getindex
     title: VectorBucketScope.getIndex()
-    $ref: '@supabase/storage-js.VectorBucketScope.getIndex'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.getIndex'
 
   - id: vectorbucket-listindexes
     title: VectorBucketScope.listIndexes()
-    $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.listIndexes'
 
   - id: vectorindex-deletevectors
-    $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.deleteVectors'
 
   - id: vectorindex-getvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.getVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.getVectors'
 
   - id: vectorindex-listvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.listVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.listVectors'
 
   - id: vectorindex-putvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.putVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.putVectors'
 
   - id: vectorindex-queryvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.queryVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.queryVectors'
 
   - id: realtime-js-realtimechannel-constructor
     title: new RealtimeChannel()

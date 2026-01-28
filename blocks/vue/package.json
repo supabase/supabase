@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "h3": "^1.15.4",
+    "h3": "^1.15.5",
     "nuxt": "^4.0.3",
     "class-variance-authority": "^0.7.1",
     "tailwind-merge": "^3.3.1",
