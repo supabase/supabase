@@ -35,7 +35,7 @@ export function useCsvFileDrop({
 
       if (event.type === 'dragover' && !isDraggedOver) {
         setIsDraggedOver(true)
-        setIsValidFile(item.type === 'text/csv')
+        setIsValidFile(item.type === 'text/csv' || item.type === 'text/tab-separated-values')
       } else if (event.type === 'dragleave' || event.type === 'drop') {
         setIsDraggedOver(false)
         setIsValidFile(false)
