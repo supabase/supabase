@@ -11,10 +11,10 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 export function MaintenanceBanner() {
   const { data: allStatusPageEvents } = useIncidentStatusQuery()
   const { maintenanceEvents = [] } = allStatusPageEvents ?? {}
-  const currentEventId = maintenanceEvents[0].id
+  const currentEventId = maintenanceEvents[0]?.id ?? ''
 
   const [dismissed, setDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.MAINTANENCE_BANNER_DISMISSED(currentEventId),
+    LOCAL_STORAGE_KEYS.MAINTENANCE_BANNER_DISMISSED(currentEventId),
     false
   )
 
