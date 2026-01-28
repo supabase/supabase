@@ -88,9 +88,10 @@ export const LinkSupportTicketForm = ({
           ? values.projectRef
           : undefined,
       category: values.category,
-      allow_support_access: !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-        ? values.allowSupportAccess
-        : false,
+      allow_support_access:
+        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+          ? values.allowSupportAccess
+          : false,
     })
   }
 

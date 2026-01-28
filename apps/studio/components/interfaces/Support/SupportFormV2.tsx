@@ -131,9 +131,10 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       category,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess: !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-        ? values.allowSupportAccess
-        : false,
+      allowSupportAccess:
+        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+          ? values.allowSupportAccess
+          : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
