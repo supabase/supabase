@@ -4,7 +4,7 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import type { Dictionary } from 'types'
 
-import { SupaRow } from '../types'
+import { PendingAddRow, PendingDeleteRow, SupaRow, isPendingAddRow } from '../types'
 import {
   type AddRowPayload,
   type DeleteRowPayload,
@@ -115,9 +115,9 @@ export function applyRowAdd(
   rows: SupaRow[],
   tempId: string,
   rowData: Dictionary<unknown>
-): SupaRow[] {
+): (PendingAddRow | SupaRow)[] {
   // Check if row with this tempId already exists
-  const existingIndex = rows.findIndex((row) => row.__tempId === tempId)
+  const existingIndex = rows.findIndex((row) => isPendingAddRow(row) && row.__tempId === tempId)
   if (existingIndex >= 0) {
     // Update existing row in place
     return rows.map((row, index) => {
@@ -125,11 +125,11 @@ export function applyRowAdd(
         return { ...row, ...rowData, __tempId: tempId }
       }
       return row
-    })
+    }) as PendingAddRow[]
   }
 
   // Add new row at the top of the table
-  const newRow: SupaRow = {
+  const newRow: PendingAddRow = {
     idx: -1, // Use -1 to indicate it's a pending row (not yet in DB)
     ...rowData,
     __tempId: tempId,
@@ -140,8 +140,11 @@ export function applyRowAdd(
 /**
  * Apply DELETE_ROW optimistic update - mark row with __isDeleted marker
  */
-export function markRowAsDeleted(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
-  return rows.map((row) => {
+export function markRowAsDeleted(
+  rows: SupaRow[],
+  rowIdentifiers: Dictionary<unknown>
+): (PendingDeleteRow | SupaRow)[] {
+  return rows.map((row): PendingDeleteRow | SupaRow => {
     const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
     if (rowMatches) {
       return { ...row, __isDeleted: true }
@@ -154,7 +157,7 @@ export function markRowAsDeleted(rows: SupaRow[], rowIdentifiers: Dictionary<unk
  * Remove a row from the list (used when cancelling ADD_ROW)
  */
 export function removeRowByTempId(rows: SupaRow[], tempId: string): SupaRow[] {
-  return rows.filter((row) => row.__tempId !== tempId)
+  return rows.filter((row) => !isPendingAddRow(row) || row.__tempId !== tempId)
 }
 
 /**
@@ -167,8 +170,8 @@ export function unmarkRowAsDeleted(
   return rows.map((row) => {
     const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
     if (rowMatches) {
-      const { __isDeleted, ...rest } = row
-      return rest as SupaRow
+      const { __isDeleted, ...rest } = row as PendingDeleteRow
+      return rest
     }
     return row
   })

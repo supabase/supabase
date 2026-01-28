@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
+import type { PendingAddRow } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { toast } from 'sonner'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import {
   AddRowPayload,
@@ -13,11 +13,11 @@ import {
   QueuedOperationType,
 } from 'state/table-editor-operation-queue.types'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { tableRowKeys } from './keys'
 import { getTableRowCreateSql } from './table-row-create-mutation'
 import { getTableRowDeleteSql } from './table-row-delete-mutation'
 import { getTableRowUpdateSql } from './table-row-update-mutation'
-import type { SupaRow } from 'components/grid/types'
 
 export type OperationQueueSaveVariables = {
   projectRef: string
@@ -49,7 +49,7 @@ function getOperationSql(operation: QueuedOperation): string {
     case QueuedOperationType.ADD_ROW: {
       const payload = operation.payload as AddRowPayload
       // Clean internal fields before SQL generation
-      const { __tempId, idx, ...cleanRowData } = payload.rowData as any
+      const { __tempId, idx, ...cleanRowData } = payload.rowData as PendingAddRow
       return getTableRowCreateSql({
         table: { id: payload.table.id, name: payload.table.name, schema: payload.table.schema },
         payload: cleanRowData,
@@ -60,7 +60,7 @@ function getOperationSql(operation: QueuedOperation): string {
     case QueuedOperationType.DELETE_ROW: {
       const payload = operation.payload as DeleteRowPayload
       // Create a mock row with the row identifiers for the delete SQL
-      const mockRow = { idx: 0, ...payload.rowIdentifiers } as SupaRow
+      const mockRow = { idx: 0, ...payload.rowIdentifiers }
       return getTableRowDeleteSql({
         table: payload.table,
         rows: [mockRow],

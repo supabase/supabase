@@ -1,10 +1,6 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { forwardRef, memo, Ref, useMemo, useRef } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { ref as valtioRef } from 'valtio'
-
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -13,11 +9,16 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
+import { Ref, forwardRef, memo, useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ref as valtioRef } from 'valtio'
+
 import type { GridProps, SupaRow } from '../../types'
+import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
@@ -199,14 +200,10 @@ export const Grid = memo(
               classes.push(originalClass)
             }
           }
-
-          // Check for newly added rows (has __tempId marker)
-          if ((row as any).__tempId) {
+          if (isPendingAddRow(row)) {
             classes.push('rdg-row--added')
           }
-
-          // Check for deleted rows (has __isDeleted marker)
-          if ((row as any).__isDeleted) {
+          if (isPendingDeleteRow(row)) {
             classes.push('rdg-row--deleted')
           }
 
