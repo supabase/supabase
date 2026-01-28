@@ -339,3 +339,75 @@ export async function getUserActivity(author: string) {
     },
   }
 }
+
+export async function getRelatedThreads(
+  threadId: string,
+  minSimilarityScore: number = 0.5
+): Promise<Array<ThreadRow & { similarityScore: number }>> {
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
+
+  // Get similar thread IDs from the similarity function
+  const { data: similarThreads, error } = await supabase.rpc('find_similar_contribute_threads', {
+    input_thread_id: threadId,
+  })
+
+  if (error) {
+    console.error('Error fetching related threads:', error)
+    console.error('Error details:', JSON.stringify(error, null, 2))
+    console.error('Thread ID:', threadId)
+    return []
+  }
+
+  if (!similarThreads || similarThreads.length === 0) {
+    return []
+  }
+
+  // Filter threads by minimum similarity score
+  const filteredThreads = similarThreads.filter(
+    (t: { similarity_score: number }) => t.similarity_score >= minSimilarityScore
+  )
+
+  if (filteredThreads.length === 0) {
+    return []
+  }
+
+  // Create a map of thread_id to similarity_score
+  const scoresMap = new Map(
+    filteredThreads.map((t: { thread_id: string; similarity_score: number }) => [
+      t.thread_id,
+      t.similarity_score,
+    ])
+  )
+
+  // Extract thread IDs from the similarity results
+  const threadIds = filteredThreads.map((t: { thread_id: string }) => t.thread_id)
+
+  // Fetch full thread data for the similar threads
+  const { data: threads, error: threadsError } = await supabase
+    .from('v_contribute_threads')
+    .select(
+      'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count'
+    )
+    .in('thread_id', threadIds)
+
+  if (threadsError) {
+    console.error('Error fetching full thread data:', threadsError)
+    return []
+  }
+
+  // Map threads to maintain the similarity order and add similarity scores
+  const threadsMap = new Map(threads?.map((t) => [t.thread_id, t]) || [])
+  const orderedThreads = threadIds
+    .map((id) => {
+      const thread = threadsMap.get(id)
+      const score = scoresMap.get(id)
+      if (!thread || score === undefined) return null
+      return {
+        ...mapThreadRowToThread(thread as Thread),
+        similarityScore: score,
+      }
+    })
+    .filter(Boolean) as Array<ThreadRow & { similarityScore: number }>
+
+  return orderedThreads
+}
