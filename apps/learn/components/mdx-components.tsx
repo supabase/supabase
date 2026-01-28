@@ -1,7 +1,6 @@
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
 
-import type { Style } from '@/registry/styles'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -9,18 +8,11 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   cn,
 } from 'ui'
-import { BlockItem } from './block-item'
-import { BlockPreview } from './block-preview'
 import { Callout } from './callout'
-import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
-import { DualRealtimeChat } from './dual-realtime-chat'
-import { RegistryBlock } from './registry-block'
-import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
 
 const components = {
-  RegistryBlock,
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -120,16 +112,14 @@ const components = {
     __rawString__,
     __withMeta__,
     __src__,
-    __style__,
     ...props
   }: React.HTMLAttributes<HTMLPreElement> & {
-    __style__?: Style['name']
     __rawString__?: string
     __withMeta__?: boolean
     __src__?: string
   }) => {
     return (
-      <StyleWrapper styleName={__style__}>
+      <div className="relative">
         <pre
           className={cn(
             'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-surface-75/75 py-4 text-foreground-light',
@@ -144,7 +134,7 @@ const components = {
             className={cn('absolute right-4 top-4', __withMeta__ && 'top-16')}
           />
         )}
-      </StyleWrapper>
+      </div>
     )
   },
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
@@ -157,7 +147,6 @@ const components = {
     />
   ),
   Callout,
-  ComponentPreview,
   CopyButton,
   TanStackBeta,
   Card: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
@@ -178,9 +167,6 @@ const components = {
       {...props}
     />
   ),
-  BlockItem,
-  BlockPreview,
-  DualRealtimeChat,
 }
 
 interface MdxProps {

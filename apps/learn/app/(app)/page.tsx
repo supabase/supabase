@@ -1,5 +1,5 @@
 import { WhatWillILearn } from '@/components/what-will-i-learn'
-import { Link } from '@/registry/default/components/ui/link'
+import Link from 'next/link'
 import { Activity, BookOpen, Database, Gauge, Wrench } from 'lucide-react'
 import { Badge, Button, Card, CardDescription, CardHeader } from 'ui'
 

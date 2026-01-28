@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3007",
-    "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build --turbopack",
+    "build": "pnpm run content:build && next build --turbopack",
     "internal:sync": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/sync-internal-content.mts",
     "start": "next start",
     "lint": "eslint .",

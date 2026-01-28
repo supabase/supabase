@@ -99,7 +99,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
               )}
               {item.title}
               {item.new && (
-                <Badge variant="brand" className="capitalize flex-shrink-0">
+                <Badge variant="default" className="capitalize flex-shrink-0">
                   NEW
                 </Badge>
               )}
@@ -140,7 +140,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
               )}
               <span className="truncate">{item.title}</span>
               {item.new && (
-                <Badge variant="brand" className="capitalize flex-shrink-0">
+                <Badge variant="default" className="capitalize flex-shrink-0">
                   NEW
                 </Badge>
               )}

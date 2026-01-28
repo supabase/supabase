@@ -1,12 +1,10 @@
-import { Style } from '@/registry/styles'
-// import { Theme } from '@/registry/themes'
 import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { ComponentProps } from 'react'
 import { SonnerToaster } from 'ui'
 
 type Config = {
-  style: Style['name']
+  style: string
   radius: number
   sonnerPosition: ComponentProps<typeof SonnerToaster>['position']
   sonnerExpand: boolean

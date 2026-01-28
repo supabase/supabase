@@ -4,7 +4,6 @@ import { CourseHero } from '@/components/course-hero'
 import { ExploreMore } from '@/components/explore-more'
 import { Mdx } from '@/components/mdx-components'
 import { NextUp } from '@/components/next-up'
-import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { getTableOfContents } from '@/lib/toc'
 import { getCurrentChapter } from '@/lib/get-current-chapter'
@@ -121,7 +120,6 @@ export default async function DocPage(props: DocPageProps) {
               )}
             </div>
           </div>
-          <SourcePanel doc={doc} />
           <div className="pb-12">
             <Mdx code={doc.body.code} />
           </div>

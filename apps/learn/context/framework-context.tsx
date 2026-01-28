@@ -1,9 +1,8 @@
 'use client'
 
-import { courses } from '@/config/docs'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-type Course = keyof typeof courses
+type Course = 'foundations' | 'smart-office' | 'performance-scaling' | 'debugging-operations'
 type CourseContextType = {
   course: Course
   setCourse: (course: Course) => void
@@ -17,7 +16,8 @@ export function FrameworkProvider({ children }: { children: React.ReactNode }) {
   // Initialize from localStorage on mount (client-side only)
   useEffect(() => {
     const storedCourse = localStorage.getItem('preferredCourse')
-    if (storedCourse && Object.keys(courses).includes(storedCourse)) {
+    const validCourses: Course[] = ['foundations', 'smart-office', 'performance-scaling', 'debugging-operations']
+    if (storedCourse && validCourses.includes(storedCourse as Course)) {
       setCourseState(storedCourse as Course)
     }
   }, [])
