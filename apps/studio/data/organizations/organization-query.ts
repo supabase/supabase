@@ -7,6 +7,7 @@ import { organizationKeys } from './keys'
 
 export type OrganizationVariables = { slug?: string }
 export type OrganizationDetail = components['schemas']['OrganizationSlugResponse']
+export type OrganizationPlanID = OrganizationDetail['plan']['id']
 
 function castOrganizationSlugResponseToOrganization(
   org: components['schemas']['OrganizationSlugResponse']

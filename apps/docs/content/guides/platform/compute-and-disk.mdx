@@ -173,5 +173,5 @@ As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/para
 
 ### Constraints
 
-- After **any** disk attribute change, there is a cooldown period of approximately six hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
+- You can modify disk attributes up to **four times** within a rolling 24-hour window. A new modification can be initiated as soon as the previous one completes. If you reach this limit, you will encounter throttling and must wait for the rolling 24-hour window to permit further adjustments.
 - You can increase disk size but cannot decrease it.

@@ -331,8 +331,8 @@ export function DiskManagementForm() {
         {isEntitlementsLoaded && isPlanUpgradeRequired && (
           <UpgradeToPro
             featureProposition="configure compute and disk"
-            primaryText="Compute and Disk configuration is not available on the Free Plan"
-            secondaryText="You will need to upgrade to at least the Pro Plan to configure compute and disk"
+            primaryText="Only available on Pro Plan and above"
+            secondaryText="Upgrade to the Pro Plan to configure compute and disk settings."
           />
         )}
 
@@ -397,7 +397,6 @@ export function DiskManagementForm() {
                     {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
                       <Admonition
                         type="destructive"
-                        className="mb-0"
                         title="Database size is currently over 90% of disk size"
                         description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
                       >
@@ -411,7 +410,6 @@ export function DiskManagementForm() {
                     {isReadOnlyMode && (
                       <Admonition
                         type="destructive"
-                        className="mb-0"
                         title="Project is currently in read-only mode"
                         description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
                       >
@@ -443,7 +441,7 @@ export function DiskManagementForm() {
                   open={advancedSettingsOpen}
                   onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                  <CollapsibleTrigger_Shadcn_ className="px-[var(--card-padding-x)] py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
                     <div className="flex flex-col items-start">
                       <span className="text-sm text-foreground">Advanced disk settings</span>
                       <span className="text-sm text-foreground-light text-left">
@@ -464,11 +462,11 @@ export function DiskManagementForm() {
                     )}
                   >
                     <div className="flex flex-col gap-y-8 py-8">
-                      <div className="px-8 flex flex-col gap-y-8">
+                      <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
                         <AutoScaleFields form={form} />
                       </div>
                       <Separator />
-                      <div className="px-8 flex flex-col gap-y-8">
+                      <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
                         <NoticeBar
                           type="default"
                           visible={disableIopsThroughputConfig}

@@ -1,17 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { boolean, number, object, string } from 'yup'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from 'lib/constants'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -42,7 +42,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { boolean, number, object, string } from 'yup'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -96,7 +96,7 @@ export const MfaAuthSettingsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
@@ -317,7 +317,7 @@ export const MfaAuthSettingsForm = () => {
           <Form_Shadcn_ {...totpForm}>
             <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={totpForm.control}
                     name="MFA_TOTP"
@@ -410,10 +410,9 @@ export const MfaAuthSettingsForm = () => {
                 e.preventDefault()
                 maybeConfirmPhoneMFAOrSubmit()
               }}
-              className="space-y-4"
             >
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE"
@@ -507,7 +506,7 @@ export const MfaAuthSettingsForm = () => {
                     source="authSmsMfa"
                     featureProposition="configure settings for SMS MFA"
                     primaryText="SMS MFA is only available on the Pro Plan and above"
-                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
+                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA."
                   />
                 )}
 
@@ -518,7 +517,7 @@ export const MfaAuthSettingsForm = () => {
                     </Button>
                   )}
                   <Button
-                    type="primary"
+                    type={promptProPlanUpgrade ? 'default' : 'primary'}
                     htmlType="submit"
                     disabled={
                       !canUpdateConfig ||
@@ -565,9 +564,9 @@ export const MfaAuthSettingsForm = () => {
         </PageSectionMeta>
         <PageSectionContent>
           <Form_Shadcn_ {...securityForm}>
-            <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
+            <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)}>
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={securityForm.control}
                     name="MFA_ALLOW_LOW_AAL"

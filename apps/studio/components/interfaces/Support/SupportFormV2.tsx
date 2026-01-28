@@ -7,6 +7,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
+import { type OrganizationPlanID } from 'data/organizations/organization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
@@ -31,6 +32,7 @@ import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
   formatMessage,
+  formatStudioVersion,
   getOrgSubscriptionPlan,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
@@ -41,12 +43,18 @@ import {
   uploadDashboardLog,
 } from './dashboard-logs'
 
-const useIsSimplifiedForm = (slug: string) => {
+const useIsSimplifiedForm = (slug: string, subscriptionPlanId?: OrganizationPlanID) => {
   const simplifiedSupportForm = useFlag('simplifiedSupportForm')
+
+  if (subscriptionPlanId === 'platform') {
+    return true
+  }
+
   if (typeof simplifiedSupportForm === 'string') {
     const slugs = (simplifiedSupportForm as string).split(',').map((x) => x.trim())
     return slugs.includes(slug)
   }
+
   return false
 }
 
@@ -62,13 +70,13 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
-  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug)
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
 
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
+  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug, subscriptionPlanId)
 
   const attachmentUpload = useAttachmentUpload()
   const { mutateAsync: uploadDashboardLogFn } = useGenerateAttachmentURLsMutation()
@@ -134,8 +142,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         message: values.message,
         attachments,
         error: initialError,
-        commit,
-        dashboardLogUrl: dashboardLogUrl?.[0],
       }),
       verified: true,
       tags: ['dashboard-support-form'],
@@ -148,6 +154,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
             .join(';'),
       browserInformation: detectBrowser(),
+      dashboardLogs: dashboardLogUrl?.[0],
+      dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
     }
 
     if (values.projectRef !== NO_PROJECT_MARKER) {

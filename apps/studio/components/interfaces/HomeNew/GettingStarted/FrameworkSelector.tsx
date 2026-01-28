@@ -1,3 +1,6 @@
+import { ConnectionType } from 'components/interfaces/Connect/Connect.constants'
+import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
+import { Box, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -12,9 +15,6 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
-import { Box, Check, ChevronDown } from 'lucide-react'
-import { ConnectionType } from 'components/interfaces/Connect/Connect.constants'
-import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
 
 interface FrameworkSelectorProps {
   value: string
@@ -55,12 +55,10 @@ export const FrameworkSelector = ({
           </Button>
         </PopoverTrigger_Shadcn_>
       </div>
-      {/* Render in a portal to avoid layout/stacking shifts; prevent auto-focus to stop scroll jump */}
       <PopoverContent_Shadcn_
         className="p-0 max-w-48"
         side="bottom"
         align="start"
-        portal
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command_Shadcn_>

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -37,7 +37,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -67,18 +67,18 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const reportGranularityV2 = useFlag('reportGranularityV2')
 
   const {
     selectedDateRange,
     updateDateRange,
     datePickerValue,
     datePickerHelpers,
-    isOrgPlanLoading,
     orgPlan,
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, reportGranularityV2)
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
@@ -89,7 +89,7 @@ const DatabaseUsage = () => {
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const report = useDatabaseReport()
-  const { data, params, largeObjectsSql, isLoading, refresh } = report
+  const { data, params, largeObjectsSql, isPending: isLoading, refresh } = report
 
   const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,
@@ -168,7 +168,7 @@ const DatabaseUsage = () => {
       if (isReplicaSelected) {
         queryClient.invalidateQueries({
           queryKey: analyticsKeys.infraMonitoring(ref, {
-            attribute: 'physical_replication_lag_physical_replica_lag_seconds',
+            attribute: 'physical_replication_lag_physical_replication_lag_seconds',
             startDate: period_start.date,
             endDate: period_end.date,
             interval,
@@ -286,7 +286,7 @@ const DatabaseUsage = () => {
                 <ChartHandler
                   startDate={selectedDateRange?.period_start?.date}
                   endDate={selectedDateRange?.period_end?.date}
-                  attribute="physical_replication_lag_physical_replica_lag_seconds"
+                  attribute="physical_replication_lag_physical_replication_lag_seconds"
                   label="Replication lag"
                   interval={selectedDateRange.interval}
                   provider="infra-monitoring"

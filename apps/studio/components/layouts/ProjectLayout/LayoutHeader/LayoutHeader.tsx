@@ -248,6 +248,7 @@ export const LayoutHeader = ({
                         [&_.command-shortcut>div]:text-foreground-lighter
                       "
                   />
+                  <HelpPopover />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
