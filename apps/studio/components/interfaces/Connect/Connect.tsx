@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
@@ -14,6 +14,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -35,14 +36,48 @@ import {
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
+import { ConnectSheet } from './ConnectSheet'
 import { ConnectTabContent } from './ConnectTabContent'
-import Link from 'next/link'
 
-export const Connect = () => {
-  const router = useRouter()
-  const { ref: projectRef } = useParams()
+const ENABLE_CONNECT_SHEET = true
+
+interface ConnectProps {
+  buttonType?: ComponentProps<typeof Button>['type']
+}
+
+export const Connect = ({ buttonType = 'default' }: ConnectProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  if (!isActiveHealthy) {
+    return (
+      <ButtonTooltip
+        disabled
+        type="default"
+        className="rounded-full"
+        icon={<Plug className="rotate-90" />}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'Project is currently not active and cannot be connected',
+          },
+        }}
+      >
+        Connect
+      </ButtonTooltip>
+    )
+  }
+
+  if (ENABLE_CONNECT_SHEET) {
+    return <ConnectSheet buttonType={buttonType} />
+  }
+
+  return <ConnectDialog buttonType={buttonType} />
+}
+
+const ConnectDialog = ({ buttonType }: ConnectProps) => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
 
   const {
     projectConnectionShowAppFrameworks: showAppFrameworks,
@@ -321,29 +356,10 @@ export const Connect = () => {
     setQueryWith,
   ])
 
-  if (!isActiveHealthy) {
-    return (
-      <ButtonTooltip
-        disabled
-        type="default"
-        className="rounded-full"
-        icon={<Plug className="rotate-90" />}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: 'Project is currently not active and cannot be connected',
-          },
-        }}
-      >
-        Connect
-      </ButtonTooltip>
-    )
-  }
-
   return (
     <Dialog open={showConnect} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
-        <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
+        <Button type={buttonType} className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
         </Button>
       </DialogTrigger>

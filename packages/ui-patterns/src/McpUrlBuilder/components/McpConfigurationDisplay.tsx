@@ -1,9 +1,9 @@
 'use client'
 
+import { stringify as stringifyToml } from '@std/toml/stringify'
+import yaml from 'js-yaml'
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
-import yaml from 'js-yaml'
-import { stringify as stringifyToml } from '@std/toml/stringify'
 import { Button, cn } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
@@ -69,7 +69,6 @@ export function McpConfigurationDisplay({
     <div className={cn('space-y-4', className)}>
       {mcpButtonData && (
         <>
-          <div className="text-xs text-foreground-light">Install in one click:</div>
           <Button type="secondary" size="small" asChild>
             <a
               href={mcpButtonData.deepLink}
@@ -95,7 +94,7 @@ export function McpConfigurationDisplay({
         selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
 
       {selectedClient.configFile && (
-        <div className="text-xs text-foreground-light">
+        <div className="text-foreground-light">
           {selectedClient.primaryInstructions
             ? 'Alternatively, add'
             : mcpButtonData
@@ -118,7 +117,7 @@ export function McpConfigurationDisplay({
         selectedClient.alternateInstructions(clientConfig, onCopyCallback)}
 
       {(selectedClient.docsUrl || selectedClient.externalDocsUrl) && (
-        <div className="flex items-center gap-2 text-xs text-foreground-light">
+        <div className="flex items-center gap-2 text-foreground-light">
           <span>Need help?</span>
           {selectedClient.docsUrl && (
             <a

@@ -48,7 +48,7 @@ export const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
 
 export const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
   return (
-    <TabsList_Shadcn_ className="bg-surface-100 px-5 rounded-lg rounded-b-none gap-5">
+    <TabsList_Shadcn_ className="bg-surface-100 px-5 rounded-lg rounded-b-none gap-5 overflow-x-auto">
       {children}
     </TabsList_Shadcn_>
   )
@@ -56,7 +56,13 @@ export const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
 
 export const ConnectTabContent = ({ value, children }: ConnectTabContentProps) => {
   return (
-    <TabsContent_Shadcn_ value={value} className="p-3 mt-1 max-h-72 overflow-scroll">
+    <TabsContent_Shadcn_
+      value={value}
+      forceMount
+      className="p-3 mt-1 max-h-72 overflow-scroll data-[state=inactive]:hidden"
+      data-connect-tab-content
+      data-tab-label={value}
+    >
       {children}
     </TabsContent_Shadcn_>
   )

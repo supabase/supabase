@@ -1,8 +1,16 @@
-export type projectKeys = {
+
+// ============================================================================
+// Project Keys (existing)
+// ============================================================================
+
+export type ProjectKeys = {
   apiUrl: string | null
   anonKey: string | null
   publishableKey: string | null
 }
+
+/** @deprecated Use ProjectKeys instead */
+export type projectKeys = ProjectKeys
 
 export interface ContentFileProps {
   projectKeys: {
@@ -20,4 +28,122 @@ export interface ContentFileProps {
   }
   connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
   onCopy?: () => void
+}
+
+// ============================================================================
+// Schema Types - Conditional Resolution
+// ============================================================================
+
+/**
+ * A value that can be resolved conditionally based on state.
+ * Resolution walks the tree using state values, falling back to DEFAULT.
+ *
+ * Example:
+ * {
+ *   framework: {
+ *     nextjs: 'NextJsContent',
+ *     react: 'ReactContent',
+ *     DEFAULT: 'GenericFrameworkContent'
+ *   },
+ *   direct: 'DirectContent',
+ *   DEFAULT: null
+ * }
+ */
+export type ConditionalValue<T> =
+  | T
+  | {
+      [stateValue: string]: ConditionalValue<T>
+      DEFAULT?: T
+    }
+
+// ============================================================================
+// Schema Types - Modes
+// ============================================================================
+
+export type ConnectMode = 'framework' | 'direct' | 'orm' | 'mcp'
+
+export interface ModeDefinition {
+  id: ConnectMode
+  label: string
+  description: string
+  icon?: string
+  fields: string[] // References to field IDs
+}
+
+// ============================================================================
+// Schema Types - Fields
+// ============================================================================
+
+export type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
+
+export interface FieldOption {
+  value: string
+  label: string
+  icon?: string
+  description?: string
+}
+
+export interface FieldDefinition {
+  id: string
+  type: FieldType
+  label: string
+  description?: string
+  // Options can be static, or reference a data source, or be conditional
+  options?: FieldOption[] | { source: string } | ConditionalValue<FieldOption[]>
+  // Only show this field when these state conditions are met
+  dependsOn?: Record<string, string[]>
+  // Default value for this field
+  defaultValue?: string | boolean | string[]
+}
+
+// ============================================================================
+// Schema Types - Steps
+// ============================================================================
+
+export interface StepDefinition {
+  id: string
+  title: string
+  description: string
+  // Component identifier or content file path, can be conditional
+  content: ConditionalValue<string | null>
+}
+
+// ============================================================================
+// Schema Types - Main Schema
+// ============================================================================
+
+export interface ConnectSchema {
+  modes: ModeDefinition[]
+  fields: Record<string, FieldDefinition>
+  // Steps are fully conditional based on state
+  steps: ConditionalValue<StepDefinition[]>
+}
+
+// ============================================================================
+// State Types
+// ============================================================================
+
+export interface ConnectState {
+  mode: ConnectMode
+  [fieldId: string]: string | boolean | string[]
+}
+
+export interface ResolvedStep {
+  id: string
+  title: string
+  description: string
+  content: string // Resolved component identifier
+}
+
+export interface ResolvedField extends FieldDefinition {
+  resolvedOptions: FieldOption[]
+}
+
+// ============================================================================
+// Step Component Props
+// ============================================================================
+
+export interface StepComponentProps {
+  state: ConnectState
+  projectKeys: ProjectKeys
 }

@@ -30,6 +30,7 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
+  SimpleCodeBlock,
   cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -43,6 +44,7 @@ import {
   connectionStringMethodOptions,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
+import { ConnectTabContent, ConnectTabTrigger, ConnectTabTriggers, ConnectTabs } from './ConnectTabs'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
@@ -63,7 +65,21 @@ const StepLabel = ({
  * [Joshen] For paid projects - Dedicated pooler is always in transaction mode
  * So session mode connection details are always using the shared pooler (Supavisor)
  */
-export const DatabaseConnectionString = () => {
+type ConnectSheetDatabaseConnectionStringVariant = 'default' | 'compact'
+
+interface ConnectSheetDatabaseConnectionStringProps {
+  variant?: ConnectSheetDatabaseConnectionStringVariant
+  showType?: boolean
+  showSource?: boolean
+  showMethod?: boolean
+}
+
+export const ConnectSheetDatabaseConnectionString = ({
+  variant = 'default',
+  showType = true,
+  showSource = true,
+  showMethod = true,
+}: ConnectSheetDatabaseConnectionStringProps) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
@@ -258,6 +274,30 @@ export const DatabaseConnectionString = () => {
   const hasCodeExamples = exampleFiles || exampleInstallCommands
   const fileTitle = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.fileTitle
 
+  const getLanguageFromFileName = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase()
+    switch (extension) {
+      case 'js':
+        return 'js'
+      case 'jsx':
+        return 'jsx'
+      case 'ts':
+        return 'ts'
+      case 'tsx':
+        return 'tsx'
+      case 'go':
+        return 'go'
+      case 'py':
+        return 'python'
+      case 'kt':
+        return 'kotlin'
+      case 'cs':
+        return 'csharp'
+      default:
+        return 'bash'
+    }
+  }
+
   // [Refactor] See if we can do this in an immutable way, technically not a good practice to do this
   let stepNumber = 0
 
@@ -278,58 +318,136 @@ export const DatabaseConnectionString = () => {
     : [ipv4SettingsUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
   const poolerBadge = sharedPoolerPreferred ? 'Shared Pooler' : 'Dedicated Pooler'
 
+  if (variant === 'compact') {
+    const sessionPoolerUri = supavisorConnectionStrings['pooler'].uri.replace('6543', '5432')
+
+    const selectedConnectionString =
+      selectedMethod === 'direct'
+        ? connectionStrings['direct'].uri
+        : selectedMethod === 'session'
+          ? sessionPoolerUri
+          : connectionStrings['pooler'].uri
+
+    const envContent = `DATABASE_URL="${selectedConnectionString}"`
+    const directFiles = [
+      {
+        name: '.env',
+        content: envContent,
+        language: 'bash',
+      },
+      ...(exampleFiles ?? []).map((file) => ({
+        name: file.name,
+        content: file.content,
+        language: getLanguageFromFileName(file.name),
+      })),
+    ]
+
+    return (
+      <div className="flex flex-col gap-6">
+        {exampleInstallCommands?.length && exampleInstallCommands.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {exampleInstallCommands.map((cmd) => (
+              <CodeBlock
+                key={`example-install-command-${cmd}`}
+                className="[&_code]:text-foreground"
+                wrapperClassName="lg:col-span-2"
+                value={cmd}
+                hideLineNumbers
+                language="bash"
+              >
+                {cmd}
+              </CodeBlock>
+            ))}
+          </div>
+        )}
+
+        {directFiles.length > 0 && (
+          <div className="border rounded-lg overflow-hidden">
+            <ConnectTabs>
+              <ConnectTabTriggers>
+                {directFiles.map((file) => (
+                  <ConnectTabTrigger key={`direct-file-${file.name}`} value={file.name} />
+                ))}
+              </ConnectTabTriggers>
+
+              {directFiles.map((file) => (
+                <ConnectTabContent key={`direct-file-content-${file.name}`} value={file.name}>
+                  <SimpleCodeBlock
+                    className={file.language}
+                    parentClassName="min-h-72"
+                    showCopy={true}
+                  >
+                    {file.content}
+                  </SimpleCodeBlock>
+                </ConnectTabContent>
+              ))}
+            </ConnectTabs>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col">
       <div className={cn('w-full flex flex-col items-start gap-2 lg:gap-3', DIALOG_PADDING_X)}>
-        <div className="flex w-full flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
-          <div className="flex">
-            <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-              Type
-            </span>
-            <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                {DATABASE_CONNECTION_TYPES.map((type) => (
-                  <SelectItem_Shadcn_ key={type.id} value={type.id}>
-                    {type.label}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+        {(showType || showSource || showMethod) && (
+          <div className="flex w-full flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
+            {showType && (
+              <div className="flex">
+                <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+                  Type
+                </span>
+                <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
+                  <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
+                    <SelectValue_Shadcn_ />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    {DATABASE_CONNECTION_TYPES.map((type) => (
+                      <SelectItem_Shadcn_ key={type.id} value={type.id}>
+                        {type.label}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </div>
+            )}
+            {showSource && (
+              <DatabaseSelector
+                align="start"
+                buttonProps={{
+                  size: 'small',
+                  className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
+                }}
+                className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
+                onSelectId={handleDatabaseChange}
+              />
+            )}
+            {showMethod && (
+              <div className="flex">
+                <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+                  Method
+                </span>
+                <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
+                  <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
+                    <SelectValue_Shadcn_ size="tiny">
+                      {connectionStringMethodOptions[selectedMethod].label}
+                    </SelectValue_Shadcn_>
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_ className="max-w-sm">
+                    {Object.keys(connectionStringMethodOptions).map((method) => (
+                      <ConnectionStringMethodSelectItem
+                        key={method}
+                        method={method as ConnectionStringMethod}
+                        poolerBadge={method === 'transaction' ? poolerBadge : undefined}
+                      />
+                    ))}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </div>
+            )}
           </div>
-          <DatabaseSelector
-            align="start"
-            buttonProps={{
-              size: 'small',
-              className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
-            }}
-            className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
-            onSelectId={handleDatabaseChange}
-          />
-          <div className="flex">
-            <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-              Method
-            </span>
-            <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ size="tiny">
-                  {connectionStringMethodOptions[selectedMethod].label}
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_ className="max-w-sm">
-                {Object.keys(connectionStringMethodOptions).map((method) => (
-                  <ConnectionStringMethodSelectItem
-                    key={method}
-                    method={method as ConnectionStringMethod}
-                    poolerBadge={method === 'transaction' ? poolerBadge : undefined}
-                  />
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </div>
-        </div>
+        )}
         <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
           <BookOpen size={12} strokeWidth={1.5} className="-mb-px" /> Learn how to connect to your
           Postgres databases.
