@@ -202,6 +202,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/confirmation-modal',
           items: [],
         },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
+          items: [],
+        },
       ],
     },
     {
