@@ -1,12 +1,13 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import dayjs from 'dayjs'
-import {
-  calculateDateRange,
-  transformToBarChartData,
-  calculateHealthMetrics,
-  calculateAggregatedMetrics,
-} from './useServiceHealthMetrics.utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import {
+  calculateAggregatedMetrics,
+  calculateDateRange,
+  calculateHealthMetrics,
+  transformToBarChartData,
+} from './useServiceHealthMetrics.utils'
 
 describe('calculateDateRange', () => {
   beforeEach(() => {

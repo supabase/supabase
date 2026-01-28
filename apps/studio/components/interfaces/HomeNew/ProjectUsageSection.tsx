@@ -39,6 +39,7 @@ import {
   sumErrors,
   computeSuccessAndNonSuccessRates,
 } from './ProjectUsage.metrics'
+import { normalizeChartBuckets } from './ChartDataTransform.utils'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 
@@ -162,13 +163,14 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const healthData = healthServices[s.key]
-        const data = healthData.eventChartData
-        const total = sumTotal(data)
-        const warn = sumWarnings(data)
-        const err = sumErrors(data)
+        // Normalize chart data to consistent bucket sizes
+        const normalizedData = normalizeChartBuckets(healthData.eventChartData, interval)
+        const total = sumTotal(normalizedData)
+        const warn = sumWarnings(normalizedData)
+        const err = sumErrors(normalizedData)
         return {
           ...s,
-          data,
+          data: normalizedData,
           total,
           warn,
           err,
@@ -176,7 +178,7 @@ export const ProjectUsageSection = () => {
           error: healthData.error,
         }
       }),
-    [serviceBase, healthServices]
+    [serviceBase, healthServices, interval]
   )
 
   const isLoading = isHealthLoading

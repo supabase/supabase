@@ -1,10 +1,11 @@
 import dayjs from 'dayjs'
+
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
 import {
+  computeSuccessAndNonSuccessRates,
+  sumErrors,
   sumTotal,
   sumWarnings,
-  sumErrors,
-  computeSuccessAndNonSuccessRates,
 } from '../HomeNew/ProjectUsage.metrics'
 
 /**
@@ -71,11 +72,13 @@ export const calculateHealthMetrics = (eventChartData: LogsBarChartDatum[]) => {
 /**
  * Calculates aggregated metrics across all services
  */
-export const calculateAggregatedMetrics = (services: {
-  total: number
-  errorCount: number
-  warningCount: number
-}[]) => {
+export const calculateAggregatedMetrics = (
+  services: {
+    total: number
+    errorCount: number
+    warningCount: number
+  }[]
+) => {
   const totalRequests = services.reduce((sum, s) => sum + s.total, 0)
   const totalErrors = services.reduce((sum, s) => sum + s.errorCount, 0)
   const totalWarnings = services.reduce((sum, s) => sum + s.warningCount, 0)

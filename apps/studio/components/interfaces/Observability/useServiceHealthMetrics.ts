@@ -1,16 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 import { get } from 'data/fetchers'
-import { genChartQuery } from '../Settings/Logs/Logs.utils'
-import { LogsTableName } from '../Settings/Logs/Logs.constants'
-import useTimeseriesUnixToIso from 'hooks/analytics/useTimeseriesUnixToIso'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from 'hooks/analytics/useTimeseriesUnixToIso'
+import { useMemo } from 'react'
+
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import { LogsTableName } from '../Settings/Logs/Logs.constants'
+import { genChartQuery } from '../Settings/Logs/Logs.utils'
 import {
-  calculateDateRange,
-  transformToBarChartData,
-  calculateHealthMetrics,
   calculateAggregatedMetrics,
+  calculateDateRange,
+  calculateHealthMetrics,
+  transformToBarChartData,
 } from './useServiceHealthMetrics.utils'
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
@@ -171,10 +172,7 @@ export const useServiceHealthMetrics = (
   }
 
   // Calculate aggregated metrics
-  const aggregated = useMemo(
-    () => calculateAggregatedMetrics(Object.values(services)),
-    [services]
-  )
+  const aggregated = useMemo(() => calculateAggregatedMetrics(Object.values(services)), [services])
 
   const isLoading = Object.values(services).some((s) => s.isLoading)
 
