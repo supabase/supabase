@@ -47,6 +47,7 @@ const routesToIgnoreDBConnection = [
   '/project/[ref]/database/backups/scheduled',
   '/project/[ref]/database/backups/pitr',
   '/project/[ref]/settings/addons',
+  '/project/[ref]/functions',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -103,15 +104,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const organizationName = selectedOrganization?.name
 
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-    const showProductMenu = selectedProject
-      ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-        (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings')) ||
-        router.pathname.includes('/project/[ref]/branches')
-      : true
 
     const ignorePausedState =
-      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+      router.pathname === '/project/[ref]' ||
+      router.pathname.includes('/project/[ref]/settings') ||
+      router.pathname.includes('/project/[ref]/functions')
     const showPausedState = isPaused && !ignorePausedState
 
     const sidebarMinSizePercentage = 1
@@ -137,7 +134,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         <div className="flex flex-row h-full w-full">
           {/*  autoSaveId="project-layout" */}
           <ResizablePanelGroup direction="horizontal">
-            {showProductMenu && productMenu && (
+            {productMenu && (
               <ResizablePanel
                 order={1}
                 minSize={sidebarMinSizePercentage}
@@ -177,7 +174,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 )}
               </ResizablePanel>
             )}
-            {showProductMenu && productMenu && sideBarIsOpen && (
+            {productMenu && sideBarIsOpen && (
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}
@@ -280,12 +277,16 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
+  const isEdgeFunctionPages = router.pathname.includes('/project/[ref]/functions')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
   const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
-    (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
+    (!isEdgeFunctionPages &&
+      !isSettingsPages &&
+      !routesToIgnoreDBConnection.includes(router.pathname)) ||
+    isVaultPage
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
@@ -351,7 +352,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed && !isBackupsPage) {
+  if (isProjectRestoreFailed && !isBackupsPage && !isEdgeFunctionPages) {
     return <RestoreFailedState />
   }
 

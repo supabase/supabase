@@ -13,6 +13,7 @@ import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
@@ -95,17 +96,12 @@ export const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="medium"
-        confirmLabel="Confirm restore"
-        confirmLabelLoading="Restoring"
+        size="small"
+        confirmLabel="Restore"
+        confirmLabelLoading="Restoring..."
+        variant="warning"
         visible={selectedBackup !== undefined}
-        title="Confirm to restore from backup"
-        alert={{
-          base: { variant: 'warning' },
-          title: 'Your project will be offline while the restore is in progress',
-          description:
-            'It is advised to upgrade at a time when there will be minimal impact for your application.',
-        }}
+        title="Restore from backup"
         loading={isRestoring || isSuccessBackup}
         onCancel={() => setSelectedBackup(undefined)}
         onConfirm={() => {
@@ -114,11 +110,25 @@ export const BackupsList = () => {
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
       >
-        <p className="text-sm">
-          Are you sure you want to restore from{' '}
-          {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new data
-          written since this backup was made.
-        </p>
+        <div className="space-y-3">
+          <p className="text-sm">
+            This will restore your database to the backup made on{' '}
+            {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')} at{' '}
+            {dayjs(selectedBackup?.inserted_at).format('HH:mm:ss')} UTC.
+          </p>
+
+          <Admonition
+            showIcon={false}
+            type="warning"
+            title="This action cannot be undone"
+            description={
+              <ul className="list-disc list-inside">
+                <li>Your project will be offline during restoration</li>
+                <li>Any new data since this backup will be lost</li>
+              </ul>
+            }
+          />
+        </div>
       </ConfirmationModal>
     </>
   )

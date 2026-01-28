@@ -14,6 +14,7 @@ export interface FileExplorerProps {
   columns: StorageColumn[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
+  isLoading?: boolean
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
@@ -24,6 +25,7 @@ export const FileExplorer = ({
   columns = [],
   selectedItems = [],
   itemSearchString,
+  isLoading = false,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
@@ -31,9 +33,6 @@ export const FileExplorer = ({
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
-
-  // [Joshen] StorageExplorer will always have at least 1 column once data is loaded
-  const hasLoaded = columns.length > 0
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -56,7 +55,7 @@ export const FileExplorer = ({
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
 
-      {!hasLoaded ? (
+      {isLoading ? (
         <FileExplorerColumn
           column={{ id: '', name: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
         />

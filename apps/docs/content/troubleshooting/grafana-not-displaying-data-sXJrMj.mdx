@@ -14,7 +14,7 @@ This guide is for identifying configuration mistakes in [self-hosted Supabase Gr
 Use the below cURL command to make sure your metrics endpoint returns data:
 
 ```sh
-curl https://<YOUR_PROJECT_REF>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<SERVICE_ROLE_KEY>'
+curl https://<YOUR_PROJECT_REF>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<SECRET_API_KEY>'
 ```
 
 ## Step 2: Set your Grafana Dashboard to auto-refresh in the top right corner

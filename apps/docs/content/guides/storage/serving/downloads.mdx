@@ -35,6 +35,71 @@ If you want the browser to start an automatic download of the asset instead of t
 
 By default it will use the asset name to save the file on disk. You can optionally pass a custom name to the `download` parameter as following: `?download=customname.jpg`
 
+#### Programmatic downloads with query parameters
+
+When using the SDK's `download()` method, you can pass additional query parameters to customize the download behavior:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+// Download with custom filename
+const { data, error } = await supabase.storage.from('avatars').download('avatar1.png', {
+  download: 'my-custom-name.png',
+})
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Download with additional query parameters
+final response = await supabase.storage
+  .from('avatars')
+  .download(
+    'avatar1.png',
+    queryParams: {
+      'download': 'my-custom-name.png',
+    },
+  );
+```
+
+[Reference.](/docs/reference/dart/storage-from-download)
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Download with additional query parameters
+let response = try await supabase.storage
+  .from("avatars")
+  .download(
+    path: "avatar1.png",
+    queryItems: [
+      URLQueryItem(name: "download", value: "my-custom-name.png")
+    ]
+  )
+```
+
+[Reference.](/docs/reference/swift/storage-from-download)
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ## Private buckets
 
 Assets stored in a non-public bucket are considered private and are not accessible via a public URL like the public buckets.
