@@ -29,6 +29,13 @@ Under the hood, Supabase Cron uses the [`pg_cron`](https://github.com/citusdata/
 
 The extension creates a `cron` schema in your database and all Jobs are stored on the `cron.job` table. Every Job's run and its status is recorded on the `cron.job_run_details` table.
 
+<Admonition type="note">
+
+You will be asked to select a schema. The default we recommend is the `extension` schema, which is mostly for **pg_cron’s internal metadata** (job definitions + run history). You usually don’t need to touch it directly — managing jobs in the Dashboard is the normal workflow. Your cron job logic can still read and write data in your own schemas (like `public` or any custom schema).
+
+</Admonition>
+
+
 The Supabase Dashboard provides an interface for you to schedule Jobs and monitor Job runs. You can also do the same with SQL.
 
 ## Resources
