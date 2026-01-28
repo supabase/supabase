@@ -1,5 +1,4 @@
-import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
 import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
 import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
@@ -12,10 +11,13 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
 
+import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const enablePgReplicate = useIsETLPrivateAlpha()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
+  const unifiedReplication = useFlag('unifiedReplication')
 
   if (!showPgReplicate) {
     return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
@@ -23,7 +25,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {enablePgReplicate ? (
+      {unifiedReplication || enablePgReplicate ? (
         <PipelineRequestStatusProvider>
           <ScaffoldContainer>
             <ScaffoldSection isFullWidth>

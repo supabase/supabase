@@ -2,6 +2,7 @@ import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { Badge, RadioGroupStacked, RadioGroupStackedItem, cn } from 'ui'
 
+import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
 
@@ -16,6 +17,7 @@ export const DestinationTypeSelection = ({
   selectedType,
   setSelectedType,
 }: DestinationTypeSelectionProps) => {
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
   const etlEnableBigQuery = useFlag('etlEnableBigQuery')
   const etlEnableIceberg = useFlag('etlEnableIceberg')
@@ -104,7 +106,7 @@ export const DestinationTypeSelection = ({
         )}
       </RadioGroupStacked>
 
-      {selectedType !== 'Read Replica' && (
+      {selectedType !== 'Read Replica' && enablePgReplicate && (
         <p className="mt-3 text-sm text-foreground-light">
           Replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
           <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
