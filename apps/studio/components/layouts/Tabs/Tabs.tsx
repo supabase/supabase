@@ -10,7 +10,7 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
@@ -29,6 +29,7 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
+import { useTabsScroll } from './Tabs.utils'
 
 export const EditorTabs = () => {
   const { ref, id } = useParams()
@@ -133,23 +134,12 @@ export const EditorTabs = () => {
     tabs.handleTabNavigation(id, router)
   }
 
-  const tabsListRef = useRef<HTMLDivElement>(null)
-  const prevTabCountRef = useRef<number>(editorTabs.length)
-
-  useEffect(() => {
-    if (tabsListRef.current) {
-      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
-    }
-  }, [])
+  const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
 
   useEffect(() => {
     if (!tabsListRef.current) return
 
-    const tabCountIncreased = editorTabs.length > prevTabCountRef.current
-
-    if (tabCountIncreased) {
-      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
-    } else if (tabs.activeTab) {
+    if (tabs.activeTab) {
       const activeTabElement = tabsListRef.current.querySelector(
         `[data-state="active"]`
       ) as HTMLElement
@@ -162,9 +152,7 @@ export const EditorTabs = () => {
         })
       }
     }
-
-    prevTabCountRef.current = editorTabs.length
-  }, [tabs.activeTab, editorTabs.length])
+  }, [tabs.activeTab, tabsListRef])
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
