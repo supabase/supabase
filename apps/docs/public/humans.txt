@@ -138,6 +138,7 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Mert Yerekapan
 Michal Kleczek
 Miles Thomas
 Monica Khoury
@@ -148,6 +149,7 @@ Nick Nowlan
 Nyannyacha
 Oli R
 Pamela Chia
+Patrick Crane
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -174,6 +176,7 @@ Sean Oliver
 Sean Thompson
 Sergio Cioban Filho
 Shane E
+Shreekar Shetty
 Sreyas Udayavarman
 Stanislav M
 Stephen Morgan
