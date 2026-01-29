@@ -36,11 +36,12 @@ export const calculateDateRange = (
   return { startDate: start, endDate: end }
 }
 
-type RawChartData = {
+export type RawChartData = {
   timestamp: string | number
   ok_count?: number | null
   warning_count?: number | null
   error_count?: number | null
+  [key: string]: string | number | null | undefined
 }
 
 /**
