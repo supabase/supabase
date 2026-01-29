@@ -1,8 +1,8 @@
 import { Code, Table2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -140,6 +140,27 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
   )
 
   const steps = workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []
+
+  const hasTrackedExposure = useRef(false)
+
+  useEffect(() => {
+    if (!IS_PLATFORM) return
+    if (hasTrackedExposure.current) return
+    if (!project?.ref || !organization?.slug) return
+
+    hasTrackedExposure.current = true
+
+    sendEvent({
+      action: 'home_getting_started_section_exposed',
+      properties: {
+        workflow: workflow === 'no-code' ? 'no_code' : workflow === 'code' ? 'code' : null,
+      },
+      groups: {
+        project: project.ref,
+        organization: organization.slug,
+      },
+    })
+  }, [workflow, project?.ref, organization?.slug, sendEvent])
 
   return (
     <section className="w-full">

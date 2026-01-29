@@ -1859,6 +1859,42 @@ export interface HomeGettingStartedClosedEvent {
 }
 
 /**
+ * Getting Started section was shown to the user in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedSectionExposedEvent {
+  action: 'home_getting_started_section_exposed'
+  properties: {
+    /**
+     * The current workflow shown (null if choosing workflow)
+     */
+    workflow: 'code' | 'no_code' | null
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the HomeV2 experiment (shown the new home page).
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeNewExperimentExposedEvent {
+  action: 'home_new_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User reordered sections in HomeV2 using drag and drop.
  *
  * @group Events
@@ -2844,6 +2880,8 @@ export type TelemetryEvent =
   | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent
   | HomeGettingStartedClosedEvent
+  | HomeGettingStartedSectionExposedEvent
+  | HomeNewExperimentExposedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | RealtimeExperimentExposedEvent
