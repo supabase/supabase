@@ -268,24 +268,32 @@ import Account from './Account'
 import Auth from './Auth'
 
 const App: Component = () => {
-  const [session, setSession] = createSignal<AuthSession | null>(null)
+  const [user, setUser] = createSignal<User | null>(null)
+
+  const fetchUser = async () => {
+    const { data, error } = await supabase.auth.getUser()
+    if (error) {
+      setUser(null)
+      return
+    }
+    setUser(data.user)
+  }
 
   createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
+    fetchUser()
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
+    supabase.auth.onAuthStateChange(() => {
+      fetchUser()
     })
   })
 
   return (
     <div class="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session() ? <Auth /> : <Account session={session()!} />}
+      {!user() ? <Auth /> : <Account user={user()!} />}
     </div>
   )
 }
+
 
 export default App
 ```
