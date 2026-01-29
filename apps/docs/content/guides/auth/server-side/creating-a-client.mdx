@@ -303,6 +303,46 @@ language="typescript"
 />
 </$CodeTabs>
 
+### Add OAuth login (optional)
+
+To add OAuth login (e.g., GitHub, Google), create a server action that redirects to the OAuth provider, and a callback route to handle the response.
+
+#### Create the OAuth action
+
+Add an `oauth` action to your auth page that initiates the OAuth flow:
+
+<$CodeSample
+path="/auth/sveltekit-full/src/routes/auth/+page.server.ts"
+meta="name=src/routes/auth/+page.server.ts"
+language="typescript"
+/>
+
+#### Create the callback route
+
+Create a callback route at `src/routes/auth/callback/+server.ts` to exchange the OAuth code for a session:
+
+<$CodeSample
+path="/auth/sveltekit-full/src/routes/auth/callback/+server.ts"
+meta="name=src/routes/auth/callback/+server.ts"
+language="typescript"
+/>
+
+#### Add OAuth buttons to your page
+
+Add buttons to trigger the OAuth flow:
+
+<$CodeSample
+path="/auth/sveltekit-full/src/routes/auth/+page.svelte"
+meta="name=src/routes/auth/+page.svelte"
+language="svelte"
+/>
+
+<Admonition type="note">
+
+Make sure to add your callback URL (e.g., `http://localhost:5173/auth/callback` for local development) to your [redirect allow list](/docs/guides/auth/redirect-urls) in the Supabase Dashboard.
+
+</Admonition>
+
 ## Congratulations
 
 You're done! To recap, you've successfully:
