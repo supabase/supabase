@@ -194,7 +194,7 @@ export const EnableExtensionModal = ({
                     isReactForm={false}
                     label="Select a schema to enable the extension for"
                   >
-                    <Input_Shadcn_ readOnly value={defaultSchema} />
+                    <Input_Shadcn_ disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
                     Extension must be installed in the “{defaultSchema}” schema.
