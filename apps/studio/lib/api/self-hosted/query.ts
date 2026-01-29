@@ -45,8 +45,27 @@ export async function executeQuery<T = unknown>({
     const result = await response.json()
 
     if (!response.ok) {
-      const { message, code, formattedError } = databaseErrorSchema.parse(result)
-      const error = new PgMetaDatabaseError(message, code, response.status, formattedError)
+      // Use safeParse to avoid throwing on schema mismatch
+      const parsed = databaseErrorSchema.safeParse(result)
+
+      if (parsed.success) {
+        const { message, code, formattedError } = parsed.data
+        const error = new PgMetaDatabaseError(message, code, response.status, formattedError)
+        return { data: undefined, error }
+      }
+
+      // Flexibly extract error message when schema doesn't match (e.g., encryption key issues)
+      const message =
+        result?.message ?? result?.msg ?? result?.error ?? 'An unexpected error occurred'
+      const code = result?.code ?? 'UNKNOWN_ERROR'
+      const formattedError = result?.formattedError ?? message
+
+      const error = new PgMetaDatabaseError(
+        String(message),
+        String(code),
+        response.status,
+        String(formattedError)
+      )
       return { data: undefined, error }
     }
 
