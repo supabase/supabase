@@ -91,7 +91,7 @@ export function applyRowAdd(
         return { ...row, ...rowData, __tempId: tempId }
       }
       return row
-    }) as PendingAddRow[]
+    })
   }
 
   const newRow: PendingAddRow = {
