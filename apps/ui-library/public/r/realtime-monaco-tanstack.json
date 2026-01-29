@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-monaco-tanstack",
+  "type": "registry:component",
+  "title": "Realtime Monaco",
+  "description": "Real-time Monaco editor for collaborative applications.",
+  "dependencies": [
+    "@monaco-editor/react",
+    "y-monaco",
+    "yjs",
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+      "content": "'use client'\n\nimport type { editor as MonacoEditor } from 'monaco-editor'\nimport { useCallback, useEffect, useRef } from 'react'\nimport { MonacoBinding } from 'y-monaco'\nimport { SupabaseProvider } from '@tiagoantunespt/y-supabase'\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport * as Y from 'yjs'\n\ntype UseConnectOnMountOptions = {\n  channel: string\n}\n\nexport function useConnectOnMount({ channel }: UseConnectOnMountOptions) {\n  const docRef = useRef<Y.Doc | null>(null)\n  const providerRef = useRef<SupabaseProvider | null>(null)\n  const bindingRef = useRef<MonacoBinding | null>(null)\n\n  const connectOnMount = useCallback(\n    (editor: MonacoEditor.IStandaloneCodeEditor) => {\n      if (bindingRef.current) return\n\n      const model = editor.getModel()\n      if (!model) return\n\n      const doc = new Y.Doc()\n      const yText = doc.getText('monaco')\n      const supabase = createClient()\n      const provider = new SupabaseProvider(channel, doc, supabase as any)\n\n      docRef.current = doc\n      providerRef.current = provider\n\n      bindingRef.current = new MonacoBinding(yText, model, new Set([editor]))\n    },\n    [channel]\n  )\n\n  useEffect(() => {\n    return () => {\n      bindingRef.current?.destroy()\n      bindingRef.current = null\n      providerRef.current?.destroy()\n      providerRef.current = null\n      docRef.current?.destroy()\n      docRef.current = null\n    }\n  }, [])\n\n  return { connectOnMount }\n}\n",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+      "content": "'use client'\n\nimport { Editor } from '@monaco-editor/react'\nimport { useConnectOnMount } from '../hooks/use-connect-on-mount'\n\ntype RealtimeMonacoProps = {\n  channel: string\n  language?: string\n  height?: string | number\n  className?: string\n  theme?: 'light' | 'dark'\n}\n\nconst DEFAULT_HEIGHT = 550\n\nconst RealtimeMonaco = ({\n  channel,\n  language = 'javascript',\n  height = DEFAULT_HEIGHT,\n  theme,\n  ...rest\n}: RealtimeMonacoProps) => {\n  const { connectOnMount } = useConnectOnMount({ channel })\n\n  return (\n    <Editor\n      height={height}\n      language={language}\n      theme={theme === 'dark' ? 'vs-dark' : 'light'}\n      onMount={connectOnMount}\n      {...rest}\n    />\n  )\n}\n\nexport default RealtimeMonaco\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { parseCookies, setCookie } from '@tanstack/react-start/server'\n\nexport function createClient() {\n  return createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return Object.entries(parseCookies()).map(\n            ([name, value]) =>\n              ({\n                name,\n                value,\n              }) as { name: string; value: string }\n          )\n        },\n        setAll(cookies) {\n          cookies.forEach((cookie) => {\n            setCookie(cookie.name, cookie.value)\n          })\n        },\n      },\n    }\n  )\n}\n",
+      "type": "registry:lib"
+    }
+  ],
+  "envVars": {
+    "VITE_SUPABASE_URL": "",
+    "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+  },
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+}

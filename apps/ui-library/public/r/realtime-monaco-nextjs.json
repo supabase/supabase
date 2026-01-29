@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-monaco-nextjs",
+  "type": "registry:component",
+  "title": "Realtime Monaco",
+  "description": "Real-time Monaco editor for collaborative applications.",
+  "dependencies": [
+    "@monaco-editor/react",
+    "y-monaco",
+    "yjs",
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+      "content": "'use client'\n\nimport type { editor as MonacoEditor } from 'monaco-editor'\nimport { useCallback, useEffect, useRef } from 'react'\nimport { MonacoBinding } from 'y-monaco'\nimport { SupabaseProvider } from '@tiagoantunespt/y-supabase'\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport * as Y from 'yjs'\n\ntype UseConnectOnMountOptions = {\n  channel: string\n}\n\nexport function useConnectOnMount({ channel }: UseConnectOnMountOptions) {\n  const docRef = useRef<Y.Doc | null>(null)\n  const providerRef = useRef<SupabaseProvider | null>(null)\n  const bindingRef = useRef<MonacoBinding | null>(null)\n\n  const connectOnMount = useCallback(\n    (editor: MonacoEditor.IStandaloneCodeEditor) => {\n      if (bindingRef.current) return\n\n      const model = editor.getModel()\n      if (!model) return\n\n      const doc = new Y.Doc()\n      const yText = doc.getText('monaco')\n      const supabase = createClient()\n      const provider = new SupabaseProvider(channel, doc, supabase as any)\n\n      docRef.current = doc\n      providerRef.current = provider\n\n      bindingRef.current = new MonacoBinding(yText, model, new Set([editor]))\n    },\n    [channel]\n  )\n\n  useEffect(() => {\n    return () => {\n      bindingRef.current?.destroy()\n      bindingRef.current = null\n      providerRef.current?.destroy()\n      providerRef.current = null\n      docRef.current?.destroy()\n      docRef.current = null\n    }\n  }, [])\n\n  return { connectOnMount }\n}\n",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+      "content": "'use client'\n\nimport { Editor } from '@monaco-editor/react'\nimport { useConnectOnMount } from '../hooks/use-connect-on-mount'\n\ntype RealtimeMonacoProps = {\n  channel: string\n  language?: string\n  height?: string | number\n  className?: string\n  theme?: 'light' | 'dark'\n}\n\nconst DEFAULT_HEIGHT = 550\n\nconst RealtimeMonaco = ({\n  channel,\n  language = 'javascript',\n  height = DEFAULT_HEIGHT,\n  theme,\n  ...rest\n}: RealtimeMonacoProps) => {\n  const { connectOnMount } = useConnectOnMount({ channel })\n\n  return (\n    <Editor\n      height={height}\n      language={language}\n      theme={theme === 'dark' ? 'vs-dark' : 'light'}\n      onMount={connectOnMount}\n      {...rest}\n    />\n  )\n}\n\nexport default RealtimeMonaco\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { NextResponse, type NextRequest } from 'next/server'\n\nexport async function updateSession(request: NextRequest) {\n  let supabaseResponse = NextResponse.next({\n    request,\n  })\n\n  // With Fluid compute, don't put this client in a global environment\n  // variable. Always create a new one on each request.\n  const supabase = createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return request.cookies.getAll()\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))\n          supabaseResponse = NextResponse.next({\n            request,\n          })\n          cookiesToSet.forEach(({ name, value, options }) =>\n            supabaseResponse.cookies.set(name, value, options)\n          )\n        },\n      },\n    }\n  )\n\n  // Do not run code between createServerClient and\n  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug\n  // issues with users being randomly logged out.\n\n  // IMPORTANT: If you remove getClaims() and you use server-side rendering\n  // with the Supabase client, your users may be randomly logged out.\n  const { data } = await supabase.auth.getClaims()\n  const user = data?.claims\n\n  if (\n    !user &&\n    !request.nextUrl.pathname.startsWith('/login') &&\n    !request.nextUrl.pathname.startsWith('/auth')\n  ) {\n    // no user, potentially respond by redirecting the user to the login page\n    const url = request.nextUrl.clone()\n    url.pathname = '/auth/login'\n    return NextResponse.redirect(url)\n  }\n\n  // IMPORTANT: You *must* return the supabaseResponse object as it is.\n  // If you're creating a new response object with NextResponse.next() make sure to:\n  // 1. Pass the request in it, like so:\n  //    const myNewResponse = NextResponse.next({ request })\n  // 2. Copy over the cookies, like so:\n  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())\n  // 3. Change the myNewResponse object to fit your needs, but avoid changing\n  //    the cookies!\n  // 4. Finally:\n  //    return myNewResponse\n  // If this is not done, you may be causing the browser and server to go out\n  // of sync and terminate the user's session prematurely!\n\n  return supabaseResponse\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { cookies } from 'next/headers'\n\n/**\n * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each\n * function when using it.\n */\nexport async function createClient() {\n  const cookieStore = await cookies()\n\n  return createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return cookieStore.getAll()\n        },\n        setAll(cookiesToSet) {\n          try {\n            cookiesToSet.forEach(({ name, value, options }) =>\n              cookieStore.set(name, value, options)\n            )\n          } catch {\n            // The `setAll` method was called from a Server Component.\n            // This can be ignored if you have middleware refreshing\n            // user sessions.\n          }\n        },\n      },\n    }\n  )\n}\n",
+      "type": "registry:lib"
+    }
+  ],
+  "envVars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+  },
+  "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+}
