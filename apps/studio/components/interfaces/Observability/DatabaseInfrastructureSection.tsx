@@ -1,6 +1,11 @@
+import { useParams } from 'common'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Info } from 'lucide-react'
+import { useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -13,16 +18,12 @@ import {
   cn,
 } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useParams } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
 import {
-  parseInfrastructureMetrics,
-  parseConnectionsData,
   getMetricStatusColor,
+  parseConnectionsData,
+  parseInfrastructureMetrics,
 } from './DatabaseInfrastructureSection.utils'
 
 type DatabaseInfrastructureSectionProps = {
@@ -125,9 +126,7 @@ export const DatabaseInfrastructureSection = ({
                 <CardTitle className="text-foreground-light text-sm font-medium">
                   Error Rate
                 </CardTitle>
-                <div className="text-foreground text-3xl mt-2">
-                  {dbErrorRate.toFixed(1)}%
-                </div>
+                <div className="text-foreground text-3xl mt-2">{dbErrorRate.toFixed(1)}%</div>
               </div>
               <div className="flex items-end gap-4 text-foreground-light">
                 <div className="flex flex-col items-end">
@@ -176,7 +175,9 @@ export const DatabaseInfrastructureSection = ({
                     <Info className="w-3 h-3 cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p>Disk I/O consumption percentage. High values may indicate disk bottlenecks.</p>
+                    <p>
+                      Disk I/O consumption percentage. High values may indicate disk bottlenecks.
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </CardTitle>
@@ -185,11 +186,14 @@ export const DatabaseInfrastructureSection = ({
               {infraLoading ? (
                 <div className="text-2xl text-foreground-light">...</div>
               ) : infraError ? (
-                <div className="text-xs text-destructive break-words">
-                  {errorMessage}
-                </div>
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
               ) : metrics ? (
-                <div className={cn('text-3xl text-foreground', getMetricStatusColor(metrics.disk.current))}>
+                <div
+                  className={cn(
+                    'text-3xl text-foreground',
+                    getMetricStatusColor(metrics.disk.current)
+                  )}
+                >
                   {metrics.disk.current.toFixed(0)}%
                 </div>
               ) : (
@@ -216,11 +220,14 @@ export const DatabaseInfrastructureSection = ({
               {infraLoading ? (
                 <div className="text-2xl text-foreground-light">...</div>
               ) : infraError ? (
-                <div className="text-xs text-destructive break-words">
-                  {errorMessage}
-                </div>
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
               ) : metrics ? (
-                <div className={cn('text-3xl text-foreground', getMetricStatusColor(metrics.ram.current))}>
+                <div
+                  className={cn(
+                    'text-3xl text-foreground',
+                    getMetricStatusColor(metrics.ram.current)
+                  )}
+                >
                   {metrics.ram.current.toFixed(0)}%
                 </div>
               ) : (
@@ -238,7 +245,10 @@ export const DatabaseInfrastructureSection = ({
                     <Info className="w-3 h-3 cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p>CPU usage percentage. High values may suggest CPU-intensive queries or workloads.</p>
+                    <p>
+                      CPU usage percentage. High values may suggest CPU-intensive queries or
+                      workloads.
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </CardTitle>
@@ -247,11 +257,14 @@ export const DatabaseInfrastructureSection = ({
               {infraLoading ? (
                 <div className="text-2xl text-foreground-light">...</div>
               ) : infraError ? (
-                <div className="text-xs text-destructive break-words">
-                  {errorMessage}
-                </div>
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
               ) : metrics ? (
-                <div className={cn('text-3xl text-foreground', getMetricStatusColor(metrics.cpu.current))}>
+                <div
+                  className={cn(
+                    'text-3xl text-foreground',
+                    getMetricStatusColor(metrics.cpu.current)
+                  )}
+                >
                   {metrics.cpu.current.toFixed(0)}%
                 </div>
               ) : (
@@ -269,7 +282,10 @@ export const DatabaseInfrastructureSection = ({
                     <Info className="w-3 h-3 cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p>Active database connections (current/max). Monitor to avoid connection exhaustion.</p>
+                    <p>
+                      Active database connections (current/max). Monitor to avoid connection
+                      exhaustion.
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </CardTitle>
@@ -278,9 +294,7 @@ export const DatabaseInfrastructureSection = ({
               {infraLoading ? (
                 <div className="text-2xl text-foreground-light">...</div>
               ) : infraError ? (
-                <div className="text-xs text-destructive break-words">
-                  {errorMessage}
-                </div>
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
               ) : connections.max > 0 ? (
                 <div
                   className={cn(

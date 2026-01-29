@@ -1,18 +1,10 @@
-import Link from 'next/link'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Loading,
-  cn,
-} from 'ui'
-import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import Link from 'next/link'
+import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, Loading, cn } from 'ui'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
-import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
+import { type ServiceKey, getHealthStatus } from './ObservabilityOverview.utils'
 
 export type ServiceHealthCardProps = {
   serviceName: string
