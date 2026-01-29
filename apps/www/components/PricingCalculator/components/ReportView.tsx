@@ -349,3 +349,29 @@ function RowLink({ provider, href }: { provider: string; href: string }) {
   )
 }
 
+function RowUnavailable({
+  provider,
+  reason,
+  href,
+}: {
+  provider: string
+  reason: string
+  href: string
+}) {
+  return (
+    <div className="grid grid-cols-4 border-t text-sm">
+      <div className="p-2 text-foreground-lighter">{provider}</div>
+      <div className="p-2 text-right text-foreground-lighter">-</div>
+      <div className="p-2 text-right text-foreground-lighter">-</div>
+      <div className="p-2 text-right text-foreground-lighter text-xs">
+        <div className="flex flex-col gap-1 items-end">
+          <span>{reason}</span>
+          <Link href={href} target="_blank" className="underline text-brand hover:text-brand-600">
+            Get quote
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+

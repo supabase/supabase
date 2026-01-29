@@ -2,8 +2,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Slider_Shadcn_, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, cn, Input } from 'ui'
-import { ChevronDown } from 'lucide-react'
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
+import {
+  Slider_Shadcn_,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  cn,
+  Input,
+} from 'ui'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { components } from 'api-types'
@@ -18,7 +28,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 // Light spring animation for content reveal
 const sectionSpring = {
-  type: 'spring',
+  type: 'spring' as const,
   stiffness: 300,
   damping: 25,
   mass: 0.8,
@@ -93,7 +103,9 @@ export default function Stage2UsageEstimation({
 }: {
   inputs: CalculatorInputs
   onChange: (next: CalculatorInputs) => void
-  authComparison: ReturnType<typeof import('~/lib/pricing-calculator/competitors').estimateAuthComparison>
+  authComparison: ReturnType<
+    typeof import('~/lib/pricing-calculator/competitors').estimateAuthComparison
+  >
   freePlanEgressLimitGb: number
   proEgressIncludedGb: number
 }) {
@@ -115,271 +127,42 @@ export default function Stage2UsageEstimation({
   const [showDatabaseAddons, setShowDatabaseAddons] = useState(false)
 
   // Check if any database add-ons are configured
-  const hasDatabaseAddonsConfigured = inputs.readReplicas > 0 || inputs.pitr || inputs.branchingHoursPerMonth > 0
+  const hasDatabaseAddonsConfigured =
+    inputs.readReplicas > 0 || inputs.pitr || inputs.branchingHoursPerMonth > 0
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-1">
-              <p className="text-foreground text-sm font-medium">Database size (GB)</p>
-              <p className="text-foreground-lighter text-xs">Default 2 GB</p>
-            </div>
-            <Input
-              type="number"
-              size="small"
-              layout="vertical"
-              value={String(inputs.databaseSizeGb)}
-              onChange={(e: any) => set({ databaseSizeGb: clamp(Number(e.target.value || 0.5), 0.5, 10_000) })}
-              className="max-w-[120px]"
-            />
-          </div>
-          <Slider_Shadcn_
-            value={[inputs.databaseSizeGb]}
-            min={0.5}
-            max={100}
-            step={0.5}
-            onValueChange={(v) => set({ databaseSizeGb: v[0] })}
-          />
-        </Panel>
-
-        <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-1">
-              <p className="text-foreground text-sm font-medium">File storage (GB)</p>
-              <p className="text-foreground-lighter text-xs">Default 10 GB</p>
-            </div>
-            <Input
-              type="number"
-              size="small"
-              layout="vertical"
-              value={String(inputs.storageSizeGb)}
-              onChange={(e: any) => set({ storageSizeGb: clamp(Number(e.target.value || 0), 0, 100_000) })}
-              className="max-w-[120px]"
-            />
-          </div>
-          <Slider_Shadcn_
-            value={[inputs.storageSizeGb]}
-            min={1}
-            max={500}
-            step={1}
-            onValueChange={(v) => set({ storageSizeGb: v[0] })}
-          />
-        </Panel>
-      </div>
-
-      <CalloutCard
-        title="Key consideration"
-        body="Supabase includes unlimited API requests. Firebase charges $0.18 per 100,000 reads/writes, which compounds quickly."
-      />
-
-      <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-col gap-1">
-            <p className="text-foreground text-sm font-medium">Expected monthly egress (GB)</p>
-            <p className="text-foreground-lighter text-xs">Default 50 GB</p>
-          </div>
-          <Input
-            type="number"
-            size="small"
-            layout="vertical"
-            value={String(inputs.egressGb)}
-            onChange={(e: any) => set({ egressGb: clamp(Number(e.target.value || 0), 0, 100_000) })}
-            className="max-w-[120px]"
-          />
-        </div>
-        <Slider_Shadcn_
-          value={[inputs.egressGb]}
-          min={0}
-          max={1000}
-          step={1}
-          onValueChange={(v) => set({ egressGb: v[0] })}
-        />
-      </Panel>
-
-      {inputs.egressGb <= freePlanEgressLimitGb ? (
-        <CalloutCard
-          title="Key consideration"
-          body="The free tier's 5 GB egress limit is the most common upgrade trigger. At your estimated usage, you're well within Pro limits."
-        />
-      ) : inputs.egressGb > proEgressIncludedGb ? (
-        <CalloutCard
-          title="Key consideration"
-          body="High egress workloads like yours benefit from Supabase's flat $0.09/GB vs Firebase's variable regional pricing."
-        />
-      ) : null}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-1">
-              <p className="text-foreground text-sm font-medium">Monthly active users</p>
-              <p className="text-foreground-lighter text-xs">Default 10,000</p>
-            </div>
-            <Input
-              type="number"
-              size="small"
-              layout="vertical"
-              value={String(inputs.mau)}
-              onChange={(e: any) => set({ mau: clamp(Math.round(Number(e.target.value || 0)), 0, 50_000_000) })}
-              className="max-w-[140px]"
-            />
-          </div>
-          <Slider_Shadcn_
-            value={[inputs.mau]}
-            min={1000}
-            max={500000}
-            step={1000}
-            onValueChange={(v) => set({ mau: v[0] })}
-          />
-        </Panel>
-
-        <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-          <p className="text-foreground text-sm font-medium">Authentication needs</p>
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 text-sm text-foreground-lighter">
-              <input type="checkbox" checked={inputs.needSso} onChange={(e) => set({ needSso: e.target.checked })} />
-              Need SSO/SAML?
-            </label>
-            <label className="flex items-center gap-2 text-sm text-foreground-lighter">
-              <input
-                type="checkbox"
-                checked={inputs.needPhoneMfa}
-                onChange={(e) => set({ needPhoneMfa: e.target.checked })}
-              />
-              Need phone-based MFA?
-            </label>
-          </div>
-          <p className="text-foreground-lighter text-xs">
-            SSO here refers to end-user SAML 2.0 (Auth). Phone MFA is priced per project add-on.
-          </p>
-        </Panel>
-      </div>
-
-      <CalloutCard title="Key consideration">
-        <div className="flex flex-col gap-3">
-          <div className="text-sm text-foreground-lighter">
-            Building your own authentication is error prone and complex. It’s costly to build and costly to maintain.{' '}
-            <Link
-              href="https://supabase.com/blog/supabase-auth-build-vs-buy"
-              target="_blank"
-              className="transition underline text-brand-link hover:text-brand-600"
+    <LazyMotion features={domAnimation}>
+      <div className="flex flex-col gap-4">
+        <AnimatePresence mode="popLayout">
+          {/* Database section */}
+          {hasDatabase && (
+            <m.div
+              key="database-section"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={sectionSpring}
+              className="flex flex-col gap-4"
             >
               <div className="flex items-center gap-2">
                 <div className="w-1 h-4 bg-brand rounded-full" />
                 <h4 className="text-foreground text-sm font-medium">Database</h4>
               </div>
-              <Input
-                type="number"
-                size="small"
-                layout="vertical"
-                value={String(inputs.realtimePeakConnections)}
-                onChange={(e: any) =>
-                  set({ realtimePeakConnections: clamp(Math.round(Number(e.target.value || 0)), 0, 10_000_000) })
-                }
-                className="max-w-[140px]"
-              />
-            </div>
-            <Slider_Shadcn_
-              value={[inputs.realtimePeakConnections]}
-              min={0}
-              max={5000}
-              step={10}
-              onValueChange={(v) => set({ realtimePeakConnections: v[0] })}
-            />
 
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex flex-col gap-1">
-                <p className="text-foreground-lighter text-xs">Realtime messages per month</p>
-              </div>
-              <Input
-                type="number"
-                size="small"
-                layout="vertical"
-                value={String(inputs.realtimeMessages)}
-                onChange={(e: any) =>
-                  set({ realtimeMessages: clamp(Math.round(Number(e.target.value || 0)), 0, 10_000_000_000) })
-                }
-                className="max-w-[160px]"
-              />
-            </div>
-            <Slider_Shadcn_
-              value={[inputs.realtimeMessages]}
-              min={0}
-              max={10_000_000}
-              step={50_000}
-              onValueChange={(v) => set({ realtimeMessages: v[0] })}
-            />
-          </div>
-        </Panel>
-
-        <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-          <p className="text-foreground text-sm font-medium">Edge Functions</p>
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-1">
-              <p className="text-foreground-lighter text-xs">Edge function invocations per month</p>
-            </div>
-            <Input
-              type="number"
-              size="small"
-              layout="vertical"
-              value={String(inputs.edgeInvocations)}
-              onChange={(e: any) =>
-                set({ edgeInvocations: clamp(Math.round(Number(e.target.value || 0)), 0, 10_000_000_000) })
-              }
-              className="max-w-[160px]"
-            />
-          </div>
-          <Slider_Shadcn_
-            value={[inputs.edgeInvocations]}
-            min={0}
-            max={5_000_000}
-            step={50_000}
-            onValueChange={(v) => set({ edgeInvocations: v[0] })}
-          />
-        </Panel>
-      </div>
-
-      <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
-          <div className="flex flex-col gap-1">
-            <p className="text-foreground text-sm font-medium">Compute tier</p>
-            <p className="text-foreground-lighter text-xs">
-              Default Micro. Each project requires dedicated compute.
-            </p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="outline" size="small" iconRight={<ChevronDown className="w-4 h-4" />}>
-                <div className="flex items-center gap-2">
-                  <ComputeBadge infraComputeSize={toComputeBadgeSize(inputs.computeTier)} />
-                  <span className="text-foreground">{inputs.computeTier}</span>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end">
-              {COMPUTE_TIERS.map((t) => (
-                <DropdownMenuItem
-                  key={t.tier}
-                  onClick={() => set({ computeTier: t.tier })}
-                  className={cn(inputs.computeTier === t.tier && 'text-brand-600')}
-                >
-                  <div className="flex items-center justify-between w-full gap-8">
-                    <span className="flex items-center gap-2">
-                      <ComputeBadge infraComputeSize={toComputeBadgeSize(t.tier)} />
-                      <span>{t.tier}</span>
-                    </span>
-                    <span className="font-mono text-foreground-lighter" translate="no">
-                      {formatUsd(t.monthlyUsd)}
-                    </span>
+              <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-foreground text-sm font-medium">Database size (GB)</p>
+                    <p className="text-foreground-lighter text-xs">Default 2 GB</p>
                   </div>
                   <Input
                     type="number"
                     size="small"
                     layout="vertical"
                     value={String(inputs.databaseSizeGb)}
-                    onChange={(e: any) => set({ databaseSizeGb: clamp(Number(e.target.value || 0.5), 0.5, 10_000) })}
+                    onChange={(e: any) =>
+                      set({ databaseSizeGb: clamp(Number(e.target.value || 0.5), 0.5, 10_000) })
+                    }
                     className="max-w-[120px]"
                   />
                 </div>
@@ -392,22 +175,62 @@ export default function Stage2UsageEstimation({
                 />
               </Panel>
 
-        <div className="flex items-center gap-2 text-foreground-lighter text-sm">
-          <InfoTooltip side="top" className="max-w-[280px]">
-            Compute is billed hourly. Temporary upgrades for migrations or traffic spikes cost only for the hours used.
-          </InfoTooltip>
-          <span>Compute is billed hourly.</span>
-        </div>
+              <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-foreground text-sm font-medium">Compute tier</p>
+                    <p className="text-foreground-lighter text-xs">
+                      Default Micro. Each project requires dedicated compute.
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="outline"
+                        size="small"
+                        iconRight={<ChevronDown className="w-4 h-4" />}
+                      >
+                        <div className="flex items-center gap-2">
+                          <ComputeBadge infraComputeSize={toComputeBadgeSize(inputs.computeTier)} />
+                          <span className="text-foreground">{inputs.computeTier}</span>
+                        </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end">
+                      {COMPUTE_TIERS.map((t) => (
+                        <DropdownMenuItem
+                          key={t.tier}
+                          onClick={() => set({ computeTier: t.tier })}
+                          className={cn(inputs.computeTier === t.tier && 'text-brand-600')}
+                        >
+                          <div className="flex items-center justify-between w-full gap-8">
+                            <span className="flex items-center gap-2">
+                              <ComputeBadge infraComputeSize={toComputeBadgeSize(t.tier)} />
+                              <span>{t.tier}</span>
+                            </span>
+                            <span className="font-mono text-foreground-lighter" translate="no">
+                              {formatUsd(t.monthlyUsd)}
+                            </span>
+                          </div>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
 
                 <div className="flex items-center gap-2 text-foreground-lighter text-sm">
                   <InfoTooltip side="top" className="max-w-[280px]">
-                    Compute is billed hourly. Temporary upgrades for migrations or traffic spikes cost only for the hours used.
+                    Compute is billed hourly. Temporary upgrades for migrations or traffic spikes
+                    cost only for the hours used.
                   </InfoTooltip>
                   <span>Compute is billed hourly.</span>
                 </div>
 
                 <Button asChild type="default" size="tiny">
-                  <Link href="https://supabase.com/docs/guides/platform/compute-add-ons" target="_blank">
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                    target="_blank"
+                  >
                     Learn about Compute add-ons
                   </Link>
                 </Button>
@@ -470,7 +293,11 @@ export default function Stage2UsageEstimation({
                             size="small"
                             layout="vertical"
                             value={String(inputs.readReplicas)}
-                            onChange={(e: any) => set({ readReplicas: clamp(Math.round(Number(e.target.value || 0)), 0, 10) })}
+                            onChange={(e: any) =>
+                              set({
+                                readReplicas: clamp(Math.round(Number(e.target.value || 0)), 0, 10),
+                              })
+                            }
                             className="w-20 shrink-0"
                           />
                         </div>
@@ -479,7 +306,9 @@ export default function Stage2UsageEstimation({
                       <Panel outerClassName="w-full" innerClassName="p-4">
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex flex-col gap-0.5">
-                            <p className="text-foreground text-sm font-medium">Branching hours/month</p>
+                            <p className="text-foreground text-sm font-medium">
+                              Branching hours/month
+                            </p>
                             <p className="text-foreground-lighter text-xs">
                               $0.01344/hour per branch
                             </p>
@@ -489,7 +318,15 @@ export default function Stage2UsageEstimation({
                             size="small"
                             layout="vertical"
                             value={String(inputs.branchingHoursPerMonth)}
-                            onChange={(e: any) => set({ branchingHoursPerMonth: clamp(Math.round(Number(e.target.value || 0)), 0, 10000) })}
+                            onChange={(e: any) =>
+                              set({
+                                branchingHoursPerMonth: clamp(
+                                  Math.round(Number(e.target.value || 0)),
+                                  0,
+                                  10000
+                                ),
+                              })
+                            }
                             className="w-24 shrink-0"
                           />
                         </div>
@@ -504,7 +341,9 @@ export default function Stage2UsageEstimation({
                           />
                           <div className="flex flex-col gap-0.5">
                             <span className="text-sm text-foreground">Point in time recovery</span>
-                            <span className="text-xs text-foreground-lighter">$100/month for 7-day retention</span>
+                            <span className="text-xs text-foreground-lighter">
+                              $100/month for 7-day retention
+                            </span>
                           </div>
                         </label>
                       </Panel>
@@ -514,7 +353,9 @@ export default function Stage2UsageEstimation({
                           <input type="checkbox" disabled />
                           <div className="flex flex-col gap-0.5">
                             <span className="text-sm text-foreground">ETL pipelines</span>
-                            <span className="text-xs text-foreground-lighter">Pricing not available while in Beta</span>
+                            <span className="text-xs text-foreground-lighter">
+                              Pricing not available while in Beta
+                            </span>
                           </div>
                         </div>
                       </Panel>
@@ -551,7 +392,9 @@ export default function Stage2UsageEstimation({
                     size="small"
                     layout="vertical"
                     value={String(inputs.storageSizeGb)}
-                    onChange={(e: any) => set({ storageSizeGb: clamp(Number(e.target.value || 0), 0, 100_000) })}
+                    onChange={(e: any) =>
+                      set({ storageSizeGb: clamp(Number(e.target.value || 0), 0, 100_000) })
+                    }
                     className="max-w-[120px]"
                   />
                 </div>
@@ -593,7 +436,9 @@ export default function Stage2UsageEstimation({
                       size="small"
                       layout="vertical"
                       value={String(inputs.mau)}
-                      onChange={(e: any) => set({ mau: clamp(Math.round(Number(e.target.value || 0)), 0, 50_000_000) })}
+                      onChange={(e: any) =>
+                        set({ mau: clamp(Math.round(Number(e.target.value || 0)), 0, 50_000_000) })
+                      }
                       className="max-w-[140px]"
                     />
                   </div>
@@ -610,7 +455,11 @@ export default function Stage2UsageEstimation({
                   <p className="text-foreground text-sm font-medium">Authentication needs</p>
                   <div className="flex flex-col gap-2">
                     <label className="flex items-center gap-2 text-sm text-foreground-lighter">
-                      <input type="checkbox" checked={inputs.needSso} onChange={(e) => set({ needSso: e.target.checked })} />
+                      <input
+                        type="checkbox"
+                        checked={inputs.needSso}
+                        onChange={(e) => set({ needSso: e.target.checked })}
+                      />
                       Need SSO/SAML?
                     </label>
                     <label className="flex items-center gap-2 text-sm text-foreground-lighter">
@@ -623,7 +472,8 @@ export default function Stage2UsageEstimation({
                     </label>
                   </div>
                   <p className="text-foreground-lighter text-xs">
-                    SSO here refers to end-user SAML 2.0 (Auth). Phone MFA is priced per project add-on.
+                    SSO here refers to end-user SAML 2.0 (Auth). Phone MFA is priced per project
+                    add-on.
                   </p>
                 </Panel>
               </div>
@@ -631,7 +481,9 @@ export default function Stage2UsageEstimation({
               <CalloutCard title="Build vs buy">
                 <div className="flex flex-col gap-3">
                   <div className="text-sm text-foreground-lighter">
-                    Authentication is a common source of security vulnerabilities when built in-house. Consider the ongoing maintenance cost of session management, token refresh, and security patches.{' '}
+                    Authentication is a common source of security vulnerabilities when built
+                    in-house. Consider the ongoing maintenance cost of session management, token
+                    refresh, and security patches.{' '}
                     <Link
                       href="https://supabase.com/blog/supabase-auth-build-vs-buy"
                       target="_blank"
@@ -678,7 +530,9 @@ export default function Stage2UsageEstimation({
                 <div className="grid grid-cols-1 gap-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col gap-1">
-                      <p className="text-foreground text-sm font-medium">Concurrent realtime connections</p>
+                      <p className="text-foreground text-sm font-medium">
+                        Concurrent realtime connections
+                      </p>
                       <p className="text-foreground-lighter text-xs">Peak simultaneous connections</p>
                     </div>
                     <Input
@@ -687,7 +541,13 @@ export default function Stage2UsageEstimation({
                       layout="vertical"
                       value={String(inputs.realtimePeakConnections)}
                       onChange={(e: any) =>
-                        set({ realtimePeakConnections: clamp(Math.round(Number(e.target.value || 0)), 0, 10_000_000) })
+                        set({
+                          realtimePeakConnections: clamp(
+                            Math.round(Number(e.target.value || 0)),
+                            0,
+                            10_000_000
+                          ),
+                        })
                       }
                       className="max-w-[140px]"
                     />
@@ -702,8 +562,12 @@ export default function Stage2UsageEstimation({
 
                   <div className="flex items-start justify-between gap-2 mt-2">
                     <div className="flex flex-col gap-1">
-                      <p className="text-foreground text-sm font-medium">Realtime messages per month</p>
-                      <p className="text-foreground-lighter text-xs">Broadcast, presence, and DB changes</p>
+                      <p className="text-foreground text-sm font-medium">
+                        Realtime messages per month
+                      </p>
+                      <p className="text-foreground-lighter text-xs">
+                        Broadcast, presence, and DB changes
+                      </p>
                     </div>
                     <Input
                       type="number"
@@ -711,7 +575,13 @@ export default function Stage2UsageEstimation({
                       layout="vertical"
                       value={String(inputs.realtimeMessages)}
                       onChange={(e: any) =>
-                        set({ realtimeMessages: clamp(Math.round(Number(e.target.value || 0)), 0, 10_000_000_000) })
+                        set({
+                          realtimeMessages: clamp(
+                            Math.round(Number(e.target.value || 0)),
+                            0,
+                            10_000_000_000
+                          ),
+                        })
                       }
                       className="max-w-[160px]"
                     />
@@ -746,7 +616,9 @@ export default function Stage2UsageEstimation({
               <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
-                    <p className="text-foreground text-sm font-medium">Edge function invocations per month</p>
+                    <p className="text-foreground text-sm font-medium">
+                      Edge function invocations per month
+                    </p>
                     <p className="text-foreground-lighter text-xs">Serverless function calls</p>
                   </div>
                   <Input
@@ -755,7 +627,13 @@ export default function Stage2UsageEstimation({
                     layout="vertical"
                     value={String(inputs.edgeInvocations)}
                     onChange={(e: any) =>
-                      set({ edgeInvocations: clamp(Math.round(Number(e.target.value || 0)), 0, 10_000_000_000) })
+                      set({
+                        edgeInvocations: clamp(
+                          Math.round(Number(e.target.value || 0)),
+                          0,
+                          10_000_000_000
+                        ),
+                      })
                     }
                     className="max-w-[160px]"
                   />
@@ -789,15 +667,21 @@ export default function Stage2UsageEstimation({
               <Panel outerClassName="w-full" innerClassName="p-4 md:p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
-                    <p className="text-foreground text-sm font-medium">Expected monthly egress (GB)</p>
-                    <p className="text-foreground-lighter text-xs">Data transferred out of Supabase</p>
+                    <p className="text-foreground text-sm font-medium">
+                      Expected monthly egress (GB)
+                    </p>
+                    <p className="text-foreground-lighter text-xs">
+                      Data transferred out of Supabase
+                    </p>
                   </div>
                   <Input
                     type="number"
                     size="small"
                     layout="vertical"
                     value={String(inputs.egressGb)}
-                    onChange={(e: any) => set({ egressGb: clamp(Number(e.target.value || 0), 0, 100_000) })}
+                    onChange={(e: any) =>
+                      set({ egressGb: clamp(Number(e.target.value || 0), 0, 100_000) })
+                    }
                     className="max-w-[120px]"
                   />
                 </div>
@@ -850,7 +734,9 @@ export default function Stage2UsageEstimation({
                     />
                     <div className="flex flex-col">
                       <span className="text-sm text-foreground">Custom domain</span>
-                      <span className="text-xs text-foreground-lighter">Use your own domain for APIs. $10/mo.</span>
+                      <span className="text-xs text-foreground-lighter">
+                        Use your own domain for APIs. $10/mo.
+                      </span>
                     </div>
                   </label>
                   <label className="flex items-start gap-2.5 cursor-pointer">
@@ -862,7 +748,9 @@ export default function Stage2UsageEstimation({
                     />
                     <div className="flex flex-col">
                       <span className="text-sm text-foreground">IPv4 address</span>
-                      <span className="text-xs text-foreground-lighter">Dedicated IPv4 for direct connections. $4/mo.</span>
+                      <span className="text-xs text-foreground-lighter">
+                        Dedicated IPv4 for direct connections. $4/mo.
+                      </span>
                     </div>
                   </label>
                   <div className="flex items-start gap-2.5">
@@ -874,7 +762,9 @@ export default function Stage2UsageEstimation({
                     />
                     <div className="flex flex-col gap-1">
                       <span className="text-sm text-foreground">Log drains</span>
-                      <span className="text-xs text-foreground-lighter">Export logs to external services. $60/mo per drain.</span>
+                      <span className="text-xs text-foreground-lighter">
+                        Export logs to external services. $60/mo per drain.
+                      </span>
                       {inputs.logDrains > 0 && (
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-xs text-foreground-lighter">Count:</span>
@@ -883,7 +773,11 @@ export default function Stage2UsageEstimation({
                             size="small"
                             layout="vertical"
                             value={String(inputs.logDrains)}
-                            onChange={(e: any) => set({ logDrains: clamp(Math.round(Number(e.target.value || 1)), 1, 10) })}
+                            onChange={(e: any) =>
+                              set({
+                                logDrains: clamp(Math.round(Number(e.target.value || 1)), 1, 10),
+                              })
+                            }
                             className="max-w-[60px]"
                           />
                         </div>
@@ -894,7 +788,9 @@ export default function Stage2UsageEstimation({
                     <input type="checkbox" disabled className="mt-0.5" />
                     <div className="flex flex-col">
                       <span className="text-sm text-foreground">AWS PrivateLink</span>
-                      <span className="text-xs text-foreground-lighter">Private connectivity. Included with Team/Enterprise.</span>
+                      <span className="text-xs text-foreground-lighter">
+                        Private connectivity. Included with Team/Enterprise.
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -926,7 +822,7 @@ export default function Stage2UsageEstimation({
             >
               <CalloutCard
                 title="No products selected"
-                body="Go back to Stage 1 to select the Supabase products you want to include in your estimate."
+                body="Go back to Step 1 to select the Supabase products you want to include in your estimate."
               />
             </m.div>
           )}
@@ -935,4 +831,3 @@ export default function Stage2UsageEstimation({
     </LazyMotion>
   )
 }
-

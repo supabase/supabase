@@ -433,10 +433,10 @@ function StagePanel({
           <div className={cn('text-foreground-lighter text-xs mt-1', active ? 'opacity-0' : 'opacity-100')}>
             Click to edit
           </div>
-        </div>
-      </button>
-      {active && <div className="mt-6">{children}</div>}
-    </Panel>
+        </button>
+        {active && <div className="mt-6">{children}</div>}
+      </Panel>
+    </LazyMotion>
   )
 }
 
