@@ -80,7 +80,9 @@ const PageLayout: NextPageWithLayout = () => {
   })
 
   const combinedStatsData = useMemo(() => {
-    const result = combinedStatsResults.data?.result as Record<string, string | number>[] | undefined
+    const result = combinedStatsResults.data?.result as
+      | Record<string, string | number>[]
+      | undefined
     return result || []
   }, [combinedStatsResults.data])
 

@@ -1,5 +1,5 @@
-import type { Datum } from 'components/ui/Charts/Charts.types'
 import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
+import type { Datum } from 'components/ui/Charts/Charts.types'
 import { useMemo } from 'react'
 
 export type FillTimeseriesOptions<T extends Datum = Datum> = {
@@ -29,10 +29,13 @@ export type FillTimeseriesResult<T extends Datum = Datum> = {
 
 /**
  * Sorts timeseries data by timestamp in ascending order
+ * Returns a new sorted array without mutating the input
  */
 export function sortByTimestamp<T extends Datum>(data: T[], timestampKey: string): T[] {
-  return data.sort((a, b) => {
-    return new Date(a[timestampKey] as string).getTime() - new Date(b[timestampKey] as string).getTime()
+  return [...data].sort((a, b) => {
+    return (
+      new Date(a[timestampKey] as string).getTime() - new Date(b[timestampKey] as string).getTime()
+    )
   })
 }
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
