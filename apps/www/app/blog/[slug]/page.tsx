@@ -93,7 +93,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const metaImageUrl = `/images/blog/${blogPost.image ? blogPost.image : blogPost.thumb}`
+    const blogImage = blogPost.image || blogPost.thumb
+    const metaImageUrl = blogImage?.startsWith('http') ? blogImage : `/images/blog/${blogImage}`
 
     return {
       title: blogPost.title,
