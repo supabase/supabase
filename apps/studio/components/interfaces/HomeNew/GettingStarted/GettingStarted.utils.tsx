@@ -1,7 +1,7 @@
-import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
-
 import { DOCS_URL } from 'lib/constants'
+import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
 import { AiIconAnimation, CodeBlock } from 'ui'
+
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'
 
@@ -376,4 +376,3 @@ export const getNoCodeWorkflowSteps = ({
     },
   ]
 }
-

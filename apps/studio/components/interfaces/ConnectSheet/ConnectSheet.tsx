@@ -1,20 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useEffect, useMemo } from 'react'
-
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  cn
-} from 'ui'
+import { useEffect, useMemo } from 'react'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, cn } from 'ui'
 
 import type { ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
@@ -51,15 +43,8 @@ export const ConnectSheet = ({ open, onOpenChange, connectTab }: ConnectSheetPro
     return modes
   }, [showAppFrameworks, showMobileFrameworks, showOrms])
 
-  const {
-    state,
-    updateField,
-    setMode,
-    activeFields,
-    resolvedSteps,
-    getFieldOptions,
-    schema,
-  } = useConnectState()
+  const { state, updateField, setMode, activeFields, resolvedSteps, getFieldOptions, schema } =
+    useConnectState()
 
   // Filter modes based on feature flags
   const availableModes = useMemo(
@@ -69,18 +54,12 @@ export const ConnectSheet = ({ open, onOpenChange, connectTab }: ConnectSheetPro
 
   // Project keys for step components
   const { ref: projectRef } = useParams()
-  const { data: settings } = useProjectSettingsV2Query(
-    { projectRef },
-    { enabled: open }
-  )
+  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: open })
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
-  const { data: apiKeys } = useAPIKeysQuery(
-    { projectRef },
-    { enabled: canReadAPIKeys }
-  )
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = canReadAPIKeys
     ? getKeys(apiKeys)
     : { anonKey: null, publishableKey: null }
@@ -141,14 +120,10 @@ export const ConnectSheet = ({ open, onOpenChange, connectTab }: ConnectSheetPro
           </div>
         </SheetHeader>
 
-          <div className="flex flex-1 flex-col overflow-y-auto">
-            {/* Configuration Section */}
-            <div className="space-y-6 border-b p-8 shrink-0">
-              <ModeSelector
-                modes={availableModes}
-                selected={state.mode}
-                onChange={setMode}
-              />
+        <div className="flex flex-1 flex-col overflow-y-auto">
+          {/* Configuration Section */}
+          <div className="space-y-6 border-b p-8 shrink-0">
+            <ModeSelector modes={availableModes} selected={state.mode} onChange={setMode} />
             <div className="border-t pt-8">
               <ConnectConfigSection
                 activeFields={activeFields}
@@ -156,16 +131,12 @@ export const ConnectSheet = ({ open, onOpenChange, connectTab }: ConnectSheetPro
                 onFieldChange={updateField}
                 getFieldOptions={getFieldOptions}
               />
-              </div>
             </div>
-
-            {/* Steps Section */}
-            <ConnectStepsSection
-              steps={resolvedSteps}
-              state={state}
-              projectKeys={projectKeys}
-            />
           </div>
+
+          {/* Steps Section */}
+          <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+        </div>
       </SheetContent>
     </Sheet>
   )

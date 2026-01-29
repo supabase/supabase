@@ -5,8 +5,8 @@ import type {
   FieldOption,
   ResolvedField,
   ResolvedStep,
-  StepFieldValueMap,
   StepDefinition,
+  StepFieldValueMap,
   StepTree,
 } from './Connect.types'
 
@@ -84,10 +84,7 @@ export function resolveConditional<T>(
  * Resolves the steps array based on current state.
  * Returns only steps that have non-null content.
  */
-export function resolveSteps(
-  schema: ConnectSchema,
-  state: ConnectState
-): ResolvedStep[] {
+export function resolveSteps(schema: ConnectSchema, state: ConnectState): ResolvedStep[] {
   const steps = resolveStepTree(schema.steps, state)
   if (steps.length === 0) return []
 
@@ -146,10 +143,7 @@ function resolveStepBranch(
 /**
  * Gets the active fields for the current mode, filtering by dependsOn conditions.
  */
-export function getActiveFields(
-  schema: ConnectSchema,
-  state: ConnectState
-): ResolvedField[] {
+export function getActiveFields(schema: ConnectSchema, state: ConnectState): ResolvedField[] {
   const currentMode = schema.modes.find((m) => m.id === state.mode)
   if (!currentMode) return []
 
@@ -173,10 +167,7 @@ export function getActiveFields(
 /**
  * Resolves field options based on current state.
  */
-function resolveFieldOptions(
-  field: { options?: unknown },
-  state: ConnectState
-): FieldOption[] {
+function resolveFieldOptions(field: { options?: unknown }, state: ConnectState): FieldOption[] {
   if (!field.options) return []
 
   // Static options array

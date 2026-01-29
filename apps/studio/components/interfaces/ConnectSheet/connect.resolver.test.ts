@@ -1,18 +1,13 @@
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
+
+import type { ConditionalValue, ConnectSchema, ConnectState, StepTree } from './Connect.types'
 import {
-  resolveConditional,
-  resolveSteps,
   getActiveFields,
   getDefaultState,
   resetDependentFields,
+  resolveConditional,
+  resolveSteps,
 } from './connect.resolver'
-import type {
-  ConnectSchema,
-  ConnectState,
-  ConditionalValue,
-  StepDefinition,
-  StepTree,
-} from './Connect.types'
 
 // ============================================================================
 // resolveConditional Tests
@@ -113,7 +108,9 @@ describe('connect.resolver:resolveConditional', () => {
     expect(resolveConditional(conditional, { mode: 'mcp', mcpClient: 'cursor' })).toBe(
       'Cursor Config'
     )
-    expect(resolveConditional(conditional, { mode: 'mcp', mcpClient: 'codex' })).toBe('Codex Config')
+    expect(resolveConditional(conditional, { mode: 'mcp', mcpClient: 'codex' })).toBe(
+      'Codex Config'
+    )
     expect(resolveConditional(conditional, { mode: 'mcp', mcpClient: 'claude-code' })).toBe(
       'Claude Code Config'
     )
@@ -143,10 +140,13 @@ describe('connect.resolver:resolveConditional', () => {
       resolveConditional(conditional, { mode: 'framework', framework: 'nextjs', frameworkUi: true })
     ).toBe('Shadcn Steps')
     expect(
-      resolveConditional(conditional, { mode: 'framework', framework: 'nextjs', frameworkUi: false })
+      resolveConditional(conditional, {
+        mode: 'framework',
+        framework: 'nextjs',
+        frameworkUi: false,
+      })
     ).toBe('Regular Steps')
   })
-
 })
 
 // ============================================================================
@@ -191,9 +191,7 @@ describe('connect.resolver:resolveSteps', () => {
   test('should resolve steps for direct mode', () => {
     const schema = createMockSchema({
       mode: {
-        framework: [
-          { id: 'step1', title: 'Install', description: 'Install', content: 'install' },
-        ],
+        framework: [{ id: 'step1', title: 'Install', description: 'Install', content: 'install' }],
         direct: [
           { id: 'connection', title: 'Connection', description: 'Connect', content: 'direct' },
         ],
@@ -278,20 +276,20 @@ describe('connect.resolver:resolveSteps', () => {
       mode: {
         framework: {
           framework: {
-            nextjs: [
-              { id: 'base', title: 'Base', description: 'Base step', content: 'base' },
-            ],
+            nextjs: [{ id: 'base', title: 'Base', description: 'Base step', content: 'base' }],
           },
           frameworkUi: {
-            true: [
-              { id: 'ui', title: 'UI', description: 'UI step', content: 'ui' },
-            ],
+            true: [{ id: 'ui', title: 'UI', description: 'UI step', content: 'ui' }],
           },
         },
       },
     })
 
-    const steps = resolveSteps(schema, { mode: 'framework', framework: 'nextjs', frameworkUi: true })
+    const steps = resolveSteps(schema, {
+      mode: 'framework',
+      framework: 'nextjs',
+      frameworkUi: true,
+    })
     expect(steps.map((step) => step.id)).toEqual(['base', 'ui'])
   })
 })
@@ -391,7 +389,14 @@ describe('connect.resolver:getActiveFields', () => {
 
   test('should handle multiple dependsOn conditions', () => {
     const schema = createSchemaWithFields(
-      [{ id: 'direct', label: 'Direct', description: '', fields: ['connectionMethod', 'useSharedPooler'] }],
+      [
+        {
+          id: 'direct',
+          label: 'Direct',
+          description: '',
+          fields: ['connectionMethod', 'useSharedPooler'],
+        },
+      ],
       {
         connectionMethod: {
           id: 'connectionMethod',
