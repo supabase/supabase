@@ -201,6 +201,7 @@ export const Grid = memo(
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
               style={{ height: `calc(100% - 35px)` }}
+              data-testid="table-import-dropzone"
               onDragOver={onDragOver}
               onDragLeave={onDragOver}
               onDrop={onFileDrop}
@@ -229,9 +230,9 @@ export const Grid = memo(
                       <p className="text-sm text-light pointer-events-auto">
                         {isDraggedOver ? (
                           isValidFileDraggedOver ? (
-                            'Drop your CSV file here'
+                            'Drop your CSV or TSV file here'
                           ) : (
-                            <span className="text-destructive">Only CSV files are accepted</span>
+                            <span className="text-destructive">Only CSV or TSV files are accepted</span>
                           )
                         ) : (
                           'This table is empty'
@@ -262,10 +263,10 @@ export const Grid = memo(
                                 })
                               }}
                             >
-                              Import data from CSV
+                              Import data from CSV/TSV
                             </Button>
                             <p className="text-xs text-foreground-light pointer-events-auto">
-                              or drag and drop a CSV file here
+                              or drag and drop a CSV/TSV file here
                             </p>
                           </div>
                         )

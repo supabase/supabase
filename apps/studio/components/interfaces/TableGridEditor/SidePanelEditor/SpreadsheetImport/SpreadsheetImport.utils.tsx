@@ -174,7 +174,7 @@ export const acceptedFileExtension = (file: any) => {
 
 export function flagInvalidFileImport(file: File): boolean {
   if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
-    toast.error("Couldn't import file: only CSV files are accepted")
+    toast.error("Couldn't import file: only CSV or TSV files are accepted")
     return true
   } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
     toast.error(
