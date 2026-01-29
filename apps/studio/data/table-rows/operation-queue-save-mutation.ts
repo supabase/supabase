@@ -71,12 +71,6 @@ function getOperationSql(operation: QueuedOperation): string {
   }
 }
 
-/**
- * Sort operations for optimal execution order:
- * 1. DELETE_ROW first (free FK constraints)
- * 2. ADD_ROW second
- * 3. EDIT_CELL_CONTENT last
- */
 function sortOperations(operations: readonly QueuedOperation[]): QueuedOperation[] {
   const operationOrder: Record<QueuedOperationType, number> = {
     [QueuedOperationType.DELETE_ROW]: 0,
@@ -103,19 +97,14 @@ export async function saveOperationQueue({
     return { result: [] }
   }
 
-  // Sort operations for optimal execution order
   const sortedOperations = sortOperations(operations)
-
-  // Generate SQL for each operation, stripping trailing semicolons to avoid double semicolons when joining
   const statements = sortedOperations.map((op) => {
     const sql = getOperationSql(op)
     return sql.endsWith(';') ? sql.slice(0, -1) : sql
   })
 
-  // Combine all statements into a single transaction
   const transactionSql = wrapWithTransaction(statements.join(';\n') + ';')
 
-  // Wrap with role impersonation if enabled
   const sql = wrapWithRoleImpersonation(transactionSql, roleImpersonationState)
 
   const { result } = await executeSql({
