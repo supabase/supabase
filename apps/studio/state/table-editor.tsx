@@ -204,10 +204,14 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'csv-import', file },
       }
     },
-    onViewOperationQueue: () => {
-      state.ui = {
-        open: 'side-panel',
-        sidePanel: { type: 'operation-queue' },
+    toggleViewOperationQueue: () => {
+      if (state.ui.open === 'side-panel' && state.ui.sidePanel.type === 'operation-queue') {
+        state.closeSidePanel()
+      } else {
+        state.ui = {
+          open: 'side-panel',
+          sidePanel: { type: 'operation-queue' },
+        }
       }
     },
 
