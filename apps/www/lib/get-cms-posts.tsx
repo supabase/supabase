@@ -1,7 +1,7 @@
+import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
 import { generateTocFromMarkdown } from './toc'
-import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
@@ -37,7 +37,7 @@ type CMSBlogPost = {
   region?: string
   logo?: string
   logo_inverse?: string
-  thumb?: {
+  imgThumb?: {
     url: string
   }
   createdAt: string
@@ -54,7 +54,7 @@ type CMSBlogPost = {
   }[]
   meta?: {
     title?: string | null
-    image?: (number | string | null) | Media
+    imgSocial?: (number | string | null) | Media
     description?: string | null
   }
 }
@@ -175,7 +175,7 @@ type ProcessedPost = {
     username: string
   }>
   toc_depth: number
-  thumb: string | null
+  imgThumb: string | null
   url: string
   path: string
   isCMS: boolean
@@ -183,7 +183,7 @@ type ProcessedPost = {
   content: string
   meta?: {
     title?: string | null
-    image?: (number | string | null) | Media
+    imgSocial?: (number | string | null) | Media
     description?: string | null
   }
 }
@@ -413,17 +413,17 @@ async function processPostData(post: any) {
       post.toc_depth ? post.toc_depth : 3
     )
 
-    // Extract thumb and image URLs from the nested structure
-    const thumbUrl = post.thumb?.url
-      ? typeof post.thumb.url === 'string' && post.thumb.url.includes('http')
-        ? post.thumb.url
-        : `${PAYLOAD_URL}${post.thumb.url}`
+    // Extract imgThumb and imgSocial URLs from the nested structure
+    const imgThumbUrl = post.imgThumb?.url
+      ? typeof post.imgThumb.url === 'string' && post.imgThumb.url.includes('http')
+        ? post.imgThumb.url
+        : `${PAYLOAD_URL}${post.imgThumb.url}`
       : null
-    const imageUrl = post.meta?.image
-      ? typeof post.meta?.image === 'string' && post.meta?.image.includes('http')
-        ? post.meta?.image
-        : `${PAYLOAD_URL}${post.meta?.image}`
-      : thumbUrl
+    const imgSocialUrl = post.meta?.imgSocial
+      ? typeof post.meta?.imgSocial === 'string' && post.meta?.imgSocial.includes('http')
+        ? post.meta?.imgSocial
+        : `${PAYLOAD_URL}${post.meta?.imgSocial}`
+      : imgThumbUrl
 
     const processedData = {
       slug: post.slug,
@@ -448,8 +448,8 @@ async function processPostData(post: any) {
           username: author.username || '',
         })) || [],
       toc_depth: post.toc_depth || 3,
-      thumb: thumbUrl,
-      image: imageUrl,
+      imgThumb: imgThumbUrl,
+      imgSocial: imgSocialUrl,
       url: `/blog/${post.slug}`,
       path: `/blog/${post.slug}`,
       isCMS: true,
@@ -524,17 +524,17 @@ export async function getAllCMSPosts({
         const markdownContent = convertRichTextToMarkdown(post.content)
         const readingTime = post.readingTime || generateReadingTime(markdownContent)
 
-        // Extract thumb and image URLs from the nested structure (handle absolute and relative)
-        const thumbUrl = post.thumb?.url
-          ? typeof post.thumb.url === 'string' && post.thumb.url.includes('http')
-            ? post.thumb.url
-            : `${PAYLOAD_URL}${post.thumb.url}`
+        // Extract imgThumb and imgSocial URLs from the nested structure (handle absolute and relative)
+        const imgThumbUrl = post.imgThumb?.url
+          ? typeof post.imgThumb.url === 'string' && post.imgThumb.url.includes('http')
+            ? post.imgThumb.url
+            : `${PAYLOAD_URL}${post.imgThumb.url}`
           : null
-        const imageUrl = post.meta?.image
-          ? typeof post.meta?.image === 'string' && post.meta?.image.includes('http')
-            ? post.meta?.image
-            : `${PAYLOAD_URL}${post.meta?.image}`
-          : thumbUrl
+        const imgSocialUrl = post.meta?.imgSocial
+          ? typeof post.meta?.imgSocial === 'string' && post.meta?.imgSocial.includes('http')
+            ? post.meta?.imgSocial
+            : `${PAYLOAD_URL}${post.meta?.imgSocial}`
+          : imgThumbUrl
 
         return {
           slug: post.slug || '',
@@ -558,8 +558,8 @@ export async function getAllCMSPosts({
               username: author.username || '',
             })) || [],
           toc_depth: post.toc_depth || 3,
-          thumb: thumbUrl,
-          image: imageUrl,
+          imgThumb: imgThumbUrl,
+          imgSocial: imgSocialUrl,
           url: `/blog/${post.slug || ''}`,
           path: `/blog/${post.slug || ''}`,
           isCMS: true,

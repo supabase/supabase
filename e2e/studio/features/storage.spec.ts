@@ -209,6 +209,71 @@ test.describe.serial('Storage', () => {
     await renameItem(page, folderName, newFolderName)
   })
 
+  test('resets folder name when renaming with empty string', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_rename_folder_empty`
+    const folderName = 'folder_to_rename'
+
+    // Create a bucket, navigate to it, and create a folder
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Right-click on the folder to open context menu
+    const folder = page.getByTitle(folderName)
+    await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
+    await folder.click({ button: 'right' })
+
+    // Click rename option from context menu
+    await page.getByRole('menuitem', { name: 'Rename' }).click()
+
+    // Clear the input and press Enter with empty name
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Rename input should be visible').toBeVisible()
+    await nameInput.clear()
+    await nameInput.press('Enter')
+
+    // Verify the input disappears (edit mode exits)
+    await expect(nameInput, 'Input should disappear after pressing Enter').not.toBeVisible()
+
+    // Verify the folder name is reset to original
+    await expect(
+      page.getByTitle(folderName),
+      'Folder should retain its original name'
+    ).toBeVisible()
+  })
+
+  test('resets folder name when clicking outside with empty string', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_rename_folder_blur`
+    const folderName = 'folder_to_blur'
+
+    // Create a bucket, navigate to it, and create a folder
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Right-click on the folder to open context menu
+    const folder = page.getByTitle(folderName)
+    await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
+    await folder.click({ button: 'right' })
+
+    // Click rename option from context menu
+    await page.getByRole('menuitem', { name: 'Rename' }).click()
+
+    // Clear the input and click outside to blur
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Rename input should be visible').toBeVisible()
+    await nameInput.clear()
+
+    // Click outside the input to trigger blur
+    await page.getByRole('button', { name: 'Edit bucket' }).click()
+
+    // Verify the folder name is reset to original
+    await expect(
+      page.getByTitle(folderName),
+      'Folder should retain its original name after blur'
+    ).toBeVisible()
+  })
+
   test('can delete a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_delete_file`
     const fileName = 'test-file.txt'
