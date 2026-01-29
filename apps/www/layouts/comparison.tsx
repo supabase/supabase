@@ -79,7 +79,10 @@ const LayoutComparison = ({ components, props }: Props) => {
           images: (() => {
             const img = props.blog.imgSocial || props.blog.imgThumb
             if (!img) return []
-            const url = img.startsWith('/') || img.startsWith('http') ? img : `https://supabase.com${basePath}/images/blog/${img}`
+            const url =
+              img.startsWith('/') || img.startsWith('http')
+                ? img
+                : `https://supabase.com${basePath}/images/blog/${img}`
             return [{ url }]
           })(),
         }}
