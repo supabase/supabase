@@ -66,7 +66,7 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
         </div>
       }
     >
-      <SidePanel.Content className="py-4">
+      <SidePanel.Content className="py-4 h-full">
         <OperationList operations={operations} />
       </SidePanel.Content>
     </SidePanel>
