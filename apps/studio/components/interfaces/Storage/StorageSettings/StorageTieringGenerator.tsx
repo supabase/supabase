@@ -47,11 +47,26 @@ const FormSchema = z
       })
     }
 
+    // Expiration should always be after the last transition.
     if (typeof expireAfterDays === 'number' && typeof transitionToGlacierAfterDays === 'number') {
       if (expireAfterDays <= transitionToGlacierAfterDays) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Expiration must be after GLACIER_IR transition',
+          path: ['expireAfterDays'],
+        })
+      }
+    }
+
+    if (
+      typeof expireAfterDays === 'number' &&
+      typeof transitionToGlacierAfterDays !== 'number' &&
+      typeof transitionToIAAfterDays === 'number'
+    ) {
+      if (expireAfterDays <= transitionToIAAfterDays) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Expiration must be after STANDARD_IA transition',
           path: ['expireAfterDays'],
         })
       }
