@@ -5,14 +5,16 @@ import type {
   FieldOption,
   ResolvedField,
   ResolvedStep,
+  StepFieldValueMap,
   StepDefinition,
+  StepTree,
 } from './Connect.types'
 
 /**
- * The order in which state keys are checked during resolution.
- * This determines the nesting order for conditional values.
+ * The order in which state keys are checked during conditional value resolution.
+ * Used for ConditionalValue (value-keyed) resolution, not for step trees.
  */
-export const STATE_KEY_ORDER = [
+const STATE_KEY_ORDER = [
   'mode',
   'framework',
   'frameworkVariant',
@@ -86,12 +88,9 @@ export function resolveSteps(
   schema: ConnectSchema,
   state: ConnectState
 ): ResolvedStep[] {
-  // First resolve which steps array to use
-  const steps = resolveConditional<StepDefinition[]>(schema.steps, state)
+  const steps = resolveStepTree(schema.steps, state)
+  if (steps.length === 0) return []
 
-  if (!steps || !Array.isArray(steps)) return []
-
-  // Then resolve each step's content
   return steps
     .map((step) => {
       const content = resolveConditional<string | null>(step.content, state)
@@ -103,6 +102,45 @@ export function resolveSteps(
       }
     })
     .filter((step) => step.content !== '' && step.content !== null)
+}
+
+/**
+ * Resolves a step tree by evaluating field-specific branches in insertion order.
+ * Each matching branch appends its steps to the final list.
+ */
+function resolveStepTree(tree: StepTree, state: ConnectState): StepDefinition[] {
+  if (Array.isArray(tree)) return tree
+  if (!isConditionalObject(tree)) return []
+
+  const resolved: StepDefinition[] = []
+
+  for (const [fieldId, valueMap] of Object.entries(tree)) {
+    if (fieldId === 'DEFAULT') continue
+    if (!isConditionalObject(valueMap)) continue
+
+    const branch = resolveStepBranch(valueMap as StepFieldValueMap, state[fieldId])
+    if (!branch) continue
+
+    resolved.push(...resolveStepTree(branch, state))
+  }
+
+  return resolved
+}
+
+function resolveStepBranch(
+  valueMap: StepFieldValueMap,
+  stateValue: ConnectState[keyof ConnectState] | undefined
+): StepTree | undefined {
+  const key = String(stateValue ?? '')
+  if (key && Object.prototype.hasOwnProperty.call(valueMap, key)) {
+    return valueMap[key]
+  }
+
+  if (valueMap.DEFAULT !== undefined) {
+    return valueMap.DEFAULT
+  }
+
+  return undefined
 }
 
 /**

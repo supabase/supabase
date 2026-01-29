@@ -5,9 +5,14 @@ import {
   getActiveFields,
   getDefaultState,
   resetDependentFields,
-  STATE_KEY_ORDER,
 } from './connect.resolver'
-import type { ConnectSchema, ConnectState, ConditionalValue, StepDefinition } from './Connect.types'
+import type {
+  ConnectSchema,
+  ConnectState,
+  ConditionalValue,
+  StepDefinition,
+  StepTree,
+} from './Connect.types'
 
 // ============================================================================
 // resolveConditional Tests
@@ -142,21 +147,6 @@ describe('connect.resolver:resolveConditional', () => {
     ).toBe('Regular Steps')
   })
 
-  test('should respect STATE_KEY_ORDER for resolution', () => {
-    // Verify the order is correct
-    expect(STATE_KEY_ORDER).toContain('mode')
-    expect(STATE_KEY_ORDER).toContain('framework')
-    expect(STATE_KEY_ORDER).toContain('frameworkVariant')
-    expect(STATE_KEY_ORDER).toContain('library')
-    expect(STATE_KEY_ORDER).toContain('mcpClient')
-
-    // mode should come before framework
-    expect(STATE_KEY_ORDER.indexOf('mode')).toBeLessThan(STATE_KEY_ORDER.indexOf('framework'))
-    // framework should come before frameworkVariant
-    expect(STATE_KEY_ORDER.indexOf('framework')).toBeLessThan(
-      STATE_KEY_ORDER.indexOf('frameworkVariant')
-    )
-  })
 })
 
 // ============================================================================
@@ -164,9 +154,7 @@ describe('connect.resolver:resolveConditional', () => {
 // ============================================================================
 
 describe('connect.resolver:resolveSteps', () => {
-  const createMockSchema = (
-    steps: ConditionalValue<StepDefinition[]>
-  ): ConnectSchema => ({
+  const createMockSchema = (steps: StepTree): ConnectSchema => ({
     modes: [
       { id: 'framework', label: 'Framework', description: '', fields: [] },
       { id: 'direct', label: 'Direct', description: '', fields: [] },
@@ -177,13 +165,20 @@ describe('connect.resolver:resolveSteps', () => {
 
   test('should resolve steps array for framework mode', () => {
     const schema = createMockSchema({
-      framework: [
-        { id: 'step1', title: 'Install', description: 'Install pkg', content: 'install-content' },
-        { id: 'step2', title: 'Configure', description: 'Configure', content: 'config-content' },
-      ],
-      direct: [
-        { id: 'connection', title: 'Connection', description: 'Connect', content: 'direct-content' },
-      ],
+      mode: {
+        framework: [
+          { id: 'step1', title: 'Install', description: 'Install pkg', content: 'install-content' },
+          { id: 'step2', title: 'Configure', description: 'Configure', content: 'config-content' },
+        ],
+        direct: [
+          {
+            id: 'connection',
+            title: 'Connection',
+            description: 'Connect',
+            content: 'direct-content',
+          },
+        ],
+      },
     })
 
     const steps = resolveSteps(schema, { mode: 'framework' })
@@ -195,12 +190,14 @@ describe('connect.resolver:resolveSteps', () => {
 
   test('should resolve steps for direct mode', () => {
     const schema = createMockSchema({
-      framework: [
-        { id: 'step1', title: 'Install', description: 'Install', content: 'install' },
-      ],
-      direct: [
-        { id: 'connection', title: 'Connection', description: 'Connect', content: 'direct' },
-      ],
+      mode: {
+        framework: [
+          { id: 'step1', title: 'Install', description: 'Install', content: 'install' },
+        ],
+        direct: [
+          { id: 'connection', title: 'Connection', description: 'Connect', content: 'direct' },
+        ],
+      },
     })
 
     const steps = resolveSteps(schema, { mode: 'direct' })
@@ -210,11 +207,13 @@ describe('connect.resolver:resolveSteps', () => {
 
   test('should filter out steps with empty content', () => {
     const schema = createMockSchema({
-      framework: [
-        { id: 'step1', title: 'Valid', description: 'Valid step', content: 'valid-content' },
-        { id: 'step2', title: 'Empty', description: 'Empty step', content: '' },
-        { id: 'step3', title: 'Null', description: 'Null step', content: null },
-      ],
+      mode: {
+        framework: [
+          { id: 'step1', title: 'Valid', description: 'Valid step', content: 'valid-content' },
+          { id: 'step2', title: 'Empty', description: 'Empty step', content: '' },
+          { id: 'step3', title: 'Null', description: 'Null step', content: null },
+        ],
+      },
     })
 
     const steps = resolveSteps(schema, { mode: 'framework' })
@@ -224,18 +223,20 @@ describe('connect.resolver:resolveSteps', () => {
 
   test('should resolve conditional step content based on state', () => {
     const schema = createMockSchema({
-      framework: [
-        {
-          id: 'configure',
-          title: 'Configure',
-          description: 'Configure',
-          content: {
-            nextjs: 'nextjs-content',
-            react: 'react-content',
-            DEFAULT: 'generic-content',
+      mode: {
+        framework: [
+          {
+            id: 'configure',
+            title: 'Configure',
+            description: 'Configure',
+            content: {
+              nextjs: 'nextjs-content',
+              react: 'react-content',
+              DEFAULT: 'generic-content',
+            },
           },
-        },
-      ],
+        ],
+      },
     })
 
     const nextjsSteps = resolveSteps(schema, { mode: 'framework', framework: 'nextjs' })
@@ -250,9 +251,9 @@ describe('connect.resolver:resolveSteps', () => {
 
   test('should return empty array when no steps resolve', () => {
     const schema = createMockSchema({
-      framework: [
-        { id: 'step1', title: 'Step', description: 'Desc', content: '' },
-      ],
+      mode: {
+        framework: [{ id: 'step1', title: 'Step', description: 'Desc', content: '' }],
+      },
     })
 
     const steps = resolveSteps(schema, { mode: 'framework' })
@@ -261,11 +262,37 @@ describe('connect.resolver:resolveSteps', () => {
 
   test('should return empty array when steps is not an array', () => {
     const schema = createMockSchema({
-      unknown: [],
+      mode: {
+        framework: {
+          framework: {},
+        },
+      },
     } as any)
 
     const steps = resolveSteps(schema, { mode: 'framework' })
     expect(steps).toEqual([])
+  })
+
+  test('should append steps from multiple field conditions in order', () => {
+    const schema = createMockSchema({
+      mode: {
+        framework: {
+          framework: {
+            nextjs: [
+              { id: 'base', title: 'Base', description: 'Base step', content: 'base' },
+            ],
+          },
+          frameworkUi: {
+            true: [
+              { id: 'ui', title: 'UI', description: 'UI step', content: 'ui' },
+            ],
+          },
+        },
+      },
+    })
+
+    const steps = resolveSteps(schema, { mode: 'framework', framework: 'nextjs', frameworkUi: true })
+    expect(steps.map((step) => step.id)).toEqual(['base', 'ui'])
   })
 })
 

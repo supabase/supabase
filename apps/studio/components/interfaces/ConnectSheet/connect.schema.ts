@@ -288,56 +288,60 @@ export const connectSchema: ConnectSchema = {
   // Steps - Conditional based on mode and nested selections
   // -------------------------------------------------------------------------
   steps: {
-    // Framework mode steps
-    framework: {
-      nextjs: {
-        true: [
-          frameworkInstallStep,
-          frameworkShadcnStep,
-          frameworkShadcnExploreStep,
-          skillsInstallStep,
-        ],
-        DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
+    // Keys are field IDs; each field maps state values to step trees.
+    mode: {
+      framework: {
+        framework: {
+          nextjs: {
+            frameworkUi: {
+              true: [
+                frameworkInstallStep,
+                frameworkShadcnStep,
+                frameworkShadcnExploreStep,
+                skillsInstallStep,
+              ],
+              DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
+            },
+          },
+          react: {
+            frameworkUi: {
+              true: [
+                frameworkInstallStep,
+                frameworkShadcnStep,
+                frameworkShadcnExploreStep,
+                skillsInstallStep,
+              ],
+              DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],
+            },
+          },
+          DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
+        },
       },
-      react: {
-        true: [
-          frameworkInstallStep,
-          frameworkShadcnStep,
-          frameworkShadcnExploreStep,
-          skillsInstallStep,
-        ],
-        DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],
+      direct: {
+        connectionType: {
+          nodejs: [directInstallStep, directFilesStep, skillsInstallStep],
+          golang: [directInstallStep, directFilesStep, skillsInstallStep],
+          dotnet: [directInstallStep, directFilesStep, skillsInstallStep],
+          python: [directInstallStep, directFilesStep, skillsInstallStep],
+          sqlalchemy: [directInstallStep, directFilesStep, skillsInstallStep],
+          DEFAULT: [directConnectionStep, skillsInstallStep],
+        },
       },
-      DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
+      orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
+      mcp: {
+        mcpClient: {
+          codex: [
+            codexAddServerStep,
+            codexEnableRemoteStep,
+            codexAuthenticateStep,
+            codexVerifyStep,
+            skillsInstallStep,
+          ],
+          'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
+          DEFAULT: [mcpConfigureStep, skillsInstallStep],
+        },
+      },
+      DEFAULT: [skillsInstallStep],
     },
-
-    // Direct connection mode - conditional steps based on connection type
-    direct: {
-      nodejs: [directInstallStep, directFilesStep, skillsInstallStep],
-      golang: [directInstallStep, directFilesStep, skillsInstallStep],
-      dotnet: [directInstallStep, directFilesStep, skillsInstallStep],
-      python: [directInstallStep, directFilesStep, skillsInstallStep],
-      sqlalchemy: [directInstallStep, directFilesStep, skillsInstallStep],
-      DEFAULT: [directConnectionStep, skillsInstallStep],
-    },
-
-    // ORM mode steps
-    orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
-
-    // MCP mode - conditional steps based on client
-    mcp: {
-      codex: [
-        codexAddServerStep,
-        codexEnableRemoteStep,
-        codexAuthenticateStep,
-        codexVerifyStep,
-        skillsInstallStep,
-      ],
-      'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
-      DEFAULT: [mcpConfigureStep, skillsInstallStep],
-    },
-
-    // Fallback
-    DEFAULT: [skillsInstallStep],
   },
 }

@@ -124,6 +124,17 @@ export interface StepDefinition {
   content: ConditionalValue<string | null>
 }
 
+export type StepTree =
+  | StepDefinition[]
+  | {
+      [fieldId: string]: StepFieldValueMap
+    }
+
+export type StepFieldValueMap = {
+  [fieldValue: string]: StepTree
+  DEFAULT?: StepTree
+}
+
 // ============================================================================
 // Schema Types - Main Schema
 // ============================================================================
@@ -132,7 +143,7 @@ export interface ConnectSchema {
   modes: ModeDefinition[]
   fields: Record<string, FieldDefinition>
   // Steps are fully conditional based on state
-  steps: ConditionalValue<StepDefinition[]>
+  steps: StepTree
 }
 
 // ============================================================================
