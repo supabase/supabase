@@ -406,6 +406,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Refine',
           url: '/guides/getting-started/quickstarts/refine',
         },
+        {
+          name: 'XMLUI',
+          url: '/guides/getting-started/quickstarts/xmlui',
+        },
       ],
     },
     {
