@@ -10,7 +10,11 @@ export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTM
 }
 
 /**
- * This is a custom TextArea component that expands based on the content.
+ * A textarea component that automatically expands its height to fit the content.
+ * @param {object} props - The component props.
+ * @param {string} props.value - The value of the textarea. This is required to calculate the height.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @returns {React.ReactElement} The expanding textarea component.
  */
 const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps>(
   ({ className, value, ...props }, ref) => {

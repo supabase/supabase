@@ -26,6 +26,21 @@ interface StringMap {
   [key: string]: number
 }
 
+/**
+ * A base component for rendering icons.
+ * @param {object} props - The component props.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | number} [props.size] - The size of the icon.
+ * @param {string} [props.type] - The type of the icon.
+ * @param {string} [props.color] - The color of the icon.
+ * @param {number} [props.strokeWidth] - The stroke width of the icon.
+ * @param {string} [props.fill] - The fill color of the icon.
+ * @param {string} [props.stroke] - The stroke color of the icon.
+ * @param {'brand' | 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink'} [props.background] - The background color of the icon.
+ * @param {React.ReactNode} [props.src] - The source of a custom SVG icon.
+ * @param {any} [props.icon] - A Feather icon component.
+ * @returns {React.ReactElement} The icon component.
+ */
 function IconBase({
   className,
   size,

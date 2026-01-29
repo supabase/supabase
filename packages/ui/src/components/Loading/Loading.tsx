@@ -8,6 +8,14 @@ interface Props {
   active: boolean
   isFullHeight?: boolean
 }
+/**
+ * A loading component that overlays a spinner on its children.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The content to be overlaid.
+ * @param {boolean} props.active - If `true`, the loading spinner will be active.
+ * @param {boolean} [props.isFullHeight=false] - If `true`, the component will take up the full height of its container.
+ * @returns {React.ReactElement} The loading component.
+ */
 export default function Loading({ children, active, isFullHeight = false }: Props) {
   const __styles = styleHandler('loading')
 

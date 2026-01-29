@@ -14,6 +14,16 @@ interface MenuProps {
   type?: 'text' | 'pills' | 'border'
 }
 
+/**
+ * A menu component that displays a list of items.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The menu items.
+ * @param {string} [props.className] - Additional CSS class names for the nav element.
+ * @param {string} [props.ulClassName] - Additional CSS class names for the ul element.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @param {'text' | 'pills' | 'border'} [props.type='text'] - The visual style of the menu.
+ * @returns {React.ReactElement} The menu component.
+ */
 function Menu({ children, className, ulClassName, style, type = 'text' }: MenuProps) {
   return (
     <nav
@@ -42,6 +52,19 @@ interface ItemProps {
   style?: React.CSSProperties
 }
 
+/**
+ * An item within a Menu component.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The content of the menu item.
+ * @param {React.ReactNode} [props.icon] - An icon to be displayed next to the item.
+ * @param {boolean} [props.active] - If `true`, the item will be styled as active.
+ * @param {boolean} [props.rounded] - If `true`, the item will have rounded corners.
+ * @param {Function} [props.onClick] - A callback function to be called when the item is clicked.
+ * @param {boolean} [props.doNotCloseOverlay=false] - If `true`, the overlay will not close when the item is clicked.
+ * @param {boolean} [props.showActiveBar=false] - If `true`, a bar will be displayed next to the active item.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @returns {React.ReactElement} The menu item component.
+ */
 export function Item({
   children,
   icon,
@@ -100,6 +123,14 @@ interface GroupProps {
   title: React.ReactNode
 }
 
+/**
+ * A group of menu items.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} [props.children] - The menu items within the group.
+ * @param {React.ReactNode} [props.icon] - An icon for the group title.
+ * @param {React.ReactNode} props.title - The title of the group.
+ * @returns {React.ReactElement} The menu group component.
+ */
 export function Group({ children, icon, title }: GroupProps) {
   const __styles = styleHandler('menu')
   const { type } = useMenuContext()
@@ -116,6 +147,12 @@ interface MiscProps {
   children: React.ReactNode
 }
 
+/**
+ * A miscellaneous item within a Menu component, typically used for non-interactive text.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The content of the miscellaneous item.
+ * @returns {React.ReactElement} The miscellaneous menu item component.
+ */
 export function Misc({ children }: MiscProps) {
   return (
     <div
