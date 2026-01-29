@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  editOperationMatchesTempId,
   operationMatchesRow,
   resolveDeleteRowConflicts,
   resolveEditCellConflicts,
@@ -101,59 +100,6 @@ describe('operationMatchesRow', () => {
       },
     }
     expect(operationMatchesRow(operation, 1, { id: 1 })).toBe(false)
-  })
-})
-
-describe('editOperationMatchesTempId', () => {
-  const mockTable = {} as any
-
-  test('should match EDIT_CELL_CONTENT operation with same tempId', () => {
-    const operation: QueuedOperation = {
-      id: 'edit_cell_content:1:name:__tempId:temp123',
-      type: QueuedOperationType.EDIT_CELL_CONTENT,
-      tableId: 1,
-      timestamp: Date.now(),
-      payload: {
-        rowIdentifiers: { __tempId: 'temp123' },
-        columnName: 'name',
-        oldValue: 'old',
-        newValue: 'new',
-        table: mockTable,
-      },
-    }
-    expect(editOperationMatchesTempId(operation, 'temp123')).toBe(true)
-  })
-
-  test('should not match EDIT_CELL_CONTENT operation with different tempId', () => {
-    const operation: QueuedOperation = {
-      id: 'edit_cell_content:1:name:__tempId:temp123',
-      type: QueuedOperationType.EDIT_CELL_CONTENT,
-      tableId: 1,
-      timestamp: Date.now(),
-      payload: {
-        rowIdentifiers: { __tempId: 'temp123' },
-        columnName: 'name',
-        oldValue: 'old',
-        newValue: 'new',
-        table: mockTable,
-      },
-    }
-    expect(editOperationMatchesTempId(operation, 'temp456')).toBe(false)
-  })
-
-  test('should return false for non-EDIT_CELL_CONTENT operations', () => {
-    const operation: QueuedOperation = {
-      id: 'add_row:1:temp123',
-      type: QueuedOperationType.ADD_ROW,
-      tableId: 1,
-      timestamp: Date.now(),
-      payload: {
-        tempId: 'temp123',
-        rowData: { name: 'new' },
-        table: mockTable,
-      },
-    }
-    expect(editOperationMatchesTempId(operation, 'temp123')).toBe(false)
   })
 })
 

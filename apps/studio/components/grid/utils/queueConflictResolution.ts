@@ -1,11 +1,14 @@
 import { generateTableChangeKey, generateTableChangeKeyFromOperation } from './queueOperationUtils'
 import {
-  type AddRowPayload,
-  type DeleteRowPayload,
-  type EditCellContentPayload,
+  type DeleteRowOperation,
+  type EditCellContentOperation,
+  type NewDeleteRowOperation,
+  type NewEditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
+  isDeleteRowOperation,
+  isEditCellContentOperation,
 } from '@/state/table-editor-operation-queue.types'
 
 export type DeleteConflictResult =
@@ -22,6 +25,11 @@ export type UpsertResult = {
   wasUpdate: boolean
 }
 
+function editOperationMatchesTempId(operation: QueuedOperation, tempId: string): boolean {
+  if (!isEditCellContentOperation(operation)) return false
+  return operation.payload.rowIdentifiers.__tempId === tempId
+}
+
 export function operationMatchesRow(
   operation: QueuedOperation,
   tableId: number,
@@ -30,15 +38,13 @@ export function operationMatchesRow(
   if (operation.tableId !== tableId) return false
 
   if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-    const payload = operation.payload as EditCellContentPayload
     return Object.entries(rowIdentifiers).every(
-      ([key, value]) => payload.rowIdentifiers[key] === value
+      ([key, value]) => operation.payload.rowIdentifiers[key] === value
     )
   }
 
   if (operation.type === QueuedOperationType.DELETE_ROW) {
-    const payload = operation.payload as DeleteRowPayload
-    return Object.entries(payload.rowIdentifiers).every(
+    return Object.entries(operation.payload.rowIdentifiers).every(
       ([key, value]) => rowIdentifiers[key] === value
     )
   }
@@ -46,24 +52,14 @@ export function operationMatchesRow(
   return false
 }
 
-/**
- * Check if an EDIT_CELL operation targets a row with the given tempId.
- */
-export function editOperationMatchesTempId(operation: QueuedOperation, tempId: string): boolean {
-  if (operation.type !== QueuedOperationType.EDIT_CELL_CONTENT) return false
-  const payload = operation.payload as EditCellContentPayload
-  return (payload.rowIdentifiers as any)?.__tempId === tempId
-}
-
 export function resolveDeleteRowConflicts(
   operations: readonly QueuedOperation[],
-  deleteOperation: NewQueuedOperation
+  deleteOperation: NewDeleteRowOperation
 ): DeleteConflictResult {
-  const deletePayload = deleteOperation.payload as DeleteRowPayload
-  const rowIdentifiers = deletePayload.rowIdentifiers
+  const rowIdentifiers = deleteOperation.payload.rowIdentifiers
 
   // Check if this row was newly added (by tempId)
-  const tempId = (deletePayload.originalRow as any)?.__tempId
+  const tempId = (deleteOperation.payload.originalRow as any)?.__tempId
   if (tempId) {
     // If deleting a newly added row, filter out the ADD_ROW operation
     const addRowKey = generateTableChangeKey({
@@ -89,16 +85,14 @@ export function resolveDeleteRowConflicts(
 
 export function resolveEditCellConflicts(
   operations: readonly QueuedOperation[],
-  editOperation: NewQueuedOperation
+  editOperation: NewEditCellContentOperation
 ): EditConflictResult {
-  const editPayload = editOperation.payload as EditCellContentPayload
-  const rowIdentifiers = editPayload.rowIdentifiers
+  const rowIdentifiers = editOperation.payload.rowIdentifiers
 
   // Check if this row is pending deletion
-  const isPendingDeletion = operations.some((op) => {
-    if (op.type === QueuedOperationType.DELETE_ROW && op.tableId === editOperation.tableId) {
-      const deletePayload = op.payload as DeleteRowPayload
-      return Object.entries(deletePayload.rowIdentifiers).every(
+  const isPendingDeletion = operations.filter(isDeleteRowOperation).some((op) => {
+    if (op.tableId === editOperation.tableId) {
+      return Object.entries(op.payload.rowIdentifiers).every(
         ([key, value]) => rowIdentifiers[key] === value
       )
     }
@@ -114,12 +108,11 @@ export function resolveEditCellConflicts(
   }
 
   // Check if this edit is on a newly added row (by tempId)
-  const tempId = (rowIdentifiers as any)?.__tempId
+  const tempId = rowIdentifiers.__tempId
   if (tempId) {
     const addRowIndex = operations.findIndex((op) => {
       if (op.type === QueuedOperationType.ADD_ROW && op.tableId === editOperation.tableId) {
-        const addPayload = op.payload as AddRowPayload
-        return addPayload.tempId === tempId
+        return op.payload.tempId === tempId
       }
       return false
     })
@@ -128,13 +121,18 @@ export function resolveEditCellConflicts(
       // Merge the edit into the ADD_ROW's rowData
       const updatedOperations = [...operations]
       const addOp = updatedOperations[addRowIndex]
-      const addPayload = { ...(addOp.payload as AddRowPayload) }
-      addPayload.rowData = { ...addPayload.rowData, [editPayload.columnName]: editPayload.newValue }
+      if (addOp.type === QueuedOperationType.ADD_ROW) {
+        const addPayload = { ...addOp.payload }
+        addPayload.rowData = {
+          ...addPayload.rowData,
+          [editOperation.payload.columnName]: editOperation.payload.newValue,
+        }
 
-      updatedOperations[addRowIndex] = {
-        ...addOp,
-        payload: addPayload,
-        timestamp: Date.now(),
+        updatedOperations[addRowIndex] = {
+          ...addOp,
+          payload: addPayload,
+          timestamp: Date.now(),
+        }
       }
 
       return { action: 'merge', updatedOperations }
@@ -163,9 +161,12 @@ export function upsertOperation(
     // Keep the old value of the operation that is being overwritten
     // When a user edits the same cell multiple times before saving,
     // we need to preserve the original "before edit" value
-    if (queuedOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-      const existingPayload = operations[existingOpIndex].payload as EditCellContentPayload
-      ;(queuedOperation.payload as EditCellContentPayload).oldValue = existingPayload.oldValue
+    const existingOp = operations[existingOpIndex]
+    if (
+      queuedOperation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
+      existingOp.type === QueuedOperationType.EDIT_CELL_CONTENT
+    ) {
+      queuedOperation.payload.oldValue = existingOp.payload.oldValue
     }
 
     updatedOperations[existingOpIndex] = queuedOperation
