@@ -1,9 +1,8 @@
 import {
-  AddRowPayload,
-  DeleteRowPayload,
-  EditCellContentPayload,
   QueuedOperation,
-  QueuedOperationType,
+  isAddRowOperation,
+  isDeleteRowOperation,
+  isEditCellContentOperation,
 } from 'state/table-editor-operation-queue.types'
 
 import { AddRowOperationItem } from './AddRowOperationItem'
@@ -19,14 +18,9 @@ export const OperationList = ({ operations }: OperationListProps) => {
     return <p className="text-sm text-foreground-light">No pending changes</p>
   }
 
-  // Group operations by type
-  const deleteOperations = operations.filter(
-    (op) => op.type === QueuedOperationType.DELETE_ROW
-  )
-  const addOperations = operations.filter((op) => op.type === QueuedOperationType.ADD_ROW)
-  const editOperations = operations.filter(
-    (op) => op.type === QueuedOperationType.EDIT_CELL_CONTENT
-  )
+  const addOperations = operations.filter(isAddRowOperation)
+  const deleteOperations = operations.filter(isDeleteRowOperation)
+  const editOperations = operations.filter(isEditCellContentOperation)
 
   return (
     <div className="space-y-6">
@@ -41,7 +35,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
                 key={op.id}
                 operationId={op.id}
                 tableId={op.tableId}
-                content={op.payload as DeleteRowPayload}
+                content={op.payload}
               />
             ))}
           </div>
@@ -59,7 +53,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
                 key={op.id}
                 operationId={op.id}
                 tableId={op.tableId}
-                content={op.payload as AddRowPayload}
+                content={op.payload}
               />
             ))}
           </div>
@@ -77,7 +71,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
                 key={op.id}
                 operationId={op.id}
                 tableId={op.tableId}
-                content={op.payload as EditCellContentPayload}
+                content={op.payload}
               />
             ))}
           </div>

@@ -6,9 +6,6 @@ import type { Dictionary } from 'types'
 
 import { PendingAddRow, PendingDeleteRow, SupaRow, isPendingAddRow } from '../types'
 import {
-  type AddRowPayload,
-  type DeleteRowPayload,
-  type EditCellContentPayload,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
@@ -24,35 +21,32 @@ interface GenerateTableChangeKeyArgs {
 
 export function generateTableChangeKeyFromOperation(operation: NewQueuedOperation): string {
   if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-    const payload = operation.payload as EditCellContentPayload
     return generateTableChangeKey({
       type: operation.type,
       tableId: operation.tableId,
-      columnName: payload.columnName,
-      rowIdentifiers: payload.rowIdentifiers,
+      columnName: operation.payload.columnName,
+      rowIdentifiers: operation.payload.rowIdentifiers,
     })
   }
 
   if (operation.type === QueuedOperationType.ADD_ROW) {
-    const payload = operation.payload as AddRowPayload
     return generateTableChangeKey({
       type: operation.type,
       tableId: operation.tableId,
-      tempId: payload.tempId,
+      tempId: operation.payload.tempId,
     })
   }
 
   if (operation.type === QueuedOperationType.DELETE_ROW) {
-    const payload = operation.payload as DeleteRowPayload
     return generateTableChangeKey({
       type: operation.type,
       tableId: operation.tableId,
-      rowIdentifiers: payload.rowIdentifiers,
+      rowIdentifiers: operation.payload.rowIdentifiers,
     })
   }
 
   // Need to explicitly handle other operations
-  throw new Error(`Unknown operation type: ${operation.type}`)
+  throw new Error(`Unknown operation type: ${(operation as never)['type']}`)
 }
 
 export function generateTableChangeKey({
@@ -267,26 +261,25 @@ export function reapplyOptimisticUpdates({
     for (const operation of tableOperations) {
       switch (operation.type) {
         case QueuedOperationType.EDIT_CELL_CONTENT: {
-          const { rowIdentifiers, columnName, newValue } =
-            operation.payload as EditCellContentPayload
+          const { rowIdentifiers, columnName, newValue } = operation.payload
           rows = applyCellEdit(rows, columnName, rowIdentifiers, newValue)
           break
         }
         case QueuedOperationType.ADD_ROW: {
-          const { tempId, rowData } = operation.payload as AddRowPayload
+          const { tempId, rowData } = operation.payload
           // Derive idx from tempId (tempId is stringified negative timestamp)
           const idx = Number(tempId)
           rows = applyRowAdd(rows, tempId, idx, rowData)
           break
         }
         case QueuedOperationType.DELETE_ROW: {
-          const { rowIdentifiers } = operation.payload as DeleteRowPayload
+          const { rowIdentifiers } = operation.payload
           rows = markRowAsDeleted(rows, rowIdentifiers)
           break
         }
         default: {
           // Need to explicitly handle other operations
-          throw new Error(`Unknown operation type: ${operation.type}`)
+          throw new Error(`Unknown operation type: ${(operation as never)['type']}`)
         }
       }
     }

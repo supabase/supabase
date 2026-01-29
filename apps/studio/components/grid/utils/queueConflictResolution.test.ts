@@ -7,7 +7,13 @@ import {
   resolveEditCellConflicts,
   upsertOperation,
 } from './queueConflictResolution'
-import { QueuedOperation, QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import {
+  type NewAddRowOperation,
+  type NewDeleteRowOperation,
+  type NewEditCellContentOperation,
+  QueuedOperation,
+  QueuedOperationType,
+} from '@/state/table-editor-operation-queue.types'
 
 // ============================================================================
 // Helper Functions Tests
@@ -172,7 +178,7 @@ describe('resolveDeleteRowConflicts', () => {
     }
 
     const operations = [addRowOp]
-    const deleteOperation = {
+    const deleteOperation: NewDeleteRowOperation = {
       type: QueuedOperationType.DELETE_ROW,
       tableId: 1,
       payload: {
@@ -230,7 +236,7 @@ describe('resolveDeleteRowConflicts', () => {
     }
 
     const operations = [addRowOp, editCellOp, otherEditOp]
-    const deleteOperation = {
+    const deleteOperation: NewDeleteRowOperation = {
       type: QueuedOperationType.DELETE_ROW,
       tableId: 1,
       payload: {
@@ -277,7 +283,7 @@ describe('resolveDeleteRowConflicts', () => {
     }
 
     const operations = [editCellOp, otherEditOp]
-    const deleteOperation = {
+    const deleteOperation: NewDeleteRowOperation = {
       type: QueuedOperationType.DELETE_ROW,
       tableId: 1,
       payload: {
@@ -310,7 +316,7 @@ describe('resolveDeleteRowConflicts', () => {
     }
 
     const operations = [otherEditOp]
-    const deleteOperation = {
+    const deleteOperation: NewDeleteRowOperation = {
       type: QueuedOperationType.DELETE_ROW,
       tableId: 1,
       payload: {
@@ -344,7 +350,7 @@ describe('resolveEditCellConflicts', () => {
     }
 
     const operations = [deleteOp]
-    const editOperation = {
+    const editOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -378,7 +384,7 @@ describe('resolveEditCellConflicts', () => {
     }
 
     const operations = [addRowOp]
-    const editOperation = {
+    const editOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -417,7 +423,7 @@ describe('resolveEditCellConflicts', () => {
     }
 
     const operations = [otherOp]
-    const editOperation = {
+    const editOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -436,7 +442,7 @@ describe('resolveEditCellConflicts', () => {
 
   test('should return add when editing tempId row but ADD_ROW not found', () => {
     const operations: QueuedOperation[] = []
-    const editOperation = {
+    const editOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -459,7 +465,7 @@ describe('upsertOperation', () => {
 
   test('should add new operation to empty queue', () => {
     const operations: QueuedOperation[] = []
-    const newOperation = {
+    const newOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -495,7 +501,7 @@ describe('upsertOperation', () => {
     }
 
     const operations = [existingOp]
-    const newOperation = {
+    const newOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -529,7 +535,7 @@ describe('upsertOperation', () => {
     }
 
     const operations = [existingOp]
-    const newOperation = {
+    const newOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -564,7 +570,7 @@ describe('upsertOperation', () => {
     }
 
     const operations = [existingOp]
-    const newOperation = {
+    const newOperation: NewDeleteRowOperation = {
       type: QueuedOperationType.DELETE_ROW,
       tableId: 1,
       payload: {
@@ -598,7 +604,7 @@ describe('upsertOperation', () => {
 
     const operations = [existingOp]
     const originalOperations = [...operations]
-    const newOperation = {
+    const newOperation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -617,7 +623,7 @@ describe('upsertOperation', () => {
 
   test('should handle ADD_ROW operation', () => {
     const operations: QueuedOperation[] = []
-    const newOperation = {
+    const newOperation: NewAddRowOperation = {
       type: QueuedOperationType.ADD_ROW,
       tableId: 1,
       payload: {

@@ -5,13 +5,7 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { toast } from 'sonner'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import {
-  AddRowPayload,
-  DeleteRowPayload,
-  EditCellContentPayload,
-  QueuedOperation,
-  QueuedOperationType,
-} from 'state/table-editor-operation-queue.types'
+import { QueuedOperation, QueuedOperationType } from 'state/table-editor-operation-queue.types'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { tableRowKeys } from './keys'
@@ -33,7 +27,7 @@ export type OperationQueueSaveVariables = {
 function getOperationSql(operation: QueuedOperation): string {
   switch (operation.type) {
     case QueuedOperationType.EDIT_CELL_CONTENT: {
-      const payload = operation.payload as EditCellContentPayload
+      const { payload } = operation
       return getTableRowUpdateSql({
         table: {
           id: payload.table.id,
@@ -47,7 +41,7 @@ function getOperationSql(operation: QueuedOperation): string {
       })
     }
     case QueuedOperationType.ADD_ROW: {
-      const payload = operation.payload as AddRowPayload
+      const { payload } = operation
       // Clean internal fields before SQL generation
       const { __tempId, idx, ...cleanRowData } = payload.rowData as PendingAddRow
       return getTableRowCreateSql({
@@ -58,7 +52,7 @@ function getOperationSql(operation: QueuedOperation): string {
       })
     }
     case QueuedOperationType.DELETE_ROW: {
-      const payload = operation.payload as DeleteRowPayload
+      const { payload } = operation
       // Create a mock row with the row identifiers for the delete SQL
       const mockRow = { idx: 0, ...payload.rowIdentifiers }
       return getTableRowDeleteSql({
@@ -67,7 +61,8 @@ function getOperationSql(operation: QueuedOperation): string {
       })
     }
     default:
-      throw new Error(`Unknown operation type: ${(operation as QueuedOperation).type}`)
+      // Error should never happen, but we'll handle it anyway
+      throw new Error(`Unknown operation: ${operation}`)
   }
 }
 

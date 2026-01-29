@@ -5,7 +5,10 @@ import {
   rowMatchesIdentifiers,
   applyCellEdit,
 } from './queueOperationUtils'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import {
+  type NewEditCellContentOperation,
+  QueuedOperationType,
+} from '@/state/table-editor-operation-queue.types'
 
 describe('generateTableChangeKey', () => {
   test('should generate key with row identifiers', () => {
@@ -41,7 +44,7 @@ describe('generateTableChangeKey', () => {
 
 describe('generateTableChangeKeyFromOperation', () => {
   test('should generate key from EDIT_CELL_CONTENT operation', () => {
-    const operation = {
+    const operation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {

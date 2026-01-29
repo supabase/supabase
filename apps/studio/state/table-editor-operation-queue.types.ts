@@ -1,10 +1,6 @@
 import type { Entity } from 'data/table-editor/table-editor-types'
 import type { Dictionary } from 'types'
 
-/**
- * Extensible enum for queued operation types.
- * Add new operation types here as we expand the queuing system.
- */
 export enum QueuedOperationType {
   EDIT_CELL_CONTENT = 'edit_cell_content',
   ADD_ROW = 'add_row',
@@ -43,24 +39,54 @@ export interface DeleteRowPayload {
   table: Entity
 }
 
-/**
- * Union type for all operation payloads.
- * Extend this as new operation types are added.
- */
 export type QueuedOperationPayload = EditCellContentPayload | AddRowPayload | DeleteRowPayload
 
-/**
- * Individual queued operation
- */
-export interface QueuedOperation {
+interface QueuedOperationBase {
   id: string
-  type: QueuedOperationType
   tableId: number // Which table this operation belongs to
   timestamp: number
-  payload: QueuedOperationPayload
 }
 
-export type NewQueuedOperation = Omit<QueuedOperation, 'id' | 'timestamp'>
+export interface EditCellContentOperation extends QueuedOperationBase {
+  type: QueuedOperationType.EDIT_CELL_CONTENT
+  payload: EditCellContentPayload
+}
+
+export interface AddRowOperation extends QueuedOperationBase {
+  type: QueuedOperationType.ADD_ROW
+  payload: AddRowPayload
+}
+
+export interface DeleteRowOperation extends QueuedOperationBase {
+  type: QueuedOperationType.DELETE_ROW
+  payload: DeleteRowPayload
+}
+
+export type QueuedOperation = EditCellContentOperation | AddRowOperation | DeleteRowOperation
+
+interface NewQueuedOperationBase {
+  tableId: number
+}
+
+export interface NewEditCellContentOperation extends NewQueuedOperationBase {
+  type: QueuedOperationType.EDIT_CELL_CONTENT
+  payload: EditCellContentPayload
+}
+
+export interface NewAddRowOperation extends NewQueuedOperationBase {
+  type: QueuedOperationType.ADD_ROW
+  payload: AddRowPayload
+}
+
+export interface NewDeleteRowOperation extends NewQueuedOperationBase {
+  type: QueuedOperationType.DELETE_ROW
+  payload: DeleteRowPayload
+}
+
+export type NewQueuedOperation =
+  | NewEditCellContentOperation
+  | NewAddRowOperation
+  | NewDeleteRowOperation
 
 /**
  * Status of the overall operation queue
@@ -73,4 +99,16 @@ export type QueueStatus = 'idle' | 'pending' | 'saving' | 'error'
 export interface OperationQueueState {
   operations: QueuedOperation[]
   status: QueueStatus
+}
+
+export function isDeleteRowOperation(op: QueuedOperation): op is DeleteRowOperation {
+  return op.type === QueuedOperationType.DELETE_ROW
+}
+
+export function isAddRowOperation(op: QueuedOperation): op is AddRowOperation {
+  return op.type === QueuedOperationType.ADD_ROW
+}
+
+export function isEditCellContentOperation(op: QueuedOperation): op is EditCellContentOperation {
+  return op.type === QueuedOperationType.EDIT_CELL_CONTENT
 }
