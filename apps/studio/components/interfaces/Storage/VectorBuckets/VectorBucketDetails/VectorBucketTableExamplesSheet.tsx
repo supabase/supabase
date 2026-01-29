@@ -1,8 +1,3 @@
-import { ChevronDown, ListPlus } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -11,25 +6,30 @@ import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SqlEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronDown, ListPlus } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
-  cn,
   CodeBlock,
-  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
+  Command_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Sheet,
   SheetContent,
   SheetHeader,
   SheetSection,
   SheetTitle,
   SheetTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 
 interface VectorBucketTableExamplesSheetProps {
@@ -159,12 +159,12 @@ insert into
 values
   (
     'doc-1',
-    '[${dimensionExample}]'::embd${sqlComment},
+    '[${dimensionExample}]'::s3vec${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
     'doc-2',
-    '[${dimensionExample}]'::embd${sqlComment},
+    '[${dimensionExample}]'::s3vec${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
 
