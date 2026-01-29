@@ -159,10 +159,10 @@ export default function Stage2UsageEstimation({
                     type="number"
                     size="small"
                     layout="vertical"
-                    value={String(inputs.databaseSizeGb)}
-                    onChange={(e: any) =>
-                      set({ databaseSizeGb: clamp(Number(e.target.value || 0.5), 0.5, 10_000) })
-                    }
+                    min={0.5}
+                    value={inputs.databaseSizeGb}
+                    onChange={(e: any) => set({ databaseSizeGb: Number(e.target.value) || 0 })}
+                    onBlur={() => set({ databaseSizeGb: clamp(inputs.databaseSizeGb, 0.5, 10_000) })}
                     className="max-w-[120px]"
                   />
                 </div>
@@ -292,11 +292,11 @@ export default function Stage2UsageEstimation({
                             type="number"
                             size="small"
                             layout="vertical"
-                            value={String(inputs.readReplicas)}
-                            onChange={(e: any) =>
-                              set({
-                                readReplicas: clamp(Math.round(Number(e.target.value || 0)), 0, 10),
-                              })
+                            min={0}
+                            value={inputs.readReplicas}
+                            onChange={(e: any) => set({ readReplicas: Number(e.target.value) || 0 })}
+                            onBlur={() =>
+                              set({ readReplicas: clamp(Math.round(inputs.readReplicas), 0, 10) })
                             }
                             className="w-20 shrink-0"
                           />
@@ -317,11 +317,15 @@ export default function Stage2UsageEstimation({
                             type="number"
                             size="small"
                             layout="vertical"
-                            value={String(inputs.branchingHoursPerMonth)}
+                            min={0}
+                            value={inputs.branchingHoursPerMonth}
                             onChange={(e: any) =>
+                              set({ branchingHoursPerMonth: Number(e.target.value) || 0 })
+                            }
+                            onBlur={() =>
                               set({
                                 branchingHoursPerMonth: clamp(
-                                  Math.round(Number(e.target.value || 0)),
+                                  Math.round(inputs.branchingHoursPerMonth),
                                   0,
                                   10000
                                 ),
@@ -391,10 +395,10 @@ export default function Stage2UsageEstimation({
                     type="number"
                     size="small"
                     layout="vertical"
-                    value={String(inputs.storageSizeGb)}
-                    onChange={(e: any) =>
-                      set({ storageSizeGb: clamp(Number(e.target.value || 0), 0, 100_000) })
-                    }
+                    min={0}
+                    value={inputs.storageSizeGb}
+                    onChange={(e: any) => set({ storageSizeGb: Number(e.target.value) || 0 })}
+                    onBlur={() => set({ storageSizeGb: clamp(inputs.storageSizeGb, 0, 100_000) })}
                     className="max-w-[120px]"
                   />
                 </div>
@@ -435,10 +439,10 @@ export default function Stage2UsageEstimation({
                       type="number"
                       size="small"
                       layout="vertical"
-                      value={String(inputs.mau)}
-                      onChange={(e: any) =>
-                        set({ mau: clamp(Math.round(Number(e.target.value || 0)), 0, 50_000_000) })
-                      }
+                      min={0}
+                      value={inputs.mau}
+                      onChange={(e: any) => set({ mau: Number(e.target.value) || 0 })}
+                      onBlur={() => set({ mau: clamp(Math.round(inputs.mau), 0, 50_000_000) })}
                       className="max-w-[140px]"
                     />
                   </div>
@@ -539,11 +543,15 @@ export default function Stage2UsageEstimation({
                       type="number"
                       size="small"
                       layout="vertical"
-                      value={String(inputs.realtimePeakConnections)}
+                      min={0}
+                      value={inputs.realtimePeakConnections}
                       onChange={(e: any) =>
+                        set({ realtimePeakConnections: Number(e.target.value) || 0 })
+                      }
+                      onBlur={() =>
                         set({
                           realtimePeakConnections: clamp(
-                            Math.round(Number(e.target.value || 0)),
+                            Math.round(inputs.realtimePeakConnections),
                             0,
                             10_000_000
                           ),
@@ -573,11 +581,13 @@ export default function Stage2UsageEstimation({
                       type="number"
                       size="small"
                       layout="vertical"
-                      value={String(inputs.realtimeMessages)}
-                      onChange={(e: any) =>
+                      min={0}
+                      value={inputs.realtimeMessages}
+                      onChange={(e: any) => set({ realtimeMessages: Number(e.target.value) || 0 })}
+                      onBlur={() =>
                         set({
                           realtimeMessages: clamp(
-                            Math.round(Number(e.target.value || 0)),
+                            Math.round(inputs.realtimeMessages),
                             0,
                             10_000_000_000
                           ),
@@ -625,11 +635,13 @@ export default function Stage2UsageEstimation({
                     type="number"
                     size="small"
                     layout="vertical"
-                    value={String(inputs.edgeInvocations)}
-                    onChange={(e: any) =>
+                    min={0}
+                    value={inputs.edgeInvocations}
+                    onChange={(e: any) => set({ edgeInvocations: Number(e.target.value) || 0 })}
+                    onBlur={() =>
                       set({
                         edgeInvocations: clamp(
-                          Math.round(Number(e.target.value || 0)),
+                          Math.round(inputs.edgeInvocations),
                           0,
                           10_000_000_000
                         ),
@@ -678,10 +690,10 @@ export default function Stage2UsageEstimation({
                     type="number"
                     size="small"
                     layout="vertical"
-                    value={String(inputs.egressGb)}
-                    onChange={(e: any) =>
-                      set({ egressGb: clamp(Number(e.target.value || 0), 0, 100_000) })
-                    }
+                    min={0}
+                    value={inputs.egressGb}
+                    onChange={(e: any) => set({ egressGb: Number(e.target.value) || 0 })}
+                    onBlur={() => set({ egressGb: clamp(inputs.egressGb, 0, 100_000) })}
                     className="max-w-[120px]"
                   />
                 </div>
@@ -772,11 +784,11 @@ export default function Stage2UsageEstimation({
                             type="number"
                             size="small"
                             layout="vertical"
-                            value={String(inputs.logDrains)}
-                            onChange={(e: any) =>
-                              set({
-                                logDrains: clamp(Math.round(Number(e.target.value || 1)), 1, 10),
-                              })
+                            min={1}
+                            value={inputs.logDrains}
+                            onChange={(e: any) => set({ logDrains: Number(e.target.value) || 0 })}
+                            onBlur={() =>
+                              set({ logDrains: clamp(Math.round(inputs.logDrains), 1, 10) })
                             }
                             className="max-w-[60px]"
                           />

@@ -31,8 +31,10 @@ export default function Stage1ProjectBasics({
             type="number"
             size="small"
             layout="vertical"
-            value={String(inputs.projects)}
-            onChange={(e: any) => set({ projects: Math.max(1, Number(e.target.value || 1)) })}
+            min={1}
+            value={inputs.projects}
+            onChange={(e: any) => set({ projects: Number(e.target.value) || 0 })}
+            onBlur={() => set({ projects: Math.max(1, inputs.projects) })}
           />
           <p className="text-foreground-lighter text-xs">Most users need 1–3 (dev/staging/prod).</p>
         </Panel>
@@ -63,8 +65,10 @@ export default function Stage1ProjectBasics({
             type="number"
             size="small"
             layout="vertical"
-            value={String(inputs.teamSize)}
-            onChange={(e: any) => set({ teamSize: Math.max(1, Number(e.target.value || 1)) })}
+            min={1}
+            value={inputs.teamSize}
+            onChange={(e: any) => set({ teamSize: Number(e.target.value) || 0 })}
+            onBlur={() => set({ teamSize: Math.max(1, inputs.teamSize) })}
           />
           <p className="text-foreground-lighter text-xs">Developers working on backend/infrastructure.</p>
         </Panel>
@@ -75,8 +79,10 @@ export default function Stage1ProjectBasics({
             type="number"
             size="small"
             layout="vertical"
-            value={String(inputs.hourlyCostUsd)}
-            onChange={(e: any) => set({ hourlyCostUsd: Math.max(0, Number(e.target.value || 0)) })}
+            min={0}
+            value={inputs.hourlyCostUsd}
+            onChange={(e: any) => set({ hourlyCostUsd: Number(e.target.value) || 0 })}
+            onBlur={() => set({ hourlyCostUsd: Math.max(0, inputs.hourlyCostUsd) })}
           />
           <p className="text-foreground-lighter text-xs">Default $150/hour (US). Used for time savings.</p>
         </Panel>
