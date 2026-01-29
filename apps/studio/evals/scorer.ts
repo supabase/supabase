@@ -338,7 +338,7 @@ export const urlValidityScorer: EvalScorer<Input, Output, Expected> = async ({ o
 
   for (const url of urls) {
     try {
-      const response = await fetch(url, { method: 'HEAD' })
+      const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
       if (response.ok) {
         validUrls++
       } else {
