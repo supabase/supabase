@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { IncidentInfo } from 'lib/api/incident-status'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { partition } from 'lodash'
 import { UseCustomQueryOptions } from 'types'
+
 import { platformKeys } from './keys'
 
-export async function getIncidentStatus(signal?: AbortSignal): Promise<IncidentInfo[]> {
+export async function getIncidentStatus(
+  signal?: AbortSignal
+): Promise<{ maintenanceEvents: IncidentInfo[]; incidents: IncidentInfo[] }> {
   const response = await fetch(`${BASE_PATH}/api/incident-status`, {
     signal,
     method: 'GET',
@@ -21,7 +24,11 @@ export async function getIncidentStatus(signal?: AbortSignal): Promise<IncidentI
   }
 
   const data = await response.json()
-  return data as IncidentInfo[]
+  const [maintenanceEvents, incidents] = partition(
+    data ?? [],
+    (event) => event.impact === 'maintenance'
+  )
+  return { maintenanceEvents, incidents }
 }
 
 export type IncidentStatusData = Awaited<ReturnType<typeof getIncidentStatus>>
