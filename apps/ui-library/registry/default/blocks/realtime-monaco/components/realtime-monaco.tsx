@@ -1,6 +1,7 @@
 'use client'
 
 import { Editor } from '@monaco-editor/react'
+
 import { useConnectOnMount } from '../hooks/use-connect-on-mount'
 
 type RealtimeMonacoProps = {
@@ -33,4 +34,4 @@ const RealtimeMonaco = ({
   )
 }
 
-export default RealtimeMonaco
+export { RealtimeMonaco }
