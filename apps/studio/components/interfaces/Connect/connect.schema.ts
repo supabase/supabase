@@ -14,20 +14,21 @@ export const INSTALL_COMMANDS: Record<string, string> = {
 
 // ============================================================================
 // Step Definitions (reusable)
+// All content paths use template syntax: {{stateKey}} is replaced with state values
 // ============================================================================
 
 const frameworkInstallStep: StepDefinition = {
   id: 'install',
   title: 'Install package',
   description: 'Run this command to install the required dependencies.',
-  content: 'InstallStep',
+  content: 'steps/install',
 }
 
 const frameworkConfigureStep: StepDefinition = {
   id: 'configure',
   title: 'Add files',
   description: 'Copy the following code into your project.',
-  content: 'FrameworkContentStep',
+  content: '{{framework}}/{{frameworkVariant}}/{{library}}',
 }
 
 const frameworkNextJsFilesStep: StepDefinition = {
@@ -35,57 +36,56 @@ const frameworkNextJsFilesStep: StepDefinition = {
   title: 'Add files',
   description:
     'Add env variables, create Supabase client helpers, and set up middleware to keep sessions refreshed.',
-  content: 'FrameworkContentStep',
+  content: '{{framework}}/{{frameworkVariant}}/{{library}}',
 }
 
 const frameworkReactFilesStep: StepDefinition = {
   id: 'configure-react',
   title: 'Add files',
-  description:
-    'Add env variables, create a Supabase client, and use it in your app to query data.',
-  content: 'FrameworkContentStep',
+  description: 'Add env variables, create a Supabase client, and use it in your app to query data.',
+  content: '{{framework}}/{{frameworkVariant}}/{{library}}',
 }
 
 const frameworkShadcnStep: StepDefinition = {
   id: 'shadcn-add',
   title: 'Add Supabase UI components',
   description: 'Run this command to install the Supabase shadcn components.',
-  content: 'ShadcnCommandStep',
+  content: 'steps/shadcn/command',
 }
 
 const frameworkShadcnExploreStep: StepDefinition = {
   id: 'shadcn-explore',
   title: 'Check out more UI components',
   description: 'Add auth, realtime and storage functionality to your project',
-  content: 'ShadcnUiStep',
+  content: 'steps/shadcn/explore',
 }
 
 const directConnectionStep: StepDefinition = {
   id: 'connection',
   title: 'Connection string',
   description: 'Copy the connection details for your database.',
-  content: 'DirectConnectionStep',
+  content: 'steps/direct-connection',
 }
 
 const directInstallStep: StepDefinition = {
   id: 'direct-install',
   title: 'Install dependencies',
   description: 'Run this command to install the required dependencies.',
-  content: 'DirectConnectionInstallStep',
+  content: 'steps/direct-install',
 }
 
 const directFilesStep: StepDefinition = {
   id: 'direct-files',
   title: 'Add files',
   description: 'Add the following files to your project.',
-  content: 'DirectConnectionStep',
+  content: 'steps/direct-connection',
 }
 
 const mcpConfigureStep: StepDefinition = {
   id: 'configure-mcp',
   title: 'Configure MCP',
   description: 'Set up your MCP client.',
-  content: 'McpConfigStep',
+  content: 'steps/mcp/cursor',
 }
 
 // Codex-specific MCP steps
@@ -93,35 +93,35 @@ const codexAddServerStep: StepDefinition = {
   id: 'codex-add-server',
   title: 'Add the Supabase MCP server to Codex',
   description: 'Run this command to add the server.',
-  content: 'CodexAddServerStep',
+  content: 'steps/mcp/codex/add-server',
 }
 
 const codexEnableRemoteStep: StepDefinition = {
   id: 'codex-enable-remote',
   title: 'Enable remote MCP client support',
   description: 'Add this to your ~/.codex/config.toml file.',
-  content: 'CodexEnableRemoteStep',
+  content: 'steps/mcp/codex/enable-remote',
 }
 
 const codexAuthenticateStep: StepDefinition = {
   id: 'codex-authenticate',
   title: 'Authenticate',
   description: 'Run the authentication command.',
-  content: 'CodexAuthenticateStep',
+  content: 'steps/mcp/codex/authenticate',
 }
 
 const codexVerifyStep: StepDefinition = {
   id: 'codex-verify',
   title: 'Verify authentication',
   description: 'Run /mcp inside Codex to verify.',
-  content: 'CodexVerifyStep',
+  content: 'steps/mcp/codex/verify',
 }
 
 const claudeAddServerStep: StepDefinition = {
   id: 'claude-add-server',
   title: 'Add MCP server',
   description: 'Add the MCP server to your project config using the command line.',
-  content: 'ClaudeAddServerStep',
+  content: 'steps/mcp/claude-code/add-server',
 }
 
 const claudeAuthenticateStep: StepDefinition = {
@@ -129,21 +129,29 @@ const claudeAuthenticateStep: StepDefinition = {
   title: 'Authenticate',
   description:
     'After configuring the MCP server, you need to authenticate. In a regular terminal (not the IDE extension) run:',
-  content: 'ClaudeAuthenticateStep',
+  content: 'steps/mcp/claude-code/authenticate',
 }
 
 const ormInstallStep: StepDefinition = {
   id: 'install',
   title: 'Install ORM',
   description: 'Add the ORM to your project.',
-  content: 'OrmInstallStep',
+  content: 'steps/orm-install',
 }
 
 const ormConfigureStep: StepDefinition = {
   id: 'configure',
   title: 'Configure ORM',
   description: 'Set up your ORM configuration.',
-  content: 'OrmContentStep',
+  content: '{{orm}}',
+}
+
+const skillsInstallStep: StepDefinition = {
+  id: 'install-skills',
+  title: 'Install Agent Skills (Optional)',
+  description:
+    'Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.',
+  content: 'steps/skills-install',
 }
 
 // ============================================================================
@@ -283,28 +291,38 @@ export const connectSchema: ConnectSchema = {
     // Framework mode steps
     framework: {
       nextjs: {
-        true: [frameworkInstallStep, frameworkShadcnStep, frameworkShadcnExploreStep],
-        DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep],
+        true: [
+          frameworkInstallStep,
+          frameworkShadcnStep,
+          frameworkShadcnExploreStep,
+          skillsInstallStep,
+        ],
+        DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
       },
       react: {
-        true: [frameworkInstallStep, frameworkShadcnStep, frameworkShadcnExploreStep],
-        DEFAULT: [frameworkInstallStep, frameworkReactFilesStep],
+        true: [
+          frameworkInstallStep,
+          frameworkShadcnStep,
+          frameworkShadcnExploreStep,
+          skillsInstallStep,
+        ],
+        DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],
       },
-      DEFAULT: [frameworkInstallStep, frameworkConfigureStep],
+      DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
     },
 
     // Direct connection mode - conditional steps based on connection type
     direct: {
-      nodejs: [directInstallStep, directFilesStep],
-      golang: [directInstallStep, directFilesStep],
-      dotnet: [directInstallStep, directFilesStep],
-      python: [directInstallStep, directFilesStep],
-      sqlalchemy: [directInstallStep, directFilesStep],
-      DEFAULT: [directConnectionStep],
+      nodejs: [directInstallStep, directFilesStep, skillsInstallStep],
+      golang: [directInstallStep, directFilesStep, skillsInstallStep],
+      dotnet: [directInstallStep, directFilesStep, skillsInstallStep],
+      python: [directInstallStep, directFilesStep, skillsInstallStep],
+      sqlalchemy: [directInstallStep, directFilesStep, skillsInstallStep],
+      DEFAULT: [directConnectionStep, skillsInstallStep],
     },
 
     // ORM mode steps
-    orm: [ormInstallStep, ormConfigureStep],
+    orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
 
     // MCP mode - conditional steps based on client
     mcp: {
@@ -313,12 +331,13 @@ export const connectSchema: ConnectSchema = {
         codexEnableRemoteStep,
         codexAuthenticateStep,
         codexVerifyStep,
+        skillsInstallStep,
       ],
-      'claude-code': [claudeAddServerStep, claudeAuthenticateStep],
-      DEFAULT: [mcpConfigureStep],
+      'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
+      DEFAULT: [mcpConfigureStep, skillsInstallStep],
     },
 
     // Fallback
-    DEFAULT: [],
+    DEFAULT: [skillsInstallStep],
   },
 }

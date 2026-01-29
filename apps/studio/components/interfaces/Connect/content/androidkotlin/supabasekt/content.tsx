@@ -1,31 +1,31 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value="MainActivity.kt" />
-        <ConnectTabTrigger value="TodoItem.kt" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value="MainActivity.kt" />
+        <MultipleCodeBlockTrigger value="TodoItem.kt" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value="TodoItem.kt">
+      <MultipleCodeBlockContent value="TodoItem.kt">
         <SimpleCodeBlock className="kotlin" parentClassName="min-h-72">
           {`
 @Serializable
 data class TodoItem(val id: Int, val name: String)
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="MainActivity.kt">
+      <MultipleCodeBlockContent value="MainActivity.kt">
         <SimpleCodeBlock className="kotlin" parentClassName="min-h-72">
           {`
 val supabase = createSupabaseClient(
@@ -75,8 +75,8 @@ fun TodoList() {
 }
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

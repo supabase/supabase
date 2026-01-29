@@ -74,11 +74,6 @@ export function ConnectConfigSection({
           case 'radio-grid':
             // For framework field, use the combobox selector
             if (field.id === 'framework') {
-              const frameworkItems = allFrameworks.map((f) => ({
-                key: f.key,
-                label: f.label,
-                icon: f.icon,
-              }))
               return (
                 <FormLayout
                   key={field.id}
@@ -90,7 +85,7 @@ export function ConnectConfigSection({
                   <FrameworkSelector
                     value={String(value ?? '')}
                     onChange={(v) => onFieldChange(field.id, v)}
-                    items={frameworkItems}
+                    items={allFrameworks}
                     className="w-full"
                     size="small"
                   />
@@ -116,14 +111,14 @@ export function ConnectConfigSection({
                       key={option.value}
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
-                      label={
-                        <div className="flex items-center gap-2">
-                          {option.icon && <ConnectionIcon icon={option.icon} />}
-                          <span className="text-sm">{option.label}</span>
-                        </div>
-                      }
+                      label=""
                       className="flex-1 rounded-lg"
-                    />
+                    >
+                      <div className="flex items-center gap-2">
+                        {option.icon && <ConnectionIcon icon={option.icon} />}
+                        <span className="text-sm">{option.label}</span>
+                      </div>
+                    </RadioGroupStackedItem>
                   ))}
                 </RadioGroupStacked>
               </FormLayout>
@@ -146,15 +141,21 @@ export function ConnectConfigSection({
                       key={option.value}
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
-                      label={
+                      label=""
+                      className="w-full"
+                    >
+                      <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-2">
                           {option.icon && <ConnectionIcon icon={option.icon} />}
                           <span className="text-sm">{option.label}</span>
                         </div>
-                      }
-                      description={option.description}
-                      className="w-full"
-                    />
+                        {option.description && (
+                          <span className="text-sm text-foreground-lighter">
+                            {option.description}
+                          </span>
+                        )}
+                      </div>
+                    </RadioGroupStackedItem>
                   ))}
                 </RadioGroupStacked>
               </FormLayout>
@@ -163,8 +164,7 @@ export function ConnectConfigSection({
           case 'select':
             // Special case for MCP client - use the custom dropdown
             if (field.id === 'mcpClient') {
-              const selectedClient =
-                MCP_CLIENTS.find((c) => c.key === value) ?? MCP_CLIENTS[0]
+              const selectedClient = MCP_CLIENTS.find((c) => c.key === value) ?? MCP_CLIENTS[0]
               return (
                 <FormLayout
                   key={field.id}

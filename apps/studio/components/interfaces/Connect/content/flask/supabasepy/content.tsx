@@ -1,31 +1,31 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value=".env" />
-        <ConnectTabTrigger value="app.py" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value=".env" />
+        <MultipleCodeBlockTrigger value="app.py" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value=".env">
+      <MultipleCodeBlockContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="app.py">
+      <MultipleCodeBlockContent value="app.py">
         <SimpleCodeBlock className="python" parentClassName="min-h-72">
           {`
 import os
@@ -58,8 +58,8 @@ if __name__ == '__main__':
     app.run(debug=True)
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

@@ -1,23 +1,23 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value=".env" />
-        <ConnectTabTrigger value="app/utils/supabase.server.ts" />
-        <ConnectTabTrigger value="app/routes/_index.tsx" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value=".env" />
+        <MultipleCodeBlockTrigger value="app/utils/supabase.server.ts" />
+        <MultipleCodeBlockTrigger value="app/routes/_index.tsx" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value=".env">
+      <MultipleCodeBlockContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {[
             '',
@@ -28,9 +28,9 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
           ].join('\n')}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="app/utils/supabase.server.ts">
+      <MultipleCodeBlockContent value="app/utils/supabase.server.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import {
@@ -69,9 +69,9 @@ export function createClient(request: Request) {
 }
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="app/routes/_index.tsx">
+      <MultipleCodeBlockContent value="app/routes/_index.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import type { Route } from "./+types/home";
@@ -98,8 +98,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

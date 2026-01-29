@@ -1,23 +1,23 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTrigger,
-  ConnectTabTriggers,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value=".env.local" />
-        <ConnectTabTrigger value="utils/supabase.ts" />
-        <ConnectTabTrigger value="src/App.jsx" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value=".env.local" />
+        <MultipleCodeBlockTrigger value="utils/supabase.ts" />
+        <MultipleCodeBlockTrigger value="src/App.jsx" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value=".env.local">
+      <MultipleCodeBlockContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {[
             '',
@@ -28,9 +28,9 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
           ].join('\n')}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="utils/supabase.ts">
+      <MultipleCodeBlockContent value="utils/supabase.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -41,9 +41,9 @@ const supabaseKey = process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISH
 export const supabase = createClient(supabaseUrl!, supabaseKey!);
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="src/App.jsx">
+      <MultipleCodeBlockContent value="src/App.jsx">
         <SimpleCodeBlock className="jsx" parentClassName="min-h-72">
           {`
 import { supabase } from '../utils/supabase'
@@ -67,8 +67,8 @@ function App() {
 export default App;
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

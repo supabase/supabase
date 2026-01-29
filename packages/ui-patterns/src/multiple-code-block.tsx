@@ -3,26 +3,27 @@ import { isValidElement, ReactNode } from 'react'
 
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
-interface ConnectTabTriggerProps {
+interface MultipleCodeBlockTriggerProps {
   value: string
 }
-interface ConnectTabTriggersProps {
+
+interface MultipleCodeBlockTriggersProps {
   children: ReactNode[]
 }
 
-interface ConnectFileTabProps {
+interface MultipleCodeBlockProps {
   children: ReactNode[]
   value?: string
   onValueChange?: (value: string) => void
 }
 
-interface ConnectTabContentProps {
+interface MultipleCodeBlockContentProps {
   children: ReactNode
   value: string
 }
-export const ConnectTabs = ({ children, value, onValueChange }: ConnectFileTabProps) => {
-  const firstChild = children[0]
 
+export const MultipleCodeBlock = ({ children, value, onValueChange }: MultipleCodeBlockProps) => {
+  const firstChild = children[0]
   const defaultValue = isValidElement(firstChild)
     ? (firstChild.props as any)?.children[0]?.props?.value || ''
     : null
@@ -34,7 +35,7 @@ export const ConnectTabs = ({ children, value, onValueChange }: ConnectFileTabPr
   )
 }
 
-export const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
+export const MultipleCodeBlockTrigger = ({ value }: MultipleCodeBlockTriggerProps) => {
   return (
     <TabsTrigger_Shadcn_
       value={value}
@@ -46,7 +47,7 @@ export const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
   )
 }
 
-export const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
+export const MultipleCodeBlockTriggers = ({ children }: MultipleCodeBlockTriggersProps) => {
   return (
     <TabsList_Shadcn_ className="bg-surface-100 px-5 rounded-lg rounded-b-none gap-5 overflow-x-auto">
       {children}
@@ -54,7 +55,7 @@ export const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
   )
 }
 
-export const ConnectTabContent = ({ value, children }: ConnectTabContentProps) => {
+export const MultipleCodeBlockContent = ({ value, children }: MultipleCodeBlockContentProps) => {
   return (
     <TabsContent_Shadcn_
       value={value}

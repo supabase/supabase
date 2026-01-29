@@ -1,4 +1,3 @@
-
 // ============================================================================
 // Project Keys (existing)
 // ============================================================================
@@ -12,6 +11,23 @@ export type ProjectKeys = {
 /** @deprecated Use ProjectKeys instead */
 export type projectKeys = ProjectKeys
 
+// ============================================================================
+// Connection Strings
+// ============================================================================
+
+export interface ConnectionStringPooler {
+  transactionShared: string
+  sessionShared: string
+  transactionDedicated?: string
+  sessionDedicated?: string
+  ipv4SupportedForDedicatedPooler: boolean
+  direct?: string
+}
+
+/** @deprecated Use ConnectionStringPooler instead */
+export type ConnectionStrings = ConnectionStringPooler
+
+/** @deprecated Use StepContentProps instead */
 export interface ContentFileProps {
   projectKeys: {
     apiUrl: string
@@ -140,9 +156,20 @@ export interface ResolvedField extends FieldDefinition {
 }
 
 // ============================================================================
-// Step Component Props
+// Step Content Props - Unified props for all step content components
 // ============================================================================
 
+/**
+ * Props passed to all step content components.
+ * Components receive full state and can conditionally render whatever they need.
+ */
+export interface StepContentProps {
+  state: ConnectState
+  projectKeys: ProjectKeys
+  connectionStringPooler: ConnectionStringPooler
+}
+
+/** @deprecated Use StepContentProps instead */
 export interface StepComponentProps {
   state: ConnectState
   projectKeys: ProjectKeys

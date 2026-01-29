@@ -1,5 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
+import {
+  connectionStringMethodOptions,
+  DATABASE_CONNECTION_TYPES,
+  FRAMEWORKS,
+  MOBILES,
+  ORMS,
+} from './Connect.constants'
 import type {
   ConnectMode,
   ConnectSchema,
@@ -8,6 +16,7 @@ import type {
   ResolvedField,
   ResolvedStep,
 } from './Connect.types'
+import { resolveFrameworkLibraryKey } from './Connect.utils'
 import {
   getActiveFields,
   getDefaultState,
@@ -15,14 +24,6 @@ import {
   resolveSteps,
 } from './connect.resolver'
 import { connectSchema } from './connect.schema'
-import {
-  connectionStringMethodOptions,
-  DATABASE_CONNECTION_TYPES,
-  FRAMEWORKS,
-  MOBILES,
-  ORMS,
-} from './Connect.constants'
-import { MCP_CLIENTS, FEATURE_GROUPS_PLATFORM } from 'ui-patterns/McpUrlBuilder'
 
 // ============================================================================
 // Data Source Helpers
@@ -32,10 +33,7 @@ import { MCP_CLIENTS, FEATURE_GROUPS_PLATFORM } from 'ui-patterns/McpUrlBuilder'
  * Get field options from a data source reference.
  * This maps source names to actual data.
  */
-function getFieldOptionsFromSource(
-  source: string,
-  state: ConnectState
-): FieldOption[] {
+function getFieldOptionsFromSource(source: string, state: ConnectState): FieldOption[] {
   switch (source) {
     case 'frameworks':
       return [...FRAMEWORKS, ...MOBILES].map((f) => ({
@@ -66,9 +64,7 @@ function getFieldOptionsFromSource(
 
       // If framework has variants, look in the variant
       if (selectedFramework.children?.length > 1 && state.frameworkVariant) {
-        const variant = selectedFramework.children.find(
-          (c) => c.key === state.frameworkVariant
-        )
+        const variant = selectedFramework.children.find((c) => c.key === state.frameworkVariant)
         if (variant?.children?.length) {
           return variant.children.map((c) => ({
             value: c.key,
@@ -137,10 +133,7 @@ function getFieldOptionsFromSource(
 /**
  * Resolve field options, handling both static options and data source references.
  */
-function resolveFieldOptionsWithSource(
-  field: ResolvedField,
-  state: ConnectState
-): FieldOption[] {
+function resolveFieldOptionsWithSource(field: ResolvedField, state: ConnectState): FieldOption[] {
   // If already resolved (from conditional resolution)
   if (field.resolvedOptions.length > 0) {
     return field.resolvedOptions
@@ -169,9 +162,7 @@ export interface UseConnectStateReturn {
   schema: ConnectSchema
 }
 
-export function useConnectState(
-  initialState?: Partial<ConnectState>
-): UseConnectStateReturn {
+export function useConnectState(initialState?: Partial<ConnectState>): UseConnectStateReturn {
   const [state, setState] = useState<ConnectState>(() => {
     const defaults = getDefaultState(connectSchema)
 
@@ -186,13 +177,12 @@ export function useConnectState(
       }
 
       // Set initial library
-      const variant = firstFramework?.children?.find(
-        (c) => c.key === defaults.frameworkVariant
-      )
-      const librarySource = variant?.children ?? firstFramework?.children?.[0]?.children
-      if (librarySource?.length) {
-        defaults.library = librarySource[0]?.key ?? ''
-      }
+      const libraryKey = resolveFrameworkLibraryKey({
+        framework: defaults.framework,
+        frameworkVariant: defaults.frameworkVariant,
+        library: defaults.library,
+      })
+      if (libraryKey) defaults.library = libraryKey
     }
 
     // Set initial ORM if mode is orm
@@ -208,56 +198,53 @@ export function useConnectState(
     return { ...defaults, ...initialState }
   })
 
-  const updateField = useCallback(
-    (fieldId: string, value: string | boolean | string[]) => {
-      setState((prev) => {
-        const next = { ...prev, [fieldId]: value }
+  const updateField = useCallback((fieldId: string, value: string | boolean | string[]) => {
+    setState((prev) => {
+      const next = { ...prev, [fieldId]: value }
 
-        // Handle cascading updates for framework selection
-        if (fieldId === 'framework') {
-          const allFrameworks = [...FRAMEWORKS, ...MOBILES]
-          const selected = allFrameworks.find((f) => f.key === value)
+      // Handle cascading updates for framework selection
+      if (fieldId === 'framework') {
+        const allFrameworks = [...FRAMEWORKS, ...MOBILES]
+        const selected = allFrameworks.find((f) => f.key === value)
 
-          // Reset variant if framework changed
-          if (selected?.children?.length > 1) {
-            next.frameworkVariant = selected.children[0]?.key ?? ''
-          } else {
-            delete next.frameworkVariant
-          }
-
-          // Reset library
-          const variant = selected?.children?.find(
-            (c) => c.key === next.frameworkVariant
-          )
-          const librarySource =
-            variant?.children ?? selected?.children?.[0]?.children ?? selected?.children
-          if (librarySource?.length) {
-            next.library = librarySource[0]?.key ?? ''
-          } else {
-            delete next.library
-          }
+        // Reset variant if framework changed
+        if (selected?.children?.length > 1) {
+          next.frameworkVariant = selected.children[0]?.key ?? ''
+        } else {
+          delete next.frameworkVariant
         }
 
-        // Handle cascading updates for variant selection
-        if (fieldId === 'frameworkVariant') {
-          const allFrameworks = [...FRAMEWORKS, ...MOBILES]
-          const selected = allFrameworks.find((f) => f.key === prev.framework)
-          const variant = selected?.children?.find((c) => c.key === value)
-          if (variant?.children?.length) {
-            next.library = variant.children[0]?.key ?? ''
-          }
+        // Reset library
+        const libraryKey = resolveFrameworkLibraryKey({
+          framework: next.framework,
+          frameworkVariant: next.frameworkVariant,
+          library: next.library,
+        })
+        if (libraryKey) {
+          next.library = libraryKey
+        } else {
+          delete next.library
         }
+      }
 
-        // Reset useSharedPooler when connectionMethod changes to 'direct'
-        if (fieldId === 'connectionMethod' && value === 'direct') {
-          next.useSharedPooler = false
-        }
+      // Handle cascading updates for variant selection
+      if (fieldId === 'frameworkVariant') {
+        const libraryKey = resolveFrameworkLibraryKey({
+          framework: prev.framework,
+          frameworkVariant: String(value),
+          library: next.library,
+        })
+        if (libraryKey) next.library = libraryKey
+      }
 
-        return resetDependentFields(next, fieldId, connectSchema)
-      })
-    },
-    []
-  )
+      // Reset useSharedPooler when connectionMethod changes to 'direct'
+      if (fieldId === 'connectionMethod' && value === 'direct') {
+        next.useSharedPooler = false
+      }
+
+      return resetDependentFields(next, fieldId, connectSchema)
+    })
+  }, [])
 
   const setMode = useCallback((mode: ConnectMode) => {
     setState((prev) => {
@@ -270,14 +257,12 @@ export function useConnectState(
         if (firstFramework?.children?.length > 1) {
           next.frameworkVariant = firstFramework.children[0]?.key ?? ''
         }
-        const variant = firstFramework?.children?.find(
-          (c) => c.key === next.frameworkVariant
-        )
-        const librarySource =
-          variant?.children ?? firstFramework?.children?.[0]?.children
-        if (librarySource?.length) {
-          next.library = librarySource[0]?.key ?? ''
-        }
+        const libraryKey = resolveFrameworkLibraryKey({
+          framework: next.framework,
+          frameworkVariant: next.frameworkVariant,
+          library: next.library,
+        })
+        if (libraryKey) next.library = libraryKey
       }
 
       if (mode === 'direct') {
@@ -297,15 +282,9 @@ export function useConnectState(
     })
   }, [])
 
-  const activeFields = useMemo(
-    () => getActiveFields(connectSchema, state),
-    [state]
-  )
+  const activeFields = useMemo(() => getActiveFields(connectSchema, state), [state])
 
-  const resolvedSteps = useMemo(
-    () => resolveSteps(connectSchema, state),
-    [state]
-  )
+  const resolvedSteps = useMemo(() => resolveSteps(connectSchema, state), [state])
 
   const getFieldOptions = useCallback(
     (fieldId: string): FieldOption[] => {

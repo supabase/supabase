@@ -1,24 +1,24 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value=".env.local" />
-        <ConnectTabTrigger value="src/lib/supabaseClient.js" />
-        <ConnectTabTrigger value="src/routes/+page.server.js" />
-        <ConnectTabTrigger value="src/routes/+page.svelte" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value=".env.local" />
+        <MultipleCodeBlockTrigger value="src/lib/supabaseClient.js" />
+        <MultipleCodeBlockTrigger value="src/routes/+page.server.js" />
+        <MultipleCodeBlockTrigger value="src/routes/+page.svelte" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value=".env.local">
+      <MultipleCodeBlockContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {[
             '',
@@ -29,9 +29,9 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
           ].join('\n')}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="src/lib/supabaseClient.js">
+      <MultipleCodeBlockContent value="src/lib/supabaseClient.js">
         <SimpleCodeBlock className="js" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -43,9 +43,9 @@ const supabaseKey = ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="src/routes/+page.server.js">
+      <MultipleCodeBlockContent value="src/routes/+page.server.js">
         <SimpleCodeBlock className="js" parentClassName="min-h-72">
           {`
 import { supabase } from "$lib/supabaseClient";
@@ -58,9 +58,9 @@ export async function load() {
 }
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="src/routes/+page.svelte">
+      <MultipleCodeBlockContent value="src/routes/+page.svelte">
         <SimpleCodeBlock className="html" parentClassName="min-h-72">
           {`
 <script>
@@ -74,8 +74,8 @@ export async function load() {
 </ul>
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

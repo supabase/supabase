@@ -1,15 +1,10 @@
-import { Copy, ExternalLink } from 'lucide-react'
+import { Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 
-import type { ConnectState, ProjectKeys } from '../Connect.types'
+import type { StepContentProps } from '../../../../Connect.types'
 
-interface ShadcnStepProps {
-  state: ConnectState
-  projectKeys: ProjectKeys
-}
-
-function getShadcnCommand(state: ConnectState): string | null {
+function getShadcnCommand(state: StepContentProps['state']): string | null {
   if (state.framework === 'nextjs') {
     return 'npx shadcn@latest add @supabase/supabase-client-nextjs'
   }
@@ -21,7 +16,7 @@ function getShadcnCommand(state: ConnectState): string | null {
   return null
 }
 
-export function ShadcnCommandStep({ state }: ShadcnStepProps) {
+function ShadcnCommandContent({ state }: StepContentProps) {
   const command = useMemo(() => getShadcnCommand(state), [state])
   const [copyLabel, setCopyLabel] = useState('Copy')
 
@@ -54,12 +49,4 @@ export function ShadcnCommandStep({ state }: ShadcnStepProps) {
   )
 }
 
-export function ShadcnUiStep(_: ShadcnStepProps) {
-  return (
-    <Button asChild type="default" icon={<ExternalLink size={14} />}>
-      <a href="https://supabase.com/ui" target="_blank" rel="noreferrer">
-        Explore supabase.com/ui
-      </a>
-    </Button>
-  )
-}
+export default ShadcnCommandContent

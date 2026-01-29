@@ -1,22 +1,22 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value="lib/main.dart" />
-        <ConnectTabTrigger value="lib/main.dart (app)" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value="lib/main.dart" />
+        <MultipleCodeBlockTrigger value="lib/main.dart (app)" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value="lib/main.dart">
+      <MultipleCodeBlockContent value="lib/main.dart">
         <SimpleCodeBlock className="dart" parentClassName="min-h-72">
           {`
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,9 +30,9 @@ Future<void> main() async {
 }
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="lib/main.dart (app)">
+      <MultipleCodeBlockContent value="lib/main.dart (app)">
         <SimpleCodeBlock className="dart" parentClassName="min-h-72">
           {`
 class MyApp extends StatelessWidget {
@@ -85,8 +85,8 @@ class _HomePageState extends State<HomePage> {
 }
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

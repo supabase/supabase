@@ -33,6 +33,12 @@ import {
   SimpleCodeBlock,
   cn,
 } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   CONNECTION_PARAMETERS,
@@ -44,7 +50,6 @@ import {
   connectionStringMethodOptions,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import { ConnectTabContent, ConnectTabTrigger, ConnectTabTriggers, ConnectTabs } from './ConnectTabs'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
@@ -363,15 +368,18 @@ export const ConnectSheetDatabaseConnectionString = ({
 
         {directFiles.length > 0 && (
           <div className="border rounded-lg overflow-hidden">
-            <ConnectTabs>
-              <ConnectTabTriggers>
+            <MultipleCodeBlock>
+              <MultipleCodeBlockTriggers>
                 {directFiles.map((file) => (
-                  <ConnectTabTrigger key={`direct-file-${file.name}`} value={file.name} />
+                  <MultipleCodeBlockTrigger key={`direct-file-${file.name}`} value={file.name} />
                 ))}
-              </ConnectTabTriggers>
+              </MultipleCodeBlockTriggers>
 
               {directFiles.map((file) => (
-                <ConnectTabContent key={`direct-file-content-${file.name}`} value={file.name}>
+                <MultipleCodeBlockContent
+                  key={`direct-file-content-${file.name}`}
+                  value={file.name}
+                >
                   <SimpleCodeBlock
                     className={file.language}
                     parentClassName="min-h-72"
@@ -379,9 +387,9 @@ export const ConnectSheetDatabaseConnectionString = ({
                   >
                     {file.content}
                   </SimpleCodeBlock>
-                </ConnectTabContent>
+                </MultipleCodeBlockContent>
               ))}
-            </ConnectTabs>
+            </MultipleCodeBlock>
           </div>
         )}
       </div>

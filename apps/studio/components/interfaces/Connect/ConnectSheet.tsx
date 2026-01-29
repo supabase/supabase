@@ -193,35 +193,6 @@ export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
               projectKeys={projectKeys}
             />
           </div>
-
-        {/* <SheetFooter className="shrink-0 flex items-center flex-wrap gap-3 w-full">
-          <div className="flex-1 w-full">
-          <Input
-            readOnly
-            copy
-            value={projectKeys.apiUrl ?? ''}
-            icon={<Globe size={16} className="text-foreground-muted" />}
-            size="small"
-            className='w-full'
-          />
-          </div>
-          <div className="flex-1 w-full">
-          <Input
-              readOnly
-              type="password"
-              copy
-              value={projectKeys.publishableKey ?? projectKeys.anonKey ?? ''}
-              icon={<KeyRound size={16} className="text-foreground-muted" />}
-              size="small"
-              className='w-full'
-            />
-          </div>
-          <Button asChild type="default" size="small" className='w-fit'>
-            <Link href={`/project/${projectRef}/database/settings`}>
-              Generate new password
-            </Link>
-          </Button>
-        </SheetFooter> */}
       </SheetContent>
     </Sheet>
   )

@@ -1,32 +1,32 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
-  ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
+import {
+  MultipleCodeBlock,
+  MultipleCodeBlockContent,
+  MultipleCodeBlockTrigger,
+  MultipleCodeBlockTriggers,
+} from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <ConnectTabs>
-      <ConnectTabTriggers>
-        <ConnectTabTrigger value=".env" />
-        <ConnectTabTrigger value="src/utils/supabase.ts" />
-        <ConnectTabTrigger value="src/routes/index.tsx" />
-      </ConnectTabTriggers>
+    <MultipleCodeBlock>
+      <MultipleCodeBlockTriggers>
+        <MultipleCodeBlockTrigger value=".env" />
+        <MultipleCodeBlockTrigger value="src/utils/supabase.ts" />
+        <MultipleCodeBlockTrigger value="src/routes/index.tsx" />
+      </MultipleCodeBlockTriggers>
 
-      <ConnectTabContent value=".env">
+      <MultipleCodeBlockContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 VITE_SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="src/utils/supabase.ts">
+      <MultipleCodeBlockContent value="src/utils/supabase.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -37,9 +37,9 @@ export const supabase = createClient(
 );
         `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
+      </MultipleCodeBlockContent>
 
-      <ConnectTabContent value="src/routes/index.tsx">
+      <MultipleCodeBlockContent value="src/routes/index.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { createFileRoute } from '@tanstack/react-router'
@@ -66,8 +66,8 @@ function Home() {
 }
 `}
         </SimpleCodeBlock>
-      </ConnectTabContent>
-    </ConnectTabs>
+      </MultipleCodeBlockContent>
+    </MultipleCodeBlock>
   )
 }
 

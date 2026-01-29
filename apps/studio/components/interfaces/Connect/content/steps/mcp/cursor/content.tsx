@@ -1,25 +1,20 @@
-import { useMemo } from 'react'
 import { useParams } from 'common'
-import { useTrack } from 'lib/telemetry/track'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
+import { useMemo } from 'react'
 import {
   createMcpCopyHandler,
   FEATURE_GROUPS_NON_PLATFORM,
   FEATURE_GROUPS_PLATFORM,
   getMcpUrl,
-  McpConfigurationDisplay,
   MCP_CLIENTS,
+  McpConfigurationDisplay,
 } from 'ui-patterns/McpUrlBuilder'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { ConnectState, ProjectKeys } from '../Connect.types'
+import type { StepContentProps } from '../../../../Connect.types'
 
-interface McpConfigStepProps {
-  state: ConnectState
-  projectKeys: ProjectKeys
-}
-
-export function McpConfigStep({ state, projectKeys }: McpConfigStepProps) {
+function McpCursorContent({ state, projectKeys }: StepContentProps) {
   const { ref: projectRef } = useParams()
 
   if (!projectRef) {
@@ -31,23 +26,17 @@ export function McpConfigStep({ state, projectKeys }: McpConfigStepProps) {
     )
   }
 
-  return (
-    <McpConfigStepInner
-      projectRef={projectRef}
-      projectKeys={projectKeys}
-      state={state}
-    />
-  )
+  return <McpCursorContentInner projectRef={projectRef} projectKeys={projectKeys} state={state} />
 }
 
-function McpConfigStepInner({
+function McpCursorContentInner({
   projectRef,
   projectKeys,
   state,
 }: {
   projectRef: string
-  projectKeys: ProjectKeys
-  state: ConnectState
+  projectKeys: StepContentProps['projectKeys']
+  state: StepContentProps['state']
 }) {
   const track = useTrack()
 
@@ -57,13 +46,9 @@ function McpConfigStepInner({
   }, [state.mcpClient])
 
   const readonly = Boolean(state.mcpReadonly)
-  const selectedFeatures = Array.isArray(state.mcpFeatures)
-    ? state.mcpFeatures
-    : []
+  const selectedFeatures = Array.isArray(state.mcpFeatures) ? state.mcpFeatures : []
 
-  const supportedFeatures = IS_PLATFORM
-    ? FEATURE_GROUPS_PLATFORM
-    : FEATURE_GROUPS_NON_PLATFORM
+  const supportedFeatures = IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
 
   const selectedFeaturesSupported = useMemo(() => {
     return selectedFeatures.filter((feature) =>
@@ -102,3 +87,5 @@ function McpConfigStepInner({
     />
   )
 }
+
+export default McpCursorContent
