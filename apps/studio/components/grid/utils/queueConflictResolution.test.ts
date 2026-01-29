@@ -14,10 +14,6 @@ import {
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 
-// ============================================================================
-// Helper Functions Tests
-// ============================================================================
-
 describe('operationMatchesRow', () => {
   const mockTable = {} as any
 
@@ -102,10 +98,6 @@ describe('operationMatchesRow', () => {
     expect(operationMatchesRow(operation, 1, { id: 1 })).toBe(false)
   })
 })
-
-// ============================================================================
-// Conflict Resolution Tests
-// ============================================================================
 
 describe('resolveDeleteRowConflicts', () => {
   const mockTable = {} as any
