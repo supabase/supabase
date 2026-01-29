@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { getConnectionStrings } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
+import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { useParams } from 'common'
 import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
