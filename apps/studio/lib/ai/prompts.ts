@@ -234,7 +234,7 @@ export const PG_BEST_PRACTICES = `
 
 ## SQL Style Guidelines
 - Ensure all generated SQL is valid for Postgres.
-- Always escape single quotes within strings using double apostrophes (e.g., \`'Night''s watch'\`).
+- **IMPORTANT:** Always escape single quotes within strings using double apostrophes. This includes contractions (e.g., \`'We''ll'\`, \`'don''t'\`, \`'it''s'\`) and possessives (e.g., \`'Night''s watch'\`). When generating sample data or any text content, carefully check for apostrophes and escape them.
 - Always quote identifiers (table names, column names) with double quotes when they contain uppercase letters (e.g., \`SELECT "locationType" FROM "Locations"\`), are PostgreSQL reserved words (e.g., \`"order"\`, \`"select"\`, \`"table"\`), or have special characters like dashes or spaces (e.g., \`"user-name"\`, \`"created at"\`). PostgreSQL normalizes unquoted identifiers to lowercase and reserves certain keywords.
 - Terminate each SQL statement with a semicolon (`
 ;`).
