@@ -1,22 +1,20 @@
-import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
-import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Eye } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { createPortal } from 'react-dom'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button } from 'ui'
 
-import { getModKeyLabel } from '@/lib/helpers'
-
-const modKey = getModKeyLabel()
+import {
+  useOperationQueueShortcuts,
+  getModKey,
+} from 'components/grid/hooks/useOperationQueueShortcuts'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
 
 export const SaveQueueActionBar = () => {
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave } = useOperationQueueActions()
-
-  useOperationQueueShortcuts()
 
   const operationCount = snap.operationQueue.operations.length
   const isSaving = snap.operationQueue.status === 'saving'
@@ -24,6 +22,16 @@ export const SaveQueueActionBar = () => {
 
   const isVisible =
     isQueueOperationsEnabled && snap.hasPendingOperations && !isOperationQueuePanelOpen
+
+  useOperationQueueShortcuts({
+    enabled: isQueueOperationsEnabled && snap.hasPendingOperations,
+    onSave: handleSave,
+    onTogglePanel: () => snap.onViewOperationQueue(),
+    isSaving,
+    hasOperations: operationCount > 0,
+  })
+
+  const modKey = getModKey()
 
   const content = (
     <AnimatePresence>
@@ -41,7 +49,7 @@ export const SaveQueueActionBar = () => {
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => snap.toggleViewOperationQueue()}
+                onClick={() => snap.onViewOperationQueue()}
                 className="text-foreground-light hover:text-foreground transition-colors flex items-center"
                 aria-label="View Details"
               >

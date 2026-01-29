@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import { toast } from 'sonner'
+
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useOperationQueueSaveMutation } from 'data/table-rows/operation-queue-save-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useCallback } from 'react'
-import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
@@ -29,7 +30,6 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
     useOperationQueueSaveMutation({
       onSuccess: () => {
         snap.clearQueue()
-        snap.closeSidePanel()
         toast.success('Changes saved successfully')
         onSaveSuccess?.()
       },
@@ -40,10 +40,12 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
     })
 
   const isSaving = snap.operationQueue.status === 'saving' || isMutationPending
-  const operations = snap.operationQueue.operations as readonly QueuedOperation[]
 
   const handleSave = useCallback(() => {
-    if (!project || operations.length === 0) return
+    if (!project) return
+
+    const operations = snap.operationQueue.operations as readonly QueuedOperation[]
+    if (operations.length === 0) return
 
     snap.setQueueStatus('saving')
 
@@ -53,7 +55,7 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
       operations,
       roleImpersonationState: getImpersonatedRoleState(),
     })
-  }, [snap, project, operations, saveOperationQueue, getImpersonatedRoleState])
+  }, [snap, project, saveOperationQueue, getImpersonatedRoleState])
 
   const handleCancel = useCallback(() => {
     // Get unique table IDs from the queue before clearing
