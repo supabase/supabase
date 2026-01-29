@@ -1,18 +1,8 @@
-import { toString as CronToString } from 'cronstrue'
 import z from 'zod'
 
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { cronPattern, secondsPattern } from '../CronJobs.constants'
-
-const convertCronToString = (schedule: string) => {
-  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
-  try {
-    return CronToString(schedule)
-  } catch (error) {
-    return schedule
-  }
-}
+import { formatScheduleString } from '../CronJobs.utils'
 
 const edgeFunctionSchema = z.object({
   type: z.literal('edge_function'),
@@ -75,7 +65,7 @@ const sqlFunctionSchema = z.object({
 
 const sqlSnippetSchema = z.object({
   type: z.literal('sql_snippet'),
-  snippet: z.string().trim().min(1),
+  snippet: z.string().trim().min(1, 'Please provide a SQL snippet to run'),
 })
 
 export const FormSchema = z
@@ -89,7 +79,7 @@ export const FormSchema = z
       .refine((value) => {
         if (cronPattern.test(value)) {
           try {
-            convertCronToString(value)
+            formatScheduleString(value)
             return true
           } catch {
             return false

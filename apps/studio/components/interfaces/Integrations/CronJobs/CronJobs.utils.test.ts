@@ -236,12 +236,27 @@ describe('parseCronJobCommand', () => {
     { description: 'every weekend at 10 AM', command: '0 10 * * 0,6' },
     { description: 'every quarter hour', command: '*/15 * * * *' },
     { description: 'twice daily at 8 AM and 8 PM', command: '0 8,20 * * *' },
+    { description: 'last day of month at midnight (pg_cron $ syntax)', command: '0 0 $ * *' },
   ]
 
   // Replace the single cronPattern test with forEach
   cronPatternTests.forEach(({ description, command }) => {
     it(`should match the regex for a cronPattern with "${description}"`, () => {
       expect(command).toMatch(cronPattern)
+    })
+  })
+
+  // Test that $ is only allowed in day-of-month position (3rd field)
+  const invalidDollarPatternTests = [
+    { description: '$ in minute position', command: '$ * * * *' },
+    { description: '$ in hour position', command: '* $ * * *' },
+    { description: '$ in month position', command: '* * * $ *' },
+    { description: '$ in day-of-week position', command: '* * * * $' },
+  ]
+
+  invalidDollarPatternTests.forEach(({ description, command }) => {
+    it(`should NOT match cronPattern with ${description}`, () => {
+      expect(command).not.toMatch(cronPattern)
     })
   })
 })
