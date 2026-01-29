@@ -127,19 +127,15 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
-  if (command.toLocaleLowerCase().match(regexDBFunction)) {
-    const [schemaName, functionName] = command
-      .replace('SELECT ', '')
-      .replace(/\(.*\);*/, '')
-
-      .trim()
-      .split('.')
-
+  // Example: "SELECT public.truncate_uploaded_images()" or "select truncate_uploaded_images()"
+  // When the schema is omitted, we should not incorrectly populate the schema field with the function name.
+  const regexDBFunction = /select\s+(?:(?<schema>[a-zA-Z0-9_-]+)\.)?(?<functionName>[a-zA-Z0-9_-]+)\s*\(\s*\)\s*;?/i
+  const matchDBFunction = command.match(regexDBFunction)
+  if (matchDBFunction?.groups?.functionName) {
     return {
       type: 'sql_function',
-      schema: schemaName,
-      functionName: functionName,
+      schema: matchDBFunction.groups.schema ?? '',
+      functionName: matchDBFunction.groups.functionName,
       snippet: originalCommand,
     }
   }
