@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+
 import { FileSystemFunctionsArtifactStore } from './fileSystemStore'
 import { assertSelfHosted } from '../util'
 

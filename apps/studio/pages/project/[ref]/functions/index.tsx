@@ -14,7 +14,7 @@ import {
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
 import {
   FunctionsEmptyState,
-  FunctionsEmptyStateLocal,
+  FunctionsInstructionsLocal,
 } from 'components/interfaces/Functions/FunctionsEmptyState'
 import { TerminalInstructionsDialog } from 'components/interfaces/Functions/TerminalInstructionsDialog'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -25,6 +25,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -37,7 +38,6 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { Admonition } from 'ui-patterns'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -167,7 +167,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                 )}
               </>
             )}
-            {!IS_PLATFORM && <FunctionsEmptyStateLocal />}
+            {!IS_PLATFORM && <FunctionsInstructionsLocal />}
           </div>
         </PageSectionContent>
       </PageSection>

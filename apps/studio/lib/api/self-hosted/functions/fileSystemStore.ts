@@ -1,7 +1,8 @@
-import path from 'path'
-import type { Dirent } from 'fs'
-import { pathToFileURL } from 'url'
-import { readdir, stat } from 'fs/promises'
+import type { Dirent } from 'node:fs'
+import { readdir, stat } from 'node:fs/promises'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
+
 import { FunctionArtifact } from './types'
 
 export class FileSystemFunctionsArtifactStore {

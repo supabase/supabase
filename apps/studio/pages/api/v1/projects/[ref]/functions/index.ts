@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { type NextApiRequest, type NextApiResponse } from 'next'
 
+import type { components } from 'api-types'
 import { uuidv4 } from 'lib/helpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { components } from 'api-types'
 import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions'
 
-export default function apiHandler(req: NextApiRequest, res: NextApiResponse) {
+export default function handlerWithErrorCatching(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler, { withAuth: true })
 }
 
@@ -27,9 +27,8 @@ const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
   const store = getFunctionsArtifactStore()
 
   const functionsArtifacts = await store.getFunctions()
-  if (!functionsArtifacts) return res.status(200).json([])
+  if (functionsArtifacts.length === 0) return res.status(200).json([])
 
-  // mix some mock data
   const functions = functionsArtifacts.map(
     (func) =>
       ({
