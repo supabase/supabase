@@ -194,6 +194,14 @@ hideToc: true
       icon: '/docs/img/icons/refine-icon',
       enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
+    {
+      title: 'XMLUI',
+      href: '/guides/getting-started/quickstarts/xmlui',
+      description:
+        'Learn how to create a Supabase project, add some sample data to your database, and query the data from an XMLUI app.',
+      icon: '/docs/img/icons/xmlui-icon',
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
+    },
   ]
     .filter((item) => item.enabled !== false)
     .map((item) => {
