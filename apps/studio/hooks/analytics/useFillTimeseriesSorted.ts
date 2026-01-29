@@ -1,9 +1,10 @@
+import type { Datum } from 'components/ui/Charts/Charts.types'
 import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { useMemo } from 'react'
 
-export type FillTimeseriesOptions = {
+export type FillTimeseriesOptions<T extends Datum = Datum> = {
   /** The timeseries data to fill gaps in */
-  data: any[]
+  data: T[]
   /** The key in each data object that contains the timestamp */
   timestampKey: string
   /** The key(s) to fill with default values when gaps exist */
@@ -20,7 +21,7 @@ export type FillTimeseriesOptions = {
   interval?: string
 }
 
-export type FillTimeseriesResult<T = any> = {
+export type FillTimeseriesResult<T extends Datum = Datum> = {
   data: T[]
   error: Error | null
   isError: boolean
@@ -29,19 +30,16 @@ export type FillTimeseriesResult<T = any> = {
 /**
  * Sorts timeseries data by timestamp in ascending order
  */
-export function sortByTimestamp<T extends Record<string, any>>(
-  data: T[],
-  timestampKey: string
-): T[] {
+export function sortByTimestamp<T extends Datum>(data: T[], timestampKey: string): T[] {
   return data.sort((a, b) => {
-    return (new Date(a[timestampKey]) as any) - (new Date(b[timestampKey]) as any)
+    return new Date(a[timestampKey] as string).getTime() - new Date(b[timestampKey] as string).getTime()
   })
 }
 
 /**
  * Validates that the data has a valid timestamp key
  */
-export function hasValidTimestamp(data: any[], timestampKey: string): boolean {
+export function hasValidTimestamp<T extends Datum>(data: T[], timestampKey: string): boolean {
   return Boolean(data[0]?.[timestampKey])
 }
 
@@ -62,8 +60,8 @@ export function hasValidTimestamp(data: any[], timestampKey: string): boolean {
  * })
  * ```
  */
-export const useFillTimeseriesSorted = <T = any>(
-  options: FillTimeseriesOptions
+export const useFillTimeseriesSorted = <T extends Datum = Datum>(
+  options: FillTimeseriesOptions<T>
 ): FillTimeseriesResult<T> => {
   const {
     data,
@@ -96,7 +94,7 @@ export const useFillTimeseriesSorted = <T = any>(
         endDate,
         minPointsToFill,
         interval
-      )
+      ) as T[]
 
       const sorted = sortByTimestamp(filled, timestampKey)
 
@@ -105,10 +103,10 @@ export const useFillTimeseriesSorted = <T = any>(
         error: null,
         isError: false,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         data: [],
-        error,
+        error: error instanceof Error ? error : new Error(String(error)),
         isError: true,
       }
     }

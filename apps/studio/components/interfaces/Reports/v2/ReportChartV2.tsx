@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
 import type { AnalyticsInterval } from 'data/analytics/constants'
@@ -32,10 +33,13 @@ export interface ReportChartV2Props {
 
 // Compute total across entire period over unique attribute keys.
 // Excludes attributes that are disabled, reference lines, max values, or marked omitFromTotal.
-export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): number {
+export function computePeriodTotal(
+  chartData: Record<string, unknown>[],
+  dynamicAttributes: MultiAttribute[]
+): number {
   const attributeKeys = Array.from(
     new Set(
-      (dynamicAttributes as any[])
+      dynamicAttributes
         .filter(
           (a) =>
             a?.enabled !== false &&
@@ -43,11 +47,11 @@ export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): 
             !a?.isMaxValue &&
             !a?.omitFromTotal
         )
-        .map((a: any) => a.attribute)
+        .map((a) => a.attribute)
     )
   )
 
-  return chartData.reduce((sum: number, row: any) => {
+  return chartData.reduce((sum: number, row: Record<string, unknown>) => {
     const rowTotal = attributeKeys.reduce((acc: number, key: string) => {
       const value = row?.[key]
       return acc + (typeof value === 'number' ? value : 0)
@@ -114,7 +118,7 @@ export const ReportChartV2 = ({
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted({
     data: chartData,
     timestampKey,
-    valueKey: (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
+    valueKey: dynamicAttributes.map((attr) => attr.attribute),
     defaultValue: 0,
     startDate,
     endDate,

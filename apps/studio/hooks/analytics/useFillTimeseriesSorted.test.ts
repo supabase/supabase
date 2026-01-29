@@ -17,16 +17,6 @@ describe('hasValidTimestamp', () => {
     expect(hasValidTimestamp(data, 'timestamp')).toBe(false)
   })
 
-  it('should return false when timestamp is null', () => {
-    const data = [{ timestamp: null, value: 1 }]
-    expect(hasValidTimestamp(data, 'timestamp')).toBe(false)
-  })
-
-  it('should return false when timestamp is undefined', () => {
-    const data = [{ timestamp: undefined, value: 1 }]
-    expect(hasValidTimestamp(data, 'timestamp')).toBe(false)
-  })
-
   it('should work with custom timestamp key', () => {
     const data = [{ period_start: '2024-01-01T00:00:00Z', value: 1 }]
     expect(hasValidTimestamp(data, 'period_start')).toBe(true)

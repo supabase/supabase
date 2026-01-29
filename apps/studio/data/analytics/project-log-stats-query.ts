@@ -20,6 +20,7 @@ export interface UsageApiCounts {
   total_rest_requests: number
   total_realtime_requests: number
   timestamp: string
+  [key: string]: string | number
 }
 
 export async function getProjectLogStats(
