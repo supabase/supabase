@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
+import { POSTGRES_PORT } from 'lib/api/self-hosted/constants'
 import {
   DEFAULT_PROJECT,
+  PROJECT_DB_HOST,
   PROJECT_ENDPOINT,
   PROJECT_ENDPOINT_PROTOCOL,
   PROJECT_REST_URL,
@@ -28,9 +30,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     project: {
       ...DEFAULT_PROJECT,
       api_key_supabase_encrypted: '',
-      db_host: 'localhost',
+      db_host: PROJECT_DB_HOST,
       db_name: 'postgres',
-      db_port: 5432,
+      db_port: POSTGRES_PORT,
       db_ssl: false,
       db_user: 'postgres',
       services: [

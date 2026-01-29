@@ -20,19 +20,20 @@ import {
 import { Admonition } from 'ui-patterns'
 import { ConnectionParameters } from './ConnectionParameters'
 
-interface ConnectionPanelProps {
+type IPv4Status = {
+  type: 'error' | 'success'
+  title: string
+  description?: string | ReactNode
+  links?: { text: string; url: string }[]
+}
+
+interface BaseConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
   badge?: string
   title: string
   description: string
   contentFooter?: ReactNode
   connectionString: string
-  ipv4Status: {
-    type: 'error' | 'success'
-    title: string
-    description?: string | ReactNode
-    links?: { text: string; url: string }[]
-  }
   notice?: string[]
   parameters?: Array<{
     key: string
@@ -44,6 +45,29 @@ interface ConnectionPanelProps {
   fileTitle?: string
   onCopyCallback: () => void
 }
+
+// Platform environment requires ipv4Status
+interface PlatformConnectionPanelProps extends BaseConnectionPanelProps {
+  env: 'platform'
+  ipv4Status: IPv4Status
+}
+
+// CLI and self-hosted environments don't need ipv4Status
+interface NonPlatformConnectionPanelProps extends BaseConnectionPanelProps {
+  env: 'cli' | 'self-hosted'
+  ipv4Status?: never
+}
+
+// Legacy props for backwards compatibility (infers env from IS_PLATFORM)
+interface LegacyConnectionPanelProps extends BaseConnectionPanelProps {
+  env?: never
+  ipv4Status?: IPv4Status
+}
+
+type ConnectionPanelProps =
+  | PlatformConnectionPanelProps
+  | NonPlatformConnectionPanelProps
+  | LegacyConnectionPanelProps
 
 const IPv4StatusIcon = ({ className, active }: { className?: string; active: boolean }) => {
   return (
@@ -103,6 +127,7 @@ export const CodeBlockFileHeader = ({ title }: { title: string }) => {
 
 export const ConnectionPanel = ({
   type = 'direct',
+  env,
   badge,
   title,
   description,
@@ -119,11 +144,14 @@ export const ConnectionPanel = ({
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
+  // Use explicit env prop if provided, otherwise fall back to IS_PLATFORM check
+  const isPlatformEnv = env === 'platform' || (env === undefined && IS_PLATFORM)
+
   const { data: poolingInfo } = useSupavisorConfigurationQuery({ projectRef })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
   const isSessionMode = poolingConfiguration?.pool_mode === 'session'
 
-  const links = ipv4Status.links ?? []
+  const links = ipv4Status?.links ?? []
 
   const isTransactionDedicatedPooler = type === 'transaction' && badge === 'Dedicated Pooler'
 
@@ -189,7 +217,7 @@ export const ConnectionPanel = ({
           )}
         </div>
         <div className="flex flex-col -space-y-px w-full">
-          {IS_PLATFORM && (
+          {isPlatformEnv && ipv4Status && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
                 <IPv4StatusIcon active={ipv4Status.type === 'success'} />
@@ -219,7 +247,7 @@ export const ConnectionPanel = ({
             </div>
           )}
 
-          {type === 'session' && (
+          {isPlatformEnv && type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
               <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
                 <WarningIcon />
@@ -234,7 +262,7 @@ export const ConnectionPanel = ({
             </div>
           )}
 
-          {IS_PLATFORM && ipv4Status.type === 'error' && (
+          {isPlatformEnv && ipv4Status?.type === 'error' && (
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild

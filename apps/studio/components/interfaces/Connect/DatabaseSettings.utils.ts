@@ -10,6 +10,42 @@ type ConnectionStrings = {
   sqlalchemy: string
 }
 
+/**
+ * Generates connection strings for self-hosted pooler connections.
+ * Uses placeholders for tenant ID and password since these are user-configured.
+ */
+export const getSelfHostedPoolerStrings = (
+  dbHost: string,
+  port: number,
+  dbName: string = 'postgres'
+): ConnectionStrings => {
+  const user = 'postgres.[POOLER_TENANT_ID]'
+  const password = '[YOUR-PASSWORD]'
+
+  const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
+  const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
+  const golang = `user=${user}\npassword=${password}\nhost=${dbHost}\nport=${port}\ndbname=${dbName}`
+  const jdbc = `jdbc:postgresql://${dbHost}:${port}/${dbName}?user=${user}&password=${password}`
+  const dotnet = `{
+  "ConnectionStrings": {
+    "DefaultConnection": "User Id=${user};Password=${password};Server=${dbHost};Port=${port};Database=${dbName}"
+  }
+}`
+  const nodejs = `DATABASE_URL=${uri}`
+
+  return {
+    psql,
+    uri,
+    golang,
+    jdbc,
+    dotnet,
+    nodejs,
+    php: golang,
+    python: golang,
+    sqlalchemy: golang,
+  }
+}
+
 export const getConnectionStrings = ({
   connectionInfo,
   poolingInfo,
