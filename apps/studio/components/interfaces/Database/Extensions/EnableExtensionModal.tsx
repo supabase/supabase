@@ -9,6 +9,7 @@ import { DOCS_URL } from 'lib/constants'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -115,6 +116,8 @@ export const EnableExtensionModal = ({
         : values.schema === 'custom'
           ? values.name
           : values.schema
+
+    console.log(extension.name, schema)
 
     enableExtension({
       projectRef: project.ref,
@@ -234,6 +237,13 @@ export const EnableExtensionModal = ({
                                   return (
                                     <SelectItem_Shadcn_ key={schema.id} value={schema.name}>
                                       {schema.name}
+                                      {schema.name === recommendedSchema ? (
+                                        <Badge className="ml-2" variant="success">
+                                          Recommended
+                                        </Badge>
+                                      ) : !defaultSchema && schema.name === 'extensions' ? (
+                                        <Badge className="ml-2">Default</Badge>
+                                      ) : null}
                                     </SelectItem_Shadcn_>
                                   )
                                 })}
@@ -288,5 +298,3 @@ export const EnableExtensionModal = ({
     </Dialog>
   )
 }
-
-export default EnableExtensionModal
