@@ -193,6 +193,7 @@
     "eslint-plugin-barrel-files": "^2.0.7",
     "graphql-ws": "5.14.1",
     "import-in-the-middle": "^2.0.0",
+    "jsdom": "^27.4.0",
     "jsdom-testing-mocks": "^1.13.1",
     "libpg-query": "17.6.0",
     "msw": "^2.3.0",
