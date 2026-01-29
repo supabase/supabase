@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
 
 import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
@@ -31,9 +30,9 @@ const BlogGridItem = ({ post }: Props) => {
   }
 
   const imageUrl = post.isCMS
-    ? post.thumb || post.image || '/images/blog/blog-placeholder.png'
-    : resolveImagePath(post.thumb) ||
-      resolveImagePath(post.image) ||
+    ? post.imgThumb || post.imgSocial || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(post.imgThumb) ||
+      resolveImagePath(post.imgSocial) ||
       '/images/blog/blog-placeholder.png'
 
   return (

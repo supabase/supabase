@@ -57,9 +57,9 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
   }
 
   const imageUrl = blog.isCMS
-    ? blog.thumb || blog.image || '/images/blog/blog-placeholder.png'
-    : resolveImagePath(blog.thumb) ||
-      resolveImagePath(blog.image) ||
+    ? blog.imgThumb || blog.imgSocial || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(blog.imgThumb) ||
+      resolveImagePath(blog.imgSocial) ||
       '/images/blog/blog-placeholder.png'
 
   return (
