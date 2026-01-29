@@ -1,14 +1,10 @@
-import Link from 'next/link'
-import dayjs from 'dayjs'
 import { HelpCircle } from 'lucide-react'
-import {
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
+import Link from 'next/link'
+import { Badge, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import { type ServiceKey, getHealthStatus } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
   key: ServiceKey
@@ -46,87 +42,48 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   postgrest: 'Auto-generated REST API for your database',
 }
 
-const getIntervalLabels = (interval: IntervalKey): { startLabel: string; endLabel: string } => {
-  switch (interval) {
-    case '1hr':
-      return { startLabel: '60 min ago', endLabel: 'Now' }
-    case '1day':
-      return { startLabel: '24 hours ago', endLabel: 'Now' }
-    case '7day':
-      return { startLabel: '7 days ago', endLabel: 'Now' }
-    default:
-      return { startLabel: 'Start', endLabel: 'Now' }
-  }
-}
-
 const getStatusLabel = (status: 'healthy' | 'warning' | 'error' | 'no-data'): string => {
   switch (status) {
     case 'healthy':
-      return 'Operational'
+      return 'Healthy'
     case 'warning':
       return 'Degraded'
     case 'error':
-      return 'Outage'
+      return 'Unhealthy'
     case 'no-data':
       return 'No data'
   }
 }
 
-const getStatusColor = (status: 'healthy' | 'warning' | 'error' | 'no-data'): string => {
+const getStatusVariant = (
+  status: 'healthy' | 'warning' | 'error' | 'no-data'
+): 'success' | 'warning' | 'destructive' | 'default' => {
   switch (status) {
     case 'healthy':
-      return 'text-brand'
+      return 'success'
     case 'warning':
-      return 'text-warning'
+      return 'warning'
     case 'error':
-      return 'text-destructive'
+      return 'destructive'
     case 'no-data':
-      return 'text-foreground-lighter'
+      return 'default'
   }
-}
-
-const getBarTotal = (datum: LogsBarChartDatum): number => {
-  return datum.ok_count + datum.warning_count + datum.error_count
-}
-
-const getBarColor = (datum: LogsBarChartDatum, total: number): string => {
-  if (total === 0) return 'bg-surface-300'
-
-  const barTotal = getBarTotal(datum)
-  if (barTotal === 0) return 'bg-surface-300'
-
-  const errorRate = (datum.error_count / barTotal) * 100
-
-  if (errorRate >= 15) return 'bg-destructive'
-  if (datum.error_count > 0 || datum.warning_count > 0) return 'bg-warning'
-  return 'bg-brand'
 }
 
 type ServiceRowProps = {
   service: ServiceConfig
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
-  interval: IntervalKey
   datetimeFormat: string
 }
 
-const ServiceRow = ({ service, data, onBarClick, interval, datetimeFormat }: ServiceRowProps) => {
+const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowProps) => {
   const { status } = getHealthStatus(data.errorRate, data.total)
   const statusLabel = getStatusLabel(status)
-  const statusColor = getStatusColor(status)
-  const { startLabel, endLabel } = getIntervalLabels(interval)
+  const statusVariant = getStatusVariant(status)
 
-  const successRate = data.total > 0 ? ((data.total - data.errorCount - data.warningCount) / data.total) * 100 : 100
-
-  // Calculate max requests for opacity scaling
-  const maxRequests = Math.max(...data.eventChartData.map(getBarTotal), 1)
-
-  const getBarOpacity = (datum: LogsBarChartDatum): number => {
-    const barTotal = getBarTotal(datum)
-    if (barTotal === 0) return 0.3
-    // Scale opacity from 0.4 to 1.0 based on request count
-    return 0.4 + (barTotal / maxRequests) * 0.6
-  }
+  const errorRate = data.total > 0 ? data.errorRate : 0
+  const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
 
   return (
     <div className="py-6 border-b border-default last:border-b-0">
@@ -149,75 +106,35 @@ const ServiceRow = ({ service, data, onBarClick, interval, datetimeFormat }: Ser
             </TooltipContent>
           </Tooltip>
         </div>
-        <span className={cn('text-sm font-medium', statusColor)}>{statusLabel}</span>
+        <Badge variant={statusVariant}>{statusLabel}</Badge>
       </div>
 
-      <div className="flex items-end gap-px h-8">
-        {data.isLoading ? (
-          <div className="flex items-end gap-px h-full w-full">
-            {Array.from({ length: 90 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex-1 h-full bg-surface-200 animate-pulse rounded-sm"
-              />
-            ))}
-          </div>
-        ) : data.eventChartData.length === 0 ? (
-          <div className="flex items-end gap-px h-full w-full">
-            {Array.from({ length: 90 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex-1 h-full bg-surface-300 rounded-sm"
-              />
-            ))}
-          </div>
-        ) : (
-          data.eventChartData.map((datum, i) => {
-            const barColor = getBarColor(datum, data.total)
-            const opacity = getBarOpacity(datum)
-            return (
-              <Tooltip key={datum.timestamp || i}>
-                <TooltipTrigger asChild>
-                  <button
-                    className={cn(
-                      'flex-1 h-full rounded-sm transition-opacity hover:brightness-110',
-                      barColor
-                    )}
-                    style={{ opacity }}
-                    onClick={() => onBarClick(datum)}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-foreground-light">
-                      {datum.timestamp ? dayjs(datum.timestamp).format(datetimeFormat) : 'Unknown'}
-                    </span>
-                    <span>
-                      {getBarTotal(datum).toLocaleString()} requests
-                    </span>
-                    {datum.error_count > 0 && (
-                      <span className="text-destructive">
-                        {((datum.error_count / getBarTotal(datum)) * 100).toFixed(2)}% error rate ({datum.error_count.toLocaleString()} errors)
-                      </span>
-                    )}
-                    {datum.warning_count > 0 && (
-                      <span className="text-warning">
-                        {datum.warning_count.toLocaleString()} warnings
-                      </span>
-                    )}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            )
-          })
-        )}
+      <div className="h-16">
+        <Loading active={data.isLoading}>
+          <LogsBarChart
+            data={data.eventChartData}
+            DateTimeFormat={datetimeFormat}
+            onBarClick={onBarClick}
+            EmptyState={
+              <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
+                No data
+              </div>
+            }
+          />
+        </Loading>
       </div>
 
-      <div className="flex items-center justify-between mt-2 text-xs text-foreground-lighter">
-        <span>{startLabel}</span>
-        <span>{data.total > 0 ? `${successRate.toFixed(2)} % success rate` : 'No data'}</span>
-        <span>{endLabel}</span>
-      </div>
+      {data.total > 0 && (
+        <div className="flex items-center justify-center mt-2 text-xs text-foreground-lighter gap-4">
+          {errorRate > 0 && (
+            <span className="text-destructive">{errorRate.toFixed(2)}% errors</span>
+          )}
+          {warningRate > 0 && (
+            <span className="text-warning">{warningRate.toFixed(2)}% warnings</span>
+          )}
+          {errorRate === 0 && warningRate === 0 && <span className="text-brand">0% errors</span>}
+        </div>
+      )}
     </div>
   )
 }
@@ -226,12 +143,11 @@ export const ServiceHealthTable = ({
   services,
   serviceData,
   onBarClick,
-  interval,
   datetimeFormat,
 }: ServiceHealthTableProps) => {
   return (
     <div>
-      <h2 className="mb-4">Project Health</h2>
+      <h2 className="heading-section mb-4">Project Health</h2>
       <div className="bg-surface-100 rounded-lg border border-default px-6">
         {services.map((service) => {
           const data = serviceData[service.key]
@@ -243,7 +159,6 @@ export const ServiceHealthTable = ({
               service={service}
               data={data}
               onBarClick={onBarClick(service.key, service.logsUrl)}
-              interval={interval}
               datetimeFormat={datetimeFormat}
             />
           )
