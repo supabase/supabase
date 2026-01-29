@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { snakeCase } from 'lodash'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useFlag, useParams } from 'common'
 import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -26,19 +19,26 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import {
-  useValidateDestinationMutation,
   type ValidationFailure,
+  useValidateDestinationMutation,
 } from 'data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { snakeCase } from 'lodash'
 import { Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
+import * as z from 'zod'
+
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'

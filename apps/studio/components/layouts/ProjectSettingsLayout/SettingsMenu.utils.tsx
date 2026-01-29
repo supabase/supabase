@@ -35,6 +35,8 @@ export const generateSettingsMenu = (
       },
     ]
   }
+
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -60,12 +62,14 @@ export const generateSettingsMenu = (
           key: 'compute-and-disk',
           url: `/project/${ref}/settings/compute-and-disk`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -73,6 +77,7 @@ export const generateSettingsMenu = (
           key: 'integrations',
           url: `/project/${ref}/settings/integrations`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -80,12 +85,14 @@ export const generateSettingsMenu = (
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'API Keys',
           key: 'api-keys',
           url: `/project/${ref}/settings/api-keys/new`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'JWT Keys',
@@ -94,6 +101,7 @@ export const generateSettingsMenu = (
             ? `/project/${ref}/settings/jwt`
             : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -101,6 +109,7 @@ export const generateSettingsMenu = (
           key: `log-drains`,
           url: `/project/${ref}/settings/log-drains`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Add Ons',
@@ -115,6 +124,7 @@ export const generateSettingsMenu = (
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           label: 'Beta',
+          disabled: !isProjectActive,
         },
       ],
     },

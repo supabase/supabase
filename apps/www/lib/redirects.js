@@ -3063,4 +3063,22 @@ module.exports = [
     source: '/docs/guides/platform/fly-postgres',
     destination: '/docs/guides/database/overview',
   },
+
+  // design
+  {
+    permanent: true,
+    source: '/:path*',
+    has: [
+      {
+        type: 'host',
+        value: 'supabase.design',
+      },
+    ],
+    destination: 'https://supabase.com/design-system/:path*',
+  },
+  {
+    permanent: true,
+    source: '/design',
+    destination: '/design-system',
+  },
 ]
