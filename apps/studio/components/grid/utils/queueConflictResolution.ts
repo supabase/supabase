@@ -116,7 +116,6 @@ export function resolveEditCellConflicts(
   // Check if this edit is on a newly added row (by tempId)
   const tempId = (rowIdentifiers as any)?.__tempId
   if (tempId) {
-    // Find the ADD_ROW operation
     const addRowIndex = operations.findIndex((op) => {
       if (op.type === QueuedOperationType.ADD_ROW && op.tableId === editOperation.tableId) {
         const addPayload = op.payload as AddRowPayload
@@ -142,7 +141,6 @@ export function resolveEditCellConflicts(
     }
   }
 
-  // Normal case: proceed with add/update
   return { action: 'add' }
 }
 
