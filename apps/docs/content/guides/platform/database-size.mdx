@@ -71,7 +71,6 @@ Vacuum operations can temporarily increase resource utilization, which may adver
 </Admonition>
 
 Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
-
 It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
 Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
 
@@ -87,9 +86,7 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 Projects on the Pro Plan and higher have auto-scaling disks.
 
-Disk size expands automatically when the database reaches 90% of the allocated disk size. The disk is expanded to be 50% larger (for example, 8 GB -> 12 GB).
-
-Auto-scaling is limited to four modifications within a rolling 24-hour window. While a new modification can be initiated immediately after the previous one completes, reaching the daily quota of four resizes will prevent further scaling until the rolling window allows it. If you reach 95% disk utilization and have exhausted your modification quota, your project will enter read-only mode.
+Disk size expands automatically when the database reaches 90% of the allocated disk size. The disk is expanded to be 50% larger (for example, 8 GB -> 12 GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
 <Admonition type="note">
 
@@ -103,7 +100,7 @@ Disk size can also be manually expanded on the [Database Settings page](/dashboa
 
 You may want to import a lot of data into your database which requires multiple disk expansions. for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database Settings page](/dashboard/project/_/database/settings).
 
-Due to restrictions on the underlying cloud provider, disk modifications are limited to four operations within a rolling 24-hour window. While a new modification can be initiated as soon as the previous one completes, you will be unable to make further adjustments if you reach this daily quota until the rolling 24-hour window permits it.
+Due to restrictions on the underlying cloud provider, disk expansions can occur only once every six hours. During the six hour cool down window, the disk cannot be resized again.
 
 </Admonition>
 

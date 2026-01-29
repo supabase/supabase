@@ -1,3 +1,4 @@
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -11,8 +12,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
-
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -36,6 +35,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -165,7 +165,7 @@ const ColumnType = ({
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+      <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
             type={error ? 'danger' : 'default'}
@@ -186,17 +186,17 @@ const ColumnType = ({
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
-          <ScrollArea className="h-[335px]">
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_
-                placeholder="Search types..."
-                // [Joshen] Addresses style issues when this component is being used in the old Form component
-                // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                className="!bg-transparent focus:!shadow-none focus:!ring-0"
-              />
-              <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
+          <Command_Shadcn_>
+            <CommandInput_Shadcn_
+              placeholder="Search types..."
+              // [Joshen] Addresses style issues when this component is being used in the old Form component
+              // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
+              className="!bg-transparent focus:!shadow-none focus:!ring-0"
+            />
+            <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
-              <CommandList_Shadcn_>
+            <CommandList_Shadcn_>
+              <ScrollArea className="h-[240px]">
                 <CommandGroup_Shadcn_>
                   {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
                     <CommandItem_Shadcn_
@@ -266,9 +266,9 @@ const ColumnType = ({
                     </CommandGroup_Shadcn_>
                   </>
                 )}
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </ScrollArea>
+              </ScrollArea>
+            </CommandList_Shadcn_>
+          </Command_Shadcn_>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
 
