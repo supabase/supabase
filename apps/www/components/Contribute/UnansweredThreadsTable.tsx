@@ -395,7 +395,7 @@ function ThreadRow({
   return (
     <TableRow className="relative group [&.hovering-badge>td]:hover:!bg-transparent">
       {/* Thread title and product areas */}
-      <TableCell className="min-w-[400px]">
+      <TableCell className="w-auto max-w-[600px]">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Channel icon */}
           <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md">
@@ -483,7 +483,7 @@ function ThreadRow({
         </div>
       </TableCell>
       {/* Stack */}
-      <TableCell>
+      <TableCell className="w-[300px]">
         <div
           onMouseEnter={(e) => {
             const row = e.currentTarget.closest('tr')
@@ -595,8 +595,8 @@ function ThreadRow({
       </TableCell>
 
       {/* Replies */}
-      <TableCell className="text-right">
-        <div className="flex flex-row items-center gap-2">
+      <TableCell className="text-right w-[100px]">
+        <div className="flex flex-row items-center justify-end gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
             <MessageSquareReply
               size={18}

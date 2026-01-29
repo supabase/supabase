@@ -1,4 +1,7 @@
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import {
   Activity,
   BarChartIcon,
@@ -7,17 +10,13 @@ import {
   SquareTerminal,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { formatBytes } from 'lib/helpers'
-import { numberFormatter } from './Charts.utils'
-import { useChartHoverState } from './useChartHoverState'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { Badge } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { formatPercentage, numberFormatter } from './Charts.utils'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ChartHeaderProps {
   title?: string
@@ -80,13 +79,10 @@ export const ChartHeader = ({
   titleTooltip,
   showNewBadge,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
-    syncId || 'default'
-  )
+  const { ref } = useParams()
+  const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
-  const { ref } = useParams()
-  const router = useRouter()
 
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
@@ -102,10 +98,14 @@ export const ChartHeader = ({
       return formatBytes(bytesValue, valuePrecision)
     }
 
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
     const formattedValue = numberFormatter(value, valuePrecision)
 
     if (typeof format === 'string' && format) {
-      return `${formattedValue}${format}`
+      return `${formattedValue} ${format}`
     }
 
     return formattedValue
