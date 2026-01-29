@@ -303,6 +303,75 @@ language="typescript"
 />
 </$CodeTabs>
 
+### Sign in with OAuth
+
+To sign users in with an OAuth provider like Google or GitHub, create a form action that calls `signInWithOAuth`. The method returns a `url` to redirect the user to the provider's authentication page.
+
+```typescript src/routes/auth/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { Actions } from './$types'
+
+export const actions: Actions = {
+  oauth: async ({ request, url, locals: { supabase } }) => {
+    const formData = await request.formData()
+    const provider = formData.get('provider') as 'google' | 'github'
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${url.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      console.error(error)
+      redirect(303, '/auth/error')
+    }
+
+    // Redirect to the OAuth provider's authentication page
+    redirect(303, data.url)
+  },
+}
+```
+
+Then, create a callback route to handle the OAuth redirect and exchange the code for a session:
+
+```typescript src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/'
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      console.error('OAuth callback error:', error)
+    } else {
+      redirect(303, next)
+    }
+  }
+
+  // Return the user to an error page with instructions
+  redirect(303, '/auth/error')
+}
+```
+
+Use the action in your sign-in form:
+
+```svelte src/routes/auth/+page.svelte
+<form method="post" action="?/oauth">
+  <input type="hidden" name="provider" value="google" />
+  <button type="submit">Sign in with Google</button>
+</form>
+
+<form method="post" action="?/oauth">
+  <input type="hidden" name="provider" value="github" />
+  <button type="submit">Sign in with GitHub</button>
+</form>
+```
+
 ## Congratulations
 
 You're done! To recap, you've successfully:
