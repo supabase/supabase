@@ -2,9 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { Loader } from 'lucide-react'
 
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { ConnectionIcon } from '@/components/interfaces/ConnectSheet/ConnectionIcon'
 import { useParams } from 'common'
-import { Connect } from 'components/interfaces/Connect/Connect'
-import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
 import { AlertError } from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -208,7 +208,7 @@ export const APIKeys = () => {
                 Connect to your project from a variety of frameworks, ORMs, an MCP server, or even
                 directly via connection string.
               </p>
-              <Connect />
+              <ConnectButton renderDialog={false} />
             </div>
           </CardContent>
         </>

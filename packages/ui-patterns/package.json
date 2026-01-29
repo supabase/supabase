@@ -582,6 +582,10 @@
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
+    "./multiple-code-block": {
+      "import": "./src/multiple-code-block.tsx",
+      "types": "./src/multiple-code-block.tsx"
+    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
