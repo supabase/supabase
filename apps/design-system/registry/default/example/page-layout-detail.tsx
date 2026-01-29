@@ -24,7 +24,7 @@ export default function PageLayoutDetail() {
           <PageHeaderSummary>
             <PageHeaderTitle>Billing</PageHeaderTitle>
             <PageHeaderDescription>
-              Manage your organization's billing and subscription settings.
+              Manage your organization&apos;s billing and subscription settings.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -72,7 +72,7 @@ export default function PageLayoutDetail() {
             <PageSectionSummary>
               <PageSectionTitle>Cost control</PageSectionTitle>
               <PageSectionDescription>
-                Set spending limits and alerts to manage your organization's costs.
+                Set spending limits and alerts to manage your organization&apos;s costs.
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>

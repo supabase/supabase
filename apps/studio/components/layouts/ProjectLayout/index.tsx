@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
-import { useFlag, useParams } from 'common'
+import { mergeRefs, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -11,18 +11,20 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, LogoLoader, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
-import PausingState from './PausingState'
+import { PausingState } from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
@@ -45,6 +47,7 @@ const routesToIgnoreDBConnection = [
   '/project/[ref]/database/backups/scheduled',
   '/project/[ref]/database/backups/pitr',
   '/project/[ref]/settings/addons',
+  '/project/[ref]/functions',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -83,10 +86,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ref
   ) => {
     const router = useRouter()
-    const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+
+    const setMainScrollContainer = useSetMainScrollContainer()
+    const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
     const { appTitle } = useCustomContent(['app:title'])
     const titleSuffix = appTitle || 'Supabase'
@@ -99,20 +104,16 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const organizationName = selectedOrganization?.name
 
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-    const showProductMenu = selectedProject
-      ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-        (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings')) ||
-        router.pathname.includes('/project/[ref]/branches')
-      : true
 
     const ignorePausedState =
-      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+      router.pathname === '/project/[ref]' ||
+      router.pathname.includes('/project/[ref]/settings') ||
+      router.pathname.includes('/project/[ref]/functions')
     const showPausedState = isPaused && !ignorePausedState
 
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
+    const sidebarMinSizePercentage = 1
+    const sidebarDefaultSizePercentage = 15
+    const sidebarMaxSizePercentage = 33
 
     return (
       <>
@@ -131,12 +132,14 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
-            {showProductMenu && productMenu && (
+          {/*  autoSaveId="project-layout" */}
+          <ResizablePanelGroup direction="horizontal">
+            {productMenu && (
               <ResizablePanel
                 order={1}
-                maxSize={33}
-                defaultSize={1}
+                minSize={sidebarMinSizePercentage}
+                maxSize={sidebarMaxSizePercentage}
+                defaultSize={sidebarDefaultSizePercentage}
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
@@ -171,7 +174,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 )}
               </ResizablePanel>
             )}
-            {showProductMenu && productMenu && sideBarIsOpen && (
+            {productMenu && sideBarIsOpen && (
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}
@@ -179,14 +182,16 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               />
             )}
             <ResizablePanel
-              defaultSize={1}
               order={2}
+              minSize={100 - sidebarMaxSizePercentage}
+              maxSize={100 - sidebarMinSizePercentage}
+              defaultSize={100 - sidebarDefaultSizePercentage}
               id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
               <main
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
-                ref={ref}
+                ref={combinedRef}
               >
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
@@ -268,16 +273,20 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isHomeNewFlag = useFlag('homeNew')
+  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
+  const isEdgeFunctionPages = router.pathname.includes('/project/[ref]/functions')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
   const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
-    (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
+    (!isEdgeFunctionPages &&
+      !isSettingsPages &&
+      !routesToIgnoreDBConnection.includes(router.pathname)) ||
+    isVaultPage
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
@@ -289,19 +298,17 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectBuilding =
     selectedProject?.status === PROJECT_STATUS.COMING_UP ||
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
-  const isProjectPausing =
-    selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
-    selectedProject?.status === PROJECT_STATUS.PAUSING
+  const isProjectPausing = selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
   // handle redirect to home for building state
   const shouldRedirectToHomeForBuilding =
-    isHomeNewFlag && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+    isHomeNew && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
 
   // We won't be showing the building state with the new home page
   const shouldShowBuildingState =
-    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNewFlag && isHomePage)
+    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNew && isHomePage)
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {
@@ -345,7 +352,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed && !isBackupsPage) {
+  if (isProjectRestoreFailed && !isBackupsPage && !isEdgeFunctionPages) {
     return <RestoreFailedState />
   }
 

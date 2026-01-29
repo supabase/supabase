@@ -1,8 +1,8 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import type { OAuthServerAppDeleteVariables } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
+import type { OAuthServerAppDeleteVariables } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteOAuthAppModalProps {
@@ -22,15 +22,12 @@ export const DeleteOAuthAppModal = ({
 }: DeleteOAuthAppModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-
+  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
   const onConfirmDeleteApp = () => {
-    if (!selectedApp) return
-
     onDelete({
       projectRef,
-      supabaseClient: supabaseClientData?.supabaseClient,
-      clientId: selectedApp.client_id,
+      clientId: selectedApp?.client_id,
+      clientEndpoint: endpointData?.endpoint,
     })
   }
 

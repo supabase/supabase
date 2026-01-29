@@ -1,6 +1,6 @@
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteFunctionProps {
   func?: DatabaseFunction
@@ -36,26 +36,24 @@ export const DeleteFunction = ({
   }
 
   return (
-    <>
-      <TextConfirmModal
-        variant={'warning'}
-        visible={visible}
-        onCancel={() => setVisible(null)}
-        onConfirm={handleDelete}
-        title="Delete this function"
-        loading={isLoading}
-        confirmLabel={`Delete function ${name}`}
-        confirmPlaceholder="Type in name of function"
-        confirmString={name ?? 'Unknown'}
-        text={
-          <>
-            <span>This will delete the function</span>{' '}
-            <span className="text-bold text-foreground">{name}</span> <span>from the schema</span>{' '}
-            <span className="text-bold text-foreground">{schema}</span>
-          </>
-        }
-        alert={{ title: 'You cannot recover this function once deleted.' }}
-      />
-    </>
+    <TextConfirmModal
+      variant={'warning'}
+      visible={visible}
+      onCancel={() => setVisible(null)}
+      onConfirm={handleDelete}
+      title="Delete this function"
+      loading={isLoading}
+      confirmLabel={`Delete function ${name}`}
+      confirmPlaceholder="Type in name of function"
+      confirmString={name ?? 'Unknown'}
+      text={
+        <>
+          <span>This will delete the function</span>{' '}
+          <span className="text-bold text-foreground">{name}</span> <span>from the schema</span>{' '}
+          <span className="text-bold text-foreground">{schema}</span>
+        </>
+      }
+      alert={{ title: 'You cannot recover this function once deleted.' }}
+    />
   )
 }

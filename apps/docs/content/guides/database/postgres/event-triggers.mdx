@@ -110,7 +110,7 @@ Event triggers run for each DDL command specified above and can consume resource
 
 Within each event trigger, helper functions exist to view the objects being modified or the command being run. For example, our example calls `pg_event_trigger_dropped_objects()` to view the object(s) being dropped. For a more comprehensive overview of these functions, read the [official event trigger definition documentation](https://www.postgresql.org/docs/current/event-trigger-definition.html)
 
-To view the matrix commands that cause an event trigger to fire, read the [official event trigger matrix documentation](https://www.postgresql.org/docs/current/event-trigger-matrix.html)
+To view the matrix commands that cause an event trigger to fire, read the [official event trigger matrix documentation](https://www.postgresql.org/docs/17/event-trigger-matrix.html)
 
 ## Disabling an event trigger
 
@@ -131,5 +131,5 @@ DROP EVENT TRIGGER dont_drop_trigger;
 ## Resources
 
 - Official Postgres Docs: [Event Trigger Behaviours](https://www.postgresql.org/docs/current/event-trigger-definition.html)
-- Official Postgres Docs: [Event Trigger Firing Matrix](https://www.postgresql.org/docs/current/event-trigger-matrix.html)
+- Official Postgres Docs: [Event Trigger Firing Matrix](https://www.postgresql.org/docs/17/event-trigger-matrix.html)
 - Supabase blog: [Postgres Event Triggers without superuser access](/blog/event-triggers-wo-superuser)

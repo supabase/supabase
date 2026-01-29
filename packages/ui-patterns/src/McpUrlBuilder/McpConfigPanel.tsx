@@ -7,7 +7,7 @@ import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
-import type { McpClient } from './types'
+import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
 import { InfoTooltip } from '../info-tooltip'
 
@@ -17,7 +17,7 @@ export interface McpConfigPanelProps {
   projectRef?: string
   initialSelectedClient?: McpClient
   onClientSelect?: (client: McpClient) => void
-  onCopyCallback?: (type?: 'url' | 'json' | 'command') => void
+  onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
   theme?: 'light' | 'dark'
   className?: string

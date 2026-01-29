@@ -71,7 +71,7 @@ export default function PageLayoutList(): React.JSX.Element {
                   <Input
                     placeholder="Search for a function"
                     size="tiny"
-                    icon={<Search size={14} />}
+                    icon={<Search />}
                     className="w-full lg:w-52"
                   />
                 </div>

@@ -120,14 +120,13 @@ export const ProjectUpgradeAlert = () => {
           Your project can be upgraded to the latest version of Postgres
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          <p className="mb-3">
-            The latest version of Postgres ({latestPgVersion}) is available for your project.
-          </p>
+          <p>The latest version of Postgres ({latestPgVersion}) is available for your project.</p>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
                 type="primary"
+                className="mt-2"
                 onClick={() => setShowUpgradeModal(true)}
                 disabled={projectUpgradeDisabled}
               >
@@ -262,9 +261,7 @@ export const ProjectUpgradeAlert = () => {
                                     <div className="flex items-center gap-3">
                                       <span className="text-foreground">{postgresVersion}</span>
                                       {value.release_channel !== 'ga' && (
-                                        <Badge variant="warning" className="mr-1 capitalize">
-                                          {value.release_channel}
-                                        </Badge>
+                                        <Badge variant="warning">{value.release_channel}</Badge>
                                       )}
                                     </div>
                                   </SelectItem_Shadcn_>

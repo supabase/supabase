@@ -366,8 +366,8 @@ export const CreateCronJobSheet = ({
                     // @ts-ignore
                     title={
                       <span>
-                        Enable <code className="text-xs w-min">pg_net</code> for HTTP requests or
-                        Edge Functions
+                        Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
+                        requests or Edge Functions
                       </span>
                     }
                     description={

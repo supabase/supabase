@@ -11,7 +11,7 @@ interface SchemaEditorProps {
   closePanel: () => void
 }
 
-const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
+export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })
@@ -77,5 +77,3 @@ const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => 
     </SidePanel>
   )
 }
-
-export default SchemaEditor

@@ -7,9 +7,15 @@ import { EventBanner } from '~/components/Events/new/EventBanner'
 import { EventsProvider } from '~/app/events/context'
 import { EventGallery } from './EventGallery'
 
-export function EventClientRenderer({ staticEvents }: { staticEvents: SupabaseEvent[] }) {
+export function EventClientRenderer({
+  staticEvents,
+  onDemandEvents,
+}: {
+  staticEvents: SupabaseEvent[]
+  onDemandEvents: SupabaseEvent[]
+}) {
   return (
-    <EventsProvider staticEvents={staticEvents}>
+    <EventsProvider staticEvents={staticEvents} onDemandEvents={onDemandEvents}>
       <DefaultLayout className="flex flex-col">
         <SectionContainer className="border-x border-b !py-8">
           <h1 className="h3 !p-0 !m-0">

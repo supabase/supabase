@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { addAPIMock } from 'tests/lib/msw'
 import { customRender } from 'tests/lib/custom-render'
+import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
 import { CreateBucketModal } from '../CreateBucketModal'
 
@@ -42,7 +42,7 @@ describe(`CreateBucketModal`, () => {
   it(`renders a dialog with a form`, async () => {
     customRender(
       <ProjectContextProvider projectRef="default">
-        <CreateBucketModal />
+        <CreateBucketModal open={true} onOpenChange={() => {}} />
       </ProjectContextProvider>,
       {
         nuqs: {

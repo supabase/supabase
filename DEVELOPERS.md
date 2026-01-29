@@ -35,7 +35,7 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
 - [Git](https://git-scm.com/)
-- [Node.js v22.x or higher](https://nodejs.org)
+- [Node.js](https://nodejs.org) version as documented in [.nvmrc](./.nvmrc)
 - [pnpm](https://pnpm.io/) version 9.x.x or higher
 - [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
@@ -192,7 +192,7 @@ We support "federating" docs, meaning doc content can come directly from externa
 
 Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
 
-See the [Vecs Python source code](https://github.com/supabase/supabase/blob/master/apps/docs/pages/guides/ai/python/%5Bslug%5D.tsx) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+See the [Vecs Python source code](https://github.com/supabase/supabase/tree/master/apps/docs/app/guides/ai/python/%5Bslug%5D to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
 
 Some things to consider:
 

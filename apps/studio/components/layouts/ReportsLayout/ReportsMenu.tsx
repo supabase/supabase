@@ -9,7 +9,6 @@ import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -17,7 +16,9 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ReportMenuItem } from './ReportMenuItem'
+import { useQueryState, parseAsBoolean } from 'nuqs'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -57,7 +58,7 @@ const ReportsMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
@@ -73,7 +74,10 @@ const ReportsMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
   const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
 

@@ -1,31 +1,31 @@
 import * as Sentry from '@sentry/nextjs'
+import CopyButton from 'components/ui/CopyButton'
+import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useStateTransition } from 'hooks/misc/useStateTransition'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Loader2, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { type Dispatch, type PropsWithChildren, useCallback, useReducer } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
-// End of third-party imports
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
-import CopyButton from 'components/ui/CopyButton'
-import InformationBox from 'components/ui/InformationBox'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useStateTransition } from 'hooks/misc/useStateTransition'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { AIAssistantOption } from './AIAssistantOption'
-import { HighlightProjectRefProvider, useHighlightProjectRefContext } from './HighlightContext'
+import { DiscordCTACard } from './DiscordCTACard'
+import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import {
-  createInitialSupportFormState,
   type SupportFormActions,
-  supportFormReducer,
   type SupportFormState,
+  createInitialSupportFormState,
+  supportFormReducer,
 } from './SupportForm.state'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
 
@@ -57,17 +57,21 @@ function useSupportFormTelemetry() {
 }
 
 export function SupportFormPage() {
-  return (
-    <HighlightProjectRefProvider>
-      <SupportFormPageContent />
-    </HighlightProjectRefProvider>
-  )
+  return <SupportFormPageContent />
 }
 
 function SupportFormPageContent() {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
-
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
+
+  const {
+    data: allStatusPageEvents,
+    isPending: isIncidentsPending,
+    isError: isIncidentsError,
+  } = useIncidentStatusQuery()
+  const { incidents = [] } = allStatusPageEvents ?? {}
+  const hasActiveIncidents =
+    !isIncidentsPending && !isIncidentsError && incidents && incidents.length > 0
 
   const sendTelemetry = useSupportFormTelemetry()
   useStateTransition(state, 'submitting', 'success', (_, curr) => {
@@ -85,10 +89,22 @@ function SupportFormPageContent() {
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
+  const isSuccess = state.type === 'success'
+
   return (
     <SupportFormWrapper>
       <SupportFormHeader />
-      <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+
+      <IncidentAdmonition isActive={hasActiveIncidents} />
+
+      {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
+      {!isSuccess && !hasActiveIncidents && (
+        <div className="flex flex-col gap-y-4">
+          <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+          <DiscordCTACard organizationSlug={orgSlug} />
+        </div>
+      )}
+
       <SupportFormBody
         form={form}
         state={state}
@@ -96,7 +112,7 @@ function SupportFormPageContent() {
         initialError={initialError}
         selectedProjectRef={projectRef}
       />
-      <SupportFormDirectEmailInfo />
+      {!isSuccess && <SupportFormDirectEmailInfo projectRef={projectRef} />}
     </SupportFormWrapper>
   )
 }
@@ -112,8 +128,10 @@ function SupportFormWrapper({ children }: PropsWithChildren) {
 }
 
 function SupportFormHeader() {
-  const { data, isLoading, isError } = usePlatformStatusQuery()
-  const isHealthy = data?.isHealthy
+  const { data: allStatusPageEvents, isPending: isLoading, isError } = useIncidentStatusQuery()
+  const { incidents = [], maintenanceEvents = [] } = allStatusPageEvents ?? {}
+  const isMaintenance = maintenanceEvents.length > 0
+  const isIncident = incidents.length > 0
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
@@ -140,10 +158,10 @@ function SupportFormHeader() {
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
-                ) : isHealthy ? (
-                  <div className="h-2 w-2 bg-brand rounded-full" />
                 ) : (
-                  <div className="h-2 w-2 bg-yellow-900 rounded-full" />
+                  <div
+                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                  />
                 )
               }
             >
@@ -152,14 +170,16 @@ function SupportFormHeader() {
                   ? 'Checking status'
                   : isError
                     ? 'Failed to check status'
-                    : isHealthy
-                      ? 'All systems operational'
-                      : 'Active incident ongoing'}
+                    : isIncident
+                      ? 'Active incident ongoing'
+                      : isMaintenance
+                        ? 'Scheduled maintenance'
+                        : 'All systems operational'}
               </Link>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center">
-            Check Supabase status page
+            Check the Supabase status page
           </TooltipContent>
         </Tooltip>
       </div>
@@ -167,44 +187,57 @@ function SupportFormHeader() {
   )
 }
 
-function SupportFormDirectEmailInfo() {
-  const { scrollToRef, setShouldHighlightRef: setHighlight } = useHighlightProjectRefContext()
+interface SupportFormDirectEmailInfoProps {
+  projectRef: string | null
+}
+
+function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoProps) {
+  const hasProjectRef = projectRef && projectRef !== NO_PROJECT_MARKER
 
   return (
-    <InformationBox
+    <Admonition
+      type="default"
       title="Having trouble submitting the form?"
       description={
-        <div className="flex flex-col gap-y-4">
-          <p className="flex items-center gap-x-1 ">
-            Email us directly at{' '}
-            <InlineLink href="mailto:support@supabase.com" className="font-mono">
-              support@supabase.com
-            </InlineLink>
-            <CopyButton
-              type="text"
-              text="support@supabase.com"
-              iconOnly
-              onClick={() => toast.success('Copied to clipboard')}
-            />
+        <>
+          <p className="!mb-2.5">
+            Please email us directly. Include your project ID and as much information as possible.
           </p>
-          <p>
-            Please, make sure to{' '}
-            <button
-              type="button"
-              className={cn(InlineLinkClassName, 'cursor-pointer')}
-              onClick={() => {
-                scrollToRef()
-                setHighlight(true)
-              }}
-            >
-              include your project ID
-            </button>{' '}
-            and as much information as possible.
+          <p className="flex items-center gap-x-1.5 flex-wrap">
+            Email:{' '}
+            <span className="inline-flex items-center gap-x-1">
+              <a
+                href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
+                className="hover:text-foreground transition-colors duration-100"
+              >
+                <code className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                  support@supabase.com
+                </code>
+              </a>
+              <CopyButton
+                type="text"
+                text="support@supabase.com"
+                iconOnly
+                onClick={() => toast.success('Copied email address to clipboard')}
+              />
+            </span>
           </p>
-        </div>
+          {hasProjectRef && (
+            <p className="flex items-center gap-x-1.5 flex-wrap">
+              Project ID:{' '}
+              <span className="inline-flex items-center gap-x-1">
+                <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+                <CopyButton
+                  iconOnly
+                  type="text"
+                  text={projectRef}
+                  onClick={() => toast.success('Copied project ID to clipboard')}
+                />
+              </span>
+            </p>
+          )}
+        </>
       }
-      defaultVisibility={true}
-      hideCollapse={true}
     />
   )
 }
@@ -224,17 +257,17 @@ function SupportFormBody({
   initialError,
   selectedProjectRef,
 }: SupportFromBodyProps) {
-  const showSuccessMessage = state.type === 'success'
+  const isSuccess = state.type === 'success'
 
   return (
     <div
       className={cn(
         'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
-        `${showSuccessMessage ? 'pt-8' : 'py-8'}`,
+        `${isSuccess ? 'pt-8' : 'py-8'}`,
         'border-default'
       )}
     >
-      {showSuccessMessage ? (
+      {isSuccess ? (
         <Success
           selectedProject={selectedProjectRef ?? undefined}
           sentCategory={state.sentCategory}

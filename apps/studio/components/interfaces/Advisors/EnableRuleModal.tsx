@@ -48,7 +48,7 @@ export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
       </DialogTrigger>
       <DialogContent size="small">
         <DialogHeader>
-          <DialogTitle>Confirm to enable rule</DialogTitle>
+          <DialogTitle>Enable rule</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>

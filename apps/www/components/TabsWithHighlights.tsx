@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
-import { Check } from 'lucide-react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { Badge, cn } from 'ui'
+import { Check } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import React, { useRef, useState } from 'react'
+import { cn } from 'ui'
 import BrowserFrame from './BrowserFrame'
 
 export type Tab = {
@@ -96,19 +96,17 @@ interface TabProps {
 }
 
 const Tab = ({ label, isActive, onClick }: TabProps) => (
-  <button onClick={onClick} aria-selected={isActive} role="tab">
-    <Badge
-      size="large"
-      className={cn(
-        // `text-left py-1.5 px-3 lg:py-2 lg:px-8 border rounded-md bg-alternative hover:border-foreground text-lg opacity-80 transition-all`,
-        'py-1.5 px-3 lg:py-2 lg:px-8',
-        'hover:border-foreground-lighter hover:text-foreground',
-        `opacity-80`,
-        isActive ? 'opacity-100 !border-foreground' : ''
-      )}
-    >
-      {label}
-    </Badge>
+  <button
+    onClick={onClick}
+    aria-selected={isActive}
+    role="tab"
+    className={cn(
+      'py-1.5 px-3 lg:py-2 lg:px-8 border rounded-full bg-alternative hover:border-foreground text-sm opacity-80 transition-all',
+      'hover:border-foreground-lighter hover:text-foreground',
+      isActive ? 'opacity-100 !border-foreground' : ''
+    )}
+  >
+    {label}
   </button>
 )
 

@@ -37,8 +37,8 @@ import {
   PageHeader,
   PageHeaderAside,
   PageHeaderBreadcrumb,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -133,13 +133,58 @@ const EdgeFunctionDetailsLayout = ({
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+
+    // Extract file paths relative to function slug
+    const filePaths = functionBody.files.map((file) => {
+      const nameSections = file.name.split('/')
+      const slugIndex = nameSections.indexOf(functionSlug ?? '')
+      return nameSections.slice(slugIndex + 1).join('/')
+    })
+
+    // Find the deepest relative path (count leading ../ segments)
+    let maxDepth = 0
+    filePaths.forEach((path) => {
+      const segments = path.split('/')
+      let depth = 0
+      for (const segment of segments) {
+        if (segment === '..') {
+          depth++
+        } else {
+          break
+        }
+      }
+      maxDepth = Math.max(maxDepth, depth)
+    })
+
+    // Add files to zip with normalized paths
     functionBody.files.forEach((file) => {
       const nameSections = file.name.split('/')
       const slugIndex = nameSections.indexOf(functionSlug ?? '')
       const fileName = nameSections.slice(slugIndex + 1).join('/')
 
+      // Count and remove leading ../ segments
+      const segments = fileName.split('/')
+      let parentDirCount = 0
+      while (segments.length > 0 && segments[0] === '..') {
+        segments.shift()
+        parentDirCount++
+      }
+
+      // Calculate safe path:
+      // - Files without ../ go into the full base path
+      // - Files with ../ go into a shallower path based on how many levels up they go
+      const depthFromBase = maxDepth - parentDirCount
+      const safePath =
+        depthFromBase > 0
+          ? Array.from({ length: depthFromBase }, (_, i) => (i === 0 ? 'src' : `src${i}`)).join(
+              '/'
+            ) +
+            '/' +
+            segments.join('/')
+          : segments.join('/')
+
       const fileBlob = new Blob([file.content])
-      zipWriter.add(fileName, new BlobReader(fileBlob))
+      zipWriter.add(safePath, new BlobReader(fileBlob))
     })
 
     const blobURL = URL.createObjectURL(await zipWriter.close())
@@ -175,7 +220,7 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full">
+        <PageHeader size="full" className="sticky top-0 z-10 bg-background">
           {breadcrumbItems.length > 0 && (
             <PageHeaderBreadcrumb>
               <BreadcrumbList>
@@ -269,7 +314,7 @@ const EdgeFunctionDetailsLayout = ({
           </PageHeaderMeta>
 
           {navigationItems.length > 0 && (
-            <PageHeaderFooter>
+            <PageHeaderNavigationTabs>
               <NavMenu>
                 {navigationItems.map((item) => {
                   const isActive = router.asPath.split('?')[0] === item.href
@@ -280,7 +325,7 @@ const EdgeFunctionDetailsLayout = ({
                   )
                 })}
               </NavMenu>
-            </PageHeaderFooter>
+            </PageHeaderNavigationTabs>
           )}
         </PageHeader>
 

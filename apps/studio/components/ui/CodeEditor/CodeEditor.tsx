@@ -1,6 +1,6 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -72,6 +72,11 @@ const CodeEditor = ({
     ...actions,
   }
 
+  const runQueryCallbackRef = useRef(runQuery.callback)
+  useEffect(() => {
+    runQueryCallbackRef.current = runQuery.callback
+  }, [runQuery.callback])
+
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
 
@@ -134,7 +139,7 @@ const CodeEditor = ({
           const selectedValue = (editorRef?.current as any)
             .getModel()
             .getValueInRange((editorRef?.current as any)?.getSelection())
-          runQuery.callback(selectedValue || (editorRef?.current as any)?.getValue())
+          runQueryCallbackRef.current(selectedValue || (editorRef?.current as any)?.getValue())
         },
       })
     }

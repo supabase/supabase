@@ -9,10 +9,9 @@ export const generateAuthMenu = (
     authenticationEmails: boolean
     authenticationMultiFactor: boolean
     authenticationAttackProtection: boolean
-    authenticationAdvanced: boolean
     authenticationShowOverview: boolean
-    authenticationShowSecurityNotifications: boolean
     authenticationOauth21: boolean
+    authenticationPerformance: boolean
   }
 ): ProductMenuGroup[] => {
   const {
@@ -21,10 +20,9 @@ export const generateAuthMenu = (
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
     authenticationShowOverview,
-    authenticationShowSecurityNotifications,
     authenticationOauth21,
+    authenticationPerformance,
   } = flags ?? {}
 
   return [
@@ -47,7 +45,7 @@ export const generateAuthMenu = (
           : []),
       ],
     },
-    ...(authenticationEmails && authenticationShowSecurityNotifications && IS_PLATFORM
+    ...(authenticationEmails && IS_PLATFORM
       ? [
           {
             title: 'Notifications',
@@ -95,7 +93,7 @@ export const generateAuthMenu = (
                       name: 'OAuth Server',
                       key: 'oauth-server',
                       url: `/project/${ref}/auth/oauth-server`,
-                      label: 'BETA',
+                      label: 'Beta',
                     },
                   ]
                 : []),
@@ -111,17 +109,6 @@ export const generateAuthMenu = (
                       name: 'Rate Limits',
                       key: 'rate-limits',
                       url: `/project/${ref}/auth/rate-limits`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              ...(authenticationEmails && !authenticationShowSecurityNotifications
-                ? [
-                    {
-                      name: 'Emails',
-                      key: 'emails',
-                      pages: ['templates', 'smtp'],
-                      url: `/project/${ref}/auth/templates`,
                       items: [],
                     },
                   ]
@@ -157,7 +144,7 @@ export const generateAuthMenu = (
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
-                label: 'BETA',
+                label: 'Beta',
               },
               {
                 name: 'Audit Logs',
@@ -165,12 +152,12 @@ export const generateAuthMenu = (
                 url: `/project/${ref}/auth/audit-logs`,
                 items: [],
               },
-              ...(authenticationAdvanced
+              ...(authenticationPerformance
                 ? [
                     {
-                      name: 'Advanced',
-                      key: 'advanced',
-                      url: `/project/${ref}/auth/advanced`,
+                      name: 'Performance',
+                      key: 'performance',
+                      url: `/project/${ref}/auth/performance`,
                       items: [],
                     },
                   ]
