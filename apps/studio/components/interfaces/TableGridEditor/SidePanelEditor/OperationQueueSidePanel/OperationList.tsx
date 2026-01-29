@@ -8,7 +8,11 @@ interface OperationListProps {
 
 export const OperationList = ({ operations }: OperationListProps) => {
   if (operations.length === 0) {
-    return <p className="text-sm text-foreground-light">No pending changes</p>
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <p className="text-md text-foreground-muted">No pending changes</p>
+      </div>
+    )
   }
 
   return (
