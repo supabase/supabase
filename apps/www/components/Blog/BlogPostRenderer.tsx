@@ -1,19 +1,17 @@
 'use client'
 
 import dayjs from 'dayjs'
+import mdxComponents from 'lib/mdx/mdxComponents'
+import { ChevronLeft } from 'lucide-react'
 import { MDXRemote } from 'next-mdx-remote'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useMemo } from 'react'
-import { ChevronLeft } from 'lucide-react'
-import { Badge } from 'ui'
-
-import mdxComponents from 'lib/mdx/mdxComponents'
-
-import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
+import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
+import { Badge } from 'ui'
 
 const ShareArticleActions = dynamic(() => import('components/Blog/ShareArticleActions'))
 const CTABanner = dynamic(() => import('components/CTABanner'))
@@ -160,9 +158,11 @@ const BlogPostRenderer = ({
   )
 
   const imageUrl = isCMS
-    ? blogMetaData.thumb ?? ''
-    : blogMetaData.thumb
-      ? `/images/blog/${blogMetaData.thumb}`
+    ? blogMetaData.imgThumb ?? ''
+    : blogMetaData.imgThumb
+      ? blogMetaData.imgThumb.startsWith('/') || blogMetaData.imgThumb.startsWith('http')
+        ? blogMetaData.imgThumb
+        : `/images/blog/${blogMetaData.imgThumb}`
       : ''
 
   return (
@@ -263,8 +263,8 @@ const BlogPostRenderer = ({
                           allowFullScreen={true}
                         />
                       ) : (
-                        blogMetaData.thumb && (
-                          <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
+                        blogMetaData.imgThumb && (
+                          <div className="hidden md:block relative mb-8 w-full aspect-[1.91/1] overflow-auto rounded-lg border">
                             <Image
                               src={imageUrl}
                               alt={blogMetaData.title}
