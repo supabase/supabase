@@ -1,7 +1,6 @@
+import { isPendingAddRow } from '../types'
 import { generateTableChangeKey, generateTableChangeKeyFromOperation } from './queueOperationUtils'
 import {
-  type DeleteRowOperation,
-  type EditCellContentOperation,
   type NewDeleteRowOperation,
   type NewEditCellContentOperation,
   NewQueuedOperation,
@@ -59,9 +58,10 @@ export function resolveDeleteRowConflicts(
   const rowIdentifiers = deleteOperation.payload.rowIdentifiers
 
   // Check if this row was newly added (by tempId)
-  const tempId = (deleteOperation.payload.originalRow as any)?.__tempId
-  if (tempId) {
-    // If deleting a newly added row, filter out the ADD_ROW operation
+  // If deleting a newly added row, filter out the ADD_ROW operation
+  const originalRow = deleteOperation.payload.originalRow
+  if (isPendingAddRow(originalRow)) {
+    const tempId = originalRow.__tempId
     const addRowKey = generateTableChangeKey({
       type: QueuedOperationType.ADD_ROW,
       tableId: deleteOperation.tableId,
