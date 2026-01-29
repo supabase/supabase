@@ -166,12 +166,12 @@ insert into
 values
   (
     'doc-1',
-    '[${dimensionExample}]'${!updatedImportForeignSchemaSyntax ? '::embd' : ''}${sqlComment},
+    '[${dimensionExample}]'${updatedImportForeignSchemaSyntax ? '::s3vec' : '::embd'}${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
     'doc-2',
-    '[${dimensionExample}]'${!updatedImportForeignSchemaSyntax ? '::embd' : ''}${sqlComment},
+    '[${dimensionExample}]'${updatedImportForeignSchemaSyntax ? '::s3vec' : '::embd'}${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
 
