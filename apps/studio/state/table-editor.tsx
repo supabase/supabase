@@ -317,16 +317,17 @@ export const createTableEditorState = () => {
     },
 
     hasPendingCellChange: (
-      type: QueuedOperationType,
       tableId: number,
-      rowIdentifiers: Record<string, unknown>,
+      rowIdentifiers: Dictionary<unknown>,
       columnName: string
     ): boolean => {
       const key = generateTableChangeKey({
-        type,
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
         tableId,
-        columnName,
-        rowIdentifiers,
+        payload: {
+          columnName,
+          rowIdentifiers,
+        },
       })
       return state.operationQueue.operations.some((op) => op.id === key)
     },

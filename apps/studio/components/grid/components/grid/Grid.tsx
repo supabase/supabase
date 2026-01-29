@@ -22,7 +22,6 @@ import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -175,9 +174,7 @@ export const Grid = memo(
               }
 
               // Check if this cell has pending changes
-              // Since we are checking for cell changes, we need to use the EDIT_CELL_CONTENT type
               const isDirty = tableEditorSnap.hasPendingCellChange(
-                QueuedOperationType.EDIT_CELL_CONTENT,
                 snap.table.id,
                 rowIdentifiers,
                 col.key

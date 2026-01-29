@@ -6,76 +6,50 @@ import type { Dictionary } from 'types'
 
 import { PendingAddRow, PendingDeleteRow, SupaRow, isPendingAddRow } from '../types'
 import {
+  EditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 
-interface GenerateTableChangeKeyArgs {
-  type: QueuedOperationType
+interface EditCellKeyOperation
+  extends Omit<EditCellContentOperation, 'payload' | 'id' | 'timestamp'> {
+  type: QueuedOperationType.EDIT_CELL_CONTENT
   tableId: number
-  columnName?: string
-  rowIdentifiers?: Record<string, unknown>
-  tempId?: string
+  payload: {
+    columnName: string
+    rowIdentifiers: Dictionary<unknown>
+  }
 }
 
-export function generateTableChangeKeyFromOperation(operation: NewQueuedOperation): string {
+export function generateTableChangeKey(
+  operation: NewQueuedOperation | EditCellKeyOperation
+): string {
   if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-    return generateTableChangeKey({
-      type: operation.type,
-      tableId: operation.tableId,
-      columnName: operation.payload.columnName,
-      rowIdentifiers: operation.payload.rowIdentifiers,
-    })
-  }
-
-  if (operation.type === QueuedOperationType.ADD_ROW) {
-    return generateTableChangeKey({
-      type: operation.type,
-      tableId: operation.tableId,
-      tempId: operation.payload.tempId,
-    })
-  }
-
-  if (operation.type === QueuedOperationType.DELETE_ROW) {
-    return generateTableChangeKey({
-      type: operation.type,
-      tableId: operation.tableId,
-      rowIdentifiers: operation.payload.rowIdentifiers,
-    })
-  }
-
-  // Need to explicitly handle other operations
-  throw new Error(`Unknown operation type: ${(operation as never)['type']}`)
-}
-
-export function generateTableChangeKey({
-  rowIdentifiers,
-  columnName,
-  tableId,
-  type,
-  tempId,
-}: GenerateTableChangeKeyArgs): string {
-  // For ADD_ROW, use tempId
-  if (type === QueuedOperationType.ADD_ROW && tempId) {
-    return `${type}:${tableId}:${tempId}`
-  }
-
-  // For DELETE_ROW, use rowIdentifiers only (no columnName)
-  if (type === QueuedOperationType.DELETE_ROW) {
-    const rowIdentifiersKey = Object.entries(rowIdentifiers ?? {})
+    const { columnName, rowIdentifiers } = operation.payload
+    const rowIdentifiersKey = Object.entries(rowIdentifiers)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, value]) => `${key}:${value}`)
       .join('|')
-    return `${type}:${tableId}:${rowIdentifiersKey}`
+    return `${operation.type}:${operation.tableId}:${columnName}:${rowIdentifiersKey}`
   }
 
-  // For EDIT_CELL_CONTENT, use columnName and rowIdentifiers
-  const rowIdentifiersKey = Object.entries(rowIdentifiers ?? {})
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${key}:${value}`)
-    .join('|')
-  return `${type}:${tableId}:${columnName}:${rowIdentifiersKey}`
+  if (operation.type === QueuedOperationType.ADD_ROW) {
+    return `${operation.type}:${operation.tableId}:${operation.payload.tempId}`
+  }
+
+  if (operation.type === QueuedOperationType.DELETE_ROW) {
+    const { rowIdentifiers } = operation.payload
+    const rowIdentifiersKey = Object.entries(rowIdentifiers)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}:${value}`)
+      .join('|')
+    return `${operation.type}:${operation.tableId}:${rowIdentifiersKey}`
+  }
+
+  // Exhaustive check - TypeScript will error if we miss a case
+  const _exhaustiveCheck: never = operation
+  throw new Error(`Unknown operation type: ${(_exhaustiveCheck as { type: string }).type}`)
 }
 
 export function rowMatchesIdentifiers(

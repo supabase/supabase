@@ -1,5 +1,5 @@
 import { isPendingAddRow } from '../types'
-import { generateTableChangeKey, generateTableChangeKeyFromOperation } from './queueOperationUtils'
+import { generateTableChangeKey } from './queueOperationUtils'
 import {
   type NewDeleteRowOperation,
   type NewEditCellContentOperation,
@@ -65,7 +65,11 @@ export function resolveDeleteRowConflicts(
     const addRowKey = generateTableChangeKey({
       type: QueuedOperationType.ADD_ROW,
       tableId: deleteOperation.tableId,
-      tempId,
+      payload: {
+        tempId,
+        rowData: originalRow,
+        table: deleteOperation.payload.table,
+      },
     })
 
     let filteredOperations = operations
@@ -146,7 +150,7 @@ export function upsertOperation(
   operations: readonly QueuedOperation[],
   newOperation: NewQueuedOperation
 ): UpsertResult {
-  const operationKey = generateTableChangeKeyFromOperation(newOperation)
+  const operationKey = generateTableChangeKey(newOperation)
   const existingOpIndex = operations.findIndex((op) => op.id === operationKey)
 
   const queuedOperation: QueuedOperation = {
