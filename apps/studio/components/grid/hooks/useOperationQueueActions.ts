@@ -1,12 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { toast } from 'sonner'
-
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useOperationQueueSaveMutation } from 'data/table-rows/operation-queue-save-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useCallback } from 'react'
+import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useOperationsQueueSnapshot, useTableEditorStateSnapshot } from 'state/table-editor'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 
 interface UseOperationQueueActionsOptions {
@@ -24,6 +23,7 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
+  const operations = useOperationsQueueSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const { mutate: saveOperationQueue, isPending: isMutationPending } =
@@ -44,7 +44,6 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
   const handleSave = useCallback(() => {
     if (!project) return
 
-    const operations = snap.operationQueue.operations as readonly QueuedOperation[]
     if (operations.length === 0) return
 
     snap.setQueueStatus('saving')
@@ -55,11 +54,10 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
       operations,
       roleImpersonationState: getImpersonatedRoleState(),
     })
-  }, [snap, project, saveOperationQueue, getImpersonatedRoleState])
+  }, [snap, project, operations, saveOperationQueue, getImpersonatedRoleState])
 
   const handleCancel = useCallback(() => {
     // Get unique table IDs from the queue before clearing
-    const operations = snap.operationQueue.operations as readonly QueuedOperation[]
     const tableIds = [...new Set(operations.map((op) => op.tableId))]
 
     // Clear the queue and invalidate queries to revert optimistic updates
@@ -73,7 +71,7 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
       })
     }
     onCancelSuccess?.()
-  }, [snap, project, queryClient, onCancelSuccess])
+  }, [snap, project, operations, queryClient, onCancelSuccess])
 
   return {
     handleSave,
