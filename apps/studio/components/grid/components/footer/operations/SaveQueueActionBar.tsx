@@ -37,14 +37,19 @@ export const SaveQueueActionBar = () => {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.2 }}
-          className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50"
+          exit={{ opacity: 0, y: 16 }}
+          transition={{
+            type: 'spring',
+            stiffness: 420,
+            damping: 30,
+            mass: 0.4,
+          }}
+          className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 transform-gpu will-change-transform"
         >
           <div className="flex items-center gap-8 pl-4 pr-2 py-2 bg-surface-100 border rounded-lg shadow-lg">
-            <span className="text-xs text-foreground-light">
+            <span className="text-xs text-foreground-light max-w-40 truncate">
               {operationCount} pending change{operationCount !== 1 ? 's' : ''}
             </span>
             <div className="flex items-center gap-2">
