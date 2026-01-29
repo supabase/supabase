@@ -32,6 +32,46 @@ Quick run through of the different building blocks that make up the SQL Editor, 
 
 - Page fetching is done on demand for the snippets via a "Load more" button due to the complexity of a tree view (we've deliberate avoided an infinite loading UX which we commonly do across other parts of the dashboard)
 
+## Data flow
+
+### Landing on the SQL Editor
+
+- Snippets and folders are all initially loaded via React Query in [`SQLEditorNav`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.tsx), which are then initialized into the Valtio store via [`snapV2.addSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.tsx#L415) calls in the `useEffects`
+
+- On `/editor/sql`
+
+  - We'll redirect users to the last visited snippet if there's one (`/editor/sql/[id]`), otherwise will redirect to `/editor/sql/new` (within [`[id].tsx`](https://github.com/supabase/supabase/blob/master/apps/studio/pages/project/%5Bref%5D/sql/%5Bid%5D.tsx) )
+
+- On `/editor/sql/[id]`
+  - We'll load the content of the snippet via `useContentQuery` and update the Valtio store via [`snapV2.setSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/pages/project/%5Bref%5D/sql/%5Bid%5D.tsx#L69)
+
+### Writing a snippet
+
+- On `/editor/sql/new`:
+
+  - The first character input will [update the Valtio store](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L192) with a snippet skeleton via `snapV2.addSnippet` and user will be redirected to `/editor/sql/[id]`, using the `id` from the skeleton
+  - Note that `snapV2.addSnippet` only handles adding snippets to the store and does not queue the snippet for saving
+  - Subsequent character inputs will follow below as per `/editor/sql/[id]`
+
+- On `/editor/sql/[id]`:
+  - [`snapV2.setSql`](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L207) will be called based on the debounced value of the code editor, in which we'll then queue the snippet for [saving](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L477) via `upsertSnippet`.
+  - Note that we do invalidate some React Queries (snippet count, snippets, and folders) after saving via [`upsertSnippet`](https://github.com/supabase/supabase/blob/chore/add-readme-for-sql-editor-overview/apps/studio/state/sql-editor-v2.ts#L412), but the invalidation is only [triggered](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L209) if it's a new snippet that's not saved in the DB yet
+
+### Running a snippet
+
+- There's several safeguards in place before we run the query
+
+  - [Check for destructive operations](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L293): Will open a confirmation modal before running the query
+  - [Check for update statements without where clause](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L300): Will open a confirmation modal before running the query
+  - [Append a preset limit to the query if it's a select](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L333): To prevent accidentally running an expensive query on the database. Users can explicitly opt out of this to set "No limit"
+
+- If the snippet's name is "Untitled query", we'll also trigger a non-blocking request to [rename the snippet via AI](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L317). Snippet name will be updated whenever the request completes.
+
+### Renaming, Moving, Deleting, Sharing snippets
+
+- These functionalities all call `upsertContent` via React Query directly without going through the Valtio store
+- We thereafter update the Valtio stores for the SQL Editor and Tabs as required if the upsert is successful
+
 ## Possible areas to simplify, refactor, or improve
 
 - `updateSnippet` and `setSql` could be consolidated in `sql-editor-v2.ts`
@@ -39,3 +79,5 @@ Quick run through of the different building blocks that make up the SQL Editor, 
 - Refactor renaming a query to have optimistic rendering for consistency on how we update snippets in the `sql-editor-v2.ts`
 
 - Implement drag and drop functionality for snippets into folders
+
+- `RenameQueryModal` and `MoveQueryModal`, could call `updateSnippet` instead of `removeSnippet` + `addSnippet`?

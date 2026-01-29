@@ -1,18 +1,17 @@
-import { debounce, memoize } from 'lodash'
-import { useMemo } from 'react'
-import { toast } from 'sonner'
-import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
-import { devtools, proxyMap } from 'valtio/utils'
-
 import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
+import { UpsertContentPayload, upsertContent } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
+import { debounce, memoize } from 'lodash'
+import { useMemo } from 'react'
+import { toast } from 'sonner'
 import type { SqlSnippets } from 'types'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
+import { devtools, proxyMap } from 'valtio/utils'
 
 type StateSnippetFolder = {
   projectRef: string
@@ -400,7 +399,7 @@ async function upsertSnippet(
   id: string,
   projectRef: string,
   payload: UpsertContentPayload,
-  shouldInvalidate = true
+  shouldInvalidate = false
 ) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
@@ -425,14 +424,14 @@ async function upsertSnippet(
   }
 }
 
-const memoizedUpdateSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
+const memoizedUpsertSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
 
 const debouncedUpdateSnippet = (
   id: string,
   projectRef: string,
   payload: UpsertContentPayload,
   shouldInvalidate = false
-) => memoizedUpdateSnippet(id)(id, projectRef, payload, shouldInvalidate)
+) => memoizedUpsertSnippet(id)(id, projectRef, payload, shouldInvalidate)
 
 async function upsertFolder(id: string, projectRef: string, name: string) {
   try {
