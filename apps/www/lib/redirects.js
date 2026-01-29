@@ -3067,11 +3067,6 @@ module.exports = [
   // design
   {
     permanent: true,
-    source: '/design',
-    destination: '/design-system',
-  },
-  {
-    permanent: true,
     source: '/:path*',
     has: [
       {
@@ -3080,5 +3075,10 @@ module.exports = [
       },
     ],
     destination: 'https://supabase.com/design-system/:path*',
+  },
+  {
+    permanent: true,
+    source: '/design',
+    destination: '/design-system',
   },
 ]
