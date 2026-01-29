@@ -50,9 +50,9 @@ export type RawChartData = {
 export const transformToBarChartData = (data: RawChartData[]): LogsBarChartDatum[] => {
   return data.map((row) => ({
     timestamp: typeof row.timestamp === 'string' ? row.timestamp : String(row.timestamp),
-    ok_count: row.ok_count || 0,
-    warning_count: row.warning_count || 0,
-    error_count: row.error_count || 0,
+    ok_count: row.ok_count ?? 0,
+    warning_count: row.warning_count ?? 0,
+    error_count: row.error_count ?? 0,
   }))
 }
 

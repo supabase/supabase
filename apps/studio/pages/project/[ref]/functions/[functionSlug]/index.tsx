@@ -180,7 +180,7 @@ const PageLayout: NextPageWithLayout = () => {
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {combinedStatsError?.message || 'Unknown error'}
+                        {combinedStatsError?.message ?? 'Unknown error'}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -225,7 +225,7 @@ const PageLayout: NextPageWithLayout = () => {
                         <WarningIcon />
                         <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          {combinedStatsError?.message || 'Unknown error'}
+                          {combinedStatsError?.message ?? 'Unknown error'}
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )
@@ -327,7 +327,7 @@ const PageLayout: NextPageWithLayout = () => {
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {combinedStatsError?.message || 'Unknown error'}
+                        {combinedStatsError?.message ?? 'Unknown error'}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -372,7 +372,7 @@ const PageLayout: NextPageWithLayout = () => {
                         <WarningIcon />
                         <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          {combinedStatsError?.message || 'Unknown error'}
+                          {combinedStatsError?.message ?? 'Unknown error'}
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )

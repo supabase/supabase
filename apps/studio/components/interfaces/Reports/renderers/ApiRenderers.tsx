@@ -76,7 +76,7 @@ export const NetworkTrafficRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve network traffic</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message || 'Unknown error'}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -140,7 +140,7 @@ export const TotalRequestsChartRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve total requests</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message || 'Unknown error'}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -272,7 +272,7 @@ export const ErrorCountsChartRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve request errors</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message || 'Unknown error'}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -323,7 +323,7 @@ export const ResponseSpeedChartRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve response speeds</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message || 'Unknown error'}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }

@@ -88,7 +88,7 @@ const ProjectUsage = () => {
   )
   const endDateLocal = dayjs()
   const { data: charts } = useFillTimeseriesSorted({
-    data: data?.result || [],
+    data: data?.result ?? [],
     timestampKey: 'timestamp',
     valueKey: [
       'total_auth_requests',

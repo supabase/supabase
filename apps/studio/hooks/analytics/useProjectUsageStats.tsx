@@ -103,7 +103,7 @@ function useProjectUsageStats({
     valueKey: 'count',
     defaultValue: 0,
     startDate: timestampStart,
-    endDate: timestampEnd || new Date().toISOString(),
+    endDate: timestampEnd ?? new Date().toISOString(),
   })
 
   return {

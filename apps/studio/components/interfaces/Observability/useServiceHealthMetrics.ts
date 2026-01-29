@@ -82,11 +82,11 @@ const fetchServiceHealthMetrics = async (
     signal,
   })
 
-  if (error || data?.error) {
-    throw error || data?.error
+  if (error ?? data?.error) {
+    throw error ?? data?.error
   }
 
-  return (data?.result || []) as ChartQueryResult[]
+  return (data?.result ?? []) as ChartQueryResult[]
 }
 
 /**
