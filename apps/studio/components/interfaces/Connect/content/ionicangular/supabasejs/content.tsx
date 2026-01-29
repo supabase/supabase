@@ -1,25 +1,25 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabs,
+  ConnectTabTriggers,
+  ConnectTabTrigger,
+  ConnectTabContent,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value="environments/environment.ts" />
-        <MultipleCodeBlockTrigger value="src/app/supabase.service.ts" />
-        <MultipleCodeBlockTrigger value="src/app/app.component.ts" />
-        <MultipleCodeBlockTrigger value="src/app/app.component.html" />
-        <MultipleCodeBlockTrigger value="src/app/app.module.ts" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value="environments/environment.ts" />
+        <ConnectTabTrigger value="src/app/supabase.service.ts" />
+        <ConnectTabTrigger value="src/app/app.component.ts" />
+        <ConnectTabTrigger value="src/app/app.component.html" />
+        <ConnectTabTrigger value="src/app/app.module.ts" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value="environments/environment.ts">
+      <ConnectTabContent value="environments/environment.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 export const environment = {
@@ -28,9 +28,9 @@ export const environment = {
 };
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="src/app/supabase.service.ts">
+      <ConnectTabContent value="src/app/supabase.service.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { Injectable } from '@angular/core';
@@ -55,9 +55,9 @@ export class SupabaseService {
 }
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="src/app/app.component.ts">
+      <ConnectTabContent value="src/app/app.component.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { Component, OnInit } from '@angular/core';
@@ -88,9 +88,9 @@ export class AppComponent implements OnInit {
 }
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="src/app/app.component.html">
+      <ConnectTabContent value="src/app/app.component.html">
         <SimpleCodeBlock className="html" parentClassName="min-h-72">
           {`
 <ion-header>
@@ -108,9 +108,9 @@ export class AppComponent implements OnInit {
 </ion-content>
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="src/app/app.module.ts">
+      <ConnectTabContent value="src/app/app.module.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { NgModule } from '@angular/core';
@@ -137,8 +137,8 @@ import { SupabaseService } from './supabase.service';
 export class AppModule {}
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

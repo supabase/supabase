@@ -1,23 +1,23 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { IS_PLATFORM } from 'lib/constants'
 import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabContent,
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { IS_PLATFORM } from 'lib/constants'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="prisma/schema.prisma" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="prisma/schema.prisma" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {connectionStringPooler.ipv4SupportedForDedicatedPooler &&
           connectionStringPooler.transactionDedicated
@@ -49,9 +49,9 @@ DATABASE_URL="${IS_PLATFORM ? `${connectionStringPooler.transactionShared}?pgbou
 DIRECT_URL="${IS_PLATFORM ? connectionStringPooler.sessionShared : connectionStringPooler.direct}"
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="prisma/schema.prisma">
+      <ConnectTabContent value="prisma/schema.prisma">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 generator client {
@@ -65,8 +65,8 @@ datasource db {
 }
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

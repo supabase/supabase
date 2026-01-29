@@ -1,32 +1,32 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+  ConnectTabContent,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="utils/supabase.ts" />
-        <MultipleCodeBlockTrigger value="App.vue" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="utils/supabase.ts" />
+        <ConnectTabTrigger value="App.vue" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="utils/supabase.ts">
+      <ConnectTabContent value="utils/supabase.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -37,9 +37,9 @@ const supabaseKey = process.env.SUPABASE_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="App.vue">
+      <ConnectTabContent value="App.vue">
         <SimpleCodeBlock className="jsx" parentClassName="min-h-72">
           {`
 <script setup>
@@ -64,8 +64,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 </template>
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

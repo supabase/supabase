@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Plug } from 'lucide-react'
-import { ComponentProps, useMemo, useState } from 'react'
+import { useRouter } from 'next/router'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
@@ -32,6 +33,7 @@ interface ConnectSheetProps {
 }
 
 export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
+  const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -113,6 +115,12 @@ export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
   ])
 
   const handleSheetChange = (open: boolean) => {
+    if (!open && router.query.showConnect === 'true') {
+      const nextQuery = { ...router.query }
+      delete nextQuery.showConnect
+      delete nextQuery.connectTab
+      router.replace({ pathname: router.pathname, query: nextQuery }, undefined, { shallow: true })
+    }
     setShowConnect(open)
   }
 
@@ -120,6 +128,20 @@ export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
     // Database selection is handled by the DatabaseSelector's internal state
     // We just need to trigger a re-render of connection strings
   }
+
+  useEffect(() => {
+    if (!router.isReady) return
+    if (router.query.showConnect === 'true') {
+      setShowConnect(true)
+      const connectTab = router.query.connectTab
+      if (typeof connectTab === 'string') {
+        if (connectTab === 'mcp') setMode('mcp')
+        else if (connectTab === 'orms') setMode('orm')
+        else if (connectTab === 'direct') setMode('direct')
+        else if (connectTab === 'frameworks' || connectTab === 'mobiles') setMode('framework')
+      }
+    }
+  }, [router.isReady, router.query.connectTab, router.query.showConnect, setMode])
 
   if (!isActiveHealthy) {
     return (

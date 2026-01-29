@@ -2,8 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { ComponentProps, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { ApiKeysTabContent } from 'components/interfaces/Connect/ApiKeysTabContent'
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -14,7 +15,6 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -36,48 +36,14 @@ import {
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
-import { ConnectSheet } from './ConnectSheet'
 import { ConnectTabContent } from './ConnectTabContent'
+import Link from 'next/link'
 
-const ENABLE_CONNECT_SHEET = true
-
-interface ConnectProps {
-  buttonType?: ComponentProps<typeof Button>['type']
-}
-
-export const Connect = ({ buttonType = 'default' }: ConnectProps) => {
-  const { data: selectedProject } = useSelectedProjectQuery()
-  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  if (!isActiveHealthy) {
-    return (
-      <ButtonTooltip
-        disabled
-        type="default"
-        className="rounded-full"
-        icon={<Plug className="rotate-90" />}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: 'Project is currently not active and cannot be connected',
-          },
-        }}
-      >
-        Connect
-      </ButtonTooltip>
-    )
-  }
-
-  if (ENABLE_CONNECT_SHEET) {
-    return <ConnectSheet buttonType={buttonType} />
-  }
-
-  return <ConnectDialog buttonType={buttonType} />
-}
-
-const ConnectDialog = ({ buttonType }: ConnectProps) => {
+export const Connect = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const {
     projectConnectionShowAppFrameworks: showAppFrameworks,
@@ -356,10 +322,29 @@ const ConnectDialog = ({ buttonType }: ConnectProps) => {
     setQueryWith,
   ])
 
+  if (!isActiveHealthy) {
+    return (
+      <ButtonTooltip
+        disabled
+        type="default"
+        className="rounded-full"
+        icon={<Plug className="rotate-90" />}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'Project is currently not active and cannot be connected',
+          },
+        }}
+      >
+        Connect
+      </ButtonTooltip>
+    )
+  }
+
   return (
     <Dialog open={showConnect} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
-        <Button type={buttonType} className="rounded-full" icon={<Plug className="rotate-90" />}>
+        <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
         </Button>
       </DialogTrigger>
@@ -424,6 +409,18 @@ const ConnectDialog = ({ buttonType }: ConnectProps) => {
                   className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
                 >
                   <McpTabContent projectKeys={projectKeys} />
+                </TabsContent_Shadcn_>
+              )
+            }
+
+            if (type.key === 'api-keys') {
+              return (
+                <TabsContent_Shadcn_
+                  key="api-keys"
+                  value="api-keys"
+                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                >
+                  <ApiKeysTabContent projectKeys={projectKeys} />
                 </TabsContent_Shadcn_>
               )
             }

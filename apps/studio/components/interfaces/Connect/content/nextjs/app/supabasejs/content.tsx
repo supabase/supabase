@@ -1,25 +1,25 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabContent,
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="page.tsx" />
-        <MultipleCodeBlockTrigger value="utils/supabase/server.ts" />
-        <MultipleCodeBlockTrigger value="utils/supabase/client.ts" />
-        <MultipleCodeBlockTrigger value="utils/supabase/middleware.ts" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="page.tsx" />
+        <ConnectTabTrigger value="utils/supabase/server.ts" />
+        <ConnectTabTrigger value="utils/supabase/client.ts" />
+        <ConnectTabTrigger value="utils/supabase/middleware.ts" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {[
             '',
@@ -30,9 +30,9 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
           ].join('\n')}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="page.tsx">
+      <ConnectTabContent value="page.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { createClient } from '@/utils/supabase/server'
@@ -54,9 +54,9 @@ export default async function Page() {
 }
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="utils/supabase/server.ts">
+      <ConnectTabContent value="utils/supabase/server.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
@@ -89,8 +89,8 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
 };
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-      <MultipleCodeBlockContent value="utils/supabase/client.ts">
+      </ConnectTabContent>
+      <ConnectTabContent value="utils/supabase/client.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createBrowserClient } from "@supabase/ssr";
@@ -105,9 +105,9 @@ export const createClient = () =>
   );
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="utils/supabase/middleware.ts">
+      <ConnectTabContent value="utils/supabase/middleware.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
@@ -149,8 +149,8 @@ export const createClient = (request: NextRequest) => {
 };
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

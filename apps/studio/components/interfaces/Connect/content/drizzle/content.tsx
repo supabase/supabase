@@ -1,23 +1,23 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+  ConnectTabContent,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env" />
-        <MultipleCodeBlockTrigger value="drizzle/schema.tsx" />
-        <MultipleCodeBlockTrigger value="index.tsx" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env" />
+        <ConnectTabTrigger value="drizzle/schema.tsx" />
+        <ConnectTabTrigger value="index.tsx" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env">
+      <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {connectionStringPooler.ipv4SupportedForDedicatedPooler &&
           connectionStringPooler.transactionDedicated
@@ -37,9 +37,9 @@ DATABASE_URL="${connectionStringPooler.transactionShared}"
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="drizzle/schema.tsx">
+      <ConnectTabContent value="drizzle/schema.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
@@ -51,9 +51,9 @@ export const users = pgTable('users', {
 });
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="index.tsx">
+      <ConnectTabContent value="index.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { drizzle } from 'drizzle-orm/postgres-js'
@@ -69,8 +69,8 @@ const db = drizzle(client);
 const allUsers = await db.select().from(users);
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

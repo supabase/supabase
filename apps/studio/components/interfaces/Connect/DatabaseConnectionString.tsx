@@ -1,7 +1,3 @@
-import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
@@ -15,6 +11,9 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
+import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -33,6 +32,7 @@ import {
   cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,
@@ -367,7 +367,7 @@ export const DatabaseConnectionString = () => {
                 {exampleInstallCommands?.map((cmd) => (
                   <CodeBlock
                     key={`example-install-command-${cmd}`}
-                    className="[&_code]:text-foreground"
+                    className="[&_code]:text-[12px] [&_code]:text-foreground"
                     wrapperClassName="lg:col-span-2"
                     value={cmd}
                     hideLineNumbers
@@ -390,7 +390,7 @@ export const DatabaseConnectionString = () => {
                         value={file.content}
                         hideLineNumbers
                         language={lang}
-                        className="[&_code]:text-foreground"
+                        className="[&_code]:text-[12px] [&_code]:text-foreground"
                       />
                     </div>
                   ))}
@@ -462,7 +462,12 @@ export const DatabaseConnectionString = () => {
                   }}
                   notice={['Does not support PREPARE statements']}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                    {
+                      ...CONNECTION_PARAMETERS.host,
+                      value: isReplicaSelected
+                        ? connectionInfo.db_host
+                        : poolingConfiguration?.db_host ?? '',
+                    },
                     {
                       ...CONNECTION_PARAMETERS.port,
                       value: poolingConfiguration?.db_port.toString() ?? '6543',
@@ -506,7 +511,7 @@ export const DatabaseConnectionString = () => {
                             )}
                             language={lang}
                             value={supavisorConnectionStrings['pooler'][selectedTab]}
-                            className="[&_code]:text-foreground"
+                            className="[&_code]:text-[12px] [&_code]:text-foreground"
                             hideLineNumbers
                             onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
                           />

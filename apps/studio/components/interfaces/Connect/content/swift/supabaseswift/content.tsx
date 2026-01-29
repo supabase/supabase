@@ -1,23 +1,23 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabs,
+  ConnectTabTriggers,
+  ConnectTabTrigger,
+  ConnectTabContent,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value="Supabase.swift" />
-        <MultipleCodeBlockTrigger value="Todo.swift" />
-        <MultipleCodeBlockTrigger value="ContentView.swift" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value="Supabase.swift" />
+        <ConnectTabTrigger value="Todo.swift" />
+        <ConnectTabTrigger value="ContentView.swift" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value="Supabase.swift">
+      <ConnectTabContent value="Supabase.swift">
         <SimpleCodeBlock className="swift" parentClassName="min-h-72">
           {`
 import Foundation
@@ -29,9 +29,9 @@ let supabase = SupabaseClient(
 )
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="Todo.swift">
+      <ConnectTabContent value="Todo.swift">
         <SimpleCodeBlock className="swift" parentClassName="min-h-72">
           {`
 import Foundation
@@ -42,9 +42,9 @@ struct Todo: Identifiable, Decodable {
 }
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="ContentView.swift">
+      <ConnectTabContent value="ContentView.swift">
         <SimpleCodeBlock className="swift" parentClassName="min-h-72">
           {`
 import Supabase
@@ -76,8 +76,8 @@ struct ContentView: View {
 
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

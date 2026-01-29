@@ -1,32 +1,32 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+  ConnectTabContent,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="utils/supabase.ts" />
-        <MultipleCodeBlockTrigger value="App.tsx" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="utils/supabase.ts" />
+        <ConnectTabTrigger value="App.tsx" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 EXPO_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 EXPO_PUBLIC_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile and desktop apps>'}
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="utils/supabase.ts">
+      <ConnectTabContent value="utils/supabase.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import 'react-native-url-polyfill/auto'
@@ -47,9 +47,9 @@ export const supabase = createClient(
   })
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="App.tsx">
+      <ConnectTabContent value="App.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import React, { useState, useEffect } from 'react';
@@ -94,8 +94,8 @@ export default function App() {
 
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

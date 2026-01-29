@@ -1,5 +1,5 @@
-import { ConnectionType } from 'components/interfaces/Connect/Connect.constants'
-import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
+import { ConnectionType } from '@/components/interfaces/ConnectSheet/Connect.constants'
+import { ConnectionIcon } from '@/components/interfaces/ConnectSheet/ConnectionIcon'
 import { Box, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {

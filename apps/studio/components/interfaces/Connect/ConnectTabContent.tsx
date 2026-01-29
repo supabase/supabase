@@ -107,7 +107,7 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
     }, [filePath])
 
     return (
-      <div ref={ref} {...props} className={cn('border rounded-lg bg-background', props.className)}>
+      <div ref={ref} {...props} className={cn('border rounded-lg', props.className)}>
         <CopyCallbackContext.Provider value={handleCopy}>
           <ContentFile
             projectKeys={projectKeys}

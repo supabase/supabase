@@ -1,23 +1,23 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+  ConnectTabContent,
+} from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="src/utility/supabaseClient.ts" />
-        <MultipleCodeBlockTrigger value="src/App.tsx" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="src/utility/supabaseClient.ts" />
+        <ConnectTabTrigger value="src/App.tsx" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {[
             '',
@@ -26,9 +26,9 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
           ].join('\n')}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="src/utility/supabaseClient.ts">
+      <ConnectTabContent value="src/utility/supabaseClient.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@refinedev/supabase";
@@ -46,9 +46,9 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
 });
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="src/App.tsx">
+      <ConnectTabContent value="src/App.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { Refine } from "@refinedev/core";
@@ -109,8 +109,8 @@ function App() {
 export default App;
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 

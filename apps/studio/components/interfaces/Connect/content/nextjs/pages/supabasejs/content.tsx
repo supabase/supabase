@@ -2,22 +2,22 @@ import type { ContentFileProps } from 'components/interfaces/Connect/Connect.typ
 
 import { SimpleCodeBlock } from 'ui'
 import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+  ConnectTabContent,
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from 'components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="utils/supabase.ts" />
-        <MultipleCodeBlockTrigger value="_app.tsx" />
-      </MultipleCodeBlockTriggers>
+    <ConnectTabs>
+      <ConnectTabTriggers>
+        <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="utils/supabase.ts" />
+        <ConnectTabTrigger value="_app.tsx" />
+      </ConnectTabTriggers>
 
-      <MultipleCodeBlockContent value=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {[
             '',
@@ -28,9 +28,9 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
           ].join('\n')}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="utils/supabase.ts">
+      <ConnectTabContent value="utils/supabase.ts">
         <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -41,9 +41,9 @@ const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUP
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
+      </ConnectTabContent>
 
-      <MultipleCodeBlockContent value="_app.tsx">
+      <ConnectTabContent value="_app.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { useState, useEffect } from 'react'
@@ -76,8 +76,8 @@ export default Page
 
 `}
         </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+      </ConnectTabContent>
+    </ConnectTabs>
   )
 }
 
