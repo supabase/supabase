@@ -195,6 +195,13 @@ services:
           - /functions/v1/
     plugins:
       - name: cors
+        config:
+          # Allow Edge Functions to handle their own CORS headers
+          # This enables custom headers (x-user-id, x-session-id, x-trace-id, etc.)
+          # to work correctly in browser requests
+          preflight_continue: true
+          origins: ["*"]
+          max_age: 3600
 
   ## Analytics routes
   - name: analytics-v1
