@@ -3,7 +3,7 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
-import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
@@ -198,7 +198,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
-                  <ConnectSheet />
+                  <ConnectButton />
                 </motion.div>
               )}
             </AnimatePresence>

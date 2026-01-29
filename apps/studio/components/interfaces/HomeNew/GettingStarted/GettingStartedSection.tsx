@@ -1,7 +1,7 @@
 import { Code, Table2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
-import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -50,7 +50,7 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
     return [
       {
         label: 'Connect',
-        component: <ConnectSheet buttonType="primary" />,
+        component: <ConnectButton buttonType="primary" renderDialog={false} />,
       },
     ]
   }, [])

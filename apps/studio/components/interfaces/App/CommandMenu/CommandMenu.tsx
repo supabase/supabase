@@ -1,4 +1,4 @@
-import { useConnectCommands } from '@/components/interfaces/ConnectSheet/Connect.Commands'
+import { useConnectCommands } from '@/components/interfaces/ConnectButton/Connect.Commands'
 import { IS_PLATFORM } from 'common'
 import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
 import {

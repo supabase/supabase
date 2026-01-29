@@ -1,25 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plug } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { ComponentProps, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import {
-  Button,
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   cn
 } from 'ui'
 
@@ -29,14 +22,12 @@ import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
 
 interface ConnectSheetProps {
-  buttonType?: ComponentProps<typeof Button>['type']
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  connectTab?: string | null
 }
 
-export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
-  const router = useRouter()
-  const { data: selectedProject } = useSelectedProjectQuery()
-  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
+export const ConnectSheet = ({ open, onOpenChange, connectTab }: ConnectSheetProps) => {
   const {
     projectConnectionShowAppFrameworks: showAppFrameworks,
     projectConnectionShowMobileFrameworks: showMobileFrameworks,
@@ -60,8 +51,6 @@ export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
     return modes
   }, [showAppFrameworks, showMobileFrameworks, showOrms])
 
-  const [showConnect, setShowConnect] = useState(false)
-
   const {
     state,
     updateField,
@@ -82,7 +71,7 @@ export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
   const { ref: projectRef } = useParams()
   const { data: settings } = useProjectSettingsV2Query(
     { projectRef },
-    { enabled: showConnect }
+    { enabled: open }
   )
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -114,61 +103,23 @@ export const ConnectSheet = ({ buttonType = 'default' }: ConnectSheetProps) => {
     publishableKey?.api_key,
   ])
 
-  const handleSheetChange = (open: boolean) => {
-    if (!open && router.query.showConnect === 'true') {
-      const nextQuery = { ...router.query }
-      delete nextQuery.showConnect
-      delete nextQuery.connectTab
-      router.replace({ pathname: router.pathname, query: nextQuery }, undefined, { shallow: true })
-    }
-    setShowConnect(open)
-  }
-
   const handleSourceChange = (databaseId: string) => {
     // Database selection is handled by the DatabaseSelector's internal state
     // We just need to trigger a re-render of connection strings
   }
 
   useEffect(() => {
-    if (!router.isReady) return
-    if (router.query.showConnect === 'true') {
-      setShowConnect(true)
-      const connectTab = router.query.connectTab
-      if (typeof connectTab === 'string') {
-        if (connectTab === 'mcp') setMode('mcp')
-        else if (connectTab === 'orms') setMode('orm')
-        else if (connectTab === 'direct') setMode('direct')
-        else if (connectTab === 'frameworks' || connectTab === 'mobiles') setMode('framework')
-      }
+    if (!open) return
+    if (typeof connectTab === 'string') {
+      if (connectTab === 'mcp') setMode('mcp')
+      else if (connectTab === 'orms') setMode('orm')
+      else if (connectTab === 'direct') setMode('direct')
+      else if (connectTab === 'frameworks' || connectTab === 'mobiles') setMode('framework')
     }
-  }, [router.isReady, router.query.connectTab, router.query.showConnect, setMode])
-
-  if (!isActiveHealthy) {
-    return (
-      <ButtonTooltip
-        disabled
-        type="default"
-        className="rounded-full"
-        icon={<Plug className="rotate-90" />}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: 'Project is currently not active and cannot be connected',
-          },
-        }}
-      >
-        Connect
-      </ButtonTooltip>
-    )
-  }
+  }, [connectTab, open, setMode])
 
   return (
-    <Sheet open={showConnect} onOpenChange={handleSheetChange}>
-      <SheetTrigger asChild>
-        <Button type={buttonType} className="rounded-full" icon={<Plug className="rotate-90" />}>
-          <span>Connect</span>
-        </Button>
-      </SheetTrigger>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent size="lg" className="flex flex-col gap-0 p-0 space-y-0" tabIndex={undefined}>
         <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
