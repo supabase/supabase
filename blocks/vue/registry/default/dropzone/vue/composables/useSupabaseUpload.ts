@@ -62,7 +62,7 @@ export function useSupabaseUpload(options: UseSupabaseUploadOptions) {
   const dropZoneRef = ref<HTMLElement | null>(null)
 
   const { isOverDropZone } = useDropZone(dropZoneRef, {
-    onDrop(droppedFiles: FileWithPreview[]) {
+    onDrop(droppedFiles: File[] | null) {
       if (!droppedFiles) return
 
       const newFiles: FileWithPreview[] = droppedFiles.map(file => ({
