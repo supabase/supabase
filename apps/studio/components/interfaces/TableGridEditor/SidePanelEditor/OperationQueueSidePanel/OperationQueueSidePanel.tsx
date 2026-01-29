@@ -37,8 +37,8 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
       header={
         <div className="flex items-center justify-between w-full">
           <div className="flex flex-col gap-1">
-            <span>Pending Changes</span>
-            <span className="text-xs text-foreground-light">
+            <span>Pending changes</span>
+            <span className="text-xs text-foreground-lighter">
               {operations.length} operation{operations.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -48,19 +48,19 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
         <div className="flex w-full justify-between border-t border-default px-3 py-4">
           <Button type="default" onClick={closePanel}>
             Close
-            <span className="text-foreground-lighter text-xs ml-1.5">{modKey}.</span>
+            <span className="text-foreground/40 text-xs ml-1.5">{modKey}.</span>
           </Button>
           <div className="flex space-x-3">
             <Button type="default" onClick={handleCancel} disabled={isSaving}>
-              Cancel All
+              Revert all
             </Button>
             <Button
               onClick={handleSave}
               disabled={isSaving || operations.length === 0}
               loading={isSaving}
             >
-              Save All
-              <span className="text-foreground-lighter text-xs ml-1.5">{modKey}S</span>
+              Save all
+              <span className="text-foreground/40 text-xs ml-1.5">{modKey}S</span>
             </Button>
           </div>
         </div>
