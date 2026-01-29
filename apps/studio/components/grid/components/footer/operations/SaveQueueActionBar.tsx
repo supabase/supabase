@@ -65,6 +65,6 @@ export const SaveQueueActionBar = () => {
     </AnimatePresence>
   )
 
-  if (typeof document === 'undefined') return null
+  if (typeof document === 'undefined' || !document.body) return null
   return createPortal(content, document.body)
 }
