@@ -1,4 +1,5 @@
 import authors from 'lib/authors.json'
+import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -7,7 +8,6 @@ import React from 'react'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { generateReadingTime } from '~/lib/helpers'
-import { MDXRemote } from 'next-mdx-remote'
 
 interface Props {
   components: React.ReactNode
@@ -76,13 +76,15 @@ const LayoutComparison = ({ components, props }: Props) => {
               return cat
             }),
           },
-          images: [
-            {
-              url: `https://supabase.com${basePath}/images/blog/${
-                props.blog.image ? props.blog.image : props.blog.thumb
-              }`,
-            },
-          ],
+          images: (() => {
+            const img = props.blog.imgSocial || props.blog.imgThumb
+            if (!img) return []
+            const url =
+              img.startsWith('/') || img.startsWith('http')
+                ? img
+                : `https://supabase.com${basePath}/images/blog/${img}`
+            return [{ url }]
+          })(),
         }}
       />
       <DefaultLayout>

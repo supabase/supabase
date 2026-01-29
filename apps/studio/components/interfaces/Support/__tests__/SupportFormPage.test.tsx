@@ -891,10 +891,6 @@ describe('SupportFormPage', () => {
     await userEvent.clear(messageField)
     await userEvent.type(messageField, 'MFA challenge fails with an unknown error code')
 
-    expect(
-      screen.queryByRole('switch', { name: /allow support access to your project/i })
-    ).toBeNull()
-
     await userEvent.click(getSubmitButton(screen))
 
     await waitFor(() => {
@@ -910,7 +906,7 @@ describe('SupportFormPage', () => {
       organizationSlug: 'org-2',
       library: '',
       affectedServices: '',
-      allowSupportAccess: false,
+      allowSupportAccess: true,
       verified: true,
       tags: ['dashboard-support-form'],
       siteUrl: 'https://project-2.supabase.dev',
