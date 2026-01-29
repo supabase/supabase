@@ -130,7 +130,7 @@ const ObservabilityMenu = () => {
 
   const menuItems = [
     {
-      title: 'Observability',
+      title: '',
       key: 'observability-section',
       items: [
         ...(showOverview

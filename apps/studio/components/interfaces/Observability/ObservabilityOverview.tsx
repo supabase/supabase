@@ -74,7 +74,7 @@ export const ObservabilityOverview = () => {
   const postgrestReportEnabled = useFlag('postgrestreport')
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
 
-  const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
+  const DEFAULT_INTERVAL: ChartIntervalKey = '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -166,18 +166,20 @@ export const ObservabilityOverview = () => {
 
   const dbServiceData = overviewData.services.db
 
-  // Creates a 2-minute time window around the clicked bar for log filtering
+  // Creates a 1-hour time window for the clicked bar for log filtering
   const handleBarClick = useCallback(
     (serviceKey: string, logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
-      const datumTimestamp = dayjs(datum.timestamp).toISOString()
-      const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-      const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+      const datumTimestamp = dayjs(datum.timestamp)
+      // Round down to the start of the hour
+      const start = datumTimestamp.startOf('hour').toISOString()
+      // Add 1 hour to get the end of the hour
+      const end = datumTimestamp.startOf('hour').add(1, 'hour').toISOString()
 
       const queryParams = new URLSearchParams({
-        iso_timestamp_start: start,
-        iso_timestamp_end: end,
+        its: start,
+        ite: end,
       })
 
       router.push(`${logsUrl}?${queryParams.toString()}`)
@@ -185,17 +187,19 @@ export const ObservabilityOverview = () => {
     [router]
   )
 
-  const handleDbBarClick = useCallback(
-    handleBarClick('db', `/project/${projectRef}/logs/postgres-logs`),
-    [handleBarClick, projectRef]
-  )
-
   return (
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center gap-3">
           <ReportHeader title="Overview" />
-          <Badge variant="warning">Beta</Badge>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant="warning">Beta</Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This page is subject to change</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <div className="flex items-center gap-3">
           <Button type="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
@@ -271,12 +275,7 @@ export const ObservabilityOverview = () => {
           interval={interval}
           refreshKey={refreshKey}
           dbErrorRate={dbServiceData.errorRate}
-          dbChartData={dbServiceData.eventChartData}
-          dbErrorCount={dbServiceData.errorCount}
-          dbWarningCount={dbServiceData.warningCount}
           isLoading={dbServiceData.isLoading}
-          onBarClick={handleDbBarClick}
-          datetimeFormat={datetimeFormat}
           slowQueriesCount={slowQueriesCount}
           slowQueriesLoading={slowQueriesLoading}
         />

@@ -1,12 +1,11 @@
 import { useParams } from 'common'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, Loading, cn } from 'ui'
-import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import { cn } from 'ui'
 import {
   MetricCard,
   MetricCardContent,
@@ -15,7 +14,6 @@ import {
   MetricCardValue,
 } from 'ui-patterns/MetricCard'
 
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
 import {
   getMetricStatusColor,
   parseConnectionsData,
@@ -26,12 +24,7 @@ type DatabaseInfrastructureSectionProps = {
   interval: '1hr' | '1day' | '7day'
   refreshKey: number
   dbErrorRate: number
-  dbChartData: LogsBarChartDatum[]
-  dbErrorCount: number
-  dbWarningCount: number
   isLoading: boolean
-  onBarClick: (datum: unknown) => void
-  datetimeFormat: string
   slowQueriesCount?: number
   slowQueriesLoading?: boolean
 }
@@ -110,102 +103,156 @@ export const DatabaseInfrastructureSection = ({
       ? String(infraError.message)
       : 'Error loading data'
 
+  // Generate database report URL with time range parameters
+  const getDatabaseReportUrl = () => {
+    const now = dayjs()
+    let its: string
+    let helperText: string
+
+    switch (interval) {
+      case '1hr':
+        its = now.subtract(1, 'hour').toISOString()
+        helperText = 'Last 60 minutes'
+        break
+      case '1day':
+        its = now.subtract(24, 'hour').toISOString()
+        helperText = 'Last 24 hours'
+        break
+      case '7day':
+        its = now.subtract(7, 'day').toISOString()
+        helperText = 'Last 7 days'
+        break
+      default:
+        its = now.subtract(24, 'hour').toISOString()
+        helperText = 'Last 24 hours'
+    }
+
+    const ite = now.toISOString()
+    const params = new URLSearchParams({
+      its,
+      ite,
+      isHelper: 'true',
+      helperText,
+    })
+
+    return `/project/${projectRef}/observability/database?${params.toString()}`
+  }
+
+  const databaseReportUrl = getDatabaseReportUrl()
+
   return (
     <div>
       <h2 className="mb-4">Database</h2>
       {/* First row: Metrics */}
       <div className="grid grid-cols-3 gap-2">
-        <MetricCard isLoading={dbLoading}>
-          <MetricCardHeader>
-            <MetricCardLabel tooltip="Percentage of database operations resulting in errors or warnings">
-              Error Rate
-            </MetricCardLabel>
-          </MetricCardHeader>
-          <MetricCardContent>
-            <MetricCardValue>{dbErrorRate.toFixed(1)}%</MetricCardValue>
-          </MetricCardContent>
-        </MetricCard>
+        <Link href={databaseReportUrl} className="block group">
+          <MetricCard isLoading={dbLoading}>
+            <MetricCardHeader href={databaseReportUrl}>
+              <MetricCardLabel tooltip="Percentage of database operations resulting in errors or warnings">
+                Error Rate
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              <MetricCardValue>{dbErrorRate.toFixed(2)}%</MetricCardValue>
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
 
-        <MetricCard isLoading={slowQueriesLoading}>
-          <MetricCardHeader href={`/project/${projectRef}/observability/query-performance`}>
-            <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
-              Slow Queries
-            </MetricCardLabel>
-          </MetricCardHeader>
-          <MetricCardContent>
-            <MetricCardValue>{slowQueriesCount}</MetricCardValue>
-          </MetricCardContent>
-        </MetricCard>
+        <Link
+          href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
+          className="block group"
+        >
+          <MetricCard isLoading={slowQueriesLoading}>
+            <MetricCardHeader
+              href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
+            >
+              <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
+                Slow Queries
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              <MetricCardValue>{slowQueriesCount}</MetricCardValue>
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
 
-        <MetricCard isLoading={infraLoading}>
-          <MetricCardHeader>
-            <MetricCardLabel tooltip="Active database connections (current/max). Monitor to avoid connection exhaustion">
-              Connections
-            </MetricCardLabel>
-          </MetricCardHeader>
-          <MetricCardContent>
-            {infraError ? (
-              <div className="text-xs text-destructive break-words">{errorMessage}</div>
-            ) : connections.max > 0 ? (
-              <MetricCardValue>
-                {connections.current}/{connections.max}
-              </MetricCardValue>
-            ) : (
-              <MetricCardValue>--</MetricCardValue>
-            )}
-          </MetricCardContent>
-        </MetricCard>
+        <Link href={databaseReportUrl} className="block group">
+          <MetricCard isLoading={infraLoading}>
+            <MetricCardHeader href={databaseReportUrl}>
+              <MetricCardLabel tooltip="Active database connections (current/max). Monitor to avoid connection exhaustion">
+                Connections
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {infraError ? (
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+              ) : connections.max > 0 ? (
+                <MetricCardValue>
+                  {connections.current}/{connections.max}
+                </MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
 
-        <MetricCard isLoading={infraLoading}>
-          <MetricCardHeader>
-            <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
-              Disk
-            </MetricCardLabel>
-          </MetricCardHeader>
-          <MetricCardContent>
-            {infraError ? (
-              <div className="text-xs text-destructive break-words">{errorMessage}</div>
-            ) : metrics ? (
-              <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
-            ) : (
-              <MetricCardValue>--</MetricCardValue>
-            )}
-          </MetricCardContent>
-        </MetricCard>
+        <Link href={databaseReportUrl} className="block group">
+          <MetricCard isLoading={infraLoading}>
+            <MetricCardHeader href={databaseReportUrl}>
+              <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
+                Disk
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {infraError ? (
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+              ) : metrics ? (
+                <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
 
-        <MetricCard isLoading={infraLoading}>
-          <MetricCardHeader>
-            <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
-              Memory
-            </MetricCardLabel>
-          </MetricCardHeader>
-          <MetricCardContent>
-            {infraError ? (
-              <div className="text-xs text-destructive break-words">{errorMessage}</div>
-            ) : metrics ? (
-              <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
-            ) : (
-              <MetricCardValue>--</MetricCardValue>
-            )}
-          </MetricCardContent>
-        </MetricCard>
+        <Link href={databaseReportUrl} className="block group">
+          <MetricCard isLoading={infraLoading}>
+            <MetricCardHeader href={databaseReportUrl}>
+              <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
+                Memory
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {infraError ? (
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+              ) : metrics ? (
+                <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
 
-        <MetricCard isLoading={infraLoading}>
-          <MetricCardHeader>
-            <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
-              CPU
-            </MetricCardLabel>
-          </MetricCardHeader>
-          <MetricCardContent>
-            {infraError ? (
-              <div className="text-xs text-destructive break-words">{errorMessage}</div>
-            ) : metrics ? (
-              <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
-            ) : (
-              <MetricCardValue>--</MetricCardValue>
-            )}
-          </MetricCardContent>
-        </MetricCard>
+        <Link href={databaseReportUrl} className="block group">
+          <MetricCard isLoading={infraLoading}>
+            <MetricCardHeader href={databaseReportUrl}>
+              <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
+                CPU
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {infraError ? (
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+              ) : metrics ? (
+                <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
       </div>
     </div>
   )

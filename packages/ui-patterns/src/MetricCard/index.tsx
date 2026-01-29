@@ -46,7 +46,11 @@ interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
 const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
   ({ isLoading = false, isDisabled = false, className, children, ...props }, ref) => {
     return (
-      <Card ref={ref} className={cn(className)} {...props}>
+      <Card
+        ref={ref}
+        className={cn('group-hover:bg-surface-200 transition-colors', className)}
+        {...props}
+      >
         <MetricCardContext.Provider value={{ isLoading, isDisabled }}>
           {children}
         </MetricCardContext.Provider>
@@ -80,7 +84,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
               <Button
                 type="text"
                 size="tiny"
-                className="px-1 text-foreground-lighter absolute right-3"
+                className="px-1 text-foreground-lighter group-hover:text-foreground absolute right-3 transition-colors"
                 asChild
               >
                 <Link href={href}>

@@ -9,7 +9,7 @@ import { useServiceHealthMetrics } from './useServiceHealthMetrics'
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
 
-export type HealthStatus = 'healthy' | 'warning' | 'error' | 'no-data'
+export type HealthStatus = 'healthy' | 'error' | 'unknown'
 
 export type ServiceHealthData = {
   total: number
@@ -52,23 +52,19 @@ export const calculateSuccessRate = (data: LogsBarChartDatum[]): number => {
 
 /**
  * Get health status and color based on error rate
- * - Green: error_rate < 5%
- * - Yellow: 5% ≤ error_rate < 15%
- * - Red: error_rate ≥ 15%
- * - Gray: No data (total_requests = 0)
+ * - Unknown: total_requests < 100 (insufficient data)
+ * - Healthy: error_rate < 1%
+ * - Unhealthy: error_rate ≥ 1%
  */
 export const getHealthStatus = (
   errorRate: number,
   total: number
 ): { status: HealthStatus; color: string } => {
-  if (total === 0) {
-    return { status: 'no-data', color: 'muted' }
+  if (total < 100) {
+    return { status: 'unknown', color: 'muted' }
   }
-  if (errorRate >= 15) {
+  if (errorRate >= 1) {
     return { status: 'error', color: 'destructive' }
-  }
-  if (errorRate >= 5) {
-    return { status: 'warning', color: 'warning' }
   }
   return { status: 'healthy', color: 'brand' }
 }

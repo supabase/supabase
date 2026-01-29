@@ -45,30 +45,37 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   postgrest: 'Auto-generated REST API for your database',
 }
 
-const getStatusLabel = (status: 'healthy' | 'warning' | 'error' | 'no-data'): string => {
+const getStatusLabel = (status: 'healthy' | 'error' | 'unknown'): string => {
   switch (status) {
     case 'healthy':
       return 'Healthy'
-    case 'warning':
-      return 'Degraded'
     case 'error':
       return 'Unhealthy'
-    case 'no-data':
-      return 'No data'
+    case 'unknown':
+      return 'Unknown'
+  }
+}
+
+const getStatusTooltip = (status: 'healthy' | 'error' | 'unknown'): string => {
+  switch (status) {
+    case 'healthy':
+      return 'Error rate is below 1%'
+    case 'error':
+      return 'Error rate is 1% or higher'
+    case 'unknown':
+      return 'Insufficient data (fewer than 100 requests)'
   }
 }
 
 const getStatusVariant = (
-  status: 'healthy' | 'warning' | 'error' | 'no-data'
+  status: 'healthy' | 'error' | 'unknown'
 ): 'success' | 'warning' | 'destructive' | 'default' => {
   switch (status) {
     case 'healthy':
       return 'success'
-    case 'warning':
-      return 'warning'
     case 'error':
       return 'destructive'
-    case 'no-data':
+    case 'unknown':
       return 'default'
   }
 }
@@ -84,6 +91,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
   const { status } = getHealthStatus(data.errorRate, data.total)
   const statusLabel = getStatusLabel(status)
   const statusVariant = getStatusVariant(status)
+  const statusTooltip = getStatusTooltip(status)
 
   const errorRate = data.total > 0 ? data.errorRate : 0
   const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
@@ -113,7 +121,14 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={statusVariant}>{statusLabel}</Badge>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant={statusVariant}>{statusLabel}</Badge>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{statusTooltip}</p>
+            </TooltipContent>
+          </Tooltip>
           <ButtonTooltip
             type="text"
             size="tiny"
@@ -128,30 +143,45 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         </div>
       </div>
 
-      <div className="h-16">
+      <div className="h-16" onClick={(e) => e.preventDefault()}>
         <Loading active={data.isLoading}>
-          <LogsBarChart
-            data={data.eventChartData}
-            DateTimeFormat={datetimeFormat}
-            onBarClick={onBarClick}
-            EmptyState={
-              <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
-                No data
-              </div>
-            }
-          />
+          {data.isLoading ? (
+            <div />
+          ) : (
+            <LogsBarChart
+              data={data.eventChartData}
+              DateTimeFormat={datetimeFormat}
+              onBarClick={onBarClick}
+              EmptyState={
+                <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
+                  No data
+                </div>
+              }
+            />
+          )}
         </Loading>
       </div>
 
       {data.total > 0 && (
         <div className="flex items-center justify-center mt-2 text-xs text-foreground-lighter gap-4 font-mono tabular-nums tracking-tight">
           {errorRate > 0 && (
-            <span className="text-destructive">{errorRate.toFixed(2)}% errors</span>
+            <span className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+              {errorRate.toFixed(2)}% errors
+            </span>
           )}
           {warningRate > 0 && (
-            <span className="text-warning">{warningRate.toFixed(2)}% warnings</span>
+            <span className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-warning" />
+              {warningRate.toFixed(2)}% warnings
+            </span>
           )}
-          {errorRate === 0 && warningRate === 0 && <span className="text-brand">0% errors</span>}
+          {errorRate === 0 && warningRate === 0 && (
+            <span className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-brand" />
+              0% errors
+            </span>
+          )}
         </div>
       )}
     </Link>
@@ -166,7 +196,7 @@ export const ServiceHealthTable = ({
 }: ServiceHealthTableProps) => {
   return (
     <div>
-      <h2 className="heading-section mb-4">Project Health</h2>
+      <h2 className="heading-section mb-4">Service Health</h2>
       <Card>
         <CardContent className="p-0">
           {services.map((service) => {
