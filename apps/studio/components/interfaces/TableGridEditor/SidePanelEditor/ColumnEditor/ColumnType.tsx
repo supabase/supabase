@@ -198,7 +198,7 @@ const ColumnType = ({
 
             <CommandList_Shadcn_>
               <ScrollArea className="h-[240px]">
-                <CommandGroup_Shadcn_ heading="Native data types">
+                <CommandGroup_Shadcn_ heading="Postgres data types">
                   {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
                     <CommandItem_Shadcn_
                       key={option.name}
