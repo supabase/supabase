@@ -11,8 +11,7 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import { Key } from 'lucide-react'
-import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
 export const TopSection = () => {
@@ -55,9 +54,9 @@ export const TopSection = () => {
                   {parentProject?.name}
                 </Link>
               )}
-              <div className="flex items-center gap-x-4">
-              <h1 className="text-3xl mb-2">{projectName}</h1>
-              <div className="flex items-center gap-x-2">
+              <h1 className="text-3xl">{projectName}</h1>
+            </div>
+            <div className="flex items-center gap-x-2">
               {isOrioleDb && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -80,13 +79,6 @@ export const TopSection = () => {
                 computeSize={project?.infra_compute_size}
               />
             </div>
-              </div>
-              <div className="flex items-center gap-x-4">
-              <p className="text-foreground-light">https://mzcycyjchljsifxkeaem.supabase.red</p>
-              <Button type="outline" size="tiny" className="w-8 h-8 p-0 justify-center"><Key strokeWidth={1.5} size={16} /></Button>
-              </div>
-            </div>
-            
           </div>
           <div className="mt-8">
             <ActivityStats />
