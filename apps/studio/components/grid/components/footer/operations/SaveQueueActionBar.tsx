@@ -53,7 +53,9 @@ export const SaveQueueActionBar = () => {
               {operationCount} pending change{operationCount !== 1 ? 's' : ''}
             </span>
             <div className="flex items-center gap-2">
-              <Button type="default" size="tiny" aria-label="View details" onClick={() => snap.onViewOperationQueue()}>Review <span className="text-foreground/40 ml-1">{`${modKey}.`}</span></Button>
+              <Button type="default" size="tiny" onClick={() => snap.onViewOperationQueue()}>
+                Review <span className="text-foreground/40 ml-1">{`${modKey}.`}</span>
+              </Button>
               <Button
                 size="tiny"
                 type="primary"

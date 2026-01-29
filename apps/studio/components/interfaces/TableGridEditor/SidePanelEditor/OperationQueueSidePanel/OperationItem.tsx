@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Maximize2, Undo2 } from 'lucide-react'
-import { Button } from 'ui'
+import { Undo2 } from 'lucide-react'
 
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -49,7 +48,9 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
     <Card className="overflow-hidden">
       <CardHeader className="pt-2.5 flex flex-row gap-2">
         <div className="min-w-0 flex-1">
-          <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">{fullTableName}</code>
+          <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">
+            {fullTableName}
+          </code>
           <div className="text-xs text-foreground mt-1 ml-0.5">
             <span>{columnName}</span>
             <span className="text-foreground-muted mx-1.5">·</span>
