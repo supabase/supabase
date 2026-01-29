@@ -72,7 +72,7 @@ services:
       - ${KONG_HTTPS_PORT}:8443/tcp
     volumes:
       # https://github.com/supabase/supabase/issues/12661
-      - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
+      - ${VOLUMES_DIR:-./volumes}/api/kong.yml:/home/kong/temp.yml:ro,z
     depends_on:
       analytics:
         condition: service_healthy
@@ -243,7 +243,7 @@ services:
     image: supabase/storage-api:v1.33.5
     restart: unless-stopped
     volumes:
-      - ./volumes/storage:/var/lib/storage:z
+      - ${VOLUMES_DIR:-./volumes}/storage:/var/lib/storage:z
     healthcheck:
       test:
         [
@@ -287,7 +287,7 @@ services:
     image: darthsim/imgproxy:v3.30.1
     restart: unless-stopped
     volumes:
-      - ./volumes/storage:/var/lib/storage:z
+      - ${VOLUMES_DIR:-./volumes}/storage:/var/lib/storage:z
     healthcheck:
       test:
         [
@@ -329,7 +329,7 @@ services:
     image: supabase/edge-runtime:v1.70.0
     restart: unless-stopped
     volumes:
-      - ./volumes/functions:/home/deno/functions:Z
+      - ${VOLUMES_DIR:-./volumes}/functions:/home/deno/functions:Z
     depends_on:
       analytics:
         condition: service_healthy
@@ -401,21 +401,21 @@ services:
     image: supabase/postgres:15.8.1.085
     restart: unless-stopped
     volumes:
-      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
-      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
       # Must be superuser to alter reserved role
-      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # Initialize the database settings with JWT_SECRET and JWT_EXP
-      - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
       # PGDATA directory is persisted between restarts
-      - ./volumes/db/data:/var/lib/postgresql/data:Z
+      - ${VOLUMES_DIR:-./volumes}/db/data:/var/lib/postgresql/data:Z
       # Changes required for internal supabase data such as _analytics
-      - ./volumes/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z
       # Changes required for Analytics support
-      - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
       # Changes required for Pooler support
-      - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
+      - ${VOLUMES_DIR:-./volumes}/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
     healthcheck:
@@ -458,7 +458,7 @@ services:
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
     volumes:
-      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
+      - ${VOLUMES_DIR:-./volumes}/logs/vector.yml:/etc/vector/vector.yml:ro,z
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
     healthcheck:
       test:
@@ -492,7 +492,7 @@ services:
       - ${POSTGRES_PORT}:5432
       - ${POOLER_PROXY_PORT_TRANSACTION}:6543
     volumes:
-      - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro,z
+      - ${VOLUMES_DIR:-./volumes}/pooler/pooler.exs:/etc/pooler/pooler.exs:ro,z
     healthcheck:
       test:
         [
