@@ -585,7 +585,7 @@ export const createTable = async ({
   await executeSql({
     projectRef,
     connectionString,
-    sql: sqlStatements.join(';\n'),
+    sql: `BEGIN;\n${sqlStatements.join(';\n')};\nCOMMIT;`,
     queryKey: ['table', 'create-with-columns'],
   })
 
