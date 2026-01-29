@@ -4,20 +4,16 @@ import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitori
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Info } from 'lucide-react'
 import { useMemo } from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Loading,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Loading, cn } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import {
+  MetricCard,
+  MetricCardContent,
+  MetricCardHeader,
+  MetricCardLabel,
+  MetricCardValue,
+} from 'ui-patterns/MetricCard'
 
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
 import {
@@ -36,18 +32,17 @@ type DatabaseInfrastructureSectionProps = {
   isLoading: boolean
   onBarClick: (datum: unknown) => void
   datetimeFormat: string
+  slowQueriesCount?: number
+  slowQueriesLoading?: boolean
 }
 
 export const DatabaseInfrastructureSection = ({
   interval,
   refreshKey,
   dbErrorRate,
-  dbChartData,
-  dbErrorCount,
-  dbWarningCount,
   isLoading: dbLoading,
-  onBarClick,
-  datetimeFormat,
+  slowQueriesCount = 0,
+  slowQueriesLoading = false,
 }: DatabaseInfrastructureSectionProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -118,198 +113,99 @@ export const DatabaseInfrastructureSection = ({
   return (
     <div>
       <h2 className="mb-4">Database</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="flex flex-col min-h-[200px]">
-          <CardHeader className="pb-0">
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-foreground-light text-sm font-medium">
-                  Error Rate
-                </CardTitle>
-                <div className="text-foreground text-3xl mt-2">{dbErrorRate.toFixed(1)}%</div>
-              </div>
-              <div className="flex items-end gap-4 text-foreground-light">
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-                    <span className="text-xs">Warn</span>
-                  </div>
-                  <span className="text-foreground text-lg">{dbWarningCount.toLocaleString()}</span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-                    <span className="text-xs">Err</span>
-                  </div>
-                  <span className="text-foreground text-lg">{dbErrorCount.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="flex-1 pt-4 overflow-hidden max-h-[200px]">
-            <Loading isFullHeight active={dbLoading}>
-              <LogsBarChart
-                isFullHeight
-                data={dbChartData}
-                DateTimeFormat={datetimeFormat}
-                onBarClick={onBarClick}
-                EmptyState={
-                  <NoDataPlaceholder
-                    size="small"
-                    message="No data for selected period"
-                    isFullHeight
-                  />
-                }
-              />
-            </Loading>
-          </CardContent>
-        </Card>
+      {/* First row: Metrics */}
+      <div className="grid grid-cols-3 gap-2">
+        <MetricCard isLoading={dbLoading}>
+          <MetricCardHeader>
+            <MetricCardLabel tooltip="Percentage of database operations resulting in errors or warnings">
+              Error Rate
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            <MetricCardValue>{dbErrorRate.toFixed(1)}%</MetricCardValue>
+          </MetricCardContent>
+        </MetricCard>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="min-h-[120px] flex flex-col justify-between">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-foreground-light text-xs font-medium flex items-center gap-1">
-                Disk
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="w-3 h-3 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>
-                      Disk I/O consumption percentage. High values may indicate disk bottlenecks.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {infraLoading ? (
-                <div className="text-2xl text-foreground-light">...</div>
-              ) : infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
-              ) : metrics ? (
-                <div
-                  className={cn(
-                    'text-3xl text-foreground',
-                    getMetricStatusColor(metrics.disk.current)
-                  )}
-                >
-                  {metrics.disk.current.toFixed(0)}%
-                </div>
-              ) : (
-                <div className="text-3xl text-foreground-light">--</div>
-              )}
-            </CardContent>
-          </Card>
+        <MetricCard isLoading={slowQueriesLoading}>
+          <MetricCardHeader href={`/project/${projectRef}/observability/query-performance`}>
+            <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
+              Slow Queries
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            <MetricCardValue>{slowQueriesCount}</MetricCardValue>
+          </MetricCardContent>
+        </MetricCard>
 
-          <Card className="min-h-[120px] flex flex-col justify-between">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-foreground-light text-xs font-medium flex items-center gap-1">
-                Memory
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="w-3 h-3 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>RAM usage percentage. Sustained high usage may indicate memory pressure.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {infraLoading ? (
-                <div className="text-2xl text-foreground-light">...</div>
-              ) : infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
-              ) : metrics ? (
-                <div
-                  className={cn(
-                    'text-3xl text-foreground',
-                    getMetricStatusColor(metrics.ram.current)
-                  )}
-                >
-                  {metrics.ram.current.toFixed(0)}%
-                </div>
-              ) : (
-                <div className="text-3xl text-foreground-light">--</div>
-              )}
-            </CardContent>
-          </Card>
+        <MetricCard isLoading={infraLoading}>
+          <MetricCardHeader>
+            <MetricCardLabel tooltip="Active database connections (current/max). Monitor to avoid connection exhaustion">
+              Connections
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            {infraError ? (
+              <div className="text-xs text-destructive break-words">{errorMessage}</div>
+            ) : connections.max > 0 ? (
+              <MetricCardValue>
+                {connections.current}/{connections.max}
+              </MetricCardValue>
+            ) : (
+              <MetricCardValue>--</MetricCardValue>
+            )}
+          </MetricCardContent>
+        </MetricCard>
 
-          <Card className="min-h-[120px] flex flex-col justify-between">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-foreground-light text-xs font-medium flex items-center gap-1">
-                CPU
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="w-3 h-3 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>
-                      CPU usage percentage. High values may suggest CPU-intensive queries or
-                      workloads.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {infraLoading ? (
-                <div className="text-2xl text-foreground-light">...</div>
-              ) : infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
-              ) : metrics ? (
-                <div
-                  className={cn(
-                    'text-3xl text-foreground',
-                    getMetricStatusColor(metrics.cpu.current)
-                  )}
-                >
-                  {metrics.cpu.current.toFixed(0)}%
-                </div>
-              ) : (
-                <div className="text-3xl text-foreground-light">--</div>
-              )}
-            </CardContent>
-          </Card>
+        <MetricCard isLoading={infraLoading}>
+          <MetricCardHeader>
+            <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
+              Disk
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            {infraError ? (
+              <div className="text-xs text-destructive break-words">{errorMessage}</div>
+            ) : metrics ? (
+              <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
+            ) : (
+              <MetricCardValue>--</MetricCardValue>
+            )}
+          </MetricCardContent>
+        </MetricCard>
 
-          <Card className="min-h-[120px] flex flex-col justify-between">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-foreground-light text-xs font-medium flex items-center gap-1">
-                Connections
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="w-3 h-3 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>
-                      Active database connections (current/max). Monitor to avoid connection
-                      exhaustion.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {infraLoading ? (
-                <div className="text-2xl text-foreground-light">...</div>
-              ) : infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
-              ) : connections.max > 0 ? (
-                <div
-                  className={cn(
-                    'text-2xl text-foreground',
-                    getMetricStatusColor((connections.current / connections.max) * 100)
-                  )}
-                >
-                  {connections.current}/{connections.max}
-                </div>
-              ) : (
-                <div className="text-3xl text-foreground-light">--</div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <MetricCard isLoading={infraLoading}>
+          <MetricCardHeader>
+            <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
+              Memory
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            {infraError ? (
+              <div className="text-xs text-destructive break-words">{errorMessage}</div>
+            ) : metrics ? (
+              <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
+            ) : (
+              <MetricCardValue>--</MetricCardValue>
+            )}
+          </MetricCardContent>
+        </MetricCard>
+
+        <MetricCard isLoading={infraLoading}>
+          <MetricCardHeader>
+            <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
+              CPU
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            {infraError ? (
+              <div className="text-xs text-destructive break-words">{errorMessage}</div>
+            ) : metrics ? (
+              <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
+            ) : (
+              <MetricCardValue>--</MetricCardValue>
+            )}
+          </MetricCardContent>
+        </MetricCard>
       </div>
     </div>
   )

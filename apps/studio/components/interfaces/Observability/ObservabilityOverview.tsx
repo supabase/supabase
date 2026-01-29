@@ -27,6 +27,7 @@ import {
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ServiceHealthTable } from './ServiceHealthTable'
+import { useSlowQueriesCount } from './useSlowQueriesCount'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 
@@ -85,6 +86,11 @@ export const ObservabilityOverview = () => {
   }, [selectedInterval])
 
   const overviewData = useObservabilityOverviewData(projectRef!, interval, refreshKey)
+
+  const { slowQueriesCount, isLoading: slowQueriesLoading } = useSlowQueriesCount(
+    projectRef,
+    refreshKey
+  )
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
@@ -271,6 +277,8 @@ export const ObservabilityOverview = () => {
           isLoading={dbServiceData.isLoading}
           onBarClick={handleDbBarClick}
           datetimeFormat={datetimeFormat}
+          slowQueriesCount={slowQueriesCount}
+          slowQueriesLoading={slowQueriesLoading}
         />
 
         <ServiceHealthTable
