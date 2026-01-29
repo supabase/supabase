@@ -8,41 +8,20 @@ import {
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 
-// ============================================================================
-// Result Types
-// ============================================================================
-
-/**
- * Result of resolving DELETE_ROW conflicts
- */
 export type DeleteConflictResult =
-  | { action: 'skip'; filteredOperations: QueuedOperation[] } // Don't add the delete (was a newly added row), but still filter the queue
-  | { action: 'add'; filteredOperations: QueuedOperation[] } // Add delete, here's filtered queue
+  | { action: 'skip'; filteredOperations: QueuedOperation[] }
+  | { action: 'add'; filteredOperations: QueuedOperation[] }
 
-/**
- * Result of resolving EDIT_CELL_CONTENT conflicts
- */
 export type EditConflictResult =
-  | { action: 'reject'; reason: string } // Can't edit (row pending deletion)
-  | { action: 'merge'; updatedOperations: QueuedOperation[] } // Merged into ADD_ROW
-  | { action: 'add' } // Normal add/update
+  | { action: 'reject'; reason: string }
+  | { action: 'merge'; updatedOperations: QueuedOperation[] }
+  | { action: 'add' }
 
-/**
- * Result of upserting an operation into the queue
- */
 export type UpsertResult = {
   operations: QueuedOperation[]
   wasUpdate: boolean
 }
 
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-/**
- * Check if an operation's row identifiers match the given identifiers.
- * Works for both EDIT_CELL_CONTENT and DELETE_ROW operations.
- */
 export function operationMatchesRow(
   operation: QueuedOperation,
   tableId: number,
@@ -76,21 +55,6 @@ export function editOperationMatchesTempId(operation: QueuedOperation, tempId: s
   return (payload.rowIdentifiers as any)?.__tempId === tempId
 }
 
-// ============================================================================
-// Conflict Resolution Functions
-// ============================================================================
-
-/**
- * Resolve conflicts when adding a DELETE_ROW operation.
- *
- * Handles two scenarios:
- * 1. Deleting a newly added row (has tempId): removes the ADD_ROW op and any EDIT_CELL ops for that row
- * 2. Deleting an existing row: removes any pending EDIT_CELL operations for that row
- *
- * @param operations - Current queue of operations (readonly)
- * @param deleteOperation - The DELETE_ROW operation being added
- * @returns DeleteConflictResult indicating whether to skip or add the operation
- */
 export function resolveDeleteRowConflicts(
   operations: readonly QueuedOperation[],
   deleteOperation: NewQueuedOperation
@@ -108,10 +72,9 @@ export function resolveDeleteRowConflicts(
       tempId,
     })
 
-    let filteredOperations = operations.filter((op) => op.id !== addRowKey)
-
-    // Also remove any EDIT_CELL operations for this temp row
-    filteredOperations = filteredOperations.filter((op) => !editOperationMatchesTempId(op, tempId))
+    let filteredOperations = operations
+      .filter((op) => op.id !== addRowKey)
+      .filter((op) => !editOperationMatchesTempId(op, tempId))
 
     return { action: 'skip', filteredOperations }
   }
@@ -124,18 +87,6 @@ export function resolveDeleteRowConflicts(
   return { action: 'add', filteredOperations }
 }
 
-/**
- * Resolve conflicts when adding an EDIT_CELL_CONTENT operation.
- *
- * Handles three scenarios:
- * 1. Editing a row pending deletion: reject the edit
- * 2. Editing a newly added row: merge the edit into the ADD_ROW's rowData
- * 3. Normal edit: proceed with add/update
- *
- * @param operations - Current queue of operations (readonly)
- * @param editOperation - The EDIT_CELL_CONTENT operation being added
- * @returns EditConflictResult indicating how to handle the operation
- */
 export function resolveEditCellConflicts(
   operations: readonly QueuedOperation[],
   editOperation: NewQueuedOperation
@@ -195,17 +146,6 @@ export function resolveEditCellConflicts(
   return { action: 'add' }
 }
 
-/**
- * Upsert an operation into the queue.
- *
- * If an operation with the same key exists:
- * - For EDIT_CELL_CONTENT: preserves the original oldValue
- * - For other types: replaces the operation entirely
- *
- * @param operations - Current queue of operations (readonly)
- * @param newOperation - The operation to add/update
- * @returns UpsertResult with the updated operations array and whether it was an update
- */
 export function upsertOperation(
   operations: readonly QueuedOperation[],
   newOperation: NewQueuedOperation
