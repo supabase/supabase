@@ -61,8 +61,9 @@ function getOperationSql(operation: QueuedOperation): string {
       })
     }
     default:
-      // Error should never happen, but we'll handle it anyway
-      throw new Error(`Unknown operation: ${operation}`)
+      // Error should never happen, but we'll handle it anyway. cast to never for exhaustive check.
+      const _exhaustiveCheck: never = operation
+      throw new Error(`Unknown operation: ${(_exhaustiveCheck as { type: string }).type}`)
   }
 }
 
