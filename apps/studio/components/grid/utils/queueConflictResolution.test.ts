@@ -80,7 +80,7 @@ describe('operationMatchesRow', () => {
       timestamp: Date.now(),
       payload: {
         rowIdentifiers: { id: 1 },
-        originalRow: { id: 1, name: 'test' },
+        originalRow: { idx: 1, id: 1, name: 'test' },
         table: mockTable,
       },
     }
@@ -95,7 +95,7 @@ describe('operationMatchesRow', () => {
       timestamp: Date.now(),
       payload: {
         tempId: 'temp123',
-        rowData: { name: 'new' },
+        rowData: { idx: 1, __tempId: '1', name: 'new' },
         table: mockTable,
       },
     }
@@ -118,7 +118,7 @@ describe('resolveDeleteRowConflicts', () => {
       timestamp: Date.now(),
       payload: {
         tempId: '-12345',
-        rowData: { name: 'new row' },
+        rowData: { idx: -12345, __tempId: '-12345', name: 'new row' },
         table: mockTable,
       },
     }
@@ -129,7 +129,7 @@ describe('resolveDeleteRowConflicts', () => {
       tableId: 1,
       payload: {
         rowIdentifiers: { __tempId: '-12345' },
-        originalRow: { __tempId: '-12345', name: 'new row' },
+        originalRow: { idx: -12345, __tempId: '-12345', name: 'new row' },
         table: mockTable,
       },
     }
@@ -148,7 +148,7 @@ describe('resolveDeleteRowConflicts', () => {
       timestamp: Date.now(),
       payload: {
         tempId: '-12345',
-        rowData: { name: 'new row' },
+        rowData: { idx: -12345, __tempId: '-12345', name: 'new row' },
         table: mockTable,
       },
     }
@@ -187,7 +187,7 @@ describe('resolveDeleteRowConflicts', () => {
       tableId: 1,
       payload: {
         rowIdentifiers: { __tempId: '-12345' },
-        originalRow: { __tempId: '-12345', name: 'new row' },
+        originalRow: { idx: -12345, __tempId: '-12345', name: 'new row' },
         table: mockTable,
       },
     }
@@ -234,7 +234,7 @@ describe('resolveDeleteRowConflicts', () => {
       tableId: 1,
       payload: {
         rowIdentifiers: { id: 1 },
-        originalRow: { id: 1, name: 'original' },
+        originalRow: { idx: 1, id: 1, name: 'original' },
         table: mockTable,
       },
     }
@@ -267,7 +267,7 @@ describe('resolveDeleteRowConflicts', () => {
       tableId: 1,
       payload: {
         rowIdentifiers: { id: 1 },
-        originalRow: { id: 1, name: 'original' },
+        originalRow: { idx: 1, id: 1, name: 'original' },
         table: mockTable,
       },
     }
@@ -290,7 +290,7 @@ describe('resolveEditCellConflicts', () => {
       timestamp: Date.now(),
       payload: {
         rowIdentifiers: { id: 1 },
-        originalRow: { id: 1, name: 'to delete' },
+        originalRow: { idx: 1, id: 1, name: 'to delete' },
         table: mockTable,
       },
     }
@@ -324,7 +324,7 @@ describe('resolveEditCellConflicts', () => {
       timestamp: Date.now(),
       payload: {
         tempId: '-12345',
-        rowData: { name: 'new row' },
+        rowData: { idx: -12345, __tempId: '-12345', name: 'new row' },
         table: mockTable,
       },
     }
@@ -510,7 +510,7 @@ describe('upsertOperation', () => {
       timestamp: Date.now() - 1000,
       payload: {
         rowIdentifiers: { id: 1 },
-        originalRow: { id: 1, name: 'old data' },
+        originalRow: { idx: 1, id: 1, name: 'old data' },
         table: mockTable,
       },
     }
@@ -521,7 +521,7 @@ describe('upsertOperation', () => {
       tableId: 1,
       payload: {
         rowIdentifiers: { id: 1 },
-        originalRow: { id: 1, name: 'updated data' },
+        originalRow: { idx: 1, id: 1, name: 'updated data' },
         table: mockTable,
       },
     }
@@ -574,7 +574,7 @@ describe('upsertOperation', () => {
       tableId: 1,
       payload: {
         tempId: '-12345',
-        rowData: { name: 'new row' },
+        rowData: { idx: -12345, __tempId: '-12345', name: 'new row' },
         table: mockTable,
       },
     }

@@ -197,7 +197,7 @@ interface QueueRowAddParams {
   projectRef: string
   tableId: number
   table: Entity
-  rowData: Dictionary<unknown>
+  rowData: PendingAddRow
   enumArrayColumns?: string[]
 }
 

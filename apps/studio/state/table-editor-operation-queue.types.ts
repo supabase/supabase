@@ -1,6 +1,8 @@
 import type { Entity } from 'data/table-editor/table-editor-types'
 import type { Dictionary } from 'types'
 
+import { PendingAddRow, SupaRow } from '@/components/grid/types'
+
 export enum QueuedOperationType {
   EDIT_CELL_CONTENT = 'edit_cell_content',
   ADD_ROW = 'add_row',
@@ -25,7 +27,7 @@ export interface EditCellContentPayload {
  */
 export interface AddRowPayload {
   tempId: string // Client-generated UUID (row has no PK yet)
-  rowData: Dictionary<unknown> // Column values for the new row
+  rowData: PendingAddRow // Column values for the new row
   table: Entity
   enumArrayColumns?: string[]
 }
@@ -35,7 +37,7 @@ export interface AddRowPayload {
  */
 export interface DeleteRowPayload {
   rowIdentifiers: Dictionary<unknown> // Primary key values
-  originalRow: Dictionary<unknown> // Full row for display/undo
+  originalRow: SupaRow // Full row for display/undo
   table: Entity
 }
 
