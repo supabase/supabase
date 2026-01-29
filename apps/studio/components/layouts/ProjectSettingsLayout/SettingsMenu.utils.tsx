@@ -116,6 +116,7 @@ export const generateSettingsMenu = (
           key: 'addons',
           url: `/project/${ref}/settings/addons`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Vault',

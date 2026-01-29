@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { PropsWithChildren } from 'react'
 
+import { useProfile } from '@/lib/profile'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -13,16 +14,17 @@ interface LogsLayoutProps {
 }
 
 const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
-  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckPermissions(
+  const { isSupportAccount, isLoading: isLoadingProfile } = useProfile()
+  const { isLoading: isLoadingPermissions, can: canUseLogsExplorer } = useAsyncCheckPermissions(
     PermissionAction.ANALYTICS_READ,
     'logflare'
   )
+  const isLoading = isLoadingProfile || isLoadingPermissions
 
-  if (!canUseLogsExplorer) {
+  if (!isSupportAccount && !canUseLogsExplorer) {
     if (isLoading) {
       return <ProjectLayout isLoading></ProjectLayout>
     }
-
     if (!isLoading && !canUseLogsExplorer) {
       return (
         <ProjectLayout>
