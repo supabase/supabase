@@ -21,6 +21,13 @@
   <pubDate>Wed, 21 Jan 2026 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/read-replicas-vs-bigger-compute</guid>
+  <title>When to use Read Replicas vs. bigger compute</title>
+  <link>https://supabase.com/blog/read-replicas-vs-bigger-compute</link>
+  <description>A practical guide to diagnosing database slowdowns and choosing between vertical scaling and Read Replicas based on your workload, budget, and performance bottlenecks.</description>
+  <pubDate>Thu, 15 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-trae-solo-integration</guid>
   <title>Introducing TRAE SOLO integration with Supabase</title>
   <link>https://supabase.com/blog/introducing-trae-solo-integration</link>
@@ -2464,6 +2471,13 @@
   <pubDate>Thu, 25 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgresql-views</guid>
+  <title>Postgres Views</title>
+  <link>https://supabase.com/blog/postgresql-views</link>
+  <description>Creating and using a view in PostgreSQL.</description>
+  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
   <title>Continuous PostgreSQL Backups using WAL-G</title>
   <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
@@ -2497,13 +2511,6 @@
   <link>https://supabase.com/blog/improved-dx</link>
   <description>We&apos;re releasing a new version of our Supabase client with some awesome new improvements.</description>
   <pubDate>Fri, 30 Oct 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-views</guid>
-  <title>Postgres Views</title>
-  <link>https://supabase.com/blog/postgresql-views</link>
-  <description>Creating and using a view in PostgreSQL.</description>
-  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/case-study-monitoro</guid>

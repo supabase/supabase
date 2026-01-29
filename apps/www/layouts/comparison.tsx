@@ -76,13 +76,15 @@ const LayoutComparison = ({ components, props }: Props) => {
               return cat
             }),
           },
-          images: [
-            {
-              url: `https://supabase.com${basePath}/images/blog/${
-                props.blog.imgSocial ? props.blog.imgSocial : props.blog.imgThumb
-              }`,
-            },
-          ],
+          images: (() => {
+            const img = props.blog.imgSocial || props.blog.imgThumb
+            if (!img) return []
+            const url =
+              img.startsWith('/') || img.startsWith('http')
+                ? img
+                : `https://supabase.com${basePath}/images/blog/${img}`
+            return [{ url }]
+          })(),
         }}
       />
       <DefaultLayout>

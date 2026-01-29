@@ -1,12 +1,12 @@
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
+import type { Blog, BlogData, PostReturnType } from 'types/post'
+
+import BlogPostClient from './BlogPostClient'
 import { processCMSContent } from '~/lib/cms/processCMSContent'
 import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
-import BlogPostClient from './BlogPostClient'
-
-import type { Metadata } from 'next'
-import type { Blog, BlogData, PostReturnType } from 'types/post'
 
 export const revalidate = 30
 
@@ -93,8 +93,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const imageField = blogPost.imgSocial ? blogPost.imgSocial : blogPost.imgThumb
-    const metaImageUrl = imageField ? `/images/blog/${imageField}` : undefined
+    const blogImage = blogPost.imgThumb || blogPost.imgSocial
+    const metaImageUrl = blogImage
+      ? blogImage.startsWith('http')
+        ? blogImage
+        : `${CMS_SITE_ORIGIN.replace('/api-v2', '')}${blogImage}`
+      : undefined
 
     return {
       title: blogPost.title,

@@ -52,8 +52,8 @@ const data = {
     ],
     ctas: [
       {
-        label: 'View documentation',
-        href: 'https://supabase.com/docs',
+        label: 'Compare Convex and Supabase',
+        href: '/alternatives/supabase-vs-convex',
         type: 'default' as any,
         icon: <ArrowUpRight className="w-4 h-4 text-current" />,
       },

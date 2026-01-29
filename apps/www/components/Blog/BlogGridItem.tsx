@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
+
 import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
 
@@ -23,17 +24,16 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
+  const resolveImagePath = (img: string | undefined): string | null => {
+    if (!img) return null
+    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
+  }
+
   const imageUrl = post.isCMS
-    ? post.imgThumb
-      ? post.imgThumb
-      : post.imgSocial
-        ? post.imgSocial
-        : '/images/blog/blog-placeholder.png'
-    : post.imgThumb
-      ? `/images/blog/${post.imgThumb}`
-      : post.imgSocial
-        ? `/images/blog/${post.imgSocial}`
-        : '/images/blog/blog-placeholder.png'
+    ? post.imgThumb || post.imgSocial || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(post.imgThumb) ||
+      resolveImagePath(post.imgSocial) ||
+      '/images/blog/blog-placeholder.png'
 
   return (
     <Link
@@ -43,7 +43,7 @@ const BlogGridItem = ({ post }: Props) => {
     >
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <div className="border-default relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border shadow-sm">
+          <div className="border-default relative mb-3 w-full aspect-[1.91/1] overflow-hidden rounded-lg border shadow-sm">
             <Image
               fill
               sizes="100%"
