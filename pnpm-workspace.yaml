@@ -6,14 +6,16 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.87.0
-  '@supabase/postgrest-js': 2.87.0
-  '@supabase/realtime-js': 2.87.0
-  '@supabase/supabase-js': 2.87.0
+  '@supabase/auth-js': 2.93.2
+  '@supabase/postgrest-js': 2.93.2
+  '@supabase/realtime-js': 2.93.2
+  '@supabase/supabase-js': 2.93.2
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
-  next: ^15.5.9
+  next: ^15.5.10
+  lodash-es: ^4.17.23
+  lodash: ^4.17.23
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -52,20 +54,34 @@ minimumReleaseAgeExclude:
   - '@vitejs/plugin-rsc'
   - stripe-experiment-sync # TODO(matlin) remove, temp just to unblock launch
   - braintrust
+  - tar
+  - diff
+  - lodash-es
+  - lodash
 
 onlyBuiltDependencies:
   - supabase
 
 overrides:
   '@eslint/eslintrc>js-yaml': ^4.1.1
+  '@nuxt/devtools-wizard>diff': ^8.0.3
   '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
   '@tanstack/directive-functions-plugin>vite': 'catalog:'
   '@tanstack/react-start-plugin>vite': 'catalog:'
+  '@tanstack/start-server-core>h3': ^1.15.5
+  '@tanstack/react-start-server>h3': ^1.15.5
+  '@smithy/config-resolver': ^4.4.0
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
+  lodash-es: 'catalog:'
+  lodash: 'catalog:'
+  payload>undici: ^7.18.2
+  preact: 10.26.10
   refractor>prismjs: ^1.30.0
-  tar: ^7.0.0
+  shadcn>diff: ^8.0.3
+  tar: ^7.5.4
   tmp: ^0.2.4
   vinxi>vite: 'catalog:'
+  vinxi>h3: ^1.15.5

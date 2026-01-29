@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
+import { formatSql } from '@/lib/formatSql'
 import { useFlag, useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
@@ -18,7 +19,6 @@ import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/tabl
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationState,
@@ -263,23 +263,22 @@ export const EntityListItem = ({
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
-                    const tableDefinition = await getTableDefinition({
+                    const formattedSchema = getTableDefinition({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
+                    }).then((tableDefinition) => {
+                      if (!tableDefinition) {
+                        throw new Error('Failed to get table schema')
+                      }
+                      return formatSql(tableDefinition)
                     })
-                    if (!tableDefinition) {
-                      return toast.error('Failed to get table schema', { id: toastId })
-                    }
 
                     try {
-                      const formatted = formatSql(tableDefinition)
-                      await copyToClipboard(formatted)
+                      await copyToClipboard(formattedSchema)
                       toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
-                      toast.error('Failed to copy schema: ' + (err.message || err), {
-                        id: toastId,
-                      })
+                      toast.error('Failed to copy schema: ' + (err.message || err), { id: toastId })
                     }
                   }}
                 >

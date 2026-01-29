@@ -40,7 +40,13 @@ const EventGridItem = ({ event }: Props) => {
                 fill
                 sizes="100%"
                 quality={100}
-                src={event.type === 'casestudy' ? event.thumb : `/images/blog/${event.thumb}`}
+                src={
+                  event.type === 'casestudy' ||
+                  event.thumb.startsWith('/') ||
+                  event.thumb.startsWith('http')
+                    ? event.thumb
+                    : `/images/blog/${event.thumb}`
+                }
                 className="scale-100 object-cover overflow-hidden"
                 alt={`${event.title} thumbnail`}
               />

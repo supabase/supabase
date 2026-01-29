@@ -26,6 +26,7 @@ import {
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH, DOCS_URL } from 'lib/constants'
@@ -71,6 +72,7 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const { hasAccess: hasReadReplicaAccess } = useCheckEntitlements('instances.read_replicas')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
@@ -171,7 +173,6 @@ const DeployNewReplicaPanel = ({
     : MAX_REPLICAS_ABOVE_XL
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
-  const isFreePlan = org?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
@@ -185,7 +186,7 @@ const DeployNewReplicaPanel = ({
     !reachedMaxReplicas &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
-    !isFreePlan &&
+    hasReadReplicaAccess &&
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
@@ -321,12 +322,12 @@ const DeployNewReplicaPanel = ({
                 <Button asChild type="default">
                   <Link
                     href={
-                      isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
-                        : `/project/${projectRef}/settings/compute-and-disk`
+                      hasReadReplicaAccess
+                        ? `/project/${projectRef}/settings/compute-and-disk`
+                        : `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
                     }
                   >
-                    {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
+                    {hasReadReplicaAccess ? 'Change compute size' : 'Upgrade to Pro'}
                   </Link>
                 </Button>
                 <DocsButton
@@ -418,9 +419,9 @@ const DeployNewReplicaPanel = ({
                     <Button asChild type="default">
                       <Link
                         href={
-                          isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
-                            : `/project/${projectRef}/settings/compute-and-disk`
+                          hasReadReplicaAccess
+                            ? `/project/${projectRef}/settings/compute-and-disk`
+                            : `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
                         }
                       >
                         Upgrade compute size
