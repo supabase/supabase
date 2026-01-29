@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight, ChevronDown, ChevronRight, Copy } from 'lucide-react'
+import { ArrowUpRight, Check, ChevronDown, ChevronRight, Copy, FileText } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 import { Button, cn } from 'ui'
@@ -14,9 +14,10 @@ import {
   buildProjectionSeries,
   calculatePricingReport,
   calculateRoiSummary,
+  decodeInputsFromHash,
   decodeInputsFromSearchParams,
+  encodeInputsToHash,
   estimateAuthComparison,
-  encodeInputsToSearchParams,
   getDefaultInputs,
 } from '~/lib/pricing-calculator'
 import type { CalculatorInputs, CalculatorStageId } from '~/lib/pricing-calculator'
@@ -37,6 +38,8 @@ export default function PricingCalculator() {
 
   const [activeStage, setActiveStage] = useState<CalculatorStageId>('products')
   const [inputs, setInputs] = useState<CalculatorInputs>(() => getDefaultInputs())
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [summaryCopied, setSummaryCopied] = useState(false)
 
   // Product selection as a Set for easy toggling
   const selectedProducts = new Set(inputs.selectedProducts)
@@ -56,20 +59,26 @@ export default function PricingCalculator() {
   }
 
   // Hydrate state from URL (shareable links)
+  // Supports both hash-based (new) and query param (legacy) formats
   useEffect(() => {
-    if (!('URLSearchParams' in window)) return
-    const params = new URLSearchParams(window.location.search)
-    const decoded = decodeInputsFromSearchParams(params, getDefaultInputs())
-    setInputs(decoded.inputs)
+    const hash = window.location.hash.slice(1) // Remove leading #
+    if (hash) {
+      // New hash-based format
+      const decoded = decodeInputsFromHash(hash, getDefaultInputs())
+      setInputs(decoded.inputs)
+    } else if (window.location.search) {
+      // Legacy query param format (for backwards compatibility)
+      const params = new URLSearchParams(window.location.search)
+      const decoded = decodeInputsFromSearchParams(params, getDefaultInputs())
+      setInputs(decoded.inputs)
+    }
   }, [])
 
   // Keep URL in sync as inputs change (shallow replace)
   useEffect(() => {
-    if (!('URLSearchParams' in window)) return
     const { pathname } = window.location
-    const params = encodeInputsToSearchParams(inputs)
-    const search = params.toString()
-    const newAsPath = pathname + (search ? `?${search}` : '')
+    const hash = encodeInputsToHash(inputs)
+    const newAsPath = pathname + '#' + hash
     history.replaceState({ url: newAsPath }, '', newAsPath)
   }, [inputs])
 
@@ -101,12 +110,75 @@ export default function PricingCalculator() {
     const url = window.location.href
     try {
       await navigator.clipboard.writeText(url)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
       sendTelemetryEvent({
         action: 'www_pricing_calculator_share_link_copied',
         properties: { stage: activeStage },
       })
     } catch {
       // Fallback: do nothing (prototype)
+    }
+  }
+
+  const generateSummaryText = () => {
+    const plan = pricingReport.recommended.plan
+    const planCost = pricingReport.estimates[plan].totalMonthlyUsd
+    const appTypeLabels: Record<string, string> = {
+      content: 'Content/Marketing',
+      ecommerce: 'E-commerce',
+      saas: 'SaaS/Dashboard',
+      social: 'Social/UGC',
+      collaboration: 'Collaboration',
+      realtime: 'Realtime/Gaming',
+    }
+
+    const formatUsd = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+
+    const lines = [
+      'Supabase Pricing Estimate',
+      '-------------------------',
+      `App type: ${appTypeLabels[inputs.appType] || inputs.appType}`,
+      `MAU: ${inputs.mau.toLocaleString()} | Database: ${inputs.databaseSizeGb} GB | Storage: ${inputs.storageSizeGb} GB`,
+      '',
+      `Recommended: ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan at ${formatUsd(planCost)}/mo`,
+      '',
+      'Competitor comparison (estimated):',
+    ]
+
+    // Add competitor comparisons
+    const firebase = authComparison.firebaseMonthlyUsd
+    const auth0 = authComparison.auth0MonthlyUsd
+    const clerk = authComparison.clerkMonthlyUsd
+
+    if (firebase > planCost) {
+      lines.push(`  vs Firebase: Save ${formatUsd(firebase - planCost)}/mo`)
+    }
+    if (auth0 && auth0 > planCost) {
+      lines.push(`  vs Auth0: Save ${formatUsd(auth0 - planCost)}/mo`)
+    }
+    if (clerk && clerk > planCost) {
+      lines.push(`  vs Clerk: Save ${formatUsd(clerk - planCost)}/mo`)
+    }
+
+    lines.push('')
+    lines.push(`Full calculator: ${window.location.href}`)
+
+    return lines.join('\n')
+  }
+
+  const copySummary = async () => {
+    try {
+      const summary = generateSummaryText()
+      await navigator.clipboard.writeText(summary)
+      setSummaryCopied(true)
+      setTimeout(() => setSummaryCopied(false), 2000)
+      sendTelemetryEvent({
+        action: 'www_pricing_calculator_summary_copied',
+        properties: { recommendedPlan: pricingReport.recommended.plan },
+      })
+    } catch {
+      // Fallback: do nothing
     }
   }
 
@@ -132,12 +204,12 @@ export default function PricingCalculator() {
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  type="default"
+                  type={linkCopied ? 'primary' : 'default'}
                   size="tiny"
-                  icon={<Copy className="w-3 h-3" />}
+                  icon={linkCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   onClick={copyShareableLink}
                 >
-                  Copy link
+                  {linkCopied ? 'Copied!' : 'Copy link'}
                 </Button>
                 <Button asChild type="outline" size="tiny" iconRight={<ArrowUpRight className="w-4 h-4" />}>
                   <Link href="/contact/sales" target="_blank">
@@ -256,12 +328,20 @@ export default function PricingCalculator() {
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  type="default"
+                  type={linkCopied ? 'primary' : 'default'}
                   size="tiny"
-                  icon={<Copy className="w-3 h-3" />}
+                  icon={linkCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   onClick={copyShareableLink}
                 >
-                  Copy link
+                  {linkCopied ? 'Copied!' : 'Copy link'}
+                </Button>
+                <Button
+                  type={summaryCopied ? 'primary' : 'default'}
+                  size="tiny"
+                  icon={summaryCopied ? <Check className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
+                  onClick={copySummary}
+                >
+                  {summaryCopied ? 'Copied!' : 'Copy summary'}
                 </Button>
                 <InfoTooltip side="top" className="max-w-[260px]">
                   Competitor pricing is sourced from official pricing pages (see report for sources and as-of dates).
