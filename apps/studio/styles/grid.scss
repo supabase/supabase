@@ -36,6 +36,16 @@
   box-shadow: inset 0 0 0 1px #24b47e;
 }
 
+// Cell with unsaved changes - yellow/amber border
+.rdg-cell.rdg-cell--dirty {
+  box-shadow: inset 0 0 0 2px hsl(var(--warning-default));
+}
+
+// When a dirty cell is also selected, keep the amber border
+.rdg-cell.rdg-cell--dirty[aria-selected='true'] {
+  box-shadow: inset 0 0 0 2px hsl(var(--warning-default));
+}
+
 .rdg {
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas;
   @apply border-t border-r-0 border-l-0;
