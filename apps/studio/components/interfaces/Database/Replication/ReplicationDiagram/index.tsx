@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import ReactFlow, { Background, ReactFlowProvider, useReactFlow } from 'reactflow'
 
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -109,7 +109,7 @@ const ReplicationDiagramContent = () => {
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
 
-  const setReactFlow = async () => {
+  const setReactFlow = useCallback(async () => {
     const graph = getDagreGraphLayout(nodes, edges)
     reactFlow.setNodes(graph.nodes)
     reactFlow.setEdges(graph.edges)
@@ -117,11 +117,11 @@ const ReplicationDiagramContent = () => {
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
     await timeout(1)
     reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
-  }
+  }, [edges, nodes, reactFlow])
 
   useEffect(() => {
     if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) setReactFlow()
-  }, [nodes, isSuccessDestinations, isSuccessReplicas])
+  }, [isSuccessDestinations, isSuccessReplicas, nodes.length, setReactFlow])
 
   return (
     <div className="nowheel relative min-h-[350px]">

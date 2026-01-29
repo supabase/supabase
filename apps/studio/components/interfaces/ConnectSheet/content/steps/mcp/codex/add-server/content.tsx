@@ -12,10 +12,9 @@ function useMcpUrl(
   const readonly = Boolean(state.mcpReadonly)
   const selectedFeatures = Array.isArray(state.mcpFeatures) ? state.mcpFeatures : []
   const supportedFeatures = IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+  const baseUrl = IS_PLATFORM ? 'https://mcp.supabase.com' : projectKeys.apiUrl ?? ''
 
   return useMemo(() => {
-    const baseUrl = IS_PLATFORM ? 'https://mcp.supabase.com' : projectKeys.apiUrl ?? ''
-
     const params = new URLSearchParams()
     if (readonly) params.set('readonly', 'true')
 
@@ -28,7 +27,7 @@ function useMcpUrl(
 
     const queryString = params.toString()
     return queryString ? `${baseUrl}?${queryString}` : baseUrl
-  }, [readonly, selectedFeatures, projectKeys.apiUrl, supportedFeatures])
+  }, [baseUrl, readonly, selectedFeatures, supportedFeatures])
 }
 
 function CodexAddServerContent({ state, projectKeys }: StepContentProps) {
