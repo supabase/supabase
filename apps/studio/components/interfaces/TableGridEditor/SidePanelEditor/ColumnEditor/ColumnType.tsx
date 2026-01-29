@@ -22,6 +22,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   CriticalIcon,
   Input,
@@ -191,13 +192,13 @@ const ColumnType = ({
               placeholder="Search types..."
               // [Joshen] Addresses style issues when this component is being used in the old Form component
               // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-              className="!bg-transparent focus:!shadow-none focus:!ring-0"
+              className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
             />
             <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
             <CommandList_Shadcn_>
               <ScrollArea className="h-[240px]">
-                <CommandGroup_Shadcn_>
+                <CommandGroup_Shadcn_ heading="Postgres data types">
                   {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
                     <CommandItem_Shadcn_
                       key={option.name}
@@ -219,10 +220,11 @@ const ColumnType = ({
                     </CommandItem_Shadcn_>
                   ))}
                 </CommandGroup_Shadcn_>
+
                 {enumTypes.length > 0 && (
                   <>
-                    <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_ heading="Other types">
                       {enumTypes.map((option) => (
                         <CommandItem_Shadcn_
                           key={option.id}
