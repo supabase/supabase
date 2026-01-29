@@ -425,7 +425,6 @@ describe('upsertOperation', () => {
 
     const result = upsertOperation(operations, newOperation)
 
-    expect(result.wasUpdate).toBe(false)
     expect(result.operations).toHaveLength(1)
     expect(result.operations[0].type).toBe(QueuedOperationType.EDIT_CELL_CONTENT)
     expect(result.operations[0].id).toBe('edit_cell_content:1:name:id:1')
@@ -461,7 +460,6 @@ describe('upsertOperation', () => {
 
     const result = upsertOperation(operations, newOperation)
 
-    expect(result.wasUpdate).toBe(false)
     expect(result.operations).toHaveLength(2)
   })
 
@@ -495,7 +493,6 @@ describe('upsertOperation', () => {
 
     const result = upsertOperation(operations, newOperation)
 
-    expect(result.wasUpdate).toBe(true)
     expect(result.operations).toHaveLength(1)
     const updated = result.operations[0]
     expect((updated.payload as any).oldValue).toBe('very first value')
@@ -528,7 +525,6 @@ describe('upsertOperation', () => {
 
     const result = upsertOperation(operations, newOperation)
 
-    expect(result.wasUpdate).toBe(true)
     expect(result.operations).toHaveLength(1)
     expect((result.operations[0].payload as any).originalRow.name).toBe('updated data')
   })
@@ -581,7 +577,6 @@ describe('upsertOperation', () => {
 
     const result = upsertOperation(operations, newOperation)
 
-    expect(result.wasUpdate).toBe(false)
     expect(result.operations).toHaveLength(1)
     expect(result.operations[0].id).toBe('add_row:1:-12345')
   })

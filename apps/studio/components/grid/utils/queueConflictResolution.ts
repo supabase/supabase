@@ -21,7 +21,6 @@ export type EditConflictResult =
 
 export type UpsertResult = {
   operations: QueuedOperation[]
-  wasUpdate: boolean
 }
 
 function editOperationMatchesTempId(operation: QueuedOperation, tempId: string): boolean {
@@ -169,8 +168,8 @@ export function upsertOperation(
     }
 
     updatedOperations[existingOpIndex] = queuedOperation
-    return { operations: updatedOperations, wasUpdate: true }
+    return { operations: updatedOperations }
   }
 
-  return { operations: [...operations, queuedOperation], wasUpdate: false }
+  return { operations: [...operations, queuedOperation] }
 }
