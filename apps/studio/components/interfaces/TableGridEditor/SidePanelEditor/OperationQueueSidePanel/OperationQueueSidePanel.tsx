@@ -34,6 +34,7 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
       size="large"
       visible={visible}
       onCancel={closePanel}
+      onOpenAutoFocus={(event) => event.preventDefault()} // Prevent focus on first focussable element since it is the revert changes ButtonTooltip
       header={
         <div className="flex items-center justify-between w-full">
           <div className="flex flex-col gap-1">
