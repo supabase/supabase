@@ -1,13 +1,12 @@
-import { Plug } from 'lucide-react'
-import { ComponentProps, useEffect, useState } from 'react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { ConnectSheet } from 'components/interfaces/ConnectSheet/ConnectSheet'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Plug } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { ComponentProps } from 'react'
 import { Button } from 'ui'
 
 interface ConnectButtonProps {
@@ -20,6 +19,7 @@ export const ConnectButton = ({
   renderDialog = true,
 }: ConnectButtonProps) => {
   const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
+  const isFlagResolved = connectSheetFlag !== undefined
   const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
 
   const { data: selectedProject } = useSelectedProjectQuery()
@@ -30,15 +30,6 @@ export const ConnectButton = ({
     parseAsBoolean.withDefault(false)
   )
   const [connectTab, setConnectTab] = useQueryState('connectTab', parseAsString)
-
-  const [connectMode, setConnectMode] = useState<'dialog' | 'sheet'>(
-    isConnectSheetEnabled ? 'sheet' : 'dialog'
-  )
-
-  useEffect(() => {
-    if (showConnect) return
-    setConnectMode(isConnectSheetEnabled ? 'sheet' : 'dialog')
-  }, [isConnectSheetEnabled, showConnect])
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -79,8 +70,8 @@ export const ConnectButton = ({
       >
         <span>Connect</span>
       </Button>
-      {renderDialog ? (
-        connectMode === 'sheet' ? (
+      {renderDialog && isFlagResolved ? (
+        isConnectSheetEnabled ? (
           <ConnectSheet
             open={showConnect}
             onOpenChange={handleOpenChange}
