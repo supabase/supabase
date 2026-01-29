@@ -112,7 +112,7 @@ export function ConnectConfigSection({
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
                       label=""
-                      className="flex-1 rounded-lg"
+                      className="flex-1 rounded-lg text-left"
                     >
                       <div className="flex items-center gap-2">
                         {option.icon && <ConnectionIcon icon={option.icon} />}
@@ -142,7 +142,7 @@ export function ConnectConfigSection({
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
                       label=""
-                      className="w-full"
+                      className="w-full text-left"
                     >
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-2">
