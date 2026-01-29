@@ -1,3 +1,4 @@
+export { default as StageProductSelection } from './StageProductSelection'
 export { default as Stage1ProjectBasics } from './Stage1ProjectBasics'
 export { default as Stage2UsageEstimation } from './Stage2UsageEstimation'
 export { default as Stage3Growth } from './Stage3Growth'

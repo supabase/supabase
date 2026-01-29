@@ -155,6 +155,9 @@ export default function ReportView({
               <p>
                 <strong className="text-foreground">Step 3:</strong> We add up all the recovered hours ({formatNumber(roiSummary.hoursRecoveredPerMonth)} hours/month) and multiply by your hourly cost rate to get the dollar value: {formatUsd(roiSummary.valueRecoveredPerMonthUsd)}/month, or {formatUsd(roiSummary.valueRecoveredPerYearUsd)} per year.
               </p>
+              <p className="mt-3 pt-3 border-t border-dashed">
+                <strong className="text-foreground">What this estimate does not include:</strong> Migration effort (one-time cost to move existing systems), team learning curve, and any vendor-specific considerations for your use case. We recommend factoring these into your decision.
+              </p>
             </div>
           </div>
         </div>
@@ -196,7 +199,11 @@ export default function ReportView({
               sourceUrls={authComparison.snapshot.providers.auth0.source_urls}
             />
           ) : (
-            <RowLink provider="Auth0" href="https://auth0.com/pricing" />
+            <RowUnavailable
+              provider="Auth0"
+              reason="Requires interactive quote"
+              href="https://auth0.com/pricing"
+            />
           )}
           {authComparison.clerkMonthlyUsd != null ? (
             <RowWithSources
@@ -331,8 +338,8 @@ function RowLink({ provider, href }: { provider: string; href: string }) {
   return (
     <div className="grid grid-cols-4 border-t text-sm">
       <div className="p-2 text-foreground-lighter">{provider}</div>
-      <div className="p-2 text-right text-foreground-lighter">—</div>
-      <div className="p-2 text-right text-foreground-lighter">—</div>
+      <div className="p-2 text-right text-foreground-lighter">-</div>
+      <div className="p-2 text-right text-foreground-lighter">-</div>
       <div className="p-2 text-right">
         <Link href={href} target="_blank" className="underline text-brand hover:text-brand-600">
           Pricing

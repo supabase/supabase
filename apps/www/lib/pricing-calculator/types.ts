@@ -9,6 +9,14 @@ export type CurrentInfrastructure =
 
 export type ProjectionPeriodMonths = 12 | 36
 
+export type AppType =
+  | 'content'
+  | 'ecommerce'
+  | 'saas'
+  | 'social'
+  | 'collaboration'
+  | 'realtime'
+
 export type ComputeTier =
   | 'Micro'
   | 'Small'
@@ -21,7 +29,9 @@ export type ComputeTier =
   | '12XL'
   | '16XL'
 
-export type CalculatorStageId = 'stage1' | 'stage2' | 'stage3' | 'stage4'
+export type CalculatorStageId = 'products' | 'stage1' | 'stage2' | 'stage3' | 'stage4'
+
+export type SelectedProduct = 'database' | 'authentication' | 'storage' | 'functions' | 'realtime' | 'vector'
 
 export type FitStatus = 'ok' | 'overage' | 'unavailable' | 'limit_exceeded'
 
@@ -44,6 +54,9 @@ export type TimeAllocationKey = 'auth' | 'database' | 'api' | 'devops'
 export type TimeAllocation = Record<TimeAllocationKey, number>
 
 export type CalculatorInputs = {
+  // Product selection
+  selectedProducts: SelectedProduct[]
+
   // Stage 1
   projects: number
   currentInfrastructure: CurrentInfrastructure
@@ -51,7 +64,7 @@ export type CalculatorInputs = {
   hourlyCostUsd: number
   needCompliance: boolean
 
-  // Stage 2
+  // Stage 2 - Usage
   databaseSizeGb: number
   storageSizeGb: number
   egressGb: number
@@ -63,10 +76,19 @@ export type CalculatorInputs = {
   edgeInvocations: number
   computeTier: ComputeTier
 
+  // Stage 2 - Add-ons
+  readReplicas: number
+  ipv4: boolean
+  pitr: boolean
+  customDomain: boolean
+  logDrains: number
+  branchingHoursPerMonth: number
+
   // Stage 3
   userGrowthRateMonthlyPct: number
   dataGrowthGbPerMonth: number
   projectionMonths: ProjectionPeriodMonths
+  appType: AppType
 
   // Stage 4 (optional overrides)
   timeAllocationOverrides?: Partial<TimeAllocation>
@@ -85,6 +107,12 @@ export type CostLineItemKey =
   | 'realtime_messages_overage'
   | 'edge_invocations_overage'
   | 'phone_mfa_addon'
+  | 'read_replicas'
+  | 'ipv4'
+  | 'pitr'
+  | 'custom_domain'
+  | 'log_drains'
+  | 'branching'
 
 export type CostLineItem = {
   key: CostLineItemKey

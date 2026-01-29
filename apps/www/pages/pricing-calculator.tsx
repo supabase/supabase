@@ -57,7 +57,7 @@ export default function PricingCalculatorPage() {
       <SectionContainer className="!py-10 md:!py-12">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-8 md:mb-10">
-            <h2 className="text-foreground text-3xl">Four stages to your estimate</h2>
+            <h2 className="text-foreground text-3xl">Five steps to your estimate</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
             <Panel hasActiveOnHover outerClassName="h-full" innerClassName="p-5 flex flex-col gap-2">
@@ -69,7 +69,7 @@ export default function PricingCalculatorPage() {
             <Panel hasActiveOnHover outerClassName="h-full" innerClassName="p-5 flex flex-col gap-2">
               <p className="text-foreground text-sm font-medium">Stage 2: Usage estimation</p>
               <p className="text-foreground-lighter text-sm">
-                Database size, monthly users, bandwidth, and realtime needs.
+                Configure usage for each product you selected.
               </p>
             </Panel>
             <Panel hasActiveOnHover outerClassName="h-full" innerClassName="p-5 flex flex-col gap-2">
@@ -81,7 +81,7 @@ export default function PricingCalculatorPage() {
             <Panel hasActiveOnHover outerClassName="h-full" innerClassName="p-5 flex flex-col gap-2">
               <p className="text-foreground text-sm font-medium">Stage 4: Time allocation (optional)</p>
               <p className="text-foreground-lighter text-sm">
-                Add detail to value analysis by estimating time spent on infrastructure today.
+                Calculate productivity benefits and ROI based on your team.
               </p>
             </Panel>
           </div>

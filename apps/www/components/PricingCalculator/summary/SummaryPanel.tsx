@@ -70,6 +70,12 @@ export default function SummaryPanel({ className, pricingReport, roiSummary, onT
         ))}
       </div>
 
+      {(pricingReport.inputs.needCompliance || recommendedEstimate.totalMonthlyUsd >= 500) && (
+        <p className="text-foreground-lighter text-xs">
+          <span className="text-foreground">Enterprise</span> plans include SLAs, dedicated support, and custom contracts. Contact sales for pricing.
+        </p>
+      )}
+
       <div className="border rounded-lg overflow-hidden">
         <div className="grid grid-cols-4 bg-surface-200 text-xs">
           <div className="p-2 text-foreground-lighter">Dimension</div>

@@ -1,7 +1,36 @@
 import competitorSnapshot from '~/data/pricing-calculator-competitors.json'
-import type { CalculatorInputs, CompetitorKey, ComparisonPlatform } from './types'
+import type { AppType, CalculatorInputs, CompetitorKey, ComparisonPlatform } from './types'
 
 const roundUsd = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100
+
+// Reads per MAU per month based on app type
+// These multipliers reflect realistic usage patterns for different app categories
+const APP_TYPE_READS_PER_MAU: Record<AppType, number> = {
+  content: 100,       // Blogs, landing pages - mostly cached, read-heavy
+  ecommerce: 300,     // Product catalogs, checkout - browse-heavy, burst writes
+  saas: 500,          // Analytics, admin panels - periodic fetches
+  social: 2000,       // Feeds, comments, likes - frequent reads, realtime
+  collaboration: 5000, // Chat, docs, whiteboards - constant sync
+  realtime: 10000,    // Multiplayer, live events - continuous state sync
+}
+
+// Function calls multiplier for Convex (similar pattern)
+const APP_TYPE_FUNCTION_CALLS_PER_MAU: Record<AppType, number> = {
+  content: 20,
+  ecommerce: 40,
+  saas: 50,
+  social: 150,
+  collaboration: 300,
+  realtime: 500,
+}
+
+export function getReadsPerMauForAppType(appType: AppType): number {
+  return APP_TYPE_READS_PER_MAU[appType] ?? APP_TYPE_READS_PER_MAU.saas
+}
+
+export function getFunctionCallsPerMauForAppType(appType: AppType): number {
+  return APP_TYPE_FUNCTION_CALLS_PER_MAU[appType] ?? APP_TYPE_FUNCTION_CALLS_PER_MAU.saas
+}
 
 export type CompetitorSnapshot = typeof competitorSnapshot
 
@@ -64,10 +93,34 @@ export function estimateFirebaseMonthlyUsd(inputs: Pick<CalculatorInputs, 'mau' 
   // Use snapshot for Firebase Auth (Tier 1 providers)
   const authCost = estimateFirebaseAuthMonthlyUsd(inputs.mau) ?? 0
 
-  // Note: Firestore is not priced per MAU; it's billed by reads/writes/storage.
-  // For a full comparison, we'd need Firestore usage estimates, but for this prototype
-  // we only include the auth component from the snapshot.
-  return roundUsd(authCost)
+  // Firestore pricing (pay-as-you-go Blaze plan):
+  // - Document reads: $0.06 per 100K reads
+  // - Document writes: $0.18 per 100K writes
+  // - Document deletes: $0.02 per 100K deletes
+  // - Stored data: $0.18 per GiB per month
+  // Reads/writes per MAU based on app type (realtime apps have much higher operation counts)
+  const readsPerMau = getReadsPerMauForAppType(inputs.appType)
+  const writesPerMau = Math.round(readsPerMau * 0.2) // Writes typically ~20% of reads
+  const firestoreReads = inputs.mau * readsPerMau
+  const firestoreWrites = inputs.mau * writesPerMau
+  const firestoreReadCost = (firestoreReads / 100_000) * 0.06
+  const firestoreWriteCost = (firestoreWrites / 100_000) * 0.18
+  const firestoreStorageCost = inputs.databaseSizeGb * 0.18
+
+  // Firebase Storage (Cloud Storage for Firebase):
+  // - Storage: $0.026 per GB per month
+  // - Egress: $0.12 per GB
+  const firebaseStorageCost = inputs.storageSizeGb * 0.026
+  const firebaseEgressCost = inputs.egressGb * 0.12
+
+  return roundUsd(
+    authCost +
+    firestoreReadCost +
+    firestoreWriteCost +
+    firestoreStorageCost +
+    firebaseStorageCost +
+    firebaseEgressCost
+  )
 }
 
 export function estimateSelfHostedMonthlyUsd(
@@ -89,7 +142,7 @@ export function estimateSelfHostedMonthlyUsd(
 }
 
 export function estimateConvexMonthlyUsd(
-  inputs: Pick<CalculatorInputs, 'mau' | 'databaseSizeGb' | 'storageSizeGb' | 'egressGb'>
+  inputs: Pick<CalculatorInputs, 'mau' | 'databaseSizeGb' | 'storageSizeGb' | 'egressGb' | 'appType'>
 ): number {
   // Convex Professional plan: $25/month base includes 1M function calls, 0.5 GiB storage, 10 GiB bandwidth
   const BASE_MONTHLY = 25
@@ -97,8 +150,9 @@ export function estimateConvexMonthlyUsd(
   const INCLUDED_STORAGE_GB = 0.5
   const INCLUDED_BANDWIDTH_GB = 10
 
-  // Estimate function calls: ~50 calls per MAU per month (typical backend workload)
-  const functionCalls = inputs.mau * 50
+  // Function calls per MAU based on app type (realtime apps have much higher call counts)
+  const callsPerMau = getFunctionCallsPerMauForAppType(inputs.appType)
+  const functionCalls = inputs.mau * callsPerMau
   const functionCallsOverage = Math.max(0, functionCalls - INCLUDED_FUNCTION_CALLS)
   const functionCallsCost = functionCallsOverage * 0.00001 // $0.00001 per call
 
@@ -212,6 +266,7 @@ export function estimateCompetitorMonthlyUsdForKey(
         databaseSizeGb: inputs.databaseSizeGb,
         storageSizeGb: inputs.storageSizeGb,
         egressGb: inputs.egressGb,
+        appType: inputs.appType,
       }),
     }
   }
@@ -237,7 +292,7 @@ export function estimateCompetitorMonthlyUsd(inputs: CalculatorInputs): { key: C
   return estimateCompetitorMonthlyUsdForKey(key, inputs)
 }
 
-export function estimateAuthComparison(inputs: Pick<CalculatorInputs, 'mau'>) {
+export function estimateAuthComparison(inputs: Pick<CalculatorInputs, 'mau' | 'databaseSizeGb' | 'storageSizeGb' | 'egressGb' | 'appType'>) {
   const mau = inputs.mau
   const snapshot = competitorSnapshot
 
@@ -249,7 +304,13 @@ export function estimateAuthComparison(inputs: Pick<CalculatorInputs, 'mau'>) {
     supabaseMonthlyUsd: supabase,
     auth0MonthlyUsd: estimateAuth0MonthlyUsd(mau),
     clerkMonthlyUsd: estimateClerkMonthlyUsd(mau),
-    firebaseMonthlyUsd: estimateFirebaseAuthMonthlyUsd(mau) ?? 0,
+    firebaseMonthlyUsd: estimateFirebaseMonthlyUsd({
+      mau: inputs.mau,
+      databaseSizeGb: inputs.databaseSizeGb,
+      storageSizeGb: inputs.storageSizeGb,
+      egressGb: inputs.egressGb,
+      appType: inputs.appType,
+    }),
     snapshot: {
       as_of: snapshot.as_of,
       providers: {

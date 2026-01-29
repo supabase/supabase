@@ -4,11 +4,33 @@ import { Input } from 'ui'
 import Panel from '~/components/Panel'
 import type { CalculatorInputs, TimeAllocationKey } from '~/lib/pricing-calculator'
 
-const FIELD_LABELS: Record<TimeAllocationKey, string> = {
-  auth: 'Hours per month on authentication',
-  database: 'Hours per month on database management',
-  api: 'Hours per month on API development',
-  devops: 'Hours per month on DevOps',
+type FieldConfig = {
+  label: string
+  hint: string
+  examples: string
+}
+
+const FIELD_CONFIG: Record<TimeAllocationKey, FieldConfig> = {
+  auth: {
+    label: 'Hours per month on authentication',
+    hint: 'Login flows, session management, password resets, OAuth integrations',
+    examples: 'Typical range: 5-20 hrs/month for custom auth; near zero with managed auth',
+  },
+  database: {
+    label: 'Hours per month on database management',
+    hint: 'Schema changes, migrations, query optimization, backup verification',
+    examples: 'Typical range: 10-40 hrs/month for self-managed Postgres',
+  },
+  api: {
+    label: 'Hours per month on API development',
+    hint: 'Building CRUD endpoints, writing data access layers, API documentation',
+    examples: 'Typical range: 20-60 hrs/month depending on feature velocity',
+  },
+  devops: {
+    label: 'Hours per month on DevOps',
+    hint: 'Server maintenance, scaling, monitoring, security patches, deployments',
+    examples: 'Typical range: 20-80 hrs/month for self-hosted infrastructure',
+  },
 }
 
 export default function Stage4TimeAllocation({

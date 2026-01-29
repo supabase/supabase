@@ -93,25 +93,26 @@ export default function Stage1ProjectBasics({
           />
           <span className="text-foreground-lighter text-sm">SOC2 / HIPAA / compliance requirements indicated</span>
         </div>
+        <p className="text-foreground-lighter text-xs">Compliance features require Team or Enterprise plans. We will recommend the appropriate tier.</p>
       </Panel>
 
-      {/* Integrated ROI messaging */}
+      {/* Contextual messaging based on current infrastructure */}
       {inputs.currentInfrastructure === 'firebase' && (
         <CalloutCard
-          title="Key consideration"
-          body="Firebase users typically see 60-80% cost reduction at scale due to Supabase's predictable pricing vs per-operation charges."
+          title="Firebase migration context"
+          body="Teams migrating from Firebase often reduce costs at scale because Supabase uses predictable subscription pricing rather than per-operation charges. Actual savings depend on your read/write volume."
         />
       )}
       {inputs.currentInfrastructure === 'aws_self_hosted' && (
         <CalloutCard
-          title="Key consideration"
-          body="Teams managing their own Postgres typically spend 40-100 hours/month on DevOps. Supabase eliminates most of this."
+          title="Self-hosted context"
+          body="Teams managing their own Postgres typically spend significant time on database operations, backups, scaling, and security patches. Supabase handles these automatically."
         />
       )}
       {inputs.projects >= 3 && (
         <CalloutCard
-          title="Key consideration"
-          body="Multi-project setups benefit from Supabase's unified dashboard and consolidated billing. No more juggling separate services."
+          title="Multi-project tip"
+          body="With 3+ projects, you may benefit from Supabase's unified dashboard and consolidated billing across environments."
         />
       )}
     </div>

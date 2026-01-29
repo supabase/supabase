@@ -12,6 +12,8 @@ const toNum = (v: string | null, fallback: number) => {
 
 export function getDefaultInputs(): CalculatorInputs {
   return {
+    selectedProducts: ['database', 'authentication'],
+
     projects: 1,
     currentInfrastructure: 'starting_fresh',
     teamSize: 2,
@@ -29,9 +31,18 @@ export function getDefaultInputs(): CalculatorInputs {
     edgeInvocations: 500_000,
     computeTier: 'Micro',
 
+    // Add-ons (defaults to disabled/zero)
+    readReplicas: 0,
+    ipv4: false,
+    pitr: false,
+    customDomain: false,
+    logDrains: 0,
+    branchingHoursPerMonth: 0,
+
     userGrowthRateMonthlyPct: 10,
     dataGrowthGbPerMonth: 1,
     projectionMonths: 12,
+    appType: 'saas',
 
     timeAllocationOverrides: {},
   }
@@ -40,6 +51,11 @@ export function getDefaultInputs(): CalculatorInputs {
 export function encodeInputsToSearchParams(inputs: CalculatorInputs): URLSearchParams {
   const p = new URLSearchParams()
   p.set('v', pricingCalculatorVersion)
+
+  // Selected products (comma-separated)
+  if (inputs.selectedProducts.length > 0) {
+    p.set('products', inputs.selectedProducts.join(','))
+  }
 
   p.set('projects', String(inputs.projects))
   p.set('infra', inputs.currentInfrastructure)
@@ -58,9 +74,18 @@ export function encodeInputsToSearchParams(inputs: CalculatorInputs): URLSearchP
   p.set('edge', String(inputs.edgeInvocations))
   p.set('compute', inputs.computeTier)
 
+  // Add-ons (only encode non-default values)
+  if (inputs.readReplicas > 0) p.set('replicas', String(inputs.readReplicas))
+  if (inputs.ipv4) p.set('ipv4', '1')
+  if (inputs.pitr) p.set('pitr', '1')
+  if (inputs.customDomain) p.set('domain', '1')
+  if (inputs.logDrains > 0) p.set('logs', String(inputs.logDrains))
+  if (inputs.branchingHoursPerMonth > 0) p.set('branch_hrs', String(inputs.branchingHoursPerMonth))
+
   p.set('growth', String(inputs.userGrowthRateMonthlyPct))
   p.set('data_growth', String(inputs.dataGrowthGbPerMonth))
   p.set('months', String(inputs.projectionMonths))
+  p.set('app_type', inputs.appType)
 
   if (inputs.timeAllocationOverrides?.auth != null) p.set('ta_auth', String(inputs.timeAllocationOverrides.auth))
   if (inputs.timeAllocationOverrides?.database != null)
@@ -78,8 +103,15 @@ export function decodeInputsFromSearchParams(params: URLSearchParams, fallback: 
   const v = params.get('v')
   const versionMatch = !v || v === pricingCalculatorVersion
 
+  // Parse selected products
+  const productsParam = params.get('products')
+  const selectedProducts: SelectedProduct[] = productsParam
+    ? productsParam.split(',').filter((p): p is SelectedProduct => VALID_PRODUCTS.includes(p as SelectedProduct))
+    : fallback.selectedProducts
+
   const inputs: CalculatorInputs = {
     ...fallback,
+    selectedProducts,
     projects: clamp(Math.round(toNum(params.get('projects'), fallback.projects)), 1, 50),
     currentInfrastructure: (params.get('infra') as CurrentInfrastructure) ?? fallback.currentInfrastructure,
     teamSize: clamp(Math.round(toNum(params.get('team'), fallback.teamSize)), 1, 500),

@@ -790,7 +790,22 @@ export interface WwwPricingPlanCtaClickedEvent {
 export interface WwwPricingCalculatorStageChangedEvent {
   action: 'www_pricing_calculator_stage_changed'
   properties: {
-    stage: 'stage1' | 'stage2' | 'stage3' | 'stage4'
+    stage: 'products' | 'stage1' | 'stage2' | 'stage3' | 'stage4'
+  }
+}
+
+/**
+ * User toggled a product on/off in the pricing calculator.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing-calculator
+ */
+export interface WwwPricingCalculatorProductToggledEvent {
+  action: 'www_pricing_calculator_product_toggled'
+  properties: {
+    product: string
+    selected: boolean
   }
 }
 
@@ -804,7 +819,7 @@ export interface WwwPricingCalculatorStageChangedEvent {
 export interface WwwPricingCalculatorShareLinkCopiedEvent {
   action: 'www_pricing_calculator_share_link_copied'
   properties: {
-    stage: 'stage1' | 'stage2' | 'stage3' | 'stage4'
+    stage: 'products' | 'stage1' | 'stage2' | 'stage3' | 'stage4'
   }
 }
 
@@ -2843,6 +2858,7 @@ export type TelemetryEvent =
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | WwwPricingCalculatorStageChangedEvent
+  | WwwPricingCalculatorProductToggledEvent
   | WwwPricingCalculatorShareLinkCopiedEvent
   | WwwPricingCalculatorReportViewedEvent
   | WwwPricingCalculatorTalkToSalesClickedEvent

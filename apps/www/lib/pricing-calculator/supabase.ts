@@ -311,6 +311,76 @@ export function calculatePlanEstimate(
     }
   }
 
+  // Read Replicas (paid plans only, same compute tier pricing per replica)
+  if (plan !== 'free' && inputs.readReplicas > 0) {
+    const replicaCost = roundUsd(inputs.readReplicas * computeTierMonthlyUsd)
+    lineItems.push({
+      key: 'read_replicas',
+      monthlyUsd: replicaCost,
+      details: [
+        `${inputs.readReplicas} replica${inputs.readReplicas > 1 ? 's' : ''} × ${inputs.computeTier} tier`,
+        `$${roundUsd(computeTierMonthlyUsd)}/month each`,
+      ],
+    })
+  }
+
+  // IPv4 Address (paid plans only)
+  if (plan !== 'free' && inputs.ipv4) {
+    const ipv4Cost = 4 // $4/month
+    lineItems.push({
+      key: 'ipv4',
+      monthlyUsd: ipv4Cost,
+      details: ['Dedicated IPv4 address'],
+    })
+  }
+
+  // Point in Time Recovery (paid plans only)
+  if (plan !== 'free' && inputs.pitr) {
+    const pitrCost = 100 // $100/month for 7-day retention
+    lineItems.push({
+      key: 'pitr',
+      monthlyUsd: pitrCost,
+      details: ['7-day retention window'],
+    })
+  }
+
+  // Custom Domain (paid plans only)
+  if (plan !== 'free' && inputs.customDomain) {
+    const domainCost = 10 // $10/month
+    lineItems.push({
+      key: 'custom_domain',
+      monthlyUsd: domainCost,
+      details: ['Custom domain for APIs'],
+    })
+  }
+
+  // Log Drains (paid plans only)
+  if (plan !== 'free' && inputs.logDrains > 0) {
+    const logDrainBaseCost = 60 // $60/month per drain (base cost, usage not included)
+    const totalLogDrainCost = roundUsd(inputs.logDrains * logDrainBaseCost)
+    lineItems.push({
+      key: 'log_drains',
+      monthlyUsd: totalLogDrainCost,
+      details: [
+        `${inputs.logDrains} drain${inputs.logDrains > 1 ? 's' : ''} × $${logDrainBaseCost}/month`,
+        '+ usage-based charges for events/egress',
+      ],
+    })
+  }
+
+  // Database Branching (paid plans only)
+  if (plan !== 'free' && inputs.branchingHoursPerMonth > 0) {
+    const branchingHourlyRate = 0.01344 // $0.01344/hour per branch
+    const branchingCost = roundUsd(inputs.branchingHoursPerMonth * branchingHourlyRate)
+    lineItems.push({
+      key: 'branching',
+      monthlyUsd: branchingCost,
+      details: [
+        `${inputs.branchingHoursPerMonth} branch-hours × $${branchingHourlyRate}/hour`,
+      ],
+    })
+  }
+
   const totalMonthlyUsd = roundUsd(lineItems.reduce((acc, item) => acc + item.monthlyUsd, 0))
 
   return {
