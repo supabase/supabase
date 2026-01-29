@@ -125,6 +125,7 @@ interface QueueCellEditParams {
   projectRef: string
   tableId: number
   table: Entity
+  row: SupaRow
   rowIdentifiers: Dictionary<unknown>
   columnName: string
   oldValue: unknown
@@ -138,12 +139,19 @@ export function queueCellEditWithOptimisticUpdate({
   projectRef,
   tableId,
   table,
-  rowIdentifiers,
+  row,
+  rowIdentifiers: callerRowIdentifiers,
   columnName,
   oldValue,
   newValue,
   enumArrayColumns,
 }: QueueCellEditParams) {
+  // Updated row identifiers to include __tempId for pending add rows so edits merge into ADD_ROW operation
+  const rowIdentifiers: Dictionary<unknown> = { ...callerRowIdentifiers }
+  if (isPendingAddRow(row)) {
+    rowIdentifiers.__tempId = row.__tempId
+  }
+
   // Queue the operation
   queueOperation({
     type: QueuedOperationType.EDIT_CELL_CONTENT,

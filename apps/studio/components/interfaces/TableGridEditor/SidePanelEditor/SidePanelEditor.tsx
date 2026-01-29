@@ -324,8 +324,18 @@ export const SidePanelEditor = ({
                 ? snap.sidePanel.jsonValue.row
                 : snap.sidePanel?.type === 'cell'
                   ? snap.sidePanel.value?.row
-                  : undefined
-            const oldValue = row?.[changedColumn]
+                  : snap.sidePanel?.type === 'row'
+                    ? snap.sidePanel.row
+                    : undefined
+
+            if (!row) {
+              saveRowError = new Error('No row found')
+              toast.error('No row found')
+              onComplete(saveRowError)
+              return
+            }
+
+            const oldValue = row[changedColumn]
 
             queueCellEditWithOptimisticUpdate({
               queryClient,
@@ -334,6 +344,7 @@ export const SidePanelEditor = ({
               tableId: selectedTable.id,
               // Cast to Entity - the queue save mutation only uses id, name, schema
               table: selectedTable as unknown as Entity,
+              row,
               rowIdentifiers: configuration.identifiers,
               columnName: changedColumn,
               oldValue: oldValue,
