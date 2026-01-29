@@ -1,5 +1,5 @@
 import { isPendingAddRow } from '../types'
-import { generateTableChangeKey } from './queueOperationUtils'
+import { generateTableChangeKey, rowMatchesIdentifiers } from './queueOperationUtils'
 import {
   type NewDeleteRowOperation,
   type NewEditCellContentOperation,
@@ -36,16 +36,11 @@ export function operationMatchesRow(
 ): boolean {
   if (operation.tableId !== tableId) return false
 
-  if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-    return Object.entries(rowIdentifiers).every(
-      ([key, value]) => operation.payload.rowIdentifiers[key] === value
-    )
-  }
-
-  if (operation.type === QueuedOperationType.DELETE_ROW) {
-    return Object.entries(operation.payload.rowIdentifiers).every(
-      ([key, value]) => rowIdentifiers[key] === value
-    )
+  if (
+    operation.type === QueuedOperationType.EDIT_CELL_CONTENT ||
+    operation.type === QueuedOperationType.DELETE_ROW
+  ) {
+    return rowMatchesIdentifiers(operation.payload.rowIdentifiers, rowIdentifiers)
   }
 
   return false

@@ -115,6 +115,10 @@ export function markRowAsDeleted(
   })
 }
 
+export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
+  return rows.filter((row) => !rowMatchesIdentifiers(row, rowIdentifiers))
+}
+
 interface QueueCellEditParams {
   queryClient: QueryClient
   queueOperation: (operation: NewQueuedOperation) => void
@@ -304,7 +308,6 @@ export function queueRowDeletesWithOptimisticUpdate({
       rowIdentifiers[pk.name] = row[pk.name]
     })
 
-    // Queue the operation
     queueOperation({
       type: QueuedOperationType.DELETE_ROW,
       tableId: table.id,
@@ -315,10 +318,19 @@ export function queueRowDeletesWithOptimisticUpdate({
       },
     })
 
-    // Apply optimistic update to the UI
     const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
     queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
       if (!old) return old
+
+      // For pending add rows, remove completely
+      if (isPendingAddRow(row)) {
+        return {
+          ...old,
+          rows: removeRow(old.rows, rowIdentifiers),
+        }
+      }
+
+      // For existing rows, mark as deleted
       return {
         ...old,
         rows: markRowAsDeleted(old.rows, rowIdentifiers),
