@@ -1,12 +1,42 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import mermaid from 'mermaid'
 import { useTheme } from 'next-themes'
 import { cn } from '../../lib/utils/cn'
 
-// @mildtomato - 28/11/2025
-// Colors are hardcoded because Mermaid's parser doesn't support CSS variables
+// Try to import beautiful-mermaid, fall back to standard mermaid
+let beautifulMermaid: typeof import('beautiful-mermaid') | null = null
+let standardMermaid: typeof import('mermaid').default | null = null
+
+try {
+  beautifulMermaid = require('beautiful-mermaid')
+} catch {
+  // beautiful-mermaid not available, will use standard mermaid
+}
+
+try {
+  standardMermaid = require('mermaid').default
+} catch {
+  // mermaid not available
+}
+
+// Supabase brand colors for beautiful-mermaid mono mode
+const SUPABASE_COLORS = {
+  light: {
+    background: '#ffffff',
+    foreground: '#1c1c1c',
+    primary: '#3ecf8e',
+    secondary: '#9333ea',
+  },
+  dark: {
+    background: '#171717',
+    foreground: '#ededed',
+    primary: '#3ecf8e',
+    secondary: '#9333ea',
+  },
+}
+
+// Legacy theme variables for standard mermaid fallback
 const darkThemeVariables = {
   background: 'transparent',
   mainBkg: '#171717',
@@ -96,12 +126,21 @@ export interface MermaidProps {
   chart: string
   /** Additional CSS classes for the container */
   className?: string
+  /** Force use of standard mermaid instead of beautiful-mermaid */
+  useStandardMermaid?: boolean
 }
 
 /**
- * Renders a Mermaid diagram from text.
+ * Renders a Mermaid diagram from text using beautiful-mermaid for ultra-fast,
+ * themeable rendering with automatic fallback to standard mermaid.
  *
- * Supports flowcharts, sequence diagrams, ER diagrams, and other Mermaid syntax.
+ * beautiful-mermaid benefits:
+ * - Ultra-fast rendering (100+ diagrams in <500ms)
+ * - Zero DOM dependencies
+ * - CSS custom properties for live theme switching
+ * - Dual output support (SVG + ASCII)
+ *
+ * Supports flowcharts, sequence diagrams, ER diagrams, state diagrams, and class diagrams.
  * Automatically adapts to light/dark theme.
  *
  * @example
@@ -112,54 +151,78 @@ export interface MermaidProps {
  * `} />
  * ```
  *
+ * @see https://github.com/lukilabs/beautiful-mermaid
  * @see https://mermaid.js.org/intro/
  */
-export function Mermaid({ chart, className }: MermaidProps) {
+export function Mermaid({ chart, className, useStandardMermaid = false }: MermaidProps) {
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const { resolvedTheme } = useTheme()
 
   const isDark = resolvedTheme === 'dark'
+  const colors = isDark ? SUPABASE_COLORS.dark : SUPABASE_COLORS.light
 
   useEffect(() => {
     if (!resolvedTheme) return
 
-    // Re-initialize mermaid with current theme
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'base',
-      themeVariables: isDark ? darkThemeVariables : lightThemeVariables,
-      sequence: {
-        useMaxWidth: false,
-        actorMargin: 150,
-        messageMargin: 60,
-        noteMargin: 20,
-      },
-      flowchart: {
-        useMaxWidth: false,
-      },
-      er: {
-        useMaxWidth: false,
-      },
-    })
-
     const renderChart = async () => {
       try {
-        // Mermaid requires a unique ID per render to avoid DOM conflicts
-        const id = `mermaid-${Math.random().toString(36).substring(2, 11)}`
-        const { svg } = await mermaid.render(id, chart.trim())
-        // Mermaid outputs <br> which isn't valid XML - fix for browser compatibility
-        setSvg(svg.replace(/<br\s*>/gi, '<br/>'))
-        setError(null)
+        // Prefer beautiful-mermaid if available and not explicitly disabled
+        if (beautifulMermaid && !useStandardMermaid) {
+          const result = await beautifulMermaid.render(chart.trim(), {
+            theme: 'mono',
+            colors: {
+              background: colors.background,
+              foreground: colors.foreground,
+              primary: colors.primary,
+              secondary: colors.secondary,
+            },
+            font: {
+              family: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              size: 14,
+            },
+          })
+          setSvg(result.svg)
+          setError(null)
+          return
+        }
+
+        // Fallback to standard mermaid
+        if (standardMermaid) {
+          standardMermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: isDark ? darkThemeVariables : lightThemeVariables,
+            sequence: {
+              useMaxWidth: false,
+              actorMargin: 150,
+              messageMargin: 60,
+              noteMargin: 20,
+            },
+            flowchart: {
+              useMaxWidth: false,
+            },
+            er: {
+              useMaxWidth: false,
+            },
+          })
+
+          const id = `mermaid-${Math.random().toString(36).substring(2, 11)}`
+          const { svg } = await standardMermaid.render(id, chart.trim())
+          setSvg(svg.replace(/<br\s*>/gi, '<br/>'))
+          setError(null)
+          return
+        }
+
+        throw new Error('No Mermaid renderer available')
       } catch (err) {
-        // Invalid chart syntax throws - display error instead of crashing
         console.error('Mermaid rendering error:', err)
         setError(err instanceof Error ? err.message : 'Failed to render diagram')
       }
     }
 
     renderChart()
-  }, [chart, resolvedTheme])
+  }, [chart, resolvedTheme, useStandardMermaid, colors, isDark])
 
   if (!resolvedTheme) {
     return <div className={cn('my-6 rounded-lg bg-muted p-6 animate-pulse h-64', className)} />
@@ -187,6 +250,13 @@ export function Mermaid({ chart, className }: MermaidProps) {
         '[&_svg]:h-auto [&_svg]:max-w-full',
         className
       )}
+      style={{
+        // CSS custom properties for beautiful-mermaid live theme switching
+        '--mermaid-bg': colors.background,
+        '--mermaid-fg': colors.foreground,
+        '--mermaid-primary': colors.primary,
+        '--mermaid-secondary': colors.secondary,
+      } as React.CSSProperties}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   )
