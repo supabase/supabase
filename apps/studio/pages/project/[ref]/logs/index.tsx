@@ -24,7 +24,7 @@ export const LogPage: NextPageWithLayout = () => {
   if (isUnifiedLogsEnabled) {
     return (
       <DefaultLayout>
-        <ProjectLayout>
+        <ProjectLayout isBlocking={false} isLoading={false}>
           <UnifiedLogs />
         </ProjectLayout>
       </DefaultLayout>

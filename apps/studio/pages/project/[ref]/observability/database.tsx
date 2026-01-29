@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
+import { useProfile } from 'lib/profile'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -67,7 +68,17 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const { profile } = useProfile()
   const reportGranularityV2 = useFlag('reportGranularityV2')
+
+  /**
+   * Check if the logged-in user has a @supabase.io email address.
+   * Internal Supabase users can bypass certain restrictions.
+   */
+  const isSupabaseInternalUser = () => {
+    if (!profile?.primary_email) return false
+    return profile.primary_email.toLowerCase().endsWith('@supabase.io')
+  }
 
   const {
     selectedDateRange,
@@ -86,7 +97,7 @@ const DatabaseUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
 
-  const isReplicaSelected = state.selectedDatabaseId !== project?.ref
+  const isReplicaSelected = state.selectedDatabaseId !== ref
 
   const report = useDatabaseReport()
   const { data, params, largeObjectsSql, isPending: isLoading, refresh } = report
@@ -247,9 +258,12 @@ const DatabaseUsage = () => {
         }
       >
         {selectedDateRange &&
-          orgPlan?.id &&
-          REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) =>
-            chart.availableIn?.includes(orgPlan?.id) ? (
+          (orgPlan?.id || isSupabaseInternalUser()) &&
+          REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+            // Allow internal Supabase users to bypass plan checks
+            const isChartAvailable = isSupabaseInternalUser() || chart.availableIn?.includes(orgPlan?.id ?? '')
+
+            return isChartAvailable ? (
               <LazyComposedChartHandler
                 key={chart.id}
                 {...chart}
@@ -278,7 +292,7 @@ const DatabaseUsage = () => {
                 orgSlug={org?.slug ?? ''}
               />
             )
-          )}
+          })}
         {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
