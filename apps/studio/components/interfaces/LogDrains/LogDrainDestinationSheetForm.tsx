@@ -602,7 +602,7 @@ export function LogDrainDestinationSheetForm({
             <ul className="text-right text-foreground-light divide-y divide-dashed text-sm">
               <li className="flex items-center justify-between gap-2 py-2" translate="no">
                 <span className="text-foreground-lighter">Additional drain cost</span>
-                <span className="text-foreground">$60 per month</span>
+                <span className="text-foreground">$10 per month</span>
               </li>
               <li className="flex items-center justify-between gap-2 py-2" translate="no">
                 <span className="text-foreground-lighter">Per million events</span>

@@ -96,7 +96,7 @@ export function LogDrains({
               title={src.name}
               description={src.description}
               icon={src.icon}
-              rightLabel={IS_PLATFORM ? 'Additional $60' : undefined}
+              rightLabel={IS_PLATFORM ? 'Additional $10' : undefined}
               onClick={() => {
                 onNewDrainClick(src.value)
               }}
