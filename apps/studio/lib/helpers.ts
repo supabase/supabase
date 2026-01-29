@@ -182,6 +182,11 @@ export const detectOS = () => {
   }
 }
 
+export const getModKeyLabel = () => {
+  const os = detectOS()
+  return os === 'macos' ? '⌘' : 'Ctrl+'
+}
+
 /**
  * Convert a list of tables to SQL
  * @param t - The list of tables
