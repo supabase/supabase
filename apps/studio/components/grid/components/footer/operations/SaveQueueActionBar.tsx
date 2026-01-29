@@ -41,21 +41,14 @@ export const SaveQueueActionBar = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50"
         >
-          <div className="flex items-center gap-8 px-4 py-3 bg-surface-100 border rounded-lg shadow-lg">
-            <span className="text-sm text-foreground">
+          <div className="flex items-center gap-8 pl-4 pr-2 py-2 bg-surface-100 border rounded-lg shadow-lg">
+            <span className="text-xs text-foreground-light">
               {operationCount} pending change{operationCount !== 1 ? 's' : ''}
             </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => snap.onViewOperationQueue()}
-                className="text-foreground-light hover:text-foreground transition-colors flex items-center"
-                aria-label="View Details"
-              >
-                <Eye size={14} />
-                <span className="text-foreground-lighter text-[10px] ml-1">{`${modKey}.`}</span>
-              </button>
+            <div className="flex items-center gap-2">
+              <Button type="default" size="tiny" aria-label="View details" onClick={() => snap.onViewOperationQueue()}>Review <span className="text-foreground/40 text-[10px] ml-1">{`${modKey}.`}</span></Button>
               <Button
                 size="tiny"
                 type="primary"
@@ -63,8 +56,8 @@ export const SaveQueueActionBar = () => {
                 disabled={isSaving}
                 loading={isSaving}
               >
-                Save
-                <span className="text-foreground-lighter text-[10px] ml-1">{`${modKey}S`}</span>
+                Save{operationCount > 1 && ' all'}
+                <span className="text-foreground/40 text-[10px] ml-1">{`${modKey}S`}</span>
               </Button>
             </div>
           </div>
