@@ -1,7 +1,19 @@
-import { useOperationQueueActions } from './useOperationQueueActions'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useHotKey } from '@/hooks/ui/useHotKey'
-import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useCallback, useEffect } from 'react'
+
+import { detectOS } from 'lib/helpers'
+
+export function getModKey() {
+  const os = detectOS()
+  return os === 'macos' ? '⌘' : 'Ctrl+'
+}
+
+interface UseOperationQueueShortcutsOptions {
+  enabled: boolean
+  onSave: () => void
+  onTogglePanel: () => void
+  isSaving?: boolean
+  hasOperations?: boolean
+}
 
 /**
  * Hook that provides keyboard shortcuts for the operation queue.
@@ -13,34 +25,44 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
  * These shortcuts are registered on the capture phase to ensure they fire
  * before the data grid handles the keyboard event.
  */
-export function useOperationQueueShortcuts() {
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
-  const snap = useTableEditorStateSnapshot()
-  const { handleSave } = useOperationQueueActions()
+export function useOperationQueueShortcuts({
+  enabled,
+  onSave,
+  onTogglePanel,
+  isSaving = false,
+  hasOperations = true,
+}: UseOperationQueueShortcutsOptions) {
+  const os = detectOS()
+  const modKey = os === 'macos' ? '⌘' : 'Ctrl+'
 
-  const isSaving = snap.operationQueue.status === 'saving'
-  const hasOperations = snap.hasPendingOperations
-  const isEnabled = isQueueOperationsEnabled && hasOperations
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      const isMod = os === 'macos' ? event.metaKey : event.ctrlKey
 
-  useHotKey(
-    (event) => {
-      event.preventDefault()
-      event.stopPropagation()
-      if (!isSaving && hasOperations) {
-        handleSave()
+      if (isMod && event.key === 's') {
+        event.preventDefault()
+        event.stopPropagation()
+        if (!isSaving && hasOperations) {
+          onSave()
+        }
+      } else if (isMod && event.key === '.') {
+        event.preventDefault()
+        event.stopPropagation()
+        onTogglePanel()
       }
     },
-    's',
-    { enabled: isEnabled }
+    [os, isSaving, hasOperations, onSave, onTogglePanel]
   )
 
-  useHotKey(
-    (event) => {
-      event.preventDefault()
-      event.stopPropagation()
-      snap.toggleViewOperationQueue()
-    },
-    '.',
-    { enabled: isEnabled }
-  )
+  // Use capture phase to intercept events before the grid handles them
+  useEffect(() => {
+    if (enabled) {
+      window.addEventListener('keydown', handleKeyDown, true)
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown, true)
+      }
+    }
+  }, [enabled, handleKeyDown])
+
+  return { modKey }
 }

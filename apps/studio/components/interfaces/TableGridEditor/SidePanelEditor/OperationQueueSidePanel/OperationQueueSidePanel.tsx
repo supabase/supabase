@@ -1,17 +1,15 @@
 import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
+import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, SidePanel } from 'ui'
 
 import { OperationList } from './OperationList'
-import { getModKeyLabel } from '@/lib/helpers'
 import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 
 interface OperationQueueSidePanelProps {
   visible: boolean
   closePanel: () => void
 }
-
-const modKey = getModKeyLabel()
 
 export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueSidePanelProps) => {
   const snap = useTableEditorStateSnapshot()
@@ -23,6 +21,14 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
     onCancelSuccess: closePanel,
   })
 
+  const { modKey } = useOperationQueueShortcuts({
+    enabled: visible,
+    onSave: handleSave,
+    onTogglePanel: closePanel,
+    isSaving,
+    hasOperations: operations.length > 0,
+  })
+
   return (
     <SidePanel
       size="large"
@@ -31,7 +37,7 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
       header={
         <div className="flex items-center justify-between w-full">
           <div className="flex flex-col gap-1">
-            <span>Pending changes</span>
+            <span>Pending Changes</span>
             <span className="text-xs text-foreground-light">
               {operations.length} operation{operations.length !== 1 ? 's' : ''}
             </span>
