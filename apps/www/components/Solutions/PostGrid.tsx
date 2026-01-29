@@ -34,7 +34,7 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
               {post.thumb && (
                 <div className="w-full aspect-video relative rounded-t-md dark:[mask-image:linear-gradient(to_bottom,_#000_0%,_#000_60%,_transparent_100%)]">
                   <Image
-                    src={post.thumb.startsWith('http') ? post.thumb : `/images/blog/${post.thumb}`}
+                    src={post.thumb.startsWith('/') || post.thumb.startsWith('http') ? post.thumb : `/images/blog/${post.thumb}`}
                     alt={post.title || ''}
                     className="object-cover"
                     fill

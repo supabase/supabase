@@ -94,7 +94,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
     const blogImage = blogPost.image || blogPost.thumb
-    const metaImageUrl = blogImage?.startsWith('http') ? blogImage : `/images/blog/${blogImage}`
+    const metaImageUrl = blogImage
+      ? blogImage.startsWith('/') || blogImage.startsWith('http')
+        ? blogImage
+        : `/images/blog/${blogImage}`
+      : undefined
 
     return {
       title: blogPost.title,

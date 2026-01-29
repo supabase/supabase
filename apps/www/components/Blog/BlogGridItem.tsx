@@ -27,7 +27,7 @@ const BlogGridItem = ({ post }: Props) => {
 
   const resolveImagePath = (img: string | undefined): string | null => {
     if (!img) return null
-    return img.startsWith('http') ? img : `/images/blog/${img}`
+    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
   }
 
   const imageUrl = post.isCMS

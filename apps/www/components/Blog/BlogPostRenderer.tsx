@@ -160,7 +160,7 @@ const BlogPostRenderer = ({
   const imageUrl = isCMS
     ? blogMetaData.thumb ?? ''
     : blogMetaData.thumb
-      ? blogMetaData.thumb.startsWith('http')
+      ? blogMetaData.thumb.startsWith('/') || blogMetaData.thumb.startsWith('http')
         ? blogMetaData.thumb
         : `/images/blog/${blogMetaData.thumb}`
       : ''

@@ -53,7 +53,7 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
   const resolveImagePath = (img: string | undefined): string | null => {
     if (!img) return null
-    return img.startsWith('http') ? img : `/images/blog/${img}`
+    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
   }
 
   const imageUrl = blog.isCMS
