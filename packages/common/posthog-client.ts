@@ -5,6 +5,17 @@ import { PostHogConfig } from 'posthog-js'
 // (e.g. if a user navigates around a lot before accepting consent)
 const MAX_PENDING_EVENTS = 20
 
+export interface ClientTelemetryEvent {
+  id: string
+  timestamp: number
+  eventType: 'capture' | 'identify' | 'pageview' | 'pageleave'
+  eventName: string
+  distinctId?: string
+  properties?: Record<string, unknown>
+}
+
+type ClientTelemetryListener = (event: ClientTelemetryEvent) => void
+
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
@@ -21,6 +32,7 @@ class PostHogClient {
   private pendingEvents: Array<{ event: string; properties: Record<string, any> }> = []
   private config: PostHogClientConfig
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
+  private devListeners: Set<ClientTelemetryListener> = new Set()
 
   constructor(config: PostHogClientConfig = {}) {
     const apiHost =
@@ -113,6 +125,8 @@ class PostHogClient {
       }
 
       posthog.capture('$pageview', properties, { transport: 'sendBeacon' })
+
+      this.emitToDevListeners('pageview', '$pageview', properties)
     } catch (error) {
       console.error('PostHog pageview capture failed:', error)
     }
@@ -134,6 +148,8 @@ class PostHogClient {
     try {
       // Use sendBeacon for page leave to survive tab close
       posthog.capture('$pageleave', properties, { transport: 'sendBeacon' })
+
+      this.emitToDevListeners('pageleave', '$pageleave', properties)
     } catch (error) {
       console.error('PostHog pageleave capture failed:', error)
     }
@@ -150,6 +166,8 @@ class PostHogClient {
 
     try {
       posthog.identify(userId, properties)
+
+      this.emitToDevListeners('identify', '$identify', { userId, ...properties })
     } catch (error) {
       console.error('PostHog identify failed:', error)
     }
@@ -182,6 +200,44 @@ class PostHogClient {
       console.error('PostHog getDistinctId failed:', error)
       return undefined
     }
+  }
+
+  subscribeToEvents(listener: ClientTelemetryListener): () => void {
+    this.devListeners.add(listener)
+    return () => this.devListeners.delete(listener)
+  }
+
+  private emitToDevListeners(
+    eventType: ClientTelemetryEvent['eventType'],
+    eventName: string,
+    properties?: Record<string, unknown>
+  ) {
+    if (this.devListeners.size === 0) return
+
+    let distinctId: string | undefined
+    try {
+      const id = posthog.get_distinct_id?.()
+      if (id && id.length > 0) {
+        distinctId = id
+      }
+    } catch {}
+
+    const event: ClientTelemetryEvent = {
+      id: `client-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      timestamp: Date.now(),
+      eventType,
+      eventName,
+      distinctId,
+      properties,
+    }
+
+    this.devListeners.forEach((listener) => {
+      try {
+        listener(event)
+      } catch (e) {
+        console.error('Dev telemetry listener error:', e)
+      }
+    })
   }
 }
 

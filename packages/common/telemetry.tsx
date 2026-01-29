@@ -19,9 +19,9 @@ import {
   getSharedTelemetryData,
   getTelemetryCookieOptions,
 } from './telemetry-utils'
-import { posthogClient } from './posthog-client'
+import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 
-export { posthogClient }
+export { posthogClient, type ClientTelemetryEvent }
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
