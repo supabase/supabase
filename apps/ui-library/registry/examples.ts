@@ -24,6 +24,17 @@ export const examples: RegistryItem[] = [
     ],
   },
   {
+    name: 'realtime-monaco-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/realtime-monaco-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
     name: 'password-based-auth-demo',
     type: 'registry:example',
     registryDependencies: [],
