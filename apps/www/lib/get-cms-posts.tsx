@@ -423,7 +423,7 @@ async function processPostData(post: any) {
       ? typeof post.meta?.imgSocial === 'string' && post.meta?.imgSocial.includes('http')
         ? post.meta?.imgSocial
         : `${PAYLOAD_URL}${post.meta?.imgSocial}`
-      : imgThumbUrl
+      : null
 
     const processedData = {
       slug: post.slug,
@@ -534,7 +534,7 @@ export async function getAllCMSPosts({
           ? typeof post.meta?.imgSocial === 'string' && post.meta?.imgSocial.includes('http')
             ? post.meta?.imgSocial
             : `${PAYLOAD_URL}${post.meta?.imgSocial}`
-          : imgThumbUrl
+          : null
 
         return {
           slug: post.slug || '',
