@@ -122,7 +122,7 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
   }, [appendEvent, isEnabled])
 
   useEffect(() => {
-    if (!isEnabled || !isOpen) return
+    if (!isEnabled || !isOpen || typeof EventSource === 'undefined') return
 
     let eventSource: EventSource | null = null
     let isMounted = true
