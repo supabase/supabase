@@ -9,9 +9,8 @@ import { Button } from 'ui'
 
 import { getModKeyLabel } from '@/lib/helpers'
 
-const modKey = getModKeyLabel()
-
 export const SaveQueueActionBar = () => {
+  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave } = useOperationQueueActions()
@@ -65,6 +64,6 @@ export const SaveQueueActionBar = () => {
     </AnimatePresence>
   )
 
-  if (typeof document === 'undefined') return null
+  if (typeof document === 'undefined' || !document.body) return null
   return createPortal(content, document.body)
 }

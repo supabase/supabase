@@ -1,16 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
-
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import { Card, CardContent, cn } from 'ui'
+
 import { ReportChartUpsell } from './ReportChartUpsell'
 
 export interface ReportChartV2Props {
@@ -32,10 +33,13 @@ export interface ReportChartV2Props {
 
 // Compute total across entire period over unique attribute keys.
 // Excludes attributes that are disabled, reference lines, max values, or marked omitFromTotal.
-export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): number {
+export function computePeriodTotal(
+  chartData: Record<string, unknown>[],
+  dynamicAttributes: MultiAttribute[]
+): number {
   const attributeKeys = Array.from(
     new Set(
-      (dynamicAttributes as any[])
+      dynamicAttributes
         .filter(
           (a) =>
             a?.enabled !== false &&
@@ -43,11 +47,11 @@ export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): 
             !a?.isMaxValue &&
             !a?.omitFromTotal
         )
-        .map((a: any) => a.attribute)
+        .map((a) => a.attribute)
     )
   )
 
-  return chartData.reduce((sum: number, row: any) => {
+  return chartData.reduce((sum: number, row: Record<string, unknown>) => {
     const rowTotal = attributeKeys.reduce((acc: number, key: string) => {
       const value = row?.[key]
       return acc + (typeof value === 'number' ? value : 0)
@@ -111,16 +115,16 @@ export const ReportChartV2 = ({
   const firstItem = chartData[0]
   const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
 
-  const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
-    chartData,
+  const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted({
+    data: chartData,
     timestampKey,
-    (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
-    0,
+    valueKey: dynamicAttributes.map((attr) => attr.attribute),
+    defaultValue: 0,
     startDate,
     endDate,
-    undefined,
-    interval
-  )
+    minPointsToFill: undefined,
+    interval,
+  })
 
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
   const chartHighlight = useChartHighlight()
