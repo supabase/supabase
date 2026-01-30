@@ -189,7 +189,7 @@ export const FunctionsEmptyState = () => {
   )
 }
 
-export const FunctionsEmptyStateLocal = () => {
+export const FunctionsInstructionsLocal = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
     if (showStripeExample) {
