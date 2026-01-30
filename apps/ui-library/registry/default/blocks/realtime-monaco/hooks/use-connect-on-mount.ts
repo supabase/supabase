@@ -1,12 +1,12 @@
 'use client'
 
-import { SupabaseProvider } from '@tiagoantunespt/y-supabase'
+import { SupabaseProvider } from '@supabase-community/y-supabase'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef } from 'react'
 import { MonacoBinding } from 'y-monaco'
 import * as Y from 'yjs'
 
-import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 type UseConnectOnMountOptions = {
   channel: string

@@ -3,9 +3,13 @@
 import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
 
-const Editor = dynamic(() => import('../blocks/realtime-monaco/components/realtime-monaco'), {
-  ssr: false,
-})
+const Editor = dynamic(
+  () =>
+    import('../blocks/realtime-monaco/components/realtime-monaco').then(
+      (mod) => mod.RealtimeMonaco
+    ),
+  { ssr: false }
+)
 
 const RealtimeMonacoDemo = () => {
   const { resolvedTheme } = useTheme()

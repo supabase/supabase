@@ -51,7 +51,7 @@
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@supabase/vue-blocks": "workspace:*",
     "@tanstack/react-query": "^5.83.0",
-    "@tiagoantunespt/y-supabase": "github:tiagoantunespt/y-supabase",
+    "@supabase-community/y-supabase": "github:supabase-community/y-supabase",
     "axios": "^1.12.0",
     "class-variance-authority": "*",
     "cmdk": "^1.0.0",
@@ -87,7 +87,7 @@
     "unist-util-visit": "^5.0.0",
     "vaul": "^0.9.6",
     "y-monaco": "^0.1.6",
-    "yjs": "^13.6.28",
+    "yjs": "^13.6.29",
     "zod": "catalog:"
   },
   "devDependencies": {
