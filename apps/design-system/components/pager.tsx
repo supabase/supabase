@@ -71,3 +71,27 @@ export function flatten(links: NavItemWithChildren[]): NavItem[] {
     }, [])
     .filter((link) => !link?.disabled)
 }
+
+export interface BreadcrumbSegment {
+  title: string
+  href?: string
+}
+
+export function getBreadcrumbSegments(doc: Doc): BreadcrumbSegment[] {
+  const segments: BreadcrumbSegment[] = [{ title: 'Docs', href: '/docs' }]
+
+  for (const section of docsConfig.sidebarNav) {
+    const flatItems = flatten(section.items ?? [])
+    const inSection = flatItems.some((item) => item.href === doc.slug)
+    if (inSection && section.title) {
+      const sectionLanding = flatItems.find((item) => item.priority) ?? flatItems[0]
+      // Only add section when current page is not the section landing (avoids "Docs > Getting Started > Introduction")
+      if (sectionLanding?.href && sectionLanding.href !== doc.slug) {
+        segments.push({ title: section.title, href: sectionLanding.href })
+      }
+      break
+    }
+  }
+
+  return segments
+}
