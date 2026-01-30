@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { X } from 'lucide-react'
-import { Button } from 'ui'
-
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { X } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { EditCellContentPayload } from '@/state/table-editor-operation-queue.types'
+
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { EditCellContentPayload } from '@/state/table-editor-operation-queue.types'
 
 interface OperationItemProps {
   operationId: string
@@ -50,17 +50,18 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
           <div className="text-xs text-foreground font-mono">{fullTableName}</div>
           <div className="text-sm text-foreground-muted mt-0.5">
             <span className="font-medium text-foreground">{columnName}</span>
-            <span className="text-foreground-muted mx-2">·</span>
+            <span className="text-foreground-muted mx-2">•</span>
             <span className="text-foreground text-xs">where {whereClause}</span>
           </div>
         </div>
-        <Button
+        <ButtonTooltip
           type="text"
           size="tiny"
           icon={<X size={14} />}
           onClick={handleDelete}
-          className="shrink-0"
+          className="shrink-0 w-7"
           aria-label="Remove operation"
+          tooltip={{ content: { side: 'bottom', text: 'Remove operation' } }}
         />
       </div>
 

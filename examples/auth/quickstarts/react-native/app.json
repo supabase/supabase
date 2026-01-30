@@ -13,7 +13,8 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.supabase.authreactnative"
     },
     "android": {
       "adaptiveIcon": {
