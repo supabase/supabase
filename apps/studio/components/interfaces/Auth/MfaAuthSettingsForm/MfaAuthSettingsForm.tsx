@@ -116,9 +116,17 @@ export const MfaAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } =
+  const { hasAccess: hasAccessToMFAEntitlement, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.mfa_phone')
-  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
+  const hasAccessToMFA = !IS_PLATFORM || hasAccessToMFAEntitlement
+  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFAEntitlement
+
+  const {
+    hasAccess: hasAccessToEnhanceSecurityEntitlement,
+    isLoading: isLoadingEntitlementEnhanceSecurity,
+  } = useCheckEntitlements('auth.mfa_enhanced_security')
+  const hasAccessToEnhanceSecurity = !IS_PLATFORM || hasAccessToEnhanceSecurityEntitlement
+  const promptEnhancedSecurityUpgrade = IS_PLATFORM && !hasAccessToEnhanceSecurityEntitlement
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
   const sendSMSHookIsEnabled =
@@ -282,7 +290,7 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading || isLoadingEntitlement) {
+  if (isLoading || isLoadingEntitlement || isLoadingEntitlementEnhanceSecurity) {
     return (
       <PageSection>
         <PageSectionContent>
@@ -580,13 +588,24 @@ export const MfaAuthSettingsForm = () => {
                           <Switch
                             checked={!field.value}
                             onCheckedChange={(value) => field.onChange(!value)}
-                            disabled={!canUpdateConfig}
+                            disabled={!canUpdateConfig || !hasAccessToEnhanceSecurity}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
+
+                {promptEnhancedSecurityUpgrade && (
+                  <UpgradeToPro
+                    fullWidth
+                    source="authEnhancedSecurity"
+                    featureProposition="configure settings for Enhanced MFA Security"
+                    primaryText="Enhanced MFA Security is not available on your plan"
+                    secondaryText="Upgrade your plan to configure settings for Enhanced MFA Security"
+                    buttonText="Upgrade"
+                  />
+                )}
                 <CardFooter className="justify-end space-x-2">
                   {securityForm.formState.isDirty && (
                     <Button type="default" onClick={() => securityForm.reset()}>
