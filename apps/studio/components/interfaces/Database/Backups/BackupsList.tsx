@@ -119,7 +119,7 @@ export const BackupsList = () => {
                 displayAs="utc"
                 utcTimestamp={selectedBackup.inserted_at}
                 labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-                className="text-left !text-sm font-mono tracking-tight"
+                className="!text-sm"
               />
             </p>
           )}
