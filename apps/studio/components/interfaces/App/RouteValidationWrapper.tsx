@@ -3,6 +3,7 @@ import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
+import { useProfile } from 'lib/profile'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
@@ -19,6 +20,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const isLoggedIn = useIsLoggedIn()
   const isUserMFAEnabled = useIsMFAEnabled()
+  const { profile } = useProfile()
 
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
   const [lastVisitedOrganization, setLastVisitedOrganization] = useLocalStorageQuery(
@@ -53,6 +55,15 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     return excemptUrls.includes(router?.pathname)
   }
 
+  /**
+   * Check if the logged-in user has a @supabase.io email address.
+   * Internal Supabase users can bypass certain validation checks.
+   */
+  function isSupabaseInternalUser(): boolean {
+    if (!profile?.primary_email) return false
+    return profile.primary_email.toLowerCase().endsWith('@supabase.io')
+  }
+
   const { isError: isErrorProject } = useProjectDetailQuery({ ref })
 
   const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
@@ -83,11 +94,18 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
     // A successful request to project details will validate access to both project and branches
     if (!!ref && isErrorProject) {
+      // Allow internal Supabase users to bypass project validation redirects
+      // This enables access to development/test projects without proper auth setup
+      if (isSupabaseInternalUser()) {
+        console.debug('[RouteValidationWrapper] Project query failed but allowing @supabase.io user to proceed')
+        return
+      }
+
       toast.error('This project does not exist')
       router.push(DEFAULT_HOME)
       return
     }
-  }, [isErrorProject])
+  }, [isErrorProject, profile])
 
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {

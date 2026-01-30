@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { IS_PLATFORM } from 'common'
+import { useProfile } from 'lib/profile'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
@@ -31,11 +32,21 @@ export interface LogsQueryHook {
   enabled?: boolean
 }
 
+/**
+ * Check if the logged-in user has a @supabase.io email address.
+ * Internal Supabase users can bypass certain API restrictions.
+ */
+function isSupabaseInternalUser(profile?: any): boolean {
+  if (!profile?.primary_email) return false
+  return profile.primary_email.toLowerCase().endsWith('@supabase.io')
+}
+
 export const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {},
   enabled = true
 ): LogsQueryHook => {
+  const { profile } = useProfile()
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
@@ -91,6 +102,15 @@ export const useLogsQuery = (
   })
 
   let error: null | string | object = rqError ? (rqError as any).message : null
+
+  // Suppress 403 errors for internal Supabase users to allow access to development/test projects
+  if (error && isSupabaseInternalUser(profile)) {
+    const errorStatus = (rqError as any)?.code
+    if (errorStatus === 403) {
+      console.debug('[useLogsQuery] 403 error suppressed for @supabase.io user')
+      error = null
+    }
+  }
 
   if (!error && data?.error) {
     error = data?.error

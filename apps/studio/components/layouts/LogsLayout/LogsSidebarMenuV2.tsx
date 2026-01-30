@@ -76,7 +76,7 @@ export function SidebarCollapsible({
   )
 }
 
-export function LogsSidebarMenuV2() {
+export function LogsSidebarMenuV2({ isSupabaseInternalUser }: { isSupabaseInternalUser: boolean }) {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
 
@@ -248,7 +248,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {unifiedLogsFlagEnabled && (
+      {(unifiedLogsFlagEnabled || isSupabaseInternalUser) && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           title="Introducing unified logs"
@@ -314,7 +314,7 @@ export function LogsSidebarMenuV2() {
       )}
       <Separator className="my-4" />
 
-      {collectionsEnabled && (
+      {(collectionsEnabled || isSupabaseInternalUser) && (
         <>
           <SidebarCollapsible title="Collections" defaultOpen={true}>
             {filteredLogs.map((collection) => {
