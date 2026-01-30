@@ -136,10 +136,7 @@ export const EnableExtensionModal = ({
     >
       <DialogContent size="small" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>
-            Enable
-            <code className="text-code-inline">{extension.name}</code>
-          </DialogTitle>
+          <DialogTitle>Enable {extension.name}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
