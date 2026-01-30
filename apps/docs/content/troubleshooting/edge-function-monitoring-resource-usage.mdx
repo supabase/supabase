@@ -1,0 +1,90 @@
+---
+title = "Monitoring Edge Function resource usage"
+topics = [ "functions" ]
+keywords = [ "monitoring", "metrics", "CPU", "memory", "performance", "edge function" ]
+---
+
+Learn how to track your Edge Function's performance and identify potential resource issues.
+
+## Accessing metrics
+
+Track your function's performance through the dashboard:
+
+1. Navigate to Edge Functions > [Your Function] > Metrics
+2. Review CPU, memory, and execution time charts
+3. Identify potential problems in resource consumption
+
+## Key metrics to monitor
+
+### CPU usage
+
+High CPU usage indicates your function is performing intensive computations. Consider:
+
+- Optimizing algorithms
+- Caching computed results
+- Moving heavy processing to background jobs
+
+### Memory usage
+
+Memory spikes can cause function failures. Watch for:
+
+- Large datasets loaded into memory
+- Accumulated objects that aren't garbage collected
+- Large dependency bundles
+
+### Execution time
+
+Long execution times can lead to timeouts. Monitor for:
+
+- Slow external API calls
+- Inefficient database queries
+- Complex computational operations
+
+## Resource limits
+
+Edge Functions have limited resources compared to traditional servers. Optimize for:
+
+- **Memory efficiency:** Avoid loading large datasets into memory
+- **CPU optimization:** Minimize complex computations
+- **Execution time:** Keep functions under 60 seconds
+
+## Best practices
+
+### Use streaming for large data
+
+Instead of loading entire files into memory, stream data:
+
+```tsx
+// Stream responses instead of buffering
+return new Response(readableStream, {
+  headers: { 'Content-Type': 'application/json' },
+})
+```
+
+### Process data in chunks
+
+Break large operations into smaller batches:
+
+```tsx
+for (const batch of dataBatches) {
+  await processBatch(batch)
+}
+```
+
+### Cache expensive operations
+
+Store results of expensive computations to avoid recalculating:
+
+```tsx
+const cachedResult = await cache.get(key)
+if (cachedResult) {
+  return cachedResult
+}
+```
+
+## Additional resources
+
+- [Edge Function CPU limits](./edge-function-cpu-limits)
+- [Edge Function shutdown reasons explained](./edge-function-shutdown-reasons-explained)
+- [Edge Function limits](/docs/guides/functions/limits)
+- [Debugging Edge Functions](/docs/guides/functions/logging)

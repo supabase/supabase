@@ -79,6 +79,7 @@ allow_list = [
     "[KMG]iB",
     "[Kk]ubernetes",
     "[Ll]iveness",
+    "[Ll]odash",
     "LogEvent",
     "[Mm]atryoshka",
     "[Mm][Cc][Pp]",

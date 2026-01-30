@@ -1,0 +1,46 @@
+---
+title = "Edge Function takes too long to respond"
+topics = [ "functions" ]
+keywords = [ "slow", "timeout", "performance", "boot", "response time", "edge function" ]
+---
+
+Edge Functions have a 60-second execution limit. If your function is taking too long to respond, follow these steps to diagnose and optimize performance.
+
+## Diagnose the issue
+
+1. **Check function logs:** Navigate to Functions > [Your Function] > Logs in the dashboard
+2. **Examine boot times:** Look for `booted` events and check for consistent boot times
+3. **Identify bottlenecks:** Review your code for slow operations
+
+## Analyze boot time patterns
+
+- **If boot times are consistently slow:** The issue is likely in your function's code, such as a large dependency, a slow API call, or a complex computation. Focus on optimizing your code, reducing dependency size, or implementing caching.
+
+- **If only some boot events are slow:** Find the affected `region` in the metadata and submit a support request via the "Help" button at the top of the dashboard.
+
+## Optimize database queries
+
+Inefficient database queries are a common cause of slow responses:
+
+```tsx
+// Good: Only select needed columns and limit results
+const { data } = await supabase.from('users').select('id, name').limit(10)
+
+// Avoid: Fetching all columns from large tables
+const { data } = await supabase.from('users').select('*')
+```
+
+## Common causes of slow functions
+
+- **Large dependencies:** Heavy packages increase boot time
+- **Slow external API calls:** Third-party services with high latency
+- **Complex computations:** CPU-intensive operations
+- **Unoptimized database queries:** Fetching more data than needed
+- **Cold starts:** First invocation after idle period takes longer
+
+## Additional resources
+
+- [Edge Function CPU limits](./edge-function-cpu-limits)
+- [Monitoring resource usage](./edge-function-monitoring-resource-usage)
+- [Debugging Edge Functions](/docs/guides/functions/logging)
+- [Edge Function limits](/docs/guides/functions/limits)
