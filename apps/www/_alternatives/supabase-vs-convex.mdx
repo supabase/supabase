@@ -20,7 +20,7 @@ This guide breaks down each platform's architecture, features, and tradeoffs to 
 
 ## What is Supabase?
 
-Supabase is an open source backend platform built on PostgreSQL. It provides a hosted Postgres database with automatic REST and GraphQL APIs, real-time subscriptions, authentication, edge functions, and file storage. Because the foundation is Postgres, you get the full power of SQL, including joins, transactions, views, stored procedures, and the entire extension ecosystem.
+Supabase is an open source backend platform built on Postgres. It provides a hosted Postgres database with automatic REST and GraphQL APIs, real-time subscriptions, authentication, edge functions, and file storage. Because the foundation is Postgres, you get the full power of SQL, including joins, transactions, views, stored procedures, and the entire extension ecosystem.
 
 Supabase runs on standard, portable technology. Your data lives in a real Postgres database that you can connect to with any SQL client, migrate to any Postgres host, or self-host entirely. The entire platform is open source under Apache 2.0.
 
@@ -54,14 +54,14 @@ The fundamental architectural difference shapes everything else in this comparis
 
 | Feature               | Supabase                           | Convex                         |
 | --------------------- | ---------------------------------- | ------------------------------ |
-| Database engine       | PostgreSQL 15+                     | Custom document store (Rust)   |
+| Database engine       | Postgres 15+                       | Custom document store (Rust)   |
 | Data model            | Relational (tables, rows, columns) | Document (nested objects)      |
 | Query language        | SQL                                | TypeScript functions           |
 | Schema                | Explicit, enforced                 | Schema-validated documents     |
 | Concurrency model     | MVCC with pessimistic locking      | Optimistic concurrency control |
 | Transaction isolation | Serializable available             | Serializable by default        |
 
-**PostgreSQL gives Supabase decades of battle-tested reliability.** You can model complex data relationships naturally with foreign keys and joins. You can move complexity into the database using views, database functions, and constraints, instead of re-implementing the same logic across your application.
+**Postgres gives Supabase decades of battle-tested reliability.** You can model complex data relationships naturally with foreign keys and joins. You can move complexity into the database using views, database functions, and constraints, instead of re-implementing the same logic across your application.
 
 **Convex's document model simplifies common patterns.** Nested data structures map directly to TypeScript types. You do not need to think about joins for simple relationships since you can embed related data directly. The tight TypeScript integration means your queries are type-checked at compile time.
 
@@ -105,11 +105,11 @@ Understanding each platform's architectural limits helps you anticipate where yo
 | Query/mutation timeout            | Configurable (minutes to hours) | 1 second hard limit              |
 | Action timeout                    | 150 seconds (Edge Functions)    | 10 minutes                       |
 | Concurrent queries                | Configurable connection pooling | 16 (Free) / 256 (Pro)            |
-| Full-text search results          | PostgreSQL FTS (configurable)   | 1,024 results maximum            |
+| Full-text search results          | Postgres FTS (configurable)     | 1,024 results maximum            |
 | Vector search results             | pgvector (configurable)         | 256 results maximum              |
 | Documents written per transaction | Limited by transaction size     | 16,000 documents                 |
 
-**PostgreSQL handles billions of rows.** You can add read replicas, partition tables, and scale vertically or horizontally. Connection pooling via PgBouncer or Supavisor handles thousands of concurrent connections. Analytical queries, aggregations, and complex joins work without artificial ceilings.
+**Postgres handles billions of rows.** You can add read replicas, partition tables, and scale vertically or horizontally. Connection pooling via PgBouncer or Supavisor handles thousands of concurrent connections. Analytical queries, aggregations, and complex joins work without artificial ceilings.
 
 **Convex's limits exist because of its architecture.** Optimistic concurrency control becomes expensive when transactions must validate against all concurrent transactions. The 32,000 document scan limit prevents analytical queries over large datasets. The 1-second timeout prevents long-running computations. These are not configuration options; they are hard constraints.
 
@@ -126,7 +126,7 @@ How each platform handles concurrent writes affects application behavior under l
 | High-contention behavior   | Predictable latency, ordered writes        | Retry storms possible           |
 | Counter/increment patterns | Native support via FOR UPDATE              | Documented conflict risk        |
 
-**PostgreSQL's pessimistic locking handles contention gracefully.** When multiple transactions target the same rows, they queue and execute in order. Latency increases predictably. The database handles the coordination.
+**Postgres's pessimistic locking handles contention gracefully.** When multiple transactions target the same rows, they queue and execute in order. Latency increases predictably. The database handles the coordination.
 
 **Convex's OCC works well in low-contention scenarios.** Transactions execute without locks, then validate at commit time. If another transaction modified the same data, the transaction retries. Convex's own documentation warns about this pattern for counters and high-contention updates.
 
@@ -462,7 +462,7 @@ Postgres has a large extension ecosystem. Supabase supports over 50 extensions, 
 | Geospatial queries    | PostGIS, pgRouting                                              | Not available                             |
 | Vector/AI embeddings  | pgvector                                                        | Built-in vector search (256 result limit) |
 | Time-series data      | Not available (TimescaleDB deprecated)                          | Not available                             |
-| Full-text search      | PostgreSQL FTS, pgroonga                                        | Built-in search (1,024 result limit)      |
+| Full-text search      | Postgres FTS, pgroonga                                          | Built-in search (1,024 result limit)      |
 | Graph queries         | Not available                                                   | Not available                             |
 | Foreign data wrappers | Wrappers extension (Stripe, Firebase, S3, BigQuery, and others) | Not applicable                            |
 | Scheduled jobs        | pg_cron                                                         | Built-in scheduling                       |
@@ -554,6 +554,6 @@ Choose Convex when:
 
 Convex offers a streamlined developer experience for TypeScript applications with simple data requirements. The real-time sync works without configuration, and the type safety catches errors at compile time rather than runtime. For prototypes and applications that fit within its architectural constraints, Convex gets you moving fast.
 
-Supabase offers the full power of PostgreSQL with a modern developer experience. You get real-time subscriptions, serverless functions, and authentication while keeping SQL's flexibility, the extension ecosystem, and data portability. Applications that start simple on Supabase can grow into complex production systems without re-platforming.
+Supabase offers the full power of Postgres with a modern developer experience. You get real-time subscriptions, serverless functions, and authentication while keeping SQL's flexibility, the extension ecosystem, and data portability. Applications that start simple on Supabase can grow into complex production systems without re-platforming.
 
 Both platforms let you build fast. Supabase lets you keep building on the same foundation as your application grows.
