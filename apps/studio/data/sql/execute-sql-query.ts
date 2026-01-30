@@ -126,7 +126,11 @@ export async function executeSql<T = any>(
     const result = await post('/platform/pg-meta/{ref}/query', {
       ...options,
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
-      query: { key },
+      params: {
+        ...options.params,
+        // @ts-expect-error: This is just a client side thing to identify queries better
+        query: { key },
+      },
     })
 
     data = result.data
