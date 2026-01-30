@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 import { WithMonitor } from './WithMonitor/WithMonitor'
 import { WithStatements } from './WithStatements/WithStatements'
+import { WithSupamonitor } from './WithSupamonitor/WithSupamonitor'
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -12,6 +13,7 @@ interface QueryPerformanceProps {
   queryPerformanceQuery: DbQueryHook<any>
   queryMetrics: PresetHookResult
   isPgStatMonitorEnabled: boolean
+  isSupamonitorEnabled: boolean
   dateRange?: {
     period_start: { date: string; time_period: string }
     period_end: { date: string; time_period: string }
@@ -25,6 +27,7 @@ export const QueryPerformance = ({
   queryPerformanceQuery,
   queryMetrics,
   isPgStatMonitorEnabled,
+  isSupamonitorEnabled,
   dateRange,
   onDateRangeChange,
 }: QueryPerformanceProps) => {
@@ -35,6 +38,10 @@ export const QueryPerformance = ({
     state.setSelectedDatabaseId(ref)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
+
+  if (isSupamonitorEnabled) {
+    return <WithSupamonitor dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
+  }
 
   if (isPgStatMonitorEnabled) {
     return <WithMonitor dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
