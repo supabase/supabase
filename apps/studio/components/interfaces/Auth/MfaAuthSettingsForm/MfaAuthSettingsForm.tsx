@@ -116,13 +116,17 @@ export const MfaAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } =
+  const { hasAccess: hasAccessToMFAEntitlement, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.mfa_phone')
-  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
+  const hasAccessToMFA = !IS_PLATFORM || hasAccessToMFAEntitlement
+  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFAEntitlement
 
-  const { hasAccess: hasAccessToEnhanceSecurity, isLoading: isLoadingEntitlementEnhanceSecurity } =
-    useCheckEntitlements('auth.mfa_enhanced_security')
-  const promptEnhancedSecurityUpgrade = IS_PLATFORM && !hasAccessToEnhanceSecurity
+  const {
+    hasAccess: hasAccessToEnhanceSecurityEntitlement,
+    isLoading: isLoadingEntitlementEnhanceSecurity,
+  } = useCheckEntitlements('auth.mfa_enhanced_security')
+  const hasAccessToEnhanceSecurity = !IS_PLATFORM || hasAccessToEnhanceSecurityEntitlement
+  const promptEnhancedSecurityUpgrade = IS_PLATFORM && !hasAccessToEnhanceSecurityEntitlement
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
   const sendSMSHookIsEnabled =
