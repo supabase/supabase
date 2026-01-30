@@ -20,6 +20,7 @@ export type ProfileContextType = {
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
+  isSupportAccount: boolean
 }
 
 export const ProfileContext = createContext<ProfileContextType>({
@@ -28,6 +29,7 @@ export const ProfileContext = createContext<ProfileContextType>({
   isLoading: true,
   isError: false,
   isSuccess: false,
+  isSupportAccount: false,
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
@@ -106,6 +108,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       isLoading,
       isError,
       isSuccess,
+      isSupportAccount: !!profile?.primary_email.endsWith('@supabase.io'),
     }
   }, [
     isLoadingProfile,
@@ -140,9 +143,9 @@ export function useProfileNameAndPicture(): {
   const avatarUrl = isGitHubProfile ? getGitHubProfileImgUrl(gitHubUsername) : undefined
 
   return {
-    username: profile?.username,
-    primaryEmail: profile?.primary_email,
+    username,
     avatarUrl,
+    primaryEmail: profile?.primary_email,
     isLoading: isLoadingProfile || isLoadingIdentities,
   }
 }
