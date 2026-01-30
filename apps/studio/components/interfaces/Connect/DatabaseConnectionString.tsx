@@ -368,7 +368,7 @@ export const DatabaseConnectionString = () => {
                       isSelfHosted && method === 'direct'
                         ? 'Manually configurable for self-hosted Supabase.'
                         : isSelfHosted && method === 'session'
-                          ? `Supavisor on port ${connectionInfo.db_port || 5432} (default configuration for self-hosted).`
+                          ? `Supavisor on port ${connectionInfo.db_port || 5432} (default pooler for self-hosted).`
                           : undefined
                     }
                   />
@@ -698,7 +698,7 @@ export const DatabaseConnectionString = () => {
                   contentType={contentType}
                   lang={lang}
                   fileTitle={fileTitle}
-                  description={`Supavisor on port ${connectionInfo.db_port || 5432} (default configuration for self-hosted).`}
+                  description={`Supavisor on port ${connectionInfo.db_port || 5432} (default pooler for self-hosted).`}
                   connectionString={selfHostedSessionPoolerStrings[selectedTab]}
                   parameters={[
                     { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
