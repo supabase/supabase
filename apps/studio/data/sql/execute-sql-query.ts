@@ -96,10 +96,15 @@ export async function executeSql<T = any>(
     }
 
     if (preflightCheck) {
+      /**
+       * [Joshen] Note that I've intentionally omitted error handling here as I'm opting
+       * to NOT block the UI if the preflight check fails for any reason.
+       */
+
       const { data: costCheck } = await post('/platform/pg-meta/{ref}/query', {
         ...options,
         body: {
-          query: `explain ${sql}`,
+          query: `explainss ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
         },
       })
