@@ -74,7 +74,7 @@ export const DatabaseConnectionString = () => {
   const state = useDatabaseSelectorStateSnapshot()
 
   // Fetch deployment mode (CLI vs self-hosted) for non-platform environments
-  const { data: deploymentMode, isPending: isLoadingDeploymentMode } = useDeploymentModeQuery()
+  const { data: deploymentMode, isLoading: isLoadingDeploymentMode } = useDeploymentModeQuery()
   const isCliMode = deploymentMode?.is_cli_mode ?? false
 
   // Determine which connection methods are available based on environment
