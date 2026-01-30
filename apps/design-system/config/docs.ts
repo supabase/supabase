@@ -61,7 +61,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/ui-patterns/introduction',
+          href: '/docs/ui-patterns/ui-patterns',
           items: [],
           priority: true,
         },
@@ -108,7 +108,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/fragments/introduction',
+          href: '/docs/fragments/fragment-components',
           items: [],
           priority: true,
         },
@@ -210,7 +210,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/introduction',
+          href: '/docs/components/atom-components',
           items: [],
           priority: true,
         },
