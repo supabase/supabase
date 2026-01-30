@@ -93,9 +93,7 @@ export default async function DocPage(props: DocPageProps) {
         >
           {breadcrumbSegments.map((segment, index) => (
             <span key={segment.title} className="flex items-center gap-1">
-              {index > 0 && (
-                <ChevronRight className="h-4 w-4 shrink-0 text-foreground-muted" />
-              )}
+              {index > 0 && <ChevronRight className="h-4 w-4 shrink-0 text-foreground-muted" />}
               {segment.href ? (
                 <Link
                   href={segment.href}
