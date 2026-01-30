@@ -15,7 +15,7 @@
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "concurrently": "^7.3.0",
-    "svelte": "^3.49.0",
+    "svelte": "^4.2.19",
     "svelte-check": "^2.8.0",
     "svelte-hcaptcha": "^0.1.1",
     "svelte-preprocess": "^4.10.7",
