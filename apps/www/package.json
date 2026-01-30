@@ -14,10 +14,10 @@
     "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "node scripts/generateStaticContent.mjs",
-    "prettier": "prettier --cache --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
     "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {
+    "@bsmnt/scrollytelling": "^0.3.3",
     "@code-hike/mdx": "^0.9.0",
     "@codesandbox/sandpack-react": "^2.20.0",
     "@hcaptcha/react-hcaptcha": "^1.12.0",
@@ -40,7 +40,7 @@
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.3.1",
     "clsx": "^1.2.1",
-    "cobe": "^0.6.2",
+    "cobe": "^0.6.5",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
@@ -49,6 +49,7 @@
     "framer-motion": "^11.0.3",
     "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
+    "gsap": "^3.13.0",
     "icons": "workspace:*",
     "lucide-react": "*",
     "markdown-toc": "^1.2.0",

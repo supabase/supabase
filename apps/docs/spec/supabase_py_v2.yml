@@ -113,7 +113,7 @@ functions:
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
-      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/jwt/legacy). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
     params:
@@ -1059,7 +1059,7 @@ functions:
     notes: |
       - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verify_otp` to sign up / sign-in a user.
-      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
+      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash for the PKCE flow for Server Side Auth. Read [the Password-based Auth guide](/docs/guides/auth/passwords) for more details.
     examples:
       - id: verify-signup-one-time-password(otp)
         name: Verify Signup One-Time Password (OTP)
@@ -1487,7 +1487,7 @@ functions:
                 type: string
                 description: An object of query params
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `link_identity()`.
       - If the candidate identity is already linked to the existing user or another user, `link_identity()` will fail.
       - If `link_identity` is run on the server, you should handle the redirect.
@@ -1540,7 +1540,7 @@ functions:
             isOptional: true
             type: string
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlink_identity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -6109,7 +6109,7 @@ functions:
               (2, 'Earth'),
               (3, 'Mars');
             ```
-        reponse: |
+        response: |
           ```json
           {
             "data": [

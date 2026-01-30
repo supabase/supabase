@@ -1,13 +1,8 @@
-import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { InlineLink } from 'components/ui/InlineLink'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -16,6 +11,9 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
+import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -33,6 +31,8 @@ import {
   Separator,
   cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,
@@ -300,7 +300,7 @@ export const DatabaseConnectionString = () => {
             </Select_Shadcn_>
           </div>
           <DatabaseSelector
-            portal={false}
+            align="start"
             buttonProps={{
               size: 'small',
               className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
@@ -462,7 +462,12 @@ export const DatabaseConnectionString = () => {
                   }}
                   notice={['Does not support PREPARE statements']}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                    {
+                      ...CONNECTION_PARAMETERS.host,
+                      value: isReplicaSelected
+                        ? connectionInfo.db_host
+                        : poolingConfiguration?.db_host ?? '',
+                    },
                     {
                       ...CONNECTION_PARAMETERS.port,
                       value: poolingConfiguration?.db_port.toString() ?? '6543',

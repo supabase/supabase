@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import { CircleAlert, Database, Download, Wind } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, Skeleton, Button } from 'ui'
+import Link from 'next/link'
 import { toast } from 'sonner'
 
-import DiffViewer from 'components/ui/DiffViewer'
+import { DiffEditor } from '@/components/ui/DiffEditor'
+import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string
@@ -13,7 +13,7 @@ interface DatabaseDiffPanelProps {
   currentBranchRef?: string
 }
 
-const DatabaseDiffPanel = ({
+export const DatabaseDiffPanel = ({
   diffContent,
   isLoading,
   error,
@@ -89,10 +89,13 @@ const DatabaseDiffPanel = ({
         </Button>
       </CardHeader>
       <CardContent className="p-0 h-96">
-        <DiffViewer language="sql" original="" modified={diffContent} />
+        <DiffEditor
+          language="sql"
+          original=""
+          modified={diffContent}
+          options={{ readOnly: true }}
+        />
       </CardContent>
     </Card>
   )
 }
-
-export default DatabaseDiffPanel

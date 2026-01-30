@@ -5,6 +5,7 @@ Supabase is 100% remote.
 Aaron Byrne
 Ada Wong
 Adam Mokan
+AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
@@ -12,11 +13,14 @@ Aleksi Immonen
 Alexander Korotkov
 Ali Waseem
 Allan S
+Amir Issaei
 Amy Q
+Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
 Anna Weihl
+Ant Evans
 Ant Wilson
 Ariuna K
 Artur Zakirov
@@ -41,6 +45,7 @@ Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
+Clayton Kast
 Craig Cannon
 Cuong Do
 Danny White
@@ -50,6 +55,7 @@ David A. Ventimiglia
 David Weitzman
 Deepthi Sigireddi
 Deji I
+Dennis Senn
 Div Arora
 Divit D
 Douglas Hunley
@@ -61,12 +67,15 @@ Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
+Eyal Ehrlich
 Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
 Felipe Stival
 Francesco Sansalvadore
+Garrett Crowell
+Gerardo Estaba
 Greg Kress
 Greg P
 Greg Richardson
@@ -74,14 +83,17 @@ Gregor Vand
 Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
+Haritabh Gupta
 Haydn Maley
 Hieu Pham
+Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
 Jason Farber
 Jean-Paul Argudo
+Jeezy
 Jeff Smick
 Jenny Kibiri
 Jess Shears
@@ -117,9 +129,11 @@ Leonardo Santiago
 Liam Cloud Hogan
 Long Hoang
 Luca Forstner
+Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
+Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Marouane Souda
@@ -127,6 +141,8 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Mert Yerekapan
+Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -136,6 +152,7 @@ Nick Nowlan
 Nyannyacha
 Oli R
 Pamela Chia
+Patrick Crane
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -161,20 +178,26 @@ Sam Rose
 Sean Oliver
 Sean Thompson
 Sergio Cioban Filho
+Shane E
+Shreekar Shetty
 Sreyas Udayavarman
 Stanislav M
 Stephen Morgan
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
+Szymon Mentel
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Taha Le Bras
 Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
 Tim Frietas
+Tim Palmer
 Timothy Lim
+Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo

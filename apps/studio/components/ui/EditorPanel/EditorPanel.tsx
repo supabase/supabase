@@ -1,8 +1,6 @@
-import { Book, Maximize2, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
@@ -15,33 +13,36 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { Book, Maximize2, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
-  cn,
   CodeBlock,
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  HoverCard_Shadcn_,
+  Command_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
   KeyboardShortcut,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   SQL_ICON,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
-import AIEditor from '../AIEditor'
+import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 
@@ -123,12 +124,16 @@ export const EditorPanel = () => {
       sql: suffixWithLimit(currentValue, 100),
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      isStatementTimeoutDisabled: true,
       handleError: (executeError) => {
         throw executeError
       },
       contextualInvalidation: true,
     })
   }
+
+  // Check if this is an EXPLAIN query result
+  const isValidExplainQuery = isExplainQuery(results ?? [])
 
   const handleChange = (value: string) => {
     setValue(value)
@@ -150,7 +155,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[46px]">
         <div className="text-xs">{label}</div>
         <div className="flex items-center">
           {templates.length > 0 && (
@@ -236,8 +241,7 @@ export const EditorPanel = () => {
               }
 
               const snippet = createSqlSnippetSkeletonV2({
-                id: uuidv4(),
-                name: 'New query',
+                name: generateSnippetTitle(),
                 sql: currentValue,
                 owner_id: profile.id,
                 project_id: project.id,
@@ -338,9 +342,15 @@ export const EditorPanel = () => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={cn(`max-h-72 shrink-0 flex flex-col`, showResults && 'h-full')}>
+          <div
+            className={cn(
+              `shrink-0 flex flex-col`,
+              isValidExplainQuery ? 'max-h-[600px]' : 'max-h-72',
+              showResults && 'h-full'
+            )}
+          >
             {showResults && (
-              <div className="border-t flex-1 overflow-auto">
+              <div className="border-t flex-1 overflow-hidden">
                 <Results rows={results} />
               </div>
             )}

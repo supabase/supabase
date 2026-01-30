@@ -1,5 +1,5 @@
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Toggle } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface ExtensionCardSkeletonProps {
   index?: number

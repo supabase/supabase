@@ -14,6 +14,7 @@ export const HIDDEN_EXTENSIONS = [
   'intagg',
   'xml2',
   'pg_tle',
+  'pg_stat_monitor',
 ]
 
 export const SEARCH_TERMS: Record<string, string[]> = {

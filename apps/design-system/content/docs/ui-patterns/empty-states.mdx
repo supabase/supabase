@@ -3,28 +3,30 @@ title: Empty states
 description: Convey the absence of data and provide clear instruction for what to do about it.
 ---
 
-Empty states convey the fact that there is nothing to list, perform, or display on the current page. **Ideally**, they also provide a clear action for the user to take.
+Empty states convey the fact that there is nothing to list, perform, or display on the current page. Ideally, they also provide a clear action for the user to take.
 
-## No data
+## Best practices
+
+### No data
 
 There are two ways an empty state may be displayed in cases where there is no data:
 
 - **Initial state**: no data to begin with
 - **Zero results**: no data after a search or filter
 
-### Initial state
+#### Initial state
 
 Perhaps the user has not yet created any data. The presentation of this empty state depends on the context of the list and the type of data it contains. Be mindful of the journey to rendering an empty state and any possible layout shift along the way.
 
-#### Presentational
+##### Presentational
 
-The user may be learning about a feature for the first time, and could benefit from lightweight feature education or onboarding. Use the dedicated [EmptyStatePresentational](../fragments/empty-state-presentational) component in this case, putting emphasis on an action the user can take.
+The user may be learning about a feature for the first time, and could benefit from lightweight feature education or onboarding. Use the dedicated [Empty State Presentational](../fragments/empty-state-presentational) component in this case, putting emphasis on an action the user can take.
 
 <ComponentPreview name="empty-state-presentational-icon" peekCode wide />
 
 Remember to use active language in presentational empty states. For example: “Create a vector bucket” instead of “No vector buckets found”. The latter is more appropriate in table-based presentations, as described below.
 
-#### Informational
+##### Informational
 
 Or perhaps the list type is data-heavy or does not benefit from additional information. In these cases, the empty state should provide show the initial state in the same presentation as the list when there is data, much like the [zero results](#zero-results) scenario.
 
@@ -32,11 +34,11 @@ Or perhaps the list type is data-heavy or does not benefit from additional infor
 
 Keep in mind that empty states will likely appear after a visual loading state. Consider layout shift and button placement during and after the transition.
 
-### Zero results
+#### Zero results
 
 Data-heavy presentations without results should have an empty state that broadly matches the state when there is data. This makes the transition between the two states more seamless.
 
-#### Table
+##### Table
 
 A [Table](../components/table) instance with zero results should display a single row. Dulling the TableHead text color and removing the TableCell hover state can further reinforce the lack of usable data.
 
@@ -47,7 +49,7 @@ Studio contains two pre-built components to handle these cases consistently:
 - No Filter Results
 - No Search Results
 
-#### Data Grid
+##### Data Grid
 
 [Data Grid](../ui-patterns/tables#data-grid) and [Data Table](../ui-patterns/tables#data-table) component patterns typically span the full height and width of a container. A classic example is [Users](https://supabase.com/dashboard/project/_/auth/users), which (as it sounds) displays a list of the project’s registered users. Any instance with zero results should display a more prominent empty with a clear title, description, and supporting illustration.
 
@@ -55,7 +57,7 @@ Studio contains two pre-built components to handle these cases consistently:
 
 Other Data Grid instances include [Cron Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) and [Queues](https://supabase.com/dashboard/project/_/integrations/queues).
 
-## Missing route
+### Missing route
 
 Users may accidentally navigate to a non-existent dynamic route, such as a non-existent bucket in [Storage](https://supabase.com/dashboard/project/_/storage) or a non-existent table in the [Table Editor](https://supabase.com/dashboard/project/_/editor). In these cases, follow the pattern of a centered [Admonition](../fragments/admonition) as shown below.
 
@@ -63,6 +65,6 @@ Users may accidentally navigate to a non-existent dynamic route, such as a non-e
 
 ## Components
 
-For presentational empty states (initial states with value propositions and actions), use the [EmptyStatePresentational](../fragments/empty-state-presentational) component from `ui-patterns`. This component provides a consistent structure with support for icons, titles, descriptions, and action buttons.
+For presentational empty states (initial states with value propositions and actions), use the [Empty State Presentational](../fragments/empty-state-presentational) component from `ui-patterns`. This component provides a consistent structure with support for icons, titles, descriptions, and action buttons.
 
 For other empty state scenarios (zero results, missing routes, etc), custom components may still be appropriate as the context and needs for each placement can differ significantly.

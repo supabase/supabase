@@ -2,18 +2,16 @@
 
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { useMediaQuery } from '@/hooks/use-media-query'
-import { Button } from 'ui'
+import { cn } from '@/lib/utils'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from 'ui'
-import {
   Drawer,
   DrawerClose,
   DrawerContent,
@@ -22,9 +20,9 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
+  Input_Shadcn_,
+  Label_Shadcn_,
 } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
 
 export default function DrawerDialogDemo() {
   const [open, setOpen] = React.useState(false)
@@ -34,7 +32,7 @@ export default function DrawerDialogDemo() {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button type="outline">Edit Profile</Button>
+          <Button type="outline">Edit profile</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -52,7 +50,7 @@ export default function DrawerDialogDemo() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button type="outline">Edit Profile</Button>
+        <Button type="outline">Edit profile</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">

@@ -1,19 +1,19 @@
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState, type KeyboardEvent, type MouseEvent } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { VectorBucket as VectorBucketIcon } from 'icons'
-import { BASE_PATH } from 'lib/constants'
+import { createNavigationHandler } from 'lib/navigation'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
@@ -49,15 +49,6 @@ export const VectorsBuckets = () => {
       : bucketsList.filter((bucket) =>
           bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
         )
-
-  const handleBucketNavigation = (bucketName: string, event: MouseEvent | KeyboardEvent) => {
-    const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
-    if (event.metaKey || event.ctrlKey) {
-      window.open(`${BASE_PATH}${url}`, '_blank')
-    } else {
-      router.push(url)
-    }
-  }
 
   return (
     <>
@@ -133,17 +124,18 @@ export const VectorsBuckets = () => {
                               // the creation time is in seconds, convert it to milliseconds
                               const created = +bucket.creationTime * 1000
 
+                              const handleBucketNavigation = createNavigationHandler(
+                                `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`,
+                                router
+                              )
+
                               return (
                                 <TableRow
                                   key={id}
                                   className="relative cursor-pointer h-16 inset-focus"
-                                  onClick={(event) => handleBucketNavigation(name, event)}
-                                  onKeyDown={(event) => {
-                                    if (event.key === 'Enter' || event.key === ' ') {
-                                      event.preventDefault()
-                                      handleBucketNavigation(name, event)
-                                    }
-                                  }}
+                                  onClick={handleBucketNavigation}
+                                  onAuxClick={handleBucketNavigation}
+                                  onKeyDown={handleBucketNavigation}
                                   tabIndex={0}
                                 >
                                   <TableCell className="w-2 pr-1">

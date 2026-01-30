@@ -5,7 +5,6 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from 'components/ui/InlineLink'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -27,6 +26,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {

@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -39,6 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'

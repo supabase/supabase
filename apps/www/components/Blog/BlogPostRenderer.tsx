@@ -1,19 +1,17 @@
 'use client'
 
 import dayjs from 'dayjs'
+import mdxComponents from 'lib/mdx/mdxComponents'
+import { ChevronLeft } from 'lucide-react'
 import { MDXRemote } from 'next-mdx-remote'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useMemo } from 'react'
-import { ChevronLeft } from 'lucide-react'
-import { Badge } from 'ui'
-
-import mdxComponents from 'lib/mdx/mdxComponents'
-
-import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
+import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
+import { Badge } from 'ui'
 
 const ShareArticleActions = dynamic(() => import('components/Blog/ShareArticleActions'))
 const CTABanner = dynamic(() => import('components/CTABanner'))
@@ -160,9 +158,11 @@ const BlogPostRenderer = ({
   )
 
   const imageUrl = isCMS
-    ? blogMetaData.thumb ?? ''
-    : blogMetaData.thumb
-      ? `/images/blog/${blogMetaData.thumb}`
+    ? blogMetaData.imgThumb ?? ''
+    : blogMetaData.imgThumb
+      ? blogMetaData.imgThumb.startsWith('/') || blogMetaData.imgThumb.startsWith('http')
+        ? blogMetaData.imgThumb
+        : `/images/blog/${blogMetaData.imgThumb}`
       : ''
 
   return (
@@ -200,8 +200,8 @@ const BlogPostRenderer = ({
                     <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (
-                    <div className="hidden lg:flex justify-between">
-                      <div className="flex-1 flex flex-col gap-3 pt-2 md:flex-row md:gap-0 lg:gap-3">
+                    <div className="flex justify-between">
+                      <div className="flex-1 flex flex-wrap gap-3 pt-2 md:gap-0 lg:gap-3">
                         {authors.map((author, i: number) => {
                           // Handle both static and CMS author image formats
                           const authorImageUrl =
@@ -209,13 +209,14 @@ const BlogPostRenderer = ({
                               ? author.author_image_url
                               : (author.author_image_url as { url: string })?.url || ''
 
+                          const authorId =
+                            (author as any).author_id ||
+                            (author as any).username ||
+                            author.author.toLowerCase().replace(/\s+/g, '_')
+
                           return (
                             <div className="mr-4 w-max" key={`author-${i}-${author.author}`}>
-                              <Link
-                                href={author.author_url}
-                                target="_blank"
-                                className="cursor-pointer"
-                              >
+                              <Link href={`/blog/authors/${authorId}`} className="cursor-pointer">
                                 <div className="flex items-center gap-3">
                                   {authorImageUrl && (
                                     <div className="w-10">
@@ -262,8 +263,8 @@ const BlogPostRenderer = ({
                           allowFullScreen={true}
                         />
                       ) : (
-                        blogMetaData.thumb && (
-                          <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
+                        blogMetaData.imgThumb && (
+                          <div className="hidden md:block relative mb-8 w-full aspect-[1.91/1] overflow-auto rounded-lg border">
                             <Image
                               src={imageUrl}
                               alt={blogMetaData.title}

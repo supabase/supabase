@@ -10,7 +10,7 @@ import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Snippet, SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { TreeView } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
 import { formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
@@ -115,17 +115,14 @@ export const SearchList = ({ search }: SearchListProps) => {
                     ...element,
                     name: (
                       <span className="flex flex-col py-0.5">
-                        <span title={element.name} className="truncate">
-                          {element.name}
-                        </span>
+                        <span className="truncate">{element.name}</span>
                         {!!visibility && (
-                          <span title={visibility} className="text-foreground-lighter text-xs">
-                            {visibility}
-                          </span>
+                          <span className="text-foreground-lighter text-xs">{visibility}</span>
                         )}
                       </span>
                     ),
                   }}
+                  nameForTitle={element.name}
                   isBranch={false}
                   isOpened={isOpened && !isPreview}
                   isSelected={isActive}

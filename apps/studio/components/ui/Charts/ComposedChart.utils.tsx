@@ -5,7 +5,7 @@ import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
-import { numberFormatter } from './Charts.utils'
+import { formatPercentage, numberFormatter } from './Charts.utils'
 
 export interface ReportAttributes {
   id?: string
@@ -42,6 +42,10 @@ export type MultiAttribute = {
   color?: {
     light: string
     dark: string
+  }
+  fill?: {
+    light?: string
+    dark?: string
   }
   statusCode?: string
   grantType?: string
@@ -232,9 +236,10 @@ export const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {formatNumeric(total as number) +
-                    (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-                  {isPercentage ? '%' : ''}
+                  {isPercentage
+                    ? formatPercentage(total as number, valuePrecision)
+                    : formatNumeric(total as number) +
+                      (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
                   {format === 'ms' ? 'ms' : ''}
                 </span>
                 {maxValueAttribute &&

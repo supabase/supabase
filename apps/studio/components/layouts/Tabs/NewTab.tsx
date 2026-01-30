@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
 import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { QuickstartAIWidget } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/QuickstartAIWidget'
@@ -15,16 +14,19 @@ import { QuickstartTemplatesWidget } from 'components/interfaces/TableGridEditor
 import { QuickstartVariant } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
 import { AssistantMessageType, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
@@ -37,13 +39,10 @@ import {
   cn,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
-import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 
-const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
 
 const ASSISTANT_QUICKSTART_MESSAGES = {
@@ -70,7 +69,10 @@ export function NewTab() {
   const [isCreatingChat, setIsCreatingChat] = useState(false)
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
-  const hasTrackedExposure = useRef(false)
+  const [hasTrackedExposure, setHasTrackedExposure] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_EXPOSURE_TRACKED(String(profile?.id ?? 'anonymous')),
+    false
+  )
 
   const { mutate: sendEvent } = useSendEventMutation()
   const track = useTrack()
@@ -93,14 +95,8 @@ export function NewTab() {
     TABLE_QUICKSTART_FLAG
   )
 
-  const isNewProject = useMemo(() => {
-    if (!project?.inserted_at) return false
-    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
-  }, [project?.inserted_at])
-
   const activeQuickstartVariant =
     editor !== 'sql' &&
-    isNewProject &&
     tableQuickstartVariant &&
     tableQuickstartVariant !== QuickstartVariant.CONTROL
       ? tableQuickstartVariant
@@ -108,18 +104,24 @@ export function NewTab() {
 
   const shouldTrackExposure =
     editor !== 'sql' &&
-    isNewProject &&
+    !!profile?.id &&
     tableQuickstartVariant !== false &&
     tableQuickstartVariant !== undefined
 
   useEffect(() => {
-    if (shouldTrackExposure && !hasTrackedExposure.current) {
-      hasTrackedExposure.current = true
+    if (shouldTrackExposure && !hasTrackedExposure) {
+      setHasTrackedExposure(true)
       track('table_quickstart_opened', {
         variant: tableQuickstartVariant,
       })
     }
-  }, [shouldTrackExposure, tableQuickstartVariant, track])
+  }, [
+    shouldTrackExposure,
+    hasTrackedExposure,
+    setHasTrackedExposure,
+    tableQuickstartVariant,
+    track,
+  ])
 
   const handleOpenAssistant = () => {
     if (isCreatingChat) return
@@ -202,7 +204,6 @@ export function NewTab() {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,

@@ -176,7 +176,7 @@ export const migrationSolutions = {
     },
     {
       id: Solutions.neon,
-      text: 'Switch From Neon',
+      text: 'Switch from Neon',
       description: '',
       url: '/solutions/switch-from-neon',
       icon: (props: any) => (
