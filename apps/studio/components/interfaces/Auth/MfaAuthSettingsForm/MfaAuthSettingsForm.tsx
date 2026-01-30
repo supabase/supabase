@@ -122,6 +122,7 @@ export const MfaAuthSettingsForm = () => {
 
   const { hasAccess: hasAccessToEnhanceSecurity, isLoading: isLoadingEntitlementEnhanceSecurity } =
     useCheckEntitlements('auth.mfa_enhanced_security')
+  const promptEnhancedSecurityUpgrade = IS_PLATFORM && !hasAccessToEnhanceSecurity
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
   const sendSMSHookIsEnabled =
@@ -591,7 +592,7 @@ export const MfaAuthSettingsForm = () => {
                   />
                 </CardContent>
 
-                {!hasAccessToEnhanceSecurity && (
+                {promptEnhancedSecurityUpgrade && (
                   <UpgradeToPro
                     fullWidth
                     source="authEnhancedSecurity"
