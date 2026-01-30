@@ -56,7 +56,7 @@ export const getSelfHostedDirectStrings = (
   dbName: string = 'postgres'
 ): ConnectionStrings => {
   const user = 'postgres'
-  const password = '[POSTGRES_PASSWORD]'
+  const password = '[YOUR-PASSWORD]'
 
   const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
   const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
