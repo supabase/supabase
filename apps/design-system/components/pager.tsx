@@ -83,14 +83,14 @@ export function getBreadcrumbSegments(doc: Doc): BreadcrumbSegment[] {
   for (const section of docsConfig.sidebarNav) {
     const flatItems = flatten(section.items ?? [])
     const inSection = flatItems.some((item) => item.href === doc.slug)
-    if (inSection && section.title) {
-      const sectionLanding = flatItems.find((item) => item.priority) ?? flatItems[0]
-      // Only add section when current page is not the section landing (avoids "Docs > Getting Started > Introduction")
-      if (sectionLanding?.href && sectionLanding.href !== doc.slug) {
-        segments.push({ title: section.title, href: sectionLanding.href })
-      }
-      break
+    if (!inSection || !section.title) continue
+
+    const sectionLanding = flatItems.find((item) => item.priority) ?? flatItems[0]
+    const isOnLanding = sectionLanding?.href === doc.slug
+    if (sectionLanding?.href && !isOnLanding) {
+      segments.push({ title: section.title, href: sectionLanding.href })
     }
+    break
   }
 
   return segments
