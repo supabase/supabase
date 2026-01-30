@@ -24,6 +24,14 @@ interface Props extends HTMLAttributes<HTMLHeadingElement> {
  * need to parse the <a> and generate anchors. Custom anchors are used in tsx files.
  * (see: /pages/guides/cli/config.tsx)
  */
+/**
+ * A heading component that automatically generates an anchor link for TOC functionality.
+ * @param {object} props - The component props.
+ * @param {string} [props.tag='h2'] - The HTML heading tag to render (e.g., 'h1', 'h2').
+ * @param {string} [props.customAnchor] - A custom anchor ID to override the generated one.
+ * @param {React.ReactNode} props.children - The content of the heading.
+ * @returns {React.ReactElement} The heading component with an anchor link.
+ */
 const Heading = forwardRef(
   ({ tag, customAnchor, children, ...props }: React.PropsWithChildren<Props>, forwardedRef) => {
     const HeadingTag = `${tag}` as any

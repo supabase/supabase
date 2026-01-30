@@ -38,6 +38,29 @@ export interface Props
 }
 
 /**
+ * An input field component.
+ * @param {object} props - The component props.
+ * @param {string} [props.inputClassName] - Additional CSS class names for the input element.
+ * @param {string} [props.iconContainerClassName] - Additional CSS class names for the icon container.
+ * @param {boolean} [props.copy] - If `true`, a copy button will be displayed.
+ * @param {Function} [props.onCopy] - A callback function to be called when the copy button is clicked.
+ * @param {string | number} [props.defaultValue] - The default value of the input.
+ * @param {string | React.ReactNode} [props.descriptionText] - A description for the input.
+ * @param {boolean} [props.disabled] - If `true`, the input will be disabled.
+ * @param {string} [props.error] - An error message to display.
+ * @param {any} [props.icon] - An icon to be displayed inside the input.
+ * @param {React.LegacyRef<HTMLInputElement>} [props.inputRef] - A ref for the input element.
+ * @param {string | React.ReactNode} [props.label] - The label for the input.
+ * @param {string} [props.afterLabel] - Text to display after the label.
+ * @param {string} [props.beforeLabel] - Text to display before the label.
+ * @param {string | React.ReactNode} [props.labelOptional] - Optional text to display next to the label.
+ * @param {'horizontal' | 'vertical'} [props.layout] - The layout of the input and label.
+ * @param {boolean} [props.reveal] - If `true`, a reveal button will be displayed for password inputs.
+ * @param {React.ReactNode} [props.actions] - Custom action buttons.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size='medium'] - The size of the input.
+ * @param {boolean} [props.borderless] - If `true`, the input will have no border.
+ * @param {Function} [props.validation] - A validation function for the input.
+ * @returns {React.ReactElement} The input component.
  * @deprecated Use `import { Input_Shadcn_ } from 'ui'` instead or `import { Input } from 'ui-patterns/DataInputs/Input'`
  */
 function Input({
@@ -194,6 +217,26 @@ function Input({
 }
 
 /**
+ * A textarea component.
+ * @param {object} props - The component props.
+ * @param {string} [props.textAreaClassName] - Additional CSS class names for the textarea element.
+ * @param {string | React.ReactNode} [props.descriptionText] - A description for the textarea.
+ * @param {string} [props.error] - An error message to display.
+ * @param {any} [props.icon] - An icon to be displayed inside the textarea.
+ * @param {string | React.ReactNode} [props.label] - The label for the textarea.
+ * @param {string} [props.afterLabel] - Text to display after the label.
+ * @param {string} [props.beforeLabel] - Text to display before the label.
+ * @param {string | React.ReactNode} [props.labelOptional] - Optional text to display next to the label.
+ * @param {'horizontal' | 'vertical'} [props.layout] - The layout of the textarea and label.
+ * @param {number} [props.rows=4] - The number of rows for the textarea.
+ * @param {number} [props.limit] - The maximum number of characters allowed.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size] - The size of the textarea.
+ * @param {boolean} [props.borderless=false] - If `true`, the textarea will have no border.
+ * @param {Function} [props.validation] - A validation function for the textarea.
+ * @param {boolean} [props.copy=false] - If `true`, a copy button will be displayed.
+ * @param {Function} [props.onCopy] - A callback function to be called when the copy button is clicked.
+ * @param {React.ReactNode} [props.actions] - Custom action buttons.
+ * @returns {React.ReactElement} The textarea component.
  * @deprecated Use ./TextArea_Shadcn_ instead
  */
 export interface TextAreaProps

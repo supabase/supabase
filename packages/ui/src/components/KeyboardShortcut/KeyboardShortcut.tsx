@@ -13,6 +13,14 @@ const getIsMac = () => {
   return false
 }
 
+/**
+ * A component to display a keyboard shortcut.
+ * It automatically replaces 'Meta' with '⌘' on Mac and 'Ctrl' on other OSes.
+ * It also replaces 'Shift' with '⇧'.
+ * @param {object} props - The component props.
+ * @param {string[]} props.keys - An array of keys to display.
+ * @returns {React.ReactElement} The keyboard shortcut component.
+ */
 export const KeyboardShortcut = ({ keys }: { keys: string[] }) => {
   const isMac = getIsMac()
   const keysWithMeta = keys.map((key) => (key === 'Meta' ? (isMac ? '⌘' : 'Ctrl') : key))

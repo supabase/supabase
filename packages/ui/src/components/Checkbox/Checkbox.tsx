@@ -38,6 +38,25 @@ interface GroupProps {
 /**
  * @deprecated Use `import { Checkbox_shadcn_ } from "ui"` instead
  */
+/**
+ * A group of checkboxes.
+ * @param {object} props - The component props.
+ * @param {string} [props.id] - The ID of the group.
+ * @param {'horizontal' | 'vertical'} [props.layout='vertical'] - The layout of the checkboxes.
+ * @param {string} [props.error] - An error message to display.
+ * @param {string} [props.descriptionText] - A description for the group.
+ * @param {string} [props.label] - The label for the group.
+ * @param {string} [props.afterLabel] - Text to display after the label.
+ * @param {string} [props.beforeLabel] - Text to display before the label.
+ * @param {string} [props.labelOptional] - Optional text to display next to the label.
+ * @param {React.ReactNode} [props.children] - The checkbox elements.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {InputProps[]} [props.options] - An array of options to create checkboxes from.
+ * @param {Function} [props.onChange] - A callback function to be called when a checkbox is changed.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size='medium'] - The size of the checkboxes.
+ * @returns {React.ReactElement} The checkbox group component.
+ * @deprecated Use `import { Checkbox_shadcn_ } from "ui"` instead
+ */
 function Group({
   id,
   layout = 'vertical',
@@ -99,6 +118,22 @@ function Group({
 }
 
 /**
+ * A single checkbox input.
+ * @param {object} props - The component props.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {string} [props.id] - The ID of the checkbox.
+ * @param {string} [props.name] - The name of the checkbox.
+ * @param {string} [props.label] - The label for the checkbox.
+ * @param {string} [props.afterLabel] - Text to display after the label.
+ * @param {string} [props.beforeLabel] - Text to display before the label.
+ * @param {string} [props.description] - A description for the checkbox.
+ * @param {boolean} [props.checked] - Whether the checkbox is checked.
+ * @param {string} [props.value] - The value of the checkbox.
+ * @param {Function} [props.onChange] - A callback function to be called when the checkbox is changed.
+ * @param {Function} [props.onBlur] - A callback function to be called when the checkbox loses focus.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size='medium'] - The size of the checkbox.
+ * @param {boolean} [props.disabled=false] - If `true`, the checkbox will be disabled.
+ * @returns {React.ReactElement} The checkbox component.
  * @deprecated Use ./Checkbox_shadcn_ instead
  */
 export function Checkbox({
