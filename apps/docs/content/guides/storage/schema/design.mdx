@@ -6,13 +6,13 @@ subtitle: 'Learn about the storage schema'
 sidebar_label: 'Schema'
 ---
 
-Storage uses Postgres to store metadata regarding your buckets and objects. Users can use RLS (Row-Level Security) policies for access control. This data is stored in a dedicated schema within your project called `storage`.
+Storage uses Postgres to store metadata regarding your S3 buckets and objects. Users can use RLS (Row-Level Security) policies for access control. This data is stored in a dedicated schema within your project called `storage`.
 
 <Admonition type="note">
 
-When working with SQL, it's crucial to consider all records in Storage tables as read-only. All operations, including uploading, copying, moving, and deleting, should **exclusively go through the API**.
+When working with SQL, it's crucial to consider all records in Storage tables as read-only. All operations, including uploading, copying, moving, and deleting, should **exclusively go through the Supabase Storage API**.
 
-This is important because the storage schema only stores the metadata and the actual objects are stored in a provider like S3. Deleting the metadata doesn't remove the object in the underlying storage provider. This results in your object being inaccessible, but you'll still be billed for it.
+This is important because the storage schema only stores the metadata and the actual objects are stored in S3 buckets. Deleting the database metadata doesn't remove the S3 object in the underlying storage provider. This results in your object being inaccessible, but you'll still be billed for it.
 
 </Admonition>
 
@@ -24,6 +24,6 @@ You have the option to query this table directly to retrieve information about y
 
 ## Modifying the schema
 
-We strongly recommend refraining from making any alterations to the `storage` schema and treating it as read-only. This approach is important because any modifications to the schema on your end could potentially clash with our future updates, leading to downtime.
+As of April 2025, the internal Supabase schemas have [restricted access](https://github.com/orgs/supabase/discussions/34270) to prevent unintentional damage by users. We strongly recommend refraining from making any alterations to the `storage` schema and treating it as read-only.
 
 However, we encourage you to add custom indexes as they can significantly improve the performance of the RLS policies you create for enforcing access control.
