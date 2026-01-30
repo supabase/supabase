@@ -1,3 +1,4 @@
+import { InlineLink } from 'components/ui/InlineLink'
 import { ChevronDown } from 'lucide-react'
 import {
   Button,
@@ -10,7 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { InlineLink } from 'components/ui/InlineLink'
+
 import { CHART_INTERVALS, LOG_RETENTION } from './logs.utils'
 
 type PlanId = keyof typeof LOG_RETENTION
@@ -54,11 +55,7 @@ export const ChartIntervalDropdown = ({
               return (
                 <Tooltip key={i.key}>
                   <TooltipTrigger asChild>
-                    <DropdownMenuRadioItem
-                      disabled
-                      value={i.key}
-                      className="!pointer-events-auto"
-                    >
+                    <DropdownMenuRadioItem disabled value={i.key} className="!pointer-events-auto">
                       {i.label}
                     </DropdownMenuRadioItem>
                   </TooltipTrigger>
