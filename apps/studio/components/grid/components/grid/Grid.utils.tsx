@@ -1,5 +1,5 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { SupaRow, isPendingAddRow } from 'components/grid/types'
+import { SupaRow } from 'components/grid/types'
 import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
