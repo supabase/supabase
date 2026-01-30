@@ -1,5 +1,5 @@
-import { ConnectionType } from 'components/interfaces/Connect/Connect.constants'
-import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
+import { ConnectionType } from '@/components/interfaces/ConnectSheet/Connect.constants'
+import { ConnectionIcon } from '@/components/interfaces/ConnectSheet/ConnectionIcon'
 import { Box, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -21,6 +21,7 @@ interface FrameworkSelectorProps {
   onChange: (value: string) => void
   items: ConnectionType[]
   className?: string
+  size?: 'tiny' | 'small'
 }
 
 export const FrameworkSelector = ({
@@ -28,6 +29,7 @@ export const FrameworkSelector = ({
   onChange,
   items,
   className,
+  size = 'tiny',
 }: FrameworkSelectorProps) => {
   const [open, setOpen] = useState(false)
 
@@ -43,9 +45,9 @@ export const FrameworkSelector = ({
       <div className={cn('flex', className)}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
-            size="tiny"
+            size={size}
             type="default"
-            className="gap-0"
+            className={cn('gap-0 justify-between', className?.includes('w-full') && 'w-full')}
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >
             <div className="flex items-center gap-2">
@@ -56,7 +58,7 @@ export const FrameworkSelector = ({
         </PopoverTrigger_Shadcn_>
       </div>
       <PopoverContent_Shadcn_
-        className="p-0 max-w-48"
+        className="p-0 w-[var(--radix-popover-trigger-width)] min-w-48"
         side="bottom"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}

@@ -1,5 +1,6 @@
 import { Plug } from 'lucide-react'
 import { useRouter } from 'next/router'
+
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ICommand } from 'ui-patterns/CommandMenu'
@@ -20,7 +21,6 @@ export function useConnectCommands() {
         id: 'connect-to-project',
         name: 'Connect to your project',
         action: () => {
-          // Open the Connect dialog by setting the showConnect query param
           router.push(
             {
               pathname: router.pathname,
@@ -37,7 +37,6 @@ export function useConnectCommands() {
         id: 'connect-mcp',
         name: 'Connect via MCP',
         action: () => {
-          // Open the Connect dialog with MCP tab
           router.push(
             {
               pathname: router.pathname,

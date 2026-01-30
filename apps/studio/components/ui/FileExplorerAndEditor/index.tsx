@@ -335,7 +335,7 @@ export const FileExplorerAndEditor = ({
     })
 
     if (!selectedFileId && files.length > 0) setSelectedFileId(files[0].id)
-  }, [files])
+  }, [files, selectedFileId, setSelectedFileId])
 
   return (
     <div

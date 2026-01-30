@@ -1,8 +1,7 @@
-import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
-
-import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import { DOCS_URL } from 'lib/constants'
+import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
 import { AiIconAnimation, CodeBlock } from 'ui'
+
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'
 
@@ -136,7 +135,7 @@ export const getCodeWorkflowSteps = ({
       title: 'Connect your application',
       icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
-        'Your project is ready; use the framework selector to preview starter code and launch the Connect flow with the client library you prefer.',
+        'Your project is ready; open the Connect sheet to grab connection details and setup guidance.',
       actions: connectActions,
     },
     {
@@ -309,7 +308,7 @@ export const getNoCodeWorkflowSteps = ({
       title: 'Connect your application',
       icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
-        'Your project is ready; use the framework selector to preview starter code and launch the Connect flow to wire up your app.',
+        'Your project is ready; open the Connect sheet to grab connection details and setup guidance.',
       actions: connectActions,
     },
     {
@@ -377,5 +376,3 @@ export const getNoCodeWorkflowSteps = ({
     },
   ]
 }
-
-export const DEFAULT_FRAMEWORK_KEY = FRAMEWORKS[0]?.key ?? 'nextjs'

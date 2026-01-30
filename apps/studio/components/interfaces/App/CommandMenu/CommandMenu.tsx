@@ -1,6 +1,6 @@
+import { useConnectCommands } from '@/components/interfaces/ConnectButton/Connect.Commands'
 import { IS_PLATFORM } from 'common'
 import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
-import { useConnectCommands } from 'components/interfaces/Connect/Connect.Commands'
 import {
   useQueryTableCommands,
   useSnippetCommands,
@@ -14,11 +14,11 @@ import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsS
 import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/ThemeSwitcher'
 import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
-import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
-import { useSupportCommands } from './Support'
-import { orderCommandSectionsByPriority } from './ordering'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
+import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgProjectSwitcher'
+import { useSupportCommands } from './Support'
+import { orderCommandSectionsByPriority } from './ordering'
 
 export default function StudioCommandMenu() {
   useApiKeysCommands()
