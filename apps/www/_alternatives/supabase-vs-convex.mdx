@@ -54,7 +54,7 @@ The fundamental architectural difference shapes everything else in this comparis
 
 | Feature               | Supabase                           | Convex                         |
 | --------------------- | ---------------------------------- | ------------------------------ |
-| Database engine       | Postgres 15+                     | Custom document store (Rust)   |
+| Database engine       | Postgres 15+                       | Custom document store (Rust)   |
 | Data model            | Relational (tables, rows, columns) | Document (nested objects)      |
 | Query language        | SQL                                | TypeScript functions           |
 | Schema                | Explicit, enforced                 | Schema-validated documents     |
@@ -105,7 +105,7 @@ Understanding each platform's architectural limits helps you anticipate where yo
 | Query/mutation timeout            | Configurable (minutes to hours) | 1 second hard limit              |
 | Action timeout                    | 150 seconds (Edge Functions)    | 10 minutes                       |
 | Concurrent queries                | Configurable connection pooling | 16 (Free) / 256 (Pro)            |
-| Full-text search results          | Postgres FTS (configurable)   | 1,024 results maximum            |
+| Full-text search results          | Postgres FTS (configurable)     | 1,024 results maximum            |
 | Vector search results             | pgvector (configurable)         | 256 results maximum              |
 | Documents written per transaction | Limited by transaction size     | 16,000 documents                 |
 
@@ -462,7 +462,7 @@ Postgres has a large extension ecosystem. Supabase supports over 50 extensions, 
 | Geospatial queries    | PostGIS, pgRouting                                              | Not available                             |
 | Vector/AI embeddings  | pgvector                                                        | Built-in vector search (256 result limit) |
 | Time-series data      | Not available (TimescaleDB deprecated)                          | Not available                             |
-| Full-text search      | Postgres FTS, pgroonga                                        | Built-in search (1,024 result limit)      |
+| Full-text search      | Postgres FTS, pgroonga                                          | Built-in search (1,024 result limit)      |
 | Graph queries         | Not available                                                   | Not available                             |
 | Foreign data wrappers | Wrappers extension (Stripe, Firebase, S3, BigQuery, and others) | Not applicable                            |
 | Scheduled jobs        | pg_cron                                                         | Built-in scheduling                       |
