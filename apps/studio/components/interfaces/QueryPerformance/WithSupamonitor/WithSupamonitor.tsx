@@ -1,6 +1,6 @@
-import { SupamonitorGrid } from './SupamonitorGrid'
+import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { LoadingLine } from 'ui'
-import { SupamonitorChart } from './SupamonitorChart'
+import { QueryPerformanceChart } from '../QueryPerformanceChart'
 import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
 import { useMemo, useState, useEffect } from 'react'
 import dayjs from 'dayjs'
@@ -70,15 +70,24 @@ export const WithSupamonitor = ({ dateRange, onDateRangeChange }: WithSupamonito
   const { logData, isLoading: isLogsLoading, error: logsError } = supamonitorLogs
 
   const parsedLogs = useMemo(() => {
-    return parseSupamonitorLogs(logData || [])
+    const result = parseSupamonitorLogs(logData || [])
+    console.log('🔍 logData:', logData)
+    console.log('🔍 parsedLogs:', result)
+    console.log('🔍 First parsed log structure:', result[0])
+    return result
   }, [logData])
 
   const chartData = useMemo(() => {
-    return transformLogsToChartData(parsedLogs)
+    const result = transformLogsToChartData(parsedLogs)
+    console.log('📊 chartData:', result)
+    console.log('📊 chartData length:', result.length)
+    return result
   }, [parsedLogs])
 
   const aggregatedGridData = useMemo(() => {
-    return aggregateLogsByQuery(parsedLogs)
+    const result = aggregateLogsByQuery(parsedLogs)
+    console.log('📋 aggregatedGridData:', result)
+    return result
   }, [parsedLogs])
 
   const handleSelectQuery = (query: string) => {
@@ -107,7 +116,7 @@ export const WithSupamonitor = ({ dateRange, onDateRangeChange }: WithSupamonito
 
   return (
     <>
-      <SupamonitorChart
+      <QueryPerformanceChart
         dateRange={dateRange}
         onDateRangeChange={onDateRangeChange}
         chartData={chartData}
@@ -126,7 +135,7 @@ export const WithSupamonitor = ({ dateRange, onDateRangeChange }: WithSupamonito
         }
       />
       <LoadingLine loading={isLogsLoading} />
-      <SupamonitorGrid
+      <QueryPerformanceGrid
         aggregatedData={aggregatedGridData}
         isLoading={isLogsLoading}
         error={
