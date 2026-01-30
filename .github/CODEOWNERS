@@ -6,6 +6,7 @@
 /packages/ui-patterns @supabase/design
 
 /apps/studio/ @supabase/Dashboard
+/apps/studio/components/ui/DevTelemetryToolbar/ @supabase/growth-eng
 
 /apps/cms/ @supabase/marketing
 

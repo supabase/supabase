@@ -170,10 +170,31 @@ export const FeatureFlagProvider = ({
 
       // Process ConfigCat flags if loaded
       if (flagValues.length > 0) {
-        let overridesCookieValue: Record<string, boolean> = {}
+        const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+        let overridesCookieValue: Record<string, boolean | number | string> = {}
+
+        const safeParse = (
+          value: string | undefined
+        ): Record<string, boolean | number | string> => {
+          if (!value) return {}
+          try {
+            return JSON.parse(value)
+          } catch {
+            return {}
+          }
+        }
+
         try {
           const cookies = getCookies()
-          overridesCookieValue = JSON.parse(cookies['vercel-flag-overrides'])
+          // Merge overrides: vercel-flag-overrides first, then x-cc-flag-overrides (local only)
+          // x-cc-flag-overrides takes precedence in local dev
+          const vercelOverrides = safeParse(cookies['vercel-flag-overrides'])
+          const ccOverrides = isLocal ? safeParse(cookies['x-cc-flag-overrides']) : {}
+
+          overridesCookieValue = {
+            ...vercelOverrides,
+            ...ccOverrides, // local overrides take precedence
+          }
         } catch {}
 
         flagValues.forEach((item) => {
