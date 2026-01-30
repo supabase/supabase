@@ -130,8 +130,8 @@ const ObservabilityMenu = () => {
 
   const menuItems = [
     {
-      title: '',
-      key: 'observability-section',
+      title: 'GENERAL',
+      key: 'general-section',
       items: [
         ...(showOverview
           ? [
@@ -139,6 +139,44 @@ const ObservabilityMenu = () => {
                 name: 'Overview',
                 key: 'observability',
                 url: `/project/${ref}/observability${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'API Gateway',
+                key: 'api-overview',
+                url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      title: 'PRODUCT',
+      key: 'product-section',
+      items: [
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Database',
+                key: 'database',
+                url: `/project/${ref}/observability/database${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'Data API',
+                key: 'postgrest',
+                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
               },
             ]
           : []),
@@ -151,30 +189,12 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Database',
-                key: 'database',
-                url: `/project/${ref}/observability/database${preservedQueryParams}`,
-              },
-            ]
-          : []),
         ...(edgeFnEnabled
           ? [
               {
                 name: 'Edge Functions',
                 key: 'edge-functions',
                 url: `/project/${ref}/observability/edge-functions${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(realtimeEnabled
-          ? [
-              {
-                name: 'Realtime',
-                key: 'realtime',
-                url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
               },
             ]
           : []),
@@ -187,26 +207,12 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        ...(IS_PLATFORM
+        ...(realtimeEnabled
           ? [
               {
-                name: 'API Gateway',
-                key: 'api-overview',
-                url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-        },
-        ...(postgrestReportEnabled
-          ? [
-              {
-                name: 'Data API',
-                key: 'postgrest',
-                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
               },
             ]
           : []),
