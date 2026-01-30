@@ -72,8 +72,6 @@ const PageLayout: NextPageWithLayout = () => {
     }
   }, [projectRef, functionSlug, router])
 
-  if (!IS_PLATFORM) return null
-
   const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
