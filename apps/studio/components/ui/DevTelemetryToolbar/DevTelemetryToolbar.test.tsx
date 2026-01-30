@@ -122,7 +122,7 @@ describe('DevTelemetryToolbar', () => {
       await renderFullToolbar()
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'Tip: Run devTelemetry() in the console to enable the Dev Telemetry Toolbar'
+        'Tip: Run `devTelemetry()` in the console to enable the Dev Telemetry Toolbar'
       )
     })
   })
