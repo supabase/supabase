@@ -8,6 +8,7 @@ import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
 import { LogsTableName } from '../Settings/Logs/Logs.constants'
 import { genChartQuery } from '../Settings/Logs/Logs.utils'
 import {
+  type RawChartData,
   calculateAggregatedMetrics,
   calculateDateRange,
   calculateHealthMetrics,
@@ -81,11 +82,11 @@ const fetchServiceHealthMetrics = async (
     signal,
   })
 
-  if (error || data?.error) {
-    throw error || data?.error
+  if (error ?? data?.error) {
+    throw error ?? data?.error
   }
 
-  return (data?.result || []) as ChartQueryResult[]
+  return (data?.result ?? []) as ChartQueryResult[]
 }
 
 /**
@@ -119,18 +120,18 @@ const useServiceHealthQuery = ({
   const normalizedData = useTimeseriesUnixToIso(queryResult.data ?? [], 'timestamp')
 
   // Fill gaps in timeseries
-  const { data: filledData } = useFillTimeseriesSorted(
-    normalizedData,
-    'timestamp',
-    'ok_count',
-    0,
+  const { data: filledData } = useFillTimeseriesSorted({
+    data: normalizedData,
+    timestampKey: 'timestamp',
+    valueKey: 'ok_count',
+    defaultValue: 0,
     startDate,
-    endDate
-  )
+    endDate,
+  })
 
   // Transform to LogsBarChartDatum format
   const eventChartData: LogsBarChartDatum[] = useMemo(
-    () => transformToBarChartData(filledData),
+    () => transformToBarChartData(filledData as RawChartData[]),
     [filledData]
   )
 
