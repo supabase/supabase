@@ -80,15 +80,3 @@ export function parseConnectionsData(
 
   return { current, max }
 }
-
-/**
- * Determines the color class for a metric based on its percentage value.
- * - >= 90%: destructive (red)
- * - >= 70%: warning (yellow)
- * - < 70%: brand (green)
- */
-export function getMetricStatusColor(percentage: number): string {
-  if (percentage >= 90) return 'text-destructive'
-  if (percentage >= 70) return 'text-warning'
-  return 'text-brand'
-}

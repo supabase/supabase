@@ -1,14 +1,14 @@
-import { describe, expect, it } from 'vitest'
-import {
-  parseNumericValue,
-  parseInfrastructureMetrics,
-  parseConnectionsData,
-  getMetricStatusColor,
-} from './DatabaseInfrastructureSection.utils'
 import type {
   InfraMonitoringMultiResponse,
   InfraMonitoringSingleResponse,
 } from 'data/analytics/infra-monitoring-query'
+import { describe, expect, it } from 'vitest'
+
+import {
+  parseConnectionsData,
+  parseInfrastructureMetrics,
+  parseNumericValue,
+} from './DatabaseInfrastructureSection.utils'
 
 describe('parseNumericValue', () => {
   it('returns number value as-is', () => {
@@ -252,25 +252,5 @@ describe('parseConnectionsData', () => {
     const result = parseConnectionsData(mockInfraData, mockMaxData)
 
     expect(result).toEqual({ current: 0, max: 100 })
-  })
-})
-
-describe('getMetricStatusColor', () => {
-  it('returns destructive color for >= 90%', () => {
-    expect(getMetricStatusColor(90)).toBe('text-destructive')
-    expect(getMetricStatusColor(95)).toBe('text-destructive')
-    expect(getMetricStatusColor(100)).toBe('text-destructive')
-  })
-
-  it('returns warning color for >= 70% and < 90%', () => {
-    expect(getMetricStatusColor(70)).toBe('text-warning')
-    expect(getMetricStatusColor(80)).toBe('text-warning')
-    expect(getMetricStatusColor(89)).toBe('text-warning')
-  })
-
-  it('returns brand color for < 70%', () => {
-    expect(getMetricStatusColor(0)).toBe('text-brand')
-    expect(getMetricStatusColor(50)).toBe('text-brand')
-    expect(getMetricStatusColor(69)).toBe('text-brand')
   })
 })

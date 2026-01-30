@@ -15,7 +15,6 @@ import {
 } from 'ui-patterns/MetricCard'
 
 import {
-  getMetricStatusColor,
   parseConnectionsData,
   parseInfrastructureMetrics,
 } from './DatabaseInfrastructureSection.utils'
