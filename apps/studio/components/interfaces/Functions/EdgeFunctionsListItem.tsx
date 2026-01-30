@@ -3,11 +3,12 @@ import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { copyToClipboard, TableCell, TableRow } from 'ui'
+import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { createNavigationHandler } from 'lib/navigation'
 
@@ -30,7 +31,9 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
       : `${protocol}://${endpoint}/functions/v1/${item.slug}`
 
-  const handleNavigation = createNavigationHandler(`/project/${ref}/functions/${item.slug}`, router)
+  const handleNavigation = IS_PLATFORM
+    ? createNavigationHandler(`/project/${ref}/functions/${item.slug}`, router)
+    : undefined
 
   return (
     <TableRow
@@ -39,7 +42,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       onAuxClick={handleNavigation}
       onKeyDown={handleNavigation}
       tabIndex={0}
-      className="cursor-pointer inset-focus"
+      className={cn({ 'cursor-pointer inset-focus': IS_PLATFORM })}
     >
       <TableCell>
         <p className="text-sm text-foreground whitespace-nowrap py-2">{item.name}</p>
