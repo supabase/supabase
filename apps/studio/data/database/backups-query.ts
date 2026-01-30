@@ -21,29 +21,6 @@ export async function getBackups({ projectRef }: BackupsVariables, signal?: Abor
   })
 
   if (error) handleError(error)
-
-  return {
-    region: 'ap-southeast-1',
-    pitr_enabled: false,
-    walg_enabled: true,
-    backups: [
-      {
-        isPhysicalBackup: true,
-        id: 141661,
-        inserted_at: '2026-01-24T15:55:44.027Z',
-        status: 'COMPLETED',
-        project_id: 139767,
-      },
-      {
-        isPhysicalBackup: true,
-        id: 137324,
-        inserted_at: '2026-01-17T15:56:56.988Z',
-        status: 'COMPLETED',
-        project_id: 139767,
-      },
-    ],
-    physicalBackupData: {},
-  }
   return data
 }
 
