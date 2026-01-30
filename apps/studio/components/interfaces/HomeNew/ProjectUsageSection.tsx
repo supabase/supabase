@@ -1,33 +1,16 @@
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import type { ChartIntervals } from 'types'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  Loading,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Loading } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
@@ -40,35 +23,6 @@ import {
   sumTotal,
   sumWarnings,
 } from './ProjectUsage.metrics'
-
-const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
-
-const CHART_INTERVALS: ChartIntervals[] = [
-  {
-    key: '1hr',
-    label: 'Last 60 minutes',
-    startValue: 1,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
-  },
-  {
-    key: '1day',
-    label: 'Last 24 hours',
-    startValue: 24,
-    startUnit: 'hour',
-    format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
-  },
-  {
-    key: '7day',
-    label: 'Last 7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D, ha',
-    availableIn: ['pro', 'team', 'enterprise'],
-  },
-]
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
@@ -242,62 +196,15 @@ export const ProjectUsageSection = () => {
             <span>Success Rate</span>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<ChevronDown size={14} />}>
-              <span>{selectedInterval.label}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-40">
-            <DropdownMenuRadioGroup
-              value={interval}
-              onValueChange={(interval) => setInterval(interval as ChartIntervalKey)}
-            >
-              {CHART_INTERVALS.map((i) => {
-                const disabled = !i.availableIn?.includes(plan?.id || 'free')
-
-                if (disabled) {
-                  const retentionDuration = LOG_RETENTION[plan?.id ?? 'free']
-                  return (
-                    <Tooltip key={i.key}>
-                      <TooltipTrigger asChild>
-                        <DropdownMenuRadioItem
-                          disabled
-                          value={i.key}
-                          className="!pointer-events-auto"
-                        >
-                          {i.label}
-                        </DropdownMenuRadioItem>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>
-                          {plan?.name} plan only includes up to {retentionDuration} day
-                          {retentionDuration > 1 ? 's' : ''} of log retention
-                        </p>
-                        <p className="text-foreground-light">
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}
-                          >
-                            Upgrade your plan
-                          </InlineLink>{' '}
-                          to increase log retention and view statistics for the{' '}
-                          {i.label.toLowerCase()}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                } else {
-                  return (
-                    <DropdownMenuRadioItem key={i.key} value={i.key}>
-                      {i.label}
-                    </DropdownMenuRadioItem>
-                  )
-                }
-              })}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ChartIntervalDropdown
+          value={interval}
+          onChange={(interval) => setInterval(interval as ChartIntervalKey)}
+          planId={plan?.id}
+          planName={plan?.name}
+          organizationSlug={organization?.slug}
+          dropdownAlign="end"
+          tooltipSide="left"
+        />
       </div>
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (
