@@ -1,6 +1,6 @@
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
-
 import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
+
+import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   const files = [
@@ -58,9 +58,7 @@ const allUsers = await db.select().from(users);
     },
   ]
 
-  return (
-    <MultipleCodeBlock files={files} />
-  )
+  return <MultipleCodeBlock files={files} />
 }
 
 export default ContentFile

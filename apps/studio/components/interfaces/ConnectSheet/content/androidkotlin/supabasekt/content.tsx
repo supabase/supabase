@@ -1,6 +1,6 @@
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
-
 import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
+
+import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   const files = [
@@ -65,9 +65,7 @@ data class TodoItem(val id: Int, val name: String)
     },
   ]
 
-  return (
-    <MultipleCodeBlock files={files} />
-  )
+  return <MultipleCodeBlock files={files} />
 }
 
 export default ContentFile

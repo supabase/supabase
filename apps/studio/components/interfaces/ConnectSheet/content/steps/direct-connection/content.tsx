@@ -2,15 +2,18 @@ import { useMemo } from 'react'
 import { CodeBlock } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { type ConnectionStringMethod, type DatabaseConnectionType } from '../../../Connect.constants'
+import {
+  type ConnectionStringMethod,
+  type DatabaseConnectionType,
+} from '../../../Connect.constants'
 import type { StepContentProps } from '../../../Connect.types'
 import { ConnectionParameters } from '../../../ConnectionParameters'
 import {
+  PASSWORD_PLACEHOLDER,
   buildConnectionParameters,
   buildSafeConnectionString,
   parseConnectionParams,
   resolveConnectionString,
-  PASSWORD_PLACEHOLDER,
 } from '../../../ConnectionString.utils'
 
 const buildPsqlCommand = (params: { host: string; port: string; database: string; user: string }) =>
