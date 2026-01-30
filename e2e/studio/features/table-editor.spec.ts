@@ -1172,4 +1172,37 @@ testRunner('table editor', () => {
     await deleteTable(page, ref, sourceTableName)
     await deleteTable(page, ref, targetTableName)
   })
+
+  test('drag and drop accepts TSV files on empty table import dropzone', async ({ page, ref }) => {
+    const tableName = 'pw_table_tsv_drop'
+
+    try {
+      // Create empty table
+      await createTable(page, ref, tableName)
+
+      // Navigate into table
+      await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+      await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+      const dropzone = page.getByTestId('table-import-dropzone')
+      await expect(dropzone).toBeVisible()
+
+      // Simulate dragging a TSV file over the dropzone.
+      await page.evaluate(() => {
+        const el = document.querySelector('[data-testid="table-import-dropzone"]')
+        if (!el) throw new Error('dropzone not found')
+
+        const dt = new DataTransfer()
+        const file = new File(['col1\tcol2\n1\t2\n'], 'test.tsv', { type: 'text/tab-separated-values' })
+        dt.items.add(file)
+
+        const event = new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt })
+        el.dispatchEvent(event)
+      })
+
+      await expect(page.getByText('Drop your CSV or TSV file here')).toBeVisible()
+    } finally {
+      await deleteTable(page, ref, tableName)
+    }
+  })
 })
