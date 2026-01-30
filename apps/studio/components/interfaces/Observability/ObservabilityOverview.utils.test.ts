@@ -86,29 +86,47 @@ describe('calculateSuccessRate', () => {
 })
 
 describe('getHealthStatus', () => {
-  describe('no-data status', () => {
-    it('returns no-data when total is 0', () => {
+  describe('unknown status', () => {
+    it('returns unknown when total is 0', () => {
       const result = getHealthStatus(0, 0)
 
       expect(result).toEqual({
-        status: 'no-data',
+        status: 'unknown',
         color: 'muted',
       })
     })
 
-    it('returns no-data even with error rate when total is 0', () => {
-      const result = getHealthStatus(100, 0)
+    it('returns unknown when total is below 100', () => {
+      const result = getHealthStatus(5, 50)
 
       expect(result).toEqual({
-        status: 'no-data',
+        status: 'unknown',
+        color: 'muted',
+      })
+    })
+
+    it('returns unknown when total is exactly 99', () => {
+      const result = getHealthStatus(10, 99)
+
+      expect(result).toEqual({
+        status: 'unknown',
+        color: 'muted',
+      })
+    })
+
+    it('returns unknown even with high error rate when total is low', () => {
+      const result = getHealthStatus(50, 20)
+
+      expect(result).toEqual({
+        status: 'unknown',
         color: 'muted',
       })
     })
   })
 
   describe('error status', () => {
-    it('returns error when error rate is exactly 15%', () => {
-      const result = getHealthStatus(15, 100)
+    it('returns error when error rate is exactly 1%', () => {
+      const result = getHealthStatus(1, 100)
 
       expect(result).toEqual({
         status: 'error',
@@ -116,8 +134,17 @@ describe('getHealthStatus', () => {
       })
     })
 
-    it('returns error when error rate is above 15%', () => {
-      const result = getHealthStatus(20, 100)
+    it('returns error when error rate is above 1%', () => {
+      const result = getHealthStatus(5, 100)
+
+      expect(result).toEqual({
+        status: 'error',
+        color: 'destructive',
+      })
+    })
+
+    it('returns error when error rate is 10%', () => {
+      const result = getHealthStatus(10, 200)
 
       expect(result).toEqual({
         status: 'error',
@@ -126,7 +153,7 @@ describe('getHealthStatus', () => {
     })
 
     it('returns error for very high error rates', () => {
-      const result = getHealthStatus(90, 100)
+      const result = getHealthStatus(90, 1000)
 
       expect(result).toEqual({
         status: 'error',
@@ -135,37 +162,8 @@ describe('getHealthStatus', () => {
     })
   })
 
-  describe('warning status', () => {
-    it('returns warning when error rate is exactly 5%', () => {
-      const result = getHealthStatus(5, 100)
-
-      expect(result).toEqual({
-        status: 'warning',
-        color: 'warning',
-      })
-    })
-
-    it('returns warning when error rate is between 5% and 15%', () => {
-      const result = getHealthStatus(10, 100)
-
-      expect(result).toEqual({
-        status: 'warning',
-        color: 'warning',
-      })
-    })
-
-    it('returns warning when error rate is just below 15%', () => {
-      const result = getHealthStatus(14.9, 100)
-
-      expect(result).toEqual({
-        status: 'warning',
-        color: 'warning',
-      })
-    })
-  })
-
   describe('healthy status', () => {
-    it('returns healthy when error rate is 0%', () => {
+    it('returns healthy when error rate is 0% with sufficient data', () => {
       const result = getHealthStatus(0, 100)
 
       expect(result).toEqual({
@@ -174,8 +172,8 @@ describe('getHealthStatus', () => {
       })
     })
 
-    it('returns healthy when error rate is below 5%', () => {
-      const result = getHealthStatus(2, 100)
+    it('returns healthy when error rate is below 1%', () => {
+      const result = getHealthStatus(0.5, 100)
 
       expect(result).toEqual({
         status: 'healthy',
@@ -183,8 +181,17 @@ describe('getHealthStatus', () => {
       })
     })
 
-    it('returns healthy when error rate is just below 5%', () => {
-      const result = getHealthStatus(4.9, 100)
+    it('returns healthy when error rate is just below 1%', () => {
+      const result = getHealthStatus(0.99, 100)
+
+      expect(result).toEqual({
+        status: 'healthy',
+        color: 'brand',
+      })
+    })
+
+    it('returns healthy with 0% error rate and large total', () => {
+      const result = getHealthStatus(0, 10000)
 
       expect(result).toEqual({
         status: 'healthy',
@@ -195,7 +202,7 @@ describe('getHealthStatus', () => {
 
   describe('edge cases', () => {
     it('handles fractional error rates correctly', () => {
-      const result = getHealthStatus(4.99, 1000)
+      const result = getHealthStatus(0.99, 1000)
 
       expect(result).toEqual({
         status: 'healthy',
@@ -203,21 +210,39 @@ describe('getHealthStatus', () => {
       })
     })
 
-    it('handles very small total values', () => {
+    it('returns unknown for very small total values', () => {
       const result = getHealthStatus(10, 1)
 
       expect(result).toEqual({
-        status: 'warning',
-        color: 'warning',
+        status: 'unknown',
+        color: 'muted',
       })
     })
 
     it('handles very large total values', () => {
-      const result = getHealthStatus(3, 1000000)
+      const result = getHealthStatus(0.5, 1000000)
 
       expect(result).toEqual({
         status: 'healthy',
         color: 'brand',
+      })
+    })
+
+    it('returns healthy when total is exactly 100 and error rate is 0', () => {
+      const result = getHealthStatus(0, 100)
+
+      expect(result).toEqual({
+        status: 'healthy',
+        color: 'brand',
+      })
+    })
+
+    it('returns error when total is exactly 100 and error rate is 1%', () => {
+      const result = getHealthStatus(1, 100)
+
+      expect(result).toEqual({
+        status: 'error',
+        color: 'destructive',
       })
     })
   })
