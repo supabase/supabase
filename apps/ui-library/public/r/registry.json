@@ -1950,6 +1950,134 @@
       ]
     },
     {
+      "name": "dropzone-nuxtjs",
+      "type": "registry:block",
+      "title": "Dropzone (File Upload) for Nuxt and Supabase",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-empty-state.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone-empty-state.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-content.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone-content.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/composables/useSupabaseUpload.ts",
+          "type": "registry:component",
+          "target": "app/composables/useSupabaseUpload.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "dropzone-vue",
+      "type": "registry:block",
+      "title": "Dropzone (File Upload) for Vue and Supabase",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone.vue",
+          "type": "registry:component",
+          "target": "components/dropzone.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone-empty-state.vue",
+          "type": "registry:component",
+          "target": "components/dropzone-empty-state.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone-content.vue",
+          "type": "registry:component",
+          "target": "components/dropzone-content.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/composables/useSupabaseUpload.ts",
+          "type": "registry:component",
+          "target": "composables/useSupabaseUpload.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "realtime-cursor-nuxtjs",
+      "type": "registry:component",
+      "title": "Realtime Cursor for Nuxt and Supabase",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "files": [
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/components/cursor.vue",
+          "type": "registry:component",
+          "target": "app/components/cursor.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/components/realtime-cursors.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-cursors.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/composables/useRealtimeCursors.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimeCursors.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "realtime-cursor-vue",
+      "type": "registry:component",
+      "title": "Realtime Cursor for Vue and Supabase",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "files": [
+        {
+          "path": "registry/default/realtime-cursor/vue/components/cursor.vue",
+          "type": "registry:component",
+          "target": "components/cursor.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/vue/components/realtime-cursors.vue",
+          "type": "registry:component",
+          "target": "components/realtime-cursors.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/vue/composables/useRealtimeCursors.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimeCursors.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "ai-editor-rules",
       "type": "registry:file",
