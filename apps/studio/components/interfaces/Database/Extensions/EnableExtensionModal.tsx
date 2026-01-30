@@ -83,6 +83,7 @@ export const EnableExtensionModal = ({
   const defaultSchema = extensionMeta?.schema
 
   const isLoading = fetchingSchemaInfo || isSchemasLoading
+  console.log(extension.name, { fetchingSchemaInfo, isSchemasLoading })
   const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
 
   const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
@@ -103,7 +104,6 @@ export const EnableExtensionModal = ({
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
     defaultValues,
-    values: defaultValues,
   })
   const { schema } = form.watch()
 
@@ -286,8 +286,8 @@ export const EnableExtensionModal = ({
           <Button
             htmlType="submit"
             form="enable-extensions-form"
-            loading={isLoading || isEnabling}
-            disabled={isEnabling}
+            loading={isEnabling}
+            disabled={isLoading || isEnabling}
           >
             Enable extension
           </Button>
