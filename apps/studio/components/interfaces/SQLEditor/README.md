@@ -1,6 +1,6 @@
 # SQL Editor Overview
 
-Quick run through of the different building blocks that make up the SQL Editor, to help navigating the codebase a little easier 🙂🙏
+Quick run-through of the different building blocks that make up the SQL Editor, to help navigating the codebase a little easier 🙂🙏
 
 ## UI structure
 
@@ -27,7 +27,7 @@ Quick run through of the different building blocks that make up the SQL Editor, 
 
 - The endpoint to fetch snippets and folders are via [`useSQLSnippetFoldersQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-folders-query.ts) and [`useSqlSnippetsQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-snippets-query.ts), both of which are paginated (limit set at 100)
 
-  - [`useSQLSnippetFoldersQuery`](<(https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-folders-query.ts)>): Specifically for fetching private snippets and folders
+  - [`useSQLSnippetFoldersQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-folders-query.ts): Specifically for fetching private snippets and folders
   - [`useSqlSnippetsQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-snippets-query.ts): For fetching shared and favorite snippets
 
 - Page fetching is done on demand for the snippets via a "Load more" button due to the complexity of a tree view (we've deliberate avoided an infinite loading UX which we commonly do across other parts of the dashboard)
@@ -55,7 +55,7 @@ Quick run through of the different building blocks that make up the SQL Editor, 
 
 - On `/editor/sql/[id]`:
   - [`snapV2.setSql`](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L207) will be called based on the debounced value of the code editor, in which we'll then queue the snippet for [saving](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L477) via `upsertSnippet`.
-  - Note that we do invalidate some React Queries (snippet count, snippets, and folders) after saving via [`upsertSnippet`](https://github.com/supabase/supabase/blob/chore/add-readme-for-sql-editor-overview/apps/studio/state/sql-editor-v2.ts#L412), but the invalidation is only [triggered](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L209) if it's a new snippet that's not saved in the DB yet
+  - Note that we do invalidate some React Queries (snippet count, snippets, and folders) after saving via [`upsertSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L412), but the invalidation is only [triggered](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L209) if it's a new snippet that's not saved in the DB yet
 
 ### Running a snippet
 
