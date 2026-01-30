@@ -173,7 +173,20 @@ async function generateEmbeddings() {
   const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openAi = new OpenAIApi(configuration)
 
-  const documents = await getDocuments() // Your custom function to load docs
+  // For this example, we'll use a simple customer support FAQ
+  // In production, replace this with your own documents/knowledge base
+  const documents = [
+    "To reset your password, click the 'Forgot Password' link on the login page and enter your email address",
+    'Refunds are processed within 5-7 business days and will appear on your original payment method',
+    'You can upgrade your plan anytime from the billing section in your account settings',
+    'Our customer support team is available Monday through Friday from 9 AM to 6 PM EST',
+    "To cancel your subscription, navigate to Account Settings and click the 'Cancel Plan' button",
+    'We accept all major credit cards, PayPal, and ACH bank transfers for payment',
+    'Your data is automatically backed up daily and stored securely with 256-bit encryption',
+    'The free trial lasts 14 days and no credit card is required to sign up',
+    "To add team members, go to the Team tab in settings and click 'Invite User'",
+    'API rate limits are 1000 requests per hour for free accounts and 10000 for paid accounts',
+  ]
 
   // Assuming each document is a string
   for (const document of documents) {
@@ -247,6 +260,31 @@ serve(async (req) => {
   })
 })
 ```
+
+### Testing your semantic search
+
+Now that you have a working search function, you can test the semantic search capabilities. The beauty of semantic search is that it understands meaning, not just keywords.
+
+After deploying your Edge Function, try calling it with these example queries to see semantic search in action. We'll assume your function is named `search`:
+
+```bash
+curl -X POST 'https://your-project.supabase.co/functions/v1/search' \
+  -H 'Authorization: Bearer YOUR_PUBLISHABLE_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"query": "I forgot my login info"}'
+```
+
+Here are some queries that demonstrate semantic understanding:
+
+| Query                               | Expected Result              | Why it works                                      |
+| ----------------------------------- | ---------------------------- | ------------------------------------------------- |
+| "I forgot my login info"            | Password reset instructions  | Understands "forgot login" = "reset password"     |
+| "Can I get my money back?"          | Refund policy                | Connects "money back" with "refunds" conceptually |
+| "How do I add more users?"          | Team member invitation steps | Links "add users" to "invite team members"        |
+| "I want to stop paying"             | Subscription cancellation    | Relates "stop paying" to "cancel subscription"    |
+| "What payment options do you have?" | Accepted payment methods     | Matches "payment options" with "payment methods"  |
+
+Notice how these queries demonstrate semantic understanding beyond simple keyword matching. Even when queries like "Can I get my money back?" or "I want to stop paying" share no keywords with their matching documents, semantic search can still find the right answers by understanding meaning and context.
 
 ### Building a smarter search function
 
