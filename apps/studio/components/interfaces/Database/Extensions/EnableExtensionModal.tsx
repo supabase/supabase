@@ -35,7 +35,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { extensionsWithRecommendedSchemas } from './Extensions.constants'
-import { useDatabaseExtentionDefaultSchemaQuery } from '@/data/database-extensions/database-extension-schema-query'
+import { useDatabaseExtensionDefaultSchemaQuery } from '@/data/database-extensions/database-extension-schema-query'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
@@ -72,7 +72,7 @@ export const EnableExtensionModal = ({
   )
 
   const { data: extensionMeta, isPending: fetchingSchemaInfo } =
-    useDatabaseExtentionDefaultSchemaQuery(
+    useDatabaseExtensionDefaultSchemaQuery(
       {
         projectRef: project?.ref,
         connectionString: project?.connectionString,

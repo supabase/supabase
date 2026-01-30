@@ -5,14 +5,14 @@ import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { getDatabaseExtensionDefaultSchemaSQL } from '../sql/queries/get-extension-default-schema'
 import { databaseExtensionsKeys } from './keys'
 
-type DatabaseExtentionDefaultSchemaVariables = {
+type DatabaseExtensionDefaultSchemaVariables = {
   extension?: string
   projectRef?: string
   connectionString?: string | null
 }
 
 async function getDatabaseExtensionDefaultSchema(
-  { extension, projectRef, connectionString }: DatabaseExtentionDefaultSchemaVariables,
+  { extension, projectRef, connectionString }: DatabaseExtensionDefaultSchemaVariables,
   signal?: AbortSignal
 ) {
   if (!extension) {
@@ -34,23 +34,23 @@ async function getDatabaseExtensionDefaultSchema(
   return result[0] as { name: string; version: string; schema: string | null }
 }
 
-type DatabaseExtentionDefaultSchemaData = Awaited<
+type DatabaseExtensionDefaultSchemaData = Awaited<
   ReturnType<typeof getDatabaseExtensionDefaultSchema>
 >
-type DatabaseExtentionDefaultSchemaError = ExecuteSqlError
+type DatabaseExtensionDefaultSchemaError = ExecuteSqlError
 
-export const useDatabaseExtentionDefaultSchemaQuery = <TData = DatabaseExtentionDefaultSchemaData>(
-  { projectRef, connectionString, extension }: DatabaseExtentionDefaultSchemaVariables,
+export const useDatabaseExtensionDefaultSchemaQuery = <TData = DatabaseExtensionDefaultSchemaData>(
+  { projectRef, connectionString, extension }: DatabaseExtensionDefaultSchemaVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<
-    DatabaseExtentionDefaultSchemaData,
-    DatabaseExtentionDefaultSchemaError,
+    DatabaseExtensionDefaultSchemaData,
+    DatabaseExtensionDefaultSchemaError,
     TData
   > = {}
 ) =>
-  useQuery<DatabaseExtentionDefaultSchemaData, DatabaseExtentionDefaultSchemaError, TData>({
+  useQuery<DatabaseExtensionDefaultSchemaData, DatabaseExtensionDefaultSchemaError, TData>({
     queryKey: databaseExtensionsKeys.defaultSchema(projectRef, extension),
     queryFn: ({ signal }) =>
       getDatabaseExtensionDefaultSchema({ projectRef, connectionString, extension }, signal),
