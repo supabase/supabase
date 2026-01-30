@@ -35,6 +35,39 @@ export const examples: RegistryItem[] = [
     ],
   },
   {
+    name: 'passwordless-auth-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/passwordless-auth.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
+    name: 'magic-link-auth-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/magic-link-auth.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
+    name: 'otp-auth-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/otp-auth.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
     name: 'current-user-avatar-demo',
     type: 'registry:example',
     registryDependencies: [],

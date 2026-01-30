@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-11-20T11:14:14.146Z
+Last updated: 2026-01-16T13:04:15.624Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -23,6 +23,8 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/nextjs/password-based-auth)
     - Password-based authentication block for Next.js
+- [Passwordless Authentication](https://supabase.com/ui/docs/nextjs/passwordless-auth)
+    - Passwordless authentication block for Next.js with Magic Link and OTP support
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/nextjs/realtime-avatar-stack)
     - Avatar stack in realtime
 - [Realtime Chat](https://supabase.com/ui/docs/nextjs/realtime-chat)
@@ -47,6 +49,8 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/react-router/password-based-auth)
     - Password-based authentication block for React Router
+- [Passwordless Authentication](https://supabase.com/ui/docs/react-router/passwordless-auth)
+    - Passwordless authentication block for React Router with Magic Link and OTP support
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/react-router/realtime-avatar-stack)
     - Avatar stack in realtime
 - [Realtime Chat](https://supabase.com/ui/docs/react-router/realtime-chat)
@@ -63,6 +67,8 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/react/password-based-auth)
     - Password-based authentication block for React Single Page Applications
+- [Passwordless Authentication](https://supabase.com/ui/docs/react/passwordless-auth)
+    - Passwordless authentication block for React SPA with Magic Link and OTP support
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/react/realtime-avatar-stack)
     - Avatar stack in realtime
 - [Realtime Chat](https://supabase.com/ui/docs/react/realtime-chat)
@@ -79,6 +85,8 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/tanstack/password-based-auth)
     - Password-based authentication block for TanStack Start
+- [Passwordless Authentication](https://supabase.com/ui/docs/tanstack/passwordless-auth)
+    - Passwordless authentication block for TanStack Start with Magic Link and OTP support
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/tanstack/realtime-avatar-stack)
     - Avatar stack in realtime
 - [Realtime Chat](https://supabase.com/ui/docs/tanstack/realtime-chat)

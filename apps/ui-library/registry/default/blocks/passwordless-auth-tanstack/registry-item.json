@@ -1,0 +1,75 @@
+{
+  "name": "passwordless-auth-tanstack",
+  "type": "registry:block",
+  "title": "Passwordless Auth for TanStack and Supabase",
+  "description": "Passwordless authentication for TanStack using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods.",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": ["@supabase/ssr@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/components/passwordless-login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/components/magic-link-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/components/otp-request-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/components/otp-verify-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/__root.tsx",
+      "type": "registry:file",
+      "target": "routes/__root.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/index.tsx",
+      "type": "registry:file",
+      "target": "routes/index.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/passwordless.tsx",
+      "type": "registry:file",
+      "target": "routes/passwordless.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/auth/error.tsx",
+      "type": "registry:file",
+      "target": "routes/auth/error.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/_protected.tsx",
+      "type": "registry:file",
+      "target": "routes/_protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/_protected/protected.tsx",
+      "type": "registry:file",
+      "target": "routes/_protected/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/auth/confirm.ts",
+      "type": "registry:file",
+      "target": "routes/auth/confirm.ts"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routes/verify-otp.tsx",
+      "type": "registry:file",
+      "target": "routes/verify-otp.tsx"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-tanstack/routeTree.gen.ts",
+      "type": "registry:file",
+      "target": "routeTree.gen.ts"
+    }
+  ]
+}

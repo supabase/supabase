@@ -1,0 +1,26 @@
+{
+  "name": "passwordless-auth-react",
+  "type": "registry:block",
+  "title": "Passwordless Auth for React and Supabase",
+  "description": "Passwordless authentication for React using Supabase Auth. Supports both Magic Link and OTP (One-Time Password) login methods. Components only, no routing included.",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": ["@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/passwordless-auth-react/components/passwordless-login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react/components/magic-link-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react/components/otp-request-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/passwordless-auth-react/components/otp-verify-form.tsx",
+      "type": "registry:component"
+    }
+  ]
+}
