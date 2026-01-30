@@ -83,7 +83,6 @@ export const EnableExtensionModal = ({
   const defaultSchema = extensionMeta?.schema
 
   const isLoading = fetchingSchemaInfo || isSchemasLoading
-  console.log(extension.name, { fetchingSchemaInfo, isSchemasLoading })
   const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
 
   const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
