@@ -68,7 +68,7 @@ export interface ContentFileProps {
 export type ConditionalValue<T> =
   | T
   | {
-      [stateValue: string]: ConditionalValue<T>
+      [stateValue: string]: ConditionalValue<T> | undefined
       DEFAULT?: T
     }
 
@@ -131,7 +131,7 @@ export type StepTree =
     }
 
 export type StepFieldValueMap = {
-  [fieldValue: string]: StepTree
+  [fieldValue: string]: StepTree | undefined
   DEFAULT?: StepTree
 }
 

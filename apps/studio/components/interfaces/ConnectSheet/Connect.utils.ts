@@ -1,9 +1,15 @@
 import { FRAMEWORKS, MOBILES } from './Connect.constants'
-import type { ConnectState } from './Connect.types'
 
-export function resolveFrameworkLibraryKey(
-  state: Pick<ConnectState, 'framework' | 'frameworkVariant' | 'library'>
-): string | null {
+type FieldValue = string | boolean | string[] | undefined
+
+interface FrameworkLibraryInput {
+  framework?: FieldValue
+  frameworkVariant?: FieldValue
+  library?: FieldValue
+  [key: string]: FieldValue
+}
+
+export function resolveFrameworkLibraryKey(state: FrameworkLibraryInput): string | null {
   const { framework, frameworkVariant, library } = state
 
   if (!framework) return null

@@ -195,7 +195,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
       defaults.mcpClient = MCP_CLIENTS[0]?.key ?? ''
     }
 
-    return { ...defaults, ...initialState }
+    return { ...defaults, ...initialState } as ConnectState
   })
 
   const updateField = useCallback((fieldId: string, value: string | boolean | string[]) => {
@@ -208,7 +208,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         const selected = allFrameworks.find((f) => f.key === value)
 
         // Reset variant if framework changed
-        if (selected?.children?.length > 1) {
+        if (selected?.children && selected.children.length > 1) {
           next.frameworkVariant = selected.children[0]?.key ?? ''
         } else {
           delete next.frameworkVariant

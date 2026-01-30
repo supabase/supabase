@@ -49,6 +49,8 @@ export type CodeBlockLang =
   | 'pgsql'
   | 'swift'
   | 'yaml'
+  | 'toml'
+  | 'html'
 
 export interface CodeBlockProps {
   title?: ReactNode
