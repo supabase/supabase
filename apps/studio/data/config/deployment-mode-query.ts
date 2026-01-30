@@ -10,12 +10,13 @@ export type DeploymentMode = {
 
 export async function getDeploymentMode(signal?: AbortSignal): Promise<DeploymentMode> {
   const response = await fetch(`${API_URL}/platform/deployment-mode`, { signal })
+  const body = await response.json()
 
   if (!response.ok) {
-    handleError(await response.json())
+    handleError(body)
   }
 
-  return response.json()
+  return body
 }
 
 export type DeploymentModeData = Awaited<ReturnType<typeof getDeploymentMode>>
