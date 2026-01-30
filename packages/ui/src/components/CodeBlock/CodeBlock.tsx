@@ -23,7 +23,6 @@ import {
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import swift from 'react-syntax-highlighter/dist/cjs/languages/hljs/swift'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
 
 import { copyToClipboard } from '../../lib/utils'
@@ -44,7 +43,6 @@ export type CodeBlockLang =
   | 'kotlin'
   | 'curl'
   | 'http'
-  | 'html'
   | 'php'
   | 'python'
   | 'go'
@@ -159,7 +157,6 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('kotlin', kotlin)
   SyntaxHighlighter.registerLanguage('curl', curl)
   SyntaxHighlighter.registerLanguage('http', http)
-  SyntaxHighlighter.registerLanguage('html', xml)
   SyntaxHighlighter.registerLanguage('php', php)
   SyntaxHighlighter.registerLanguage('python', python)
   SyntaxHighlighter.registerLanguage('go', go)
