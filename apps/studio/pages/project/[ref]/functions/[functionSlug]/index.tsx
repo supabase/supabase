@@ -19,7 +19,7 @@ import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -66,10 +66,13 @@ const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
 
-  if (!IS_PLATFORM) {
-    router.push(`/project/${projectRef}/functions/${functionSlug}/details`)
-    return <></>
-  }
+  useEffect(() => {
+    if (!IS_PLATFORM && projectRef && functionSlug) {
+      router.replace(`/project/${projectRef}/functions/${functionSlug}/details`)
+    }
+  }, [projectRef, functionSlug, router])
+
+  if (!IS_PLATFORM) return null
 
   const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
