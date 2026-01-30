@@ -153,6 +153,13 @@ module.exports = [
     port: '',
     pathname: '**',
   },
+  // OG Edge Function
+  {
+    protocol: 'https',
+    hostname: 'zhfonblqamxferhoguzj.supabase.co',
+    port: '',
+    pathname: '/functions/v1/generate-og',
+  },
   // Dynamically generated CMS patterns based on CMS_SITE_ORIGIN
   ...generateCMSRemotePatterns(),
 ]
