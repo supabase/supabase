@@ -1,6 +1,5 @@
-import { QueryKey, useQuery } from '@tanstack/react-query'
-
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { QueryKey, useQuery } from '@tanstack/react-query'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { MB, PROJECT_STATUS } from 'lib/constants'
@@ -9,7 +8,11 @@ import {
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { sqlKeys } from './keys'
+
+const COST_THRESHOLD = 20_000 // Arbitrary - need to find a good value
+export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -18,9 +21,15 @@ export type ExecuteSqlVariables = {
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  /**
+   * Disables transaction mode - should be used only for manual queries ran via the SQL Editor
+   * */
   isStatementTimeoutDisabled?: boolean
-  autoLimit?: number
-  contextualInvalidation?: boolean
+  /**
+   * Runs an EXPLAIN before actually running the query, rejects the query if cost exceeds a threshold.
+   * Intended to be used for interfaces that heavily rely on queries on the DB
+   * */
+  preflightCheck?: boolean
 }
 
 /**
@@ -37,16 +46,8 @@ export async function executeSql<T = any>(
     handleError,
     isRoleImpersonationEnabled = false,
     isStatementTimeoutDisabled = false,
-  }: Pick<
-    ExecuteSqlVariables,
-    | 'projectRef'
-    | 'connectionString'
-    | 'sql'
-    | 'queryKey'
-    | 'handleError'
-    | 'isRoleImpersonationEnabled'
-    | 'isStatementTimeoutDisabled'
-  >,
+    preflightCheck = false,
+  }: ExecuteSqlVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
   fetcherOverride?: (options: {
@@ -76,26 +77,44 @@ export async function executeSql<T = any>(
       error = result.error
     }
   } else {
-    const result = await post('/platform/pg-meta/{ref}/query', {
+    const options = {
       signal,
+      headers,
       params: {
+        path: { ref: projectRef },
         header: {
           'x-connection-encrypted': connectionString ?? '',
           'x-pg-application-name': isStatementTimeoutDisabled
             ? 'supabase/dashboard-query-editor'
             : DEFAULT_PLATFORM_APPLICATION_NAME,
         },
-        path: { ref: projectRef },
-        // @ts-expect-error: This is just a client side thing to identify queries better
-        query: {
-          key:
-            queryKey
-              ?.filter((seg) => typeof seg === 'string' || typeof seg === 'number')
-              .join('-') ?? '',
-        },
       },
+    }
+
+    if (preflightCheck) {
+      const { data: costCheck } = await post('/platform/pg-meta/{ref}/query', {
+        ...options,
+        body: {
+          query: `explain (format json) ${sql}`,
+          disable_statement_timeout: isStatementTimeoutDisabled,
+        },
+      })
+      const cost = costCheck?.[0]['QUERY PLAN'][0]['Plan']['Total Cost'] ?? 0
+      if (cost >= COST_THRESHOLD) {
+        return handleErrorFetchers({
+          message: COST_THRESHOLD_ERROR,
+          code: cost,
+          metadata: { cost, sql },
+        })
+      }
+    }
+
+    const key =
+      queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
+    const result = await post('/platform/pg-meta/{ref}/query', {
+      ...options,
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
-      headers,
+      query: { key },
     })
 
     data = result.data
