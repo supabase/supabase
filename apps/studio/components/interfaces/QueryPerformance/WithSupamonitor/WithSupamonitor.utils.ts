@@ -71,10 +71,8 @@ export const parseSupamonitorLogs = (logData: any[]): ParsedLogEntry[] => {
       
       try {
         const parsed = JSON.parse(jsonString)
-        // Merge the parsed JSON with the original log's timestamp and other fields
         return {
-          ...parsed, // Start with parsed JSON data
-          // Preserve important fields from the original log object
+          ...parsed,
           timestamp: log.timestamp || parsed.timestamp,
           id: log.id,
           log_type: log.log_type,
@@ -105,13 +103,11 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
 
   console.log('📊 transformLogsToChartData: Processing', parsedLogs.length, 'parsed logs')
 
-  // Debug: Log all available fields in the first log
   if (parsedLogs.length > 0) {
     const firstLog = parsedLogs[0]
     console.log('🔍 First log all fields:', firstLog)
     console.log('🔍 First log keys:', Object.keys(firstLog))
     
-    // Check for time-related fields
     const timeFields = Object.keys(firstLog).filter(key => 
       key.toLowerCase().includes('time') || 
       key.toLowerCase().includes('exec') || 
@@ -126,9 +122,8 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
 
   const result = parsedLogs
     .map((log: ParsedLogEntry, index: number) => {
-      // Check multiple possible timestamp field names
       const possibleTimestamps = [
-        log.timestamp, // Preserved from original log
+        log.timestamp,
         log.bucket_start_time, 
         log.bucket, 
         log.ts,
@@ -168,14 +163,11 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
         return null
       }
 
-      // Calculate percentiles from histogram if available
       const percentiles =
         log.resp_calls && Array.isArray(log.resp_calls)
           ? calculatePercentilesFromHistogram(log.resp_calls)
           : { p50: 0, p95: 0 }
 
-      // Extract time metrics - check for various possible field names
-      // Supamonitor might use different field names, so we need to check all possibilities
       const meanTime = parseFloat(
         String(
           log.mean_time ?? 
@@ -222,7 +214,6 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
         )
       )
 
-      // Extract other metrics
       const calls = parseInt(String(log.calls ?? log.call_count ?? log.total_calls ?? log.count ?? 0), 10)
       const rowsRead = parseInt(String(log.rows ?? log.rows_read ?? log.total_rows ?? 0), 10)
       const cacheHits = parseFloat(String(log.shared_blks_hit ?? log.cache_hits ?? log.hits ?? 0))
@@ -301,7 +292,6 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): QueryPerform
     let totalExecutionTimeForQuery = 0
 
     logs.forEach((log) => {
-      // Check for various possible field names for time metrics
       const logMeanTime = parseFloat(
         String(
           log.mean_time ?? 
@@ -351,7 +341,6 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): QueryPerform
       totalExecutionTimeForQuery += logMeanTime * logCalls
     })
 
-    // Overall mean time is the weighted average
     const avgMeanTime = totalCalls > 0 ? totalExecutionTimeForQuery / totalCalls : 0
     const finalMinTime = minTime === Infinity ? 0 : minTime
     const finalMaxTime = maxTime === -Infinity ? 0 : maxTime
