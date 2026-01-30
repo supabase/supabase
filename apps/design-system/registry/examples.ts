@@ -1569,4 +1569,9 @@ export const examples: Registry = [
     registryDependencies: ['mermaid'],
     files: ['example/mermaid-basic.tsx'],
   },
+  {
+    name: 'status-code-demo',
+    type: 'components:example',
+    files: ['example/status-code-demo.tsx'],
+  },
 ]

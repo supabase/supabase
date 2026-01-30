@@ -71,6 +71,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "StatusCode": {
+      name: "StatusCode",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/StatusCode")),
+      source: "",
+      files: ["registry/default//StatusCode/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "accordion-demo": {
       name: "accordion-demo",
       type: "components:example",
@@ -2883,6 +2894,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/mermaid-basic")),
       source: "",
       files: ["registry/default/example/mermaid-basic.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "status-code-demo": {
+      name: "status-code-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/status-code-demo")),
+      source: "",
+      files: ["registry/default/example/status-code-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
