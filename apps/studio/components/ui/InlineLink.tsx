@@ -12,7 +12,7 @@ interface InlineLinkProps {
 }
 
 export const InlineLinkClassName =
-  'underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-inherit hover:text-foreground'
+  'underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-inherit hover:text-foreground text-focus'
 
 export const InlineLink = ({
   href,
