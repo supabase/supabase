@@ -63,12 +63,12 @@ export const parseSupamonitorLogs = (logData: any[]): ParsedLogEntry[] => {
   const validParsedLogs = logData
     .map((log) => {
       let jsonString = log.event_message || ''
-      
+
       const colonIndex = jsonString.indexOf(':')
       if (colonIndex !== -1) {
         jsonString = jsonString.substring(colonIndex + 1).trim()
       }
-      
+
       try {
         const parsed = JSON.parse(jsonString)
         return {
@@ -87,7 +87,7 @@ export const parseSupamonitorLogs = (logData: any[]): ParsedLogEntry[] => {
     .filter((log) => log !== null)
 
   console.log('✅ Successfully parsed', validParsedLogs.length, 'out of', logData.length, 'logs')
-  
+
   if (validParsedLogs.length > 0) {
     console.log('📦 First parsed entry keys:', Object.keys(validParsedLogs[0]))
     console.log('📦 First parsed entry:', validParsedLogs[0])
@@ -107,15 +107,16 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
     const firstLog = parsedLogs[0]
     console.log('🔍 First log all fields:', firstLog)
     console.log('🔍 First log keys:', Object.keys(firstLog))
-    
-    const timeFields = Object.keys(firstLog).filter(key => 
-      key.toLowerCase().includes('time') || 
-      key.toLowerCase().includes('exec') || 
-      key.toLowerCase().includes('duration') ||
-      key.toLowerCase().includes('latency')
+
+    const timeFields = Object.keys(firstLog).filter(
+      (key) =>
+        key.toLowerCase().includes('time') ||
+        key.toLowerCase().includes('exec') ||
+        key.toLowerCase().includes('duration') ||
+        key.toLowerCase().includes('latency')
     )
     console.log('🔍 Time-related fields found:', timeFields)
-    timeFields.forEach(field => {
+    timeFields.forEach((field) => {
       console.log(`  - ${field}:`, firstLog[field], typeof firstLog[field])
     })
   }
@@ -124,8 +125,8 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
     .map((log: ParsedLogEntry, index: number) => {
       const possibleTimestamps = [
         log.timestamp,
-        log.bucket_start_time, 
-        log.bucket, 
+        log.bucket_start_time,
+        log.bucket,
         log.ts,
         log.time,
         log.period_start,
@@ -170,54 +171,47 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
 
       const meanTime = parseFloat(
         String(
-          log.mean_time ?? 
-          log.mean_exec_time ?? 
-          log.mean_query_time ?? 
-          log.avg_time ??
-          log.average_time ??
-          log.exec_time ??
-          log.query_time ??
-          log.total_time ??
-          (log as any).mean ??
-          (log as any).avg ??
-          0
-        )
-      )
-      
-      const minTime = parseFloat(
-        String(
-          log.min_time ?? 
-          log.min_exec_time ?? 
-          log.min_query_time ?? 
-          (log as any).min ??
-          0
-        )
-      )
-      
-      const maxTime = parseFloat(
-        String(
-          log.max_time ?? 
-          log.max_exec_time ?? 
-          log.max_query_time ?? 
-          (log as any).max ??
-          0
-        )
-      )
-      
-      const stddevTime = parseFloat(
-        String(
-          log.stddev_time ?? 
-          log.stddev_exec_time ?? 
-          log.stddev_query_time ?? 
-          (log as any).stddev ??
-          0
+          log.mean_time ??
+            log.mean_exec_time ??
+            log.mean_query_time ??
+            log.avg_time ??
+            log.average_time ??
+            log.exec_time ??
+            log.query_time ??
+            log.total_time ??
+            (log as any).mean ??
+            (log as any).avg ??
+            0
         )
       )
 
-      const calls = parseInt(String(log.calls ?? log.call_count ?? log.total_calls ?? log.count ?? 0), 10)
+      const minTime = parseFloat(
+        String(log.min_time ?? log.min_exec_time ?? log.min_query_time ?? (log as any).min ?? 0)
+      )
+
+      const maxTime = parseFloat(
+        String(log.max_time ?? log.max_exec_time ?? log.max_query_time ?? (log as any).max ?? 0)
+      )
+
+      const stddevTime = parseFloat(
+        String(
+          log.stddev_time ??
+            log.stddev_exec_time ??
+            log.stddev_query_time ??
+            (log as any).stddev ??
+            0
+        )
+      )
+
+      const calls = parseInt(
+        String(log.calls ?? log.call_count ?? log.total_calls ?? log.count ?? 0),
+        10
+      )
       const rowsRead = parseInt(String(log.rows ?? log.rows_read ?? log.total_rows ?? 0), 10)
       const cacheHits = parseFloat(String(log.shared_blks_hit ?? log.cache_hits ?? log.hits ?? 0))
-      const cacheMisses = parseFloat(String(log.shared_blks_read ?? log.cache_misses ?? log.misses ?? 0))
+      const cacheMisses = parseFloat(
+        String(log.shared_blks_read ?? log.cache_misses ?? log.misses ?? 0)
+      )
 
       if (index === 0) {
         console.log('✅ First log transformed:', {
@@ -294,43 +288,38 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): QueryPerform
     logs.forEach((log) => {
       const logMeanTime = parseFloat(
         String(
-          log.mean_time ?? 
-          log.mean_exec_time ?? 
-          log.mean_query_time ?? 
-          log.avg_time ??
-          log.average_time ??
-          log.exec_time ??
-          log.query_time ??
-          (log as any).mean ??
-          (log as any).avg ??
-          0
+          log.mean_time ??
+            log.mean_exec_time ??
+            log.mean_query_time ??
+            log.avg_time ??
+            log.average_time ??
+            log.exec_time ??
+            log.query_time ??
+            (log as any).mean ??
+            (log as any).avg ??
+            0
         )
       )
-      
+
       const logMinTime = parseFloat(
-        String(
-          log.min_time ?? 
-          log.min_exec_time ?? 
-          log.min_query_time ?? 
-          (log as any).min ??
-          0
-        )
+        String(log.min_time ?? log.min_exec_time ?? log.min_query_time ?? (log as any).min ?? 0)
       )
-      
+
       const logMaxTime = parseFloat(
-        String(
-          log.max_time ?? 
-          log.max_exec_time ?? 
-          log.max_query_time ?? 
-          (log as any).max ??
-          0
-        )
+        String(log.max_time ?? log.max_exec_time ?? log.max_query_time ?? (log as any).max ?? 0)
       )
-      
-      const logCalls = parseInt(String(log.calls ?? log.call_count ?? log.total_calls ?? log.count ?? 0), 10)
+
+      const logCalls = parseInt(
+        String(log.calls ?? log.call_count ?? log.total_calls ?? log.count ?? 0),
+        10
+      )
       const logRows = parseInt(String(log.rows ?? log.rows_read ?? log.total_rows ?? 0), 10)
-      const logCacheHits = parseFloat(String(log.shared_blks_hit ?? log.cache_hits ?? log.hits ?? 0))
-      const logCacheMisses = parseFloat(String(log.shared_blks_read ?? log.cache_misses ?? log.misses ?? 0))
+      const logCacheHits = parseFloat(
+        String(log.shared_blks_hit ?? log.cache_hits ?? log.hits ?? 0)
+      )
+      const logCacheMisses = parseFloat(
+        String(log.shared_blks_read ?? log.cache_misses ?? log.misses ?? 0)
+      )
 
       minTime = Math.min(minTime, logMinTime)
       maxTime = Math.max(maxTime, logMaxTime)
