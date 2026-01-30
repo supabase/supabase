@@ -66,7 +66,7 @@ hideToc: true
 
     Create a helper file `lib/supabase.ts` that exports a Supabase client using your Project URL and key.
 
-    Create a `.env` file and populate with your Supabase connection variables:
+    Rename `.env.example` to `.env` and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="publishable" />
@@ -90,7 +90,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Create a login component">
 
-    Let's set up a React Native component to manage logins and sign ups.
+    Create a React Native component to manage logins and sign ups. The app later uses the [`getClaims`](/docs/reference/javascript/auth-getclaims) method in `App.tsx` to validate the local JWT before showing the signed-in user.
 
     </StepHikeCompact.Details>
 
