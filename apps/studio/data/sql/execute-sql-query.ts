@@ -10,6 +10,10 @@ import {
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { sqlKeys } from './keys'
+import {
+  calculateSummary,
+  createNodeTree,
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 
 const COST_THRESHOLD = 20_000 // Arbitrary - need to find a good value
 export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
@@ -95,11 +99,14 @@ export async function executeSql<T = any>(
       const { data: costCheck } = await post('/platform/pg-meta/{ref}/query', {
         ...options,
         body: {
-          query: `explain (format json) ${sql}`,
+          query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
         },
       })
-      const cost = costCheck?.[0]['QUERY PLAN'][0]['Plan']['Total Cost'] ?? 0
+      const parsedTree = !!costCheck ? createNodeTree(costCheck) : undefined
+      const summary = !!parsedTree ? calculateSummary(parsedTree) : undefined
+      const cost = summary?.totalCost ?? 0
+
       if (cost >= COST_THRESHOLD) {
         return handleErrorFetchers({
           message: COST_THRESHOLD_ERROR,
