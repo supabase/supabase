@@ -1,40 +1,24 @@
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
+
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
-
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="page.tsx" />
-        <MultipleCodeBlockTrigger value="utils/supabase/server.ts" />
-        <MultipleCodeBlockTrigger value="utils/supabase/client.ts" />
-        <MultipleCodeBlockTrigger value="utils/supabase/middleware.ts" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value=".env.local">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {[
-            '',
-            `NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
-            projectKeys?.publishableKey
-              ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
-              : `NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
-            '',
-          ].join('\n')}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="page.tsx">
-        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: '.env.local',
+      language: 'bash',
+      code: [
+        `NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        projectKeys?.publishableKey
+          ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+          : `NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+        '',
+      ].join('\n'),
+    },
+    {
+      name: 'page.tsx',
+      language: 'tsx',
+      code: `
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 
@@ -52,13 +36,12 @@ export default async function Page() {
     </ul>
   )
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="utils/supabase/server.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'utils/supabase/server.ts',
+      language: 'ts',
+      code: `
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -87,12 +70,12 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
     },
   );
 };
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-      <MultipleCodeBlockContent value="utils/supabase/client.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'utils/supabase/client.ts',
+      language: 'ts',
+      code: `
 import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -103,13 +86,12 @@ export const createClient = () =>
     supabaseUrl!,
     supabaseKey!,
   );
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="utils/supabase/middleware.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'utils/supabase/middleware.ts',
+      language: 'ts',
+      code: `
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -147,11 +129,11 @@ export const createClient = (request: NextRequest) => {
 
   return supabaseResponse
 };
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
-  )
+`,
+    },
+  ]
+
+  return <MultipleCodeBlock files={files} />
 }
 
 // [Joshen] Used as a dynamic import

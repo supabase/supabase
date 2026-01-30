@@ -1,5 +1,4 @@
 import { type ReactNode } from 'react'
-
 import { cn } from 'ui'
 
 interface ConnectSheetStepProps {
@@ -56,7 +55,7 @@ export const ConnectSheetStep = ({
         </div>
 
         {/* Right column: content */}
-        <div className="lg:pl-0" data-step-content>
+        <div className="lg:pl-0 [&_pre.code-block]:!bg-surface-75" data-step-content>
           {children}
         </div>
       </div>

@@ -1,38 +1,24 @@
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
+
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
-
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env" />
-        <MultipleCodeBlockTrigger value="app/utils/supabase.server.ts" />
-        <MultipleCodeBlockTrigger value="app/routes/_index.tsx" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value=".env">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {[
-            '',
-            `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
-            projectKeys?.publishableKey
-              ? `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
-              : `VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
-            '',
-          ].join('\n')}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="app/utils/supabase.server.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: '.env',
+      language: 'bash',
+      code: [
+        `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        projectKeys?.publishableKey
+          ? `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+          : `VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+        '',
+      ].join('\n'),
+    },
+    {
+      name: 'app/utils/supabase.server.ts',
+      language: 'ts',
+      code: `
 import {
   createServerClient,
   parseCookieHeader,
@@ -67,13 +53,12 @@ export function createClient(request: Request) {
 
   return { supabase, headers };
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="app/routes/_index.tsx">
-        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'app/routes/_index.tsx',
+      language: 'tsx',
+      code: `
 import type { Route } from "./+types/home";
 import { createClient } from "~/utils/supabase.server";
 
@@ -96,11 +81,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   );
 }
 
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
-  )
+`,
+    },
+  ]
+
+  return <MultipleCodeBlock files={files} />
 }
 
 export default ContentFile

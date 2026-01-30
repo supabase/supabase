@@ -1,47 +1,33 @@
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env" />
-        <MultipleCodeBlockTrigger value="src/supabaseClient.tsx" />
-        <MultipleCodeBlockTrigger value="src/App.tsx" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value=".env">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: '.env',
+      language: 'bash',
+      code: `
 REACT_APP_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 REACT_APP_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile or desktop apps>'}
-        `}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/supabaseClient.tsx">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+        `,
+    },
+    {
+      name: 'src/supabaseClient.tsx',
+      language: 'ts',
+      code: `
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
 const supabaseKey = process.env.REACT_APP_SUPABASE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/App.tsx">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'src/App.tsx',
+      language: 'ts',
+      code: `
 import React, { useEffect, useState } from 'react';
 import { setupIonicReact, IonApp } from '@ionic/react';
 import {
@@ -105,10 +91,12 @@ export default function App() {
     </IonApp>
   );
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+`,
+    },
+  ]
+
+  return (
+    <MultipleCodeBlock files={files} />
   )
 }
 

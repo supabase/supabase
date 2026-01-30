@@ -1,38 +1,23 @@
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value="environments/environment.ts" />
-        <MultipleCodeBlockTrigger value="src/app/supabase.service.ts" />
-        <MultipleCodeBlockTrigger value="src/app/app.component.ts" />
-        <MultipleCodeBlockTrigger value="src/app/app.component.html" />
-        <MultipleCodeBlockTrigger value="src/app/app.module.ts" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value="environments/environment.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: 'environments/environment.ts',
+      language: 'ts',
+      code: `
 export const environment = {
   supabaseUrl: '${projectKeys.apiUrl ?? 'your-project-url'}',
   supabaseKey: '${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile apps>'}',
 };
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/app/supabase.service.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'src/app/supabase.service.ts',
+      language: 'ts',
+      code: `
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
@@ -53,13 +38,12 @@ export class SupabaseService {
     return this.supabase.from('todos').select('*');
   }
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/app/app.component.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'src/app/app.component.ts',
+      language: 'ts',
+      code: `
 import { Component, OnInit } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 
@@ -86,13 +70,12 @@ export class AppComponent implements OnInit {
     }
   }
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/app/app.component.html">
-        <SimpleCodeBlock className="html" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'src/app/app.component.html',
+      language: 'html',
+      code: `
 <ion-header>
 <ion-toolbar>
   <ion-title>Todo List</ion-title>
@@ -106,13 +89,12 @@ export class AppComponent implements OnInit {
   </ion-item>
 </ion-list>
 </ion-content>
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/app/app.module.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+`,
+    },
+    {
+      name: 'src/app/app.module.ts',
+      language: 'ts',
+      code: `
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -135,10 +117,12 @@ import { SupabaseService } from './supabase.service';
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+`,
+    },
+  ]
+
+  return (
+    <MultipleCodeBlock files={files} />
   )
 }
 

@@ -1,24 +1,13 @@
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value="lib/main.dart" />
-        <MultipleCodeBlockTrigger value="lib/main.dart (app)" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value="lib/main.dart">
-        <SimpleCodeBlock className="dart" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: 'lib/main.dart',
+      language: 'dart',
+      code: `
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -28,13 +17,12 @@ Future<void> main() async {
   );
   runApp(MyApp());
 }
-        `}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="lib/main.dart (app)">
-        <SimpleCodeBlock className="dart" parentClassName="min-h-72">
-          {`
+        `,
+    },
+    {
+      name: 'lib/main.dart (app)',
+      language: 'dart',
+      code: `
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -83,10 +71,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+`,
+    },
+  ]
+
+  return (
+    <MultipleCodeBlock files={files} />
   )
 }
 

@@ -1,33 +1,21 @@
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env" />
-        <MultipleCodeBlockTrigger value="app.py" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value=".env">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: '.env',
+      language: 'bash',
+      code: `
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
-        `}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="app.py">
-        <SimpleCodeBlock className="python" parentClassName="min-h-72">
-          {`
+        `,
+    },
+    {
+      name: 'app.py',
+      language: 'python',
+      code: `
 import os
 from flask import Flask
 from supabase import create_client, Client
@@ -56,10 +44,12 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+`,
+    },
+  ]
+
+  return (
+    <MultipleCodeBlock files={files} />
   )
 }
 

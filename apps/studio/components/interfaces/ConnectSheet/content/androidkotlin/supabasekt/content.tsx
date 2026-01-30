@@ -1,33 +1,13 @@
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value="MainActivity.kt" />
-        <MultipleCodeBlockTrigger value="TodoItem.kt" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value="TodoItem.kt">
-        <SimpleCodeBlock className="kotlin" parentClassName="min-h-72">
-          {`
-@Serializable
-data class TodoItem(val id: Int, val name: String)
-        `}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="MainActivity.kt">
-        <SimpleCodeBlock className="kotlin" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: 'MainActivity.kt',
+      language: 'kotlin',
+      code: `
 val supabase = createSupabaseClient(
     supabaseUrl = "${projectKeys.apiUrl ?? 'your-project-url'}",
     supabaseKey = "${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile apps>'}"
@@ -73,10 +53,20 @@ fun TodoList() {
         }
     }
 }
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
+`,
+    },
+    {
+      name: 'TodoItem.kt',
+      language: 'kotlin',
+      code: `
+@Serializable
+data class TodoItem(val id: Int, val name: String)
+        `,
+    },
+  ]
+
+  return (
+    <MultipleCodeBlock files={files} />
   )
 }
 

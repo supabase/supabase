@@ -78,7 +78,7 @@ const directFilesStep: StepDefinition = {
   id: 'direct-files',
   title: 'Add files',
   description: 'Add the following files to your project.',
-  content: 'steps/direct-connection',
+  content: 'steps/direct-files',
 }
 
 const mcpConfigureStep: StepDefinition = {

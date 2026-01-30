@@ -1,36 +1,22 @@
+import { MultipleCodeBlock } from 'ui-patterns/multiple-code-block'
+
 import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-import { SimpleCodeBlock } from 'ui'
-import {
-  MultipleCodeBlock,
-  MultipleCodeBlockContent,
-  MultipleCodeBlockTrigger,
-  MultipleCodeBlockTriggers,
-} from 'ui-patterns/multiple-code-block'
-
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
-  return (
-    <MultipleCodeBlock>
-      <MultipleCodeBlockTriggers>
-        <MultipleCodeBlockTrigger value=".env.local" />
-        <MultipleCodeBlockTrigger value="src/utility/supabaseClient.ts" />
-        <MultipleCodeBlockTrigger value="src/App.tsx" />
-      </MultipleCodeBlockTriggers>
-
-      <MultipleCodeBlockContent value=".env.local">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {[
-            '',
-            `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
-            `SUPABASE_KEY=${projectKeys?.publishableKey ?? projectKeys?.anonKey ?? 'your-anon-key'}`,
-            '',
-          ].join('\n')}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/utility/supabaseClient.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
-          {`
+  const files = [
+    {
+      name: '.env.local',
+      language: 'bash',
+      code: [
+        `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        `SUPABASE_KEY=${projectKeys?.publishableKey ?? projectKeys?.anonKey ?? 'your-anon-key'}`,
+        '',
+      ].join('\n'),
+    },
+    {
+      name: 'src/utility/supabaseClient.ts',
+      language: 'ts',
+      code: `
 import { createClient } from "@refinedev/supabase";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -44,13 +30,12 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
     persistSession: true,
   },
 });
-        `}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-
-      <MultipleCodeBlockContent value="src/App.tsx">
-        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
-          {`
+        `,
+    },
+    {
+      name: 'src/App.tsx',
+      language: 'tsx',
+      code: `
 import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import routerProvider, {
@@ -107,11 +92,11 @@ function App() {
 }
 
 export default App;
-`}
-        </SimpleCodeBlock>
-      </MultipleCodeBlockContent>
-    </MultipleCodeBlock>
-  )
+`,
+    },
+  ]
+
+  return <MultipleCodeBlock files={files} />
 }
 
 export default ContentFile
