@@ -1,11 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { useMemo } from 'react'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { COOLDOWN_DURATION } from './disk-attributes-update-mutation'
 import { configKeys } from './keys'
 
 export type DiskAttributesVariables = {
@@ -54,38 +51,17 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
   enabled?: boolean
 }) => {
   const {
-    data,
     isPending: isLoading,
     isError,
     isSuccess,
     error,
   } = useDiskAttributesQuery({ projectRef }, { enabled })
 
-  const lastModifiedAtString = dayjs(data?.last_modified_at ?? '').utc()
-  const secondsFromNow = Math.max(
-    0,
-    dayjs().utc().diff(dayjs(lastModifiedAtString).utc(), 'second')
-  )
-
-  const remainingDuration = useMemo(() => {
-    return lastModifiedAtString === undefined || COOLDOWN_DURATION - secondsFromNow < 0
-      ? 0
-      : COOLDOWN_DURATION - secondsFromNow
-  }, [lastModifiedAtString, secondsFromNow])
-
-  if (data?.last_modified_at === undefined)
-    return {
-      remainingDuration: 0,
-      isWithinCooldownWindow: false,
-      isLoading,
-      isError,
-      error,
-      isSuccess,
-    }
-
+  // AWS now allows up to 4 modifications in 24 hours without mandatory wait time.
+  // We no longer enforce a client-side cooldown - server will return an error if limit is exceeded.
   return {
-    remainingDuration,
-    isWithinCooldownWindow: remainingDuration > 0,
+    remainingDuration: 0,
+    isWithinCooldownWindow: false,
     isLoading,
     isError,
     error,

@@ -1,7 +1,6 @@
+import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
 
 export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {
@@ -72,10 +71,10 @@ export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) 
             </div>
             <div className="flex flex-col gap-0 flex-grow">
               <p className="text-sm text-foreground">
-                For 6 hours you will not be able to change any disk attributes.
+                Disk modifications are limited to 4 changes within a 24-hour period.
               </p>
               <p className="text-sm text-foreground-light">
-                There is a cooldown period enforced for any disk attribute modifications
+                A new modification can be initiated as soon as the previous one completes.
               </p>
             </div>
           </DialogSection>

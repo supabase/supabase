@@ -5,8 +5,6 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
-export const COOLDOWN_DURATION = 60 * 60 * 6
-
 export type UpdateDiskAttributesVariables = {
   ref?: string
   storageType: 'gp3' | 'io2'
