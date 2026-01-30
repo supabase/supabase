@@ -189,7 +189,7 @@ export const FunctionsEmptyState = () => {
   )
 }
 
-export const FunctionsEmptyStateLocal = () => {
+export const FunctionsInstructionsLocal = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
     if (showStripeExample) {
@@ -360,16 +360,15 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
 
 export const FunctionsSecretsEmptyStateLocal = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Managing secrets and environment variables locally</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
-        <div className="p-8">
-          <div className="flex items-center gap-2">
-            <Lock size={20} />
-            <h4 className="text-base text-foreground">Managing secrets</h4>
+    <>
+      <Card>
+        <CardHeader className="flex-row items-center justify-between">
+          Local development & CLI
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
           </div>
+        </CardHeader>
+        <CardContent>
           <div className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
             <p>
               Local secrets and environment variables can be loaded in either of the following two
@@ -386,9 +385,50 @@ export const FunctionsSecretsEmptyStateLocal = () => {
               </li>
             </ul>
           </div>
-          <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex-row items-center justify-between">
+          Self-Hosted Supabase
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={`${DOCS_URL}/guides/self-hosting/docker#configuring-services`} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="prose [&>code]:text-xs space-x-1 text-sm max-w-full">
+            <span>Change settings in</span>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/supabase/supabase/blob/master/docker/.env.example"
+            >
+              .env file
+            </a>
+            <span>and</span>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml"
+            >
+              docker-compose.yml
+            </a>
+            <span>at</span>
+            <code>functions</code>
+            <span>service</span>
+          </p>
+          <p className="prose [&>code]:text-xs space-x-1 text-sm max-w-full">
+            <span>Secrets can also be loaded at runtime by injecting them into</span>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/supabase/supabase/blob/8bb82bb3a5aee631e8e6e6e0c8a5f6e97fb8f898/docker/volumes/functions/main/index.ts#L74"
+            >
+              main/index.ts file
+            </a>
+          </p>
+        </CardContent>
+      </Card>
+    </>
   )
 }
