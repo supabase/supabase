@@ -104,7 +104,7 @@ export async function executeSql<T = any>(
       const { data: costCheck } = await post('/platform/pg-meta/{ref}/query', {
         ...options,
         body: {
-          query: `explainss ${sql}`,
+          query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
         },
       })
