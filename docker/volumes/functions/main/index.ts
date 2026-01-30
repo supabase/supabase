@@ -1,10 +1,13 @@
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
 import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts'
+import * as toml from 'https://deno.land/std@0.224.0/toml/mod.ts'
 
 console.log('main function started')
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET')
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
+const FUNCTIONS_VOLUME_PATH = Deno.env.get('FUNCTIONS_VOLUME_PATH')
+const CONFIG_PATH = `${FUNCTIONS_VOLUME_PATH}/config.toml`
 
 function getAuthToken(req: Request) {
   const authHeader = req.headers.get('authorization')
@@ -30,8 +33,44 @@ async function verifyJWT(jwt: string): Promise<boolean> {
   return true
 }
 
+async function getFuncKeyValue(functionName: string, key: string): Promise<any> {
+  try {
+    // Read the TOML file into a string
+    const fileContent = await Deno.readTextFile(CONFIG_PATH);
+
+    // Parse the string
+    const config = toml.parse(fileContent);
+
+    // You can now access the properties
+    const func_key_value: any = config.functions[functionName][key];
+
+    // Un-comment the line below to output the key value to docker logs console
+    // console.log(`'${key}' value for '${functionName}' is: ${func_key_value}`);
+    return func_key_value;
+
+  } catch (e) {
+    console.error(`Error reading or parsing file: ${e.message}`);
+    return VERIFY_JWT;
+  }
+}
+
 serve(async (req: Request) => {
-  if (req.method !== 'OPTIONS' && VERIFY_JWT) {
+  const url = new URL(req.url)
+  const { pathname } = url
+  const path_parts = pathname.split('/')
+  const service_name = path_parts[1]
+
+  if (!service_name || service_name === '') {
+    const error = { msg: 'missing function name in request' }
+    return new Response(JSON.stringify(error), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const FUNC_VERIFY_JWT = await getFuncKeyValue(service_name, 'verify_jwt');
+  
+  if (req.method !== 'OPTIONS' && FUNC_VERIFY_JWT) {
     try {
       const token = getAuthToken(req)
       const isValidJWT = await verifyJWT(token)
@@ -51,20 +90,7 @@ serve(async (req: Request) => {
     }
   }
 
-  const url = new URL(req.url)
-  const { pathname } = url
-  const path_parts = pathname.split('/')
-  const service_name = path_parts[1]
-
-  if (!service_name || service_name === '') {
-    const error = { msg: 'missing function name in request' }
-    return new Response(JSON.stringify(error), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  const servicePath = `/home/deno/functions/${service_name}`
+  const servicePath = `${FUNCTIONS_VOLUME_PATH}/${service_name}`
   console.error(`serving the request with ${servicePath}`)
 
   const memoryLimitMb = 150
