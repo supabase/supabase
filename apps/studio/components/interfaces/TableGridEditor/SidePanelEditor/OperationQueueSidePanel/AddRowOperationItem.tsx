@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, X } from 'lucide-react'
-import { Button } from 'ui'
-
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Plus, X } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { AddRowPayload } from '@/state/table-editor-operation-queue.types'
+import { Button } from 'ui'
+
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
+import { AddRowPayload } from '@/state/table-editor-operation-queue.types'
 
 interface AddRowOperationItemProps {
   operationId: string
@@ -14,7 +14,11 @@ interface AddRowOperationItemProps {
   content: AddRowPayload
 }
 
-export const AddRowOperationItem = ({ operationId, tableId, content }: AddRowOperationItemProps) => {
+export const AddRowOperationItem = ({
+  operationId,
+  tableId,
+  content,
+}: AddRowOperationItemProps) => {
   const { table, rowData } = content
   const tableSchema = table.schema
   const tableName = table.name
@@ -26,9 +30,7 @@ export const AddRowOperationItem = ({ operationId, tableId, content }: AddRowOpe
   const fullTableName = `${tableSchema}.${tableName}`
 
   // Get first 3 column values for preview
-  const columns = Object.entries(rowData).filter(
-    ([key]) => !key.startsWith('__') && key !== 'idx'
-  )
+  const columns = Object.entries(rowData).filter(([key]) => !key.startsWith('__') && key !== 'idx')
   const previewColumns = columns.slice(0, 3)
   const remainingCount = columns.length - previewColumns.length
 
