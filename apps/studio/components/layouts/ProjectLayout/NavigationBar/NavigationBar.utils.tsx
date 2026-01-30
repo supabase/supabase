@@ -10,6 +10,9 @@ import type { Project } from 'data/projects/project-detail-query'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
+// Helper to safely build project URLs when ref might be undefined
+const projectUrl = (ref: string | undefined, path: string) => (ref ? `/project/${ref}/${path}` : '')
+
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
@@ -93,6 +96,38 @@ export const generateProductRoutes = (
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
+            items: [
+              {
+                title: 'Storage',
+                items: [
+                  { name: 'Files', key: 'files', url: projectUrl(ref, 'storage/files'), items: [] },
+                  {
+                    name: 'Analytics',
+                    key: 'analytics',
+                    url: projectUrl(ref, 'storage/analytics'),
+                    items: [],
+                  },
+                  {
+                    name: 'Vectors',
+                    key: 'vectors',
+                    url: projectUrl(ref, 'storage/vectors'),
+                    items: [],
+                  },
+                  {
+                    name: 'S3 Access',
+                    key: 's3',
+                    url: projectUrl(ref, 'storage/s3'),
+                    items: [],
+                  },
+                  {
+                    name: 'Settings',
+                    key: 'settings',
+                    url: projectUrl(ref, 'storage/settings'),
+                    items: [],
+                  },
+                ],
+              },
+            ],
           },
         ]
       : []),
@@ -103,6 +138,26 @@ export const generateProductRoutes = (
             label: 'Edge Functions',
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
+            items: [
+              {
+                title: 'Edge Functions',
+                items: [
+                  {
+                    name: 'Functions',
+                    key: 'main',
+                    pages: ['', 'new'],
+                    url: projectUrl(ref, 'functions'),
+                    items: [],
+                  },
+                  {
+                    name: 'Secrets',
+                    key: 'secrets',
+                    url: projectUrl(ref, 'functions/secrets'),
+                    items: [],
+                  },
+                ],
+              },
+            ],
           },
         ]
       : []),
@@ -113,6 +168,25 @@ export const generateProductRoutes = (
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+            items: [
+              {
+                title: 'Realtime',
+                items: [
+                  {
+                    name: 'Inspector',
+                    key: 'inspector',
+                    url: projectUrl(ref, 'realtime/inspector'),
+                    items: [],
+                  },
+                  {
+                    name: 'Quotas',
+                    key: 'quotas',
+                    url: projectUrl(ref, 'realtime/quotas'),
+                    items: [],
+                  },
+                ],
+              },
+            ],
           },
         ]
       : []),
@@ -137,6 +211,25 @@ export const generateOtherRoutes = (
       label: 'Advisors',
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      items: [
+        {
+          title: 'Advisors',
+          items: [
+            {
+              name: 'Security',
+              key: 'security',
+              url: projectUrl(ref, 'advisors/security'),
+              items: [],
+            },
+            {
+              name: 'Performance',
+              key: 'performance',
+              url: projectUrl(ref, 'advisors/performance'),
+              items: [],
+            },
+          ],
+        },
+      ],
     },
     ...(IS_PLATFORM && reportsEnabled
       ? [

@@ -81,16 +81,21 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     },
   })
 
-  const setValue: Dispatch<SetStateAction<T>> = (value) => {
-    const valueToStore = value instanceof Function ? value(storedValue) : value
+  const setValue: Dispatch<SetStateAction<T>> = useCallback(
+    (value) => {
+      // For functional updates, read current value from cache to avoid stale closures
+      const currentValue = queryClient.getQueryData<T>(queryKey) ?? initialValue
+      const valueToStore = value instanceof Function ? value(currentValue) : value
 
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(key, JSON.stringify(valueToStore))
-    }
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore))
+      }
 
-    queryClient.setQueryData(queryKey, valueToStore)
-    queryClient.invalidateQueries({ queryKey })
-  }
+      queryClient.setQueryData(queryKey, valueToStore)
+      queryClient.invalidateQueries({ queryKey })
+    },
+    [queryClient, queryKey, initialValue, key]
+  )
 
   return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const
 }

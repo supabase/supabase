@@ -25,6 +25,7 @@ export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
+  RECENT_SIDEBAR_ROUTES: (ref: string) => `recent-sidebar-routes-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
 
   AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,

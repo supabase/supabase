@@ -1,4 +1,5 @@
 export const COMMAND_MENU_SECTIONS = {
+  RECENTS: 'Recents',
   ACTIONS: 'Actions',
   NAVIGATE: 'Navigate',
   QUERY: 'Queries',
