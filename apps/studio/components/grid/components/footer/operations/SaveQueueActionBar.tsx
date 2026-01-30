@@ -9,9 +9,8 @@ import { Button } from 'ui'
 
 import { getModKeyLabel } from '@/lib/helpers'
 
-const modKey = getModKeyLabel()
-
 export const SaveQueueActionBar = () => {
+  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave } = useOperationQueueActions()

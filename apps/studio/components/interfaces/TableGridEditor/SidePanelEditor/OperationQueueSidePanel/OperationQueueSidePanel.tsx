@@ -11,9 +11,8 @@ interface OperationQueueSidePanelProps {
   closePanel: () => void
 }
 
-const modKey = getModKeyLabel()
-
 export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueSidePanelProps) => {
+  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
 
   const operations = snap.operationQueue.operations as readonly QueuedOperation[]
