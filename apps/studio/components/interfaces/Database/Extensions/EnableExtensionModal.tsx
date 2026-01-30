@@ -117,8 +117,6 @@ export const EnableExtensionModal = ({
           ? values.name
           : values.schema
 
-    console.log(extension.name, schema)
-
     enableExtension({
       projectRef: project.ref,
       connectionString: project?.connectionString,
