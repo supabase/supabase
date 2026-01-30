@@ -7,9 +7,9 @@ Your Supabase project supports connecting to the Postgres DB without SSL enabled
 
 Disabling SSL enforcement only applies to connections to Postgres and Supavisor ("Connection Pooler"); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) automatically enforce SSL on all incoming connections.
 
-<Admonition type="note">
+<Admonition type="caution">
 
-Projects need to be at least on Postgres 13.3.0 to enable SSL enforcement. You can find the Postgres version of your project in the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). If your project is on an older version, you will need to [upgrade](/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project) to use this feature.
+Applying or updating SSL enforcement triggers a fast database reboot. On small projects this usually completes in a few seconds, but larger databases may see a longer interruption.
 
 </Admonition>
 
