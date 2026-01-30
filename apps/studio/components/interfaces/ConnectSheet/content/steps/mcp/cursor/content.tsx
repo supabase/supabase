@@ -43,18 +43,17 @@ function McpCursorContentInner({
   const selectedClient = useMemo(() => {
     const clientKey = String(state.mcpClient ?? '')
     return MCP_CLIENTS.find((c) => c.key === clientKey) ?? MCP_CLIENTS[0]
-  }, [state.mcpClient, MCP_CLIENTS])
+  }, [state.mcpClient])
 
   const readonly = Boolean(state.mcpReadonly)
   const selectedFeatures = Array.isArray(state.mcpFeatures) ? state.mcpFeatures : []
 
-  const supportedFeatures = IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
-
   const selectedFeaturesSupported = useMemo(() => {
+    const supportedFeatures = IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
     return selectedFeatures.filter((feature) =>
       supportedFeatures.some((group) => group.id === feature)
     )
-  }, [selectedFeatures, supportedFeatures])
+  }, [selectedFeatures])
 
   const handleCopy = useMemo(
     () =>
@@ -64,7 +63,7 @@ function McpCursorContentInner({
         onTrack: (event) => track(event.action, event.properties, event.groups),
         projectRef,
       }),
-    [createMcpCopyHandler, selectedClient, track, projectRef]
+    [selectedClient, track, projectRef]
   )
 
   const { clientConfig } = getMcpUrl({

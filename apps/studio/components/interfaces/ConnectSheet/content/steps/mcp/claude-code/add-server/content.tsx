@@ -11,13 +11,13 @@ function useMcpUrl(
 ): string {
   const readonly = Boolean(state.mcpReadonly)
   const selectedFeatures = Array.isArray(state.mcpFeatures) ? state.mcpFeatures : []
-  const supportedFeatures = IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const baseUrl = IS_PLATFORM ? 'https://mcp.supabase.com' : projectKeys.apiUrl ?? ''
 
   return useMemo(() => {
     const params = new URLSearchParams()
     if (readonly) params.set('readonly', 'true')
 
+    const supportedFeatures = IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
     const validFeatures = selectedFeatures.filter((f) =>
       supportedFeatures.some((group) => group.id === f)
     )
@@ -27,7 +27,7 @@ function useMcpUrl(
 
     const queryString = params.toString()
     return queryString ? `${baseUrl}?${queryString}` : baseUrl
-  }, [baseUrl, readonly, selectedFeatures, supportedFeatures])
+  }, [baseUrl, readonly, selectedFeatures])
 }
 
 function ClaudeAddServerContent({ state, projectKeys }: StepContentProps) {
