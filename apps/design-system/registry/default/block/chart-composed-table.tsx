@@ -11,10 +11,11 @@ import {
   ChartLoadingState,
   ChartBar,
   ChartFooter,
+  getStatusRowClass,
 } from 'ui-patterns/Chart'
 import { BarChart2, ExternalLink } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from 'ui'
+import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader, cn } from 'ui'
 import { format } from 'date-fns'
 
 export default function ChartComposedTable() {
@@ -88,8 +89,11 @@ export default function ChartComposedTable() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.slice(0, 3).map((item) => (
-                  <TableRow key={item.timestamp}>
+                {data.slice(0, 3).map((item, index) => (
+                  <TableRow key={item.timestamp} className={cn(
+                    index === 0 ? getStatusRowClass('warning') : undefined,
+                    index === 1 ? getStatusRowClass('destructive') : undefined,
+                  )}>
                     <TableCell className="text-foreground-light">
                       {format(new Date(item.timestamp), 'MMM d, yyyy h:mm a')}
                     </TableCell>
