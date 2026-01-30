@@ -147,7 +147,7 @@ export const DatabaseInfrastructureSection = ({
       <div className="grid grid-cols-3 gap-2">
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={dbLoading}>
-            <MetricCardHeader href={databaseReportUrl}>
+            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Percentage of database operations resulting in errors or warnings">
                 Error Rate
               </MetricCardLabel>
@@ -165,6 +165,7 @@ export const DatabaseInfrastructureSection = ({
           <MetricCard isLoading={slowQueriesLoading}>
             <MetricCardHeader
               href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
+              linkTooltip="Go to query performance"
             >
               <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
                 Slow Queries
@@ -178,7 +179,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl}>
+            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Active database connections (current/max). Monitor to avoid connection exhaustion">
                 Connections
               </MetricCardLabel>
@@ -199,7 +200,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl}>
+            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
                 Disk
               </MetricCardLabel>
@@ -218,7 +219,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl}>
+            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
               <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
                 Memory
               </MetricCardLabel>
@@ -237,7 +238,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl}>
+            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
               <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
                 CPU
               </MetricCardLabel>
