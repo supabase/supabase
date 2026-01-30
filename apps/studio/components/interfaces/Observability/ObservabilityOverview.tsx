@@ -14,6 +14,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
+import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
@@ -201,6 +202,8 @@ export const ObservabilityOverview = () => {
           datetimeFormat={datetimeFormat}
         />
       </div>
+
+      <ObservabilityOverviewFooter />
     </ReportPadding>
   )
 }
