@@ -6,6 +6,13 @@ import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
 import { type ServiceKey, getHealthStatus } from './ObservabilityOverview.utils'
 
+const colorClassMap: Record<string, string> = {
+  muted: 'bg-muted',
+  destructive: 'bg-destructive',
+  warning: 'bg-warning',
+  brand: 'bg-brand',
+}
+
 export type ServiceHealthCardProps = {
   serviceName: string
   serviceKey: ServiceKey
@@ -42,7 +49,7 @@ export const ServiceHealthCard = ({
       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-0 border-b-0">
         <div className="flex flex-col">
           <CardTitle className="text-foreground-light flex items-center gap-2 text-xs font-medium">
-            <div className={cn('w-1.5 h-1.5 rounded-full', `bg-${color}`)} />
+            <div className={cn('w-1.5 h-1.5 rounded-full', colorClassMap[color] || 'bg-muted')} />
             {serviceName}
           </CardTitle>
           <div className="flex items-start gap-6 mt-2">
