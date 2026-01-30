@@ -46,6 +46,42 @@ export const getSelfHostedPoolerStrings = (
   }
 }
 
+/**
+ * Generates connection strings for self-hosted direct postgres connections.
+ * Uses placeholder for password since it's user-configured.
+ */
+export const getSelfHostedDirectStrings = (
+  dbHost: string,
+  port: number,
+  dbName: string = 'postgres'
+): ConnectionStrings => {
+  const user = 'postgres'
+  const password = '[POSTGRES_PASSWORD]'
+
+  const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
+  const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
+  const golang = `user=${user}\npassword=${password}\nhost=${dbHost}\nport=${port}\ndbname=${dbName}`
+  const jdbc = `jdbc:postgresql://${dbHost}:${port}/${dbName}?user=${user}&password=${password}`
+  const dotnet = `{
+  "ConnectionStrings": {
+    "DefaultConnection": "User Id=${user};Password=${password};Server=${dbHost};Port=${port};Database=${dbName}"
+  }
+}`
+  const nodejs = `DATABASE_URL=${uri}`
+
+  return {
+    psql,
+    uri,
+    golang,
+    jdbc,
+    dotnet,
+    nodejs,
+    php: golang,
+    python: golang,
+    sqlalchemy: golang,
+  }
+}
+
 export const getConnectionStrings = ({
   connectionInfo,
   poolingInfo,

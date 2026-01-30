@@ -31,7 +31,7 @@ interface BaseConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
   badge?: string
   title: string
-  description: string
+  description: string | ReactNode
   contentFooter?: ReactNode
   connectionString: string
   notice?: string[]

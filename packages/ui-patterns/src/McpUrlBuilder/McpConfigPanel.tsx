@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
+import { ExternalLink } from 'lucide-react'
 import { cn, Separator, CodeBlock } from 'ui'
 
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
@@ -22,6 +23,7 @@ export interface McpConfigPanelProps {
   theme?: 'light' | 'dark'
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
+  isSelfHosted?: boolean // True when running self-hosted Supabase (not CLI, not platform)
   apiUrl?: string
 }
 
@@ -35,6 +37,7 @@ export function McpConfigPanel({
   className,
   theme = 'dark',
   isPlatform,
+  isSelfHosted,
   apiUrl,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
@@ -101,6 +104,17 @@ export function McpConfigPanel({
           >
             {mcpUrl}
           </CodeBlock>
+          {isSelfHosted && (
+            <a
+              href="https://supabase.com/docs/guides/self-hosting/enable-mcp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand hover:underline inline-flex items-center text-xs mt-2"
+            >
+              Read self-hosted docs
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-y-3">

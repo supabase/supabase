@@ -44,7 +44,11 @@ import {
   connectionStringMethodOptions,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import { getConnectionStrings, getSelfHostedPoolerStrings } from './DatabaseSettings.utils'
+import {
+  getConnectionStrings,
+  getSelfHostedDirectStrings,
+  getSelfHostedPoolerStrings,
+} from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
 const StepLabel = ({
@@ -75,13 +79,13 @@ export const DatabaseConnectionString = () => {
 
   // Determine which connection methods are available based on environment
   // CLI: only direct connection (postgres directly accessible)
-  // Self-hosted: only session and transaction pooler (via Supavisor)
+  // Self-hosted: session and transaction pooler (via Supavisor), plus optional direct connection
   // Platform: all methods available
   const isSelfHosted = !IS_PLATFORM && !isCliMode
   const availableMethods: ConnectionStringMethod[] = isCliMode
     ? ['direct']
     : isSelfHosted
-      ? ['session', 'transaction']
+      ? ['session', 'transaction', 'direct']
       : ['direct', 'transaction', 'session']
   const defaultMethod = isCliMode ? 'direct' : isSelfHosted ? 'session' : 'direct'
 
@@ -268,10 +272,18 @@ export const DatabaseConnectionString = () => {
   // Self-hosted pooler connection strings (Supavisor)
   // Uses placeholders for tenant ID and password since these are user-configured
   // Use connectionInfo.db_host which comes from the API (server-side has access to SUPABASE_PUBLIC_URL)
-  const selfHostedSessionPoolerStrings = getSelfHostedPoolerStrings(connectionInfo.db_host, 5432)
+  const selfHostedSessionPoolerStrings = getSelfHostedPoolerStrings(
+    connectionInfo.db_host,
+    connectionInfo.db_port || 5432
+  )
   const selfHostedTransactionPoolerStrings = getSelfHostedPoolerStrings(
     connectionInfo.db_host,
     6543
+  )
+  // Self-hosted direct connection strings (requires manual configuration to expose postgres)
+  const selfHostedDirectStrings = getSelfHostedDirectStrings(
+    connectionInfo.db_host,
+    connectionInfo.db_port || 5432
   )
 
   const lang = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
@@ -352,6 +364,13 @@ export const DatabaseConnectionString = () => {
                     key={method}
                     method={method}
                     poolerBadge={IS_PLATFORM && method === 'transaction' ? poolerBadge : undefined}
+                    descriptionOverride={
+                      isSelfHosted && method === 'direct'
+                        ? 'Manually configurable for self-hosted Supabase.'
+                        : isSelfHosted && method === 'session'
+                          ? `Supavisor on port ${connectionInfo.db_port || 5432} (default configuration for self-hosted).`
+                          : undefined
+                    }
                   />
                 ))}
               </SelectContent_Shadcn_>
@@ -480,6 +499,42 @@ export const DatabaseConnectionString = () => {
                     { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
                     { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
                     { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'direct')}
+                />
+              )}
+
+              {selectedMethod === 'direct' && isSelfHosted && (
+                <ConnectionPanel
+                  type="direct"
+                  env="self-hosted"
+                  title={connectionStringMethodOptions.direct.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={
+                    <>
+                      Manually{' '}
+                      <a
+                        href="https://supabase.com/docs/guides/self-hosting/docker#exposing-your-postgres-database"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-foreground"
+                      >
+                        configurable
+                      </a>{' '}
+                      for self-hosted Supabase.
+                    </>
+                  }
+                  connectionString={selfHostedDirectStrings[selectedTab]}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    {
+                      ...CONNECTION_PARAMETERS.port,
+                      value: String(connectionInfo.db_port || 5432),
+                    },
+                    { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
+                    { ...CONNECTION_PARAMETERS.user, value: 'postgres' },
                   ]}
                   onCopyCallback={() => handleCopy(selectedTab, 'direct')}
                 />
@@ -643,11 +698,14 @@ export const DatabaseConnectionString = () => {
                   contentType={contentType}
                   lang={lang}
                   fileTitle={fileTitle}
-                  description={connectionStringMethodOptions.session.description}
+                  description={`Supavisor on port ${connectionInfo.db_port || 5432} (default configuration for self-hosted).`}
                   connectionString={selfHostedSessionPoolerStrings[selectedTab]}
                   parameters={[
                     { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
-                    { ...CONNECTION_PARAMETERS.port, value: '5432' },
+                    {
+                      ...CONNECTION_PARAMETERS.port,
+                      value: String(connectionInfo.db_port || 5432),
+                    },
                     { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
                     {
                       ...CONNECTION_PARAMETERS.user,
@@ -736,9 +794,11 @@ export const DatabaseConnectionString = () => {
 const ConnectionStringMethodSelectItem = ({
   method,
   poolerBadge,
+  descriptionOverride,
 }: {
   method: ConnectionStringMethod
   poolerBadge?: string
+  descriptionOverride?: string
 }) => {
   // Only show badges on platform (not for CLI or self-hosted)
   const badges: ReactNode[] = []
@@ -765,7 +825,7 @@ const ConnectionStringMethodSelectItem = ({
           {connectionStringMethodOptions[method].label}
         </div>
         <div className="text-foreground-lighter text-xs">
-          {connectionStringMethodOptions[method].description}
+          {descriptionOverride ?? connectionStringMethodOptions[method].description}
         </div>
         {badges.length > 0 && (
           <div className="flex items-center gap-0.5 flex-wrap mt-1.5">
