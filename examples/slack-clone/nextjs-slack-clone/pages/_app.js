@@ -31,7 +31,7 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
 
     supabase.auth.getSession().then(({ data: { session } }) => saveSession(session))
 
-    const { subscription: authListener } = supabase.auth.onAuthStateChange(
+    const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log(session)
         saveSession(session)
@@ -39,7 +39,7 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
     )
 
     return () => {
-      authListener.unsubscribe()
+      authListener.subscription.unsubscribe()
     }
   }, [])
 
