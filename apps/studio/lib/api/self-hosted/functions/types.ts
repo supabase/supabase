@@ -4,3 +4,8 @@ export type FunctionArtifact = {
   created_at: number
   updated_at: number
 }
+
+export type FunctionBlobArtifact = {
+  filename: string
+  data: Blob
+}
