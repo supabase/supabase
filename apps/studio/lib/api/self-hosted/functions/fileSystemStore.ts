@@ -1,9 +1,9 @@
 import type { Dirent } from 'node:fs'
-import { readdir, stat } from 'node:fs/promises'
+import { readdir, readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { FunctionArtifact } from './types'
+import { FunctionArtifact, FunctionBlobArtifact } from './types'
 
 export class FileSystemFunctionsArtifactStore {
   constructor(private folderPath: string) {}
@@ -29,6 +29,24 @@ export class FileSystemFunctionsArtifactStore {
 
     return parseFolderToFunctionArtifact(functionFolder)
   }
+
+  async getBlobArtifactsBySlug(slug: string): Promise<FunctionBlobArtifact[]> {
+    if (slug === 'main') return []
+
+    const functionFolderPath = path.join(this.folderPath, slug)
+    const functionFolder = await readdir(functionFolderPath, {
+      recursive: true,
+      withFileTypes: true,
+    })
+
+    const blobArtifacts = await Promise.all(
+      functionFolder
+        .filter((i) => i.isFile())
+        .map(async (file) => await parseFileToFunctionBlobArtifact(file, functionFolderPath))
+    )
+
+    return blobArtifacts.filter((f) => f !== undefined)
+  }
 }
 
 async function parseFolderToFunctionArtifact(
@@ -48,5 +66,21 @@ async function parseFolderToFunctionArtifact(
     entrypoint_path: pathToFileURL(entrypointPath).href,
     created_at: entrypointStat.birthtimeMs,
     updated_at: entrypointStat.mtimeMs,
+  }
+}
+
+async function parseFileToFunctionBlobArtifact(
+  file: Dirent,
+  originalFolderPath: string
+): Promise<FunctionBlobArtifact | undefined> {
+  if (!file.isFile()) return
+
+  const buffer = await readFile(path.join(file.parentPath, file.name))
+  /* @ts-ignore: Buffer<ArrayBufferLike> to ArrayBuffer */
+  const blob = new Blob([buffer], { type: 'text/plain' })
+
+  return {
+    data: blob,
+    filename: path.join(file.parentPath, file.name),
   }
 }
