@@ -101,7 +101,7 @@ export const SignUpForm = () => {
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
       const { returnTo } = router.query
-      const basePath = returnTo || '/sign-in'
+      const basePath = returnTo || '/new' // New users should be redirected to new org creation
       const fullPath = buildPathWithParams(basePath as string)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
       redirectTo = fullRedirectUrl
