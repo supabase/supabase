@@ -1,4 +1,3 @@
-import { toString as CronToString } from 'cronstrue'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -36,7 +35,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
-import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
+import { formatScheduleString, isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
 
 export const CronJobPage = () => {
@@ -81,16 +80,16 @@ export const CronJobPage = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="cursor-pointer underline decoration-dotted lowercase">
-            {isSecondsFormat(job.schedule)
-              ? job.schedule.toLowerCase()
-              : CronToString(job.schedule.toLowerCase())}
+            {formatScheduleString(job.schedule.toLowerCase())}
           </span>
         </TooltipTrigger>
         <TooltipContent side="bottom" align="center">
           <div className="text-xs">
             <p className="font-mono mb-1">{job.schedule.toLowerCase()}</p>
             {!isSecondsFormat(job.schedule) && (
-              <p className="text-foreground-light">{CronToString(job.schedule.toLowerCase())}</p>
+              <p className="text-foreground-light">
+                {formatScheduleString(job.schedule.toLowerCase())}
+              </p>
             )}
           </div>
         </TooltipContent>
