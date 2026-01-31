@@ -220,7 +220,7 @@ const Column = ({
           )}
         </div>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[28%]">
         <div className="w-[95%]">
           <ColumnType
             value={column.format}
@@ -238,7 +238,7 @@ const Column = ({
           />
         </div>
       </div>
-      <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
+      <div className={`${isNewRecord ? 'w-[22%]' : 'w-[27%]'}`}>
         <div className="w-[95%]">
           <InputWithSuggestions
             data-testid={`${column.name}-default-value`}

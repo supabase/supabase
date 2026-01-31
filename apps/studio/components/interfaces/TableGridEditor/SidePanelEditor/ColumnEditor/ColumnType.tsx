@@ -173,16 +173,17 @@ const ColumnType = ({
             role="combobox"
             size={'small'}
             aria-expanded={open}
+            title={value || 'Choose a column type...'}
             className={cn('w-full justify-between', !value && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
             {value ? (
-              <div className="flex gap-2 items-center">
-                <span>{inferIcon(getOptionByName(value)?.type ?? '')}</span>
-                {value.replaceAll('"', '')}
+              <div className="flex gap-2 items-center min-w-0">
+                <span className="shrink-0">{inferIcon(getOptionByName(value)?.type ?? '')}</span>
+                <span className="truncate">{value.replaceAll('"', '')}</span>
               </div>
             ) : (
-              'Choose a column type...'
+              <span className="truncate">Choose a column type...</span>
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
