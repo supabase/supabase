@@ -241,7 +241,7 @@
         }
       }
     },
-    "/admin/user/{user_id}": {
+    "/admin/users/{user_id}": {
       "get": {
         "security": [
           {
