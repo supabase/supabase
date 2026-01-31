@@ -8,7 +8,8 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { CreateProjectButton } from './Home/ProjectList/CreateProjectButton'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -136,9 +137,13 @@ export const HomePageActions = ({
         )}
 
         {projectCreationEnabled && !hideNewProject && (
-          <Button asChild icon={<Plus />} type="primary" size="tiny">
-            <Link href={`/new/${slug}`}>New project</Link>
-          </Button>
+          IS_PLATFORM ? (
+            <Button asChild icon={<Plus />} type="primary" size="tiny">
+              <Link href={`/new/${slug}`}>New project</Link>
+            </Button>
+          ) : (
+            <CreateProjectButton organizationSlug={slug} />
+          )
         )}
       </div>
     </div>

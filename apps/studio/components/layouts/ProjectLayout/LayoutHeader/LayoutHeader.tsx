@@ -30,6 +30,7 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
+import { ProjectSwitcher } from '../ProjectSwitcher'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -147,6 +148,7 @@ export const LayoutHeader = ({
                   >
                     <LayoutHeaderDivider />
                     <ProjectDropdown />
+                    {!IS_PLATFORM && <ProjectSwitcher currentProjectRef={projectRef} />}
 
                     {exceedingLimits && (
                       <div className="ml-2">
