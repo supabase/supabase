@@ -129,6 +129,7 @@ export function McpConfigPanel({
           clientConfig={clientConfig}
           onCopyCallback={onCopyCallback}
           onInstallCallback={onInstallCallback}
+          isPlatform={isPlatform}
         />
       </div>
     </div>
