@@ -5,6 +5,7 @@
 /packages/pg-meta @supabase/postgres @avallete
 
 /apps/studio/ @supabase/Dashboard
+/apps/studio/components/ui/DevTelemetryToolbar/ @supabase/growth-eng
 
 /apps/cms/ @supabase/marketing
 

@@ -24,6 +24,7 @@ import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
+import { DevTelemetryToolbarTrigger } from 'components/ui/DevTelemetryToolbar'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
@@ -208,6 +209,7 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
+                <DevTelemetryToolbarTrigger />
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-2">
