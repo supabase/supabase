@@ -129,12 +129,17 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
 
   const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
-    const [schemaName, functionName] = command
+    const functionPart = command
       .replace('SELECT ', '')
       .replace(/\(.*\);*/, '')
-
       .trim()
-      .split('.')
+
+    const parts = functionPart.split('.')
+
+    // If there's a dot, we have schema.function format
+    // If no dot, assume 'public' schema and the whole part is the function name
+    const schemaName = parts.length > 1 ? parts[0] : 'public'
+    const functionName = parts.length > 1 ? parts[1] : parts[0]
 
     return {
       type: 'sql_function',
