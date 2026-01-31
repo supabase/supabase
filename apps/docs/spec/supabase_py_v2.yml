@@ -290,7 +290,7 @@ functions:
         name: Sign up with a phone number and password (whatsapp)
         isSpotlight: true
         description: |
-          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+          The user will be sent a WhatsApp message which contains an OTP. By default, a given user can only request an OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
         code: |
           ```python
           response = supabase.auth.sign_up(
@@ -603,10 +603,10 @@ functions:
                   Only for phone signups.
     notes: |
       - Requires either an email or phone number.
-      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
       - If the user doesn't exist, `sign_in_with_otp()` will signup the user instead. To restrict this behavior, you can set `should_create_user` in `SignInWithPasswordlessCredentials.options` to `false`.
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
-      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
+      - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
@@ -614,7 +614,7 @@ functions:
       - id: sign-in-with-email
         name: Sign in with email
         isSpotlight: true
-        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an email which contains either a magiclink or an OTP or both. By default, a given user can only request an OTP once every 60 seconds.
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp(
@@ -637,7 +637,7 @@ functions:
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
-        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an SMS which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp(
@@ -647,7 +647,7 @@ functions:
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
         isSpotlight: false
-        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        description: The user will be sent a WhatsApp message which contains an OTP. By default, a given user can only request an OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp(
@@ -1498,7 +1498,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.link_identity(
-              {provider: "github"}
+              {"provider": "github"}
           )
           ```
         response: |
@@ -1555,7 +1555,7 @@ functions:
 
           # find the google identity
           google_identity = list(
-              filter(lambda identity: identity.provider == "google", res.identities)
+              filter(lambda identity: identity.provider == "google", response.identities)
           ).pop()
 
           # unlink the google identity
@@ -1564,9 +1564,9 @@ functions:
   - id: send-password-reauthentication
     title: 'reauthenticate()'
     notes: |
-      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - This method is used together with `update_user()` when a user's password needs to be updated.
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
-      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+      - A user is only required to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
     examples:
       - id: send-reauthentication-nonce
@@ -2248,7 +2248,7 @@ functions:
           ```python
           response = supabase.auth.admin.list_users(
               page=1,
-              per_page=1000,
+              per_page=1000
           )
           ```
   - id: create-user
@@ -4080,7 +4080,7 @@ functions:
               (1, 'Mordor');
             ```
         response: |
-          ```
+          ```json
           {
             "data": [
               {
@@ -4098,7 +4098,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("characters")
               .delete()
               .in_("id", [1, 2, 3])
               .execute()
@@ -5822,7 +5822,7 @@ functions:
         subContent:
           - name: type
             isOptional: true
-            type: '"plain" | "phrase" | "websearch"'
+            type: '"plain" | "phrase" | "web_search"'
             description: Change how the `query` text is interpreted
           - name: config
             isOptional: true
@@ -5883,11 +5883,38 @@ functions:
               .select("catchphrase")
               .text_search(
                   "catchphrase",
-                  "'fat' & 'cat'",
+                  "'the' & 'cat'",
                   options={"type": "plain", "config": "english"},
               )
               .execute()
           )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table quotes (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              catchphrase text
+            );
+
+            insert into quotes (catchphrase) values
+                ('The quick brown fox'),
+                ('The cat sat on the mat'),
+                ('A dog is a loyal friend')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "catchphrase": "The cat sat on the mat"
+              }
+            ],
+            "count": null
+          }
           ```
       - id: full-normalization
         name: Full normalization
@@ -5899,11 +5926,38 @@ functions:
               .select("catchphrase")
               .text_search(
                   "catchphrase",
-                  "'fat' & 'cat'",
+                  "'the' & 'cat'",
                   options={"type": "phrase", "config": "english"},
               )
               .execute()
           )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table quotes (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              catchphrase text
+            );
+
+            insert into quotes (catchphrase) values
+                ('The quick brown fox'),
+                ('The cat sat on the mat'),
+                ('A dog is a loyal friend')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "catchphrase": "The cat sat on the mat"
+              }
+            ],
+            "count": null
+          }
           ```
       - id: web-search
         name: Websearch
@@ -5924,11 +5978,41 @@ functions:
               .select("catchphrase")
               .text_search(
                   "catchphrase",
-                  "'fat or cat'",
-                  options={"type": "websearch", "config": "english"},
+                  "fox or cat",
+                  options={"type": "web_search", "config": "english"},
               )
               .execute()
           )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table quotes (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              catchphrase text
+            );
+
+            insert into quotes (catchphrase) values
+                ('The quick brown fox'),
+                ('The cat sat on the mat'),
+                ('A dog is a loyal friend')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "catchphrase": "The quick brown fox"
+              },
+              {
+                "catchphrase": "The cat sat on the mat"
+              }
+            ],
+            "count": null
+          }
           ```
 
   - id: match
@@ -6128,7 +6212,7 @@ functions:
           response = (
               supabase.table("orchestral_sections")
               .select("name, instruments!inner(name)")
-              .or_("book_id.eq.1,name.eq.guqin", reference_table="instruments")
+              .or_("section_id.eq.1,name.eq.guqin", reference_table="instruments")
               .execute()
           )
           ```
@@ -6525,6 +6609,7 @@ functions:
               supabase.table("instruments")
               .select("name, section:orchestral_sections(name)")
               .order("section(name)", desc=False)
+              .execute()
           )
           ```
         data:
