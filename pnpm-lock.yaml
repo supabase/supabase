@@ -260,9 +260,6 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      common:
-        specifier: workspace:*
-        version: link:../../packages/common
       contentlayer2:
         specifier: 0.4.6
         version: 0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
