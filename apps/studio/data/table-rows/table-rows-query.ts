@@ -1,7 +1,6 @@
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-
+import { type QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
@@ -15,6 +14,8 @@ import {
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from 'types'
+
+import { handleError } from '../fetchers'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
@@ -374,6 +375,7 @@ export async function getTableRows(
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+        preflightCheck: true,
       },
       signal
     )
@@ -384,7 +386,7 @@ export async function getTableRows(
 
     return { rows }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Unknown error')
+    throw handleError(error)
   }
 }
 
