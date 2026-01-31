@@ -84,13 +84,14 @@ If you need to move your project to a different organization, see [project trans
             --dbname [CONNECTION_STRING]
           ```
 
-      Depending on your local configuration, the following parameters may need to be set (example below) :
-      - sslmode
-      - gssencmode
+    Depending on your local configuration, the following parameters may need to be set (example below) :
 
-      ```bash
-      postgresql://postgres.[REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:5432/postgres?sslmode=require&gssencmode=disable
-      ```
+    - sslmode
+    - gssencmode
+
+    ```bash
+    postgresql://postgres.[REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:5432/postgres?sslmode=require&gssencmode=disable
+    ```
 
 ## Alternative method
 
@@ -98,8 +99,8 @@ If you need to move your project to a different organization, see [project trans
 
 The following operations can be done remotely with no local setup required via the Google Colab notebook below:
 
- - Backup database
- - Restore backup
- - Migrate Storage (from active project or zip file with objects)
+- Backup database
+- Restore backup
+- Migrate Storage (from active project or zip file with objects)
 
-[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
+[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/Supabase-Migration-Tool/blob/main/Supabase_migrate.ipynb)
