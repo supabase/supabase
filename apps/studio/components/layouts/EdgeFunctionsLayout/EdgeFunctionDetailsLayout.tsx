@@ -299,27 +299,23 @@ const EdgeFunctionDetailsLayout = ({
                     </div>
                   </PopoverContent_Shadcn_>
                 </Popover_Shadcn_>
-                {IS_PLATFORM && (
-                  <>
-                    {!!functionSlug && (
-                      <Button
-                        type="default"
-                        icon={<Send />}
-                        onClick={() => {
-                          setIsOpen(true)
-                          sendEvent({
-                            action: 'edge_function_test_side_panel_opened',
-                            groups: {
-                              project: ref ?? 'Unknown',
-                              organization: org?.slug ?? 'Unknown',
-                            },
-                          })
-                        }}
-                      >
-                        Test
-                      </Button>
-                    )}
-                  </>
+                {!!functionSlug && (
+                  <Button
+                    type="default"
+                    icon={<Send />}
+                    onClick={() => {
+                      setIsOpen(true)
+                      sendEvent({
+                        action: 'edge_function_test_side_panel_opened',
+                        groups: {
+                          project: ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }}
+                  >
+                    Test
+                  </Button>
                 )}
               </div>
             </PageHeaderAside>
