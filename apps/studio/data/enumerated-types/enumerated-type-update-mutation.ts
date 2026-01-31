@@ -15,6 +15,11 @@ export type EnumeratedTypeUpdateVariables = {
   values?: { original: string; updated: string; isNew: boolean }[]
 }
 
+// Escape single quotes in SQL string literals by doubling them
+function escapeSqlString(str: string): string {
+  return str.replace(/'/g, "''")
+}
+
 export async function updateEnumeratedType({
   projectRef,
   connectionString,
@@ -34,24 +39,24 @@ export async function updateEnumeratedType({
           // Consider if any new enums were added before any existing enums
           const firstExistingEnumValue = values.find((x) => !x.isNew)
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+            `alter type "${schema}"."${name.updated}" add value '${escapeSqlString(x.updated)}' before '${escapeSqlString(firstExistingEnumValue?.original ?? '')}';`
           )
         } else {
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' after '${
+            `alter type "${schema}"."${name.updated}" add value '${escapeSqlString(x.updated)}' after '${escapeSqlString(
               values[idx - 1].updated
-            }';`
+            )}';`
           )
         }
       } else if (x.original !== x.updated) {
         statements.push(
-          `alter type "${schema}"."${name.updated}" rename value '${x.original}' to '${x.updated}';`
+          `alter type "${schema}"."${name.updated}" rename value '${escapeSqlString(x.original)}' to '${escapeSqlString(x.updated)}';`
         )
       }
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
+    statements.push(`comment on type "${schema}"."${name.updated}" is '${escapeSqlString(description)}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
