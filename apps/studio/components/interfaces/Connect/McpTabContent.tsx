@@ -1,5 +1,6 @@
 import { IS_PLATFORM, useParams } from 'common'
 import Panel from 'components/ui/Panel'
+import { useDeploymentModeQuery } from 'data/config/deployment-mode-query'
 import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { useTheme } from 'next-themes'
@@ -42,6 +43,11 @@ const McpTabContentInnerLoaded = ({
   const track = useTrack()
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
 
+  // Detect deployment mode for non-platform environments
+  const { data: deploymentMode } = useDeploymentModeQuery()
+  const isCliMode = deploymentMode?.is_cli_mode ?? false
+  const isSelfHosted = !IS_PLATFORM && !isCliMode
+
   const handleCopy = useMemo(
     () =>
       createMcpCopyHandler({
@@ -68,6 +74,7 @@ const McpTabContentInnerLoaded = ({
       projectRef={projectRef}
       theme={resolvedTheme as 'light' | 'dark'}
       isPlatform={IS_PLATFORM}
+      isSelfHosted={isSelfHosted}
       apiUrl={projectKeys.apiUrl ?? undefined}
       onCopyCallback={handleCopy}
       onInstallCallback={handleInstall}

@@ -5,6 +5,12 @@ export * from './infrastructure'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
 /**
+ * Indicates that the app is running via the Supabase CLI (local development).
+ * When false and !IS_PLATFORM, we're in self-hosted docker mode.
+ */
+export const IS_CLI = !IS_PLATFORM && !!process.env.CURRENT_CLI_VERSION
+
+/**
  * Indicates that the app is running in a test environment (E2E tests).
  * Set via NEXT_PUBLIC_NODE_ENV=test in the generateLocalEnv.js script.
  */

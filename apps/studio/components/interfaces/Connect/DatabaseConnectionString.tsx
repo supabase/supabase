@@ -9,6 +9,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useDeploymentModeQuery } from 'data/config/deployment-mode-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
@@ -43,7 +44,11 @@ import {
   connectionStringMethodOptions,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import { getConnectionStrings } from './DatabaseSettings.utils'
+import {
+  getConnectionStrings,
+  getSelfHostedDirectStrings,
+  getSelfHostedPoolerStrings,
+} from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
 const StepLabel = ({
@@ -68,13 +73,32 @@ export const DatabaseConnectionString = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
+  // Fetch deployment mode (CLI vs self-hosted) for non-platform environments
+  const { data: deploymentMode, isLoading: isLoadingDeploymentMode } = useDeploymentModeQuery()
+  const isCliMode = deploymentMode?.is_cli_mode ?? false
+
+  // Determine which connection methods are available based on environment
+  // CLI: only direct connection (postgres directly accessible)
+  // Self-hosted: session and transaction pooler (via Supavisor), plus optional direct connection
+  // Platform: all methods available
+  const isSelfHosted = !IS_PLATFORM && !isCliMode
+  const availableMethods: ConnectionStringMethod[] = isCliMode
+    ? ['direct']
+    : isSelfHosted
+      ? ['session', 'transaction', 'direct']
+      : ['direct', 'transaction', 'session']
+  const defaultMethod = isCliMode ? 'direct' : isSelfHosted ? 'session' : 'direct'
+
   // URL state management
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
   const [querySource, setQuerySource] = useQueryState('source', parseAsString)
-  const [queryMethod, setQueryMethod] = useQueryState('method', parseAsString.withDefault('direct'))
+  const [queryMethod, setQueryMethod] = useQueryState(
+    'method',
+    parseAsString.withDefault(defaultMethod)
+  )
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
-  const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>('direct')
+  const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>(defaultMethod)
 
   const sharedPoolerPreferred = useMemo(() => {
     return org?.plan?.id === 'free'
@@ -90,12 +114,11 @@ export const DatabaseConnectionString = () => {
       setSelectedTab('uri')
     }
 
-    const validMethods: ConnectionStringMethod[] = ['direct', 'transaction', 'session']
-    if (queryMethod && validMethods.includes(queryMethod as ConnectionStringMethod)) {
+    if (queryMethod && availableMethods.includes(queryMethod as ConnectionStringMethod)) {
       setSelectedMethod(queryMethod as ConnectionStringMethod)
-    } else if (queryMethod && !validMethods.includes(queryMethod as ConnectionStringMethod)) {
-      setQueryMethod('direct')
-      setSelectedMethod('direct')
+    } else if (queryMethod && !availableMethods.includes(queryMethod as ConnectionStringMethod)) {
+      setQueryMethod(defaultMethod)
+      setSelectedMethod(defaultMethod)
     }
 
     if (querySource && querySource !== state.selectedDatabaseId) {
@@ -177,7 +200,7 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingDeploymentMode
   const isError = isErrorPoolerConfig || isErrorReadReplicas
   const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
 
@@ -245,6 +268,23 @@ export const DatabaseConnectionString = () => {
     },
     metadata: { projectRef },
   })
+
+  // Self-hosted pooler connection strings (Supavisor)
+  // Uses placeholders for tenant ID and password since these are user-configured
+  // Use connectionInfo.db_host which comes from the API (server-side has access to SUPABASE_PUBLIC_URL)
+  const selfHostedSessionPoolerStrings = getSelfHostedPoolerStrings(
+    connectionInfo.db_host,
+    connectionInfo.db_port || 5432
+  )
+  const selfHostedTransactionPoolerStrings = getSelfHostedPoolerStrings(
+    connectionInfo.db_host,
+    6543
+  )
+  // Self-hosted direct connection strings (requires manual configuration to expose postgres)
+  const selfHostedDirectStrings = getSelfHostedDirectStrings(
+    connectionInfo.db_host,
+    connectionInfo.db_port || 5432
+  )
 
   const lang = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
   const contentType =
@@ -319,11 +359,18 @@ export const DatabaseConnectionString = () => {
                 </SelectValue_Shadcn_>
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_ className="max-w-sm">
-                {Object.keys(connectionStringMethodOptions).map((method) => (
+                {availableMethods.map((method) => (
                   <ConnectionStringMethodSelectItem
                     key={method}
-                    method={method as ConnectionStringMethod}
-                    poolerBadge={method === 'transaction' ? poolerBadge : undefined}
+                    method={method}
+                    poolerBadge={IS_PLATFORM && method === 'transaction' ? poolerBadge : undefined}
+                    descriptionOverride={
+                      isSelfHosted && method === 'direct'
+                        ? 'Manually configurable for self-hosted Supabase.'
+                        : isSelfHosted && method === 'session'
+                          ? `Supavisor on port ${connectionInfo.db_port || 5432} (default pooler for self-hosted).`
+                          : undefined
+                    }
                   />
                 ))}
               </SelectContent_Shadcn_>
@@ -406,9 +453,10 @@ export const DatabaseConnectionString = () => {
               </div>
             )}
             <div className="px-4 md:px-7 py-8">
-              {selectedMethod === 'direct' && (
+              {selectedMethod === 'direct' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="direct"
+                  env="platform"
                   title={connectionStringMethodOptions.direct.label}
                   contentType={contentType}
                   lang={lang}
@@ -436,9 +484,66 @@ export const DatabaseConnectionString = () => {
                 />
               )}
 
+              {selectedMethod === 'direct' && isCliMode && (
+                <ConnectionPanel
+                  type="direct"
+                  env="cli"
+                  title={connectionStringMethodOptions.direct.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={connectionStringMethodOptions.direct.description}
+                  connectionString={connectionStrings['direct'][selectedTab]}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
+                    { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+                    { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'direct')}
+                />
+              )}
+
+              {selectedMethod === 'direct' && isSelfHosted && (
+                <ConnectionPanel
+                  type="direct"
+                  env="self-hosted"
+                  title={connectionStringMethodOptions.direct.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={
+                    <>
+                      Manually{' '}
+                      <a
+                        href="https://supabase.com/docs/guides/self-hosting/docker#exposing-your-postgres-database"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-foreground"
+                      >
+                        configurable
+                      </a>{' '}
+                      for self-hosted Supabase.
+                    </>
+                  }
+                  connectionString={selfHostedDirectStrings[selectedTab]}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    {
+                      ...CONNECTION_PARAMETERS.port,
+                      value: String(connectionInfo.db_port || 5432),
+                    },
+                    { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
+                    { ...CONNECTION_PARAMETERS.user, value: 'postgres' },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'direct')}
+                />
+              )}
+
               {selectedMethod === 'transaction' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="transaction"
+                  env="platform"
                   title={connectionStringMethodOptions.transaction.label}
                   contentType={contentType}
                   lang={lang}
@@ -526,9 +631,35 @@ export const DatabaseConnectionString = () => {
                 </ConnectionPanel>
               )}
 
+              {selectedMethod === 'transaction' && isSelfHosted && (
+                <ConnectionPanel
+                  type="transaction"
+                  env="self-hosted"
+                  title={connectionStringMethodOptions.transaction.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={connectionStringMethodOptions.transaction.description}
+                  connectionString={selfHostedTransactionPoolerStrings[selectedTab]}
+                  notice={['Does not support PREPARE statements']}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    { ...CONNECTION_PARAMETERS.port, value: '6543' },
+                    { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
+                    {
+                      ...CONNECTION_PARAMETERS.user,
+                      value: 'postgres.[POOLER_TENANT_ID]',
+                    },
+                    { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                />
+              )}
+
               {selectedMethod === 'session' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="session"
+                  env="platform"
                   title={connectionStringMethodOptions.session.label}
                   contentType={contentType}
                   lang={lang}
@@ -553,6 +684,33 @@ export const DatabaseConnectionString = () => {
                       value: sharedPoolerConfig?.db_name ?? '',
                     },
                     { ...CONNECTION_PARAMETERS.user, value: sharedPoolerConfig?.db_user ?? '' },
+                    { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
+                />
+              )}
+
+              {selectedMethod === 'session' && isSelfHosted && (
+                <ConnectionPanel
+                  type="session"
+                  env="self-hosted"
+                  title={connectionStringMethodOptions.session.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={`Supavisor on port ${connectionInfo.db_port || 5432} (default pooler for self-hosted).`}
+                  connectionString={selfHostedSessionPoolerStrings[selectedTab]}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    {
+                      ...CONNECTION_PARAMETERS.port,
+                      value: String(connectionInfo.db_port || 5432),
+                    },
+                    { ...CONNECTION_PARAMETERS.database, value: 'postgres' },
+                    {
+                      ...CONNECTION_PARAMETERS.user,
+                      value: 'postgres.[POOLER_TENANT_ID]',
+                    },
                     { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
                   ]}
                   onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
@@ -636,20 +794,23 @@ export const DatabaseConnectionString = () => {
 const ConnectionStringMethodSelectItem = ({
   method,
   poolerBadge,
+  descriptionOverride,
 }: {
   method: ConnectionStringMethod
   poolerBadge?: string
+  descriptionOverride?: string
 }) => {
+  // Only show badges on platform (not for CLI or self-hosted)
   const badges: ReactNode[] = []
 
-  if (method !== 'direct') {
+  if (IS_PLATFORM && method !== 'direct') {
     badges.push(
       <Badge key="direct" className="flex gap-x-1">
         Shared Pooler
       </Badge>
     )
   }
-  if (poolerBadge === 'Dedicated Pooler') {
+  if (IS_PLATFORM && poolerBadge === 'Dedicated Pooler') {
     badges.push(
       <Badge key="dedicated" className="flex gap-x-1">
         {poolerBadge}
@@ -664,11 +825,13 @@ const ConnectionStringMethodSelectItem = ({
           {connectionStringMethodOptions[method].label}
         </div>
         <div className="text-foreground-lighter text-xs">
-          {connectionStringMethodOptions[method].description}
+          {descriptionOverride ?? connectionStringMethodOptions[method].description}
         </div>
-        <div className="flex items-center gap-0.5 flex-wrap mt-1.5">
-          {badges.map((badge) => badge)}
-        </div>
+        {badges.length > 0 && (
+          <div className="flex items-center gap-0.5 flex-wrap mt-1.5">
+            {badges.map((badge) => badge)}
+          </div>
+        )}
       </div>
     </SelectItem_Shadcn_>
   )
