@@ -46,4 +46,6 @@ export const databaseKeys = {
     schema: string | undefined,
     table: string | undefined
   ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
+  supamonitorEnabled: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'supamonitor-enabled'] as const,
 }

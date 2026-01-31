@@ -3,6 +3,7 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useSupamonitorStatus } from 'components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
@@ -27,6 +28,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
   const {
@@ -118,6 +120,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
         isPgStatMonitorEnabled={isPgStatMonitorEnabled}
+        isSupamonitorEnabled={isSupamonitorEnabled}
         dateRange={selectedDateRange}
         onDateRangeChange={updateDateRange}
       />

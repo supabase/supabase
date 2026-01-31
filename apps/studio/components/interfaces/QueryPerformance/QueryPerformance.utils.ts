@@ -43,7 +43,7 @@ export type QueryPerformanceErrorContext = {
   projectRef?: string
   databaseIdentifier?: string
   queryPreset?: string
-  queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'monitor' | 'slowQueriesCount'
+  queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'monitor' | 'slowQueriesCount' | 'supamonitor'
   sql?: string
   errorMessage?: string
   postgresVersion?: string
