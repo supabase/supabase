@@ -37,6 +37,13 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/schemas`,
           items: [],
         },
+        {
+          name: 'Schema Graph',
+          key: 'schema-graph',
+          url: `/project/${ref}/database/schema-graph`,
+          label: 'New',
+          items: [],
+        },
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
         {
           name: 'Functions',
