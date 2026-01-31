@@ -126,7 +126,7 @@ export const RLSPolicyList = ({
             <div>
               <span className="text-foreground-lighter">Roles: </span>
               <span className="font-mono">
-                {(policy.roles as string[]).join(', ')}
+                {policy.roles.join(', ')}
               </span>
             </div>
 

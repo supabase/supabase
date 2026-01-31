@@ -13,8 +13,8 @@ import { RLSContextEditor } from './RLSContextEditor'
 import { RLSTableSelector } from './RLSTableSelector'
 import { RLSPolicyList } from './RLSPolicyList'
 import { RLSResultsTable } from './RLSResultsTable'
-import { Button, Card, CardContent, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
-import { Play, AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
+import { Button, Card, CardContent, CardHeader, CardTitle, Tabs, TabsList, TabsTrigger } from 'ui'
+import { Play, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const RLSPlayground = () => {
@@ -124,7 +124,7 @@ export const RLSPlayground = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <Tabs value={operation} onValueChange={(v) => setOperation(v as any)}>
+                <Tabs value={operation} onValueChange={(v) => setOperation(v as typeof operation)}>
                   <TabsList>
                     <TabsTrigger value="SELECT">SELECT</TabsTrigger>
                     <TabsTrigger value="INSERT">INSERT</TabsTrigger>

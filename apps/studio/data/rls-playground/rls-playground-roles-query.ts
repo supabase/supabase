@@ -42,7 +42,7 @@ export const useRLSPlaygroundRolesQuery = <TData = RLSPlaygroundRolesData>(
   }: UseCustomQueryOptions<RLSPlaygroundRolesData, RLSPlaygroundRolesError, TData> = {}
 ) => {
   return useQuery<RLSPlaygroundRolesData, RLSPlaygroundRolesError, TData>({
-    queryKey: rlsPlaygroundKeys.roles(projectRef),
+    queryKey: rlsPlaygroundKeys.roles(projectRef, connectionString),
     queryFn: ({ signal }) => getRLSPlaygroundRoles({ projectRef, connectionString }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,

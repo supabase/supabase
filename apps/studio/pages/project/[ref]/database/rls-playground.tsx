@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { RLSPlayground } from 'components/interfaces/Database/RLSPlayground'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -14,8 +13,6 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const RLSPlaygroundPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
-
   return (
     <>
       <PageHeader size="large">

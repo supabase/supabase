@@ -26,24 +26,28 @@ export const RLSContextEditor = ({
   )
   const [jwtError, setJwtError] = useState<string | null>(null)
   
-  // Track if we should notify parent (avoid loops)
-  const isInternalChange = useRef(false)
+  // Track programmatic updates to avoid notifying parent redundantly
+  const programmaticValueRef = useRef<string | null>(null)
 
-  // Handle JWT text changes with debounced parsing
+  // Handle JWT text changes - only notify parent for user edits
   const handleJwtTextChange = useCallback((text: string) => {
     setJwtText(text)
+    
+    // Skip parent notification if this matches a programmatic update
+    if (programmaticValueRef.current === text) {
+      programmaticValueRef.current = null
+      return
+    }
+    
     try {
       const parsed = JSON.parse(text)
       setJwtError(null)
-      // Only notify parent if this is a user edit
-      if (!isInternalChange.current) {
-        onContextChange({
-          ...context,
-          jwtClaims: parsed,
-          userId: parsed.sub,
-        })
-      }
-    } catch (e) {
+      onContextChange({
+        ...context,
+        jwtClaims: parsed,
+        userId: parsed.sub,
+      })
+    } catch {
       setJwtError('Invalid JSON')
     }
   }, [context, onContextChange])
@@ -54,9 +58,9 @@ export const RLSContextEditor = ({
       ...context.jwtClaims,
       role,
     }
-    isInternalChange.current = true
-    setJwtText(JSON.stringify(updatedClaims, null, 2))
-    isInternalChange.current = false
+    const newJwtText = JSON.stringify(updatedClaims, null, 2)
+    programmaticValueRef.current = newJwtText
+    setJwtText(newJwtText)
     onContextChange({
       ...context,
       role,
@@ -117,9 +121,9 @@ export const RLSContextEditor = ({
   ]
 
   const applyPreset = useCallback((preset: (typeof presets)[0]) => {
-    isInternalChange.current = true
-    setJwtText(JSON.stringify(preset.context.jwtClaims, null, 2))
-    isInternalChange.current = false
+    const newJwtText = JSON.stringify(preset.context.jwtClaims, null, 2)
+    programmaticValueRef.current = newJwtText
+    setJwtText(newJwtText)
     onContextChange(preset.context)
   }, [onContextChange])
 

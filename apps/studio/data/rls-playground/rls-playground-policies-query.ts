@@ -49,7 +49,7 @@ export const useRLSPlaygroundPoliciesQuery = <TData = RLSPlaygroundPoliciesData>
   }: UseCustomQueryOptions<RLSPlaygroundPoliciesData, RLSPlaygroundPoliciesError, TData> = {}
 ) => {
   return useQuery<RLSPlaygroundPoliciesData, RLSPlaygroundPoliciesError, TData>({
-    queryKey: rlsPlaygroundKeys.policies(projectRef, schema, table ?? ''),
+    queryKey: rlsPlaygroundKeys.policies(projectRef, schema, table ?? '', connectionString),
     queryFn: ({ signal }) =>
       getRLSPlaygroundPolicies({ projectRef, connectionString, schema, table }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && !!table,
