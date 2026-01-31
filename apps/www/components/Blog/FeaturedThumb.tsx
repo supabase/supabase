@@ -57,10 +57,8 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
   }
 
   const imageUrl = blog.isCMS
-    ? blog.imgThumb || blog.imgSocial || '/images/blog/blog-placeholder.png'
-    : resolveImagePath(blog.imgThumb) ||
-      resolveImagePath(blog.imgSocial) ||
-      '/images/blog/blog-placeholder.png'
+    ? blog.imgThumb || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(blog.imgThumb) || '/images/blog/blog-placeholder.png'
 
   return (
     <div key={blog.slug} className="w-full">
