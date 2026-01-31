@@ -4,31 +4,7 @@ import {
   getAllTroubleshootingEntriesInternal,
   getArticleSlug,
 } from '../../../features/docs/Troubleshooting.utils.common.mjs'
-
-/**
- * Represents a troubleshooting article loaded from local MDX files.
- * These articles are stored in `content/troubleshooting/` and provide
- * solutions for common issues users encounter.
- */
-interface TroubleshootingEntry {
-  /** Absolute path to the MDX file */
-  filePath: string
-  /** Raw MDX content including JSX components */
-  content: string
-  /** Markdown content with JSX stripped out (cleaner for embeddings) */
-  contentWithoutJsx: string
-  /** Frontmatter metadata */
-  data: {
-    title: string
-    topics: string[]
-    keywords?: string[]
-    /** Unique identifier for this article (used for stable URLs) */
-    database_id: string
-    /** Original GitHub discussion URL if migrated from discussions */
-    github_url?: string
-    date_created?: Date
-  }
-}
+import type { ITroubleshootingEntry } from '../../../features/docs/Troubleshooting.utils.js'
 
 /**
  * Loader for troubleshooting articles from local MDX files.
@@ -41,13 +17,13 @@ export class TroubleshootingLoader extends BaseLoader {
 
   constructor(
     source: string,
-    public entry: TroubleshootingEntry
+    public entry: ITroubleshootingEntry
   ) {
     const slug = getArticleSlug(entry)
     super(source, `/guides/troubleshooting/${slug}`)
   }
 
-  async load() {
+  async load(): Promise<TroubleshootingSource[]> {
     return [new TroubleshootingSource(this.source, this.path, this.entry)]
   }
 }
@@ -65,7 +41,7 @@ export class TroubleshootingSource extends BaseSource {
   constructor(
     source: string,
     path: string,
-    public entry: TroubleshootingEntry
+    public entry: ITroubleshootingEntry
   ) {
     super(source, path)
   }
@@ -120,6 +96,6 @@ export class TroubleshootingSource extends BaseSource {
  * @returns Array of loaders, one per troubleshooting article
  */
 export async function fetchTroubleshootingSources(): Promise<TroubleshootingLoader[]> {
-  const entries = (await getAllTroubleshootingEntriesInternal()) as TroubleshootingEntry[]
+  const entries = (await getAllTroubleshootingEntriesInternal()) as ITroubleshootingEntry[]
   return entries.map((entry) => new TroubleshootingLoader('troubleshooting', entry))
 }

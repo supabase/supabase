@@ -151,7 +151,10 @@ export async function fetchAllSources(fullIndex: boolean) {
     .then((loaders) => Promise.all(loaders.map((loader) => loader.load())))
     .then((data) => data.flat())
 
-  const sources: SearchSource[] = (
+  // Type assertion required because ReferenceLoader.load() returns Promise<BaseSource[]>
+  // which widens the inferred union type. All concrete sources in this array are valid
+  // SearchSource types (MarkdownSource, OpenApiReferenceSource, etc.).
+  const sources = (
     await Promise.all([
       guideSources,
       lintWarningsGuideSources,
@@ -166,7 +169,7 @@ export async function fetchAllSources(fullIndex: boolean) {
       partnerIntegrationSources,
       troubleshootingSources,
     ])
-  ).flat()
+  ).flat() as SearchSource[]
 
   return sources
 }
