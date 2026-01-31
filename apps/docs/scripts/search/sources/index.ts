@@ -1,10 +1,5 @@
 import { type GuideModel } from '../../../resources/guide/guideModel.js'
 import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
-import {
-  GitHubDiscussionLoader,
-  type GitHubDiscussionSource,
-  fetchDiscussions,
-} from './github-discussion.js'
 import { LintWarningsGuideLoader, type LintWarningsGuideSource } from './lint-warnings-guide.js'
 import { MarkdownLoader, type MarkdownSource } from './markdown.js'
 import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations.js'
@@ -16,13 +11,14 @@ import {
   OpenApiReferenceLoader,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
+import { fetchTroubleshootingSources, type TroubleshootingSource } from './troubleshooting.js'
 
 export type SearchSource =
   | MarkdownSource
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
-  | GitHubDiscussionSource
+  | TroubleshootingSource
   | IntegrationSource
   | LintWarningsGuideSource
 
@@ -150,18 +146,9 @@ export async function fetchAllSources(fullIndex: boolean) {
         .then((data) => data.flat())
     : []
 
-  const githubDiscussionSources = fetchDiscussions(
-    'supabase',
-    'supabase',
-    'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
-  )
-    .then((discussions) =>
-      Promise.all(
-        discussions.map((discussion) =>
-          new GitHubDiscussionLoader('supabase/supabase', discussion).load()
-        )
-      )
-    )
+  // Load troubleshooting articles from local MDX files
+  const troubleshootingSources = fetchTroubleshootingSources()
+    .then((loaders) => Promise.all(loaders.map((loader) => loader.load())))
     .then((data) => data.flat())
 
   const sources: SearchSource[] = (
@@ -177,7 +164,7 @@ export async function fetchAllSources(fullIndex: boolean) {
       ktLibReferenceSource,
       cliReferenceSource,
       partnerIntegrationSources,
-      githubDiscussionSources,
+      troubleshootingSources,
     ])
   ).flat()
 
