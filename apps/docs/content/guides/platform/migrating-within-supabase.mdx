@@ -37,18 +37,6 @@ If you need to move your project to a different organization, see [project trans
 
 ---
 
-## Quick start
-
-The simplest option using this Google Colab notebook where you provide the necessary details for Backup and Restore operations:
-
-[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
-
----
-
-## Alternative method
-
-This method can be used if there are issues using the Colab notebook or you prefer running the operations locally.
-
 ### Backup database
 
     1. Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
@@ -71,7 +59,7 @@ This method can be used if there are issues using the Colab notebook or you pref
 
 ### Restore database backup
 
-1.  Install [Postgresql](https://www.postgresql.org/download/) which includes the command line tool psql
+1.  Install [PostgreSQL](https://www.postgresql.org/download/) which includes the command line tool psql
 
 2.  Create a [new project](https://database.new). In the new project:
 
@@ -96,14 +84,22 @@ This method can be used if there are issues using the Colab notebook or you pref
             --dbname [CONNECTION_STRING]
           ```
 
-### Migrate storage
+      Depending on your local configuration, the following parameters may need to be set (example below) :
+      - sslmode
+      - gssencmode
 
-Use the Google Colab notebook to either upload the Storage objects or transfer the Storage objects from an active Supabase Project.
+      ```bash
+      postgresql://postgres.[REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:5432/postgres?sslmode=require&gssencmode=disable
+      ```
+
+## Alternative method
+
+**Disclaimer - This is experimental and you should use at own risk**
+
+The following operations can be done remotely with no local setup required via the Google Colab notebook below:
+
+ - Backup database
+ - Restore backup
+ - Migrate Storage (from active project or zip file with objects)
 
 [![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
-
-### Troubleshooting notes
-
-- If you have created any custom roles with login attribute, you have to manually set their passwords in the new project.
-- If you get this error: **"...received invalid response to GSSAPI negotiation..."**. You are likely using psql and Postgres version 15 or lower. Install the latest version to resolve this issue.
-- If you are still getting connection errors, try adding this to the end of the connection string: "?sslmode=require&gssencmode=disable"
