@@ -46,7 +46,9 @@ lines={[[1, -1]]}
 meta="name=src/environments/environment.ts"
 />
 
-Now you have the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
+With the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
+
+This uses the [`getUser`](/docs/reference/javascript/auth-getuser) method to get the current user details if there is an existing session. This method performs a network request to the Supabase Auth server.
 
 <$CodeSample
 path="/user-management/angular-user-management/src/app/supabase.service.ts"

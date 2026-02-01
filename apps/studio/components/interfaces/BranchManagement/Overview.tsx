@@ -118,9 +118,9 @@ export const Overview = ({
           IS_PLATFORM &&
           persistentBranches.length === 0 && (
             <div className="px-6 py-10 flex items-center justify-between">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-0.5">
                 <p className="text-sm">Upgrade to unlock persistent branches</p>
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-foreground-lighter text-balance">
                   Persistent branches are long-lived, cannot be reset, and are ideal for staging
                   environments.
                 </p>
@@ -136,9 +136,9 @@ export const Overview = ({
           !isLoadingEntitlement &&
           hasAccessToPersistentBranching &&
           persistentBranches.length === 0 && (
-            <div className="flex items-center flex-col justify-center w-full py-10">
+            <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
               <p>No persistent branches</p>
-              <p className="text-foreground-light text-center">
+              <p className="text-foreground-lighter text-center text-balance">
                 Persistent branches are long-lived, cannot be reset, and are ideal for staging
                 environments.
               </p>
@@ -196,8 +196,8 @@ export const Overview = ({
       <BranchManagementSection header="Scheduled for deletion branches">
         {isLoading && <BranchLoader />}
         {isSuccess && scheduledForDeletionBranches.length === 0 && (
-          <div className="flex items-center flex-col justify-center w-full py-10">
-            <p>No scheduled for deletion branches</p>
+          <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
+            <p className="text-foreground-lighter">No branches scheduled for deletion</p>
           </div>
         )}
         {isSuccess &&

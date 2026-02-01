@@ -3,11 +3,18 @@
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**"
+      ]
     },
     "cms#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "BLOG_APP_URL",
         "CRON_SECRET",
@@ -25,10 +32,15 @@
         "S3_ENDPOINT",
         "VERCEL_PROJECT_PRODUCTION_URL"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "design-system#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
@@ -41,10 +53,16 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".contentlayer/**"
+      ]
     },
     "studio#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPPORT_API_URL",
@@ -133,12 +151,18 @@
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_SHA",
-        "SNIPPETS_MANAGEMENT_FOLDER"
+        "SNIPPETS_MANAGEMENT_FOLDER",
+        "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "www#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "ANALYZE",
         "CI",
@@ -210,10 +234,16 @@
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".contentlayer/**"
+      ]
     },
     "ui-library#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
@@ -235,7 +265,11 @@
         "SUPABASE_MANAGEMENT_API_TOKEN",
         "OPENAI_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".contentlayer/**"
+      ]
     },
     "lint": {
       "outputs": []
@@ -251,7 +285,9 @@
       "cache": false
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": [
+        "^typecheck"
+      ],
       "outputs": []
     }
   }

@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
@@ -17,8 +10,8 @@ import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreat
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
-  extractPostgresVersionDetails,
   PostgresVersionSelector,
+  extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
@@ -54,11 +47,17 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
-import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, FormField_Shadcn_, Form_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
+import { z } from 'zod'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 

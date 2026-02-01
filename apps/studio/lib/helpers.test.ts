@@ -1,9 +1,11 @@
+import { copyToClipboard } from 'ui'
 import { v4 as _uuidV4 } from 'uuid'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   detectBrowser,
   detectOS,
+  extractUrls,
   formatBytes,
   formatCurrency,
   getDatabaseMajorVersion,
@@ -20,14 +22,13 @@ import {
   removeCommentsFromSql,
   removeJSONTrailingComma,
   snakeToCamel,
+  stripMarkdownCodeBlocks,
   tablesToSQL,
   timeout,
   tryParseInt,
   tryParseJson,
   uuidv4,
 } from './helpers'
-
-import { copyToClipboard } from 'ui'
 
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid'),
@@ -308,6 +309,197 @@ describe('isValidHttpUrl', () => {
     const result = isValidHttpUrl('not a url')
 
     expect(result).toBe(false)
+  })
+})
+
+describe('extractUrls', () => {
+  it('should extract basic http URLs', () => {
+    const result = extractUrls('Visit http://example.com for more info')
+    expect(result).toEqual(['http://example.com'])
+  })
+
+  it('should extract basic https URLs', () => {
+    const result = extractUrls('Check out https://supabase.com')
+    expect(result).toEqual(['https://supabase.com'])
+  })
+
+  it('should extract URLs with ports', () => {
+    const result = extractUrls('Connect to http://localhost:3000')
+    expect(result).toEqual(['http://localhost:3000'])
+  })
+
+  it('should extract URLs with paths', () => {
+    const result = extractUrls('Go to https://example.com/path/to/page')
+    expect(result).toEqual(['https://example.com/path/to/page'])
+  })
+
+  it('should extract URLs with query parameters', () => {
+    const result = extractUrls('Visit https://example.com/search?q=test&page=1')
+    expect(result).toEqual(['https://example.com/search?q=test&page=1'])
+  })
+
+  it('should extract URLs with fragments', () => {
+    const result = extractUrls('See https://example.com/page#section')
+    expect(result).toEqual(['https://example.com/page#section'])
+  })
+
+  it('should extract URLs with complex paths, query params, and fragments', () => {
+    const result = extractUrls('Check https://example.com/api/v1/users?id=123&name=test#details')
+    expect(result).toEqual(['https://example.com/api/v1/users?id=123&name=test#details'])
+  })
+
+  it('should extract multiple URLs from text', () => {
+    const result = extractUrls('Visit http://example.com and https://supabase.com for more info')
+    expect(result).toEqual(['http://example.com', 'https://supabase.com'])
+  })
+
+  it('should remove trailing punctuation from URLs', () => {
+    const result = extractUrls('Visit https://example.com.')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should remove multiple trailing punctuation marks', () => {
+    const result = extractUrls('Check https://example.com!!!')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should remove trailing punctuation including parentheses', () => {
+    const result = extractUrls('See (https://example.com)')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should handle URLs with trailing commas and periods', () => {
+    const result = extractUrls('Visit https://example.com, and https://supabase.com.')
+    expect(result).toEqual(['https://example.com', 'https://supabase.com'])
+  })
+
+  it('should handle URLs with subpath and markdown bolding', () => {
+    const result = extractUrls('Check out **https://example.com/subpath** for details')
+    expect(result).toEqual(['https://example.com/subpath'])
+  })
+
+  it('should return empty array when no URLs are found', () => {
+    const result = extractUrls('This is just plain text with no URLs')
+    expect(result).toEqual([])
+  })
+
+  it('should return empty array for empty string', () => {
+    const result = extractUrls('')
+    expect(result).toEqual([])
+  })
+
+  it('should handle URLs in parentheses', () => {
+    const result = extractUrls('Check out (https://example.com) for details')
+    expect(result).toEqual(['https://example.com'])
+  })
+
+  it('should be case insensitive for protocol', () => {
+    const result = extractUrls('Visit HTTP://EXAMPLE.COM and HTTPS://SUPABASE.COM')
+    expect(result).toEqual(['HTTP://EXAMPLE.COM', 'HTTPS://SUPABASE.COM'])
+  })
+
+  it('should handle URLs with special characters in path', () => {
+    const result = extractUrls('Visit https://example.com/path_with_underscores/file-name.txt')
+    expect(result).toEqual(['https://example.com/path_with_underscores/file-name.txt'])
+  })
+
+  it('should handle URLs with encoded characters', () => {
+    const result = extractUrls('Visit https://example.com/search?q=hello%20world')
+    expect(result).toEqual(['https://example.com/search?q=hello%20world'])
+  })
+
+  it('should handle URLs with subdomains', () => {
+    const result = extractUrls('Visit https://www.example.com and https://api.example.com')
+    expect(result).toEqual(['https://www.example.com', 'https://api.example.com'])
+  })
+
+  describe('with excludeCodeBlocks option', () => {
+    it('should exclude URLs in fenced code blocks', () => {
+      const text = 'Visit https://real.com\n```\nhttps://code.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs in fenced code blocks with language specifier', () => {
+      const text = 'Visit https://real.com\n```sql\nSELECT * FROM https://code.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs in inline code', () => {
+      const text = 'Use `https://code.com` for the endpoint, or visit https://real.com'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should handle multiple code blocks', () => {
+      const text =
+        'https://first.com\n```\nhttps://code1.com\n```\nhttps://second.com\n```\nhttps://code2.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual([
+        'https://first.com',
+        'https://second.com',
+      ])
+    })
+
+    it('should not exclude code blocks by default', () => {
+      const text = 'Visit https://real.com\n```\nhttps://code.com\n```'
+      expect(extractUrls(text)).toEqual(['https://real.com', 'https://code.com'])
+    })
+  })
+
+  describe('with excludeTemplates option', () => {
+    it('should not extract URLs with angle brackets in subdomain', () => {
+      // Angle brackets in subdomain prevent the URL from being extracted at all
+      const text = 'Visit https://real.com or https://<project-ref>.supabase.co'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs truncated at angle brackets in path', () => {
+      // The regex stops at angle brackets - exclude the whole truncated URL
+      const text = 'Visit https://real.com or https://example.com/api/<project-id>/data'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual(['https://real.com'])
+    })
+
+    it('should keep URLs without angle brackets', () => {
+      const text = 'Visit https://example.com/path_with_underscores'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual([
+        'https://example.com/path_with_underscores',
+      ])
+    })
+  })
+
+  describe('with both options', () => {
+    it('should exclude both code blocks and template URLs', () => {
+      const text =
+        'Visit https://real.com\n```\nhttps://code.com\n```\nOr https://<project-ref>.supabase.co'
+      expect(extractUrls(text, { excludeCodeBlocks: true, excludeTemplates: true })).toEqual([
+        'https://real.com',
+      ])
+    })
+  })
+})
+
+describe('stripMarkdownCodeBlocks', () => {
+  it('should remove fenced code blocks', () => {
+    const text = 'Before\n```\ncode here\n```\nAfter'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Before\n\nAfter')
+  })
+
+  it('should remove fenced code blocks with language specifier', () => {
+    const text = 'Before\n```typescript\nconst x = 1;\n```\nAfter'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Before\n\nAfter')
+  })
+
+  it('should remove inline code', () => {
+    const text = 'Use `inline code` here'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Use  here')
+  })
+
+  it('should handle multiple code blocks', () => {
+    const text = '```js\ncode1\n```\ntext\n```ts\ncode2\n```'
+    expect(stripMarkdownCodeBlocks(text)).toBe('\ntext\n')
+  })
+
+  it('should preserve text without code blocks', () => {
+    const text = 'Just regular text here'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Just regular text here')
   })
 })
 
