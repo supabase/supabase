@@ -2,9 +2,11 @@ import type { PostgresColumn } from '@supabase/postgres-meta'
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
 import {
-  generateTableChangeKey,
-  generateTableChangeKeyFromOperation,
-} from 'components/grid/utils/queueOperationUtils'
+  resolveDeleteRowConflicts,
+  resolveEditCellConflicts,
+  upsertOperation,
+} from 'components/grid/utils/queueConflictResolution'
+import { generateTableChangeKey } from 'components/grid/utils/queueOperationUtils'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
@@ -16,7 +18,6 @@ import {
   NewQueuedOperation,
   type OperationQueueState,
   type QueueStatus,
-  type QueuedOperation,
   QueuedOperationType,
 } from './table-editor-operation-queue.types'
 
@@ -236,34 +237,49 @@ export const createTableEditorState = () => {
     /**
      * Queue a new operation for later processing.
      * If an operation with the same key already exists, it will be overwritten.
+     * Handles conflict resolution:
+     * - DELETE_ROW on a row: remove any pending EDIT_CELL ops for that row
+     * - EDIT_CELL on a row pending deletion: reject (console.warn)
+     * - EDIT_CELL on a newly added row: merge edit into ADD_ROW's rowData
+     * - DELETE_ROW on a newly added row: cancel both operations
      */
     queueOperation: (operation: NewQueuedOperation) => {
-      const operationKey = generateTableChangeKeyFromOperation(operation)
-      const existingOpIndex = state.operationQueue.operations.findIndex(
-        (op) => op.id === operationKey
-      )
-
-      const newOperation: QueuedOperation = {
-        ...operation,
-        id: operationKey,
-        timestamp: Date.now(),
-      }
-
-      if (existingOpIndex >= 0) {
-        // [Ali] Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
-        // When a user edits the same cell multiple times before saving, we need to preserve the original "before edit" value, not the intermediate value from the previous queued edit
-        if (newOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-          newOperation.payload.oldValue =
-            state.operationQueue.operations[existingOpIndex].payload.oldValue
+      const updateQueueStatus = () => {
+        if (state.operationQueue.operations.length === 0) {
+          state.operationQueue.status = 'idle'
+        } else if (state.operationQueue.status === 'idle') {
+          state.operationQueue.status = 'pending'
         }
-        state.operationQueue.operations[existingOpIndex] = newOperation
-      } else {
-        state.operationQueue.operations.push(newOperation)
       }
 
-      if (state.operationQueue.status === 'idle') {
-        state.operationQueue.status = 'pending'
+      // Handle DELETE_ROW conflicts
+      if (operation.type === QueuedOperationType.DELETE_ROW) {
+        const result = resolveDeleteRowConflicts(state.operationQueue.operations, operation)
+        state.operationQueue.operations = result.filteredOperations
+        if (result.action === 'skip') {
+          updateQueueStatus()
+          return
+        }
       }
+
+      // Handle EDIT_CELL_CONTENT conflicts
+      if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+        const result = resolveEditCellConflicts(state.operationQueue.operations, operation)
+        if (result.action === 'reject') {
+          console.warn(result.reason)
+          return
+        }
+        if (result.action === 'merge') {
+          state.operationQueue.operations = result.updatedOperations
+          updateQueueStatus()
+          return
+        }
+      }
+
+      // Normal upsert
+      const { operations } = upsertOperation(state.operationQueue.operations, operation)
+      state.operationQueue.operations = operations
+      updateQueueStatus()
     },
 
     /**
@@ -301,16 +317,17 @@ export const createTableEditorState = () => {
     },
 
     hasPendingCellChange: (
-      type: QueuedOperationType,
       tableId: number,
-      rowIdentifiers: Record<string, unknown>,
+      rowIdentifiers: Dictionary<unknown>,
       columnName: string
     ): boolean => {
       const key = generateTableChangeKey({
-        type,
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
         tableId,
-        columnName,
-        rowIdentifiers,
+        payload: {
+          columnName,
+          rowIdentifiers,
+        },
       })
       return state.operationQueue.operations.some((op) => op.id === key)
     },
