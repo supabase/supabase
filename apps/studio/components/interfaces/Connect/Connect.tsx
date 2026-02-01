@@ -4,6 +4,7 @@ import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 
+import { ApiKeysTabContent } from 'components/interfaces/Connect/ApiKeysTabContent'
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -408,6 +409,18 @@ export const Connect = () => {
                   className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
                 >
                   <McpTabContent projectKeys={projectKeys} />
+                </TabsContent_Shadcn_>
+              )
+            }
+
+            if (type.key === 'api-keys') {
+              return (
+                <TabsContent_Shadcn_
+                  key="api-keys"
+                  value="api-keys"
+                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                >
+                  <ApiKeysTabContent projectKeys={projectKeys} />
                 </TabsContent_Shadcn_>
               )
             }

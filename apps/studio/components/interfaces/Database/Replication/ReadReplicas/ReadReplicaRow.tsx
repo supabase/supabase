@@ -7,7 +7,6 @@ import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/
 import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { type Database } from '@/data/read-replicas/replicas-query'
-import { DatabaseStatus } from '@/data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useParams } from 'common'
 import { Database as DatabaseIcon } from 'icons'
@@ -28,16 +27,12 @@ import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
 
 interface ReadReplicaRow {
   replica: Database
-  replicaStatus?: DatabaseStatus
   onUpdateReplica: () => void
 }
 
-export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: ReadReplicaRow) => {
+export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => {
   const { ref } = useParams()
-  const { identifier, region, status: baseStatus } = replica
-
-  const status = replicaStatus?.status ?? baseStatus
-  const initStatus = replicaStatus?.replicaInitializationStatus?.status
+  const { identifier, region, status } = replica
   const formattedId = formatDatabaseID(identifier ?? '')
 
   const {
@@ -58,11 +53,8 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
 
   const regionLabel = Object.values(AWS_REGIONS).find((x) => x.code === region)?.displayName
 
-  const isInTransition = useMemo(
-    () => getIsInTransition({ initStatus, status }),
-    [initStatus, status]
-  )
-  const statusLabel = useMemo(() => getStatusLabel({ initStatus, status }), [initStatus, status])
+  const isInTransition = useMemo(() => getIsInTransition({ status }), [status])
+  const statusLabel = useMemo(() => getStatusLabel({ status }), [status])
 
   return (
     <>

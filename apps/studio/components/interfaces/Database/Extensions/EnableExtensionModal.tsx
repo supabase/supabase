@@ -1,8 +1,4 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
-import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -10,6 +6,9 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -108,6 +107,8 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     return undefined
   }
 
+  const isLoading = fetchingSchemaInfo || isSchemasLoading
+
   const validate = (values: any) => {
     const errors: any = {}
     if (values.schema === 'custom' && !values.name) errors.name = 'Required field'
@@ -170,7 +171,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                   </Admonition>
                 )}
 
-                {fetchingSchemaInfo || isSchemasLoading ? (
+                {isLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
                     <div className="w-3/4">
@@ -269,7 +270,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                 <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
                   Cancel
                 </Button>
-                <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
+                <Button htmlType="submit" disabled={isEnabling || isLoading} loading={isEnabling}>
                   Enable extension
                 </Button>
               </Modal.Content>

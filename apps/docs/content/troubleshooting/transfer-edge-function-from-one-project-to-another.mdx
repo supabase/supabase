@@ -4,7 +4,7 @@ topics = ["cli", "database", "functions"]
 keywords = ["functions", "typescript", "deno"]
 ---
 
-This guide shows how you can transfer your Edge Functions from one project to another using the Supabase CLI.
+This guide shows how you can transfer your Edge Functions from one project to another using the Supabase CLI or the Supabase Dashboard.
 
 ## Pre-requisites
 
@@ -14,7 +14,7 @@ To follow through this guide, you need the following:
 - You must have installed the [Supabase CLI tool](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli)
 - Both source and target projects must be active
 
-## Steps:
+## Steps (using the Supabase CLI):
 
 1. Login to your Supabase account (the account with the functions) using your terminal
 
@@ -57,3 +57,22 @@ supabase functions deploy --project-ref your_target_project_ref
 ```
 
 This deploys all functions within the `supabase/functions` to the target project. You can confirm by checking your Edge Functions on [the project dashboard](/dashboard/project/_/functions)
+
+## Steps (using the Supabase Dashboard):
+
+1. In the source project, navigate to **Edge Functions** from the side menu
+
+2. Using the `Download` button, download your desired function as zip:
+   ![Download Edge Function](/docs/img/troubleshooting/download-edge-function-via-dashboard.gif)
+
+3. In the target project, navigate to **Edge Functions** from the side menu
+
+4. Click on the `Deploy a new function` button, select **Via Editor** operation
+
+5. Drag and drop your downloaded function (the zip function from step 2) into the editor
+
+6. Add your function name and click on the `Deploy function` button to deploy the function:
+
+![Upload Edge Function](/docs/img/troubleshooting/upload-edge-function-via-dashboard.gif)
+
+With this, you can transfer your edge functions between your Supabase projects.

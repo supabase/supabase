@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useDebounce } from '@uidotdev/usehooks'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -8,7 +9,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from 'components/ui/AlertError'

@@ -23,7 +23,7 @@ const listPoliciesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to get the policies for'),
 })
 
-const MOCK_TABLES_DATA = [
+export const MOCK_TABLES_DATA = [
   {
     name: 'user_documents',
     rls_enabled: false,
@@ -169,7 +169,7 @@ function createMockedRenderingTools() {
   ) as typeof renderingTools
 }
 
-function createMockListTablesTool() {
+function createMockListTablesTool(overrideData?: Record<string, typeof MOCK_TABLES_DATA>) {
   return tool({
     description: 'Lists tables and columns for the provided schemas.',
     inputSchema: listTablesInputSchema,
@@ -177,7 +177,7 @@ function createMockListTablesTool() {
       const effectiveSchemas = schemas?.length ? schemas : ['public']
       return effectiveSchemas.map((schema) => ({
         schema,
-        tables: MOCK_TABLES_DATA,
+        tables: overrideData?.[schema] ?? MOCK_TABLES_DATA,
       }))
     },
   })
@@ -293,6 +293,10 @@ function createMockListPoliciesTool() {
   })
 }
 
+export type MockToolOverrides = {
+  list_tables?: Record<string, typeof MOCK_TABLES_DATA>
+}
+
 /**
  * Deterministic mock implementations of MCP/platform tools for evals.
  * These mirror tool names used in prompts so the model can call them,
@@ -300,7 +304,7 @@ function createMockListPoliciesTool() {
  *
  * Note: search_docs uses the real implementation
  */
-export async function getMockTools() {
+export async function getMockTools(overrides?: MockToolOverrides) {
   const mockedRenderingTools = createMockedRenderingTools()
 
   const { search_docs } = await getMcpTools({
@@ -314,7 +318,7 @@ export async function getMockTools() {
   return {
     ...mockedRenderingTools,
     search_docs,
-    list_tables: createMockListTablesTool(),
+    list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),
     list_edge_functions: createMockListEdgeFunctionsTool(),
     get_advisors: createMockGetAdvisorsTool(),

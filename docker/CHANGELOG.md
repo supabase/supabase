@@ -15,6 +15,47 @@ Check updates for each service to learn more.
 
 ---
 
+## [2026-01-27]
+
+### Studio
+- Updated to `2026.01.27-sha-6aa59ff`
+- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557)
+- Fixed type generator - PR [#40481](https://github.com/supabase/supabase/pull/40481)
+- Fixed minor UI discrepancies - PR [#40579](https://github.com/supabase/supabase/pull/40579), PR [#41936](https://github.com/supabase/supabase/pull/41936), PR [#41970](https://github.com/supabase/supabase/pull/41970), PR [#41971](https://github.com/supabase/supabase/pull/41971), PR [#41972](https://github.com/supabase/supabase/pull/41972), PR [#42015](https://github.com/supabase/supabase/pull/42015)
+
+### Auth
+- Updated to `v2.185.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.185.0)
+- ⚠️ Fixed security related issues
+
+### PostgREST
+- Updated to `v14.3` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.3)
+
+### Realtime
+- Updated to `v2.72.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.72.0)
+- Changed healthchecks logging to off by default (requires `docker-compose.yml` update) - PR [realtime#1677](https://github.com/supabase/realtime/pull/1677), PR [#42156](https://github.com/supabase/supabase/pull/42156)
+- Changed logging configuration and healthcheck frequency to reduce log volume - PR [#42112](https://github.com/supabase/supabase/pull/42112)
+
+### Storage
+- Updated to `v1.33.5` - [Changelog](https://github.com/supabase/storage/releases/tag/v1.33.5)
+
+### imgproxy
+- Updated to `v3.30.1` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v3.30.1)
+
+### Postgres Meta
+- Updated to `v0.95.2` - [Changelog](https://github.com/supabase/postgres-meta/releases/tag/v0.95.2)
+
+### Edge Runtime
+- Updated to `v1.70.0` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.70.0)
+
+### Analytics (Logflare)
+- Updated to `v1.30.3` - [Changelog](https://github.com/Logflare/logflare/releases/tag/v1.30.3)
+
+### Postgres
+- No image update
+- Fixed Postgres logging configuration (requires `volumes/logs/vector.yml` update) - PR [#41800](https://github.com/supabase/supabase/pull/41800)
+
+---
+
 ## [2025-12-18]
 
 ### Documentation
@@ -27,7 +68,7 @@ Check updates for each service to learn more.
 
 ### Studio
 - Updated to `2025.12.17-sha-43f4f7f`
-- ⚠️ Fixed additional potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- ⚠️ Fixed additional issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 - Fixed an issue with the Users page not being updated on changes - PR [#41254](https://github.com/supabase/supabase/pull/41254)
 
 ### MCP Server
@@ -50,7 +91,7 @@ Check updates for each service to learn more.
 ### Studio
 
 - Updated to `2025.12.09-sha-434634f`
-- ⚠️ Fixed potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- ⚠️ Fixed security issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 
 ### MCP Server
 

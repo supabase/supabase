@@ -650,7 +650,7 @@
     "github-slugger": "^2.0.0",
     "icons": "workspace:*",
     "js-yaml": "^3.14.1",
-    "lodash": "^4.17.21",
+    "lodash": "catalog:",
     "lucide-react": "*",
     "mdast": "^3.0.0",
     "monaco-editor": "*",

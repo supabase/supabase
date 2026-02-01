@@ -278,6 +278,24 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    */
   properties: {
     instanceSize?: string
+    /**
+     * Whether Data API is enabled.
+     * true = "Data API + Connection String" (default)
+     * false = "Only Connection String"
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Data API schema configuration. Only relevant when dataApiEnabled is true.
+     * true = "Use dedicated API schema for Data API"
+     * false = "Use public schema for Data API" (default)
+     */
+    useApiSchema?: boolean
+    /**
+     * Postgres engine type selection.
+     * true = "Postgres with OrioleDB" (alpha)
+     * false = "Postgres" (default)
+     */
+    useOrioleDb?: boolean
   }
   groups: TelemetryGroups
 }

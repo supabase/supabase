@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.12.17-sha-43f4f7f
+    image: supabase/studio:2026.01.27-sha-6aa59ff
     restart: unless-stopped
     healthcheck:
       test:
@@ -59,6 +59,11 @@ services:
       NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
       # Uncomment to use Big Query backend for analytics
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
+      SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
+      EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
+    volumes:
+      - ./volumes/snippets:/app/snippets:Z
+      - ./volumes/functions:/app/edge-functions:Z
 
   kong:
     container_name: supabase-kong
@@ -90,7 +95,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.184.0
+    image: supabase/gotrue:v2.185.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -173,7 +178,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v14.1
+    image: postgrest/postgrest:v14.3
     restart: unless-stopped
     depends_on:
       db:
@@ -197,7 +202,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.68.0
+    image: supabase/realtime:v2.72.0
     restart: unless-stopped
     depends_on:
       db:
@@ -212,8 +217,9 @@ services:
           "curl -sSfL --head -o /dev/null -H \"Authorization: Bearer ${ANON_KEY}\" http://localhost:4000/api/tenants/realtime-dev/health"
         ]
       timeout: 5s
-      interval: 5s
+      interval: 30s
       retries: 3
+      start_period: 10s
     environment:
       PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
@@ -231,11 +237,12 @@ services:
       APP_NAME: realtime
       SEED_SELF_HOST: "true"
       RUN_JANITOR: "true"
+      DISABLE_HEALTHCHECK_LOGGING: "true"
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.33.0
+    image: supabase/storage-api:v1.33.5
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -279,7 +286,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.8.0
+    image: darthsim/imgproxy:v3.30.1
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -298,10 +305,11 @@ services:
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
+      IMGPROXY_MAX_SRC_RESOLUTION: 16.8
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.95.1
+    image: supabase/postgres-meta:v0.95.2
     restart: unless-stopped
     depends_on:
       db:
@@ -320,7 +328,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.69.28
+    image: supabase/edge-runtime:v1.70.0
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
@@ -344,7 +352,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.27.0
+    image: supabase/logflare:1.30.3
     restart: unless-stopped
     ports:
       - 4000:4000

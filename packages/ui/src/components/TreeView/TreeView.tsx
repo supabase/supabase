@@ -63,7 +63,11 @@ const TreeViewItem = forwardRef<
     /** The horizontal padding of the item */
     xPadding?: number
     /** name of entity */
-    name: string
+    name: string | ReactNode
+    /** Optional description of entity */
+    description?: string
+    /** String name to use for title attribute when name is a ReactNode */
+    nameForTitle?: string
     /** icon of entity */
     icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
@@ -74,6 +78,8 @@ const TreeViewItem = forwardRef<
     isLoading?: boolean
     /** Callback for double-click */
     onDoubleClick?: (e: React.MouseEvent) => void
+    /** Actions to render on the right end of the item */
+    actions?: ReactNode
   }
 >(
   (
@@ -88,15 +94,19 @@ const TreeViewItem = forwardRef<
       isLoading = false,
       xPadding = 16,
       name = '',
+      description,
+      nameForTitle,
       icon,
       isEditing = false,
       onEditSubmit,
       onDoubleClick,
+      actions,
       ...props
     },
     ref
   ) => {
-    const [localValueState, setLocalValueState] = useState(name)
+    const nameString = nameForTitle ?? (typeof name === 'string' ? name : '')
+    const [localValueState, setLocalValueState] = useState(nameString)
     const inputRef = useRef<HTMLInputElement>(null)
     const timeRef = useRef<number>(0)
 
@@ -137,15 +147,15 @@ const TreeViewItem = forwardRef<
           }
         }, 200)
       } else {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isEditing])
+    }, [isEditing, nameString])
 
     useEffect(() => {
       if (!isLoading) {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isLoading])
+    }, [isLoading, nameString])
 
     const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
       const timestamp = Number(new Date())
@@ -175,14 +185,23 @@ const TreeViewItem = forwardRef<
       ...divProps
     } = props as any
 
+    const trimmedDescription = description?.trim()
+    const titleText = trimmedDescription ? `${nameString}\n${trimmedDescription}` : nameString
+
     return (
       <div
         ref={ref}
+        title={titleText}
         {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }), props.className)}
+        className={cn(
+          TreeViewItemVariant({ isSelected, isOpened, isPreview }),
+          !!actions && 'pr-2',
+          !isEditing && !!actions && 'justify-between',
+          props.className
+        )}
         style={{
           paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,
           ...props.style,
@@ -199,54 +218,58 @@ const TreeViewItem = forwardRef<
             className={'absolute h-full w-px bg-border-strong'}
           ></div>
         ))}
+
         {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        {isBranch ? (
-          <>
-            {isLoading ? (
-              <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
-            ) : (
-              <ChevronRight
+
+        <div className="flex items-center gap-x-3 truncate">
+          {isBranch ? (
+            <>
+              {isLoading ? (
+                <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
+              ) : (
+                <ChevronRight
+                  className={cn(
+                    'text-foreground-muted',
+                    'group-aria-selected:text-foreground-light',
+                    'group-aria-expanded:text-foreground-light',
+                    'transition-transform duration-200',
+                    'group-aria-expanded:rotate-90'
+                  )}
+                  size={CHEVRON_ICON_SIZE}
+                  strokeWidth={1.5}
+                />
+              )}
+              <TreeViewFolderIcon
                 className={cn(
-                  'text-foreground-muted',
+                  'transition-colors',
+                  ' text-foreground-muted',
                   'group-aria-selected:text-foreground-light',
-                  'group-aria-expanded:text-foreground-light',
-                  'transition-transform duration-200',
-                  'group-aria-expanded:rotate-90'
+                  'group-aria-expanded:text-foreground-light'
                 )}
-                size={CHEVRON_ICON_SIZE}
+                isOpen={isExpanded}
+                size={ENTITY_ICON_SIZE}
                 strokeWidth={1.5}
               />
-            )}
-            <TreeViewFolderIcon
-              className={cn(
-                'transition-colors',
-                ' text-foreground-muted',
-                'group-aria-selected:text-foreground-light',
-                'group-aria-expanded:text-foreground-light'
-              )}
-              isOpen={isExpanded}
-              size={ENTITY_ICON_SIZE}
-              strokeWidth={1.5}
-            />
-          </>
-        ) : (
-          icon || (
-            <SQL_ICON
-              className={cn(
-                'transition-colors',
-                'fill-foreground-muted',
-                'group-aria-selected:fill-foreground',
-                'w-5 h-5 shrink-0',
-                '-ml-0.5'
-              )}
-              size={ENTITY_ICON_SIZE}
-              strokeWidth={1.5}
-            />
-          )
-        )}
-        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
-          {name}
-        </span>
+            </>
+          ) : (
+            icon || (
+              <SQL_ICON
+                className={cn(
+                  'transition-colors',
+                  'fill-foreground-muted',
+                  'group-aria-selected:fill-foreground',
+                  'w-5 h-5 shrink-0'
+                )}
+                size={ENTITY_ICON_SIZE}
+                strokeWidth={1.5}
+              />
+            )
+          )}
+          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>{name}</span>
+        </div>
+
+        {!isEditing && actions}
+
         <form onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
             autoFocus
@@ -261,8 +284,8 @@ const TreeViewItem = forwardRef<
               if (e.key === 'Enter') {
                 inputRef.current?.blur()
               } else if (e.key === 'Escape') {
-                setLocalValueState(name)
-                onEditSubmit?.(name)
+                setLocalValueState(nameString)
+                onEditSubmit?.(nameString)
               } else {
                 e.stopPropagation()
               }
