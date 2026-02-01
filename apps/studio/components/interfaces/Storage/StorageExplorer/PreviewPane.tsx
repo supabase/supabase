@@ -212,7 +212,7 @@ export const PreviewPane = () => {
               <Button
                 type="outline"
                 icon={<Copy />}
-                onClick={() => onCopyUrl(file.name)}
+                onClick={() => onCopyUrl(file)}
                 disabled={file.isCorrupted}
               >
                 Get URL
@@ -232,19 +232,19 @@ export const PreviewPane = () => {
                 <DropdownMenuContent side="bottom" align="center">
                   <DropdownMenuItem
                     key="expires-one-week"
-                    onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
+                    onClick={() => onCopyUrl(file, URL_EXPIRY_DURATION.WEEK)}
                   >
                     Expire in 1 week
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="expires-one-month"
-                    onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
+                    onClick={() => onCopyUrl(file, URL_EXPIRY_DURATION.MONTH)}
                   >
                     Expire in 1 month
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="expires-one-year"
-                    onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
+                    onClick={() => onCopyUrl(file, URL_EXPIRY_DURATION.YEAR)}
                   >
                     Expire in 1 year
                   </DropdownMenuItem>

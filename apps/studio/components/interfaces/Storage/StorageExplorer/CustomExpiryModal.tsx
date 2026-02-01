@@ -36,7 +36,7 @@ export const CustomExpiryModal = () => {
         onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
           await onCopyUrl(
-            selectedFileCustomExpiry!.name,
+            selectedFileCustomExpiry!,
             values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
           )
           setSubmitting(false)

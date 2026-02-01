@@ -46,7 +46,7 @@ export const useFetchFileUrlQuery = (
 ) => {
   const { openedFolders, selectedBucket } = useStorageExplorerStateSnapshot()
   const pathToFile = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
-  const formattedPathToFile = [pathToFile, file?.name].join('/')
+  const formattedPathToFile = file?.path ?? [pathToFile, file?.name].join('/')
 
   return useQuery<string, ResponseError, string>({
     queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', formattedPathToFile],
