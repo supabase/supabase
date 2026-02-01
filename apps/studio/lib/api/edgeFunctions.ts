@@ -11,7 +11,7 @@ export const isValidEdgeFunctionURL = (url: string) => {
 
   if (!IS_PLATFORM) {
     const regexValidLocalEdgeFunctionURL = new RegExp(
-      '^https?://[^\\s/$.?#].[^\\s]*/functions/v[0-9]+/.*$'
+      '^https?://[^\\s/?#]+/functions/v[0-9]{1}/.*$'
     )
 
     return regexValidLocalEdgeFunctionURL.test(url)
