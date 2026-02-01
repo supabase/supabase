@@ -13,6 +13,7 @@ import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { normalizeCpuUsageDataPoints } from 'data/analytics/normalize-cpu-usage'
 import { useChartHighlight } from './useChartHighlight'
 
 import dayjs from 'dayjs'
@@ -124,6 +125,14 @@ const ComposedChartHandler = ({
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const chartHighlight = useChartHighlight()
+  const shouldNormalizeCpuUsage = id === 'cpu-usage'
+  const cpuUsageAttributeNames = useMemo(
+    () =>
+      attributes
+        .map((attr) => attr.attribute)
+        .filter((name) => name?.startsWith('cpu_usage_busy_')),
+    [attributes]
+  )
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -201,8 +210,12 @@ const ComposedChartHandler = ({
         return formattedDataPoint
       })
 
-    return combined as DataPoint[]
-  }, [data, attributeQueries, attributes])
+    const resolvedData = shouldNormalizeCpuUsage
+      ? normalizeCpuUsageDataPoints(combined, cpuUsageAttributeNames)
+      : combined
+
+    return resolvedData as DataPoint[]
+  }, [data, attributeQueries, attributes, cpuUsageAttributeNames, shouldNormalizeCpuUsage])
 
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
@@ -246,7 +259,7 @@ const ComposedChartHandler = ({
         },
       },
     ]
-  }, [ref])
+  }, [ref, router])
 
   if (loading) {
     return (
