@@ -169,106 +169,104 @@ export const FileExplorerRow = ({
   const rowOptions =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
-        ...(canUpdateFiles
-          ? [
-            {
-              name: 'Rename',
-              icon: <Edit size={14} strokeWidth={1} />,
-              onClick: () => setSelectedItemToRename(itemWithColumnIndex),
-            },
-          ]
-          : []),
-        {
-          name: 'Download',
-          icon: <Download size={14} strokeWidth={1} />,
-          onClick: () => downloadFolder(itemWithColumnIndex),
-        },
-        {
-          name: 'Copy path to folder',
-          icon: <Copy size={14} strokeWidth={1} />,
-          onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
-        },
-        ...(canUpdateFiles
-          ? [
-            { name: 'Separator', icon: undefined, onClick: undefined },
-            {
-              name: 'Delete',
-              icon: <Trash2 size={14} strokeWidth={1} />,
-              onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
-            },
-          ]
-          : []),
-      ]
-      : [
-        ...(!item.isCorrupted
-          ? [
-            ...(isPublic
-              ? [
-                {
-                  name: 'Get URL',
-                  icon: <Copy size={14} strokeWidth={1} />,
-                  onClick: () => onCopyUrl(itemWithColumnIndex),
-                },
-              ]
-              : [
-                {
-                  name: 'Get URL',
-                  icon: <Copy size={14} strokeWidth={1} />,
-                  children: [
-                    {
-                      name: 'Expire in 1 week',
-                      onClick: () =>
-                        onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK),
-                    },
-                    {
-                      name: 'Expire in 1 month',
-                      onClick: () =>
-                        onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH),
-                    },
-                    {
-                      name: 'Expire in 1 year',
-                      onClick: () =>
-                        onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR),
-                    },
-                    {
-                      name: 'Custom expiry',
-                      onClick: () => setSelectedFileCustomExpiry(itemWithColumnIndex),
-                    },
-                  ],
-                },
-              ]),
-            ...(canUpdateFiles
-              ? [
+          ...(canUpdateFiles
+            ? [
                 {
                   name: 'Rename',
                   icon: <Edit size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
-                {
-                  name: 'Move',
-                  icon: <Move size={14} strokeWidth={1} />,
-                  onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
-                },
-                {
-                  name: 'Download',
-                  icon: <Download size={14} strokeWidth={1} />,
-                  onClick: () => downloadFile(itemWithColumnIndex),
-                },
-                { name: 'Separator', icon: undefined, onClick: undefined },
               ]
-              : []),
-          ]
-          : []),
-        ...(canUpdateFiles
-          ? [
-            {
-              name: 'Delete',
-              icon: <Trash2 size={14} strokeWidth={1} />,
-              onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
-            },
-          ]
-          : []),
-      ]
+            : []),
+          {
+            name: 'Download',
+            icon: <Download size={14} strokeWidth={1} />,
+            onClick: () => downloadFolder(itemWithColumnIndex),
+          },
+          {
+            name: 'Copy path to folder',
+            icon: <Copy size={14} strokeWidth={1} />,
+            onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
+          },
+          ...(canUpdateFiles
+            ? [
+                { name: 'Separator', icon: undefined, onClick: undefined },
+                {
+                  name: 'Delete',
+                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+                },
+              ]
+            : []),
+        ]
+      : [
+          ...(!item.isCorrupted
+            ? [
+                ...(isPublic
+                  ? [
+                      {
+                        name: 'Get URL',
+                        icon: <Copy size={14} strokeWidth={1} />,
+                        onClick: () => onCopyUrl(itemWithColumnIndex),
+                      },
+                    ]
+                  : [
+                      {
+                        name: 'Get URL',
+                        icon: <Copy size={14} strokeWidth={1} />,
+                        children: [
+                          {
+                            name: 'Expire in 1 week',
+                            onClick: () => onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK),
+                          },
+                          {
+                            name: 'Expire in 1 month',
+                            onClick: () =>
+                              onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH),
+                          },
+                          {
+                            name: 'Expire in 1 year',
+                            onClick: () => onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR),
+                          },
+                          {
+                            name: 'Custom expiry',
+                            onClick: () => setSelectedFileCustomExpiry(itemWithColumnIndex),
+                          },
+                        ],
+                      },
+                    ]),
+                ...(canUpdateFiles
+                  ? [
+                      {
+                        name: 'Rename',
+                        icon: <Edit size={14} strokeWidth={1} />,
+                        onClick: () => setSelectedItemToRename(itemWithColumnIndex),
+                      },
+                      {
+                        name: 'Move',
+                        icon: <Move size={14} strokeWidth={1} />,
+                        onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
+                      },
+                      {
+                        name: 'Download',
+                        icon: <Download size={14} strokeWidth={1} />,
+                        onClick: () => downloadFile(itemWithColumnIndex),
+                      },
+                      { name: 'Separator', icon: undefined, onClick: undefined },
+                    ]
+                  : []),
+              ]
+            : []),
+          ...(canUpdateFiles
+            ? [
+                {
+                  name: 'Delete',
+                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+                },
+              ]
+            : []),
+        ]
 
   const size = item.metadata ? formatBytes(item.metadata.size) : '-'
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
@@ -339,8 +337,9 @@ export const FileExplorerRow = ({
           <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
             {!isSelected && (
               <div
-                className={`absolute ${item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                  }`}
+                className={`absolute ${
+                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
+                }`}
                 style={{ top: '2px' }}
               >
                 <RowIcon
@@ -353,8 +352,9 @@ export const FileExplorerRow = ({
             )}
             <Checkbox
               label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                }`}
+              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              }`}
               checked={isSelected}
               onChange={(event) => {
                 event.stopPropagation()
@@ -387,8 +387,9 @@ export const FileExplorerRow = ({
         )}
 
         <div
-          className={`flex items-center justify-end ${view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
-            }`}
+          className={`flex items-center justify-end ${
+            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+          }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
             event.stopPropagation()
