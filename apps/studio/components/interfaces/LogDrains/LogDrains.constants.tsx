@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 import { Datadog, Grafana, Sentry } from 'icons'
-import { BracesIcon } from 'lucide-react'
+import { BracesIcon, Cloud } from 'lucide-react'
 
 const iconProps = {
   height: 24,
@@ -29,6 +29,12 @@ export const LOG_DRAIN_TYPES = [
     description:
       'Loki is an open-source log aggregation system designed to store and query logs from multiple sources',
     icon: <Grafana {...iconProps} fill="currentColor" strokeWidth={0} />,
+  },
+  {
+    value: 's3',
+    name: 'Amazon S3',
+    description: 'Forward logs to an S3 bucket',
+    icon: <Cloud {...iconProps} />,
   },
   {
     value: 'sentry',

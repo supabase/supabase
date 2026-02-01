@@ -56,6 +56,7 @@ export function LogDrains({
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -90,7 +91,9 @@ export function LogDrains({
     return (
       <>
         <div className="grid lg:grid-cols-2 gap-4">
-          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+          {LOG_DRAIN_TYPES.filter(
+            (t) => (t.value !== 'sentry' || sentryEnabled) && (t.value !== 's3' || s3Enabled)
+          ).map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}
@@ -195,10 +198,7 @@ export function LogDrains({
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
                 track('log_drain_confirm_button_submitted', {
-                  destination: selectedLogDrain.type as Exclude<
-                    LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3' | 'axiom'
-                  >,
+                  destination: selectedLogDrain.type,
                 })
               }
             }}
