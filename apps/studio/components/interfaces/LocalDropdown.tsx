@@ -43,7 +43,10 @@ export const LocalDropdown = () => {
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
         </DropdownMenuItem>
-        <DropdownMenuItem className="flex gap-2 cursor-pointer" onClick={() => setCommandMenuOpen(true)}>
+        <DropdownMenuItem
+          className="flex gap-2 cursor-pointer"
+          onClick={() => setCommandMenuOpen(true)}
+        >
           <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Command menu
         </DropdownMenuItem>
@@ -57,7 +60,11 @@ export const LocalDropdown = () => {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value} className="cursor-pointer">
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
