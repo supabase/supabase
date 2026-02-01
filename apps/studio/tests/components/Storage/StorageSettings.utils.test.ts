@@ -1,9 +1,13 @@
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
+  BUCKET_LIMIT_ERROR_PREFIX,
   convertFromBytes,
   convertToBytes,
+  decodeBucketLimitErrorMessage,
+  encodeBucketLimitErrorMessage,
+  isBucketLimitErrorMessage,
 } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
 describe('StorageSettings.utils: convertFromBytes', () => {
   test('should convert 1024 to 1KB', () => {
@@ -77,5 +81,55 @@ describe('StorageSettings.utils: convertToBytes', () => {
   test('should be able to handle negative inputs', () => {
     const output = convertToBytes(-12312, StorageSizeUnits.KB)
     expect(output).toStrictEqual(0)
+  })
+})
+
+describe('StorageSettings.utils: bucket limit error encoding', () => {
+  const bucketLists = [
+    {
+      description: 'multiple buckets with standard limits',
+      buckets: [
+        { name: 'images', limit: 1024 },
+        { name: 'avatars', limit: 2048 },
+      ],
+    },
+    {
+      description: 'single bucket with zero limit',
+      buckets: [{ name: 'avatars', limit: 0 }],
+    },
+    {
+      description: 'bucket names with spaces and punctuation and large limits',
+      buckets: [
+        { name: 'prod-images', limit: Number.MAX_SAFE_INTEGER },
+        { name: 'logs archive', limit: 987654321 },
+      ],
+    },
+    {
+      description: 'empty bucket list',
+      buckets: [],
+    },
+    {
+      description: 'bucket name with pipe/comma character (edge case)',
+      buckets: [
+        { name: 'data|backup', limit: 4096 },
+        { name: 'reports,2023', limit: 8192 },
+      ],
+    },
+  ]
+
+  bucketLists.forEach(({ description, buckets }) => {
+    test(`should round trip encode/decode for ${description}`, () => {
+      const encoded = encodeBucketLimitErrorMessage(buckets)
+      expect(encoded.startsWith(BUCKET_LIMIT_ERROR_PREFIX)).toBe(true)
+      expect(isBucketLimitErrorMessage(encoded)).toBe(true)
+
+      const decoded = decodeBucketLimitErrorMessage(encoded)
+      expect(decoded).toStrictEqual(buckets)
+    })
+  })
+
+  test('should return empty results for non bucket limit errors', () => {
+    expect(isBucketLimitErrorMessage('other:error')).toBe(false)
+    expect(decodeBucketLimitErrorMessage('other:error')).toStrictEqual([])
   })
 })

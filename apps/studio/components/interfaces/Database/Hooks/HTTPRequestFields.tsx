@@ -1,12 +1,13 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -50,9 +51,9 @@ const HTTPRequestFields = ({
 }: HTTPRequestFieldsProps) => {
   const { ref } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { canReadAPIKeys } = useApiKeysVisibility()
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: ref, reveal: true },
     { enabled: canReadAPIKeys }

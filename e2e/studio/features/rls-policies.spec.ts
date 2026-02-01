@@ -200,12 +200,12 @@ test.describe.serial('RLS Policies', () => {
 
         // A confirmation modal appears when toggling RLS from the policies page
         await expect(
-          page.getByRole('heading', { name: 'Confirm to disable Row Level Security' }),
+          page.getByRole('heading', { name: 'Disable Row Level Security' }),
           'RLS disable confirmation modal should appear'
         ).toBeVisible({ timeout: 50000 })
 
         // Confirm disabling RLS
-        await page.getByRole('button', { name: 'Confirm' }).click()
+        await page.getByRole('button', { name: 'Disable RLS' }).click()
 
         // After confirming, the toggle button text should change to "Enable RLS"
         await expect(
@@ -234,7 +234,7 @@ test.describe.serial('RLS Policies', () => {
       // Hover the badge to verify the tooltip explains the risk
       await unrestrictedBadge.hover()
       await expect(
-        page.getByText(/Data is publicly accessible via API/i),
+        page.getByText(/This table can be accessed by anyone via the Data API as RLS is disabled/i),
         'Tooltip should describe unrestricted public access when RLS is disabled'
       ).toBeVisible({ timeout: 10000 })
     })

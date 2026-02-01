@@ -3,7 +3,13 @@ import { useRef } from 'react'
 
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 
-export function useLastUsedAPIKeysLogQuery(projectRef: string, enabled?: boolean) {
+export function useLastUsedAPIKeysLogQuery({
+  projectRef,
+  enabled,
+}: {
+  projectRef: string
+  enabled?: boolean
+}) {
   const now = useRef(new Date()).current
   return useLogsQuery(
     projectRef,

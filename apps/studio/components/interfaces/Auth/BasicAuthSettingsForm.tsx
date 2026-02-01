@@ -38,7 +38,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
 
 const schema = object({
@@ -58,7 +58,7 @@ export const BasicAuthSettingsForm = () => {
     error: authConfigError,
     isError,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 

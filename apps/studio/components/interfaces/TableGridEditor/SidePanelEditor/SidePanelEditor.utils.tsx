@@ -5,10 +5,12 @@ import Papa from 'papaparse'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
+import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
+import { createDatabasePolicy } from 'data/database-policies/database-policy-create-mutation'
 import type { Constraint } from 'data/database/constraints-query'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
@@ -496,6 +498,8 @@ export const createTable = async ({
   isRLSEnabled,
   importContent,
   organizationSlug,
+  generatedPolicies = [],
+  onCreatePoliciesSuccess,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -510,6 +514,8 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
   organizationSlug?: string
+  generatedPolicies?: GeneratedPolicy[]
+  onCreatePoliciesSuccess?: () => void
 }) => {
   const queryClient = getQueryClient()
 
@@ -583,6 +589,39 @@ export const createTable = async ({
     queryKey: ['table', 'create-with-columns'],
   })
 
+  // 6. Create generated RLS policies if any
+  // [Joshen] Possible area for optimization to create all policies in a single query call
+  // Can be subsequently added to the table creation SQL as well for a single transaction
+
+  const failedPolicies: GeneratedPolicy[] = []
+  if (generatedPolicies.length > 0 && isRLSEnabled) {
+    toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
+    await Promise.all(
+      generatedPolicies.map(async (policy) => {
+        try {
+          return await createDatabasePolicy({
+            projectRef,
+            connectionString,
+            payload: {
+              name: policy.name,
+              table: policy.table,
+              schema: policy.schema,
+              definition: policy.definition,
+              check: policy.check,
+              action: policy.action,
+              command: policy.command,
+              roles: policy.roles,
+            },
+          })
+        } catch (error: any) {
+          console.error('Failed to generate policy', error.message)
+          failedPolicies.push(policy)
+        }
+      })
+    )
+    onCreatePoliciesSuccess?.()
+  }
+
   // Track table creation event (fire-and-forget to avoid blocking)
   sendEvent({
     event: {
@@ -591,6 +630,7 @@ export const createTable = async ({
         method: 'table_editor',
         schema_name: payload.schema,
         table_name: payload.name,
+        has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
       },
       groups: {
         project: projectRef,
@@ -681,7 +721,6 @@ export const createTable = async ({
                 type="horizontal"
                 barClass="bg-brand"
                 labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                labelBottomClass=""
                 labelTop={`${progress.toFixed(2)}%`}
                 labelTopClass="tabular-nums"
               />
@@ -721,7 +760,7 @@ export const createTable = async ({
   })
 
   // Finally, return the created table
-  return table
+  return { table, failedPolicies }
 }
 
 /** TODO: Refactor to do in a single transaction */

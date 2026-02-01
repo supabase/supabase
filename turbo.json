@@ -3,11 +3,18 @@
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**"
+      ]
     },
     "cms#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "BLOG_APP_URL",
         "CRON_SECRET",
@@ -25,10 +32,15 @@
         "S3_ENDPOINT",
         "VERCEL_PROJECT_PRODUCTION_URL"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "design-system#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
@@ -41,10 +53,16 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".contentlayer/**"
+      ]
     },
     "studio#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPPORT_API_URL",
@@ -84,6 +102,8 @@
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "NEXT_PUBLIC_MCP_URL",
+        "NEXT_PUBLIC_IS_NIMBUS",
+        "NEXT_PUBLIC_ONGOING_INCIDENT",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
@@ -102,6 +122,8 @@
         "DEFAULT_PROJECT_NAME",
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
+        "BRAINTRUST_API_KEY",
+        "BRAINTRUST_PROJECT_ID",
         "AUTH_JWT_SECRET",
         "LOGFLARE_API_KEY",
         "LOGFLARE_PUBLIC_ACCESS_TOKEN",
@@ -123,14 +145,24 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
-        "NEXT_PUBLIC_IS_NIMBUS",
-        "NEXT_PUBLIC_ONGOING_INCIDENT"
+        "STATUSPAGE_API_KEY",
+        "STATUSPAGE_PAGE_ID"
       ],
-      "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "passThroughEnv": [
+        "CURRENT_CLI_VERSION",
+        "VERCEL_GIT_COMMIT_SHA",
+        "SNIPPETS_MANAGEMENT_FOLDER",
+        "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "www#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "ANALYZE",
         "CI",
@@ -192,19 +224,26 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "LUMA_API_KEY",
+        "NEXT_RUNTIME",
         // These env vars are used by some community and marketing integrations
         "SENTRY_DSN_COMMUNITY",
         "NOTION_SUPASQUAD_API_KEY",
         "NOTION_SUPASQUAD_APPLICATIONS_DB_ID",
+        "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY",
-        "NEXT_RUNTIME"
+        "CUSTOMERIO_APP_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".contentlayer/**"
+      ]
     },
     "ui-library#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
@@ -226,7 +265,11 @@
         "SUPABASE_MANAGEMENT_API_TOKEN",
         "OPENAI_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".contentlayer/**"
+      ]
     },
     "lint": {
       "outputs": []
@@ -242,7 +285,9 @@
       "cache": false
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": [
+        "^typecheck"
+      ],
       "outputs": []
     }
   }

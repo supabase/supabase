@@ -7,7 +7,11 @@ title: 'Manage Compute usage'
 
 Each project on the Supabase platform includes a dedicated Postgres instance running on its own server. You are charged for the [Compute](/docs/guides/platform/compute-and-disk#compute) resources of that server, independent of your database usage.
 
-Paused projects do not count towards Compute usage.
+<Admonition type="note">
+
+Paused projects do not count towards Compute usage. Compute Hours are **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
 
 ## How charges are calculated
 
@@ -103,6 +107,22 @@ The project's Compute size changes throughout the billing cycle.
 | **Subtotal**                  |       | **<Price price="39" />** |
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="29" />** |
+
+### Projects not running for full month
+
+One project is running for the entire month, two other projects were launched and deleted within a few days.
+We only bill for the hours while the project was running and billing stops once a project is deleted.
+Compute is always billed in arrears when your billing cycle resets.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| Compute Hours Micro Project 2 | 20    | <Price price="0.27" />      |
+| Compute Hours Micro Project 3 | 70    | <Price price="0.94" />      |
+| **Subtotal**                  |       | **<Price price="36.21" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="26.21" />** |
 
 ## View usage
 

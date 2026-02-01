@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import { useStorageV2Page } from 'components/interfaces/Storage/Storage.utils'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -34,10 +34,14 @@ export const StorageBucketsLayout = ({
             label: 'Buckets',
             href: `/project/${ref}/storage/files`,
           },
-          {
-            label: 'Settings',
-            href: `/project/${ref}/storage/files/settings`,
-          },
+          ...(IS_PLATFORM
+            ? [
+                {
+                  label: 'Settings',
+                  href: `/project/${ref}/storage/files/settings`,
+                },
+              ]
+            : []),
           {
             label: 'Policies',
             href: `/project/${ref}/storage/files/policies`,

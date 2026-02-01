@@ -1,16 +1,19 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { NoPermission } from 'components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useLogsQuery } from 'hooks/analytics/useLogsQuery'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { Card, EyeOffIcon } from 'ui'
+import { Card } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   Table,
@@ -20,17 +23,13 @@ import {
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
-import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
-import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
+import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
 
 interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }
 }
 
-function useLastSeen(
-  projectRef: string,
-  enabled?: boolean
-): {
+function useLastSeen({ projectRef, enabled }: { projectRef: string; enabled?: boolean }): {
   data?: LastSeenData
   isLoading: boolean
 } {
@@ -70,20 +69,23 @@ function useLastSeen(
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
 
-  const { canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
   const {
     data: apiKeysData,
     error,
-    isLoading: isLoadingApiKeys,
+    isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed') ?? true
-  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(
-    projectRef ?? '',
-    !hideApiKeyLastUsed
-  )
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen({
+    projectRef: projectRef ?? '',
+    enabled: showApiKeysLastUsed,
+  })
 
   const secretApiKeys = useMemo(
     () =>
@@ -99,7 +101,7 @@ export const SecretAPIKeys = () => {
   const deletingAPIKeyIdRef = useRef<string | null>(null)
 
   const { setValue: setAPIKeyToDelete, value: apiKeyToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
+    urlKey: 'deleteSecretKey',
     select: (id: string) => (id ? secretApiKeys?.find((key) => key.id === id) : undefined),
     enabled: !!secretApiKeys?.length,
     onError: (_error, selectedId) =>
@@ -108,7 +110,7 @@ export const SecretAPIKeys = () => {
 
   const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted API key`)
+      toast.success('Successfully deleted secret key')
       setAPIKeyToDelete(null)
     },
     onError: () => {
@@ -132,17 +134,7 @@ export const SecretAPIKeys = () => {
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
-        <Card>
-          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-            <EyeOffIcon />
-            <p className="text-sm text-foreground">
-              You do not have permission to read API Secret Keys
-            </p>
-            <p className="text-foreground-light">
-              Contact your organization owner/admin to request access.
-            </p>
-          </div>
-        </Card>
+        <NoPermission resourceText="view API keys" />
       ) : isLoadingApiKeys || isLoadingPermissions ? (
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
@@ -164,7 +156,7 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                {!hideApiKeyLastUsed && (
+                {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
                 <TableHead />

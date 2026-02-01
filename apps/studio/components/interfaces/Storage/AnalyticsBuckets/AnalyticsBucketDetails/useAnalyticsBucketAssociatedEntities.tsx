@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useDeletePublicationMutation } from 'data/replication/publication-delete-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'

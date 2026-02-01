@@ -6,9 +6,8 @@ import { useParams } from 'common'
 import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { APIKeys } from 'components/interfaces/Home/NewProjectPanel/APIKeys'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
-import { DisplayConfigSettings } from 'components/ui/ProjectSettings/DisplayConfigSettings'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
@@ -35,7 +34,8 @@ const BuildingState = () => {
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
@@ -134,8 +134,7 @@ const BuildingState = () => {
               </div>
             </div>
             <div className="col-span-12  lg:col-span-8 flex flex-col gap-8">
-              <DisplayApiSettings showLegacyText={false} />
-              <DisplayConfigSettings />
+              <APIKeys />
             </div>
           </div>
         </div>

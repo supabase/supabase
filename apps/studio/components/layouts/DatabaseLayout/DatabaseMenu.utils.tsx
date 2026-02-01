@@ -47,7 +47,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Triggers',
           key: 'triggers',
-          url: `/project/${ref}/database/triggers`,
+          url: `/project/${ref}/database/triggers/data`,
           items: [],
         },
         {
@@ -106,7 +106,7 @@ export const generateDatabaseMenu = (
     {
       title: 'Platform',
       items: [
-        ...(showPgReplicate
+        ...(IS_PLATFORM && showPgReplicate
           ? [
               {
                 name: 'Replication',

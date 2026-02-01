@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 
 export function RecentItems() {
   const { ref } = useParams()
@@ -53,17 +53,21 @@ export function RecentItems() {
                   transition={{ delay: index * 0.012, duration: 0.15 }}
                 >
                   <Link
-                    href={`/project/${ref}/${
+                    href={
                       item.type === 'sql'
-                        ? `sql/${item.metadata?.sqlId}`
+                        ? `/project/${ref}/sql/${item.metadata?.sqlId}`
                         : item.type === 'r' ||
                             item.type === 'v' ||
                             item.type === 'm' ||
                             item.type === 'f' ||
                             item.type === 'p'
-                          ? `editor/${item.metadata?.tableId}?schema=${item.metadata?.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`
-                          : `explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
-                    }`}
+                          ? buildTableEditorUrl({
+                              projectRef: ref,
+                              tableId: item.metadata?.tableId!,
+                              schema: item.metadata?.schema,
+                            })
+                          : `/project/${ref}/explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
+                    }
                     className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
                   >
                     <div className="flex h-6 w-6 items-center justify-center rounded bg-surface-100 border">

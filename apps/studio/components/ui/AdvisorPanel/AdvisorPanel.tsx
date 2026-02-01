@@ -75,7 +75,7 @@ export const AdvisorPanel = () => {
 
   const {
     data: lintData,
-    isLoading: isLintsLoading,
+    isPending: isLintsLoading,
     isError: isLintsError,
   } = useProjectLintsQuery(
     { projectRef: project?.ref },
@@ -108,7 +108,7 @@ export const AdvisorPanel = () => {
 
   const {
     data: notificationsData,
-    isLoading: isNotificationsLoading,
+    isPending: isNotificationsLoading,
     isError: isNotificationsError,
   } = useNotificationsV2Query(
     {
@@ -328,7 +328,6 @@ export const AdvisorPanel = () => {
                 .filter((status) => !notificationFilterStatuses.includes(status))
                 .forEach((status) => setNotificationFilters(status, 'status'))
             }}
-            hasProjectRef={hasProjectRef}
             onClose={handleClose}
             isPlatform={IS_PLATFORM}
           />

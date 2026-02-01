@@ -50,3 +50,59 @@ export const useCloudMarketplaceOnboardingInfoQuery = <TData = CloudMarketplaceO
     staleTime: 30 * 60 * 1000,
   })
 }
+
+export type CloudMarketplaceContractEligibilityVariables = {
+  buyerId: string
+}
+
+export async function getCloudMarketplaceContractLinkingEligibility(
+  { buyerId }: CloudMarketplaceContractEligibilityVariables,
+  signal?: AbortSignal
+) {
+  const { data, error } = await get(
+    '/platform/cloud-marketplace/buyers/{buyer_id}/contract-linking-eligibility',
+    {
+      params: { path: { buyer_id: buyerId } },
+      signal,
+    }
+  )
+
+  if (error) handleError(error)
+
+  return data
+}
+
+export type CloudMarketplaceContractLinkingEligibility = Awaited<
+  ReturnType<typeof getCloudMarketplaceContractLinkingEligibility>
+>
+export type CloudMarketplaceContractLinkingIneligibilityReason =
+  CloudMarketplaceContractLinkingEligibility['eligibility']['reasons'][0]
+
+export type CloudMarketplaceContractEligibilityError = ResponseError
+
+export const useCloudMarketplaceContractLinkingEligibilityQuery = <
+  TData = CloudMarketplaceContractLinkingEligibility,
+>(
+  { buyerId }: CloudMarketplaceContractEligibilityVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<
+    CloudMarketplaceContractLinkingEligibility,
+    CloudMarketplaceContractEligibilityError,
+    TData
+  > = {}
+) => {
+  const { profile } = useProfile()
+  return useQuery<
+    CloudMarketplaceContractLinkingEligibility,
+    CloudMarketplaceContractEligibilityError,
+    TData
+  >({
+    queryKey: cloudMarketplaceKeys.contractLinkingEligibility(buyerId),
+    queryFn: ({ signal }) => getCloudMarketplaceContractLinkingEligibility({ buyerId }, signal),
+    enabled: enabled && profile !== undefined,
+    ...options,
+    staleTime: 60 * 1000,
+  })
+}

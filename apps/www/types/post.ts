@@ -15,8 +15,10 @@ export interface PostTypes {
     url: string
   }
   content?: string
-  thumb: string
-  image?: string
+  imgThumb?: string // Used by blog posts and case studies
+  imgSocial?: string // Used by blog posts
+  thumb?: string // Used by events
+  thumb_light?: string // Used by events (light mode variant)
   readingTime?: string
   description: string
   url: string
@@ -110,8 +112,8 @@ export type Blog = {
   blog_url?: string
   url?: string
   source: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgThumb?: string
   youtubeHero?: string
   launchweek?: number | string
   meta_title?: string
@@ -145,8 +147,8 @@ export type BlogData = {
   blog_url?: string
   url?: string
   source: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgThumb?: string
   youtubeHero?: string
   launchweek?: number | string
   meta_title?: string

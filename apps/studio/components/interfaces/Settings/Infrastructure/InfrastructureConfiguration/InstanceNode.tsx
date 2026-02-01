@@ -386,9 +386,6 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             >
               Restart replica
             </DropdownMenuItem>
-            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
-                Resize replica
-              </DropdownMenuItem> */}
             <DropdownMenuItemTooltip
               className="gap-x-2 !pointer-events-auto"
               disabled={!canManageReplicas}

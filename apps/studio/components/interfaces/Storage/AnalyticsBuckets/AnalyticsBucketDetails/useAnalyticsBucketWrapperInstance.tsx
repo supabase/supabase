@@ -13,10 +13,10 @@ export const useAnalyticsBucketWrapperInstance = (
   { bucketId }: { bucketId?: string },
   options?: { enabled?: boolean }
 ) => {
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const defaultEnabled = options?.enabled ?? true
-  const { data, isLoading: isLoadingFDWs } = useFDWsQuery(
+  const { data, isPending: isLoadingFDWs } = useFDWsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
