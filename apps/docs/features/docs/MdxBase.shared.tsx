@@ -7,6 +7,7 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
+import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/[slug]/AiSkillsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
@@ -42,6 +43,7 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AiPromptsIndex,
+  AiSkillsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
