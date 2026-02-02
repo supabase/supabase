@@ -6,6 +6,7 @@ import {
   COMPUTE_MAX_IOPS,
   computeInstanceAddonVariantIdSchema,
 } from 'shared-data'
+
 import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,
@@ -182,7 +183,28 @@ type AvailableAddon = {
 }
 
 const isProjectAddonVariantMeta = (meta: unknown): meta is ProjectAddonVariantMeta => {
-  return typeof meta === 'object' && meta !== null
+  if (typeof meta !== 'object' || meta === null) return false
+
+  const obj = meta as Record<string, unknown>
+
+  // Validate supported_cloud_providers is an array if present (used at line 200)
+  if ('supported_cloud_providers' in obj && !Array.isArray(obj.supported_cloud_providers)) {
+    return false
+  }
+
+  // Check for at least one expected property to ensure it's likely a real ProjectAddonVariantMeta
+  const hasExpectedProperty =
+    'cpu_cores' in obj ||
+    'memory_gb' in obj ||
+    'cpu_dedicated' in obj ||
+    'baseline_disk_io_mbs' in obj ||
+    'max_disk_io_mbs' in obj ||
+    'connections_direct' in obj ||
+    'connections_pooler' in obj ||
+    'backup_duration_days' in obj ||
+    'supported_cloud_providers' in obj
+
+  return hasExpectedProperty
 }
 
 export function getAvailableComputeOptions(
