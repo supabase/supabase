@@ -4,6 +4,8 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
+import { filterProtectedSchemaIndexStatements } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+
 export type TableIndexAdvisorVariables = {
   projectRef?: string
   connectionString?: string | null
@@ -134,6 +136,14 @@ export async function getTableIndexAdvisorSuggestions({
   const suggestions: IndexAdvisorSuggestion[] = (result || [])
     .filter((row) => row.index_statements && row.index_statements.length > 0)
     .map((row) => {
+      // Filter out protected schema index statements
+      const filteredStatements = filterProtectedSchemaIndexStatements(row.index_statements)
+
+      // Skip this suggestion if all statements were filtered out
+      if (filteredStatements.length === 0) {
+        return null
+      }
+
       const improvement =
         row.total_cost_before > 0
           ? ((row.total_cost_before - row.total_cost_after) / row.total_cost_before) * 100
@@ -144,7 +154,7 @@ export async function getTableIndexAdvisorSuggestions({
         calls: row.calls,
         total_time: row.total_time,
         mean_time: row.mean_time,
-        index_statements: row.index_statements,
+        index_statements: filteredStatements,
         startup_cost_before: row.startup_cost_before,
         startup_cost_after: row.startup_cost_after,
         total_cost_before: row.total_cost_before,
@@ -152,6 +162,7 @@ export async function getTableIndexAdvisorSuggestions({
         improvement_percentage: Math.round(improvement * 100) / 100,
       }
     })
+    .filter((suggestion): suggestion is IndexAdvisorSuggestion => suggestion !== null)
 
   // Extract all unique columns from suggestions
   const allIndexStatements = suggestions.flatMap((s) => s.index_statements)

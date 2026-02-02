@@ -3,8 +3,10 @@
  *
  * Note that events are not emitted for users that have opted out of telemetry.
  *
- * Original definitions located at:
- * https://github.com/supabase/supabase/blob/master/packages/common/telemetry-constants.ts
+ * ## Naming conventions
+ * Event names and actions should use standardized past-tense verbs for data quality and consistency.
+ * Only use verbs already established in this file or in https://github.com/supabase/platform/blob/develop/shared/src/telemetry.ts
+ * Adding new verbs requires @growth-eng review to prevent data pollution.
  *
  * @module telemetry-frontend
  */
@@ -165,14 +167,14 @@ export interface CronJobUpdatedEvent {
 }
 
 /**
- * Cron job deleted.
+ * Cron job removed. Previously: cron_job_deleted
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
-export interface CronJobDeletedEvent {
-  action: 'cron_job_deleted'
+export interface CronJobRemovedEvent {
+  action: 'cron_job_removed'
   groups: TelemetryGroups
 }
 
@@ -263,6 +265,24 @@ export interface FeaturePreviewDisabledEvent {
 }
 
 /**
+ * User was exposed to the project creation form (exposure event for RLS option experiment).
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationRlsOptionExperimentExposedEvent {
+  action: 'project_creation_rls_option_experiment_exposed'
+  properties: {
+    /**
+     * Experiment variant: 'control' (checkbox hidden) or 'test' (checkbox shown)
+     */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Existing project creation form was submitted and the project was created.
  *
  * @group Events
@@ -276,6 +296,32 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    */
   properties: {
     instanceSize?: string
+    /**
+     * Whether the automatic RLS event trigger option was enabled
+     */
+    enableRlsEventTrigger?: boolean
+    /**
+     * Experiment variant: 'control' (checkbox not shown) or 'test' (checkbox shown)
+     */
+    rlsOptionVariant?: 'control' | 'test'
+    /**
+     * Whether Data API is enabled.
+     * true = "Data API + Connection String" (default)
+     * false = "Only Connection String"
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Data API schema configuration. Only relevant when dataApiEnabled is true.
+     * true = "Use dedicated API schema for Data API"
+     * false = "Use public schema for Data API" (default)
+     */
+    useApiSchema?: boolean
+    /**
+     * Postgres engine type selection.
+     * true = "Postgres with OrioleDB" (alpha)
+     * false = "Postgres" (default)
+     */
+    useOrioleDb?: boolean
   }
   groups: TelemetryGroups
 }
@@ -668,7 +714,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAddSQLBlockClicked {
+export interface CustomReportAddSQLBlockClickedEvent {
   action: 'custom_report_add_sql_block_clicked'
   groups: TelemetryGroups
 }
@@ -1407,7 +1453,7 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
  * @source studio
  * @page /dashboard/org/{slug}/security
  */
-export interface OrganizationMfaEnforcementUpdated {
+export interface OrganizationMfaEnforcementUpdatedEvent {
   action: 'organization_mfa_enforcement_updated'
   properties: {
     mfaEnforced: boolean
@@ -1539,14 +1585,14 @@ export interface BranchMergeSubmittedEvent {
 }
 
 /**
- * Triggered when a branch merge is successful.
+ * Triggered when a branch merge completes successfully. Previously: branch_merge_succeeded
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/merge
  */
-export interface BranchMergeSucceededEvent {
-  action: 'branch_merge_succeeded'
+export interface BranchMergeCompletedEvent {
+  action: 'branch_merge_completed'
   properties: {
     /**
      * The type of branch being merged, e.g. preview, persistent
@@ -1714,18 +1760,12 @@ export interface HomeActivityStatClickedEvent {
 export interface RealtimeExperimentExposedEvent {
   action: 'realtime_experiment_exposed'
   properties: {
-    /**
-     * The experiment variant shown to the user
-     */
+    /** The PostHog experiment/feature flag name */
+    experiment_id: 'realtimeButtonVariant'
+    /** The experiment variant shown to the user */
     variant: 'control' | 'hide-button' | 'triggers'
-    /**
-     * Whether the table already has realtime enabled
-     */
+    /** Whether the table already has realtime enabled */
     table_has_realtime_enabled: boolean
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
   }
   groups: TelemetryGroups
 }
@@ -2046,9 +2086,9 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Whether RLS was enabled on the table
      */
@@ -2058,7 +2098,7 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
      */
     has_rls_policies: boolean
     /**
-     * Whether AI-generated policies were used (only possible in treatment)
+     * Whether AI-generated policies were used (only possible in variation)
      */
     has_generated_policies: boolean
   }
@@ -2080,9 +2120,9 @@ export interface TableCreateGeneratePoliciesExperimentExposedEvent {
      */
     experiment_id: 'tableCreateGeneratePolicies'
     /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
+     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
      */
-    variant: 'control' | 'treatment'
+    variant: 'control' | 'variation'
     /**
      * Days since project creation (to segment by new user cohorts)
      */
@@ -2453,7 +2493,17 @@ export interface LogDrainSaveButtonClickedEvent {
     /**
      * Type of the destination saved
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'elastic'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
   }
   groups: TelemetryGroups
 }
@@ -2471,7 +2521,17 @@ export interface LogDrainConfirmButtonSubmittedEvent {
     /**
      * Type of the destination confirmed
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'elastic'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
   }
   groups: TelemetryGroups
 }
@@ -2550,6 +2610,18 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User clicked on "Explain with AI" button in Query Performance detail panel
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/query-performance
+ */
+export interface QueryPerformanceAIExplanationButtonClickedEvent {
+  action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2590,6 +2662,128 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
+ * Triggered when a Studio error UI element is displayed (mounted).
+ * This includes error Admonitions and Toast notifications.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DashboardErrorCreatedEvent {
+  action: 'dashboard_error_created'
+  properties: {
+    /**
+     * Source of the error
+     */
+    source?: 'admonition' | 'toast'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully completed installing an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_installed
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallCompletedEvent {
+  action: 'integration_install_completed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted an integration install via the integrations marketplace. Previously: integration_install_started
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallSubmittedEvent {
+  action: 'integration_install_submitted'
+  properties: {
+    /**
+     * The name of the integration being installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted an integration uninstall via the integrations marketplace. Previously: integration_uninstall_started
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallSubmittedEvent {
+  action: 'integration_uninstall_submitted'
+  properties: {
+    /**
+     * The name of the integration being uninstalled
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Installation failed for an integration.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallFailedEvent {
+  action: 'integration_install_failed'
+  properties: {
+    /**
+     * The name of the integration whose installation failed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully completed uninstalling an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_uninstalled
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallCompletedEvent {
+  action: 'integration_uninstall_completed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the enable Create rls_ensure trigger button in the RLS Event Trigger banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/auth/policies
+ */
+export interface RlsEventTriggerBannerCreateButtonClickedEvent {
+  action: 'rls_event_trigger_banner_create_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2601,13 +2795,14 @@ export type TelemetryEvent =
   | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
-  | CronJobDeletedEvent
+  | CronJobRemovedEvent
   | CronJobCreateClickedEvent
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
@@ -2643,7 +2838,7 @@ export type TelemetryEvent =
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
-  | CustomReportAddSQLBlockClicked
+  | CustomReportAddSQLBlockClickedEvent
   | CustomReportAssistantSQLBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
@@ -2680,7 +2875,7 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
-  | OrganizationMfaEnforcementUpdated
+  | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | BranchCreateButtonClickedEvent
@@ -2688,7 +2883,7 @@ export type TelemetryEvent =
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent
-  | BranchMergeSucceededEvent
+  | BranchMergeCompletedEvent
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
@@ -2731,5 +2926,13 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | QueryPerformanceAIExplanationButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
+  | DashboardErrorCreatedEvent
+  | IntegrationInstallCompletedEvent
+  | IntegrationInstallSubmittedEvent
+  | IntegrationUninstallSubmittedEvent
+  | IntegrationInstallFailedEvent
+  | IntegrationUninstallCompletedEvent
+  | RlsEventTriggerBannerCreateButtonClickedEvent

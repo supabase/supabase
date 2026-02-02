@@ -21,9 +21,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
-  PIPELINE_ACTIONABLE_STATES,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,
@@ -182,7 +181,7 @@ export const RowMenu = ({
             <p>Edit destination</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
-            <Trash stroke="red" size={14} />
+            <Trash size={14} />
             <p>Delete destination</p>
           </DropdownMenuItem>
         </DropdownMenuContent>

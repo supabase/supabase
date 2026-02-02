@@ -1,8 +1,11 @@
 'use client'
 
-import * as React from 'react'
 import { Index } from '@/__registry__'
+import * as React from 'react'
 
+import { useConfig } from '@/hooks/use-config'
+import { styles } from '@/registry/styles'
+import { ChevronRight, Expand } from 'lucide-react'
 import {
   Button,
   CollapsibleContent_Shadcn_,
@@ -10,9 +13,6 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
-import { useConfig } from '@/hooks/use-config'
-import { styles } from '@/registry/styles'
-import { ChevronRight, Expand } from 'lucide-react'
 
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
@@ -70,7 +70,7 @@ export function ComponentPreview({
     return (
       <>
         <div
-          className={cn('preview flex min-h-[350px] w-full justify-center p-10', {
+          className={cn('preview flex min-h-[256px] w-full justify-center p-10', {
             'items-center': align === 'center',
             'items-start': align === 'start',
             'items-end': align === 'end',

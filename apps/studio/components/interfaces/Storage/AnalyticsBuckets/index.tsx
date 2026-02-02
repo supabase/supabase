@@ -6,10 +6,10 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
-import { BASE_PATH } from 'lib/constants'
+import { createNavigationHandler } from 'lib/navigation'
 import {
   Card,
   Table,
@@ -26,6 +26,7 @@ import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
@@ -40,6 +41,9 @@ export const AnalyticsBuckets = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  const { data: config } = useProjectStorageConfigQuery({ projectRef: ref })
+  const maxAnalyticsBuckets = config?.features.icebergCatalog.maxCatalogs ?? 2
 
   const {
     data: buckets = [],
@@ -57,18 +61,6 @@ export const AnalyticsBuckets = () => {
       : bucket.name.toLowerCase().includes(filterString.toLowerCase())
   )
   const hasNoBuckets = buckets.length === 0
-
-  const handleBucketNavigation = (
-    bucketId: string,
-    event: React.MouseEvent | React.KeyboardEvent
-  ) => {
-    const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucketId)}`
-    if (event.metaKey || event.ctrlKey) {
-      window.open(`${BASE_PATH}${url}`, '_blank')
-    } else {
-      router.push(url)
-    }
-  }
 
   return (
     <>
@@ -101,13 +93,12 @@ export const AnalyticsBuckets = () => {
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
-                              {analyticsBuckets.length}
-                              /2
+                              {analyticsBuckets.length}/{maxAnalyticsBuckets}
                             </span>
                           </TooltipTrigger>
-                          <TooltipContent side="bottom" className="w-64 text-center">
-                            Each project can only have up to 2 buckets while analytics buckets are
-                            in alpha{' '}
+                          <TooltipContent side="bottom" className="w-72 text-center">
+                            Each project can only have up to {maxAnalyticsBuckets} buckets while
+                            analytics buckets are in alpha{' '}
                           </TooltipContent>
                         </Tooltip>
                       )}
@@ -154,47 +145,53 @@ export const AnalyticsBuckets = () => {
                                 </TableCell>
                               </TableRow>
                             )}
-                            {analyticsBuckets.map((bucket) => (
-                              <TableRow
-                                key={bucket.name}
-                                className="relative cursor-pointer h-16 inset-focus"
-                                onClick={(event) => handleBucketNavigation(bucket.name, event)}
-                                onKeyDown={(event) => {
-                                  if (event.key === 'Enter' || event.key === ' ') {
-                                    event.preventDefault()
-                                    handleBucketNavigation(bucket.name, event)
-                                  }
-                                }}
-                                tabIndex={0}
-                              >
-                                <TableCell className="w-2 pr-1">
-                                  <AnalyticsBucketIcon
-                                    size={16}
-                                    className="text-foreground-muted"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <p className="whitespace-nowrap max-w-[512px] truncate">
-                                    {bucket.name}
-                                  </p>
-                                </TableCell>
+                            {analyticsBuckets.map((bucket) => {
+                              const handleBucketNavigation = createNavigationHandler(
+                                `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.name)}`,
+                                router
+                              )
 
-                                <TableCell>
-                                  <p className="text-foreground-light">
-                                    <TimestampInfo
-                                      utcTimestamp={bucket.created_at}
-                                      className="text-sm text-foreground-light"
+                              return (
+                                <TableRow
+                                  key={bucket.name}
+                                  className="relative cursor-pointer h-16 inset-focus"
+                                  onClick={handleBucketNavigation}
+                                  onAuxClick={handleBucketNavigation}
+                                  onKeyDown={handleBucketNavigation}
+                                  tabIndex={0}
+                                >
+                                  <TableCell className="w-2 pr-1">
+                                    <AnalyticsBucketIcon
+                                      size={16}
+                                      className="text-foreground-muted"
                                     />
-                                  </p>
-                                </TableCell>
+                                  </TableCell>
+                                  <TableCell>
+                                    <p className="whitespace-nowrap max-w-[512px] truncate">
+                                      {bucket.name}
+                                    </p>
+                                  </TableCell>
 
-                                <TableCell>
-                                  <div className="flex justify-end items-center h-full">
-                                    <ChevronRight size={14} className="text-foreground-muted/60" />
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
+                                  <TableCell>
+                                    <p className="text-foreground-light">
+                                      <TimestampInfo
+                                        utcTimestamp={bucket.created_at}
+                                        className="text-sm text-foreground-light"
+                                      />
+                                    </p>
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <div className="flex justify-end items-center h-full">
+                                      <ChevronRight
+                                        size={14}
+                                        className="text-foreground-muted/60"
+                                      />
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            })}
                           </TableBody>
                         </Table>
                       </Card>

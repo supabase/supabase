@@ -72,6 +72,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
     onSuccess: () => {
       setIsFeedbackSent(true)
       setFeedback('')
+      setStoredFeedback(null)
       setScreenshot(null)
       setSending(false)
     },
@@ -294,9 +295,9 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
 
 const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
   return (
-    <div className="px-0 pt-3 pb-0">
-      <div className="grid gap-3">
-        <div className="px-6 grid gap-4 py-3 text-center text-foreground-light">
+    <div>
+      <div className="grid gap-3 py-3">
+        <div className="px-6 grid gap-4 text-center text-foreground-light">
           <CircleCheck className="mx-auto text-brand-500" size={24} />
           <div className="text-center flex flex-col">
             <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>

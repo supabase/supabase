@@ -25,12 +25,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import {
-  ChangeEmailAddressForm,
-  GitHubChangeEmailAddress,
-  SSOChangeEmailAddress,
-} from './ChangeEmailAddress'
 import {
   PageSection,
   PageSectionContent,
@@ -39,6 +33,12 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import {
+  ChangeEmailAddressForm,
+  GitHubChangeEmailAddress,
+  SSOChangeEmailAddress,
+} from './ChangeEmailAddress'
 
 const getProviderName = (provider: string) =>
   provider === 'github'

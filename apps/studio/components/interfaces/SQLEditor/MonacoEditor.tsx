@@ -188,7 +188,7 @@ const MonacoEditor = ({
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
     if (id && value) {
-      if (ref && profile !== undefined && project !== undefined) {
+      if (!snippet && ref && profile !== undefined && project !== undefined) {
         const snippet = createSqlSnippetSkeletonV2({
           idOverride: id,
           name: snippetName,
@@ -205,7 +205,8 @@ const MonacoEditor = ({
 
   useEffect(() => {
     if (debouncedValue.length > 0 && snippet) {
-      snapV2.setSql(id, value)
+      const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
+      snapV2.setSql({ id, sql: value, shouldInvalidate })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue])

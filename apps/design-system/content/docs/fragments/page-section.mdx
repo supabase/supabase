@@ -14,11 +14,11 @@ fragment: true
 ## Sub-components
 
 - `PageSection` - Root container with orientation variants (`horizontal` or `vertical`)
-- `PageSectionMeta` - Meta wrapper for summary and aside (groups summary and aside together)
-- `PageSectionSummary` - Container for section title and description (should be inside PageSectionMeta, has `flex-1`)
+- `PageSectionMeta` - Meta wrapper for `PageSectionSummary` and optional `PageSectionAside`
+- `PageSectionSummary` - Container for section title and description (should be inside `PageSectionMeta`, has `flex-1`)
 - `PageSectionTitle` - Section heading (h2)
 - `PageSectionDescription` - Supporting text below section title
-- `PageSectionAside` - Container for section-level actions (should be inside PageSectionMeta, has `shrink-0`)
+- `PageSectionAside` - Container for section-level actions (should be inside `PageSectionMeta`, has `shrink-0`)
 - `PageSectionContent` - Container for the main section content
 
 ## Orientation Variants
@@ -42,6 +42,15 @@ fragment: true
 <ComponentPreview
   name="page-section-with-aside"
   description="PageSection with multiple action buttons in the Aside component"
+  peekCode
+  wide
+/>
+
+### Without Aside
+
+<ComponentPreview
+  name="page-section-title-only"
+  description="PageSection with title only"
   peekCode
   wide
 />

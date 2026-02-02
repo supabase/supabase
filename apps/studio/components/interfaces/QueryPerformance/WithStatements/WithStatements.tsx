@@ -25,6 +25,7 @@ import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { captureQueryPerformanceError } from '../QueryPerformance.utils'
 import { getErrorMessage } from 'lib/get-error-message'
+import { parseAsString, useQueryStates } from 'nuqs'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
@@ -55,6 +56,10 @@ export const WithStatements = ({
     true
   )
 
+  const [{ indexAdvisor }] = useQueryStates({
+    indexAdvisor: parseAsString.withDefault('false'),
+  })
+
   const handleRefresh = () => {
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
@@ -62,8 +67,8 @@ export const WithStatements = ({
   }
 
   const processedData = useMemo(() => {
-    return transformStatementDataToRows(data || [])
-  }, [data])
+    return transformStatementDataToRows(data || [], indexAdvisor === 'true')
+  }, [data, indexAdvisor])
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 

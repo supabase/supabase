@@ -436,8 +436,8 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/auth',
-        destination: '/project/:ref/auth',
-        permanent: false,
+        destination: '/project/:ref/auth/providers',
+        permanent: true,
       },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
@@ -563,6 +563,15 @@ const nextConfig = {
   turbopack: {
     rules: {
       '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      // special case for Deno libs to be loaded as a raw text. They're passed as raw text to the Monaco editor.
+      'edge-runtime.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      'lib.deno.d.ts': {
         loaders: ['raw-loader'],
         as: '*.js',
       },

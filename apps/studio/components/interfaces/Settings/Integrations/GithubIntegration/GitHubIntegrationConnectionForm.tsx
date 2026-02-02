@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { IS_PLATFORM } from 'common'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -73,6 +74,9 @@ const GitHubIntegrationConnectionForm = ({
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !selectedProject?.parent_project_ref
+
+  const isProPlanAndUp = selectedOrganization?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -448,7 +452,7 @@ const GitHubIntegrationConnectionForm = ({
                           <Button
                             type="default"
                             className="justify-start h-[34px] w-full"
-                            disabled={isLoadingGitHubRepos}
+                            disabled={disabled || isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
                               <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -467,12 +471,7 @@ const GitHubIntegrationConnectionForm = ({
                           </Button>
                         </FormControl_Shadcn_>
                       </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_
-                        portal
-                        className="p-0 w-80"
-                        side="bottom"
-                        align="start"
-                      >
+                      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
                           <CommandList_Shadcn_ className="!max-h-[200px]">
@@ -704,7 +703,7 @@ const GitHubIntegrationConnectionForm = ({
                   <Button
                     type="outline"
                     onClick={handleRemoveIntegration}
-                    disabled={disabled || isDeletingConnection}
+                    disabled={isDeletingConnection}
                     loading={isDeletingConnection}
                   >
                     Disable integration
@@ -724,7 +723,7 @@ const GitHubIntegrationConnectionForm = ({
                   </Button>
                 )}
                 <Button
-                  type="primary"
+                  type={promptProPlanUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     disabled ||

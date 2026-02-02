@@ -1,11 +1,11 @@
 import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
 import AlertError from 'components/ui/AlertError'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { sortBy } from 'lodash'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface PolicyRolesProps {
   selectedRoles: string[]

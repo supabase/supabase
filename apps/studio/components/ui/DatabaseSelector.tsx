@@ -38,8 +38,8 @@ interface DatabaseSelectorProps {
   additionalOptions?: { id: string; name: string }[]
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
-  portal?: boolean
   className?: string
+  align?: 'start' | 'end'
 }
 
 export const DatabaseSelector = ({
@@ -48,7 +48,7 @@ export const DatabaseSelector = ({
   additionalOptions = [],
   onSelectId = noop,
   buttonProps,
-  portal = true,
+  align = 'end',
   className,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
@@ -118,7 +118,7 @@ export const DatabaseSelector = ({
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={portal}>
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align={align}>
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             {additionalOptions.length > 0 && (

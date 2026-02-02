@@ -89,7 +89,7 @@ export const ServiceList = () => {
                 </Alert_Shadcn_>
               ) : (
                 <FormLayout
-                  layout="horizontal"
+                  layout="flex-row-reverse"
                   label={
                     isCustomDomainActive ? (
                       <div className="flex items-center space-x-2">
@@ -107,6 +107,7 @@ export const ServiceList = () => {
                         ? 'RESTful endpoint for querying your read replica'
                         : 'RESTful endpoint for querying and managing your database'
                   }
+                  className="[&>div]:xl:w-1/2 [&>div>div]:w-full"
                 >
                   <Input copy readOnly className="font-mono" value={endpoint} />
                 </FormLayout>

@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -27,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'

@@ -129,7 +129,7 @@ export const ReportsNumericFilter = ({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="p-0 w-72" portal={true}>
+      <PopoverContent align="start" className="p-0 w-72">
         <form
           onSubmit={(e) => {
             e.preventDefault()

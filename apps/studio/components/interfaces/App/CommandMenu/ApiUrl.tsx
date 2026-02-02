@@ -6,6 +6,7 @@ import { Badge, copyToClipboard } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { toast } from 'sonner'
 
 export function useApiUrlCommand() {
   const setIsOpen = useSetCommandMenuOpen()
@@ -27,7 +28,9 @@ export function useApiUrlCommand() {
         id: 'api-url',
         name: 'Copy API URL',
         action: () => {
-          copyToClipboard(apiUrl ?? '')
+          copyToClipboard(apiUrl ?? '', () => {
+            toast.success('API URL copied to clipboard')
+          })
           setIsOpen(false)
         },
         icon: () => <Link />,

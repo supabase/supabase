@@ -11,7 +11,6 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
@@ -19,6 +18,7 @@ import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organizat
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,

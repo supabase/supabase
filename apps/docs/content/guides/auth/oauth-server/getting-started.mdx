@@ -200,7 +200,7 @@ export default async function ConsentPage({
 }: {
   searchParams: { authorization_id?: string }
 }) {
-  const authorizationId = searchParams.authorization_id
+  const authorizationId = (await searchParams).authorization_id
 
   if (!authorizationId) {
     return <div>Error: Missing authorization_id</div>

@@ -8,6 +8,7 @@ const MAX_PENDING_EVENTS = 20
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
+  uiHost?: string
 }
 
 class PostHogClient {
@@ -18,14 +19,20 @@ class PostHogClient {
   private pendingGroups: Record<string, string> = {}
   private pendingIdentification: { userId: string; properties?: Record<string, any> } | null = null
   private pendingEvents: Array<{ event: string; properties: Record<string, any> }> = []
+  private pendingExposures: Array<{ experimentId: string; properties: Record<string, any> }> = []
   private config: PostHogClientConfig
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
 
   constructor(config: PostHogClientConfig = {}) {
+    const apiHost =
+      config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green'
+    const uiHost =
+      config.uiHost || process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com'
+
     this.config = {
       apiKey: config.apiKey || process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      apiHost:
-        config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green',
+      apiHost,
+      uiHost,
     }
   }
 
@@ -39,6 +46,7 @@ class PostHogClient {
 
     const config: Partial<PostHogConfig> = {
       api_host: this.config.apiHost,
+      ui_host: this.config.uiHost,
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
@@ -77,6 +85,12 @@ class PostHogClient {
         this.pendingEvents = []
 
         this.initialized = true
+
+        // Flush any pending experiment exposures (with deduplication)
+        this.pendingExposures.forEach(({ experimentId, properties }) => {
+          this.fireExposureIfNew(experimentId, properties)
+        })
+        this.pendingExposures = []
       },
     }
 
@@ -152,6 +166,7 @@ class PostHogClient {
     this.pendingIdentification = null
     this.pendingGroups = {}
     this.pendingEvents = []
+    this.pendingExposures = []
 
     if (!this.initStarted) return
 
@@ -174,6 +189,63 @@ class PostHogClient {
     } catch (error) {
       console.error('PostHog getDistinctId failed:', error)
       return undefined
+    }
+  }
+
+  /**
+   * Returns PostHog's session_id for the current session.
+   * Returns undefined until PostHog's `loaded` callback fires.
+   */
+  getSessionId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.get_session_id()
+    } catch (error) {
+      console.error('PostHog getSessionId failed:', error)
+      return undefined
+    }
+  }
+
+  /**
+   * Captures an experiment exposure event with session-based deduplication.
+   * Events are queued if PostHog is not yet initialized, then deduped on flush.
+   */
+  captureExperimentExposure(
+    experimentId: string,
+    properties: Record<string, any>,
+    hasConsent: boolean = true
+  ) {
+    if (!hasConsent) return
+
+    if (!this.initialized) {
+      // Only queue if not already queued for this experiment (first exposure wins)
+      if (!this.pendingExposures.some((e) => e.experimentId === experimentId)) {
+        if (this.pendingExposures.length >= this.maxPendingEvents) {
+          this.pendingExposures.shift()
+        }
+        this.pendingExposures.push({ experimentId, properties })
+      }
+      return
+    }
+
+    this.fireExposureIfNew(experimentId, properties)
+  }
+
+  private fireExposureIfNew(experimentId: string, properties: Record<string, any>) {
+    const sessionId = this.getSessionId()
+    if (!sessionId) return
+
+    const storageKey = `ph_exposed:${experimentId}`
+
+    try {
+      if (sessionStorage.getItem(storageKey) === sessionId) return
+
+      const eventName = `${experimentId}_experiment_exposed`
+      posthog.capture(eventName, { experiment_id: experimentId, ...properties })
+      sessionStorage.setItem(storageKey, sessionId)
+    } catch (error) {
+      console.error('PostHog experiment exposure capture failed:', error)
     }
   }
 }

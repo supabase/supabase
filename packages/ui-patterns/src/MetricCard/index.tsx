@@ -1,28 +1,28 @@
 'use client'
 
+import dayjs from 'dayjs'
+import { ChevronRight, HelpCircle } from 'lucide-react'
+import Link from 'next/link'
 import * as React from 'react'
 import { useContext } from 'react'
 import {
+  Area,
+  AreaChart,
+  Tooltip as RechartsTooltip,
+  TooltipProps as RechartsTooltipProps,
+  ResponsiveContainer,
+} from 'recharts'
+import {
   Button,
+  Card,
+  CardContent,
+  CardTitle,
+  Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Card,
-  CardTitle,
   cn,
-  CardContent,
-  Skeleton,
 } from 'ui'
-import { ExternalLink, HelpCircle } from 'lucide-react'
-import Link from 'next/link'
-import {
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  TooltipProps as RechartsTooltipProps,
-} from 'recharts'
-import dayjs from 'dayjs'
 
 interface MetricCardContextValue {
   isLoading?: boolean
@@ -46,7 +46,11 @@ interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
 const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
   ({ isLoading = false, isDisabled = false, className, children, ...props }, ref) => {
     return (
-      <Card ref={ref} className={cn(className)} {...props}>
+      <Card
+        ref={ref}
+        className={cn('group-hover:bg-surface-200 transition-colors', className)}
+        {...props}
+      >
         <MetricCardContext.Provider value={{ isLoading, isDisabled }}>
           {children}
         </MetricCardContext.Provider>
@@ -59,10 +63,11 @@ MetricCard.displayName = 'MetricCard'
 interface MetricCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   href?: string
   children: React.ReactNode
+  linkTooltip?: string
 }
 
 const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>(
-  ({ className, href, children, ...props }, ref) => {
+  ({ className, href, children, linkTooltip, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -73,14 +78,24 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
         {...props}
       >
         <div className="flex flex-row items-center gap-2">{children}</div>
-        {href && (
-          <Button type="text" size="tiny" className="px-1 text-foreground-lighter" asChild>
-            <Link href={href}>
-              <ExternalLink aria-disabled={true} size={14} strokeWidth={1.5} />
-              <span className="sr-only">More information</span>
-            </Link>
-          </Button>
-        )}
+        {href ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="text"
+                size="tiny"
+                className="px-1 text-foreground-lighter group-hover:text-foreground absolute right-3 transition-colors"
+                asChild
+              >
+                <Link href={href}>
+                  <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
+                  <span className="sr-only">More information</span>
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            {linkTooltip ? <TooltipContent>{linkTooltip}</TooltipContent> : null}
+          </Tooltip>
+        ) : null}
       </div>
     )
   }
@@ -132,7 +147,7 @@ const MetricCardLabel = React.forwardRef<HTMLDivElement, MetricCardLabelProps>(
             <TooltipTrigger asChild>
               <HelpCircle size={14} strokeWidth={1.5} />
             </TooltipTrigger>
-            <TooltipContent>{tooltip}</TooltipContent>
+            <TooltipContent className="max-w-xs">{tooltip}</TooltipContent>
           </Tooltip>
         )}
       </CardTitle>
