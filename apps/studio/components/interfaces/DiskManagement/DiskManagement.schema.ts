@@ -4,6 +4,7 @@ import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
   calculateIopsRequiredForThroughput,
+  calculateMaxThroughput,
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
@@ -189,11 +190,8 @@ export const CreateDiskStorageSchema = ({
       }
 
       if (throughput !== undefined) {
-        // gp3 requires roughly 4 IOPS per 1 MB/s of throughput (0.25 MB/s per IOPS), capped by gp3 max
-        const iopsThroughputLimit = Math.min(
-          0.25 * provisionedIOPS,
-          DISK_LIMITS[DiskType.GP3].maxThroughput
-        )
+        // gp3 throughput scales with provisioned IOPS (capped by gp3 max)
+        const iopsThroughputLimit = calculateMaxThroughput(provisionedIOPS)
         if (throughput > DISK_LIMITS[DiskType.GP3].maxThroughput) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
