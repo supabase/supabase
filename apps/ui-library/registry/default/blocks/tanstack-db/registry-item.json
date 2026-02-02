@@ -4,11 +4,12 @@
   "type": "registry:block",
   "title": "TanStack DB for Next.js and Supabase",
   "description": "TanStack Query integration with Supabase collections for type-safe database operations",
-  "registryDependencies": [],
+  "registryDependencies": ["button", "input", "label", "sheet"],
   "dependencies": [
     "@tanstack/react-query@latest",
     "github:ivasilov/supabase-collection",
-    "zod@latest"
+    "zod@latest",
+    "@tanstack/react-db@latest"
   ],
   "files": [
     {

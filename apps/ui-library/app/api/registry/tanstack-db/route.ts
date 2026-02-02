@@ -64,7 +64,8 @@ export async function GET(request: NextRequest) {
     // Get the first table for the example CRUD page
     const tableNames = Object.keys(openApiSpec.definitions).filter((name) => !name.startsWith('_'))
     const firstTableName = tableNames[0]
-    const firstTableDefinition = firstTableName ? openApiSpec.definitions[firstTableName] : null
+    // TODO: Remove the hardcoded table name
+    const firstTableDefinition = firstTableName ? openApiSpec.definitions['persons'] : null
 
     // Read the base registry JSON
     const baseRegistry = await readBaseRegistry()

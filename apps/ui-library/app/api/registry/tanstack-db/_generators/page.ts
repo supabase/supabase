@@ -17,9 +17,6 @@ import { ${listComponentName} } from './${tableName}-list'
 export default async function ${pascalName}Page() {
   const queryClient = getQueryClient()
 
-  // Prefetch ${camelName} on the server
-  await queryClient.prefetchQuery(${collectionName}.listQueryOptions())
-
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="container mx-auto max-w-4xl py-8">
