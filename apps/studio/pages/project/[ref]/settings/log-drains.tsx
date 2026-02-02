@@ -54,6 +54,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     useCheckEntitlements('log_drains')
 
   const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
@@ -218,6 +219,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                   <DropdownMenuContent align="end" side="bottom">
                     {LOG_DRAIN_TYPES.filter((t) => {
                       if (t.value === 'sentry') return sentryEnabled
+                      if (t.value === 's3') return s3Enabled
                       if (t.value === 'axiom') return axiomEnabled
                       return true
                     }).map((drainType) => (

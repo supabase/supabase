@@ -91,6 +91,14 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('s3'),
+    s3_bucket: z.string().min(1, { message: 'Bucket name is required' }),
+    storage_region: z.string().min(1, { message: 'Region is required' }),
+    access_key_id: z.string().min(1, { message: 'Access Key ID is required' }),
+    secret_access_key: z.string().min(1, { message: 'Secret Access Key is required' }),
+    batch_timeout: z.coerce
+      .number()
+      .int({ message: 'Batch timeout must be an integer' })
+      .min(1, { message: 'Batch timeout must be a positive integer' }),
   }),
   z.object({
     type: z.literal('sentry'),
@@ -180,6 +188,7 @@ export function LogDrainDestinationSheetForm({
   const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
 
   const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
 
   const { ref } = useParams()
@@ -206,6 +215,11 @@ export function LogDrainDestinationSheetForm({
       username: defaultConfig?.username || '',
       password: defaultConfig?.password || '',
       dsn: defaultConfig?.dsn || '',
+      s3_bucket: defaultConfig?.s3_bucket || '',
+      storage_region: defaultConfig?.storage_region || '',
+      access_key_id: defaultConfig?.access_key_id || '',
+      secret_access_key: defaultConfig?.secret_access_key || '',
+      batch_timeout: defaultConfig?.batch_timeout ?? 3000,
       dataset_name: defaultConfig?.dataset_name || '',
       api_token: defaultConfig?.api_token || '',
     },
@@ -334,6 +348,7 @@ export function LogDrainDestinationSheetForm({
                       <SelectContent_Shadcn_>
                         {LOG_DRAIN_TYPES.filter((t) => {
                           if (t.value === 'sentry') return sentryEnabled
+                          if (t.value === 's3') return s3Enabled
                           if (t.value === 'axiom') return axiomEnabled
                           return true
                         }).map((type) => (
@@ -522,6 +537,49 @@ export function LogDrainDestinationSheetForm({
                         </>
                       }
                     />
+                  </div>
+                )}
+                {type === 's3' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      value="s3_bucket"
+                      label="S3 Bucket"
+                      placeholder="my-log-bucket"
+                      formControl={form.control}
+                      description="The name of an existing S3 bucket."
+                    />
+                    <LogDrainFormItem
+                      value="storage_region"
+                      label="Region"
+                      placeholder="us-east-1"
+                      formControl={form.control}
+                      description="AWS region where the bucket is located."
+                    />
+                    <LogDrainFormItem
+                      value="access_key_id"
+                      label="Access Key ID"
+                      placeholder="AKIA..."
+                      formControl={form.control}
+                    />
+                    <LogDrainFormItem
+                      type="password"
+                      value="secret_access_key"
+                      label="Secret Access Key"
+                      placeholder="••••••••••••••••"
+                      formControl={form.control}
+                    />
+                    <LogDrainFormItem
+                      type="number"
+                      value="batch_timeout"
+                      label="Batch Timeout (ms)"
+                      placeholder="3000"
+                      formControl={form.control}
+                      description="Recommended 2000–5000ms."
+                    />
+                    <p className="text-xs text-foreground-lighter">
+                      Ensure the account tied to the Access Key ID can write to the specified
+                      bucket.
+                    </p>
                   </div>
                 )}
                 {type === 'axiom' && (
