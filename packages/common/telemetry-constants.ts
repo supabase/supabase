@@ -2493,9 +2493,6 @@ export interface LogDrainSaveButtonClickedEvent {
     /**
      * Type of the destination saved
      */
-<<<<<<< HEAD
-    destination: string
-=======
     destination:
       | 'postgres'
       | 'bigquery'
@@ -2507,7 +2504,6 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
->>>>>>> f17f049e5e24cf906509ace8581f27d667f95b34
   }
   groups: TelemetryGroups
 }
