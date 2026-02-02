@@ -8,8 +8,8 @@ sidebar_label: 'Debugging'
 
 <Admonition type="note">
 
-  The docs reflect the error codes and information in [PostgREST's official
-  docs](https://docs.postgrest.org/en/stable/).
+The docs reflect the error codes and information in [PostgREST's official
+docs](https://docs.postgrest.org/en/stable/).
 
 </Admonition>
 
@@ -35,37 +35,37 @@ To understand the errors reference the [Postgres Error Docs](https://www.postgre
 Here's the text formatted as a proper markdown table:
 
 | Postgres error code(s) | HTTP status                    | Error description               |
-| ------------------------ | ------------------------------ | ------------------------------- |
-| 08\*                     | 503                            | pg connection err               |
-| 09\*                     | 500                            | triggered action exception      |
-| 0L\*                     | 403                            | invalid grantor                 |
-| 0P\*                     | 403                            | invalid role specification      |
-| 23503                    | 409                            | foreign key violation           |
-| 23505                    | 409                            | uniqueness violation            |
-| 25006                    | 405                            | read only sql transaction       |
-| 25\*                     | 500                            | invalid transaction state       |
-| 28\*                     | 403                            | invalid auth specification      |
-| 2D\*                     | 500                            | invalid transaction termination |
-| 38\*                     | 500                            | external routine exception      |
-| 39\*                     | 500                            | external routine invocation     |
-| 3B\*                     | 500                            | savepoint exception             |
-| 40\*                     | 500                            | transaction rollback            |
-| 53400                    | 500                            | config limit exceeded           |
-| 53\*                     | 503                            | insufficient resources          |
-| 54\*                     | 500                            | too complex                     |
-| 55\*                     | 500                            | obj not in prerequisite state   |
-| 57\*                     | 500                            | operator intervention           |
-| 58\*                     | 500                            | system error                    |
-| F0\*                     | 500                            | config file error               |
-| HV\*                     | 500                            | foreign data wrapper error      |
-| P0001                    | 400                            | default code for "raise"        |
-| P0\*                     | 500                            | PL/pgSQL error                  |
-| XX\*                     | 500                            | internal error                  |
-| 42883                    | 404                            | undefined function              |
-| 42P01                    | 404                            | undefined table                 |
-| 42P17                    | 500                            | infinite recursion              |
-| 42501                    | if authenticated 403, else 401 | insufficient privileges         |
-| other                    | 400                            |                                 |
+| ---------------------- | ------------------------------ | ------------------------------- |
+| 08\*                   | 503                            | connection error                |
+| 09\*                   | 500                            | triggered action exception      |
+| 0L\*                   | 403                            | invalid grantor                 |
+| 0P\*                   | 403                            | invalid role specification      |
+| 23503                  | 409                            | foreign key violation           |
+| 23505                  | 409                            | uniqueness violation            |
+| 25006                  | 405                            | read only SQL transaction       |
+| 25\*                   | 500                            | invalid transaction state       |
+| 28\*                   | 403                            | invalid auth specification      |
+| 2D\*                   | 500                            | invalid transaction termination |
+| 38\*                   | 500                            | external routine exception      |
+| 39\*                   | 500                            | external routine invocation     |
+| 3B\*                   | 500                            | savepoint exception             |
+| 40\*                   | 500                            | transaction rollback            |
+| 53400                  | 500                            | config limit exceeded           |
+| 53\*                   | 503                            | insufficient resources          |
+| 54\*                   | 500                            | too complex                     |
+| 55\*                   | 500                            | obj not in prerequisite state   |
+| 57\*                   | 500                            | operator intervention           |
+| 58\*                   | 500                            | system error                    |
+| F0\*                   | 500                            | config file error               |
+| HV\*                   | 500                            | foreign data wrapper error      |
+| P0001                  | 400                            | default code for "raise"        |
+| P0\*                   | 500                            | PL/pgSQL error                  |
+| XX\*                   | 500                            | internal error                  |
+| 42883                  | 404                            | undefined function              |
+| 42P01                  | 404                            | undefined table                 |
+| 42P17                  | 500                            | infinite recursion              |
+| 42501                  | if authenticated 403, else 401 | insufficient privileges         |
+| other                  | 400                            |                                 |
 
 ## API level errors
 
@@ -73,12 +73,12 @@ Here's the text formatted as a proper markdown table:
 
 Errors that prevent that data API from interacting with Postgres.
 
-| Code     | HTTP status | Description                                                                                                             |
-| -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Code     | HTTP status | Description                                                                                                           |
+| -------- | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | PGRST000 | 503         | Could not connect with the database due to an incorrect connection string or due to the Postgres service not running. |
-| PGRST001 | 503         | Could not connect with the database due to an internal error.                                                           |
-| PGRST002 | 503         | Could not connect with the database when building the schema cache                                                      |
-| PGRST003 | 504         | The request timed out waiting for a connection from PostgREST's internal pool                                           |
+| PGRST001 | 503         | Could not connect with the database due to an internal error.                                                         |
+| PGRST002 | 503         | Could not connect with the database when building the schema cache                                                    |
+| PGRST003 | 504         | The request timed out waiting for a connection from PostgREST's internal pool                                         |
 
 ### API requests
 
@@ -87,7 +87,7 @@ Errors with data structures or request formatting
 | Code     | HTTP status | Description                                                                                                                 |
 | -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
 | PGRST100 | 400         | Parsing error in the query string parameter.                                                                                |
-| PGRST101 | 405         | For database functions, only `GET`and`POST` verbs are allowed. Any other verb will throw this error.                        |
+| PGRST101 | 405         | For database functions, only `GET` and `POST` verbs are allowed. Any other verb will throw this error.                        |
 | PGRST102 | 400         | An invalid request body was sent(e.g. an empty body or malformed JSON).                                                     |
 | PGRST103 | 416         | An invalid range was specified for limits.                                                                                  |
 | PGRST105 | 405         | An invalid `UPDATE`/`UPSERT` request was done                                                                               |
@@ -190,8 +190,7 @@ from
   cross join unnest(metadata.parsed) as parsed
 where
   parsed.sql_state_code like '42501'
-  and -- the authenticator role represents the database API
-  parsed.user_name = 'authenticator'
+  and parsed.user_name = 'authenticator' -- the authenticator role represents the database API
 order by timestamp desc
 limit 100;
 ```
@@ -202,7 +201,7 @@ PostgREST error codes are only captured in the logs for projects running V14+. Y
 
 </Admonition>
 
-#### Find specific API Error
+#### Find specific API error
 
 ```sql
 select
@@ -211,16 +210,15 @@ select
   event_message,
   coalesce(proxy_status, 'not_recorded') as error_codes,
   path
-from edge_logs
-cross join unnest(metadata) as metadata
-cross join unnest(response) AS response
-cross join unnest(request) AS request
+from
+  edge_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(response) as response
+  cross join unnest(request) as request
 where
   status_code >= 300
-    and
-   regexp_contains(path, '^/rest/v1/')
-    and
-  regexp_contains(proxy_status, '(?i)THE_RELEVANT_STATUS_CODE')
+  and regexp_contains(path, '^/rest/v1/')
+  and regexp_contains(proxy_status, '(?i)THE_RELEVANT_STATUS_CODE');
 ```
 
 #### Count errors per path by hour:
@@ -241,45 +239,40 @@ from
   cross join unnest(response) as response
   cross join unnest(response.headers) as headers
   cross join unnest(request) as request
-where 
-  status_code >= 300 
-    and 
-  regexp_contains(path, '^/rest/v1/')
+where status_code >= 300 and regexp_contains(path, '^/rest/v1/')
 group by hour, proxy_status, path;
 ```
 
-#### Find data API request from specific authetenticated user
+#### Find data API request from specific authenticated user
 
 ```sql
 select
   cast(timestamp as datetime) as timestamp,
   event_message,
-  cf_connecting_ip AS requesters_ip,
-  url AS request_URL,
-  request.method AS request_method,
+  cf_connecting_ip as requesters_ip,
+  url as request_url,
+  request.method as request_method,
   sb.auth_user as user_id,
-  apikey_payload.role AS apikey_role,
+  apikey_payload.role as apikey_role,
   authorization_payload.role as authorization_token_role,
   user_agent,
   city,
   country,
   continent,
   postalCode
-from edge_logs
-cross join unnest(metadata) as metadata
-cross join unnest(request) as request
-cross join unnest(sb) as sb
-cross join unnest(jwt) as jwt
-cross join unnest(jwt.apikey) as jwt_apikey
-cross join unnest(jwt_apikey.payload) as apikey_payload
-cross join unnest(authorization) as authorization_key
-cross join unnest(authorization_key.payload) as authorization_payload
-cross join unnest(headers) as headers
-cross join unnest(cf) as cf
-cross join unnest(response) as response
-where
-  regexp_contains(path, '^/rest/v1/') 
-    AND
-  sb.auth_user = 'SOME_USER_ID' --<---ADD USER_ID from auth.users table
-order by timestamp DESC;
+from
+  edge_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(request) as request
+  cross join unnest(sb) as sb
+  cross join unnest(jwt) as jwt
+  cross join unnest(jwt.apikey) as jwt_apikey
+  cross join unnest(jwt_apikey.payload) as apikey_payload
+  cross join unnest(authorization) as authorization_key
+  cross join unnest(authorization_key.payload) as authorization_payload
+  cross join unnest(headers) as headers
+  cross join unnest(cf) as cf
+  cross join unnest(response) as response
+where regexp_contains(path, '^/rest/v1/') and sb.auth_user = 'SOME_USER_ID' -- <---ADD USER_ID from auth.users table
+order by timestamp desc;
 ```
