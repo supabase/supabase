@@ -436,8 +436,8 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/auth',
-        destination: '/project/:ref/auth',
-        permanent: false,
+        destination: '/project/:ref/auth/providers',
+        permanent: true,
       },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length

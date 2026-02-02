@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { IS_PLATFORM } from 'common'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -73,6 +74,9 @@ const GitHubIntegrationConnectionForm = ({
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !selectedProject?.parent_project_ref
+
+  const isProPlanAndUp = selectedOrganization?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -719,7 +723,7 @@ const GitHubIntegrationConnectionForm = ({
                   </Button>
                 )}
                 <Button
-                  type="primary"
+                  type={promptProPlanUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     disabled ||

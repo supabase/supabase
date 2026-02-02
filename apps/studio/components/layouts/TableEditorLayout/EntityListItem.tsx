@@ -1,11 +1,6 @@
-import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { type CSSProperties } from 'react'
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -18,18 +13,19 @@ import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/tabl
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
+import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { type CSSProperties } from 'react'
+import { toast } from 'sonner'
 import {
-  useRoleImpersonationStateSnapshot,
   type RoleImpersonationState,
+  useRoleImpersonationStateSnapshot,
 } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Badge,
   Button,
-  cn,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -42,8 +38,12 @@ import {
   TooltipContent,
   TooltipTrigger,
   TreeViewItemVariant,
+  cn,
+  copyToClipboard,
 } from 'ui'
+
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
+import { formatSql } from '@/lib/formatSql'
 
 export interface EntityListItemProps {
   id: number | string
@@ -263,23 +263,23 @@ export const EntityListItem = ({
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
-                    const tableDefinition = await getTableDefinition({
+                    const formattedSchema = getTableDefinition({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
+                    }).then((tableDefinition) => {
+                      if (!tableDefinition) {
+                        throw new Error('Failed to get table schema')
+                      }
+                      return formatSql(tableDefinition)
                     })
-                    if (!tableDefinition) {
-                      return toast.error('Failed to get table schema', { id: toastId })
-                    }
 
                     try {
-                      const formatted = formatSql(tableDefinition)
-                      await copyToClipboard(formatted)
-                      toast.success('Table schema copied to clipboard', { id: toastId })
-                    } catch (err: any) {
-                      toast.error('Failed to copy schema: ' + (err.message || err), {
-                        id: toastId,
+                      await copyToClipboard(formattedSchema, () => {
+                        toast.success('Table schema copied to clipboard', { id: toastId })
                       })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), { id: toastId })
                     }
                   }}
                 >

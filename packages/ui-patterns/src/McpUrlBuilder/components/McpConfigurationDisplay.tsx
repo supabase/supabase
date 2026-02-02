@@ -17,6 +17,7 @@ interface McpConfigurationDisplayProps {
   basePath: string
   onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
+  isPlatform?: boolean
 }
 
 type ConfigFormat = CodeBlockLang | 'toml'
@@ -29,12 +30,14 @@ export function McpConfigurationDisplay({
   basePath,
   onCopyCallback,
   onInstallCallback,
+  isPlatform,
 }: McpConfigurationDisplayProps) {
   const mcpButtonData = getMcpButtonData({
     basePath,
     theme,
     client: selectedClient,
     clientConfig,
+    isPlatform,
   })
 
   // Extract file extension and determine format
@@ -69,7 +72,9 @@ export function McpConfigurationDisplay({
     <div className={cn('space-y-4', className)}>
       {mcpButtonData && (
         <>
-          <div className="text-xs text-foreground-light">Install in one click:</div>
+          <div className="text-xs text-foreground-light">
+            {selectedClient.deepLinkDescription ?? 'Install in one click:'}
+          </div>
           <Button type="secondary" size="small" asChild>
             <a
               href={mcpButtonData.deepLink}
@@ -95,24 +100,25 @@ export function McpConfigurationDisplay({
         selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
 
       {selectedClient.configFile && (
-        <div className="text-xs text-foreground-light">
-          {selectedClient.primaryInstructions
-            ? 'Alternatively, add'
-            : mcpButtonData
-              ? 'Or add'
-              : 'Add'}{' '}
-          this configuration to{' '}
-          <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
-        </div>
+        <>
+          <div className="text-xs text-foreground-light">
+            {selectedClient.primaryInstructions
+              ? 'Alternatively, add'
+              : mcpButtonData
+                ? 'Or add'
+                : 'Add'}{' '}
+            this configuration to{' '}
+            <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
+          </div>
+          <CodeBlock
+            value={configValue}
+            language={displayLanguage}
+            className="max-h-64 overflow-y-auto"
+            focusable={false}
+            onCopyCallback={() => onCopyCallback?.('config')}
+          />
+        </>
       )}
-
-      <CodeBlock
-        value={configValue}
-        language={displayLanguage}
-        className="max-h-64 overflow-y-auto"
-        focusable={false}
-        onCopyCallback={() => onCopyCallback?.('config')}
-      />
 
       {selectedClient.alternateInstructions &&
         selectedClient.alternateInstructions(clientConfig, onCopyCallback)}

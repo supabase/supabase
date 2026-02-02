@@ -1,15 +1,16 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 // End of third-party imports
 
-import { API_URL } from 'lib/constants'
+import { API_URL, BASE_PATH } from 'lib/constants'
 import { HttpResponse, http } from 'msw'
 import { createMockOrganization, createMockProject } from 'tests/helpers'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'
 import { createMockProfileContext } from 'tests/lib/profile-helpers'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
 import { SupportFormPage } from '../SupportFormPage'
 
@@ -86,9 +87,7 @@ const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoist
   }
 })
 
-const supportVersionInfo = `\n\n---\nSupabase Studio version: SHA ${mockCommitSha} deployed at ${dayjs(
-  mockCommitTime
-).format('YYYY-MM-DD HH:mm:ss Z')}`
+const mockStudioVersion = `SHA ${mockCommitSha} deployed at ${dayjs(mockCommitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
 
 vi.mock('react-inlinesvg', () => ({
   __esModule: true,
@@ -172,6 +171,14 @@ vi.mock(import('lib/gotrue'), async (importOriginal) => {
       ...(actual.auth as any),
       onAuthStateChange: vi.fn(),
     },
+  }
+})
+
+vi.mock(import('lib/constants'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    IS_PLATFORM: true,
   }
 })
 
@@ -399,11 +406,9 @@ describe('SupportFormPage', () => {
       },
     })
 
-    addAPIMock({
-      method: 'get',
-      path: '/platform/status',
-      response: { is_healthy: true } as any,
-    })
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/incident-status`, () => HttpResponse.json([], { status: 200 }))
+    )
 
     addAPIMock({
       method: 'get',
@@ -461,11 +466,22 @@ describe('SupportFormPage', () => {
   })
 
   test('shows system status: not healthy', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/status',
-      response: { is_healthy: false } as any,
-    })
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/incident-status`, () =>
+        HttpResponse.json(
+          [
+            {
+              id: 'z3qp8rln72pl',
+              active_since: '2026-01-26T10:30:00Z',
+              impact: 'critical',
+              status: 'in_progress',
+              name: 'Test incident',
+            },
+          ],
+          { status: 200 }
+        )
+      )
+    )
 
     renderSupportFormPage()
 
@@ -476,7 +492,7 @@ describe('SupportFormPage', () => {
 
   test('shows system status: check failed', async () => {
     mswServer.use(
-      http.get(`${API_URL}/platform/status`, () =>
+      http.get(`${BASE_PATH}/api/incident-status`, () =>
         HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
       )
     )
@@ -810,10 +826,9 @@ describe('SupportFormPage', () => {
       siteUrl: 'https://project-1.example.com',
       additionalRedirectUrls: 'https://project-1.example.com/callbacks',
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
-    const expectedMessage =
-      'Requests return status 500 when calling the RPC endpoint' + supportVersionInfo
-    expect(payload.message).toBe(expectedMessage)
+    expect(payload.message).toBe('Requests return status 500 when calling the RPC endpoint')
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
@@ -876,10 +891,6 @@ describe('SupportFormPage', () => {
     await userEvent.clear(messageField)
     await userEvent.type(messageField, 'MFA challenge fails with an unknown error code')
 
-    expect(
-      screen.queryByRole('switch', { name: /allow support access to your project/i })
-    ).toBeNull()
-
     await userEvent.click(getSubmitButton(screen))
 
     await waitFor(() => {
@@ -895,15 +906,15 @@ describe('SupportFormPage', () => {
       organizationSlug: 'org-2',
       library: '',
       affectedServices: '',
-      allowSupportAccess: false,
+      allowSupportAccess: true,
       verified: true,
       tags: ['dashboard-support-form'],
       siteUrl: 'https://project-2.supabase.dev',
       additionalRedirectUrls: 'https://project-2.supabase.dev/redirect',
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
-    const expectedMessage = 'MFA challenge fails with an unknown error code' + supportVersionInfo
-    expect(payload.message).toBe(expectedMessage)
+    expect(payload.message).toBe('MFA challenge fails with an unknown error code')
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
@@ -1002,10 +1013,10 @@ describe('SupportFormPage', () => {
       siteUrl: 'https://project-3.apps.supabase.co',
       additionalRedirectUrls: 'https://project-3.apps.supabase.co/auth',
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
     expect(payload.message).toBe(
-      'Connections time out after 30 seconds\n\nError: Connection timeout detected' +
-        supportVersionInfo
+      'Connections time out after 30 seconds\n\nError: Connection timeout detected'
     )
 
     await waitFor(() => {
@@ -1381,10 +1392,9 @@ describe('SupportFormPage', () => {
     })
 
     const payload = submitSpy.mock.calls[0]?.[0]
-    expect(payload.message).toContain('Navigation menu does not respond after latest deploy')
-    expect(payload.message).toMatch(
-      /Dashboard logs: https:\/\/storage\.example\.com\/signed\/.+\.json/
-    )
+    expect(payload.message).toBe('Navigation menu does not respond after latest deploy')
+    expect(payload.dashboardLogs).toMatch(/^https:\/\/storage\.example\.com\/signed\/.+\.json$/)
+    expect(payload.dashboardStudioVersion).toBe(mockStudioVersion)
   })
 
   test('shows toast on submission error and allows form re-editing and resubmission', async () => {
@@ -1455,10 +1465,9 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
-    expect(payload.message).toMatch(
-      'Settings page shows 500 error - updated description' + supportVersionInfo
-    )
-    expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
+    expect(payload.message).toBe('Settings page shows 500 error - updated description')
+    expect(payload.dashboardLogs).toMatch(/^https:\/\/storage\.example\.com\/signed\/.+\.json$/)
+    expect(payload.dashboardStudioVersion).toBe(mockStudioVersion)
 
     await waitFor(() => {
       expect(toastSuccessSpy).toHaveBeenCalledWith('Support request sent. Thank you!')
@@ -1684,9 +1693,9 @@ describe('SupportFormPage', () => {
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
+      dashboardStudioVersion: mockStudioVersion,
     })
-    const expectedMessage = 'I need help accessing my Supabase account' + supportVersionInfo
-    expect(payload.message).toBe(expectedMessage)
+    expect(payload.message).toBe('I need help accessing my Supabase account')
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()

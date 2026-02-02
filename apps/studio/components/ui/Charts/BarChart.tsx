@@ -191,7 +191,7 @@ const BarChart = ({
             animationDuration={300}
             maxBarSize={48}
           >
-            {data?.map((_entry: Datum, index: any) => (
+            {data?.map((_entry: Datum, index: number) => (
               <Cell
                 key={`cell-${index}`}
                 className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}

@@ -1,12 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import dayjs, { Dayjs } from 'dayjs'
-import maxBy from 'lodash/maxBy'
-import meanBy from 'lodash/meanBy'
-import sumBy from 'lodash/sumBy'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-
+import { IS_PLATFORM, useParams } from 'common'
 import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -19,8 +12,14 @@ import {
   useFunctionsCombinedStatsQuery,
 } from 'data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import dayjs, { Dayjs } from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import maxBy from 'lodash/maxBy'
+import meanBy from 'lodash/meanBy'
+import sumBy from 'lodash/sumBy'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -66,6 +65,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
+
   const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
@@ -81,7 +81,9 @@ const PageLayout: NextPageWithLayout = () => {
   })
 
   const combinedStatsData = useMemo(() => {
-    const result = combinedStatsResults.data?.result
+    const result = combinedStatsResults.data?.result as
+      | Record<string, string | number>[]
+      | undefined
     return result || []
   }, [combinedStatsResults.data])
 
@@ -98,10 +100,10 @@ const PageLayout: NextPageWithLayout = () => {
     data: combinedStatsChartData,
     error: combinedStatsError,
     isError: isErrorCombinedStats,
-  } = useFillTimeseriesSorted(
-    combinedStatsData,
-    'timestamp',
-    [
+  } = useFillTimeseriesSorted({
+    data: combinedStatsData,
+    timestampKey: 'timestamp',
+    valueKey: [
       'requests_count',
       'log_count',
       'log_info_count',
@@ -119,10 +121,10 @@ const PageLayout: NextPageWithLayout = () => {
       'avg_external_memory_used',
       'max_cpu_time_used',
     ],
-    0,
-    startDate.toISOString(),
-    endDate.toISOString()
-  )
+    defaultValue: 0,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  })
 
   const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -179,7 +181,7 @@ const PageLayout: NextPageWithLayout = () => {
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {combinedStatsError.message}
+                        {combinedStatsError?.message ?? 'Unknown error'}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -224,7 +226,7 @@ const PageLayout: NextPageWithLayout = () => {
                         <WarningIcon />
                         <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          {combinedStatsError.message}
+                          {combinedStatsError?.message ?? 'Unknown error'}
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )
@@ -326,7 +328,7 @@ const PageLayout: NextPageWithLayout = () => {
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {combinedStatsError.message}
+                        {combinedStatsError?.message ?? 'Unknown error'}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -371,7 +373,7 @@ const PageLayout: NextPageWithLayout = () => {
                         <WarningIcon />
                         <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          {combinedStatsError.message}
+                          {combinedStatsError?.message ?? 'Unknown error'}
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )

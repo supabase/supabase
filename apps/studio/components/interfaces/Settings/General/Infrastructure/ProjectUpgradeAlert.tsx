@@ -120,14 +120,13 @@ export const ProjectUpgradeAlert = () => {
           Your project can be upgraded to the latest version of Postgres
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          <p className="mb-3">
-            The latest version of Postgres ({latestPgVersion}) is available for your project.
-          </p>
+          <p>The latest version of Postgres ({latestPgVersion}) is available for your project.</p>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
                 type="primary"
+                className="mt-2"
                 onClick={() => setShowUpgradeModal(true)}
                 disabled={projectUpgradeDisabled}
               >

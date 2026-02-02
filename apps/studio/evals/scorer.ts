@@ -2,11 +2,24 @@ import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
+import { extractUrls } from 'lib/helpers'
+import { extractIdentifiers } from 'lib/sql-identifier-quoting'
+import { isQuotedInSql, needsQuoting } from 'lib/sql-identifier-quoting'
 import { parse } from 'libpg-query'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
-type Input = string
+type Input = {
+  prompt: string
+  mockTables?: Record<
+    string,
+    Array<{
+      name: string
+      rls_enabled: boolean
+      columns: Array<{ name: string; data_type: string }>
+    }>
+  >
+}
 
 type Output = {
   finishReason: FinishReason
@@ -34,6 +47,7 @@ export type AssistantEvalCaseCategory =
 
 export type AssistantEvalCaseMetadata = {
   category?: AssistantEvalCaseCategory[]
+  description?: string
 }
 
 export type AssistantEvalCase = EvalCase<Input, Expected, AssistantEvalCaseMetadata>
@@ -125,7 +139,7 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 
 export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
   return await concisenessEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -152,7 +166,7 @@ export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
   output,
 }) => {
   return await completenessEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -180,7 +194,7 @@ export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async (
   output,
 }) => {
   return await goalCompletionEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -258,8 +272,92 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
   }
 
   return await correctnessEvaluator({
-    input,
+    input: input.prompt,
     expected: expected.correctAnswer,
     output: extractTextOnly(output.steps),
   })
+}
+
+export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = async ({
+  input,
+  output,
+}) => {
+  // Skip if no SQL queries
+  if (!output.sqlQueries?.length) {
+    return null
+  }
+
+  const errors: string[] = []
+  let totalNeedingQuotes = 0
+  let properlyQuoted = 0
+
+  for (const sql of output.sqlQueries) {
+    try {
+      const ast = await parse(sql)
+      const identifiers = extractIdentifiers(ast)
+
+      for (const identifier of identifiers) {
+        if (needsQuoting(identifier)) {
+          totalNeedingQuotes++
+          if (isQuotedInSql(sql, identifier)) {
+            properlyQuoted++
+          } else {
+            const sqlPreview = sql.length > 100 ? `${sql.substring(0, 100)}...` : sql
+            errors.push(
+              `Identifier "${identifier}" needs quoting but is not quoted in: ${sqlPreview}`
+            )
+          }
+        }
+      }
+    } catch (error) {
+      // Skip invalid SQL - already handled by sqlSyntaxScorer
+      continue
+    }
+  }
+
+  const score = totalNeedingQuotes === 0 ? 1 : properlyQuoted / totalNeedingQuotes
+
+  return {
+    name: 'SQL Identifier Quoting',
+    score,
+    metadata: errors.length > 0 ? { errors } : undefined,
+  }
+}
+
+export const urlValidityScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+  const responseText = extractTextOnly(output.steps)
+  const urls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+
+  // Skip if no URLs found
+  if (urls.length === 0) {
+    return null
+  }
+
+  const errors: string[] = []
+  let validUrls = 0
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      if (response.ok) {
+        validUrls++
+      } else {
+        errors.push(`${url} returned ${response.status}`)
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      errors.push(`${url} failed: ${errorMessage}`)
+    }
+  }
+
+  const metadata = {
+    urls,
+    errors: errors.length > 0 ? errors : undefined,
+  }
+
+  return {
+    name: 'URL Validity',
+    score: validUrls / urls.length,
+    metadata,
+  }
 }
