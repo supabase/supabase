@@ -15,17 +15,21 @@ interface CustomDocumentProps {
 export const CustomDocument = ({ doc }: CustomDocumentProps) => {
   return (
     <ScaffoldContainer id={doc.id}>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail className="sticky top-12 flex flex-col gap-y-8">
+      <ScaffoldSection className="py-12">
+        <ScaffoldSectionDetail>
           <p className="text-base m-0">{doc.name}</p>
-          <p className="text-sm text-foreground-light m-0">{doc.description}</p>
+          <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
+            <p>{doc.description}</p>
+          </div>
         </ScaffoldSectionDetail>
-        <ScaffoldSectionContent className="flex items-center justify-center h-full">
-          <Button asChild type="default" iconRight={<ExternalLink />}>
-            <a download href={doc.action.url} target="_blank" rel="noreferrer noopener">
-              {doc.action.text}
-            </a>
-          </Button>
+        <ScaffoldSectionContent>
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button asChild type="default" iconRight={<ExternalLink />}>
+              <a download href={doc.action.url} target="_blank" rel="noreferrer noopener">
+                {doc.action.text}
+              </a>
+            </Button>
+          </div>
         </ScaffoldSectionContent>
       </ScaffoldSection>
     </ScaffoldContainer>

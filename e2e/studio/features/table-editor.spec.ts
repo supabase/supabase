@@ -496,7 +496,7 @@ testRunner('table editor', () => {
 
     await page.getByRole('button', { name: 'Filter', exact: true }).click()
     await page.getByRole('button', { name: 'Add filter' }).click()
-    await page.getByRole('button', { name: 'id', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'id', exact: true }).click()
     await page.getByRole('menuitem', { name: colName }).click()
     await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
     const waitForFilterApply = createApiResponseWaiter(

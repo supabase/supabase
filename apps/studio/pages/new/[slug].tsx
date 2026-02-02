@@ -1,13 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from 'components/interfaces/ProjectCreation/ComputeSizeSelector'
@@ -17,8 +11,8 @@ import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreat
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
-  extractPostgresVersionDetails,
   PostgresVersionSelector,
+  extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
@@ -53,12 +47,19 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
-import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, FormField_Shadcn_, Form_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
+import { z } from 'zod'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -67,8 +68,13 @@ const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
   const defaultProvider = useDefaultProvider()
+  const { profile } = useProfile()
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const rlsExperimentVariant = usePHFlag<'control' | 'test' | false | undefined>(
+    'projectCreationEnableRlsEventTrigger'
+  )
+  const shouldShowEnableRlsEventTrigger = rlsExperimentVariant === 'test'
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -87,6 +93,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
+  const hasTrackedRlsExposure = useRef(false)
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -115,7 +122,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: undefined,
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
-      useApiSchema: false,
+      enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
     },
@@ -224,7 +231,13 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
-  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan
+  const userPrimaryEmail = profile?.primary_email?.toLowerCase()
+  const isUserAtFreeProjectLimit = userPrimaryEmail
+    ? membersExceededLimit.some(
+        (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
+      )
+    : false
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
 
   const {
     mutate: createProject,
@@ -236,6 +249,12 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
+          ...((rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test') && {
+            rlsOptionVariant: rlsExperimentVariant,
+          }),
+          dataApiEnabled: form.getValues('dataApi'),
+          useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
           project: res.ref,
@@ -272,7 +291,7 @@ const Wizard: NextPageWithLayout = () => {
       postgresVersion,
       instanceSize,
       dataApi,
-      useApiSchema,
+      enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
     } = values
@@ -299,10 +318,11 @@ const Wizard: NextPageWithLayout = () => {
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
-      dataApiUseApiSchema: !dataApi ? false : useApiSchema,
+      dataApiUseApiSchema: false,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
+      ...(enableRlsEventTrigger ? { dbSql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } : {}),
     }
 
     if (postgresVersion) {
@@ -368,6 +388,20 @@ const Wizard: NextPageWithLayout = () => {
       })
     }
   }, [instanceSize, watchedInstanceSize, form])
+
+  // Track exposure to RLS option experiment (only when explicitly assigned to a variant)
+  useEffect(() => {
+    if (
+      !hasTrackedRlsExposure.current &&
+      currentOrg?.slug &&
+      (rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test')
+    ) {
+      hasTrackedRlsExposure.current = true
+      track('project_creation_rls_option_experiment_exposed', {
+        variant: rlsExperimentVariant,
+      })
+    }
+  }, [currentOrg?.slug, rlsExperimentVariant, track])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -445,7 +479,7 @@ const Wizard: NextPageWithLayout = () => {
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
-                        className="rounded-none border-0"
+                        className="rounded-none border-0 border-t"
                         type="note"
                         title="Need a free project?"
                         description={

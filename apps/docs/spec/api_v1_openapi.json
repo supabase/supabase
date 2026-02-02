@@ -3006,254 +3006,6 @@
         "x-oauth-scope": "secrets:write"
       }
     },
-    "/v1/projects/{ref}/config/storage": {
-      "get": {
-        "operationId": "v1-get-storage-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/StorageConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's storage config" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_config_read"] }],
-        "summary": "Gets project's storage config",
-        "tags": ["Storage"],
-        "x-endpoint-owners": ["storage"]
-      },
-      "patch": {
-        "operationId": "v1-update-storage-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateStorageConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's storage config" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_config_write"] }],
-        "summary": "Updates project's storage config",
-        "tags": ["Storage"],
-        "x-endpoint-owners": ["storage"]
-      }
-    },
-    "/v1/projects/{ref}/config/database/postgres": {
-      "get": {
-        "operationId": "v1-get-postgres-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's Postgres config" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_read"] }],
-        "summary": "Gets project's Postgres config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
-        "x-oauth-scope": "database:read"
-      },
-      "put": {
-        "operationId": "v1-update-postgres-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdatePostgresConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's Postgres config" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
-        "summary": "Updates project's Postgres config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
-        "x-oauth-scope": "database:write"
-      }
-    },
-    "/v1/projects/{ref}/config/database/pgbouncer": {
-      "get": {
-        "operationId": "v1-get-project-pgbouncer-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's pgbouncer config" }
-        },
-        "security": [{ "fga_permissions": ["database_read"] }],
-        "summary": "Get project's pgbouncer config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
-        "x-oauth-scope": "database:read"
-      }
-    },
-    "/v1/projects/{ref}/config/database/pooler": {
-      "get": {
-        "operationId": "v1-get-pooler-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse" }
-                }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's supavisor config" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_pooling_config_read"] }],
-        "summary": "Gets project's supavisor config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra"],
-        "x-oauth-scope": "database:read"
-      },
-      "patch": {
-        "operationId": "v1-update-pooler-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's supavisor config" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_pooling_config_write"] }],
-        "summary": "Updates project's supavisor config",
-        "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["infra"],
-        "x-oauth-scope": "database:write"
-      }
-    },
     "/v1/projects/{ref}/config/auth": {
       "get": {
         "operationId": "v1-get-auth-service-config",
@@ -3329,67 +3081,6 @@
         "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
         "x-endpoint-owners": ["auth"],
         "x-oauth-scope": "auth:write"
-      }
-    },
-    "/v1/projects/{ref}/config/realtime": {
-      "get": {
-        "operationId": "v1-get-realtime-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Gets project's realtime configuration",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Gets realtime configuration",
-        "tags": ["Realtime"],
-        "x-endpoint-owners": ["realtime"]
-      },
-      "patch": {
-        "operationId": "v1-update-realtime-config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateRealtimeConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "204": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Updates realtime configuration",
-        "tags": ["Realtime"],
-        "x-endpoint-owners": ["realtime"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -5210,6 +4901,410 @@
         "x-oauth-scope": "storage:read"
       }
     },
+    "/v1/projects/{ref}/config/disk/util": {
+      "get": {
+        "operationId": "v1-get-disk-utilization",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DiskUtilMetricsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get disk utilization" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get disk utilization",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/disk": {
+      "post": {
+        "operationId": "v1-modify-database-disk",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DiskRequestBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to modify database disk" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_add_ons_write"] }],
+        "summary": "Modify database disk",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/disk/autoscale": {
+      "get": {
+        "operationId": "v1-get-project-disk-autoscale-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DiskAutoscaleConfig" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get project disk autoscale config" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Gets project disk autoscale config",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/storage": {
+      "get": {
+        "operationId": "v1-get-storage-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StorageConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's storage config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_config_read"] }],
+        "summary": "Gets project's storage config",
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["storage"]
+      },
+      "patch": {
+        "operationId": "v1-update-storage-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateStorageConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's storage config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["storage_config_write"] }],
+        "summary": "Updates project's storage config",
+        "tags": ["Storage"],
+        "x-endpoint-owners": ["storage"]
+      }
+    },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "v1-get-project-pgbouncer-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's pgbouncer config" }
+        },
+        "security": [{ "fga_permissions": ["database_read"] }],
+        "summary": "Get project's pgbouncer config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "database:read"
+      }
+    },
+    "/v1/projects/{ref}/config/database/pooler": {
+      "get": {
+        "operationId": "v1-get-pooler-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's supavisor config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_pooling_config_read"] }],
+        "summary": "Gets project's supavisor config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "operationId": "v1-update-pooler-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's supavisor config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_pooling_config_write"] }],
+        "summary": "Updates project's supavisor config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/config/database/postgres": {
+      "get": {
+        "operationId": "v1-get-postgres-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's Postgres config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_read"] }],
+        "summary": "Gets project's Postgres config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "database:read"
+      },
+      "put": {
+        "operationId": "v1-update-postgres-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostgresConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's Postgres config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
+        "summary": "Updates project's Postgres config",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/config/realtime": {
+      "get": {
+        "operationId": "v1-get-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets project's realtime configuration",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Gets realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      },
+      "patch": {
+        "operationId": "v1-update-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRealtimeConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      }
+    },
     "/v1/projects/{ref}/config/auth/sso/providers": {
       "post": {
         "operationId": "v1-create-a-sso-provider",
@@ -6927,7 +7022,7 @@
       },
       "UpdateCustomHostnameBody": {
         "type": "object",
-        "properties": { "custom_hostname": { "type": "string", "minLength": 1 } },
+        "properties": { "custom_hostname": { "type": "string", "maxLength": 253, "minLength": 1 } },
         "required": ["custom_hostname"]
       },
       "NetworkBanResponse": {
@@ -7195,7 +7290,7 @@
       },
       "VanitySubdomainBody": {
         "type": "object",
-        "properties": { "vanity_subdomain": { "type": "string" } },
+        "properties": { "vanity_subdomain": { "type": "string", "maxLength": 63 } },
         "required": ["vanity_subdomain"]
       },
       "SubdomainAvailabilityResponse": {
@@ -7676,276 +7771,6 @@
         },
         "required": ["status"],
         "additionalProperties": false
-      },
-      "StorageConfigResponse": {
-        "type": "object",
-        "properties": {
-          "fileSizeLimit": { "type": "integer", "format": "int64" },
-          "features": {
-            "type": "object",
-            "properties": {
-              "imageTransformation": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "s3Protocol": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "icebergCatalog": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxNamespaces": { "type": "integer", "minimum": 0 },
-                  "maxTables": { "type": "integer", "minimum": 0 },
-                  "maxCatalogs": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
-              },
-              "vectorBuckets": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxBuckets": { "type": "integer", "minimum": 0 },
-                  "maxIndexes": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxBuckets", "maxIndexes"]
-              }
-            },
-            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
-          },
-          "capabilities": {
-            "type": "object",
-            "properties": {
-              "list_v2": { "type": "boolean" },
-              "iceberg_catalog": { "type": "boolean" }
-            },
-            "required": ["list_v2", "iceberg_catalog"]
-          },
-          "external": {
-            "type": "object",
-            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
-            "required": ["upstreamTarget"]
-          },
-          "migrationVersion": { "type": "string" },
-          "databasePoolMode": { "type": "string" }
-        },
-        "required": [
-          "fileSizeLimit",
-          "features",
-          "capabilities",
-          "external",
-          "migrationVersion",
-          "databasePoolMode"
-        ]
-      },
-      "UpdateStorageConfigBody": {
-        "type": "object",
-        "properties": {
-          "fileSizeLimit": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 536870912000,
-            "format": "int64"
-          },
-          "features": {
-            "type": "object",
-            "properties": {
-              "imageTransformation": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "s3Protocol": {
-                "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
-              },
-              "icebergCatalog": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxNamespaces": { "type": "integer", "minimum": 0 },
-                  "maxTables": { "type": "integer", "minimum": 0 },
-                  "maxCatalogs": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
-              },
-              "vectorBuckets": {
-                "type": "object",
-                "properties": {
-                  "enabled": { "type": "boolean" },
-                  "maxBuckets": { "type": "integer", "minimum": 0 },
-                  "maxIndexes": { "type": "integer", "minimum": 0 }
-                },
-                "required": ["enabled", "maxBuckets", "maxIndexes"]
-              }
-            }
-          },
-          "external": {
-            "type": "object",
-            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
-            "required": ["upstreamTarget"]
-          }
-        },
-        "additionalProperties": false
-      },
-      "PostgresConfigResponse": {
-        "type": "object",
-        "properties": {
-          "effective_cache_size": { "type": "string" },
-          "logical_decoding_work_mem": { "type": "string" },
-          "maintenance_work_mem": { "type": "string" },
-          "track_activity_query_size": { "type": "string" },
-          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
-          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
-          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_replication_slots": { "type": "integer" },
-          "max_slot_wal_keep_size": { "type": "string" },
-          "max_standby_archive_delay": { "type": "string" },
-          "max_standby_streaming_delay": { "type": "string" },
-          "max_wal_size": { "type": "string" },
-          "max_wal_senders": { "type": "integer" },
-          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
-          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
-          "shared_buffers": { "type": "string" },
-          "statement_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "track_commit_timestamp": { "type": "boolean" },
-          "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "work_mem": { "type": "string" },
-          "checkpoint_timeout": {
-            "type": "string",
-            "description": "Default unit: s",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "hot_standby_feedback": { "type": "boolean" }
-        }
-      },
-      "UpdatePostgresConfigBody": {
-        "type": "object",
-        "properties": {
-          "effective_cache_size": { "type": "string" },
-          "logical_decoding_work_mem": { "type": "string" },
-          "maintenance_work_mem": { "type": "string" },
-          "track_activity_query_size": { "type": "string" },
-          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
-          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
-          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
-          "max_replication_slots": { "type": "integer" },
-          "max_slot_wal_keep_size": { "type": "string" },
-          "max_standby_archive_delay": { "type": "string" },
-          "max_standby_streaming_delay": { "type": "string" },
-          "max_wal_size": { "type": "string" },
-          "max_wal_senders": { "type": "integer" },
-          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
-          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
-          "shared_buffers": { "type": "string" },
-          "statement_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "track_commit_timestamp": { "type": "boolean" },
-          "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": {
-            "type": "string",
-            "description": "Default unit: ms",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "work_mem": { "type": "string" },
-          "checkpoint_timeout": {
-            "type": "string",
-            "description": "Default unit: s",
-            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
-          },
-          "hot_standby_feedback": { "type": "boolean" },
-          "restart_database": { "type": "boolean" }
-        },
-        "additionalProperties": false
-      },
-      "V1PgbouncerConfigResponse": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": { "type": "integer" },
-          "ignore_startup_parameters": { "type": "string" },
-          "max_client_conn": { "type": "integer" },
-          "pool_mode": { "type": "string", "enum": ["transaction", "session", "statement"] },
-          "connection_string": { "type": "string" },
-          "server_idle_timeout": { "type": "integer" },
-          "server_lifetime": { "type": "integer" },
-          "query_wait_timeout": { "type": "integer" },
-          "reserve_pool_size": { "type": "integer" }
-        }
-      },
-      "SupavisorConfigResponse": {
-        "type": "object",
-        "properties": {
-          "identifier": { "type": "string" },
-          "database_type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
-          "is_using_scram_auth": { "type": "boolean" },
-          "db_user": { "type": "string" },
-          "db_host": { "type": "string" },
-          "db_port": { "type": "integer" },
-          "db_name": { "type": "string" },
-          "connection_string": { "type": "string" },
-          "connectionString": { "type": "string", "description": "Use connection_string instead" },
-          "default_pool_size": { "type": "integer", "nullable": true },
-          "max_client_conn": { "type": "integer", "nullable": true },
-          "pool_mode": { "type": "string", "enum": ["transaction", "session"] }
-        },
-        "required": [
-          "identifier",
-          "database_type",
-          "is_using_scram_auth",
-          "db_user",
-          "db_host",
-          "db_port",
-          "db_name",
-          "connection_string",
-          "connectionString",
-          "default_pool_size",
-          "max_client_conn",
-          "pool_mode"
-        ]
-      },
-      "UpdateSupavisorConfigBody": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 3000,
-            "nullable": true
-          },
-          "pool_mode": {
-            "type": "string",
-            "enum": ["transaction", "session"],
-            "description": "Dedicated pooler mode for the project"
-          }
-        }
-      },
-      "UpdateSupavisorConfigResponse": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": { "type": "integer", "nullable": true },
-          "pool_mode": { "type": "string" }
-        },
-        "required": ["default_pool_size", "pool_mode"]
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -8843,148 +8668,6 @@
           "oauth_server_allow_dynamic_registration": { "type": "boolean", "nullable": true },
           "oauth_server_authorization_path": { "type": "string", "nullable": true }
         }
-      },
-      "RealtimeConfigResponse": {
-        "type": "object",
-        "properties": {
-          "private_only": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Whether to only allow private channels"
-          },
-          "connection_pool": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100,
-            "nullable": true,
-            "description": "Sets connection pool size for Realtime Authorization"
-          },
-          "max_concurrent_users": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "nullable": true,
-            "description": "Sets maximum number of concurrent users rate limit"
-          },
-          "max_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "nullable": true,
-            "description": "Sets maximum number of events per second rate per channel limit"
-          },
-          "max_bytes_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000,
-            "nullable": true,
-            "description": "Sets maximum number of bytes per second rate per channel limit"
-          },
-          "max_channels_per_client": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "nullable": true,
-            "description": "Sets maximum number of channels per client rate limit"
-          },
-          "max_joins_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "nullable": true,
-            "description": "Sets maximum number of joins per second rate limit"
-          },
-          "max_presence_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "nullable": true,
-            "description": "Sets maximum number of presence events per second rate limit"
-          },
-          "max_payload_size_in_kb": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "nullable": true,
-            "description": "Sets maximum number of payload size in KB rate limit"
-          },
-          "suspend": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Whether to suspend realtime"
-          }
-        },
-        "required": [
-          "private_only",
-          "connection_pool",
-          "max_concurrent_users",
-          "max_events_per_second",
-          "max_bytes_per_second",
-          "max_channels_per_client",
-          "max_joins_per_second",
-          "max_presence_events_per_second",
-          "max_payload_size_in_kb",
-          "suspend"
-        ]
-      },
-      "UpdateRealtimeConfigBody": {
-        "type": "object",
-        "properties": {
-          "private_only": {
-            "type": "boolean",
-            "description": "Whether to only allow private channels"
-          },
-          "connection_pool": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100,
-            "description": "Sets connection pool size for Realtime Authorization"
-          },
-          "max_concurrent_users": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "description": "Sets maximum number of concurrent users rate limit"
-          },
-          "max_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50000,
-            "description": "Sets maximum number of events per second rate per channel limit"
-          },
-          "max_bytes_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000,
-            "description": "Sets maximum number of bytes per second rate per channel limit"
-          },
-          "max_channels_per_client": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "description": "Sets maximum number of channels per client rate limit"
-          },
-          "max_joins_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "description": "Sets maximum number of joins per second rate limit"
-          },
-          "max_presence_events_per_second": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000,
-            "description": "Sets maximum number of presence events per second rate limit"
-          },
-          "max_payload_size_in_kb": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000,
-            "description": "Sets maximum number of payload size in KB rate limit"
-          },
-          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
-        },
-        "additionalProperties": false
       },
       "CreateThirdPartyAuthBody": {
         "type": "object",
@@ -9904,6 +9587,491 @@
           "public": { "type": "boolean" }
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string" },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": { "type": "number" },
+              "fs_avail_bytes": { "type": "number" },
+              "fs_used_bytes": { "type": "number" }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
+      },
+      "DiskRequestBody": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "discriminator": { "propertyName": "type" },
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "throughput_mibps": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["gp3"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["io2"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              }
+            ]
+          }
+        },
+        "required": ["attributes"]
+      },
+      "DiskAutoscaleConfig": {
+        "type": "object",
+        "properties": {
+          "growth_percent": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Growth percentage for disk autoscaling"
+          },
+          "min_increment_gb": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Minimum increment size for disk autoscaling in GB"
+          },
+          "max_size_gb": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Maximum limit the disk size will grow to in GB"
+          }
+        },
+        "required": ["growth_percent", "min_increment_gb", "max_size_gb"]
+      },
+      "StorageConfigResponse": {
+        "type": "object",
+        "properties": {
+          "fileSizeLimit": { "type": "integer", "format": "int64" },
+          "features": {
+            "type": "object",
+            "properties": {
+              "imageTransformation": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "s3Protocol": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "icebergCatalog": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxNamespaces": { "type": "integer", "minimum": 0 },
+                  "maxTables": { "type": "integer", "minimum": 0 },
+                  "maxCatalogs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxBuckets": { "type": "integer", "minimum": 0 },
+                  "maxIndexes": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
+              }
+            },
+            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
+          },
+          "capabilities": {
+            "type": "object",
+            "properties": {
+              "list_v2": { "type": "boolean" },
+              "iceberg_catalog": { "type": "boolean" }
+            },
+            "required": ["list_v2", "iceberg_catalog"]
+          },
+          "external": {
+            "type": "object",
+            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
+            "required": ["upstreamTarget"]
+          },
+          "migrationVersion": { "type": "string" },
+          "databasePoolMode": { "type": "string" }
+        },
+        "required": [
+          "fileSizeLimit",
+          "features",
+          "capabilities",
+          "external",
+          "migrationVersion",
+          "databasePoolMode"
+        ]
+      },
+      "UpdateStorageConfigBody": {
+        "type": "object",
+        "properties": {
+          "fileSizeLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 536870912000,
+            "format": "int64"
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "imageTransformation": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "s3Protocol": {
+                "type": "object",
+                "properties": { "enabled": { "type": "boolean" } },
+                "required": ["enabled"]
+              },
+              "icebergCatalog": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxNamespaces": { "type": "integer", "minimum": 0 },
+                  "maxTables": { "type": "integer", "minimum": 0 },
+                  "maxCatalogs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxBuckets": { "type": "integer", "minimum": 0 },
+                  "maxIndexes": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
+              }
+            }
+          },
+          "external": {
+            "type": "object",
+            "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
+            "required": ["upstreamTarget"]
+          }
+        },
+        "additionalProperties": false
+      },
+      "V1PgbouncerConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer" },
+          "ignore_startup_parameters": { "type": "string" },
+          "max_client_conn": { "type": "integer" },
+          "pool_mode": { "type": "string", "enum": ["transaction", "session", "statement"] },
+          "connection_string": { "type": "string" },
+          "server_idle_timeout": { "type": "integer" },
+          "server_lifetime": { "type": "integer" },
+          "query_wait_timeout": { "type": "integer" },
+          "reserve_pool_size": { "type": "integer" }
+        }
+      },
+      "SupavisorConfigResponse": {
+        "type": "object",
+        "properties": {
+          "identifier": { "type": "string" },
+          "database_type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
+          "is_using_scram_auth": { "type": "boolean" },
+          "db_user": { "type": "string" },
+          "db_host": { "type": "string" },
+          "db_port": { "type": "integer" },
+          "db_name": { "type": "string" },
+          "connection_string": { "type": "string" },
+          "connectionString": { "type": "string", "description": "Use connection_string instead" },
+          "default_pool_size": { "type": "integer", "nullable": true },
+          "max_client_conn": { "type": "integer", "nullable": true },
+          "pool_mode": { "type": "string", "enum": ["transaction", "session"] }
+        },
+        "required": [
+          "identifier",
+          "database_type",
+          "is_using_scram_auth",
+          "db_user",
+          "db_host",
+          "db_port",
+          "db_name",
+          "connection_string",
+          "connectionString",
+          "default_pool_size",
+          "max_client_conn",
+          "pool_mode"
+        ]
+      },
+      "UpdateSupavisorConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3000,
+            "nullable": true
+          },
+          "pool_mode": {
+            "type": "string",
+            "enum": ["transaction", "session"],
+            "description": "Dedicated pooler mode for the project"
+          }
+        }
+      },
+      "UpdateSupavisorConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer", "nullable": true },
+          "pool_mode": { "type": "string" }
+        },
+        "required": ["default_pool_size", "pool_mode"]
+      },
+      "PostgresConfigResponse": {
+        "type": "object",
+        "properties": {
+          "effective_cache_size": { "type": "string" },
+          "logical_decoding_work_mem": { "type": "string" },
+          "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_replication_slots": { "type": "integer" },
+          "max_slot_wal_keep_size": { "type": "string" },
+          "max_standby_archive_delay": { "type": "string" },
+          "max_standby_streaming_delay": { "type": "string" },
+          "max_wal_size": { "type": "string" },
+          "max_wal_senders": { "type": "integer" },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
+          "shared_buffers": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "track_commit_timestamp": { "type": "boolean" },
+          "wal_keep_size": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "work_mem": { "type": "string" },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "hot_standby_feedback": { "type": "boolean" }
+        }
+      },
+      "UpdatePostgresConfigBody": {
+        "type": "object",
+        "properties": {
+          "effective_cache_size": { "type": "string" },
+          "logical_decoding_work_mem": { "type": "string" },
+          "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_replication_slots": { "type": "integer" },
+          "max_slot_wal_keep_size": { "type": "string" },
+          "max_standby_archive_delay": { "type": "string" },
+          "max_standby_streaming_delay": { "type": "string" },
+          "max_wal_size": { "type": "string" },
+          "max_wal_senders": { "type": "integer" },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
+          "shared_buffers": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "track_commit_timestamp": { "type": "boolean" },
+          "wal_keep_size": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "work_mem": { "type": "string" },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "hot_standby_feedback": { "type": "boolean" },
+          "restart_database": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "RealtimeConfigResponse": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "nullable": true,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "required": [
+          "private_only",
+          "connection_pool",
+          "max_concurrent_users",
+          "max_events_per_second",
+          "max_bytes_per_second",
+          "max_channels_per_client",
+          "max_joins_per_second",
+          "max_presence_events_per_second",
+          "max_payload_size_in_kb",
+          "suspend"
+        ]
+      },
+      "UpdateRealtimeConfigBody": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
+        },
+        "additionalProperties": false
       },
       "CreateProviderBody": {
         "type": "object",

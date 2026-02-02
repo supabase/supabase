@@ -113,7 +113,7 @@ functions:
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
-      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/jwt/legacy). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
     params:
@@ -1487,7 +1487,7 @@ functions:
                 type: string
                 description: An object of query params
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `link_identity()`.
       - If the candidate identity is already linked to the existing user or another user, `link_identity()` will fail.
       - If `link_identity` is run on the server, you should handle the redirect.
@@ -1540,7 +1540,7 @@ functions:
             isOptional: true
             type: string
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlink_identity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.

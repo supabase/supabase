@@ -265,6 +265,24 @@ export interface FeaturePreviewDisabledEvent {
 }
 
 /**
+ * User was exposed to the project creation form (exposure event for RLS option experiment).
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationRlsOptionExperimentExposedEvent {
+  action: 'project_creation_rls_option_experiment_exposed'
+  properties: {
+    /**
+     * Experiment variant: 'control' (checkbox hidden) or 'test' (checkbox shown)
+     */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Existing project creation form was submitted and the project was created.
  *
  * @group Events
@@ -278,6 +296,32 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    */
   properties: {
     instanceSize?: string
+    /**
+     * Whether the automatic RLS event trigger option was enabled
+     */
+    enableRlsEventTrigger?: boolean
+    /**
+     * Experiment variant: 'control' (checkbox not shown) or 'test' (checkbox shown)
+     */
+    rlsOptionVariant?: 'control' | 'test'
+    /**
+     * Whether Data API is enabled.
+     * true = "Data API + Connection String" (default)
+     * false = "Only Connection String"
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Data API schema configuration. Only relevant when dataApiEnabled is true.
+     * true = "Use dedicated API schema for Data API"
+     * false = "Use public schema for Data API" (default)
+     */
+    useApiSchema?: boolean
+    /**
+     * Postgres engine type selection.
+     * true = "Postgres with OrioleDB" (alpha)
+     * false = "Postgres" (default)
+     */
+    useOrioleDb?: boolean
   }
   groups: TelemetryGroups
 }
@@ -2449,7 +2493,17 @@ export interface LogDrainSaveButtonClickedEvent {
     /**
      * Type of the destination saved
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'elastic'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
   }
   groups: TelemetryGroups
 }
@@ -2467,7 +2521,17 @@ export interface LogDrainConfirmButtonSubmittedEvent {
     /**
      * Type of the destination confirmed
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'elastic'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
   }
   groups: TelemetryGroups
 }
@@ -2738,6 +2802,7 @@ export type TelemetryEvent =
   | CronJobHistoryClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationInitialStepPromptIntendedEvent

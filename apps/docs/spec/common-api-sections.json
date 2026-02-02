@@ -719,6 +719,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-disk-utilization",
+        "title": "Get disk utilization",
+        "slug": "v1-get-disk-utilization",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-network-restrictions",
         "title": "Get network restrictions",
         "slug": "v1-get-network-restrictions",
@@ -740,6 +746,12 @@
         "id": "v1-get-project",
         "title": "Get project",
         "slug": "v1-get-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-disk-autoscale-config",
+        "title": "Get project disk autoscale config",
+        "slug": "v1-get-project-disk-autoscale-config",
         "type": "operation"
       },
       {
@@ -770,6 +782,12 @@
         "id": "v1-list-available-restore-versions",
         "title": "List available restore versions",
         "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-modify-database-disk",
+        "title": "Modify database disk",
+        "slug": "v1-modify-database-disk",
         "type": "operation"
       },
       {

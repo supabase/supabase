@@ -104,11 +104,17 @@ transforms:
           .timestamp = to_timestamp!(parsed.time)
           .metadata.host = .project
       }
+  # Filter out healthcheck logs from Realtime
+  realtime_logs_filtered:
+    type: filter
+    inputs:
+      - router.realtime
+    condition: '!contains(string!(.event_message), "/health")'
   # Realtime logs are structured so we parse the severity level using regex (ignore time because it has no date)
   realtime_logs:
     type: remap
     inputs:
-      - router.realtime
+      - realtime_logs_filtered
     source: |-
       .metadata.project = del(.project)
       .metadata.external_id = .metadata.project
@@ -154,7 +160,7 @@ transforms:
       if err != null || parsed == null {
         .metadata.parsed.error_severity = "info"
       }
-      if parsed != null {
+      if parsed.level != null {
        .metadata.parsed.error_severity = parsed.level
       }
       if .metadata.parsed.error_severity == "info" {

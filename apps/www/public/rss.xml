@@ -4,9 +4,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 08 Jan 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 27 Jan 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-privatelink-available</guid>
+  <title>Supabase PrivateLink is now available</title>
+  <link>https://supabase.com/blog/supabase-privatelink-available</link>
+  <description>Connect to your Supabase database without touching the public internet.</description>
+  <pubDate>Tue, 27 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-best-practices-for-ai-agents</guid>
+  <title>Introducing: Postgres Best Practices</title>
+  <link>https://supabase.com/blog/postgres-best-practices-for-ai-agents</link>
+  <description>We are releasing Agent Skills for Postgres Best Practices to help AI coding agents write high quality, correct Postgres code.</description>
+  <pubDate>Wed, 21 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/read-replicas-vs-bigger-compute</guid>
+  <title>When to use Read Replicas vs. bigger compute</title>
+  <link>https://supabase.com/blog/read-replicas-vs-bigger-compute</link>
+  <description>A practical guide to diagnosing database slowdowns and choosing between vertical scaling and Read Replicas based on your workload, budget, and performance bottlenecks.</description>
+  <pubDate>Thu, 15 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-trae-solo-integration</guid>
   <title>Introducing TRAE SOLO integration with Supabase</title>
   <link>https://supabase.com/blog/introducing-trae-solo-integration</link>
@@ -2450,6 +2471,34 @@
   <pubDate>Thu, 25 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgresql-views</guid>
+  <title>Postgres Views</title>
+  <link>https://supabase.com/blog/postgresql-views</link>
+  <description>Creating and using a view in PostgreSQL.</description>
+  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
+  <title>Continuous PostgreSQL Backups using WAL-G</title>
+  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
+  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
+  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-templates</guid>
+  <title>What are PostgreSQL Templates?</title>
+  <link>https://supabase.com/blog/postgresql-templates</link>
+  <description>What are PostgreSQL templates and what are they used for?</description>
+  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
+  <title>Physical vs Logical Backups in PostgreSQL</title>
+  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
+  <description>What are physical and logical backups in Postgres?</description>
+  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-dashboard-performance</guid>
   <title>Making the Supabase Dashboard Supa-fast</title>
   <link>https://supabase.com/blog/supabase-dashboard-performance</link>
@@ -2462,13 +2511,6 @@
   <link>https://supabase.com/blog/improved-dx</link>
   <description>We&apos;re releasing a new version of our Supabase client with some awesome new improvements.</description>
   <pubDate>Fri, 30 Oct 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-views</guid>
-  <title>Postgres Views</title>
-  <link>https://supabase.com/blog/postgresql-views</link>
-  <description>Creating and using a view in PostgreSQL.</description>
-  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/case-study-monitoro</guid>
@@ -2541,13 +2583,6 @@
   <pubDate>Wed, 05 Aug 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
-  <title>Continuous PostgreSQL Backups using WAL-G</title>
-  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
-  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
-  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/supabase-alpha-july-2020</guid>
   <title>Supabase Alpha July 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-july-2020</link>
@@ -2560,20 +2595,6 @@
   <link>https://supabase.com/blog/alpha-launch-postmortem</link>
   <description>Everything that went wrong with Supabase&apos;s launch</description>
   <pubDate>Fri, 10 Jul 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-templates</guid>
-  <title>What are PostgreSQL Templates?</title>
-  <link>https://supabase.com/blog/postgresql-templates</link>
-  <description>What are PostgreSQL templates and what are they used for?</description>
-  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
-  <title>Physical vs Logical Backups in PostgreSQL</title>
-  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
-  <description>What are physical and logical backups in Postgres?</description>
-  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-steve-chavez</guid>
