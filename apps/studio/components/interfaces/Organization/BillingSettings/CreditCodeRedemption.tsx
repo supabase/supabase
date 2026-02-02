@@ -35,6 +35,7 @@ import { useOrganizationPreviewCreditCodeQuery } from '@/data/organizations/orga
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useFlag } from 'common'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -55,6 +56,8 @@ export const CreditCodeRedemption = ({
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
+
+  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
 
   const { data: org, isLoading: isOrgLoading } = useSelectedOrganizationQuery({})
 
@@ -172,6 +175,10 @@ export const CreditCodeRedemption = ({
     if (!visible) {
       setCaptchaRef(null)
     }
+  }
+
+  if (!redeemCodeEnabled) {
+    return null
   }
 
   return (
