@@ -1,76 +1,28 @@
-import dayjs from 'dayjs'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { ChartIntervals } from 'types'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  Loading,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle, Loading } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import { useServiceStats } from './ProjectUsageSection.utils'
-import type { StatsLike } from './ProjectUsageSection.utils'
+
+import { useServiceHealthMetrics } from '../Observability/useServiceHealthMetrics'
+import { normalizeChartBuckets } from './ChartDataTransform.utils'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
+  computeSuccessAndNonSuccessRates,
+  sumErrors,
   sumTotal,
   sumWarnings,
-  sumErrors,
-  computeSuccessAndNonSuccessRates,
-  computeChangePercent,
-  formatDelta,
 } from './ProjectUsage.metrics'
-
-const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
-
-const CHART_INTERVALS: ChartIntervals[] = [
-  {
-    key: '1hr',
-    label: 'Last 60 minutes',
-    startValue: 1,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
-  },
-  {
-    key: '1day',
-    label: 'Last 24 hours',
-    startValue: 24,
-    startUnit: 'hour',
-    format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
-  },
-  {
-    key: '7day',
-    label: 'Last 7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D, ha',
-    availableIn: ['pro', 'team', 'enterprise'],
-  },
-]
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
@@ -89,7 +41,8 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  stats: StatsLike
+  isLoading: boolean
+  error: unknown | null
 }
 
 export const ProjectUsageSection = () => {
@@ -105,6 +58,7 @@ export const ProjectUsageSection = () => {
 
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
@@ -113,7 +67,11 @@ export const ProjectUsageSection = () => {
     return { datetimeFormat: format }
   }, [selectedInterval])
 
-  const statsByService = useServiceStats(projectRef!, interval)
+  const {
+    services: healthServices,
+    isLoading: isHealthLoading,
+    endDate,
+  } = useServiceHealthMetrics(projectRef!, interval, refreshKey)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -158,76 +116,70 @@ export const ProjectUsageSection = () => {
   const services: ServiceComputed[] = useMemo(
     () =>
       serviceBase.map((s) => {
-        const currentStats = statsByService[s.key].current
-        const data = currentStats.eventChartData
-        const total = sumTotal(data)
-        const warn = sumWarnings(data)
-        const err = sumErrors(data)
-        return { ...s, stats: currentStats, data, total, warn, err }
+        const healthData = healthServices[s.key]
+        // Normalize chart data to consistent bucket sizes using the same endDate from the query
+        const normalizedData = normalizeChartBuckets(
+          healthData.eventChartData,
+          interval,
+          new Date(endDate)
+        )
+        const total = sumTotal(normalizedData)
+        const warn = sumWarnings(normalizedData)
+        const err = sumErrors(normalizedData)
+        return {
+          ...s,
+          data: normalizedData,
+          total,
+          warn,
+          err,
+          isLoading: healthData.isLoading,
+          error: healthData.error,
+        }
       }),
-    [serviceBase, statsByService]
+    [serviceBase, healthServices, interval, endDate]
   )
 
-  const isLoading = services.some((s) => s.stats.isLoading)
+  const isLoading = isHealthLoading
 
-  const handleBarClick = (logRoute: string, serviceKey: ServiceKey) => (datum: any) => {
-    if (!datum?.timestamp) return
+  const handleBarClick =
+    (logRoute: string, serviceKey: ServiceKey) => (datum: LogsBarChartDatum) => {
+      if (!datum?.timestamp) return
 
-    const datumTimestamp = dayjs(datum.timestamp).toISOString()
-    const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-    const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+      const datumTimestamp = dayjs(datum.timestamp).toISOString()
+      const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
+      const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
 
-    const queryParams = new URLSearchParams({
-      iso_timestamp_start: start,
-      iso_timestamp_end: end,
-    })
-
-    router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
-
-    if (projectRef && organization?.slug) {
-      sendEvent({
-        action: 'home_project_usage_chart_clicked',
-        properties: {
-          service_type: serviceKey,
-          bar_timestamp: datum.timestamp,
-        },
-        groups: {
-          project: projectRef,
-          organization: organization.slug,
-        },
+      const queryParams = new URLSearchParams({
+        iso_timestamp_start: start,
+        iso_timestamp_end: end,
       })
+
+      router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
+
+      if (projectRef && organization?.slug) {
+        sendEvent({
+          action: 'home_project_usage_chart_clicked',
+          properties: {
+            service_type: serviceKey,
+            bar_timestamp: datum.timestamp,
+          },
+          groups: {
+            project: projectRef,
+            organization: organization.slug,
+          },
+        })
+      }
     }
-  }
 
   const enabledServices = services.filter((s) => s.enabled)
   const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
   const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
   const totalWarnings = enabledServices.reduce((sum, s) => sum + (s.warn || 0), 0)
-  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
+  const { successRate } = computeSuccessAndNonSuccessRates(
     totalRequests,
     totalWarnings,
     totalErrors
   )
-
-  const prevServiceTotals = useMemo(
-    () =>
-      serviceBase.map((s) => {
-        const previousStats = statsByService[s.key].previous
-        const data = previousStats.eventChartData
-        return {
-          enabled: s.enabled,
-          total: sumTotal(data),
-        }
-      }),
-    [serviceBase, statsByService]
-  )
-
-  const enabledPrev = prevServiceTotals.filter((s) => s.enabled)
-  const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
-
-  const totalRequestsChangePct = computeChangePercent(totalRequests, prevTotalRequests)
-  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand-link' : 'text-destructive'
-  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   return (
     <div className="space-y-6">
@@ -236,72 +188,23 @@ export const ProjectUsageSection = () => {
           <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={cn('text-sm', totalDeltaClass)}>
-              {formatDelta(totalRequestsChangePct)}
-            </span>
           </div>
           <div className="flex items-start gap-2 heading-section text-foreground-light">
-            <span className="text-foreground">{successRate.toFixed(1)}%</span>
+            <span className="text-foreground">
+              {successRate === 100 ? '100' : successRate.toFixed(1)}%
+            </span>
             <span>Success Rate</span>
-            <span className={cn('text-sm', nonSuccessClass)}>{formatDelta(nonSuccessRate)}</span>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<ChevronDown size={14} />}>
-              <span>{selectedInterval.label}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-40">
-            <DropdownMenuRadioGroup
-              value={interval}
-              onValueChange={(interval) => setInterval(interval as ChartIntervalKey)}
-            >
-              {CHART_INTERVALS.map((i) => {
-                const disabled = !i.availableIn?.includes(plan?.id || 'free')
-
-                if (disabled) {
-                  const retentionDuration = LOG_RETENTION[plan?.id ?? 'free']
-                  return (
-                    <Tooltip key={i.key}>
-                      <TooltipTrigger asChild>
-                        <DropdownMenuRadioItem
-                          disabled
-                          value={i.key}
-                          className="!pointer-events-auto"
-                        >
-                          {i.label}
-                        </DropdownMenuRadioItem>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>
-                          {plan?.name} plan only includes up to {retentionDuration} day
-                          {retentionDuration > 1 ? 's' : ''} of log retention
-                        </p>
-                        <p className="text-foreground-light">
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}
-                          >
-                            Upgrade your plan
-                          </InlineLink>{' '}
-                          to increase log retention and view statistics for the{' '}
-                          {i.label.toLowerCase()}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                } else {
-                  return (
-                    <DropdownMenuRadioItem key={i.key} value={i.key}>
-                      {i.label}
-                    </DropdownMenuRadioItem>
-                  )
-                }
-              })}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ChartIntervalDropdown
+          value={interval}
+          onChange={(interval) => setInterval(interval as ChartIntervalKey)}
+          planId={plan?.id}
+          planName={plan?.name}
+          organizationSlug={organization?.slug}
+          dropdownAlign="end"
+          tooltipSide="left"
+        />
       </div>
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (

@@ -306,6 +306,44 @@ Uppy has integrations with different frameworks:
 
 Resumable uploads also supports using signed upload tokens to created time-limited URLs that you can share to your users by invoking the `createSignedUploadUrl` method on the SDK and including the returned token in the `x-signature` header of the resumable upload.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```typescript
+// Create a signed upload URL
+const { data } = await supabase.storage.from('bucket_name').createSignedUploadUrl('file_path', {
+  upsert: true, // Optional: allow overwriting existing files
+})
+
+// Use the signed URL token in resumable upload headers
+// Include data.token in the x-signature header
+```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+# Create a signed upload URL with upsert option
+response = supabase.storage.from_('bucket_name').create_signed_upload_url(
+    'file_path',
+    options={'upsert': 'true'}  # Optional: allow overwriting existing files
+)
+
+# Use the signed URL token in resumable upload headers
+# Include response.token in the x-signature header
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 See this [full example using Uppy with signed URLs](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-signed-uppy) for more context.
 
 ## Overwriting files

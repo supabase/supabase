@@ -48,8 +48,8 @@ export const ClientSideExceptionHandler = ({
         </p>
         <p className="text-foreground-light text-sm">{message}</p>
       </div>
-      <Admonition type="warning" showIcon={false} title="We recommend trying the following:">
-        <ul className="list-disc pl-2 list-inside text-sm space-y-1 [&_b]:font-medium [&_b]:text-foreground">
+      <Admonition type="note" showIcon={false} title="We recommend trying the following:">
+        <ul className="list-disc mt-1.5 pl-2 list-inside text-sm space-y-1">
           <li>
             <span
               className={cn(InlineLinkClassName, 'cursor-pointer')}
@@ -77,9 +77,7 @@ export const ClientSideExceptionHandler = ({
             </span>{' '}
             to clean potentially outdated data
           </li>
-          <li>
-            Disable browser extensions that might modify page content (e.g., Google Translate)
-          </li>
+          <li>Disable browser extensions that might modify page content (e.g. Google Translate)</li>
           <li>If the problem persists, please contact support for assistance</li>
         </ul>
       </Admonition>

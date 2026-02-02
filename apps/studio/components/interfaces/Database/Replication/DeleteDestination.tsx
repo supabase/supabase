@@ -1,4 +1,4 @@
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 
 interface DeleteDestinationProps {
   visible: boolean

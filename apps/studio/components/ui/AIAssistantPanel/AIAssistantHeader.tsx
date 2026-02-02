@@ -29,7 +29,7 @@ export const AIAssistantHeader = ({
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
   return (
     <div className="z-30 sticky top-0">
-      <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
+      <div className="border-b border-b-muted flex items-center bg gap-x-4 pl-4 pr-3 h-[46px]">
         <div className="text-sm flex-1 flex items-center">
           <AiIconAnimation size={20} allowHoverEffect={false} />
           <span className="text-border-stronger dark:text-border-strong ml-3">
@@ -103,7 +103,7 @@ export const AIAssistantHeader = ({
                     ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
                     : ''
           }
-          className="border-0 border-b rounded-none bg-background mb-0"
+          className="border-0 border-b rounded-none bg-background"
         >
           {!isHipaaProjectDisallowed && (
             <Button type="default" className="w-fit mt-4" onClick={() => setIsOptInModalOpen(true)}>

@@ -40,7 +40,7 @@ export const RolesList = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections
 
-  const { data, isLoading } = useDatabaseRolesQuery({
+  const { data, isPending: isLoading } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -186,7 +186,7 @@ export const RolesList = () => {
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
             <Badge variant="success">Protected</Badge>
           </div>
@@ -204,7 +204,7 @@ export const RolesList = () => {
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 

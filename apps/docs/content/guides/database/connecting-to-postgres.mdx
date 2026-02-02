@@ -10,9 +10,9 @@ How you connect to your database depends on where you're connecting from:
 
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
-  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6
-  - For persistent clients, and support for both IPv4 and IPv6, use [pooler session mode](#pooler-session-mode)
-  - For temporary clients (for example, serverless or edge functions) use [pooler transaction mode](#pooler-transaction-mode)
+  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html), [migrations](/docs/guides/deployment/database-migrations), [backup-restore](/docs/guides/platform/migrating-within-supabase/backup-restore), or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6. IPv4 available as [Add-on](/docs/guides/platform/ipv4-address).
+  - For application traffic from persistent clients, and support for both IPv4 and IPv6, use [pooler session mode](#pooler-session-mode)
+  - For application traffic from temporary clients (for example, serverless or edge functions) use [pooler transaction mode](#pooler-transaction-mode)
 
 ## Quickstarts
 
@@ -279,17 +279,20 @@ Because the dedicated pooler is hosted on the same machine as your database, it 
 **Direct connection:**
 
 - Best for: persistent backend services
-- Limitation: IPv6 only
+- Use for migrations, pg_dump, backup and management tools
+- Limitation: IPv6 only by default. IPv4 available as [Add-on](/docs/guides/platform/ipv4-address).
 
 **Shared pooler:**
 
 - Best for: general-purpose connections (supports IPv4 and IPv6)
   - Supavisor session mode → persistent backend that require IPv4
   - Supavisor transaction mode → serverless functions or short-lived tasks
+- Use for application runtime traffic (queries, writes)
 
 **Dedicated pooler (paid tier):**
 
 - Best for: high-performance apps that need dedicated resources
+- Use for application runtime traffic (queries, writes)
 - Uses PgBouncer
 
 You can follow the decision flow in the connection method diagram to quickly choose the right option for your environment.

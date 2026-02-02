@@ -1,7 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { Plus, ShieldCheck } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -22,11 +27,6 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus, ShieldCheck } from 'lucide-react'
 
 const NAME_SCHEMA = z
   .string()
@@ -45,23 +45,22 @@ const SCHEMA = z.object({
   description: z.string().max(256, "Description shouldn't be too long").trim(),
 })
 
-const CreateSecretAPIKeyDialog = () => {
+export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
   const [visible, setVisible] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const onClose = (value: boolean) => {
-    setVisible(value)
+  const onOpenChange = (value: boolean) => {
+    if (value) setVisible('secret')
+    else setVisible('')
   }
 
+  const defaultValues = { name: '', description: '' }
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
-    defaultValues: {
-      name: '',
-      description: '',
-    },
+    defaultValues,
   })
 
   const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
@@ -77,14 +76,15 @@ const CreateSecretAPIKeyDialog = () => {
       {
         onSuccess: (data) => {
           toast.success(`Your secret API key ${data.prefix}... is ready.`)
-          onClose(false)
+          form.reset(defaultValues)
+          onOpenChange(false)
         },
       }
     )
   }
 
   return (
-    <Dialog open={visible} onOpenChange={onClose}>
+    <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button type="default" className="mt-2" icon={<Plus />}>
           New secret key
@@ -171,5 +171,3 @@ const CreateSecretAPIKeyDialog = () => {
     </Dialog>
   )
 }
-
-export default CreateSecretAPIKeyDialog

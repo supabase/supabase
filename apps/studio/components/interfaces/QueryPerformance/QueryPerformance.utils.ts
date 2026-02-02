@@ -1,5 +1,8 @@
+import * as Sentry from '@sentry/nextjs'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+
+import { getErrorMessage } from 'lib/get-error-message'
 
 dayjs.extend(duration)
 
@@ -34,4 +37,48 @@ export const transformLogsToJSON = (log: string) => {
   } catch (error) {
     return null
   }
+}
+
+export type QueryPerformanceErrorContext = {
+  projectRef?: string
+  databaseIdentifier?: string
+  queryPreset?: string
+  queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'monitor' | 'slowQueriesCount'
+  sql?: string
+  errorMessage?: string
+  postgresVersion?: string
+  databaseType?: 'primary' | 'read-replica'
+}
+
+export function captureQueryPerformanceError(
+  error: unknown,
+  context: QueryPerformanceErrorContext
+) {
+  Sentry.withScope((scope) => {
+    scope.setTag('query-performance', 'true')
+
+    scope.setContext('query-performance', {
+      projectRef: context.projectRef,
+      databaseIdentifier: context.databaseIdentifier,
+      queryPreset: context.queryPreset,
+      queryType: context.queryType,
+      postgresVersion: context.postgresVersion,
+      databaseType: context.databaseType,
+      errorMessage: context.errorMessage,
+    })
+
+    if (error instanceof Error) {
+      Sentry.captureException(error)
+      return
+    }
+
+    const errorMessage = getErrorMessage(error)
+    const errorToCapture = new Error(errorMessage || 'Query performance error')
+
+    if (error !== null && error !== undefined) {
+      errorToCapture.cause = error
+    }
+
+    Sentry.captureException(errorToCapture)
+  })
 }

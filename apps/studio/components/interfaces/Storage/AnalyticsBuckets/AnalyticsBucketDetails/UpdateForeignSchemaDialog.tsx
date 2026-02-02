@@ -66,7 +66,7 @@ export const UpdateForeignSchemaDialog = ({
     values: { schema: schemasAssociatedWithNamespace[0] },
   })
 
-  const { mutateAsync: importForeignSchema, isLoading: isUpdating } =
+  const { mutateAsync: importForeignSchema, isPending: isUpdating } =
     useFDWImportForeignSchemaMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {

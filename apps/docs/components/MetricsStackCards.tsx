@@ -53,14 +53,11 @@ const metricsStackOptions: MetricsStackOption[] = [
         Supabase alongside your app telemetry.
       </>
     ),
-    href: '/guides/telemetry/metrics/datadog',
+    href: 'https://docs.datadoghq.com/integrations/supabase/',
     icon: <Datadog className="h-5 w-5" />,
     iconColor: '#632CA6',
     iconBg: 'rgba(99,44,166,0.1)',
-    badges: [
-      { label: 'Supabase guide', variant: 'default' },
-      { label: 'Community', variant: 'community' },
-    ],
+    badges: [{ label: 'Community', variant: 'community' }],
   },
   {
     title: 'Vendor-agnostic / BYO Prometheus',

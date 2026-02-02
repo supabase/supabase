@@ -204,9 +204,9 @@ functions:
 
         > No storage option exists to persist the session, which may result in unexpected behavior when using auth. If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
 
-        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
+        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/supabase-js/blob/master/packages/core/auth-js/src/lib/types.ts#L1053).
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
-      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/auth/providers). A refresh token never expires and can only be used once.
 
     examples:
       - id: create-auth-client
@@ -1235,7 +1235,7 @@ functions:
         3. `invite` – Used when verifying an OTP sent as part of an invitation to join a project or organization.
         4. `email_change` – Used when verifying an OTP sent to a new email address during an email update process.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
-      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
+      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in.  You may wish to use the hash for the PKCE flow for Server Side Auth. Read [the Password-based Auth guide](/docs/guides/auth/passwords) for more details.
     examples:
       - id: verify-signup-one-time-password(otp)
         name: Verify Signup One-Time Password (OTP)
@@ -1720,7 +1720,7 @@ functions:
     title: 'linkIdentity()'
     $ref: '@supabase/auth-js.GoTrueClient.linkIdentity'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
       - If `linkIdentity` is run in the browser, the user is automatically redirected to the returned URL. On the server, you should handle the redirect.
@@ -1748,7 +1748,7 @@ functions:
     title: 'unlinkIdentity()'
     $ref: '@supabase/auth-js.GoTrueClient.unlinkIdentity'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -2254,6 +2254,8 @@ functions:
             "error": null
           }
           ```
+  - id: auth-js-gotrueclient-initialize
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
@@ -3225,8 +3227,9 @@ functions:
             { ban_duration: '100y' }
           )
           ```
+  - id: auth-js-gotrueadminapi-signout
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
   - id: mfa-list-factors-admin
-    title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
@@ -6080,7 +6083,7 @@ functions:
               (2, 'Leia'),
               (3, 'Han');
             ```
-        reponse: |
+        response: |
           ```json
           {
             "data": [
@@ -7446,7 +7449,7 @@ functions:
       This section contains methods for working with File Buckets.
   - id: list-buckets
     title: listBuckets()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
+    $ref: '@supabase/storage-js.StorageClient.listBuckets'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7455,7 +7458,7 @@ functions:
 
   - id: get-bucket
     title: getBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
+    $ref: '@supabase/storage-js.StorageClient.getBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7464,7 +7467,7 @@ functions:
 
   - id: create-bucket
     title: createBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
+    $ref: '@supabase/storage-js.StorageClient.createBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
@@ -7473,7 +7476,7 @@ functions:
 
   - id: empty-bucket
     title: emptyBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
+    $ref: '@supabase/storage-js.StorageClient.emptyBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7482,7 +7485,7 @@ functions:
 
   - id: update-bucket
     title: updateBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
+    $ref: '@supabase/storage-js.StorageClient.updateBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
@@ -7491,7 +7494,7 @@ functions:
 
   - id: delete-bucket
     title: deleteBucket()
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
+    $ref: '@supabase/storage-js.StorageClient.deleteBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
@@ -7503,7 +7506,7 @@ functions:
     notes: |
       This section contains methods for working with Analytics Buckets.
   - id: storageanalytics-from
-    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.from'
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.constructor'
 
   - id: storageanalytics-createbucket
     $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.createBucket'
@@ -7645,78 +7648,45 @@ functions:
   - id: supabase-js-supabaseclient-schema
     title: SupabaseClient.schema()
     $ref: '@supabase/supabase-js.SupabaseClient.schema'
-  - id: auth-js-gotrueadminapi-constructor
-    title: new GoTrueAdminApi()
-    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
-    examples:
-      - id: auth-js-gotrueadminapi-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import { GoTrueAdminApi } from '@supabase/auth-js'
+  - id: oauth-server-api
+    title: 'OAuth Server API'
+    notes: |
+      The OAuth Server API allows you to build custom OAuth consent screens for your application.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
 
-          const admin = new GoTrueAdminApi({
-            url: 'https://xyzcompany.supabase.co/auth/v1',
-            headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
-          })
-          ```
-  - id: auth-js-gotrueadminapi-signout
-    title: GoTrueAdminApi.signOut()
-    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
-  - id: auth-js-gotrueclient-constructor
-    title: new GoTrueClient()
-    $ref: '@supabase/auth-js.GoTrueClient.constructor'
-    examples:
-      - id: auth-js-gotrueclient-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import { GoTrueClient } from '@supabase/auth-js'
-
-          const auth = new GoTrueClient({
-            url: 'https://xyzcompany.supabase.co/auth/v1',
-            headers: { apikey: 'public-anon-key' },
-            storageKey: 'supabase-auth',
-          })
-          ```
-  - id: auth-js-gotrueclient-initialize
-    title: GoTrueClient.initialize()
-    $ref: '@supabase/auth-js.GoTrueClient.initialize'
-  - id: auth-js-gotrueclient-isthrowonerrorenabled
-    title: GoTrueClient.isThrowOnErrorEnabled()
-    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
   - id: auth-js-authoauthserverapi-approveauthorization
-    title: AuthOAuthServerApi.approveAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
   - id: auth-js-authoauthserverapi-denyauthorization
-    title: AuthOAuthServerApi.denyAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
   - id: auth-js-authoauthserverapi-getauthorizationdetails
-    title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: auth-js-authoauthserverapi-listgrants
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.listGrants'
+  - id: auth-js-authoauthserverapi-revokegrant
+    title: AuthOAuthServerApi.revokeGrant()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.revokeGrant'
+  - id: oauth-admin-api
+    title: 'OAuth Admin API'
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `service_role` key in the browser.
+
   - id: auth-js-gotrueadminoauthapi-createclient
-    title: GoTrueAdminOAuthApi.createClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
   - id: auth-js-gotrueadminoauthapi-deleteclient
-    title: GoTrueAdminOAuthApi.deleteClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
   - id: auth-js-gotrueadminoauthapi-getclient
-    title: GoTrueAdminOAuthApi.getClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
   - id: auth-js-gotrueadminoauthapi-listclients
-    title: GoTrueAdminOAuthApi.listClients()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
   - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
-    title: GoTrueAdminOAuthApi.regenerateClientSecret()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
   - id: auth-js-gotrueadminoauthapi-updateclient
-    title: GoTrueAdminOAuthApi.updateClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
   - id: auth-js-gotruemfaapi-listfactors
-    title: GoTrueMFAApi.listFactors()
     $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
   - id: postgrest-js-postgrestbuilder-constructor
-    title: new PostgrestBuilder()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
     examples:
       - id: postgrest-js-postgrestbuilder-constructor-example-1
@@ -7983,22 +7953,22 @@ functions:
     $ref: '@supabase/storage-js.index.StorageClient.updateBucket'
 
   - id: storagevectors-create-bucket
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.createBucket'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.createBucket'
 
   - id: storagevectors-delete-bucket
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.deleteBucket'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.deleteBucket'
 
   - id: storagevectors-get-bucket
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.getBucket'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.getBucket'
 
   - id: storagevectors-list-buckets
-    $ref: '@supabase/storage-js.index.StorageVectorsClient.listBuckets'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.listBuckets'
 
   - id: storagevectors-from
-    $ref: '@supabase/storage-js.StorageVectorsClient.from'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.from'
 
   - id: vectorbucket-index
-    $ref: '@supabase/storage-js.index.VectorBucketScope.index'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.index'
 
   - id: storagefile-exists
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
@@ -8019,34 +7989,34 @@ functions:
 
   - id: vectorbucket-createindex
     title: VectorBucketScope.createIndex()
-    $ref: '@supabase/storage-js.VectorBucketScope.createIndex'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.createIndex'
 
   - id: vectorbucket-deleteindex
     title: VectorBucketScope.deleteIndex()
-    $ref: '@supabase/storage-js.VectorBucketScope.deleteIndex'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.deleteIndex'
 
   - id: vectorbucket-getindex
     title: VectorBucketScope.getIndex()
-    $ref: '@supabase/storage-js.VectorBucketScope.getIndex'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.getIndex'
 
   - id: vectorbucket-listindexes
     title: VectorBucketScope.listIndexes()
-    $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.listIndexes'
 
   - id: vectorindex-deletevectors
-    $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.deleteVectors'
 
   - id: vectorindex-getvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.getVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.getVectors'
 
   - id: vectorindex-listvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.listVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.listVectors'
 
   - id: vectorindex-putvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.putVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.putVectors'
 
   - id: vectorindex-queryvectors
-    $ref: '@supabase/storage-js.VectorIndexScope.queryVectors'
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.queryVectors'
 
   - id: realtime-js-realtimechannel-constructor
     title: new RealtimeChannel()
