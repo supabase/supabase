@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
@@ -11,7 +7,9 @@ import { useAPIKeyIdQuery } from 'data/api-keys/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Eye, EyeOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 export function ApiKeyPill({
   apiKey,
@@ -23,6 +21,8 @@ export function ApiKeyPill({
 
   // State that controls whether to show the full API key
   const [show, setShowState] = useState(false)
+  // Prefetched key for Safari clipboard compatibility
+  const [prefetchedKey, setPrefetchedKey] = useState<string | null>(null)
 
   const isSecret = apiKey.type === 'secret'
 
@@ -78,31 +78,35 @@ export function ApiKeyPill({
     setShowState(!show)
   }
 
-  async function onCopy() {
-    // If key is already revealed, use that value
-    if (data?.api_key) return data?.api_key ?? ''
+  async function prefetchKey() {
+    // Pre-fetch key on hover so it's ready when user clicks
+    // Safari requires clipboard data to be available immediately
+    if (prefetchedKey || data?.api_key || !isSecret) return
 
     try {
-      // Fetch full key and immediately clear from cache after copying
       const result = await refetchApiKey()
+      if (result.isSuccess && result.data.api_key) {
+        setPrefetchedKey(result.data.api_key)
+      }
       queryClient.removeQueries({
         queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
         exact: true,
       })
+    } catch (err) {
+      console.error('Failed to prefetch API key:', err)
+    }
+  }
 
-      if (result.isSuccess) return result.data.api_key ?? ''
+  function onCopy() {
+    // Use already-revealed key, prefetched key, or fall back to masked key
+    const key = data?.api_key ?? prefetchedKey ?? apiKey.api_key
 
-      if (error) {
-        toast.error('Failed to copy secret API key')
-        return ''
-      }
-    } catch (error) {
-      console.error('Failed to fetch API key:', error)
-      return ''
+    // Clear prefetched key after copying for security
+    if (prefetchedKey) {
+      setTimeout(() => setPrefetchedKey(null), 0)
     }
 
-    // Fallback to the masked version if fetch fails
-    return apiKey.api_key
+    return key
   }
 
   // States for disabling buttons/showing tooltips
@@ -165,6 +169,8 @@ export function ApiKeyPill({
             iconOnly
             className="rounded-full px-2 pointer-events-auto"
             disabled={isRestricted || isLoadingPermission}
+            onMouseEnter={prefetchKey}
+            onMouseLeave={() => setPrefetchedKey(null)}
           />
         </TooltipTrigger>
         <TooltipContent side="bottom">

@@ -46,17 +46,14 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     return (
       <Button
         ref={ref}
+        {...props}
         onPointerDownCapture={(e) => {
-          // Safari requires clipboard operations to happen on pointerdown (not click)
-          // and in the capture phase (before the event reaches child elements like icons).
-          // Without this, Safari's user gesture detection fails.
-          if (e.button !== 0) return // Only handle left click
-          const textToCopy = asyncText ? asyncText() : text
+          if (e.button !== 0) return
           setShowCopied(true)
-          copyToClipboard(textToCopy)
+          const textPromise = asyncText ? asyncText() : Promise.resolve(text)
+          copyToClipboard(textPromise)
         }}
         onClick={onClick}
-        {...props}
         className={cn({ 'px-1': iconOnly }, props.className)}
         icon={
           showCopied ? <Check strokeWidth={2} className="text-brand" /> : props.icon ?? <Copy />

@@ -1,6 +1,5 @@
 import { Check, Copy } from 'lucide-react'
 import { forwardRef, useState } from 'react'
-
 import { cn, copyToClipboard } from 'ui'
 
 const CommandRender = forwardRef<HTMLDivElement, { commands: any[]; className?: string }>(
@@ -33,7 +32,7 @@ const Command = ({ item }: any) => {
             <button
               type="button"
               className="text-foreground-lighter hover:text-foreground"
-              onClick={() => {
+              onPointerDownCapture={() => {
                 function onCopy(value: any) {
                   setIsCopied(true)
                   copyToClipboard(value)

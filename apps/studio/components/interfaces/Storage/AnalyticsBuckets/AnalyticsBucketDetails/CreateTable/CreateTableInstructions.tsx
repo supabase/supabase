@@ -1,32 +1,32 @@
+import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
-  getDecryptedValues,
-  useVaultSecretDecryptedValueQuery,
-} from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import {
-  Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
+  Accordion_Shadcn_,
   Card,
   CardFooter,
   CardHeader,
   CardTitle,
   CodeBlock,
 } from 'ui'
+
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 import { getPyicebergSnippet } from './CreateTableInstructions.constants'
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import {
+  getDecryptedValues,
+  useVaultSecretDecryptedValueQuery,
+} from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const CreateTableInstructions = ({
   hideHeader = false,
@@ -39,6 +39,7 @@ export const CreateTableInstructions = ({
   const { data: project } = useSelectedProjectQuery()
   const [showKeys, setShowKeys] = useState(false)
   const [isFetchingSecretsOnCopy, setIsFetchingSecretsOnCopy] = useState(false)
+  const [prefetchedSecrets, setPrefetchedSecrets] = useState<Record<string, string> | null>(null)
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance({ bucketId })
@@ -174,37 +175,47 @@ export const CreateTableInstructions = ({
                 <CopyButton
                   type="default"
                   loading={isFetchingSecretsOnCopy}
-                  asyncText={async () => {
-                    if (!!decryptedS3AccessKey && !!decryptedS3SecretKey && !!decryptedToken) {
-                      return getPyicebergSnippet({
-                        ref,
-                        warehouse: wrapperValues.warehouse,
-                        catalogUri: wrapperValues.catalog_uri,
-                        s3Endpoint: wrapperValues['s3.endpoint'],
-                        s3Region: projectSettings?.region,
-                        s3AccessKey: decryptedS3AccessKey,
-                        s3SecretKey: decryptedS3SecretKey,
-                        token: decryptedToken,
-                      })
-                    } else {
+                  onMouseEnter={async () => {
+                    // Pre-fetch secrets on hover so they're ready when user clicks
+                    // Safari requires clipboard data to be available immediately
+                    if (!prefetchedSecrets && !decryptedS3AccessKey) {
                       setIsFetchingSecretsOnCopy(true)
-                      const decryptedSecrets = await getDecryptedValues({
+                      const secrets = await getDecryptedValues({
                         projectRef: project?.ref,
                         connectionString: project?.connectionString,
                         ids: [s3AccessKeyVaultID, s3SecretKeyVaultID, tokenVaultID],
                       })
+                      setPrefetchedSecrets(secrets)
                       setIsFetchingSecretsOnCopy(false)
-                      return getPyicebergSnippet({
-                        ref,
-                        warehouse: wrapperValues.warehouse,
-                        catalogUri: wrapperValues.catalog_uri,
-                        s3Endpoint: wrapperValues['s3.endpoint'],
-                        s3Region: projectSettings?.region,
-                        s3AccessKey: decryptedSecrets[s3AccessKeyVaultID],
-                        s3SecretKey: decryptedSecrets[s3SecretKeyVaultID],
-                        token: decryptedSecrets[tokenVaultID],
-                      })
                     }
+                  }}
+                  onMouseLeave={() => {
+                    // Clear prefetched secrets when mouse leaves for security
+                    setPrefetchedSecrets(null)
+                  }}
+                  asyncText={() => {
+                    // Use prefetched secrets or already-revealed secrets
+                    const s3AccessKey =
+                      decryptedS3AccessKey ?? prefetchedSecrets?.[s3AccessKeyVaultID]
+                    const s3SecretKey =
+                      decryptedS3SecretKey ?? prefetchedSecrets?.[s3SecretKeyVaultID]
+                    const token = decryptedToken ?? prefetchedSecrets?.[tokenVaultID]
+
+                    // Clear prefetched secrets after copying for security
+                    if (prefetchedSecrets) {
+                      setTimeout(() => setPrefetchedSecrets(null), 0)
+                    }
+
+                    return getPyicebergSnippet({
+                      ref,
+                      warehouse: wrapperValues.warehouse,
+                      catalogUri: wrapperValues.catalog_uri,
+                      s3Endpoint: wrapperValues['s3.endpoint'],
+                      s3Region: projectSettings?.region,
+                      s3AccessKey,
+                      s3SecretKey,
+                      token,
+                    })
                   }}
                 />
                 <ButtonTooltip
