@@ -15,12 +15,14 @@ import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/Th
 import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
 import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
+import { useRecentRoutesCommands } from './RecentRoutes'
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
 
 export default function StudioCommandMenu() {
+  useRecentRoutesCommands()
   useApiKeysCommands()
   useApiUrlCommand()
   useConnectCommands()
