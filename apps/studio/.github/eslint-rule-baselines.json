@@ -99,8 +99,6 @@
       "components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/JsonEditor/index.tsx": 2,
       "components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.tsx": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/TextEditor.tsx": 2,
-      "components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/QuickstartAIWidget.tsx": 1,
-      "components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/useAITableGeneration.ts": 2,
       "components/interfaces/TableGridEditor/TableDefinition.tsx": 1,
       "components/interfaces/TableGridEditor/TableGridEditor.tsx": 2,
       "components/interfaces/UnifiedLogs/ServiceFlow/components/ServiceFlowHeader.tsx": 2,

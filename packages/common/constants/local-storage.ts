@@ -118,10 +118,6 @@ export const LOCAL_STORAGE_KEYS = {
    * WWW
    */
   BLOG_VIEW: 'supabase-blog-view',
-
-  // Used to track if user has been exposed to table quickstart experiment (prevents duplicate exposure events)
-  TABLE_QUICKSTART_EXPOSURE_TRACKED: (userId: string) =>
-    `table-quickstart-exposure-tracked-${userId}`,
 } as const
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
