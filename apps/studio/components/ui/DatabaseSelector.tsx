@@ -234,7 +234,7 @@ export const DatabaseSelector = ({
                       // the replica panel from a "portal" based component (e.g dialog, sheet, dropdown, etc)
                       // Although I'd prefer if there's a better way to resolve this
                       await timeout(50)
-                      setShowNewReplicaPanel(true)
+                      if (!unifiedReplication) setShowNewReplicaPanel(true)
                     }}
                     className="w-full flex items-center gap-2"
                   >
