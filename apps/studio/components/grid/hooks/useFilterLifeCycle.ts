@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { filtersToUrlParams, formatFilterURLParams } from '../SupabaseGrid.utils'
 import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 /**
@@ -12,19 +13,17 @@ import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 export function useInitializeFiltersFromUrl() {
   const snap = useTableEditorTableStateSnapshot()
   const { filters: urlFilters } = useTableEditorFiltersSort()
-  const initializedRef = useRef(false)
 
-  useEffect(() => {
-    // Only run once on mount
-    if (initializedRef.current) return
-    initializedRef.current = true
-
-    // Parse URL filters and set them in snap
+  const initializeFilters = useStaticEffectEvent(() => {
     const parsedFilters = formatFilterURLParams(urlFilters)
     if (parsedFilters.length > 0) {
       snap.setFilters(parsedFilters)
     }
-  }, [urlFilters, snap])
+  })
+
+  useEffect(() => {
+    initializeFilters()
+  }, [initializeFilters])
 }
 
 /**
