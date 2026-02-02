@@ -10,10 +10,10 @@ import { toast } from 'sonner'
  *
  * Copied code from https://wolfgangrittner.dev/how-to-use-clipboard-api-in-firefox/
  */
-export const copyToClipboard = async (str: string | Promise<string>, callback = noop) => {
+export const copyToClipboard = (str: string | Promise<string>, callback = noop) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    if (typeof ClipboardItem && navigator.clipboard?.write) {
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
       // NOTE: Safari locks down the clipboard API to only work when triggered
       // by a direct user interaction. You can't use it async in a promise.
       // But! You can wrap the promise in a ClipboardItem, and give that to

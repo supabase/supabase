@@ -1,6 +1,5 @@
 import { Check, Copy } from 'lucide-react'
 import { ComponentProps, forwardRef, useEffect, useState } from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 type CopyButtonBaseProps = {
@@ -47,12 +46,16 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     return (
       <Button
         ref={ref}
-        onClick={(e) => {
+        onPointerDownCapture={(e) => {
+          // Safari requires clipboard operations to happen on pointerdown (not click)
+          // and in the capture phase (before the event reaches child elements like icons).
+          // Without this, Safari's user gesture detection fails.
+          if (e.button !== 0) return // Only handle left click
           const textToCopy = asyncText ? asyncText() : text
           setShowCopied(true)
           copyToClipboard(textToCopy)
-          onClick?.(e)
         }}
+        onClick={onClick}
         {...props}
         className={cn({ 'px-1': iconOnly }, props.className)}
         icon={
