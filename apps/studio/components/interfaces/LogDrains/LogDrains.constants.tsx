@@ -1,5 +1,5 @@
 import { components } from 'api-types'
-import { Datadog, Grafana, Sentry } from 'icons'
+import { Datadog, Grafana, Sentry, Last9 } from 'icons'
 import { Axiom } from 'icons'
 import { BracesIcon, Cloud } from 'lucide-react'
 
@@ -51,6 +51,12 @@ export const LOG_DRAIN_TYPES = [
       'Axiom is a data platform designed to efficiently collect, store, and analyze event and telemetry data at massive scale.',
     icon: <Axiom {...iconProps} fill="currentColor" strokeWidth={0} />,
   },
+  {
+    value: 'last9',
+    name: 'Last9',
+    description: 'Last9 is an observability platform for monitoring and telemetry data',
+    icon: <Last9 {...iconProps} fill="currentColor" strokeWidth={0} />,
+  },
 ] as const
 
 export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_TYPES.map((source) => source.value)
@@ -83,6 +89,17 @@ export const DATADOG_REGIONS = [
   {
     label: 'US5',
     value: 'US5',
+  },
+] as const
+
+export const LAST9_REGIONS = [
+  {
+    label: 'US West 1',
+    value: 'US-WEST-1',
+  },
+  {
+    label: 'AP South 1',
+    value: 'AP-SOUTH-1',
   },
 ] as const
 
