@@ -63,10 +63,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { mutate: createLogDrain, isPending: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
+      setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
     onError: () => {
       toast.error('Failed to create log drain')
+      setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
   })
@@ -159,7 +161,6 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setPendingLogDrainValues(null)
           }
           setIsCreateConfirmModalOpen(false)
-          setOpen(false)
         }}
         onCancel={() => {
           setIsCreateConfirmModalOpen(false)

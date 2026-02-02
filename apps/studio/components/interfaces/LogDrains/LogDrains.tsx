@@ -5,7 +5,7 @@ import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-quer
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useTrack } from 'lib/telemetry/track'
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -150,8 +150,11 @@ export function LogDrains({
                   <TableCell className="text-foreground-light">
                     <div className="flex items-center gap-2">
                       {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon && (
-                        <span className="h-4 w-4 text-foreground-light">
-                          {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon}
+                        <span className="text-foreground-light">
+                          {cloneElement(
+                            LOG_DRAIN_TYPES.find((t) => t.value === drain.type)!.icon,
+                            { height: 16, width: 16 }
+                          )}
                         </span>
                       )}
                       <span className="truncate max-w-40">
