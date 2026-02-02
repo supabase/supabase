@@ -2,6 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { AlertCircle } from 'lucide-react'
@@ -35,7 +36,6 @@ import { useOrganizationPreviewCreditCodeQuery } from '@/data/organizations/orga
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useFlag } from 'common'
 
 const FORM_ID = 'credit-code-redemption'
 
