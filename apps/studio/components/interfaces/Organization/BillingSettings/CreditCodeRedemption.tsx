@@ -7,7 +7,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -35,6 +35,7 @@ import { z } from 'zod'
 import { useOrganizationPreviewCreditCodeQuery } from '@/data/organizations/organization-credit-code-preview-query'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'credit-code-redemption'
@@ -107,8 +108,8 @@ export const CreditCodeRedemption = ({
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
   )
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
+  const captchaTokenRef = useRef<string | null>(null)
 
   const {
     mutateAsync: redeemCode,
@@ -121,37 +122,34 @@ export const CreditCodeRedemption = ({
     },
   })
 
-  const captchaRefCallback = useCallback((node: any) => {
-    setCaptchaRef(node)
-  }, [])
-
   const resetCaptcha = () => {
-    setCaptchaToken(null)
-    captchaRef?.resetCaptcha()
+    captchaTokenRef.current = null
+    captchaRef.current?.resetCaptcha()
   }
 
   const initHcaptcha = async () => {
-    if (codeRedemptionModalVisible && captchaRef) {
-      let token = captchaToken
+    let token = captchaTokenRef.current
 
-      try {
-        if (!token) {
-          const captchaResponse = await captchaRef.execute({ async: true })
-          token = captchaResponse?.response ?? null
-          setCaptchaToken(token)
-          return token
-        }
-      } catch (error) {
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+        captchaTokenRef.current = token
         return token
       }
-
+    } catch (error) {
       return token
     }
+
+    return token
   }
+  const initHcaptchaRef = useLatest(initHcaptcha)
 
   useEffect(() => {
-    initHcaptcha()
-  }, [codeRedemptionModalVisible, captchaRef])
+    if (codeRedemptionModalVisible) {
+      initHcaptchaRef.current()
+    }
+  }, [codeRedemptionModalVisible, initHcaptchaRef])
 
   const onSubmit: SubmitHandler<CreditCodeRedemptionForm> = async ({ code }) => {
     const token = await initHcaptcha()
@@ -173,7 +171,7 @@ export const CreditCodeRedemption = ({
   const onCodeRedemptionDialogVisibilityChange = (visible: boolean) => {
     setCodeRedemptionModalVisible(visible)
     if (!visible) {
-      setCaptchaRef(null)
+      resetCaptcha()
     }
   }
 
@@ -182,10 +180,7 @@ export const CreditCodeRedemption = ({
   }
 
   return (
-    <Dialog
-      open={codeRedemptionModalVisible}
-      onOpenChange={(open) => onCodeRedemptionDialogVisibilityChange(open)}
-    >
+    <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
       {!modalVisible && (
         <DialogTrigger asChild>
           <ButtonTooltip
@@ -211,7 +206,7 @@ export const CreditCodeRedemption = ({
 
       <DialogContent onInteractOutside={(e) => e.preventDefault()} size={'large'}>
         <HCaptcha
-          ref={captchaRefCallback}
+          ref={captchaRef}
           sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
           size="invisible"
           onOpen={() => {
@@ -222,11 +217,11 @@ export const CreditCodeRedemption = ({
             if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
           }}
           onVerify={(token) => {
-            setCaptchaToken(token)
+            captchaTokenRef.current = token
             if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
           }}
           onExpire={() => {
-            setCaptchaToken(null)
+            captchaTokenRef.current = null
           }}
         />
         <DialogHeader>

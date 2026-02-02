@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMutation, useQuery } from '@tanstack/react-query'
-
 import { IS_PLATFORM } from 'common'
-import { post, handleError } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError, UseCustomMutationOptions, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
 
 export type OrganizationCreditCodePreviewVariables = {
@@ -55,8 +55,6 @@ export const useOrganizationPreviewCreditCodeQuery = <TData = OrganizationPrevie
     undefined,
     { organizationSlug: slug }
   )
-
-  console.log({ canApplyCreditCode, slug })
 
   return useQuery<OrganizationPreviewCreditCodeData, OrganizationPreviewCreditCodeError, TData>({
     queryKey: organizationKeys.previewCreditCode(slug, code),
