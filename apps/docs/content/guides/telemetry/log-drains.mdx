@@ -12,12 +12,13 @@ You can read about the initial announcement [here](/blog/log-drains) and vote fo
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination           | Transport Method | Configuration                                     |
-| --------------------- | ---------------- | ------------------------------------------------- |
-| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
-| DataDog               | HTTP             | API Key <br /> Region                             |
-| Loki                  | HTTP             | URL <br /> Headers                                |
-| Sentry                | HTTP             | DSN                                               |
+| Destination           | Transport Method | Configuration                                                                          |
+| --------------------- | ---------------- | -------------------------------------------------------------------------------------- |
+| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers                                      |
+| Datadog               | HTTP             | API Key <br /> Region                                                                  |
+| Loki                  | HTTP             | URL <br /> Headers                                                                     |
+| Sentry                | HTTP             | DSN                                                                                    |
+| Amazon S3             | AWS SDK          | S3 Bucket <br/> Region <br/> Access Key ID <br/> Secret Access Key <br/> Batch Timeout |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
@@ -136,13 +137,13 @@ Deno.serve(async (req) => {
 
 </Accordion>
 
-## DataDog logs
+## Datadog logs
 
-Logs sent to DataDog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to DataDog.
+Logs sent to Datadog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to Datadog.
 
 The payload message is a JSON string of the raw log event, prefixed with the event timestamp.
 
-To setup DataDog log drain, generate a DataDog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your DataDog site.
+To setup Datadog log drain, generate a Datadog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your Datadog site.
 
 <Accordion
   type="default"
@@ -153,9 +154,9 @@ To setup DataDog log drain, generate a DataDog API key [here](https://app.datado
       id="walkthrough"
     >
 
-    1. Generate API Key in [DataDog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
+    1. Generate API Key in [Datadog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
     2. Create log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains)
-    3. Watch for events in the [DataDog Logs page](https://app.datadoghq.com/logs)
+    3. Watch for events in the [Datadog Logs page](https://app.datadoghq.com/logs)
 
     </AccordionItem>
 
@@ -224,6 +225,24 @@ To set up the Axiom log drain, you have to:
    - Name of the dataset
    - API token
 4. Watch for events in the Stream panel of Axiom dashboard
+
+## Amazon S3
+
+Logs are written to an existing S3 bucket that you own.
+
+Required configuration when creating an S3 Log Drain:
+
+- S3 Bucket: the name of an existing S3 bucket.
+- Region: the AWS region where the bucket is located.
+- Access Key ID: used for authentication.
+- Secret Access Key: used for authentication.
+- Batch Timeout (ms): maximum time to wait before flushing a batch. Recommended 2000–5000ms.
+
+<Admonition type="note">
+
+Ensure the AWS account tied to the Access Key ID has permissions to write to the specified S3 bucket.
+
+</Admonition>
 
 ## Pricing
 

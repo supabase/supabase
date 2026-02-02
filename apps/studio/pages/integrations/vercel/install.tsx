@@ -43,7 +43,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const {
     data: organizationsData,
-    isLoading: isLoadingOrganizationsQuery,
+    isPending: isLoadingOrganizationsQuery,
     isSuccess: isOrganizationsDataSuccess,
   } = useOrganizationsQuery()
 

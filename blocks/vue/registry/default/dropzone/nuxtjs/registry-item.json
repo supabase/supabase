@@ -1,0 +1,30 @@
+{
+  "name": "dropzone-nuxtjs",
+  "type": "registry:block",
+  "title": "Dropzone (File Upload) for Nuxt and Supabase",
+  "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+  "registryDependencies": ["button"],
+  "files": [
+    {
+      "path": "registry/default/dropzone/nuxtjs/app/components/dropzone.vue",
+      "type": "registry:component",
+      "target": "app/components/dropzone.vue"
+    },
+    {
+      "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-empty-state.vue",
+      "type": "registry:component",
+      "target": "app/components/dropzone-empty-state.vue"
+    },
+    {
+      "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-content.vue",
+      "type": "registry:component",
+      "target": "app/components/dropzone-content.vue"
+    },
+    {
+      "path": "registry/default/dropzone/nuxtjs/app/composables/useSupabaseUpload.ts",
+      "type": "registry:component",
+      "target": "app/composables/useSupabaseUpload.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "@vueuse/core", "lucide-vue-next"]
+}

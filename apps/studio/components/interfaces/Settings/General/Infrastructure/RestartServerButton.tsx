@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const RestartServerButton = () => {
   const router = useRouter()
@@ -169,22 +169,21 @@ const RestartServerButton = () => {
         </Button>
       )}
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={serviceToRestart !== undefined}
+        variant="destructive"
         title={`Restart ${serviceToRestart}`}
-        // @ts-ignore
         description={
           <>
-            Are you sure you want to restart the{' '}
-            <span className="text-foreground">{serviceToRestart}</span>? There will be a few minutes
-            of downtime.
+            Are you sure you want to restart your {serviceToRestart}? There will be a few minutes of
+            downtime.
           </>
         }
-        buttonLabel="Restart"
-        buttonLoadingLabel="Restarting"
-        onSelectCancel={() => setServiceToRestart(undefined)}
-        onSelectConfirm={async () => {
+        confirmLabel="Restart"
+        confirmLabelLoading="Restarting"
+        loading={isLoading}
+        onCancel={() => setServiceToRestart(undefined)}
+        onConfirm={async () => {
           if (serviceToRestart === 'project') {
             await requestProjectRestart()
           } else if (serviceToRestart === 'database') {

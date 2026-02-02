@@ -1,7 +1,7 @@
-import { X } from 'lucide-react'
-import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -55,7 +55,7 @@ export const ReportBlock = ({
   const {
     data,
     error: contentError,
-    isLoading: isLoadingContent,
+    isPending: isLoadingContent,
   } = useContentIdQuery(
     { projectRef, id: item.id },
     {
@@ -82,7 +82,7 @@ export const ReportBlock = ({
   const {
     data: queryResult,
     error: executeSqlError,
-    isLoading: executeSqlLoading,
+    isPending: executeSqlLoading,
     refetch,
   } = useQuery({
     queryKey: sqlKeys.query(projectRef, [

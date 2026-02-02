@@ -1,17 +1,15 @@
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import React, { useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useTrack } from 'lib/telemetry/track'
+import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
+import React, { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,14 +20,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function LogDrains({
   onNewDrainClick,
@@ -46,7 +45,7 @@ export function LogDrains({
   const { ref } = useParams()
   const {
     data: logDrains,
-    isLoading,
+    isPending: isLoading,
     refetch,
     error,
     isError,
@@ -85,6 +84,10 @@ export function LogDrains({
     return <LogDrainsEmpty />
   }
 
+  if (isError) {
+    return <AlertError subject="Failed to load log drains" error={error}></AlertError>
+  }
+
   if (!isLoading && !hasLogDrains) {
     return (
       <>
@@ -110,10 +113,6 @@ export function LogDrains({
         <VoteLink />
       </>
     )
-  }
-
-  if (isError) {
-    return <AlertError error={error}></AlertError>
   }
 
   return (
@@ -203,10 +202,7 @@ export function LogDrains({
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
                 track('log_drain_confirm_button_submitted', {
-                  destination: selectedLogDrain.type as Exclude<
-                    LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3' | 'axiom'
-                  >,
+                  destination: selectedLogDrain.type,
                 })
               }
             }}

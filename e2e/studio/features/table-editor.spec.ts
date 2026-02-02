@@ -1,13 +1,14 @@
-import { expect, Locator, Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { isCLI } from '../utils/is-cli.js'
+import { env } from '../env.config.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import {
+  createApiResponseWaiter,
   waitForApiResponse,
   waitForGridDataToLoad,
   waitForTableToLoad,
@@ -71,7 +72,7 @@ const createTable = async (page: Page, ref: string, tableName: string) => {
   await expect(
     page.getByRole('button', { name: `View ${tableName}`, exact: true }),
     'Table should be visible after creation'
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
@@ -107,7 +108,9 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
   await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
 }
 
-test.describe('table editor', () => {
+// Due to rate API rate limits run this test in serial mode on platform.
+const testRunner = env.IS_PLATFORM ? test.describe.serial : test.describe
+testRunner('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
     await withFileOnceSetup(import.meta.url, async () => {
       const ctx = await browser.newContext()
@@ -240,14 +243,20 @@ test.describe('table editor', () => {
     await page.getByTestId('table-name-input').fill(tableNameRlsDisabled)
     await page.getByLabel('Enable Row Level Security (').click()
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // Wait for table creation
     const apiPromise = waitForApiResponse(
       page,
       'pg-meta',
       ref,
       'tables?include_columns=false&included_schemas=public'
-    ) // wait for table creation
+    )
+    // Wait for lints refresh
+    const lintsPromise = waitForApiResponse(page, 'projects', ref, 'run-lints')
+
     await page.getByRole('button', { name: 'Save' }).click()
     await apiPromise
+    await lintsPromise
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
   })
@@ -487,11 +496,17 @@ test.describe('table editor', () => {
 
     await page.getByRole('button', { name: 'Filter', exact: true }).click()
     await page.getByRole('button', { name: 'Add filter' }).click()
-    await page.getByRole('button', { name: 'id', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'id', exact: true }).click()
     await page.getByRole('menuitem', { name: colName }).click()
     await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
+    const waitForFilterApply = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('button', { name: 'Apply filter' }).click()
-    await waitForGridDataToLoad(page, ref)
+    await waitForFilterApply
     await page.waitForTimeout(500)
     await page.getByRole('button', { name: 'Filtered by 1 rule' }).click({ force: true })
     await expect(page.getByRole('gridcell', { name: '789' })).toBeVisible()
@@ -548,8 +563,14 @@ test.describe('table editor', () => {
     await page.getByRole('button', { name: 'Sort', exact: true }).click()
     await page.getByRole('button', { name: 'Pick a column to sort by' }).click()
     await page.getByRole('menuitem', { name: colName }).click()
+    const waitForSortingApply = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('button', { name: 'Apply sorting' }).click()
-    await waitForGridDataToLoad(page, ref)
+    await waitForSortingApply
     await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
 
     // Verify sorted row content asc lexicographically for strings
@@ -577,8 +598,11 @@ test.describe('table editor', () => {
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
     await expect(page.getByText('A total of 50 rows will be')).toBeVisible()
+    const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Import data' }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // insert data
+    await waitForCsvInsert // insert data
     await waitForGridDataToLoad(page, ref) // retrieve updated data
     await expect(page.getByText('50 records')).toBeVisible()
 
@@ -590,29 +614,33 @@ test.describe('table editor', () => {
     await page.getByRole('tab', { name: 'Paste text' }).click()
     await page.getByRole('textbox').fill(fileContent)
     await expect(page.getByText('A total of 51 rows will be')).toBeVisible()
+    const waitForPasteInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Import data' }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // insert data
+    await waitForPasteInsert // insert data
     await waitForGridDataToLoad(page, ref) // retrieve updated data
     await expect(page.getByText('101 records')).toBeVisible()
 
     // test pagination (page 1 -> page 2)
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).not.toBeVisible()
-    let footer: Locator
-    if (isCLI()) {
-      footer = page.getByLabel('Table grid footer')
-    } else {
-      footer = page.locator('[data-sentry-component="GridFooter"]')
-    }
-    await footer.getByRole('button').nth(1).click()
-    await waitForGridDataToLoad(page, ref) // retrieve next page data
+    const waitForPageChange = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+    await page.getByLabel('Table grid footer').getByRole('button').nth(1).click()
+    await waitForPageChange // retrieve next page data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).toBeVisible()
 
     // change pagination size (100 -> 500)
     await page.getByRole('button', { name: 'rows' }).click()
+    const waitForPaginationChange = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('menuitem', { name: '500 rows' }).click()
-    await waitForGridDataToLoad(page, ref) // retrieve updated pagination size data
+    await waitForPaginationChange // retrieve updated pagination size data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await page.getByRole('grid').evaluate((element) => {
       element.scrollTop = element.scrollHeight
@@ -628,8 +656,11 @@ test.describe('table editor', () => {
     await page.getByRole('row', { name: 'value 3 to delete' }).getByRole('checkbox').click()
     await page.getByRole('button', { name: 'Delete 3 rows' }).click()
     await expect(page.getByText('delete the selected 3 rows')).toBeVisible()
+    const waitForDeleteRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Delete' }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // delete selected rows
+    await waitForDeleteRows // delete selected rows
     await waitForGridDataToLoad(page, ref) // retrieve row data
 
     // export selected rows when multiple rows action is selected
@@ -665,7 +696,7 @@ test.describe('table editor', () => {
     const downloadJsonPath = await downloadJson.path()
     const jsonContent = fs.readFileSync(downloadJsonPath, 'utf-8')
     expect(jsonContent).toBe(
-      `[{"idx":0,"id":4,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 4 to export"},{"idx":1,"id":5,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 5 to export"},{"idx":2,"id":6,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 6 to export"}]`
+      `[{"id":4,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 4 to export"},{"id":5,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 5 to export"},{"id":6,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 6 to export"}]`
     )
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadJsonPath)
@@ -708,9 +739,12 @@ test.describe('table editor', () => {
     // select all actions works (delete action)
     await page.getByRole('checkbox', { name: 'Select All' }).click()
     await page.getByRole('button', { name: 'Delete 98 rows' }).click()
+    const waitForDeleteAllRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Delete' }).click()
     await expect(page.getByText('delete the selected 98 rows')).toBeVisible()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // delete all rows
+    await waitForDeleteAllRows // delete all rows
     await waitForGridDataToLoad(page, ref) // retrieve rows data
     await expect(page.getByRole('gridcell', { name: 'value 7' })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101' })).not.toBeVisible()
@@ -997,5 +1031,145 @@ test.describe('table editor', () => {
 
     // Cleanup
     await deleteTable(page, ref, tableName)
+  })
+
+  test('can create and remove foreign key with column selection', async ({ page, ref }) => {
+    const sourceTableName = 'pw_table_fk_source'
+    const targetTableName = 'pw_table_fk_target'
+
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    await dismissToastsIfAny(page)
+
+    // Create target table first (will be referenced)
+    await createTable(page, ref, targetTableName)
+
+    // Create source table (will have the foreign key)
+    await createTable(page, ref, sourceTableName)
+    await page.getByRole('button', { name: `View ${sourceTableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Open edit table dialog
+    await page
+      .getByRole('button', { name: `View ${sourceTableName}`, exact: true })
+      .locator('button[aria-haspopup="menu"]')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+    // Open foreign key selector
+    await page.getByRole('button', { name: 'Add foreign key relation' }).click()
+
+    // Select schema (should default to public)
+    await expect(page.getByRole('button', { name: 'Select a schema' })).toContainText('public')
+
+    // Select target table
+    const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
+      response.url().includes(`table-public-${targetTableName}`)
+    )
+
+    await page.getByRole('button', { name: 'Select a table to reference to' }).click()
+    await page.getByRole('menuitem', { name: `public ${targetTableName}` }).click()
+
+    // Wait for table columns to load
+    await tableQueryPromise
+
+    // Verify column selection UI appears
+    await expect(
+      page.getByText(`Select columns from public.${targetTableName} to reference to`)
+    ).toBeVisible()
+
+    // Select source column (id from source table)
+    await page.getByRole('button', { name: '---' }).first().click()
+    await page.getByRole('menuitem', { name: 'id int8' }).click()
+
+    // Wait for the first dropdown to update - there should only be one '---' button left now
+    await expect(page.getByRole('button', { name: '---' })).toHaveCount(1)
+
+    // Select target column (id from target table)
+    await page.getByRole('button', { name: '---' }).first().click()
+    await page.getByRole('menuitem', { name: 'id int8' }).click()
+
+    // Verify cascade action options are visible
+    await expect(page.getByText('Action if referenced row is updated')).toBeVisible()
+    await expect(page.getByText('Action if referenced row is removed')).toBeVisible()
+
+    // Verify save button is now enabled
+    const saveButton = page.getByRole('button', { name: 'Save' }).last()
+    await expect(saveButton).toBeEnabled()
+
+    // Save the foreign key
+    const fkCreatePromise = waitForApiResponseWithTimeout(page, (response) =>
+      response.url().includes('query?key=')
+    )
+    await saveButton.click()
+    await fkCreatePromise
+
+    // Verify foreign key selector closed
+    await expect(
+      page.getByRole('banner', { name: `Add foreign key relationship to ${sourceTableName}` })
+    ).not.toBeVisible()
+
+    // Save table changes
+    const saveTablePromise = waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-update'),
+      15000
+    )
+    await page.getByRole('button', { name: 'Save' }).first().click()
+    await saveTablePromise
+
+    // Wait for table editor side panel to close
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+
+    // Verify foreign key was created by opening edit table dialog again
+    await page
+      .getByRole('button', { name: `View ${sourceTableName}`, exact: true })
+      .locator('button[aria-haspopup="menu"]')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+    // Scroll down to see foreign key relations section
+    await page.getByRole('heading', { name: 'Foreign keys' }).scrollIntoViewIfNeeded()
+
+    // Verify foreign key relation exists
+    await expect(page.getByRole('link', { name: 'public.pw_table_fk_target' })).toBeVisible()
+
+    // Remove the foreign key relation
+    await page.getByRole('button', { name: 'Remove' }).click()
+
+    // Save the table changes after removing foreign key
+    const removeFkPromise = waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-update'),
+      15000
+    )
+    await page.getByRole('button', { name: 'Save' }).first().click()
+    await removeFkPromise
+
+    // Wait for table editor side panel to close
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+
+    // Verify foreign key was removed by opening edit table dialog again
+    await page
+      .getByRole('button', { name: `View ${sourceTableName}`, exact: true })
+      .locator('button[aria-haspopup="menu"]')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit table' }).click()
+
+    // Scroll down to see foreign key relations section
+    await page.getByRole('heading', { name: 'Foreign keys' }).scrollIntoViewIfNeeded()
+    // Verify foreign key relation no longer exists
+    await expect(page.getByText(`public.${targetTableName}`, { exact: false })).not.toBeVisible()
+
+    // Close the edit table dialog
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+
+    // Clean up
+    await deleteTable(page, ref, sourceTableName)
+    await deleteTable(page, ref, targetTableName)
   })
 })

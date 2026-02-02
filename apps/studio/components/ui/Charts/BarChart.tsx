@@ -123,11 +123,7 @@ const BarChart = ({
         title={title}
         format={format}
         customDateFormat={customDateFormat}
-        highlightedValue={
-          typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
-            : resolvedHighlightedValue
-        }
+        highlightedValue={resolvedHighlightedValue}
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
         syncId={syncId}
@@ -195,7 +191,7 @@ const BarChart = ({
             animationDuration={300}
             maxBarSize={48}
           >
-            {data?.map((_entry: Datum, index: any) => (
+            {data?.map((_entry: Datum, index: number) => (
               <Cell
                 key={`cell-${index}`}
                 className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}

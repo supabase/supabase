@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
@@ -50,15 +50,22 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    ProjectsInfiniteData,
+    ProjectsInfiniteError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number
+  > = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>({
+  return useInfiniteQuery({
     queryKey: projectKeys.infiniteList({ limit, sort, search }),
     queryFn: ({ signal, pageParam }) =>
       getProjects({ limit, page: pageParam, sort, search }, signal),
     enabled: enabled && profile !== undefined,
     staleTime: 30 * 60 * 1000, // 30 minutes
+    initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length
       const currentTotalCount = page * limit

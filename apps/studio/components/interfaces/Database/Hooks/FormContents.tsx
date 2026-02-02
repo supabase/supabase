@@ -1,12 +1,13 @@
 import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect } from 'react'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { Checkbox, Input, Listbox, Radio, SidePanel } from 'ui'
@@ -51,7 +52,7 @@ export const FormContents = ({
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: keys = [] } = useAPIKeysQuery(
     { projectRef: ref, reveal: true },
     { enabled: canReadAPIKeys }

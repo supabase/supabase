@@ -72,7 +72,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const {
     error,
     data: profile,
-    isLoading: isLoadingProfile,
+    isPending: isLoadingProfile,
     isError,
     isSuccess,
   } = useProfileQuery({
@@ -129,7 +129,7 @@ export function useProfileNameAndPicture(): {
   isLoading: boolean
 } {
   const { profile, isLoading: isLoadingProfile } = useProfile()
-  const { data: identitiesData, isLoading: isLoadingIdentities } = useProfileIdentitiesQuery()
+  const { data: identitiesData, isPending: isLoadingIdentities } = useProfileIdentitiesQuery()
 
   const username = profile?.username
   const isGitHubProfile = profile?.auth0_id?.startsWith('github')

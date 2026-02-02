@@ -1,7 +1,7 @@
 import { components } from 'api-types'
 import { Datadog, Grafana, Sentry } from 'icons'
-import { BracesIcon, Cloud } from 'lucide-react'
 import { Axiom } from 'icons'
+import { BracesIcon, Cloud } from 'lucide-react'
 
 const iconProps = {
   height: 24,

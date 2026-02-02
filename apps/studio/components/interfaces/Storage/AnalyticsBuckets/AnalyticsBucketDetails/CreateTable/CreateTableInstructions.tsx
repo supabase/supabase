@@ -48,7 +48,7 @@ export const CreateTableInstructions = ({
   const s3SecretKeyVaultID = wrapperValues.vault_aws_secret_access_key
   const tokenVaultID = wrapperValues.vault_token
 
-  const { data: decryptedS3AccessKey, isLoading: isDecryptingS3AccessKey } =
+  const { data: decryptedS3AccessKey, isPending: isDecryptingS3AccessKey } =
     useVaultSecretDecryptedValueQuery(
       {
         projectRef: project?.ref,
@@ -58,7 +58,7 @@ export const CreateTableInstructions = ({
       { enabled: showKeys }
     )
 
-  const { data: decryptedS3SecretKey, isLoading: isDecryptingS3SecretKey } =
+  const { data: decryptedS3SecretKey, isPending: isDecryptingS3SecretKey } =
     useVaultSecretDecryptedValueQuery(
       {
         projectRef: project?.ref,
@@ -68,7 +68,7 @@ export const CreateTableInstructions = ({
       { enabled: showKeys }
     )
 
-  const { data: decryptedToken, isLoading: isDecryptingToken } = useVaultSecretDecryptedValueQuery(
+  const { data: decryptedToken, isPending: isDecryptingToken } = useVaultSecretDecryptedValueQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
