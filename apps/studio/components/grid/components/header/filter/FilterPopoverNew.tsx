@@ -1,10 +1,10 @@
-import { format } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
 import { useDebounce } from '@uidotdev/usehooks'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { Filter } from 'components/grid/types'
 import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
+import { format } from 'date-fns'
+import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Calendar } from 'ui'
 import {
@@ -13,10 +13,11 @@ import {
   FilterGroup,
   FilterOption,
   FilterProperty,
-  isGroup,
   SerializableFilterProperty,
+  isGroup,
   updateGroupAtPath,
 } from 'ui-patterns'
+
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 
 export interface FilterPopoverProps {
@@ -119,13 +120,21 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   const { filters: urlFilters, onApplyFilters } = useTableFilter()
   const snap = useTableEditorTableStateSnapshot()
 
-  // Local state for immediate UI updates
+  // Initialize from URL only once on mount. After that, local state is source of truth.
   const [localFilters, setLocalFilters] = useState<Filter[]>(urlFilters)
   const debouncedLocalFilters = useDebounce(localFilters, 500)
 
-  useEffect(() => {
+  // Create a stable callback that always has access to latest onApplyFilters
+  // but doesn't cause effect to re-run when onApplyFilters reference changes
+  const applyFiltersEvent = useStaticEffectEvent(() => {
     onApplyFilters(debouncedLocalFilters)
-  }, [debouncedLocalFilters, onApplyFilters])
+  })
+
+  // Update URL when filters change (for bookmarking/sharing), but don't react to URL changes.
+  // useStaticEffectEvent ensures we always call the latest onApplyFilters without re-triggering.
+  useEffect(() => {
+    applyFiltersEvent()
+  }, [debouncedLocalFilters, applyFiltersEvent])
 
   const [freeformText, setFreeformText] = useState('')
   const { mutateAsync: generateFilters, isPending: isGenerating } = useSqlFilterGenerateMutation()
