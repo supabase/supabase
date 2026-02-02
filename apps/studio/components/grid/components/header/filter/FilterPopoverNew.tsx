@@ -1,10 +1,8 @@
-import { useDebounce } from '@uidotdev/usehooks'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import type { Filter } from 'components/grid/types'
 import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
 import { format } from 'date-fns'
-import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Calendar } from 'ui'
 import {
@@ -117,30 +115,14 @@ function serializeFilterProperties(
 }
 
 export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
-  const { filters: urlFilters, onApplyFilters } = useTableFilter()
+  const { filters, setFilters } = useTableFilterNew()
   const snap = useTableEditorTableStateSnapshot()
-
-  // Initialize from URL only once on mount. After that, local state is source of truth.
-  const [localFilters, setLocalFilters] = useState<Filter[]>(urlFilters)
-  const debouncedLocalFilters = useDebounce(localFilters, 500)
-
-  // Create a stable callback that always has access to latest onApplyFilters
-  // but doesn't cause effect to re-run when onApplyFilters reference changes
-  const applyFiltersEvent = useStaticEffectEvent(() => {
-    onApplyFilters(debouncedLocalFilters)
-  })
-
-  // Update URL when filters change (for bookmarking/sharing), but don't react to URL changes.
-  // useStaticEffectEvent ensures we always call the latest onApplyFilters without re-triggering.
-  useEffect(() => {
-    applyFiltersEvent()
-  }, [debouncedLocalFilters, applyFiltersEvent])
 
   const [freeformText, setFreeformText] = useState('')
   const { mutateAsync: generateFilters, isPending: isGenerating } = useSqlFilterGenerateMutation()
 
   // Convert filters to FilterGroup for the FilterBar
-  const filterGroup = useMemo(() => filtersToFilterGroup(localFilters), [localFilters])
+  const filterGroup = useMemo(() => filtersToFilterGroup(filters), [filters])
 
   const columns = useMemo(() => snap.table?.columns ?? [], [snap.table?.columns])
 
@@ -171,11 +153,13 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   )
 
   // Handle filter changes from FilterBar
-  const handleFilterChange = useCallback((newFilterGroup: FilterGroup) => {
-    const newFilters = filterGroupToFilters(newFilterGroup)
-    // Update local state immediately for responsive UI
-    setLocalFilters(newFilters)
-  }, [])
+  const handleFilterChange = useCallback(
+    (newFilterGroup: FilterGroup) => {
+      const newFilters = filterGroupToFilters(newFilterGroup)
+      setFilters(newFilters)
+    },
+    [setFilters]
+  )
 
   const actions = useMemo(
     () => [
