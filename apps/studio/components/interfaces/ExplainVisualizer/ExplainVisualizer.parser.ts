@@ -273,7 +273,7 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
   }
   tree.forEach(traverse)
 
-  stats.totalCost = tree[0].cost?.end ?? 0
+  stats.totalCost = tree[0]?.cost?.end ?? 0
   return stats
 }
 

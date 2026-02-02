@@ -19,11 +19,6 @@ import { Admonition } from 'ui-patterns'
 import { InlineLinkClassName } from './InlineLink'
 import { ResponseError } from '@/types'
 
-type CostMetadata = {
-  cost: number
-  sql: string
-}
-
 interface HighQueryCostErrorProps {
   error: ResponseError
   suggestions?: string[]
@@ -43,7 +38,7 @@ export const HighCostError = ({ error, suggestions }: HighQueryCostErrorProps) =
 }
 
 const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProps) => {
-  const metadata = error.metadata as CostMetadata
+  const metadata = error.metadata
 
   return (
     <Dialog>
@@ -70,7 +65,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
             <Tooltip>
               <TooltipTrigger className={InlineLinkClassName}>estimated cost</TooltipTrigger>
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
-                <p>Estimated cost: {metadata.cost.toLocaleString()}</p>
+                <p>Estimated cost: {metadata?.cost.toLocaleString()}</p>
                 <p className="text-foreground-light">
                   Determined via the <code className="text-code-inline">EXPLAIN</code> command
                 </p>

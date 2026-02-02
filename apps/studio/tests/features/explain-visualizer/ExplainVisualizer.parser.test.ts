@@ -1,15 +1,14 @@
-import { describe, test, expect } from 'vitest'
 import {
-  parseExplainOutput,
-  parseNodeDetails,
   calculateMaxCost,
   calculateSummary,
-  type ExplainSummary,
+  parseExplainOutput,
+  parseNodeDetails,
 } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 import type {
-  QueryPlanRow,
   ExplainNode,
+  QueryPlanRow,
 } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
+import { describe, expect, test } from 'vitest'
 
 // Helper to create QueryPlanRow array from strings
 const toQueryPlanRows = (lines: string[]): QueryPlanRow[] =>
@@ -879,13 +878,14 @@ describe('calculateSummary', () => {
     expect(result).toEqual({
       totalTime: 0,
       totalCost: 0,
+      maxCost: 0,
       hasSeqScan: false,
       seqScanTables: [],
       hasIndexScan: false,
     })
   })
 
-  test('calculates totalCost from cost.end', () => {
+  test('calculates totalCost from root node cost.end', () => {
     const tree: ExplainNode[] = [
       {
         operation: 'Seq Scan',
@@ -901,6 +901,47 @@ describe('calculateSummary', () => {
 
     const result = calculateSummary(tree)
     expect(result.totalCost).toBe(45.5)
+  })
+
+  test('calculates maxCost from maximum cost across all nodes', () => {
+    const tree: ExplainNode[] = [
+      {
+        operation: 'Limit',
+        details: '',
+        cost: { start: 0, end: 100 },
+        rows: 10,
+        width: 36,
+        level: 0,
+        children: [
+          {
+            operation: 'Sort',
+            details: '',
+            cost: { start: 0, end: 250 }, // This is the maximum
+            rows: 1000,
+            width: 36,
+            level: 1,
+            children: [
+              {
+                operation: 'Seq Scan',
+                details: 'on users',
+                cost: { start: 0, end: 150 },
+                rows: 1000,
+                width: 36,
+                level: 2,
+                children: [],
+                raw: '',
+              },
+            ],
+            raw: '',
+          },
+        ],
+        raw: '',
+      },
+    ]
+
+    const result = calculateSummary(tree)
+    expect(result.totalCost).toBe(100) // Root node cost
+    expect(result.maxCost).toBe(250) // Maximum across all nodes
   })
 
   test('calculates totalTime from actualTime.end', () => {
@@ -1090,7 +1131,8 @@ describe('calculateSummary', () => {
     ]
 
     const result = calculateSummary(tree)
-    expect(result.totalCost).toBe(35.8)
+    expect(result.totalCost).toBe(35.8) // Root node cost
+    expect(result.maxCost).toBe(35.8) // Maximum cost across all nodes (root is highest)
     expect(result.totalTime).toBe(2.345)
     expect(result.hasSeqScan).toBe(true)
     expect(result.hasIndexScan).toBe(true)
