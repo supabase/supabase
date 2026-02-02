@@ -151,10 +151,10 @@ export function LogDrains({
                     <div className="flex items-center gap-2">
                       {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon && (
                         <span className="text-foreground-light">
-                          {cloneElement(
-                            LOG_DRAIN_TYPES.find((t) => t.value === drain.type)!.icon,
-                            { height: 16, width: 16 }
-                          )}
+                          {cloneElement(LOG_DRAIN_TYPES.find((t) => t.value === drain.type)!.icon, {
+                            height: 16,
+                            width: 16,
+                          })}
                         </span>
                       )}
                       <span className="truncate max-w-40">
