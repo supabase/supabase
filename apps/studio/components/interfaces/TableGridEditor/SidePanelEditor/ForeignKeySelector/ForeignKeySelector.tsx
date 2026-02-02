@@ -15,17 +15,17 @@ import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
-import type { ForeignKey } from './ForeignKeySelector.types'
+import type { ForeignKey, SelectorErrors, SelectorTypeError } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
 
 const EMPTY_STATE: ForeignKey = {
@@ -62,14 +62,16 @@ export const ForeignKeySelector = ({
   const { selectedSchema } = useQuerySchemaState()
 
   const [fk, setFk] = useState(EMPTY_STATE)
-  const [errors, setErrors] = useState<{ columns?: string; types?: any[]; typeNotice?: any[] }>({})
-  const hasTypeErrors = (errors?.types ?? []).filter((x: any) => x !== undefined).length > 0
-  const hasTypeNotices = (errors?.typeNotice ?? []).filter((x: any) => x !== undefined).length > 0
+  const [errors, setErrors] = useState<SelectorErrors>({})
+  const hasTypeErrors = (errors.types ?? []).length > 0
+  const hasTypeNotices = (errors.typeNotice ?? []).length > 0
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: schemas = [] } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const sortedSchemas = [...schemas].sort((a, b) => a.name.localeCompare(b.name))
+
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -77,18 +79,17 @@ export const ForeignKeySelector = ({
     includeColumns: false,
   })
 
-  const { data: selectedTable, isLoading: isLoadingSelectedTable } =
-    useTableRetrieveQuery<PostgresTable>(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schema: fk.schema,
-        name: fk.table,
-      },
-      {
-        enabled: !!project?.ref && !!fk.schema && !!fk.table,
-      }
-    )
+  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PostgresTable>(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: fk.schema,
+      name: fk.table,
+    },
+    {
+      enabled: !!project?.ref && !!fk.schema && !!fk.table,
+    }
+  )
 
   const disableApply = isLoadingSelectedTable || selectedTable === undefined || hasTypeErrors
 
@@ -146,8 +147,8 @@ export const ForeignKeySelector = ({
     setFk({ ...fk, [action]: value })
   }
 
-  const validateSelection = (resolve: any) => {
-    const errors: any = {}
+  const validateSelection = (resolve: () => void) => {
+    const errors: SelectorErrors = {}
     const incompleteColumns = fk.columns.filter(
       (column) => column.source === '' || column.target === ''
     )
@@ -165,8 +166,8 @@ export const ForeignKeySelector = ({
   }
 
   const validateType = () => {
-    const typeNotice: any = []
-    const typeErrors: any = []
+    const typeNotice: SelectorTypeError[] = []
+    const typeErrors: SelectorTypeError[] = []
 
     fk.columns.forEach((column) => {
       const { source, target, sourceType: sType, targetType: tType } = column
@@ -183,7 +184,6 @@ export const ForeignKeySelector = ({
       if (
         (NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
         (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
-        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
         (sourceType === 'uuid' && targetType === 'uuid')
       )
         return
@@ -192,10 +192,10 @@ export const ForeignKeySelector = ({
       if (sourceType === targetType) return
 
       if (sourceColumn?.isNewColumn && targetType !== '') {
-        return typeNotice.push({ sourceType, targetType })
+        return typeNotice.push({ source, sourceType, target, targetType })
       }
 
-      typeErrors.push({ sourceType, targetType })
+      typeErrors.push({ source, sourceType, target, targetType })
     })
 
     setErrors({ types: typeErrors, typeNotice })
@@ -206,11 +206,13 @@ export const ForeignKeySelector = ({
       if (foreignKey !== undefined) setFk(foreignKey)
       else setFk({ ...EMPTY_STATE, id: uuidv4() })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   useEffect(() => {
     if (visible) validateType()
-  }, [fk])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fk, visible])
 
   return (
     <SidePanel
@@ -224,7 +226,7 @@ export const ForeignKeySelector = ({
           disableApply={disableApply}
           applyButtonLabel="Save"
           closePanel={onClose}
-          applyFunction={(resolve: any) => validateSelection(resolve)}
+          applyFunction={(resolve) => validateSelection(resolve)}
         />
       }
     >
@@ -246,7 +248,7 @@ export const ForeignKeySelector = ({
             value={fk.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas?.map((schema) => {
+            {sortedSchemas.map((schema) => {
               return (
                 <Listbox.Option
                   key={schema.id}
@@ -306,7 +308,7 @@ export const ForeignKeySelector = ({
                 <div className="flex flex-col gap-y-3">
                   <label className="text-foreground-light text-sm">
                     Select columns from{' '}
-                    <code className="text-xs">
+                    <code className="text-code-inline">
                       {fk.schema}.{fk.table}
                     </code>{' '}
                     to reference to
@@ -421,9 +423,8 @@ export const ForeignKeySelector = ({
                             if (x === undefined) return null
                             return (
                               <li key={`type-error-${idx}`}>
-                                <code className="text-xs">{fk.columns[idx]?.source}</code> (
-                                {x.sourceType}) and{' '}
-                                <code className="text-xs">{fk.columns[idx]?.target}</code>(
+                                <code className="text-code-inline">{x.source}</code> ({x.sourceType}
+                                ) and <code className="text-code-inline">{x.target}</code>(
                                 {x.targetType})
                               </li>
                             )
@@ -444,7 +445,7 @@ export const ForeignKeySelector = ({
                             return (
                               <li key={`type-error-${idx}`}>
                                 <div className="flex items-center gap-x-1">
-                                  <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
+                                  <code className="text-code-inline">{x.source}</code>{' '}
                                   <ArrowRight size={14} /> {x.targetType}
                                 </div>
                               </li>
@@ -472,18 +473,18 @@ export const ForeignKeySelector = ({
                         </p>
                         <ul className="mt-2 list-disc pl-4 space-y-1">
                           <li>
-                            <code className="text-xs">Cascade</code>: if the referencing table
-                            represents something that is a component of what is represented by the
-                            referenced table and cannot exist independently
+                            <code className="text-code-inline">Cascade</code>: if the referencing
+                            table represents something that is a component of what is represented by
+                            the referenced table and cannot exist independently
                           </li>
                           <li>
-                            <code className="text-xs">Restrict</code> or{' '}
-                            <code className="text-xs">No action</code>: if the two tables represent
-                            independent objects
+                            <code className="text-code-inline">Restrict</code> or{' '}
+                            <code className="text-code-inline">No action</code>: if the two tables
+                            represent independent objects
                           </li>
                           <li>
-                            <code className="text-xs">Set NULL</code> or{' '}
-                            <code className="text-xs">Set default</code>: if a foreign-key
+                            <code className="text-code-inline">Set NULL</code> or{' '}
+                            <code className="text-code-inline">Set default</code>: if a foreign-key
                             relationship represents optional information
                           </li>
                         </ul>

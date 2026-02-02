@@ -11,6 +11,8 @@ export interface EgressProps {
   currentBillingCycleSelected: boolean
   orgDailyStats: OrgDailyUsageResponse | undefined
   isLoadingOrgDailyStats: boolean
+  startDate: string | undefined
+  endDate: string | undefined
 }
 
 const Egress = ({
@@ -20,6 +22,8 @@ const Egress = ({
   currentBillingCycleSelected,
   orgDailyStats,
   isLoadingOrgDailyStats,
+  startDate,
+  endDate,
 }: EgressProps) => {
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -47,6 +51,8 @@ const Egress = ({
       chartMeta={chartMeta}
       subscription={subscription}
       currentBillingCycleSelected={currentBillingCycleSelected}
+      startDate={startDate}
+      endDate={endDate}
     />
   )
 }

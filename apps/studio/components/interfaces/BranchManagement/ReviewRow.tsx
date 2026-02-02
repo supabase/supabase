@@ -24,7 +24,7 @@ export const ReviewRow = ({ branch }: ReviewRowProps) => {
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onSuccess: () => {
       toast.success('Branch marked as not ready for review')
       queryClient.invalidateQueries({

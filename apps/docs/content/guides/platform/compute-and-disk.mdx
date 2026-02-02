@@ -61,7 +61,7 @@ Compute instance changes are usually applied with less than 2 minutes of downtim
 
 </Admonition>
 
-When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
+When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](/dashboard/project/_/observability) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
 
 ## Disk
 
@@ -105,7 +105,7 @@ Larger compute instances (4XL and above) are designed for sustained, high perfor
 
 ### Choosing the right compute instance for consistent disk performance
 
-If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
+If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](/dashboard/project/_/observability). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
 
 ### Provisioned disk throughput and IOPS
 

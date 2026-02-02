@@ -7,24 +7,34 @@ import {
   IntegrationLoadingCard,
 } from 'components/interfaces/Integrations/Landing/IntegrationCard'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
+import { useFlag } from 'common'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
+const FEATURED_INTEGRATIONS = ['cron', 'queues'] // + either stripe_sync_engine or stripe_wrapper depending on feature flag
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   cron: 'img/integrations/covers/cron-cover.webp',
   queues: 'img/integrations/covers/queues-cover.png',
   stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
+  stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
@@ -36,6 +46,16 @@ const IntegrationsPage: NextPageWithLayout = () => {
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
+
+  const isStripeSyncEngineEnabled = useFlag('enableStripeSyncEngineIntegration')
+
+  const featuredIntegrationIds = useMemo(() => {
+    if (isStripeSyncEngineEnabled) {
+      return FEATURED_INTEGRATIONS.concat(['stripe_sync_engine'])
+    } else {
+      return FEATURED_INTEGRATIONS.concat(['stripe_wrapper'])
+    }
+  }, [isStripeSyncEngineEnabled])
 
   const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
     useInstalledIntegrations()
@@ -97,8 +117,9 @@ const IntegrationsPage: NextPageWithLayout = () => {
     }
 
     const featured = filteredAndSortedIntegrations.filter((i) =>
-      FEATURED_INTEGRATIONS.includes(i.id)
+      featuredIntegrationIds.includes(i.id)
     )
+
     const allIntegrations = filteredAndSortedIntegrations // Include all integrations, including featured
 
     return {
@@ -149,10 +170,22 @@ const IntegrationsPage: NextPageWithLayout = () => {
   )
 
   return (
-    <PageLayout {...pageContent} size="large">
-      <ScaffoldContainer size="large" className="container">
-        <ScaffoldSection isFullWidth>
-          <div className="flex-1 max-w-md mb-6">
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{pageContent.title}</PageHeaderTitle>
+            <PageHeaderDescription>{pageContent.subtitle}</PageHeaderDescription>
+          </PageHeaderSummary>
+          {pageContent.secondaryActions && (
+            <PageHeaderAside>{pageContent.secondaryActions}</PageHeaderAside>
+          )}
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionMeta>
             <Input
               value={search}
               size="tiny"
@@ -161,56 +194,58 @@ const IntegrationsPage: NextPageWithLayout = () => {
               icon={<Search size={14} />}
               className="w-52"
             />
-          </div>
+          </PageSectionMeta>
 
-          {isLoading && (
-            <div
-              className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3"
-              style={{ gridAutoRows: 'minmax(110px, auto)' }}
-            >
-              {new Array(8).fill(0).map((_, idx) => (
-                <IntegrationLoadingCard key={`integration-loading-${idx}`} />
-              ))}
-            </div>
-          )}
+          <PageSectionContent>
+            {isLoading && (
+              <div
+                className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3"
+                style={{ gridAutoRows: 'minmax(110px, auto)' }}
+              >
+                {new Array(8).fill(0).map((_, idx) => (
+                  <IntegrationLoadingCard key={`integration-loading-${idx}`} />
+                ))}
+              </div>
+            )}
 
-          {/* Error State */}
-          {isError && (
-            <AlertError subject="Failed to retrieve available integrations" error={error} />
-          )}
+            {/* Error State */}
+            {isError && (
+              <AlertError subject="Failed to retrieve available integrations" error={error} />
+            )}
 
-          {/* Success State */}
-          {isSuccess && (
-            <>
-              {/* No Search Results */}
-              {search.length > 0 && filteredAndSortedIntegrations.length === 0 && (
-                <NoSearchResults searchString={search} onResetFilter={() => setSearch('')} />
-              )}
+            {/* Success State */}
+            {isSuccess && (
+              <>
+                {/* No Search Results */}
+                {search.length > 0 && filteredAndSortedIntegrations.length === 0 && (
+                  <NoSearchResults searchString={search} onResetFilter={() => setSearch('')} />
+                )}
 
-              {/* Grouped View (All integrations, no search) */}
-              {groupedIntegrations && (
-                <>
-                  {/* Featured Integrations */}
-                  {groupedIntegrations.featured.length > 0 && (
-                    <FeaturedIntegrationsGrid integrations={groupedIntegrations.featured} />
-                  )}
+                {/* Grouped View (All integrations, no search) */}
+                {groupedIntegrations && (
+                  <>
+                    {/* Featured Integrations */}
+                    {groupedIntegrations.featured.length > 0 && (
+                      <FeaturedIntegrationsGrid integrations={groupedIntegrations.featured} />
+                    )}
 
-                  {/* All Integrations */}
-                  {groupedIntegrations.allIntegrations.length > 0 && (
-                    <AllIntegrationsGrid integrations={groupedIntegrations.allIntegrations} />
-                  )}
-                </>
-              )}
+                    {/* All Integrations */}
+                    {groupedIntegrations.allIntegrations.length > 0 && (
+                      <AllIntegrationsGrid integrations={groupedIntegrations.allIntegrations} />
+                    )}
+                  </>
+                )}
 
-              {/* Single List View (Category filtered or searching) */}
-              {!groupedIntegrations && filteredAndSortedIntegrations.length > 0 && (
-                <AllIntegrationsGrid integrations={filteredAndSortedIntegrations} />
-              )}
-            </>
-          )}
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </PageLayout>
+                {/* Single List View (Category filtered or searching) */}
+                {!groupedIntegrations && filteredAndSortedIntegrations.length > 0 && (
+                  <AllIntegrationsGrid integrations={filteredAndSortedIntegrations} />
+                )}
+              </>
+            )}
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

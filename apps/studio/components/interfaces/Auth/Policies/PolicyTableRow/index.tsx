@@ -8,8 +8,6 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
   Card,
   CardContent,
   CardHeader,
@@ -21,7 +19,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'
@@ -75,27 +73,39 @@ const PolicyTableRowComponent = ({
   })
 
   const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
-  const isPubliclyReadableWritable =
-    !isRLSEnabled && isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
-  const rlsEnabledNoPolicies = isRLSEnabled && policies.length === 0
+  const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
+  const isPubliclyReadableWritable = !isRLSEnabled && hasApiAccess
+  const rlsEnabledNoPolicies = isRLSEnabled && hasApiAccess && policies.length === 0
+  const isApiDisabledDueToRoles = isTableExposedThroughAPI && !hasAnonAuthenticatedRolesAccess
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
   const showPolicies = !isPoliciesLoading && !isPoliciesError
 
+  const shouldHideHeaderBorder =
+    isPubliclyReadableWritable ||
+    rlsEnabledNoPolicies ||
+    !isTableExposedThroughAPI ||
+    isApiDisabledDueToRoles
+
+  const admonitionMessage = useMemo(() => {
+    if (isPubliclyReadableWritable) {
+      return 'This table can be accessed by anyone via the Data API as RLS is disabled.'
+    }
+    if (isApiDisabledDueToRoles) {
+      return 'This table cannot be accessed via the Data API as no permissions exist for the anon or authenticated roles.'
+    }
+    return 'This table can be accessed via the Data API but no RLS policies exist so no data will be returned.'
+  }, [isPubliclyReadableWritable, isApiDisabledDueToRoles])
+
   return (
     <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
-      <CardHeader
-        className={cn(
-          'py-3 px-4',
-          (isPubliclyReadableWritable || rlsEnabledNoPolicies || !isTableExposedThroughAPI) &&
-            'border-b-0'
-        )}
-      >
+      <CardHeader className={cn('py-3 px-4', shouldHideHeaderBorder && 'border-b-0')}>
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
+          hasApiAccess={hasApiAccess}
           onSelectToggleRLS={onSelectToggleRLS}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
@@ -105,26 +115,26 @@ const PolicyTableRowComponent = ({
         <Admonition
           showIcon={false}
           type="warning"
-          className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
+          className="border-0 border-y rounded-none min-h-12 flex items-center"
         >
-          No data will be selectable via Supabase APIs as this schema is not exposed. You may
-          configure this in your project's{' '}
-          <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+          <p className="text-foreground-light">
+            No data will be selectable via Supabase APIs as this schema is not exposed. You may
+            configure this in your project’s{' '}
+            <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+          </p>
         </Admonition>
       )}
 
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && isTableExposedThroughAPI && (
-        <Alert_Shadcn_
-          className="border-0 rounded-none mb-0 border-y h-[50px] py-0 flex items-center"
-          variant={isPubliclyReadableWritable ? 'warning' : 'default'}
-        >
-          <AlertDescription_Shadcn_>
-            {isPubliclyReadableWritable
-              ? "Anyone with your project's anonymous key can read, modify, or delete your data."
-              : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
+      {(isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
+        isTableExposedThroughAPI && (
+          <Admonition
+            showIcon={false}
+            type={isPubliclyReadableWritable ? 'warning' : 'default'}
+            className="border-0 border-y rounded-none min-h-12 flex items-center"
+          >
+            <p>{admonitionMessage}</p>
+          </Admonition>
+        )}
 
       {isPoliciesLoading && (
         <CardContent>

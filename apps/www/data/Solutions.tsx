@@ -7,6 +7,7 @@ import {
   PointerIcon,
   PuzzleIcon,
   TrendingUpIcon,
+  UsersIcon,
   ZapIcon,
 } from 'lucide-react'
 
@@ -21,6 +22,7 @@ export enum Solutions {
   firebase = 'firebase',
   neon = 'neon',
   startups = 'startups',
+  agencies = 'agencies',
   enterprise = 'enterprise',
   hackathon = 'hackathon',
   innovationTeams = 'innovation-teams',
@@ -120,6 +122,13 @@ export const useCaseSolutions = {
       icon: TrendingUpIcon,
     },
     {
+      id: Solutions.agencies,
+      text: 'Agencies',
+      description: '',
+      url: '/solutions/agencies',
+      icon: UsersIcon,
+    },
+    {
       id: Solutions.enterprise,
       text: 'Enterprise',
       description: '',
@@ -167,7 +176,7 @@ export const migrationSolutions = {
     },
     {
       id: Solutions.neon,
-      text: 'Switch From Neon',
+      text: 'Switch from Neon',
       description: '',
       url: '/solutions/switch-from-neon',
       icon: (props: any) => (

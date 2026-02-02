@@ -6,11 +6,10 @@ import { useState } from 'react'
 
 import { PostgresColumn } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -27,6 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
@@ -48,7 +48,7 @@ export const ColumnList = ({
     data: selectedTable,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -82,7 +82,7 @@ export const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
         </div>
         {!isSchemaLocked && isTableEntity && (
@@ -120,7 +120,10 @@ export const ColumnList = ({
       {isSuccess && (
         <>
           {columns.length === 0 ? (
-            <NoSearchResults />
+            <NoSearchResults
+              searchString={filterString}
+              onResetFilter={() => setFilterString('')}
+            />
           ) : (
             <div>
               <Table
@@ -149,10 +152,10 @@ export const ColumnList = ({
                       )}
                     </Table.td>
                     <Table.td>
-                      <code className="text-xs">{x.data_type}</code>
+                      <code className="text-code-inline">{x.data_type}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
-                      <code className="text-xs">{x.format}</code>
+                      <code className="text-code-inline">{x.format}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
                       {x.is_nullable ? (

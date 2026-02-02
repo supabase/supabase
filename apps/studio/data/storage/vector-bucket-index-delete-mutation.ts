@@ -49,7 +49,9 @@ export const useVectorBucketIndexDeleteMutation = ({
     mutationFn: (vars) => deleteVectorBucketIndex(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, bucketName } = variables
-      await queryClient.invalidateQueries(storageKeys.vectorBucketsIndexes(projectRef, bucketName))
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.vectorBucketsIndexes(projectRef, bucketName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -7,7 +7,7 @@ import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
-import type { McpClient } from './types'
+import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
 import { InfoTooltip } from '../info-tooltip'
 
@@ -17,6 +17,8 @@ export interface McpConfigPanelProps {
   projectRef?: string
   initialSelectedClient?: McpClient
   onClientSelect?: (client: McpClient) => void
+  onCopyCallback: (type?: McpOnCopyCallback) => void
+  onInstallCallback?: () => void
   theme?: 'light' | 'dark'
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
@@ -28,6 +30,8 @@ export function McpConfigPanel({
   projectRef,
   initialSelectedClient,
   onClientSelect,
+  onCopyCallback,
+  onInstallCallback,
   className,
   theme = 'dark',
   isPlatform,
@@ -93,6 +97,7 @@ export function McpConfigPanel({
             hideLineNumbers
             language="http"
             className="max-h-64 overflow-y-auto"
+            onCopyCallback={() => onCopyCallback?.('url')}
           >
             {mcpUrl}
           </CodeBlock>
@@ -122,6 +127,9 @@ export function McpConfigPanel({
           basePath={basePath}
           selectedClient={selectedClient}
           clientConfig={clientConfig}
+          onCopyCallback={onCopyCallback}
+          onInstallCallback={onInstallCallback}
+          isPlatform={isPlatform}
         />
       </div>
     </div>

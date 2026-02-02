@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
 import {
+  Button,
+  Input_Shadcn_,
+  Label_Shadcn_,
   Sheet,
   SheetClose,
   SheetContent,
@@ -24,7 +24,7 @@ export default function SheetSide() {
       {SHEET_SIDES.map((side) => (
         <Sheet key={side}>
           <SheetTrigger asChild>
-            <Button type="outline">{side}</Button>
+            <Button type="outline">From {side}</Button>
           </SheetTrigger>
           <SheetContent side={side}>
             <SheetHeader>

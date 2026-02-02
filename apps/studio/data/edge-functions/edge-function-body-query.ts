@@ -1,6 +1,7 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
 import { useQuery } from '@tanstack/react-query'
-import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
+
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
@@ -33,16 +34,29 @@ export async function getEdgeFunctionBody(
 
   if (!data || !boundary) return { files: [] }
 
-  for await (let part of parseMultipartStream(data, { boundary })) {
+  let metadata: {
+    deno2_entrypoint_path?: string | null
+  } = {}
+
+  for await (let part of parseMultipartStream(data, {
+    boundary,
+    maxFileSize: 20 * 1024 * 1024,
+  })) {
     if (part.isFile) {
       files.push({
         name: part.filename,
         content: part.text,
       })
+    } else {
+      // treat it as metadata
+      metadata = JSON.parse(part.text)
     }
   }
 
-  return { files: files as Omit<EdgeFunctionFile, 'id' | 'selected'>[] }
+  return {
+    metadata,
+    files: files as Omit<FileData, 'id' | 'selected' | 'state'>[],
+  }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>

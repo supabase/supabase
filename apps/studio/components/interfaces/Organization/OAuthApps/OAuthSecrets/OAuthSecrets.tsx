@@ -26,7 +26,7 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []
 
-  const { mutate: createSecret, isLoading: isCreatingSecret } = useClientSecretCreateMutation({
+  const { mutate: createSecret, isPending: isCreatingSecret } = useClientSecretCreateMutation({
     onSuccess: (data) => setCreatedSecret(data),
   })
 

@@ -64,7 +64,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const {
     data: createS3KeyData,
     mutate: createS3AccessKey,
-    isLoading: isCreating,
+    isPending: isCreating,
   } = useS3AccessKeyCreateMutation({
     onSuccess: () => {
       setShowSuccess(true)

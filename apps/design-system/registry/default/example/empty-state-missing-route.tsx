@@ -17,7 +17,7 @@ export default function EmptyStateMissingRoute() {
           <Link
             href="/"
             onClick={(e) => {
-              e.preventDefault()
+              e.preventDefault() // Just for demo purposes
             }}
           >
             Head back

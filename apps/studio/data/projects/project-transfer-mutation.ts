@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
+import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 
 export type ProjectTransferVariables = {
   projectRef?: string
@@ -40,6 +41,7 @@ export const useProjectTransferMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>({
     mutationFn: (vars) => transferProject(vars),
@@ -50,7 +52,7 @@ export const useProjectTransferMutation = ({
           queryKey: projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
         }),
         queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        invalidateProjectsQuery(),
       ])
       await onSuccess?.(data, variables, context)
     },

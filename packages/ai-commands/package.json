@@ -14,7 +14,7 @@
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "catalog:",
-    "ai": "^5.0.0",
+    "ai": "5.0.52",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
     "js-tiktoken": "^1.0.10",

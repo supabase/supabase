@@ -105,9 +105,9 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
-export const useIsSecurityNotificationsEnabled = () => {
+export const useIsQueueOperationsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
 export const useFeaturePreviewModal = () => {
@@ -116,7 +116,6 @@ export const useFeaturePreviewModal = () => {
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const isSecurityNotificationsAvailable = useFlag('securityNotifications')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -131,18 +130,11 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
-        case 'security-notifications':
-          return isSecurityNotificationsAvailable
         default:
           return true
       }
     },
-    [
-      gitlessBranchingEnabled,
-      advisorRulesEnabled,
-      isUnifiedLogsPreviewAvailable,
-      isSecurityNotificationsAvailable,
-    ]
+    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
   )
 
   const selectedFeatureKey = (

@@ -1,5 +1,6 @@
 import { IS_PLATFORM } from 'common'
 import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
+import { useConnectCommands } from 'components/interfaces/Connect/Connect.Commands'
 import {
   useQueryTableCommands,
   useSnippetCommands,
@@ -16,10 +17,13 @@ import { useApiUrlCommand } from './ApiUrl'
 import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useContextSearchCommands } from './ContextSearchCommands'
+import { useCreateCommands } from './CreateCommands'
 
 export default function StudioCommandMenu() {
   useApiKeysCommands()
   useApiUrlCommand()
+  useConnectCommands()
   useProjectLevelTableEditorCommands()
   useProjectSwitchCommand()
   useConfigureOrganizationCommand()
@@ -36,6 +40,8 @@ export default function StudioCommandMenu() {
   useSupportCommands()
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
+  useCreateCommands()
+  useContextSearchCommands()
 
   return (
     <CommandMenu>

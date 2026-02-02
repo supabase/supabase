@@ -9,17 +9,7 @@ export type APIKeyCreateVariables = {
   projectRef?: string
   name: string
   description?: string
-} & (
-  | {
-      type: 'publishable'
-    }
-  | {
-      type: 'secret'
-      // secret_jwt_template?: { // @mildtomato (Jonny) removed this field to reduce scope
-      //   role: string
-      // } | null
-    }
-)
+} & ({ type: 'publishable' } | { type: 'secret' })
 
 export async function createAPIKey(payload: APIKeyCreateVariables) {
   if (!payload.projectRef) throw new Error('projectRef is required')

@@ -5,6 +5,18 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
+/**
+ * Parses the exposed schema string returned from PostgREST config.
+ *
+ * @param schemaString - e.g., `public,graphql_public`
+ */
+export const parseDbSchemaString = (schemaString: string): string[] => {
+  return schemaString
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+}
+
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
 }
@@ -25,7 +37,7 @@ export async function getProjectPostgrestConfig(
   })
   if (error) handleError(error)
   // [Joshen] Not sure why but db_pool isn't part of the API typing
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
   return data as unknown as PostgrestConfigResponse
 }
 

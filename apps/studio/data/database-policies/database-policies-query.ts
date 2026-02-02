@@ -7,7 +7,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databasePoliciesKeys } from './keys'
 
-export type DatabasePoliciesVariables = {
+type DatabasePoliciesVariables = {
   projectRef?: string
   connectionString?: string | null
   schema?: string

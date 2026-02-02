@@ -1,9 +1,10 @@
-import { AiIconAnimation, Button, Card, cn } from 'ui'
-import Link from 'next/link'
-import { AnimatedCursors } from './AnimatedCursors'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Button, Card, cn } from 'ui'
+import { AnimatedCursors } from './AnimatedCursors'
 
 /**
  * Acts as a container component for the entire log display
@@ -92,7 +93,9 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
               Receive realtime messages in your application by listening to a channel
             </p>
             <Button type="default" asChild>
-              <Link href="https://supabase.com/docs/guides/realtime/subscribing-to-database-changes#listening-on-client-side">
+              <Link
+                href={`${DOCS_URL}/guides/realtime/subscribing-to-database-changes#listening-on-client-side`}
+              >
                 Read the guide
               </Link>
             </Button>

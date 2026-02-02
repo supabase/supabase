@@ -33,7 +33,7 @@ export const PublicationsTableItem = ({
     'publications'
   )
 
-  const { mutate: updatePublications, isLoading } = useDatabasePublicationUpdateMutation()
+  const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
 
   const toggleReplicationForTable = async (
     table: PostgresTable,
@@ -94,7 +94,7 @@ export const PublicationsTableItem = ({
               <TooltipTrigger>
                 <Switch
                   size="small"
-                  disabled={!canUpdatePublications || isLoading || isProtected}
+                  disabled={!canUpdatePublications || isPending || isProtected}
                   checked={checked}
                   onClick={() => toggleReplicationForTable(table, selectedPublication)}
                 />

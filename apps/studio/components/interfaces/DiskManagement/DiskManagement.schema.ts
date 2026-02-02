@@ -50,8 +50,9 @@ export const CreateDiskStorageSchema = ({
 }) => {
   const isFlyProject = cloudProvider === 'FLY'
   const isAwsNimbusProject = cloudProvider === 'AWS_NIMBUS'
+  const isAwsK8sProject = cloudProvider === 'AWS_K8S'
 
-  const validateDiskConfiguration = !isFlyProject && !isAwsNimbusProject
+  const validateDiskConfiguration = !isFlyProject && !isAwsNimbusProject && !isAwsK8sProject
 
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb } = data

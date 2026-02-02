@@ -24,7 +24,7 @@ const VERCEL_ICON = (
   </svg>
 )
 
-const SidePanelVercelProjectLinker = () => {
+export const SidePanelVercelProjectLinker = () => {
   const { ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
@@ -72,7 +72,7 @@ const SidePanelVercelProjectLinker = () => {
     [vercelProjectsById]
   )
 
-  const { mutate: createConnections, isLoading: isCreatingConnection } =
+  const { mutate: createConnections, isPending: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       async onSuccess({ env_sync_error: envSyncError }) {
         if (envSyncError) {

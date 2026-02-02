@@ -54,19 +54,19 @@ export const MessageDetailsPanel = ({
 
   const {
     mutate: archiveMessage,
-    isLoading: isLoadingArchive,
+    isPending: isLoadingArchive,
     isSuccess: isSuccessArchive,
   } = useDatabaseQueueMessageArchiveMutation()
 
   const {
     mutate: readMessage,
-    isLoading: isLoadingRead,
+    isPending: isLoadingRead,
     isSuccess: isSuccessRead,
   } = useDatabaseQueueMessageReadMutation()
 
   const {
     mutate: deleteMessage,
-    isLoading: isLoadingDelete,
+    isPending: isLoadingDelete,
     isSuccess: isSuccessDelete,
   } = useDatabaseQueueMessageDeleteMutation()
 

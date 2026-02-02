@@ -65,7 +65,7 @@ export const DeleteAccountButton = () => {
   })
   const { account } = form.watch()
 
-  const { mutate: submitSupportTicket, isLoading } = useSendSupportTicketMutation({
+  const { mutate: submitSupportTicket, isPending } = useSendSupportTicketMutation({
     onSuccess: () => {
       setIsOpen(false)
       setDeletionRequestFlag()
@@ -171,7 +171,7 @@ export const DeleteAccountButton = () => {
                               autoFocus
                               {...field}
                               autoComplete="off"
-                              disabled={isLoading}
+                              disabled={isPending}
                               placeholder="Enter the account above"
                             />
                           </FormControl_Shadcn_>
@@ -186,8 +186,8 @@ export const DeleteAccountButton = () => {
                       size="small"
                       type="danger"
                       htmlType="submit"
-                      loading={isLoading}
-                      disabled={account !== accountEmail || isLoading}
+                      loading={isPending}
+                      disabled={account !== accountEmail || isPending}
                     >
                       Submit request for account deletion
                     </Button>

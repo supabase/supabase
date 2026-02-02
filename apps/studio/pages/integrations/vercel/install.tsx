@@ -43,7 +43,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const {
     data: organizationsData,
-    isLoading: isLoadingOrganizationsQuery,
+    isPending: isLoadingOrganizationsQuery,
     isSuccess: isOrganizationsDataSuccess,
   } = useOrganizationsQuery()
 
@@ -111,7 +111,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   }
 
-  const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
+  const { mutate, isPending: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onMutate() {
         snapshot.setLoading(true)

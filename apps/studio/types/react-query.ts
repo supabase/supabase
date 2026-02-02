@@ -1,4 +1,5 @@
 import type {
+  DefaultError,
   QueryKey,
   UseInfiniteQueryOptions,
   UseMutationOptions,
@@ -10,7 +11,7 @@ export type UseCustomQueryOptions<
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
-> = UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+> = Omit<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryKey'>
 
 export type UseCustomMutationOptions<
   TData = unknown,
@@ -21,8 +22,11 @@ export type UseCustomMutationOptions<
 
 export type UseCustomInfiniteQueryOptions<
   TQueryFnData = unknown,
-  TError = unknown,
+  TError = DefaultError,
   TData = TQueryFnData,
-  TQueryData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
-> = UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>
+  TPageParam = unknown,
+> = Omit<
+  UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
+  'queryKey' | 'getNextPageParam' | 'initialPageParam'
+>

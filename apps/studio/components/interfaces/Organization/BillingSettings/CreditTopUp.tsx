@@ -71,7 +71,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const {
     mutateAsync: topUpCredits,
-    isLoading: executingTopUp,
+    isPending: executingTopUp,
     error: errorInitiatingTopUp,
   } = useOrganizationCreditTopUpMutation({})
 

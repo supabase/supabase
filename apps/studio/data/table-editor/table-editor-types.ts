@@ -13,16 +13,25 @@ interface TableRelationship extends PostgresRelationship {
   update_action: 'a' | 'r' | 'c' | 'n' | 'd'
 }
 
+interface TableUniqueIndex {
+  schema: string
+  table_name: string
+  table_id: number
+  columns: string[]
+}
+
 export interface Table extends PostgresTable {
   entity_type: ENTITY_TYPE.TABLE
   columns: PostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
 export interface PartitionedTable extends PostgresTable {
   entity_type: ENTITY_TYPE.PARTITIONED_TABLE
   columns: PostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
 export interface View extends PostgresView {

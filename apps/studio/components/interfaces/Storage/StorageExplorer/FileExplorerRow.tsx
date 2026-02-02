@@ -17,7 +17,6 @@ import {
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
-import { useParams } from 'common'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -48,7 +47,7 @@ import {
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
-import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
+import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 export const RowIcon = ({
@@ -115,8 +114,6 @@ export const FileExplorerRow = ({
   selectedItems = [],
   style,
 }: FileExplorerRowProps) => {
-  const { ref: projectRef, bucketId } = useParams()
-
   const {
     selectedBucket,
     selectedFilePreview,
@@ -128,6 +125,7 @@ export const FileExplorerRow = ({
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
+    downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
     openFolder,
@@ -254,13 +252,7 @@ export const FileExplorerRow = ({
                       {
                         name: 'Download',
                         icon: <Download size={14} strokeWidth={1} />,
-                        onClick: async () => {
-                          await downloadFile({
-                            projectRef,
-                            bucketId,
-                            file: itemWithColumnIndex,
-                          })
-                        },
+                        onClick: () => downloadFile(itemWithColumnIndex),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]

@@ -659,6 +659,13 @@
         "type": "function"
       },
       {
+        "id": "auth-js-gotrueclient-initialize",
+        "title": "Initialize client session",
+        "slug": "auth-initialize",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "auth-mfa-api",
         "title": "Auth MFA",
         "slug": "auth-mfa-api",
@@ -704,6 +711,58 @@
             "title": "Get Authenticator Assurance Level",
             "slug": "auth-mfa-getauthenticatorassurancelevel",
             "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-gotruemfaapi-listfactors",
+            "title": "List all factors for current user",
+            "slug": "auth-mfa-listfactors",
+            "product": "auth",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "id": "oauth-server-api",
+        "isFunc": false,
+        "title": "OAuth Server",
+        "slug": "auth-admin-oauth-server",
+        "product": "auth-admin",
+        "type": "function",
+        "items": [
+          {
+            "id": "auth-js-authoauthserverapi-getauthorizationdetails",
+            "title": "Get authorization details",
+            "slug": "auth-admin-oauth-getauthorizationdetails",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-approveauthorization",
+            "title": "Approve authorization",
+            "slug": "auth-admin-oauth-approveauthorization",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-denyauthorization",
+            "title": "Deny authorization",
+            "slug": "auth-admin-oauth-denyauthorization",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-listgrants",
+            "title": "List grants",
+            "slug": "auth-admin-oauth-listgrants",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-revokegrant",
+            "title": "Revoke grant",
+            "slug": "auth-admin-oauth-revokegrant",
+            "product": "auth-admin",
             "type": "function"
           }
         ]
@@ -771,6 +830,13 @@
             "type": "function"
           },
           {
+            "id": "auth-js-gotrueadminapi-signout",
+            "title": "Sign out a user (admin)",
+            "slug": "auth-admin-signout",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
             "id": "mfa-list-factors",
             "title": "List all factors for a user",
             "slug": "auth-admin-mfa-listfactors",
@@ -783,6 +849,66 @@
             "slug": "auth-admin-mfa-deletefactor",
             "product": "auth-admin",
             "type": "function"
+          },
+          {
+            "id": "mfa-list-factors-admin",
+            "title": "List all factors for a user (admin)",
+            "slug": "auth-admin-mfa-listfactors-admin",
+            "product": "auth-admin",
+            "type": "function"
+          },
+
+          {
+            "id": "oauth-admin-api",
+            "isFunc": false,
+            "title": "OAuth Admin",
+            "slug": "auth-admin-oauth-admin",
+            "product": "auth-admin",
+            "type": "function",
+            "items": [
+              {
+                "id": "auth-js-gotrueadminoauthapi-listclients",
+                "title": "List OAuth clients",
+                "slug": "auth-admin-oauth-listclients",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-getclient",
+                "title": "Get OAuth client",
+                "slug": "auth-admin-oauth-getclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-createclient",
+                "title": "Create OAuth client",
+                "slug": "auth-admin-oauth-createclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-updateclient",
+                "title": "Update OAuth client",
+                "slug": "auth-admin-oauth-updateclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-deleteclient",
+                "title": "Delete OAuth client",
+                "slug": "auth-admin-oauth-deleteclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-regenerateclientsecret",
+                "title": "Regenerate client secret",
+                "slug": "auth-admin-oauth-regenerateclientsecret",
+                "product": "auth-admin",
+                "type": "function"
+              }
+            ]
           }
         ]
       }
@@ -881,130 +1007,328 @@
     "title": "Storage",
     "items": [
       {
-        "id": "create-bucket",
-        "title": "Create a bucket",
-        "slug": "storage-createbucket",
+        "id": "file-buckets",
+        "isFunc": false,
+        "title": "File Buckets",
+        "slug": "file-buckets",
         "product": "storage",
-        "type": "function"
+        "type": "function",
+        "items": [
+          {
+            "id": "storageclient-from",
+            "title": "Access a storage bucket",
+            "slug": "storageclient-from",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "list-buckets",
+            "title": "List all buckets",
+            "slug": "storage-listbuckets",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "get-bucket",
+            "title": "Retrieve a bucket",
+            "slug": "storage-getbucket",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "create-bucket",
+            "title": "Create a bucket",
+            "slug": "storage-createbucket",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "empty-bucket",
+            "title": "Empty a bucket",
+            "slug": "storage-emptybucket",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "update-bucket",
+            "title": "Update a bucket",
+            "slug": "storage-updatebucket",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "delete-bucket",
+            "title": "Delete a bucket",
+            "slug": "storage-deletebucket",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-upload",
+            "title": "Upload a file",
+            "slug": "storage-from-upload",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-update",
+            "title": "Replace an existing file",
+            "slug": "storage-from-update",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-move",
+            "title": "Move an existing file",
+            "slug": "storage-from-move",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-copy",
+            "title": "Copy an existing file",
+            "slug": "storage-from-copy",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-create-signed-url",
+            "title": "Create a signed URL",
+            "slug": "storage-from-createsignedurl",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-create-signed-urls",
+            "title": "Create signed URLs",
+            "slug": "storage-from-createsignedurls",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-create-signed-upload-url",
+            "title": "Create signed upload URL",
+            "slug": "storage-from-createsigneduploadurl",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-upload-to-signed-url",
+            "title": "Upload to a signed URL",
+            "slug": "storage-from-uploadtosignedurl",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-get-public-url",
+            "title": "Retrieve public URL",
+            "slug": "storage-from-getpublicurl",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-download",
+            "title": "Download a file",
+            "slug": "storage-from-download",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-remove",
+            "title": "Delete files in a bucket",
+            "slug": "storage-from-remove",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "from-list",
+            "title": "List all files in a bucket",
+            "slug": "storage-from-list",
+            "product": "storage",
+            "type": "function"
+          },
+          {
+            "id": "storagefile-exists",
+            "title": "Check if file exists",
+            "slug": "storage-from-exists",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagefile-info",
+            "title": "Get file metadata",
+            "slug": "storage-from-info",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagefile-list-v2",
+            "title": "List files (v2)",
+            "slug": "storage-from-listv2",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagefile-to-base64",
+            "title": "Convert file to base64",
+            "slug": "storage-from-tobase64",
+            "type": "function",
+            "product": "storage"
+          }
+        ]
       },
       {
-        "id": "get-bucket",
-        "title": "Retrieve a bucket",
-        "slug": "storage-getbucket",
+        "id": "analytics-buckets",
+        "isFunc": false,
+        "title": "Analytics Buckets",
+        "slug": "analytics-buckets",
         "product": "storage",
-        "type": "function"
+        "type": "function",
+        "items": [
+          {
+            "id": "storageanalytics-from",
+            "title": "Access an analytics bucket",
+            "slug": "storageanalytics-from",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storageanalytics-createbucket",
+            "title": "Create a new analytics bucket",
+            "slug": "storageanalytics-createbucket",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storageanalytics-listbuckets",
+            "title": "List analytics buckets",
+            "slug": "storageanalytics-listbuckets",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storageanalytics-deletebucket",
+            "title": "Delete an analytics bucket",
+            "slug": "storageanalytics-deletebucket",
+            "type": "function",
+            "product": "storage"
+          }
+        ]
       },
       {
-        "id": "list-buckets",
-        "title": "List all buckets",
-        "slug": "storage-listbuckets",
+        "id": "vector-buckets",
+        "isFunc": false,
+        "title": "Vector Buckets",
+        "slug": "vector-buckets",
         "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "update-bucket",
-        "title": "Update a bucket",
-        "slug": "storage-updatebucket",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "delete-bucket",
-        "title": "Delete a bucket",
-        "slug": "storage-deletebucket",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "empty-bucket",
-        "title": "Empty a bucket",
-        "slug": "storage-emptybucket",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-upload",
-        "title": "Upload a file",
-        "slug": "storage-from-upload",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-download",
-        "title": "Download a file",
-        "slug": "storage-from-download",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-list",
-        "title": "List all files in a bucket",
-        "slug": "storage-from-list",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-update",
-        "title": "Replace an existing file",
-        "slug": "storage-from-update",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-move",
-        "title": "Move an existing file",
-        "slug": "storage-from-move",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-copy",
-        "title": "Copy an existing file",
-        "slug": "storage-from-copy",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-remove",
-        "title": "Delete files in a bucket",
-        "slug": "storage-from-remove",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-create-signed-url",
-        "title": "Create a signed URL",
-        "slug": "storage-from-createsignedurl",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-create-signed-urls",
-        "title": "Create signed URLs",
-        "slug": "storage-from-createsignedurls",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-create-signed-upload-url",
-        "title": "Create signed upload URL",
-        "slug": "storage-from-createsigneduploadurl",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-upload-to-signed-url",
-        "title": "Upload to a signed URL",
-        "slug": "storage-from-uploadtosignedurl",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-get-public-url",
-        "title": "Retrieve public URL",
-        "slug": "storage-from-getpublicurl",
-        "product": "storage",
-        "type": "function"
+        "type": "function",
+        "items": [
+          {
+            "id": "storagevectors-from",
+            "title": "Access a vector bucket",
+            "slug": "storagevectors-from",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagevectors-create-bucket",
+            "title": "Create a vector bucket",
+            "slug": "storagevectors-createbucket",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagevectors-delete-bucket",
+            "title": "Delete a vector bucket",
+            "slug": "storagevectors-deletebucket",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagevectors-get-bucket",
+            "title": "Retrieve a vector bucket",
+            "slug": "storagevectors-getbucket",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagevectors-list-buckets",
+            "title": "List all vector buckets",
+            "slug": "storagevectors-listbuckets",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorbucket-createindex",
+            "title": "Create a vector index",
+            "slug": "vectorbucket-createindex",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorbucket-deleteindex",
+            "title": "Delete a vector index",
+            "slug": "vectorbucket-deleteindex",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorbucket-getindex",
+            "title": "Retrieve a vector index",
+            "slug": "vectorbucket-getindex",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorbucket-listindexes",
+            "title": "List all vector indexes",
+            "slug": "vectorbucket-listindexes",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorbucket-index",
+            "title": "Access a vector index",
+            "slug": "vectorbucket-index",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-deletevectors",
+            "title": "Delete vectors from index",
+            "slug": "vectorindex-deletevectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-getvectors",
+            "title": "Retrieve vectors from index",
+            "slug": "vectorindex-getvectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-listvectors",
+            "title": "List vectors in index",
+            "slug": "vectorindex-listvectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-putvectors",
+            "title": "Add vectors to index",
+            "slug": "vectorindex-putvectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-queryvectors",
+            "title": "Search vectors in index",
+            "slug": "vectorindex-queryvectors",
+            "type": "function",
+            "product": "storage"
+          }
+        ]
       }
     ]
   },

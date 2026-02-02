@@ -228,9 +228,9 @@ export const formatCronJobColumns = ({
 }: {
   onSelectEdit: (job: CronJob) => void
   onSelectDelete: (job: CronJob) => void
-}) => {
+}): Array<Column<CronJob>> => {
   return CRON_TABLE_COLUMNS.map((col) => {
-    const res: Column<any> = {
+    const res: Column<CronJob> = {
       key: col.id,
       name: col.name,
       minWidth: col.minWidth ?? 100,

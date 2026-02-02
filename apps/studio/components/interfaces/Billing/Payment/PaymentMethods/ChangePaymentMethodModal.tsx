@@ -15,7 +15,7 @@ const ChangePaymentMethodModal = ({
   onClose,
 }: ChangePaymentMethodModalProps) => {
   const { slug } = useParams()
-  const { mutate: markAsDefault, isLoading: isUpdating } =
+  const { mutate: markAsDefault, isPending: isUpdating } =
     useOrganizationPaymentMethodMarkAsDefaultMutation({
       onSuccess: () => {
         toast.success(

@@ -1,0 +1,57 @@
+---
+title: Expose Queues for local and self-hosted Supabase
+subtitle: Learn how to expose Queues when running Supabase with Supabase CLI or Docker Compose
+---
+
+By default, local and self-hosted Supabase instances expose only core schemas like public and graphql_public.
+To allow client-side consumers to use your queues, you have to add `pgmq_public` schema to the list of exposed schemas.
+
+Before continuing, complete the step [Expose queues to client-side consumers](/docs/guides/queues/quickstart#expose-queues-to-client-side-consumers) from the Queues Quickstart guide. This creates the `pgmq_public` schema, which must exist before it can be exposed through the API.
+
+<Admonition type="note">
+
+You only need to expose the `pgmq_public` schema manually when running Supabase locally with the Supabase CLI or self-hosting using Docker Compose.
+
+</Admonition>
+
+## Expose Queues with Supabase CLI
+
+When running Supabase locally with Supabase CLI, update your project's `config.toml` file.
+Locate the `[api]` section and add `pgmq_public` to the list of schemas.
+
+```toml
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public", "pgmq_public"]
+```
+
+Then restart your local Supabase stack.
+
+```bash
+supabase stop && supabase start
+```
+
+## Expose queues with Docker compose
+
+When running Supabase with Docker Compose, locate the `PGRST_DB_SCHEMAS` variable inside your `.env` file and add `pgmq_public` to it. This environment variable is passed to the `rest` service inside `docker-compose.yml`.
+
+```
+PGRST_DB_SCHEMAS=public,graphql_public,pgmq_public
+```
+
+Restart your containers for the changes to take effect.
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+## Stop exposing queues
+
+If you no longer want to expose the `pgmq_public` schema, you can remove it from your configuration.
+
+- For Supabase CLI, remove `pgmq_public` from the `[api]` schemas list in your `config.toml` file.
+- For Docker Compose, remove `pgmq_public` from the `PGRST_DB_SCHEMAS` variable in your `.env` file.
+
+After updating your configuration, restart your containers for the changes to take effect.

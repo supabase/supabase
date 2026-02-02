@@ -11,7 +11,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
-import { badgeVariants, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 
@@ -93,7 +93,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
       <div className="relative">
         <div
           className={cn(
-            'h-[35px] relative border rounded-sm w-full transition',
+            'h-[35px] relative border rounded-sm w-full transition overflow-visible',
             showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
@@ -155,15 +155,15 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
           </AnimatePresence>
           <AnimatePresence>
             {showNewSize && (
-              <motion.span
+              <motion.div
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 4 }}
                 transition={{ duration: 0.12, delay: 0.12 }}
-                className={cn(badgeVariants({ variant: 'success' }), 'absolute right-1 top-[5px]')}
+                className="absolute right-2 top-0 flex items-center h-full"
               >
-                New disk size
-              </motion.span>
+                <Badge variant="success">New disk size</Badge>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

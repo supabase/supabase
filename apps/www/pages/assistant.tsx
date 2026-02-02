@@ -682,7 +682,7 @@ function Assistant() {
                 <div className="min-h-12 flex items-center gap-x-2">
                   {!isUserLoading && (
                     <Button type="primary" size="medium" asChild>
-                      <Link href="/dashboard/project/_?aiAssistantPanelOpen=true">
+                      <Link href="/dashboard/project/_?sidebar=ai-assistant">
                         {isLoggedIn ? 'Dashboard' : 'Start your project'}
                       </Link>
                     </Button>

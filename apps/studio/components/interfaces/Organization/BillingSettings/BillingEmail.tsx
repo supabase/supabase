@@ -51,7 +51,7 @@ const BillingEmail = () => {
     'organizations'
   )
 
-  const { data: billingCustomer, isLoading: loadingBillingCustomer } =
+  const { data: billingCustomer, isPending: loadingBillingCustomer } =
     useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingEmail })
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -65,7 +65,7 @@ const BillingEmail = () => {
   const { errors } = form.formState
   const additionalEmailsError = errors.additionalBillingEmails ?? []
 
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { mutate: updateOrganization, isPending: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: z.infer<typeof formSchema>) => {
     if (!canUpdateOrganization) {
@@ -117,7 +117,7 @@ const BillingEmail = () => {
             <form id={FORM_ID} onSubmit={form.handleSubmit(onUpdateOrganizationEmail)}>
               <FormPanel
                 footer={
-                  <div className="flex py-4 px-8">
+                  <div className="flex py-4 px-[var(--card-padding-x)]">
                     <FormActions
                       form={FORM_ID}
                       isSubmitting={isUpdating}

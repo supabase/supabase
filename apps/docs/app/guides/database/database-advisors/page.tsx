@@ -2,6 +2,7 @@ import { Octokit } from '@octokit/core'
 import { capitalize } from 'lodash-es'
 import rehypeSlug from 'rehype-slug'
 import { Heading } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
@@ -43,7 +44,18 @@ In the dashboard, navigate to [Security Advisor](https://supabase.com/dashboard/
 const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 
 const DatabaseAdvisorDocs = async () => {
-  const { lints, lintsList } = await getLints()
+  let lints: Awaited<ReturnType<typeof getLints>>['lints'] = []
+  let lintsList: Awaited<ReturnType<typeof getLints>>['lintsList'] = []
+  let fetchError: Error | null = null
+
+  try {
+    const data = await getLints()
+    lints = data.lints
+    lintsList = data.lintsList
+  } catch (error) {
+    fetchError = error instanceof Error ? error : new Error('Unknown error fetching advisor docs')
+    console.error('[database-advisors] Failed to fetch advisor docs from GitHub', fetchError)
+  }
 
   const options = {
     mdxOptions: {
@@ -56,19 +68,40 @@ const DatabaseAdvisorDocs = async () => {
     <GuideTemplate meta={meta} editLink={editLink}>
       <MDXRemoteBase source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
-      <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
-        {lints.map((lint) => (
-          <TabPanel
-            key={lint.path}
-            id={lint.path}
-            label={capitalize(getBasename(lint.path).replace(/_/g, ' '))}
+
+      {fetchError ? (
+        <Admonition type="note" title="Couldn’t load the full Advisor library">
+          We fetch remediation guides straight from the <code>supabase/splinter</code> repository
+          during the build. GitHub timed out just now, so we’re showing the overview only.
+          <br />
+          <br />
+          You can check back in a few minutes or browse the
+          {` `}
+          <a
+            className="underline decoration-dashed underline-offset-2"
+            href="https://github.com/supabase/splinter/tree/main/docs"
+            target="_blank"
+            rel="noreferrer"
           >
-            <section id={getBasename(lint.path)}>
-              <MDXRemoteBase source={lint.content} options={options} />
-            </section>
-          </TabPanel>
-        ))}
-      </Tabs>
+            latest Markdown on GitHub (opens in a new tab)
+          </a>
+          .
+        </Admonition>
+      ) : (
+        <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
+          {lints.map((lint) => (
+            <TabPanel
+              key={lint.path}
+              id={lint.path}
+              label={capitalize(getBasename(lint.path).replace(/_/g, ' '))}
+            >
+              <section id={getBasename(lint.path)}>
+                <MDXRemoteBase source={lint.content} options={options} />
+              </section>
+            </TabPanel>
+          ))}
+        </Tabs>
+      )}
     </GuideTemplate>
   )
 }

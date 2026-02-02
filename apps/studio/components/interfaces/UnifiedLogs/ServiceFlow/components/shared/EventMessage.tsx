@@ -47,9 +47,9 @@ export const EventMessage = ({
                     ? 'warning'
                     : 'default'
               }
-              className="ml-2 text-xs"
+              className="ml-2"
             >
-              {severity.toUpperCase()}
+              {severity}
             </Badge>
           )}
         </span>
