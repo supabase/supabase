@@ -27,6 +27,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -55,7 +56,7 @@ export const CreditCodeRedemption = ({
     'stripe.subscriptions'
   )
 
-  const { data: org } = useSelectedOrganizationQuery({})
+  const { data: org, isLoading: isOrgLoading } = useSelectedOrganizationQuery({})
 
   const router = useRouter()
 
@@ -73,16 +74,11 @@ export const CreditCodeRedemption = ({
   const [debouncedCode, setDebouncedCode] = useState(watchedCode)
 
   useEffect(() => {
-    const handle = setTimeout(() => setDebouncedCode(watchedCode), 250)
+    const handle = setTimeout(() => setDebouncedCode(watchedCode), 400)
     return () => clearTimeout(handle)
   }, [watchedCode])
 
-  const {
-    data: codePreview,
-    isLoading: isLoadingCodePreview,
-    error: errorCodePreview,
-    isSuccess: codePreviewSuccessful,
-  } = useOrganizationPreviewCreditCodeQuery(
+  const { data: codePreview, error: errorCodePreview } = useOrganizationPreviewCreditCodeQuery(
     {
       slug,
       code: debouncedCode,
@@ -103,7 +99,7 @@ export const CreditCodeRedemption = ({
     if (typeof codeFromParams === 'string' && codeFromParams.trim().length > 0) {
       form.setValue('code', codeFromParams)
     }
-  }, [router.isReady, router.query.code, form])
+  }, [router.isReady, router.query.code])
 
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
@@ -188,7 +184,9 @@ export const CreditCodeRedemption = ({
           <ButtonTooltip
             type="default"
             className="pointer-events-auto"
-            disabled={!canRedeemCode || !isPermissionsLoaded}
+            disabled={
+              !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading
+            }
             tooltip={{
               content: {
                 side: 'bottom',
@@ -236,79 +234,89 @@ export const CreditCodeRedemption = ({
         <DialogSectionSeparator />
 
         <Form_Shadcn_ {...form}>
-          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-2">
-              <FormField_Shadcn_
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItemLayout label="Code" className="gap-1">
-                    <Input_Shadcn_ {...field} className="uppercase" />
-                  </FormItemLayout>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4 border-t pt-2">
-                <div className="space-y-1">
-                  <span className="text-sm font-medium text-foreground-lighter">
-                    Current Balance
-                  </span>
-                  {customerProfile ? (
-                    <p className="text-2xl font-medium">${customerProfile?.balance / -100}</p>
-                  ) : (
-                    <p>-</p>
-                  )}
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-foreground-lighter">New Balance</span>
-
-                  <p className="text-2xl font-medium">
-                    {' '}
-                    {codePreview && customerProfile
-                      ? '$' + (customerProfile?.balance / -100 + codePreview.amount_cents / 100)
-                      : '-'}
-                  </p>
-                </div>
+          {isOrgLoading || isCustomerProfileLoading ? (
+            <div className="p-6 space-y-4">
+              <ShimmeringLoader />
+              <div className="flex space-x-4">
+                <ShimmeringLoader className="w-1/2" />
+                <ShimmeringLoader className="w-1/2" />
               </div>
+            </div>
+          ) : (
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+              <DialogSection className="flex flex-col gap-2">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItemLayout label="Code" className="gap-1">
+                      <Input_Shadcn_ {...field} className="uppercase" />
+                    </FormItemLayout>
+                  )}
+                />
 
-              <Alert variant={'default'} className="mt-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Potential charges</AlertTitle>
-                <AlertDescription>
-                  <p>
-                    The credits will be applied to your organization "{org?.name}" and cannot be
-                    used across other organizations you may have.
-                  </p>
-                  <p className="mt-1">
-                    Credits are used whenever invoices are issued. Once you run out of credits, your
-                    default payment method will be charged for future invoices. You will not be
-                    downgraded automatically.
-                  </p>
-                </AlertDescription>
-              </Alert>
+                <div className="grid grid-cols-2 gap-4 border-t pt-2">
+                  <div className="space-y-1">
+                    <span className="text-sm font-medium text-foreground-lighter">
+                      Current Balance
+                    </span>
+                    {customerProfile ? (
+                      <p className="text-2xl font-medium">${customerProfile?.balance / -100}</p>
+                    ) : (
+                      <p>-</p>
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-foreground-lighter">New Balance</span>
 
-              {(errorRedeemingCode || errorCodePreview) && (
-                <Alert_Shadcn_ variant="destructive">
-                  <AlertCircle className="h-4 w-4 text-foreground-light" />
-                  <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    {errorRedeemingCode?.message || errorCodePreview?.message}
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
-            </DialogSection>
+                    <p className="text-2xl font-medium">
+                      {' '}
+                      {codePreview && customerProfile
+                        ? '$' + (customerProfile?.balance / -100 + codePreview.amount_cents / 100)
+                        : '-'}
+                    </p>
+                  </div>
+                </div>
 
-            <DialogFooter>
-              <Button
-                htmlType="submit"
-                type="primary"
-                loading={redeemingCode}
-                disabled={!codePreview}
-              >
-                Redeem
-              </Button>
-            </DialogFooter>
-          </form>
+                <Alert variant={'default'} className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Potential charges</AlertTitle>
+                  <AlertDescription>
+                    <p>
+                      The credits will be applied to your organization "{org?.name}" and cannot be
+                      used across other organizations you may have.
+                    </p>
+                    <p className="mt-1">
+                      Credits are used whenever invoices are issued. Once you run out of credits,
+                      your default payment method will be charged for future invoices. You will not
+                      be downgraded automatically.
+                    </p>
+                  </AlertDescription>
+                </Alert>
+
+                {(errorRedeemingCode || errorCodePreview) && (
+                  <Alert_Shadcn_ variant="destructive">
+                    <AlertCircle className="h-4 w-4 text-foreground-light" />
+                    <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {errorRedeemingCode?.message || errorCodePreview?.message}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+              </DialogSection>
+
+              <DialogFooter>
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  loading={redeemingCode}
+                  disabled={!codePreview}
+                >
+                  Redeem
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </Form_Shadcn_>
       </DialogContent>
     </Dialog>
