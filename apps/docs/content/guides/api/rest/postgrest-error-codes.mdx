@@ -87,7 +87,7 @@ Errors with data structures or request formatting
 | Code     | HTTP status | Description                                                                                                                 |
 | -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
 | PGRST100 | 400         | Parsing error in the query string parameter.                                                                                |
-| PGRST101 | 405         | For database functions, only `GET` and `POST` verbs are allowed. Any other verb will throw this error.                        |
+| PGRST101 | 405         | For database functions, only `GET` and `POST` verbs are allowed. Any other verb will throw this error.                      |
 | PGRST102 | 400         | An invalid request body was sent(e.g. an empty body or malformed JSON).                                                     |
 | PGRST103 | 416         | An invalid range was specified for limits.                                                                                  |
 | PGRST105 | 405         | An invalid `UPDATE`/`UPSERT` request was done                                                                               |
@@ -188,9 +188,7 @@ from
   postgres_logs
   cross join unnest(metadata) as metadata
   cross join unnest(metadata.parsed) as parsed
-where
-  parsed.sql_state_code like '42501'
-  and parsed.user_name = 'authenticator' -- the authenticator role represents the database API
+where parsed.sql_state_code like '42501' and parsed.user_name = 'authenticator' -- the authenticator role represents the database API
 order by timestamp desc
 limit 100;
 ```
