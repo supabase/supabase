@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { IS_PLATFORM } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 
 export enum RealtimeButtonVariant {
   CONTROL = 'control',
@@ -30,9 +30,7 @@ export function useRealtimeExperiment({
   isTable = false,
   isRealtimeEnabled = false,
 }: UseRealtimeExperimentOptions): UseRealtimeExperimentResult {
-  const track = useTrack()
   const realtimeButtonVariant = usePHFlag<RealtimeButtonVariant>('realtimeButtonVariant')
-  const hasTrackedExposure = useRef(false)
 
   const activeVariant = useMemo(() => {
     if (!IS_PLATFORM) return null
@@ -42,25 +40,13 @@ export function useRealtimeExperiment({
     return realtimeButtonVariant
   }, [isTable, realtimeButtonVariant])
 
-  useEffect(() => {
-    if (!IS_PLATFORM) return
-    if (hasTrackedExposure.current) return
-    if (!isTable || !realtimeButtonVariant) return
+  const shouldTrack = IS_PLATFORM && isTable && !!realtimeButtonVariant
 
-    hasTrackedExposure.current = true
-
-    try {
-      track('realtime_experiment_exposed', {
-        experiment_id: 'realtimeButtonVariant',
-        variant: realtimeButtonVariant,
-        table_has_realtime_enabled: isRealtimeEnabled,
-      })
-    } catch (error) {
-      // Reset tracking flag on error to allow retry
-      hasTrackedExposure.current = false
-      console.error('Failed to track realtime experiment exposure:', error)
-    }
-  }, [isTable, realtimeButtonVariant, isRealtimeEnabled, track])
+  useTrackExperimentExposure(
+    'realtime',
+    shouldTrack ? realtimeButtonVariant : undefined,
+    { table_has_realtime_enabled: isRealtimeEnabled }
+  )
 
   return {
     activeVariant,
