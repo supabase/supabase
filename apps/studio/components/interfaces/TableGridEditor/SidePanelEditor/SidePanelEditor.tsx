@@ -4,6 +4,8 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
@@ -22,7 +24,7 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { lintKeys } from 'data/lint/keys'
 import { privilegeKeys } from 'data/privileges/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
-import { isTableLike } from 'data/table-editor/table-editor-types'
+import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
@@ -67,6 +69,7 @@ import {
 } from './TableEditor/ApiAccessToggle'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { OperationQueueSidePanel } from './OperationQueueSidePanel/OperationQueueSidePanel'
 
 export type SaveTableParams =
   | SaveTableParamsNew
@@ -200,6 +203,7 @@ export const SidePanelEditor = ({
 
   const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
   const generatePoliciesFlag = usePHFlag<string>('tableCreateGeneratePolicies')
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -283,6 +287,45 @@ export const SidePanelEditor = ({
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
+          // Queue the operation if queue operations feature is enabled
+          if (isQueueOperationsEnabled) {
+            const changedColumn = Object.keys(payload)[0]
+            if (!changedColumn) {
+              saveRowError = new Error('No changed column')
+              toast.error('No changed column')
+              onComplete(saveRowError)
+              return
+            }
+
+            const row =
+              snap.sidePanel?.type === 'json'
+                ? snap.sidePanel.jsonValue.row
+                : snap.sidePanel?.type === 'cell'
+                  ? snap.sidePanel.value?.row
+                  : undefined
+            const oldValue = row?.[changedColumn]
+
+            queueCellEditWithOptimisticUpdate({
+              queryClient,
+              queueOperation: snap.queueOperation,
+              projectRef: project.ref,
+              tableId: selectedTable.id,
+              // Cast to Entity - the queue save mutation only uses id, name, schema
+              table: selectedTable as unknown as Entity,
+              rowIdentifiers: configuration.identifiers,
+              columnName: changedColumn,
+              oldValue: oldValue,
+              newValue: payload[changedColumn],
+              enumArrayColumns,
+            })
+
+            // Close panel immediately without error
+            onComplete()
+            setIsEdited(false)
+            snap.closeSidePanel()
+            return
+          }
+
           try {
             await updateTableRow({
               projectRef: project.ref,
@@ -935,6 +978,10 @@ export const SidePanelEditor = ({
         saveContent={onImportData}
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
+      />
+      <OperationQueueSidePanel
+        visible={snap.sidePanel?.type === 'operation-queue'}
+        closePanel={snap.closeSidePanel}
       />
       <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>

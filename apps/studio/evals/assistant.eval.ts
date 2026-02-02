@@ -13,6 +13,7 @@ import {
   sqlIdentifierQuotingScorer,
   sqlSyntaxScorer,
   toolUsageScorer,
+  urlValidityScorer,
 } from './scorer'
 import { ToolSet, TypedToolCall, TypedToolResult } from 'ai'
 
@@ -83,6 +84,7 @@ Eval('Assistant', {
     completenessScorer,
     docsFaithfulnessScorer,
     correctnessScorer,
+    urlValidityScorer,
   ],
 })
 

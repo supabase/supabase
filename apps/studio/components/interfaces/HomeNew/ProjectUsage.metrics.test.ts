@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import {
-  computeChangePercent,
   computeSuccessAndNonSuccessRates,
   sumErrors,
   sumTotal,
@@ -42,15 +41,5 @@ describe('ProjectUsage.metrics', () => {
     // success = 160 - (15 + 5) = 140 → 87.5%
     expect(successRate).toBeCloseTo(87.5)
     expect(nonSuccessRate).toBeCloseTo(12.5)
-  })
-
-  it('computeChangePercent handles zero previous safely', () => {
-    expect(computeChangePercent(10, 0)).toBe(100)
-    expect(computeChangePercent(0, 0)).toBe(0)
-  })
-
-  it('computeChangePercent returns standard percentage delta', () => {
-    expect(computeChangePercent(120, 100)).toBe(20)
-    expect(computeChangePercent(80, 100)).toBe(-20)
   })
 })
