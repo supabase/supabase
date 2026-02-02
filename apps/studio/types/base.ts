@@ -92,6 +92,8 @@ type CostMetadata = {
   sql: string
 }
 
+export type ErrorMetadata = CostMetadata
+
 export class ResponseError extends Error {
   code?: number
   requestId?: string

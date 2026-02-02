@@ -7,6 +7,7 @@ import createClient from 'openapi-fetch'
 import { ResponseError } from 'types'
 
 import type { paths } from './api'
+import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript
 
@@ -167,7 +168,7 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
         : undefined
     const metadata =
       'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
-        ? error.metadata
+        ? (error.metadata as ErrorMetadata)
         : undefined
 
     if (errorMessage) {
