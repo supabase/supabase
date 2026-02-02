@@ -1,7 +1,6 @@
 'use client'
 
-import { type ClientTelemetryEvent, posthogClient } from 'common'
-import { API_URL } from 'lib/constants'
+import { type ClientTelemetryEvent, ensurePlatformSuffix, posthogClient } from 'common'
 import {
   type ReactNode,
   createContext,
@@ -12,9 +11,14 @@ import {
   useState,
 } from 'react'
 
+import type {
+  DevTelemetryEvent,
+  DevTelemetryToolbarContextType,
+  ServerTelemetryEvent,
+} from './types'
 import { getCookie } from './utils'
 
-const IS_LOCAL_DEV = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
 const MAX_EVENTS = 200
 const STORAGE_KEY = 'dev-telemetry-toolbar-enabled'
 
@@ -28,39 +32,14 @@ declare global {
   }
 }
 
-interface ServerTelemetryEvent {
-  id: string
-  timestamp: number
-  sessionId: string
-  eventType: 'capture' | 'identify' | 'groupIdentify' | 'alias'
-  eventName: string
-  distinctId: string
-  properties?: Record<string, unknown>
-  groups?: Record<string, string | number>
+const DevToolbarContext = createContext<DevTelemetryToolbarContextType | null>(null)
+
+interface DevToolbarProviderProps {
+  children: ReactNode
+  apiUrl: string
 }
 
-export interface DevTelemetryEvent {
-  id: string
-  timestamp: number
-  source: 'client' | 'server'
-  eventType: string
-  eventName: string
-  distinctId?: string
-  properties?: Record<string, unknown>
-}
-
-interface DevTelemetryToolbarContextType {
-  isEnabled: boolean
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  events: DevTelemetryEvent[]
-  setEvents: React.Dispatch<React.SetStateAction<DevTelemetryEvent[]>>
-  dismissToolbar: () => void
-}
-
-const DevTelemetryToolbarContext = createContext<DevTelemetryToolbarContextType | null>(null)
-
-export function DevTelemetryToolbarProvider({ children }: { children: ReactNode }) {
+export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps) {
   const [isEnabled, setIsEnabled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [events, setEvents] = useState<DevTelemetryEvent[]>([])
@@ -85,10 +64,7 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
     window.devTelemetry = () => {
       localStorage.setItem(STORAGE_KEY, 'true')
       setIsEnabled(true)
-      console.log('Dev Telemetry Toolbar enabled! Click the activity icon in the header.')
     }
-
-    console.log('Tip: Run `devTelemetry()` in the console to enable the Dev Telemetry Toolbar')
 
     return () => {
       delete window.devTelemetry
@@ -131,11 +107,11 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
       if (!isMounted) return
 
       const sessionId = getCookie('session_id')
-      const url = `${API_URL}/telemetry/stream${
+      const streamUrl = `${ensurePlatformSuffix(apiUrl)}/telemetry/stream${
         sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : ''
       }`
 
-      eventSource = new EventSource(url, { withCredentials: true })
+      eventSource = new EventSource(streamUrl, { withCredentials: true })
 
       eventSource.onopen = () => {
         sseRetryDelayRef.current = SSE_INITIAL_RETRY_MS
@@ -154,7 +130,7 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
             properties: data.properties,
           })
         } catch (e) {
-          console.error('[DevTelemetryToolbar] Failed to parse SSE event:', e)
+          console.error('[DevToolbar] Failed to parse SSE event:', e)
         }
       }
 
@@ -165,7 +141,7 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
         eventSource = null
 
         const delay = sseRetryDelayRef.current
-        console.warn(`[DevTelemetryToolbar] SSE connection error, reconnecting in ${delay}ms...`)
+        console.warn(`[DevToolbar] SSE connection error, reconnecting in ${delay}ms...`)
 
         sseRetryTimeoutRef.current = setTimeout(() => {
           if (isMounted) {
@@ -187,14 +163,14 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
         sseRetryTimeoutRef.current = null
       }
     }
-  }, [appendEvent, isEnabled, isOpen])
+  }, [apiUrl, appendEvent, isEnabled, isOpen])
 
   if (!IS_LOCAL_DEV) {
     return <>{children}</>
   }
 
   return (
-    <DevTelemetryToolbarContext.Provider
+    <DevToolbarContext.Provider
       value={{
         isEnabled,
         isOpen,
@@ -205,12 +181,23 @@ export function DevTelemetryToolbarProvider({ children }: { children: ReactNode 
       }}
     >
       {children}
-    </DevTelemetryToolbarContext.Provider>
+    </DevToolbarContext.Provider>
   )
 }
 
-export function useDevTelemetryToolbar() {
-  const context = useContext(DevTelemetryToolbarContext)
+export function useDevToolbar() {
+  if (!IS_LOCAL_DEV) {
+    return {
+      isEnabled: false,
+      isOpen: false,
+      setIsOpen: () => {},
+      events: [],
+      setEvents: () => {},
+      dismissToolbar: () => {},
+    }
+  }
+
+  const context = useContext(DevToolbarContext)
   if (!context) {
     return {
       isEnabled: false,

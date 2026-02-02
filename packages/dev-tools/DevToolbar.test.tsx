@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-// Override the common mock from vitestSetup.ts with what we need for these tests
+// Mock common package
 vi.mock('common', async () => {
   return {
     useParams: () => ({ ref: 'default' }),
@@ -19,15 +19,11 @@ vi.mock('common', async () => {
     posthogClient: {
       subscribeToEvents: vi.fn(() => () => {}),
     },
+    ensurePlatformSuffix: (url: string) => url,
   }
 })
 
-// Mock lib/constants
-vi.mock('lib/constants', () => ({
-  API_URL: 'http://localhost:3000',
-}))
-
-const originalEnv = process.env.NEXT_PUBLIC_ENVIRONMENT
+const originalEnv = process.env.NODE_ENV
 
 /**
  * Helper to render the full component tree as used in production.
@@ -36,36 +32,58 @@ const originalEnv = process.env.NEXT_PUBLIC_ENVIRONMENT
  * The Toolbar is the actual panel/sheet.
  */
 async function renderFullToolbar() {
-  const { DevTelemetryToolbarProvider } = await import('./DevTelemetryToolbarContext')
-  const { DevTelemetryToolbarTrigger } = await import('./DevTelemetryToolbarTrigger')
-  const { DevTelemetryToolbar } = await import('./DevTelemetryToolbar')
+  const { DevToolbarProvider } = await import('./DevToolbarContext')
+  const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+  const { DevToolbar } = await import('./DevToolbar')
 
   return render(
-    <DevTelemetryToolbarProvider>
-      <DevTelemetryToolbarTrigger />
-      <DevTelemetryToolbar />
-    </DevTelemetryToolbarProvider>
+    <DevToolbarProvider apiUrl="http://localhost:3000">
+      <DevToolbarTrigger />
+      <DevToolbar />
+    </DevToolbarProvider>
   )
 }
 
-describe('DevTelemetryToolbar', () => {
+describe('DevToolbar', () => {
   beforeEach(() => {
+    const store = new Map<string, string>()
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value)
+      },
+      removeItem: (key: string) => {
+        store.delete(key)
+      },
+      clear: () => {
+        store.clear()
+      },
+      key: (index: number) => Array.from(store.keys())[index] ?? null,
+      get length() {
+        return store.size
+      },
+    }
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
+    })
+
     localStorage.clear()
     delete window.devTelemetry
-    vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    process.env.NEXT_PUBLIC_ENVIRONMENT = originalEnv
+    process.env.NODE_ENV = originalEnv
     vi.resetModules()
     vi.restoreAllMocks()
   })
 
   describe('when not in local development', () => {
     beforeEach(() => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'production'
+      process.env.NODE_ENV = 'production'
     })
 
     it('returns null and does not render anything', async () => {
@@ -82,21 +100,11 @@ describe('DevTelemetryToolbar', () => {
 
       expect(window.devTelemetry).toBeUndefined()
     })
-
-    it('does not log console hints in production', async () => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'production'
-      const consoleSpy = vi.spyOn(console, 'log')
-
-      vi.resetModules()
-      await renderFullToolbar()
-
-      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('devTelemetry()'))
-    })
   })
 
   describe('when in local development but not enabled', () => {
     beforeEach(() => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
     })
 
     it('does not render trigger when toolbar is not enabled', async () => {
@@ -114,22 +122,11 @@ describe('DevTelemetryToolbar', () => {
       expect(window.devTelemetry).toBeDefined()
       expect(typeof window.devTelemetry).toBe('function')
     })
-
-    it('logs hint to enable toolbar in local dev', async () => {
-      const consoleSpy = vi.spyOn(console, 'log')
-
-      vi.resetModules()
-      await renderFullToolbar()
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Tip: Run `devTelemetry()` in the console to enable the Dev Telemetry Toolbar'
-      )
-    })
   })
 
   describe('when in local development and enabled', () => {
     beforeEach(() => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
       localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
     })
 
@@ -186,12 +183,10 @@ describe('DevTelemetryToolbar', () => {
 
   describe('window.devTelemetry function', () => {
     beforeEach(() => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
     })
 
-    it('enables toolbar when called and logs confirmation', async () => {
-      const consoleSpy = vi.spyOn(console, 'log')
-
+    it('enables toolbar when called', async () => {
       vi.resetModules()
       const { rerender } = await renderFullToolbar()
 
@@ -205,20 +200,15 @@ describe('DevTelemetryToolbar', () => {
 
       // Re-import and rerender to pick up state change
       vi.resetModules()
-      const { DevTelemetryToolbarProvider } = await import('./DevTelemetryToolbarContext')
-      const { DevTelemetryToolbarTrigger } = await import('./DevTelemetryToolbarTrigger')
-      const { DevTelemetryToolbar } = await import('./DevTelemetryToolbar')
+      const { DevToolbarProvider } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { DevToolbar } = await import('./DevToolbar')
 
       rerender(
-        <DevTelemetryToolbarProvider>
-          <DevTelemetryToolbarTrigger />
-          <DevTelemetryToolbar />
-        </DevTelemetryToolbarProvider>
-      )
-
-      // Should log the confirmation message (matches the actual implementation)
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Dev Telemetry Toolbar enabled! Click the activity icon in the header.'
+        <DevToolbarProvider apiUrl="http://localhost:3000">
+          <DevToolbarTrigger />
+          <DevToolbar />
+        </DevToolbarProvider>
       )
 
       expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('true')
@@ -227,7 +217,7 @@ describe('DevTelemetryToolbar', () => {
 
   describe('cleanup', () => {
     it('removes window.devTelemetry on unmount', async () => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
 
       vi.resetModules()
       const result = await renderFullToolbar()
@@ -242,7 +232,7 @@ describe('DevTelemetryToolbar', () => {
 
   describe('EventCard keyboard accessibility', () => {
     beforeEach(() => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
       localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
     })
 
@@ -266,7 +256,7 @@ describe('DevTelemetryToolbar', () => {
 
   describe('Flag override UI', () => {
     beforeEach(() => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
       localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
     })
 
@@ -294,10 +284,10 @@ describe('DevTelemetryToolbar', () => {
   })
 })
 
-describe('DevTelemetryToolbar utils', () => {
+describe('DevToolbar utils', () => {
   describe('safeJsonParse', () => {
     it('logs warning for invalid JSON in local environment', async () => {
-      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'development'
       const consoleSpy = vi.spyOn(console, 'warn')
 
       vi.resetModules()
@@ -307,7 +297,7 @@ describe('DevTelemetryToolbar utils', () => {
 
       expect(result).toEqual({})
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[DevTelemetryToolbar] Failed to parse JSON'),
+        expect.stringContaining('[DevToolbar] Failed to parse JSON'),
         expect.anything()
       )
     })

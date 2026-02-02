@@ -38,7 +38,7 @@ import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/Featur
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
-import { DevTelemetryToolbar, DevTelemetryToolbarProvider } from 'components/ui/DevTelemetryToolbar'
+import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import dayjs from 'dayjs'
@@ -173,7 +173,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         enableSystem
                         disableTransitionOnChange
                       >
-                        <DevTelemetryToolbarProvider>
+                        <DevToolbarProvider apiUrl={API_URL}>
                           <AiAssistantStateContextProvider>
                             <CommandProvider>
                               <FeaturePreviewContextProvider>
@@ -187,8 +187,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                               <MonacoThemeProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
-                          <DevTelemetryToolbar />
-                        </DevTelemetryToolbarProvider>
+                          <DevToolbar />
+                        </DevToolbarProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

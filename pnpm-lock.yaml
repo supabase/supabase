@@ -468,6 +468,9 @@ importers:
       config:
         specifier: workspace:*
         version: link:../../packages/config
+      dev-tools:
+        specifier: workspace:*
+        version: link:../../packages/dev-tools
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
@@ -1238,6 +1241,9 @@ importers:
       dayjs:
         specifier: ^1.11.10
         version: 1.11.13
+      dev-tools:
+        specifier: workspace:*
+        version: link:../../packages/dev-tools
       dnd-core:
         specifier: ^16.0.1
         version: 16.0.1
@@ -1960,6 +1966,9 @@ importers:
       dayjs:
         specifier: ^1.11.12
         version: 1.11.13
+      dev-tools:
+        specifier: workspace:*
+        version: link:../../packages/dev-tools
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
@@ -2443,6 +2452,52 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
+
+  packages/dev-tools:
+    dependencies:
+      common:
+        specifier: workspace:*
+        version: link:../common
+      lucide-react:
+        specifier: '*'
+        version: 0.511.0(react@18.3.1)
+      react:
+        specifier: 'catalog:'
+        version: 18.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 18.3.1(react@18.3.1)
+      ui:
+        specifier: workspace:*
+        version: link:../ui
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^6.6.0
+        version: 6.6.3
+      '@testing-library/react':
+        specifier: ^16.0.0
+        version: 16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@testing-library/user-event':
+        specifier: ^14.0.0
+        version: 14.6.1(@testing-library/dom@10.4.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 18.3.0
+      next-router-mock:
+        specifier: ^0.9.13
+        version: 0.9.13(next@16.0.11(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.2
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)
 
   packages/eslint-config-supabase:
     devDependencies:
@@ -28638,6 +28693,10 @@ snapshots:
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.1.0)':
     dependencies:
       '@testing-library/dom': 10.1.0
+
+  '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.0)':
+    dependencies:
+      '@testing-library/dom': 10.4.0
 
   '@tokenizer/token@0.3.0': {}
 

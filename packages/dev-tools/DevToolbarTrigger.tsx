@@ -5,12 +5,12 @@ import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
-import { useDevTelemetryToolbar } from './DevTelemetryToolbarContext'
+import { useDevToolbar } from './DevToolbarContext'
 
-const IS_LOCAL_DEV = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
 
-export function DevTelemetryToolbarTrigger() {
-  const { isEnabled, isOpen, setIsOpen, events, dismissToolbar } = useDevTelemetryToolbar()
+export function DevToolbarTrigger() {
+  const { isEnabled, isOpen, setIsOpen, events, dismissToolbar } = useDevToolbar()
   const [popoverOpen, setPopoverOpen] = useState(false)
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -69,7 +69,7 @@ export function DevTelemetryToolbarTrigger() {
             'focus-visible:outline-0 focus-visible:outline-transparent focus-visible:outline-offset-0',
             isOpen && 'text-foreground bg-surface-300'
           )}
-          aria-label="Open dev telemetry toolbar"
+          aria-label="Open dev toolbar"
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleTriggerMouseLeave}

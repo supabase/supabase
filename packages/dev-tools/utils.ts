@@ -20,18 +20,15 @@ export function safeJsonParse<T>(value: string | undefined, fallback: T, context
   try {
     return JSON.parse(value) as T
   } catch (error) {
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-      console.warn(
-        `[DevTelemetryToolbar] Failed to parse JSON${context ? ` for ${context}` : ''}:`,
-        error
-      )
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[DevToolbar] Failed to parse JSON${context ? ` for ${context}` : ''}:`, error)
     }
     return fallback
   }
 }
 
-const PH_ORIGINALS_KEY = 'devTelemetryFlagOriginals:posthog'
-const CC_ORIGINALS_KEY = 'devTelemetryFlagOriginals:configcat'
+export const PH_ORIGINALS_KEY = 'devToolbarFlagOriginals:posthog'
+export const CC_ORIGINALS_KEY = 'devToolbarFlagOriginals:configcat'
 
 export function readOriginals(
   key: typeof PH_ORIGINALS_KEY | typeof CC_ORIGINALS_KEY
@@ -41,8 +38,8 @@ export function readOriginals(
     const stored = window.localStorage.getItem(key)
     return stored ? JSON.parse(stored) : {}
   } catch (error) {
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-      console.warn(`[DevTelemetryToolbar] Failed to read originals from ${key}:`, error)
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[DevToolbar] Failed to read originals from ${key}:`, error)
     }
     return {}
   }
@@ -59,8 +56,6 @@ export function writeOriginals(
   }
   window.localStorage.setItem(key, JSON.stringify(value))
 }
-
-export { PH_ORIGINALS_KEY, CC_ORIGINALS_KEY }
 
 export function valuesAreEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true

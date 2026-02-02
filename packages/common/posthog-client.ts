@@ -209,7 +209,7 @@ class PostHogClient {
     }
   }
 
-/**
+  /**
    * Returns PostHog's session_id for the current session.
    * Returns undefined until PostHog's `loaded` callback fires.
    */
