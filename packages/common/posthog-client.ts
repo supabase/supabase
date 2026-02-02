@@ -166,6 +166,7 @@ class PostHogClient {
     this.pendingIdentification = null
     this.pendingGroups = {}
     this.pendingEvents = []
+    this.pendingExposures = []
 
     if (!this.initStarted) return
 
@@ -218,7 +219,13 @@ class PostHogClient {
     if (!hasConsent) return
 
     if (!this.initialized) {
-      this.pendingExposures.push({ experimentId, properties })
+      // Only queue if not already queued for this experiment (first exposure wins)
+      if (!this.pendingExposures.some((e) => e.experimentId === experimentId)) {
+        if (this.pendingExposures.length >= this.maxPendingEvents) {
+          this.pendingExposures.shift()
+        }
+        this.pendingExposures.push({ experimentId, properties })
+      }
       return
     }
 
