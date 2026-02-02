@@ -1,8 +1,7 @@
-import { useMemo } from 'react'
-
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
+import { useMemo } from 'react'
 
 export enum RealtimeButtonVariant {
   CONTROL = 'control',
@@ -42,11 +41,9 @@ export function useRealtimeExperiment({
 
   const shouldTrack = IS_PLATFORM && isTable && !!realtimeButtonVariant
 
-  useTrackExperimentExposure(
-    'realtime',
-    shouldTrack ? realtimeButtonVariant : undefined,
-    { table_has_realtime_enabled: isRealtimeEnabled }
-  )
+  useTrackExperimentExposure('realtime', shouldTrack ? realtimeButtonVariant : undefined, {
+    table_has_realtime_enabled: isRealtimeEnabled,
+  })
 
   return {
     activeVariant,

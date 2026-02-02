@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
-
 import { hasConsented, posthogClient } from 'common'
+import { useEffect } from 'react'
 
 export function useTrackExperimentExposure(
   experimentId: string,
