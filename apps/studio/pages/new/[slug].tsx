@@ -254,7 +254,6 @@ const Wizard: NextPageWithLayout = () => {
             rlsOptionVariant: rlsExperimentVariant,
           }),
           dataApiEnabled: form.getValues('dataApi'),
-          useApiSchema: form.getValues('useApiSchema'),
           useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
