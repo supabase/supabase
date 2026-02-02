@@ -18,26 +18,25 @@ If you get stuck while working through this guide, refer to the [full example on
 
 ## Building the app
 
-Let's start building the React app from scratch.
+Start building the React app from scratch.
 
 ### Initialize a React app
 
-We can use [Vite](https://vitejs.dev/guide/) to initialize
-an app called `supabase-react`:
+Use [Vite](https://vitejs.dev/guide/) to initialize an app called `supabase-react`:
 
 ```bash
 npm create vite@latest supabase-react -- --template react
 cd supabase-react
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js).
+Install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js).
 
 ```bash
 npm install @supabase/supabase-js
 ```
 
 And finally, save the environment variables in a `.env.local` file.
-All we need are the Project URL and the key that you copied [earlier](#get-api-details).
+Use the Project URL and the key that you copied [earlier](#get-api-details).
 
 <$CodeSample
 path="/user-management/react-user-management/.env.example"
@@ -45,8 +44,8 @@ lines={[[1, -1]]}
 meta="name=.env"
 />
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
-on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed
+on the browser, and that's fine as you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
 
 Create and edit `src/supabaseClient.js`:
 
@@ -63,7 +62,7 @@ You can find the full contents of this file [here](https://raw.githubusercontent
 
 ### Set up a login component
 
-Let's set up a React component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Create a React component to manage logins and sign ups. It uses Magic Links, so users can sign in with their email without using passwords.
 
 Create and edit `src/Auth.jsx`:
 
@@ -78,9 +77,10 @@ meta="name=src/Auth.jsx"
 Users also need a way to edit their profile details and manage their accounts after signing in.
 
 ### Create an upload widget
+
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
-Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
+Create an avatar for the user so that they can upload a profile photo. Start by creating a new component:
 
 Create and edit `src/Avatar.jsx`:
 
@@ -90,9 +90,9 @@ lines={[[1, -1]]}
 meta="name=src/Avatar.jsx"
 />
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
+After a user is signed, allow them to edit their profile details and manage their account.
 
-Let's create a new component for that called `src/Account.jsx` and also add the `Avatar` component created earlier.
+Create a new component for that called `src/Account.jsx` and also add the `Avatar` component created earlier.
 
 <$CodeSample
 path="/user-management/react-user-management/src/Account.jsx"
@@ -102,7 +102,7 @@ meta="name=src/Account.jsx"
 
 ### Launch!
 
-Now that we have all the components in place, let's update `src/App.jsx`:
+Now that you have all the components in place, update `src/App.jsx`, which fetches the user session using the [`getUser`](/docs/reference/javascript/auth-getuser) method to get the current user details if there is an existing session. This method performs a network request to the Supabase Auth server. 
 
 <$CodeSample
 path="/user-management/react-user-management/src/App.jsx"
