@@ -40,7 +40,7 @@ export function TanstackDBGenerator() {
   const [packageManager, setPackageManager] = useLocalStorage(LOCAL_STORAGE_KEY, 'npm')
 
   const baseUrl = getBaseUrl()
-  const apiUrl = `${baseUrl}/api/registry/tanstack-db?ref=${encodeURIComponent(projectRef)}&anonKey=${encodeURIComponent(anonKey)}`
+  const apiUrl = `${baseUrl}${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/api/registry/tanstack-db?ref=${encodeURIComponent(projectRef)}&anonKey=${encodeURIComponent(anonKey)}`
 
   const commands: Record<PackageManager, string> = {
     npm: `npx shadcn@latest add "${apiUrl}"`,
