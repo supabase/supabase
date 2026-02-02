@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tanstack-db-nextjs",
+  "type": "registry:block",
+  "title": "TanStack DB for Next.js and Supabase",
+  "description": "TanStack Query integration with Supabase collections for type-safe database operations",
+  "dependencies": [
+    "@tanstack/react-query@latest",
+    "github:ivasilov/supabase-collection",
+    "zod@latest",
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/tanstack-db/lib/query-client.ts",
+      "content": "import { QueryClient, defaultShouldDehydrateQuery, isServer } from '@tanstack/react-query'\nimport { cache } from 'react'\n\nfunction makeQueryClient() {\n  return new QueryClient({\n    defaultOptions: {\n      queries: {\n        staleTime: 60 * 1000,\n      },\n      dehydrate: {\n        // include pending queries in dehydration\n        shouldDehydrateQuery: (query) =>\n          defaultShouldDehydrateQuery(query) || query.state.status === 'pending',\n        shouldRedactErrors: (error) => {\n          // We should not catch Next.js server errors\n          // as that's how Next.js detects dynamic pages\n          // so we cannot redact them.\n          // Next.js also automatically redacts errors for us\n          // with better digests.\n          return false\n        },\n      },\n    },\n  })\n}\n\nlet browserQueryClient: QueryClient | undefined = undefined\nconst serverQueryClient = cache(() => makeQueryClient())\n\nexport function getQueryClient() {\n  if (isServer) {\n    return serverQueryClient()\n  } else {\n    // Browser: make a new query client if we don't already have one\n    // This is very important, so we don't re-make a new client if React\n    // suspends during the initial render. This may not be needed if we\n    // have a suspense boundary BELOW the creation of the query client\n    if (!browserQueryClient) browserQueryClient = makeQueryClient()\n    return browserQueryClient\n  }\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/blocks/tanstack-db/app/providers.tsx",
+      "content": "'use client'\n\nimport { QueryClientProvider } from '@tanstack/react-query'\n\nimport { getQueryClient } from '@/registry/default/blocks/tanstack-db/lib/query-client'\n\nexport function Providers({ children }: { children: React.ReactNode }) {\n  // NOTE: Avoid useState when initializing the query client if you don't\n  //       have a suspense boundary between this and the code that may\n  //       suspend because React will throw away the client on the initial\n  //       render if it suspends and there is no boundary\n  const queryClient = getQueryClient()\n\n  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>\n}\n",
+      "type": "registry:component",
+      "target": "app/providers.tsx"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { NextResponse, type NextRequest } from 'next/server'\n\nexport async function updateSession(request: NextRequest) {\n  let supabaseResponse = NextResponse.next({\n    request,\n  })\n\n  // With Fluid compute, don't put this client in a global environment\n  // variable. Always create a new one on each request.\n  const supabase = createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return request.cookies.getAll()\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))\n          supabaseResponse = NextResponse.next({\n            request,\n          })\n          cookiesToSet.forEach(({ name, value, options }) =>\n            supabaseResponse.cookies.set(name, value, options)\n          )\n        },\n      },\n    }\n  )\n\n  // Do not run code between createServerClient and\n  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug\n  // issues with users being randomly logged out.\n\n  // IMPORTANT: If you remove getClaims() and you use server-side rendering\n  // with the Supabase client, your users may be randomly logged out.\n  const { data } = await supabase.auth.getClaims()\n  const user = data?.claims\n\n  if (\n    !user &&\n    !request.nextUrl.pathname.startsWith('/login') &&\n    !request.nextUrl.pathname.startsWith('/auth')\n  ) {\n    // no user, potentially respond by redirecting the user to the login page\n    const url = request.nextUrl.clone()\n    url.pathname = '/auth/login'\n    return NextResponse.redirect(url)\n  }\n\n  // IMPORTANT: You *must* return the supabaseResponse object as it is.\n  // If you're creating a new response object with NextResponse.next() make sure to:\n  // 1. Pass the request in it, like so:\n  //    const myNewResponse = NextResponse.next({ request })\n  // 2. Copy over the cookies, like so:\n  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())\n  // 3. Change the myNewResponse object to fit your needs, but avoid changing\n  //    the cookies!\n  // 4. Finally:\n  //    return myNewResponse\n  // If this is not done, you may be causing the browser and server to go out\n  // of sync and terminate the user's session prematurely!\n\n  return supabaseResponse\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { cookies } from 'next/headers'\n\n/**\n * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each\n * function when using it.\n */\nexport async function createClient() {\n  const cookieStore = await cookies()\n\n  return createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return cookieStore.getAll()\n        },\n        setAll(cookiesToSet) {\n          try {\n            cookiesToSet.forEach(({ name, value, options }) =>\n              cookieStore.set(name, value, options)\n            )\n          } catch {\n            // The `setAll` method was called from a Server Component.\n            // This can be ignored if you have middleware refreshing\n            // user sessions.\n          }\n        },\n      },\n    }\n  )\n}\n",
+      "type": "registry:lib"
+    }
+  ],
+  "envVars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+  },
+  "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+}

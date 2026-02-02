@@ -17,6 +17,7 @@ import { DualRealtimeChat } from './dual-realtime-chat'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
+import { TanstackDBGenerator } from './tanstack-db-generator'
 import type { Style } from '@/registry/styles'
 
 const components = {
@@ -181,6 +182,7 @@ const components = {
   BlockItem,
   BlockPreview,
   DualRealtimeChat,
+  TanstackDBGenerator,
 }
 
 interface MdxProps {

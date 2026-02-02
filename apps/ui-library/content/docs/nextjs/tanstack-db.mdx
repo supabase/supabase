@@ -1,0 +1,120 @@
+---
+title: TanStack DB
+description: Type-safe database collections with TanStack Query and Supabase
+---
+
+This block provides TanStack Query integration with Supabase collections for type-safe database operations. It generates Zod schemas and collection configurations based on your database schema.
+
+## Installation
+
+Enter your Supabase project credentials to generate a personalized installation command. The block will include schemas and collections for all tables in your database.
+
+<TanstackDBGenerator />
+
+<Callout type="info">
+  Your credentials are only used to fetch your database schema. They are not stored or sent to any
+  server other than your Supabase project.
+</Callout>
+
+## What's included
+
+This block installs the following files:
+
+| File                         | Description                                          |
+| ---------------------------- | ---------------------------------------------------- |
+| `lib/schemas.ts`             | Zod schemas for all your database tables             |
+| `lib/db.ts`                  | Supabase collections for type-safe CRUD operations   |
+| `lib/query-client.ts`        | TanStack Query client configuration with SSR support |
+| `app/providers.tsx`          | React Query provider component                       |
+| `lib/supabase/client.ts`     | Browser Supabase client                              |
+| `lib/supabase/server.ts`     | Server-side Supabase client                          |
+| `lib/supabase/middleware.ts` | Middleware for session handling                      |
+
+## Getting started
+
+After installing the block, add the required environment variables to your `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=your-anon-key
+```
+
+## Usage
+
+### Wrap your app with the Providers component
+
+Update your root layout to include the Providers component:
+
+```tsx
+import { Providers } from '@/app/providers'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+```
+
+### Using collections in your components
+
+Each table in your database gets a corresponding collection. Here's how to use them:
+
+```tsx
+'use client'
+
+import { usersCollection } from '@/lib/db'
+
+export function UserList() {
+  const { data: users, isLoading } = usersCollection.useList()
+
+  if (isLoading) return <div>Loading...</div>
+
+  return <ul>{users?.map((user) => <li key={user.id}>{user.name}</li>)}</ul>
+}
+```
+
+### Available collection methods
+
+Each collection provides the following methods:
+
+| Method        | Description                |
+| ------------- | -------------------------- |
+| `useList()`   | Fetch all items            |
+| `useGet(key)` | Fetch a single item by key |
+| `useCreate()` | Create a new item          |
+| `useUpdate()` | Update an existing item    |
+| `useDelete()` | Delete an item             |
+
+### Server-side data fetching
+
+For server components, you can prefetch data using the query client:
+
+```tsx
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+
+import { usersCollection } from '@/lib/db'
+import { getQueryClient } from '@/lib/query-client'
+
+export default async function UsersPage() {
+  const queryClient = getQueryClient()
+
+  // Prefetch users on the server
+  await queryClient.prefetchQuery(usersCollection.listQueryOptions())
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <UserList />
+    </HydrationBoundary>
+  )
+}
+```
+
+## Further reading
+
+- [TanStack Query documentation](https://tanstack.com/query/latest)
+- [Supabase JavaScript client](https://supabase.com/docs/reference/javascript)
+- [Generating TypeScript types](https://supabase.com/docs/guides/api/rest/generating-types)

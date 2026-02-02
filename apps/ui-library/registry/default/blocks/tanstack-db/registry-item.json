@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tanstack-db-nextjs",
+  "type": "registry:block",
+  "title": "TanStack DB for Next.js and Supabase",
+  "description": "TanStack Query integration with Supabase collections for type-safe database operations",
+  "registryDependencies": [],
+  "dependencies": [
+    "@tanstack/react-query@latest",
+    "github:ivasilov/supabase-collection",
+    "zod@latest"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/tanstack-db/lib/query-client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/blocks/tanstack-db/app/providers.tsx",
+      "type": "registry:component",
+      "target": "app/providers.tsx"
+    }
+  ],
+  "docs": "This block provides TanStack Query integration with Supabase collections. The schemas and collections are generated based on your database schema."
+}
