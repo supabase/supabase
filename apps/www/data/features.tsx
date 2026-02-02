@@ -455,32 +455,33 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
   },
   {
     title: 'Read replicas',
-    subtitle: 'Deploy read-only databases across multiple regions for lower latency.',
+    subtitle: 'Isolate heavy workloads and reduce global latency',
     description: `
-Supabase Read Replicas allow you to deploy additional read-only databases that are kept in sync with your Primary database. This feature enhances performance, improves resource management, and reduces latency for global applications.
+Supabase Read Replicas distribute read traffic across multiple databases. Use them to isolate analytics workloads from production, reduce latency for global users or scale read capacity beyond a single database.
 
 ## Key features
-1. Load balancing: Distribute read operations across multiple databases, reducing load on the Primary.
-2. Global deployment: Deploy replicas closer to users for reduced latency.
-3. Dedicated endpoints: Each replica has its own database and API endpoints.
-4. API load balancer: Automatically balance GET requests across all available endpoints.
+
+1. Workload Isolation: Run heavy read queries (analytics, reports, exports, batch jobs) on dedicated replicas without impacting production response times.
+2. Multi-region deployment: Deploy replicas in regions closer to your users. European users query European databases.
+3. Dedicated endpoints: Each replica provides separate database and API connection strings for direct access.
+4. Automatic routing: API load balancer routes GET requests to the nearest available replica.
 5. Centralized configuration: Settings are propagated across all databases in a project.
-6. Monitoring tools: Track replication lag and resource utilization through the Supabase Dashboard.
+6. Monitoring tools: Track replication lag and resource usage directly in the Supabase Dashboard.
 
-## Benefits:
-- Improved performance: Serve data from the nearest location, reducing response times.
-- Increased availability: Distribute read traffic across multiple replicas for enhanced resilience.
-- Scalability: Handle higher read loads by offloading queries to replicas.
-- Data redundancy: Replicas provide additional copies of your data.
-- Analytics support: Run resource-intensive queries on replicas without impacting production.
+## When to use Read Replicas
 
-## Read Replicas are particularly valuable for:
-- Global applications serving users across different regions
-- High-traffic websites with read-heavy workloads
-- Real-time analytics dashboards requiring low-latency data access
-- Applications needing to scale read capacity independently of write capacity
+- Your analytics team's reports slow down production (workload isolation)
+- Users in Europe or Asia experience 100-150ms latency (geo-distribution)
+- You've reached 16XL and need more read capacity (horizontal scaling)
+- Your workload is 80%+ reads and needs to scale independently of writes
 
-By leveraging Read Replicas, you can achieve consistent low-latency performance globally, improve application responsiveness for read operations, and enhance system reliability through better resource distribution and redundancy.
+## Get Started
+
+Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
+
+[Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
+
+[Read documentation](https://supabase.com/docs/guides/platform/read-replicas)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
