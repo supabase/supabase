@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { orgSSOKeys } from '../sso/keys'
+import { subscriptionKeys } from '../subscriptions/keys'
 import { organizationKeys } from './keys'
 
 export type OrganizationCreditCodeRedemptionVariables = {
@@ -64,9 +65,13 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
   >({
     mutationFn: (vars) => redeemCode(vars),
     async onSuccess(data, variables, context) {
-      const { slug } = variables
+      const { slug, code } = variables
 
       await queryClient.invalidateQueries({ queryKey: organizationKeys.customerProfile(slug) })
+      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) })
+      await queryClient.invalidateQueries({
+        queryKey: organizationKeys.previewCreditCode(slug, code),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

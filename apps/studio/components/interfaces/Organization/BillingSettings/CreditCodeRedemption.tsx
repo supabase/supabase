@@ -1,18 +1,18 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { useRouter } from 'next/router'
-
+import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { AlertCircle } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -23,15 +23,17 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
-import { toast } from 'sonner'
-import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { z } from 'zod'
+
 import { useOrganizationPreviewCreditCodeQuery } from '@/data/organizations/organization-credit-code-preview-query'
+import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -53,6 +55,8 @@ export const CreditCodeRedemption = ({
     'stripe.subscriptions'
   )
 
+  const { data: org } = useSelectedOrganizationQuery({})
+
   const router = useRouter()
 
   const form = useForm<CreditCodeRedemptionForm>({
@@ -64,8 +68,6 @@ export const CreditCodeRedemption = ({
 
   const { data: customerProfile, isLoading: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({ slug })
-
-  console.log(customerProfile)
 
   const watchedCode = form.watch('code')
   const [debouncedCode, setDebouncedCode] = useState(watchedCode)
@@ -177,120 +179,138 @@ export const CreditCodeRedemption = ({
   }
 
   return (
-    <div className="flex items-center justify-end py-4 px-8">
-      <Dialog
-        open={codeRedemptionModalVisible}
-        onOpenChange={(open) => onCodeRedemptionDialogVisibilityChange(open)}
-      >
-        {!modalVisible && (
-          <DialogTrigger asChild>
-            <ButtonTooltip
-              type="default"
-              className="pointer-events-auto"
-              disabled={!canRedeemCode || !isPermissionsLoaded}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text:
-                    isPermissionsLoaded && !canRedeemCode
-                      ? 'You need additional permissions to redeem codes'
-                      : undefined,
-                },
-              }}
-            >
-              Redeem Code
-            </ButtonTooltip>
-          </DialogTrigger>
-        )}
-
-        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
-          <HCaptcha
-            ref={captchaRefCallback}
-            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-            size="invisible"
-            onOpen={() => {
-              // [Joshen] This is to ensure that hCaptcha popup remains clickable
-              if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+    <Dialog
+      open={codeRedemptionModalVisible}
+      onOpenChange={(open) => onCodeRedemptionDialogVisibilityChange(open)}
+    >
+      {!modalVisible && (
+        <DialogTrigger asChild>
+          <ButtonTooltip
+            type="default"
+            className="pointer-events-auto"
+            disabled={!canRedeemCode || !isPermissionsLoaded}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text:
+                  isPermissionsLoaded && !canRedeemCode
+                    ? 'You need additional permissions to redeem codes'
+                    : undefined,
+              },
             }}
-            onClose={() => {
-              if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
-            }}
-            onVerify={(token) => {
-              setCaptchaToken(token)
-              if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
-            }}
-            onExpire={() => {
-              setCaptchaToken(null)
-            }}
-          />
-          <DialogHeader>
-            <DialogTitle>Redeem Code</DialogTitle>
-            <DialogDescription className="space-y-2">
-              <p className="prose text-sm">
-                Redeem your credit code to add credits to your organization
-              </p>
-            </DialogDescription>
-          </DialogHeader>
+          >
+            Redeem Code
+          </ButtonTooltip>
+        </DialogTrigger>
+      )}
 
-          <DialogSectionSeparator />
+      <DialogContent onInteractOutside={(e) => e.preventDefault()} size={'large'}>
+        <HCaptcha
+          ref={captchaRefCallback}
+          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+          size="invisible"
+          onOpen={() => {
+            // [Joshen] This is to ensure that hCaptcha popup remains clickable
+            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          }}
+          onClose={() => {
+            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          }}
+          onVerify={(token) => {
+            setCaptchaToken(token)
+            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          }}
+          onExpire={() => {
+            setCaptchaToken(null)
+          }}
+        />
+        <DialogHeader>
+          <DialogTitle>Redeem Code</DialogTitle>
+          <DialogDescription className="space-y-2">
+            <p className="prose text-sm">
+              Redeem your credit code to add credits to your organization
+            </p>
+          </DialogDescription>
+        </DialogHeader>
 
-          <Form_Shadcn_ {...form}>
-            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-              <DialogSection className="flex flex-col gap-2">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItemLayout label="Code" className="gap-1">
-                      <Input_Shadcn_ {...field} className="uppercase" />
-                    </FormItemLayout>
-                  )}
-                />
+        <DialogSectionSeparator />
 
-                <div className="grid grid-cols-2 gap-4 border-t pt-2">
-                  <div className="space-y-1">
-                    <span className="text-sm font-medium text-foreground-lighter">
-                      Current Balance
-                    </span>
-                    <p className="text-2xl font-medium">${customerProfile?.balance / -100}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm font-medium text-foreground-lighter">New Balance</span>
-
-                    <p className="text-2xl font-medium">
-                      {' '}
-                      {codePreview
-                        ? '$' + (customerProfile?.balance / -100 + codePreview.amount_cents / 100)
-                        : '-'}
-                    </p>
-                  </div>
-                </div>
-
-                {(errorRedeemingCode || errorCodePreview) && (
-                  <Alert_Shadcn_ variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {errorRedeemingCode?.message || errorCodePreview?.message}
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+        <Form_Shadcn_ {...form}>
+          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-2">
+              <FormField_Shadcn_
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItemLayout label="Code" className="gap-1">
+                    <Input_Shadcn_ {...field} className="uppercase" />
+                  </FormItemLayout>
                 )}
-              </DialogSection>
+              />
 
-              <DialogFooter>
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  loading={redeemingCode}
-                  disabled={!codePreview}
-                >
-                  Redeem
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form_Shadcn_>
-        </DialogContent>
-      </Dialog>
-    </div>
+              <div className="grid grid-cols-2 gap-4 border-t pt-2">
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-foreground-lighter">
+                    Current Balance
+                  </span>
+                  {customerProfile ? (
+                    <p className="text-2xl font-medium">${customerProfile?.balance / -100}</p>
+                  ) : (
+                    <p>-</p>
+                  )}
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-foreground-lighter">New Balance</span>
+
+                  <p className="text-2xl font-medium">
+                    {' '}
+                    {codePreview && customerProfile
+                      ? '$' + (customerProfile?.balance / -100 + codePreview.amount_cents / 100)
+                      : '-'}
+                  </p>
+                </div>
+              </div>
+
+              <Alert variant={'default'} className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Potential charges</AlertTitle>
+                <AlertDescription>
+                  <p>
+                    The credits will be applied to your organization "{org?.name}" and cannot be
+                    used across other organizations you may have.
+                  </p>
+                  <p className="mt-1">
+                    Credits are used whenever invoices are issued. Once you run out of credits, your
+                    default payment method will be charged for future invoices. You will not be
+                    downgraded automatically.
+                  </p>
+                </AlertDescription>
+              </Alert>
+
+              {(errorRedeemingCode || errorCodePreview) && (
+                <Alert_Shadcn_ variant="destructive">
+                  <AlertCircle className="h-4 w-4 text-foreground-light" />
+                  <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    {errorRedeemingCode?.message || errorCodePreview?.message}
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+            </DialogSection>
+
+            <DialogFooter>
+              <Button
+                htmlType="submit"
+                type="primary"
+                loading={redeemingCode}
+                disabled={!codePreview}
+              >
+                Redeem
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form_Shadcn_>
+      </DialogContent>
+    </Dialog>
   )
 }

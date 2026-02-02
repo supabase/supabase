@@ -59,7 +59,7 @@ const CreditBalance = () => {
           <FormPanel
             footer={
               subscription?.billing_via_partner ? undefined : (
-                <div className='flex justify-end'>
+                <div className='flex justify-end items-center py-4 px-8 gap-x-2'>
                   <CreditCodeRedemption slug={slug} />
                   <CreditTopUp slug={slug} />
                 </div>

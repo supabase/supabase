@@ -192,7 +192,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   }
 
   return (
-    <div className="flex items-center justify-end py-4 px-8">
       <Dialog open={topUpModalVisible} onOpenChange={(open) => onTopUpDialogVisibilityChange(open)}>
         <DialogTrigger asChild>
           <ButtonTooltip
@@ -346,6 +345,5 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
   )
 }
