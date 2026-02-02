@@ -60,15 +60,23 @@ export const EnableExtensionModal = ({
   extension,
   onCancel,
 }: EnableExtensionModalProps) => {
-  const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
 
-  const { data: schemas, isPending: isSchemasLoading } = useSchemasQuery(
+  const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
+
+  const { data: schemas = [], isPending: isSchemasLoading } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     { enabled: visible }
+  )
+  const availableSchemas = schemas.filter(
+    (schema) =>
+      schema.name === recommendedSchema ||
+      !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
   )
 
   const { data: extensionMeta, isPending: fetchingSchemaInfo } =
@@ -80,12 +88,10 @@ export const EnableExtensionModal = ({
       },
       { enabled: visible }
     )
-  const defaultSchema = extensionMeta?.schema
+  // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
+  const defaultSchema = extension.name === 'pg_cron' ? 'pg_catalog' : extensionMeta?.schema
 
   const isLoading = fetchingSchemaInfo || isSchemasLoading
-  const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
-
-  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
@@ -97,7 +103,7 @@ export const EnableExtensionModal = ({
     },
   })
 
-  const defaultValues = { name: extension.name, schema: 'extensions' }
+  const defaultValues = { name: extension.name, schema: recommendedSchema ?? 'extensions' }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -220,27 +226,20 @@ export const EnableExtensionModal = ({
                                 <code className="text-code-inline">{extension.name}</code>
                               </SelectItem_Shadcn_>
                               <SelectSeparator_Shadcn_ />
-                              {schemas
-                                ?.filter(
-                                  (schema) =>
-                                    !protectedSchemas.some(
-                                      (protectedSchema) => protectedSchema.name === schema.name
-                                    )
+                              {availableSchemas.map((schema) => {
+                                return (
+                                  <SelectItem_Shadcn_ key={schema.id} value={schema.name}>
+                                    {schema.name}
+                                    {schema.name === recommendedSchema ? (
+                                      <Badge className="ml-2" variant="success">
+                                        Recommended
+                                      </Badge>
+                                    ) : !defaultSchema && schema.name === 'extensions' ? (
+                                      <Badge className="ml-2">Default</Badge>
+                                    ) : null}
+                                  </SelectItem_Shadcn_>
                                 )
-                                .map((schema) => {
-                                  return (
-                                    <SelectItem_Shadcn_ key={schema.id} value={schema.name}>
-                                      {schema.name}
-                                      {schema.name === recommendedSchema ? (
-                                        <Badge className="ml-2" variant="success">
-                                          Recommended
-                                        </Badge>
-                                      ) : !defaultSchema && schema.name === 'extensions' ? (
-                                        <Badge className="ml-2">Default</Badge>
-                                      ) : null}
-                                    </SelectItem_Shadcn_>
-                                  )
-                                })}
+                              })}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
                         </FormControl_Shadcn_>
