@@ -1,10 +1,9 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useEffect, useMemo, useRef } from 'react'
-
+import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
+import { useMemo } from 'react'
 
 dayjs.extend(utc)
 
@@ -50,9 +49,7 @@ export function useTableCreateGeneratePolicies({
   isNewRecord = false,
   projectInsertedAt,
 }: UseTableCreateGeneratePoliciesOptions): UseTableCreateGeneratePoliciesResult {
-  const track = useTrack()
   const tableCreateGeneratePoliciesFlag = usePHFlag<string>('tableCreateGeneratePolicies')
-  const hasTrackedExposure = useRef(false)
 
   const enabled = useMemo(() => {
     if (!IS_PLATFORM) return false
@@ -60,28 +57,24 @@ export function useTableCreateGeneratePolicies({
     return true
   }, [tableCreateGeneratePoliciesFlag])
 
-  useEffect(() => {
-    if (!IS_PLATFORM) return
-    if (hasTrackedExposure.current) return
-    if (!isNewRecord) return
-    if (!isValidExperimentVariant(tableCreateGeneratePoliciesFlag)) return
-    if (!projectInsertedAt) return
+  const daysSinceCreation = useMemo(() => {
+    if (!projectInsertedAt) return undefined
+    const insertedDate = dayjs.utc(projectInsertedAt)
+    if (!insertedDate.isValid()) return undefined
+    return dayjs.utc().diff(insertedDate, 'day')
+  }, [projectInsertedAt])
 
-    try {
-      const insertedDate = dayjs.utc(projectInsertedAt)
-      if (!insertedDate.isValid()) return
+  const shouldTrack =
+    IS_PLATFORM &&
+    isNewRecord &&
+    isValidExperimentVariant(tableCreateGeneratePoliciesFlag) &&
+    daysSinceCreation !== undefined
 
-      const daysSinceCreation = dayjs.utc().diff(insertedDate, 'day')
-      track('table_create_generate_policies_experiment_exposed', {
-        experiment_id: 'tableCreateGeneratePolicies',
-        variant: tableCreateGeneratePoliciesFlag,
-        days_since_project_creation: daysSinceCreation,
-      })
-      hasTrackedExposure.current = true
-    } catch {
-      hasTrackedExposure.current = false
-    }
-  }, [isNewRecord, tableCreateGeneratePoliciesFlag, projectInsertedAt, track])
+  useTrackExperimentExposure(
+    'table_create_generate_policies',
+    shouldTrack ? tableCreateGeneratePoliciesFlag : undefined,
+    { days_since_project_creation: daysSinceCreation }
+  )
 
   return {
     enabled,
