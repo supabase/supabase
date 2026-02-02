@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import { RegistryItem } from 'shadcn/schema'
-import fs from 'fs/promises'
 
+import {
+  generateDbContent,
+  generateListContent,
+  generatePageContent,
+  generateSchemasContent,
+  generateSheetContent,
+} from './_generators'
 import { OpenAPISchema, RegistryFile } from './types'
 import { toSingular } from './utils'
-import {
-  generateSchemasContent,
-  generateDbContent,
-  generatePageContent,
-  generateSheetContent,
-  generateListContent,
-} from './generators'
+import fs from 'fs/promises'
 
 // Read the base registry JSON
 async function readBaseRegistry(): Promise<RegistryItem> {
