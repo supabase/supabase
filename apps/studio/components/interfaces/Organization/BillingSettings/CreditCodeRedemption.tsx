@@ -89,7 +89,7 @@ export const CreditCodeRedemption = ({
     },
     {
       // Avoid firing on initial mount and only when code is present
-      enabled: !!debouncedCode && debouncedCode.trim().length > 0,
+      enabled: !!debouncedCode && debouncedCode.trim().length > 2,
       refetchOnWindowFocus: false,
     }
   )
@@ -100,10 +100,10 @@ export const CreditCodeRedemption = ({
     const queryCode = router.query.code
     const codeFromParams = Array.isArray(queryCode) ? queryCode[0] : queryCode
 
-    if (typeof codeFromParams === 'string' && codeFromParams.trim().length > 0) {
+    if (typeof codeFromParams === 'string' && codeFromParams.trim().length > 2) {
       form.setValue('code', codeFromParams)
     }
-  }, [router.isReady, router.query.code])
+  }, [router.isReady, router.query.code, form])
 
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false

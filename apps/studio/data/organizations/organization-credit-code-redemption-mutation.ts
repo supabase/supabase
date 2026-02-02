@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
-import { orgSSOKeys } from '../sso/keys'
 import { subscriptionKeys } from '../subscriptions/keys'
 import { organizationKeys } from './keys'
 
@@ -42,7 +41,7 @@ export async function redeemCode({
   return data
 }
 
-type OrganizationTaxIdUpdateData = Awaited<ReturnType<typeof redeemCode>>
+type RedeemCodeData = Awaited<ReturnType<typeof redeemCode>>
 
 export const useOrganizationCreditCodeRedemptionMutation = ({
   onSuccess,
@@ -50,7 +49,7 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
   ...options
 }: Omit<
   UseCustomMutationOptions<
-    OrganizationTaxIdUpdateData,
+    RedeemCodeData,
     ResponseError,
     OrganizationCreditCodeRedemptionVariables
   >,
@@ -58,11 +57,7 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    OrganizationTaxIdUpdateData,
-    ResponseError,
-    OrganizationCreditCodeRedemptionVariables
-  >({
+  return useMutation<RedeemCodeData, ResponseError, OrganizationCreditCodeRedemptionVariables>({
     mutationFn: (vars) => redeemCode(vars),
     async onSuccess(data, variables, context) {
       const { slug, code } = variables
