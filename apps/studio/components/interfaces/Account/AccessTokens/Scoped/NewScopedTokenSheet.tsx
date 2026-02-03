@@ -54,6 +54,8 @@ const TokenSchema = z.object({
 
 type TokenFormValues = z.infer<typeof TokenSchema>
 
+export type { TokenFormValues }
+
 export interface NewScopedTokenSheetProps {
   visible: boolean
   onOpenChange: (open: boolean) => void

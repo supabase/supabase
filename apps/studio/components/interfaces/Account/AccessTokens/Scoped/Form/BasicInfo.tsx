@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { Control } from 'react-hook-form'
+import { Control, ControllerRenderProps } from 'react-hook-form'
 
 import { DatePicker } from 'components/ui/DatePicker'
 import {
@@ -20,9 +20,10 @@ import {
   getExpiresAtOptions,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
+import { TokenFormValues } from '../NewScopedTokenSheet'
 
 interface BasicInfoProps {
-  control: Control<any>
+  control: Control<TokenFormValues>
   expirationDate: string
   onCustomDateChange?: (date: { date: string } | undefined) => void
   onCustomExpiryChange?: (isCustom: boolean) => void
@@ -52,7 +53,10 @@ export const BasicInfo = ({
     }
   }
 
-  const handleExpiryChange = (value: string, field: any) => {
+  const handleExpiryChange = (
+    value: string,
+    field: ControllerRenderProps<TokenFormValues, 'expiresAt'>
+  ) => {
     const isCustom = value === CUSTOM_EXPIRY_VALUE
     setIsCustomSelected(isCustom)
     onCustomExpiryChange?.(isCustom)

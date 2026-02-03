@@ -19,7 +19,7 @@ export const TokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenLis
       className: 'w-36 max-w-36',
       render: (token) => (
         <p className="truncate" title={token.name}>
-          {token.name} x
+          {token.name}
         </p>
       ),
     },
