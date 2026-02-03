@@ -147,16 +147,16 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
     }
   }
 
-  const onDeleteToken = async (tokenId: string | number) => {
-    deleteToken({ id: tokenId })
+  const onDeleteToken = async (tokenId: string | number | undefined | null) => {
+    deleteToken({ id: tokenId as string })
   }
 
   const filteredTokens = useMemo(() => {
     const filtered = !searchString
       ? tokens
       : tokens?.filter((token) => {
-          return token.name.toLowerCase().includes(searchString.toLowerCase())
-        })
+        return token.name.toLowerCase().includes(searchString.toLowerCase())
+      })
 
     if (!filtered) return filtered
 

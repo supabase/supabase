@@ -17,7 +17,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   CUSTOM_EXPIRY_VALUE,
-  getExpiresAtOptions,
+  EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
 import { TokenFormValues } from '../NewScopedTokenSheet'
@@ -98,7 +98,7 @@ export const BasicInfo = ({
                     <SelectValue_Shadcn_ placeholder="Expires at" />
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
-                    {Object.values(getExpiresAtOptions()).map(
+                    {Object.values(EXPIRES_AT_OPTIONS).map(
                       (option: { value: string; label: string }) => (
                         <SelectItem_Shadcn_ key={option.value} value={option.value}>
                           {option.label}
@@ -116,7 +116,12 @@ export const BasicInfo = ({
                   minDate={new Date()}
                   maxDate={dayjs().add(1, 'year').toDate()}
                   onChange={(date) => {
-                    if (date.to) handleCustomDateChange(new Date(date.to))
+                    const selectedDate = date.to || date.from
+                    if (selectedDate) {
+                      handleCustomDateChange(new Date(selectedDate))
+                    } else {
+                      handleCustomDateChange(undefined)
+                    }
                   }}
                 >
                   {customDate ? `${dayjs(customDate).format('DD MMM, HH:mm')}` : 'Select date'}
