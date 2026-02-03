@@ -48,7 +48,9 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   const sseRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const dismissToolbar = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {}
     setIsEnabled(false)
     setIsOpen(false)
   }, [])
@@ -56,13 +58,18 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   useEffect(() => {
     if (!IS_LOCAL_DEV) return
 
-    const stored = localStorage.getItem(STORAGE_KEY)
+    let stored: string | null = null
+    try {
+      stored = localStorage.getItem(STORAGE_KEY)
+    } catch {}
     if (stored === 'true') {
       setIsEnabled(true)
     }
 
     window.devTelemetry = () => {
-      localStorage.setItem(STORAGE_KEY, 'true')
+      try {
+        localStorage.setItem(STORAGE_KEY, 'true')
+      } catch {}
       setIsEnabled(true)
     }
 
@@ -143,6 +150,10 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
         const delay = sseRetryDelayRef.current
         console.warn(`[DevToolbar] SSE connection error, reconnecting in ${delay}ms...`)
 
+        if (sseRetryTimeoutRef.current) {
+          clearTimeout(sseRetryTimeoutRef.current)
+          sseRetryTimeoutRef.current = null
+        }
         sseRetryTimeoutRef.current = setTimeout(() => {
           if (isMounted) {
             connect()
