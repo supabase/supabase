@@ -263,7 +263,10 @@ export function useKeyboardNavigation({
       } else if (e.key === 'ArrowRight') {
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
-        setActiveInput(null)
+        const activeElement = document.activeElement as HTMLElement | null
+        if (activeElement && activeElement.blur) {
+          activeElement.blur()
+        }
       } else if (e.key === 'Enter') {
         if (activeInput?.type === 'value') {
           e.preventDefault()
