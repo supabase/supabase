@@ -144,7 +144,7 @@ export function useHighlightNavigation(
         setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
         return
       }
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === 'Tab') {
         // Only select dropdown item if there are items available
         if (itemsLength > 0) {
           e.preventDefault()
