@@ -24,6 +24,7 @@ import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
 import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -31,7 +32,7 @@ const rowKeyGetter = (row: SupaRow) => {
 
 interface IGrid extends GridProps {
   rows: SupaRow[]
-  error: Error | null
+  error: ResponseError | null
   isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -215,11 +216,10 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
+                'absolute top-9 p-2 w-full z-[1]',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
-              style={{ height: `calc(100% - 35px)` }}
               onDragOver={onDragOver}
               onDragLeave={onDragOver}
               onDrop={onFileDrop}

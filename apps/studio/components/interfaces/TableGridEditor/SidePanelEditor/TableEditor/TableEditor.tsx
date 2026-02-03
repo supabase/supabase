@@ -14,7 +14,6 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useChanged } from 'hooks/misc/useChanged'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableCreateGeneratePolicies } from 'hooks/misc/useTableCreateGeneratePolicies'
@@ -128,11 +127,6 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
-
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    isTable: !isNewRecord,
-    isRealtimeEnabled,
-  })
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -456,7 +450,7 @@ export const TableEditor = ({
               </Admonition>
             )}
 
-            {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
+            {realtimeEnabled && (
               <Checkbox
                 id="enable-realtime"
                 label="Enable Realtime"
