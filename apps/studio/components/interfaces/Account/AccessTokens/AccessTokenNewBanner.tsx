@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Button } from 'ui'
+import { Button, Badge } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -39,15 +39,18 @@ export const AccessTokenNewBanner = <T,>({
               size="small"
               className="max-w-xl input-mono"
               value={getTokenValue(token)}
-              onChange={() => {}}
+              onChange={() => { }}
               onCopy={() => toast.success('Token copied to clipboard')}
             />
           </div>
           {permissions && permissions.length > 0 && (
-            <div className="mt-2">
-              <p className="text-sm text-foreground-light">
-                <strong>Permissions:</strong> {permissions.join(', ')}
-              </p>
+            <div className="pt-4">
+              <h3 className="text-sm font-medium mb-3">Permissions assigned to this token:</h3>
+              <div className="flex flex-wrap gap-2">
+                {permissions.map((permission) => (
+                  <Badge key={permission}>{permission}</Badge>
+                ))}
+              </div>
             </div>
           )}
         </div>
