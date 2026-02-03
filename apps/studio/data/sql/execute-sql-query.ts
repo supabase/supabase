@@ -15,7 +15,7 @@ import {
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 
-const COST_THRESHOLD = 20_000 // Arbitrary - need to find a good value
+const COST_THRESHOLD = 100_000 // Arbitrary - need to find a good value
 export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 
 export type ExecuteSqlVariables = {
