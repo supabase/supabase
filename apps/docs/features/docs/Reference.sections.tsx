@@ -1,17 +1,20 @@
+import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
   Badge,
-  cn,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
 } from 'ui'
 
-import { isFeatureEnabled } from 'common'
+import { type IApiEndPoint } from './Reference.api.utils'
+import { RefInternalLink } from './Reference.navigation.client'
+import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 import ApiSchema from '~/components/ApiSchema'
-import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
+import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -20,7 +23,7 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
@@ -35,9 +38,6 @@ import {
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
-import { type IApiEndPoint } from './Reference.api.utils'
-import { RefInternalLink } from './Reference.navigation.client'
-import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
 type RefSectionsProps = {
   libraryId: string
@@ -286,6 +286,8 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
+  const endpointFgaPermissions =
+    endpointDetails.security?.find((sec) => 'fga_permissions' in sec)?.fga_permissions ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -355,6 +357,20 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointFgaPermissions.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              The fine-grained token must include the following permissions to access this endpoint:
+            </h3>
+            <ul>
+              {endpointFgaPermissions.map((perm) => (
+                <li key={perm} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{perm}</span>
+                </li>
+              ))}
             </ul>
           </section>
         )}
