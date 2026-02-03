@@ -75,9 +75,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
 
-  // const pipelineStatus = pipelineStatusData?.status
-  // const statusName = getStatusName(pipelineStatus)
-
   // Fetch table-level replication status to surface errors in list view
   const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
