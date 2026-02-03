@@ -16,7 +16,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { DocsButton } from './DocsButton'
 import { InlineLinkClassName } from './InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 import { ResponseError } from '@/types'
 
 interface HighQueryCostErrorProps {
@@ -85,6 +87,9 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
           )}
         </DialogSection>
         <DialogFooter>
+          <DocsButton
+            href={`${DOCS_URL}/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX`}
+          />
           <DialogClose asChild>
             <Button type="default" className="opacity-100">
               Understood
