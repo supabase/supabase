@@ -438,6 +438,31 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
+  {
+    key: 'kiro',
+    label: 'Kiro',
+    icon: 'kiro',
+    configFile: '~/.kiro/settings/mcp.json',
+    externalDocsUrl: 'https://kiro.dev/docs/mcp/',
+    generateDeepLink: (_config, options) => {
+      const power = options?.isPlatform ? 'supabase-hosted' : 'supabase-local'
+      return `https://kiro.dev/launch/powers/${power}`
+    },
+    deepLinkDescription: (
+      <>
+        Install the Supabase{' '}
+        <a
+          href="https://kiro.dev/docs/powers/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand hover:underline"
+        >
+          power
+        </a>{' '}
+        for Kiro. This bundles the Supabase MCP server and steering files for best practices.
+      </>
+    ),
+  },
 ]
 
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'

@@ -8,6 +8,7 @@ import { type OrganizationPlanID } from 'data/organizations/organization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { type Dispatch, type MouseEventHandler } from 'react'
@@ -77,6 +78,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
   const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug, subscriptionPlanId)
+  const showClientLibraries = useIsFeatureEnabled('support:show_client_libraries')
 
   const attachmentUpload = useAttachmentUpload()
   const { mutateAsync: uploadDashboardLogFn } = useGenerateAttachmentURLsMutation()
@@ -105,6 +107,21 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
+    // Library is required when selecting "APIs and Client Libraries" category,
+    // but only when the library selector is visible (not in simplified form)
+    if (
+      !simplifiedSupportForm &&
+      showClientLibraries &&
+      formValues.category === SupportCategories.PROBLEM &&
+      !formValues.library
+    ) {
+      form.setError('library', {
+        type: 'manual',
+        message: "Please select the library that you're facing issues with",
+      })
+      return
+    }
+
     dispatch({ type: 'SUBMIT' })
 
     const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues

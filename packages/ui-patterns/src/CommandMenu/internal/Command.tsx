@@ -4,7 +4,7 @@ import { type PropsWithChildren, forwardRef } from 'react'
 import { CommandItem_Shadcn_, cn } from 'ui'
 import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
-import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
+import { useResetCommandMenu, useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import type { ICommand, IActionCommand, IRouteCommand } from './types'
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
@@ -53,6 +53,7 @@ const CommandItem = forwardRef<
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
   const telemetryContext = useCommandMenuTelemetryContext()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
@@ -81,6 +82,7 @@ const CommandItem = forwardRef<
       if (command.route.startsWith('http')) {
         setIsOpen(false)
         window.open(command.route, '_blank', 'noreferrer,noopener')
+        resetCommandMenu()
       } else {
         router.push(command.route)
       }

@@ -1,8 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useFlag, useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,26 +9,32 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from 'lib/constants'
+import { Plus, Search, X } from 'lucide-react'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
-  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationCallout } from './EnableReplicationCallout'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -44,8 +46,19 @@ export const Destinations = () => {
 
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
-  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+
+  const [_, setDestinationType] = useQueryState(
+    'type',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
 
   const {
     data: databases = [],
@@ -175,7 +188,7 @@ export const Destinations = () => {
               <Button
                 type="default"
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                onClick={() => setDestinationType('Read Replica')}
               >
                 Add destination
               </Button>
@@ -229,33 +242,9 @@ export const Destinations = () => {
                       )
                     })}
 
-                  {filteredDestinations.map((destination) => {
-                    const pipeline = pipelinesData?.pipelines.find(
-                      (p) => p.destination_id === destination.id
-                    )
-
-                    const type =
-                      'big_query' in destination.config
-                        ? 'BigQuery'
-                        : 'iceberg' in destination.config
-                          ? 'Analytics Bucket'
-                          : undefined
-
-                    return (
-                      <DestinationRow
-                        key={destination.id}
-                        sourceId={sourceId}
-                        destinationId={destination.id}
-                        destinationName={destination.name}
-                        type={type}
-                        pipeline={pipeline}
-                        error={pipelinesError}
-                        isLoading={isPipelinesLoading}
-                        isError={isPipelinesError}
-                        isSuccess={isPipelinesSuccess}
-                      />
-                    )
-                  })}
+                  {filteredDestinations.map((destination) => (
+                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                  ))}
 
                   {!isLoading &&
                     filteredDestinations.length === 0 &&
@@ -281,18 +270,22 @@ export const Destinations = () => {
               className={cn(
                 'w-full',
                 'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
+                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4>Create your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
-                Destinations are external platforms where your database changes are automatically
-                sent. Connect to various data warehouses and analytics platforms to enable real-time
-                data pipelines.
+              <h4>
+                {unifiedReplication
+                  ? 'Replication keeps your data in sync across systems'
+                  : 'Create your first destination'}
+              </h4>
+              <p className="text-foreground-light text-sm text-balance text-center mt-1">
+                {unifiedReplication
+                  ? 'Deploy read replicas for lower latency and better resource management, or capture database changes to external platforms for real-time data pipelines.'
+                  : 'Destinations are external platforms where your database changes are automatically sent. Connect to various data warehouses and analytics platforms to enable real-time data pipelines.'}
               </p>
               <Button
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                onClick={() => setDestinationType('Read Replica')}
                 className="mt-4"
               >
                 Add destination
@@ -302,11 +295,7 @@ export const Destinations = () => {
         )}
       </div>
 
-      <DestinationPanel
-        visible={showNewDestinationPanel}
-        onClose={() => setShowNewDestinationPanel(false)}
-        onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)}
-      />
+      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
     </>
   )
 }

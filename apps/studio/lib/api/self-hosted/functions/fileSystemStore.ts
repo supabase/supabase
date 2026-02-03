@@ -18,6 +18,17 @@ export class FileSystemFunctionsArtifactStore {
 
     return functionsArtifacts.filter((f) => f !== undefined)
   }
+
+  async getFunctionBySlug(slug: string): Promise<FunctionArtifact | undefined> {
+    const dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+
+    const functionFolder = dirEntries.find(
+      (dir) => dir.isDirectory() && dir.name !== 'main' && dir.name === slug
+    )
+    if (!functionFolder) return
+
+    return parseFolderToFunctionArtifact(functionFolder)
+  }
 }
 
 async function parseFolderToFunctionArtifact(

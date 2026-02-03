@@ -1,9 +1,3 @@
-import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
-import { BarChart2, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { Fragment, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { CPUWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/CPUWarnings'
@@ -30,15 +24,20 @@ import {
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import dayjs from 'dayjs'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { capitalize } from 'lodash'
+import { BarChart2, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { useShowNewReplicaPanel } from './InfrastructureConfiguration/use-show-new-replica'
 
 const NON_DEDICATED_IO_RESOURCES = [
   'ci_micro',
@@ -73,8 +72,6 @@ export const InfrastructureActivity = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-
-  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { computeInstance } = getAddons(selectedAddons)
   const hasDedicatedIOResources =
