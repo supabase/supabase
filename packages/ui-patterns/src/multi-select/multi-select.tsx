@@ -27,9 +27,14 @@ interface MultiSelectContextProps {
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
   size: MultiSelectorProps['size']
   disabled?: boolean
+  dropdownPlacement: 'top' | 'bottom'
+  dropdownMaxHeight: number
 }
 
 const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(null)
+
+const DROPDOWN_MAX_HEIGHT = 300
+const DROPDOWN_GAP = 8
 
 const commandItemClass = cn(
   'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
@@ -81,6 +86,9 @@ function MultiSelector({
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
 
+  const [dropdownPlacement, setDropdownPlacement] = React.useState<'top' | 'bottom'>('bottom')
+  const [dropdownMaxHeight, setDropdownMaxHeight] = React.useState<number>(DROPDOWN_MAX_HEIGHT)
+
   const toggleValue = React.useCallback(
     (toggledValue: string) => {
       if (values.includes(toggledValue)) {
@@ -92,10 +100,42 @@ function MultiSelector({
     [values]
   )
 
+  const updateDropdownMetrics = React.useCallback(() => {
+    if (typeof window === 'undefined') return
+    const triggerEl = ref.current as HTMLDivElement | null
+    if (!triggerEl) return
+
+    const rect = triggerEl.getBoundingClientRect()
+    const viewportHeight = window.innerHeight
+    const spaceBelow = viewportHeight - rect.bottom - DROPDOWN_GAP
+    const spaceAbove = rect.top - DROPDOWN_GAP
+    const shouldDropUp = spaceBelow < DROPDOWN_MAX_HEIGHT && spaceAbove > spaceBelow
+    const placement = shouldDropUp ? 'top' : 'bottom'
+    const availableSpace = Math.max(placement === 'top' ? spaceAbove : spaceBelow, 0)
+    const nextHeight =
+      availableSpace > 0 ? Math.min(DROPDOWN_MAX_HEIGHT, availableSpace) : DROPDOWN_MAX_HEIGHT
+
+    setDropdownPlacement(placement)
+    setDropdownMaxHeight(nextHeight)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    const controller = new AbortController()
+    const { signal } = controller
+
+    const handleUpdate = updateDropdownMetrics
+    handleUpdate()
+    window.addEventListener('resize', handleUpdate, { signal })
+    window.addEventListener('scroll', handleUpdate, { capture: true, passive: true, signal })
+
+    return () => controller.abort()
+  }, [open, updateDropdownMetrics])
+
   // detect clicks from outside
   useOnClickOutside(ref, () => {
     if (open) {
-      setOpen(!open)
+      setOpen(false)
     }
   })
 
@@ -143,6 +183,8 @@ function MultiSelector({
         setActiveIndex,
         size: size || 'small',
         disabled,
+        dropdownPlacement,
+        dropdownMaxHeight,
       }}
     >
       <Command
@@ -183,7 +225,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, setOpen } = useMultiSelect()
+    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
+      useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
 
@@ -216,19 +259,27 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
-        setOpen(true)
-        setInputValue('')
-
         if (IS_INLINE_MODE) {
+          if (!open) {
+            setOpen(true)
+            setInputValue('')
+          }
+
           event.stopPropagation()
           event.preventDefault()
 
           setTimeout(() => {
             inlineInputRef.current?.focus()
           }, 100)
+
+          return
         }
+
+        const willOpen = !open
+        setOpen(willOpen)
+        if (willOpen) setInputValue('')
       },
-      []
+      [open, setOpen, setInputValue, IS_INLINE_MODE]
     )
 
     return (
@@ -404,16 +455,21 @@ MultiSelector.Input = MultiSelectorInput
 
 const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children }, ref) => {
-    const { open } = useMultiSelect()
+    const { open, dropdownPlacement } = useMultiSelect()
+
+    const closedTranslationClass = dropdownPlacement === 'top' ? 'translate-y-3' : '-translate-y-3'
 
     return (
       <div
         ref={ref}
         className={cn(
-          'absolute w-full bg-overlay shadow-md z-10 border border-overlay top-[calc(100%+0.25rem)] rounded-md transition-all -translate-y-3',
+          'absolute w-full bg-overlay shadow-md z-10 border border-overlay rounded-md transition-all',
+          dropdownPlacement === 'top'
+            ? 'bottom-[calc(100%+0.25rem)] origin-bottom'
+            : 'top-[calc(100%+0.25rem)] origin-top',
           open
             ? 'opacity-100 translate-y-0 visible duration-150 ease-[.76,0,.23,1]'
-            : 'opacity-0 -translate-y-3 invisible duration-0',
+            : cn('opacity-0 invisible duration-0', closedTranslationClass),
           className
         )}
       >
@@ -432,7 +488,7 @@ const MultiSelectorList = React.forwardRef<
     creatable?: boolean
   }
 >(({ className, children, creatable = false }, ref) => {
-  const { open, inputValue, setInputValue, toggleValue } = useMultiSelect()
+  const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
   const options = !!children
     ? Array.isArray(children)
@@ -452,9 +508,10 @@ const MultiSelectorList = React.forwardRef<
       className={cn(
         'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors',
         'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
-        'scrollbar-thumb-rounded-lg w-full max-h-[300px] overflow-y-auto',
+        'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
         className
       )}
+      style={{ maxHeight: dropdownMaxHeight }}
     >
       {children}
       {creatable && inputValue.length > 0 && !isOptionExists ? (

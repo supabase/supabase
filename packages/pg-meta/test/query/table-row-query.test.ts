@@ -1752,4 +1752,98 @@ describe('Table Row Query', () => {
     expect(largeRowCustom.PPG).toHaveLength(10) // multi-dimentional array are truncated
     expect(largeRowCustom.ACC).toHaveLength(10)
   })
+
+  withTestDatabase('should handle reserved keyword "collation" as column name', async (db) => {
+    // Create a table with a column named "collation" (a PostgreSQL reserved keyword)
+    await db.executeQuery(`
+      CREATE TABLE IF NOT EXISTS "public"."test" (
+        id SERIAL PRIMARY KEY,
+        "collation" TEXT
+      );
+      
+      DELETE FROM "public"."test";
+      INSERT INTO "public"."test" ("collation") 
+      VALUES 
+        ('value1'),
+        ('value2'),
+        ('value3');
+    `)
+
+    // Get table metadata
+    const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+    const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+    const testTable = tables.find((table) => table.name === 'test')
+
+    expect(testTable).toBeDefined()
+
+    // Generate SQL - this should properly quote the "collation" column name
+    const sql = getTableRowsSql({
+      table: testTable!,
+      page: 1,
+      limit: 100,
+    })
+
+    // Verify SQL generation - the "collation" column should be properly quoted
+    expect(sql).toMatchInlineSnapshot(`
+      "with _base_query as (select * from public.test order by test.id asc nulls last limit 100 offset 0)
+        select id,case
+              when octet_length("collation"::text) > 10240 
+              then left("collation"::text, 10240) || '...'
+              else "collation"::text
+            end as "collation" from _base_query;"
+    `)
+
+    // Execute the generated SQL and verify the results
+    const queryResult = await db.executeQuery(sql)
+    expect(queryResult.length).toBe(3)
+    expect(queryResult[0].collation).toBe('value1')
+    expect(queryResult[1].collation).toBe('value2')
+    expect(queryResult[2].collation).toBe('value3')
+
+    // Test with ORDER BY on the collation column
+    const sqlWithOrder = getTableRowsSql({
+      table: testTable!,
+      page: 1,
+      limit: 100,
+      sorts: [{ table: 'test', column: 'collation', ascending: true, nullsFirst: false }],
+    })
+
+    // Verify the ORDER BY clause properly quotes the collation column
+    expect(sqlWithOrder).toMatchInlineSnapshot(`
+      "with _base_query as (select * from public.test order by test."collation" asc nulls last limit 100 offset 0)
+        select id,case
+              when octet_length("collation"::text) > 10240 
+              then left("collation"::text, 10240) || '...'
+              else "collation"::text
+            end as "collation" from _base_query;"
+    `)
+
+    const queryResultWithOrder = await db.executeQuery(sqlWithOrder)
+    expect(queryResultWithOrder.length).toBe(3)
+    expect(queryResultWithOrder[0].collation).toBe('value1')
+    expect(queryResultWithOrder[1].collation).toBe('value2')
+    expect(queryResultWithOrder[2].collation).toBe('value3')
+
+    // Test with FILTER on the collation column
+    const sqlWithFilter = getTableRowsSql({
+      table: testTable!,
+      page: 1,
+      limit: 100,
+      filters: [{ column: 'collation', operator: '=', value: 'value2' }],
+    })
+
+    // Verify the WHERE clause properly quotes the collation column
+    expect(sqlWithFilter).toMatchInlineSnapshot(`
+      "with _base_query as (select * from public.test where "collation" = 'value2' order by test.id asc nulls last limit 100 offset 0)
+        select id,case
+              when octet_length("collation"::text) > 10240 
+              then left("collation"::text, 10240) || '...'
+              else "collation"::text
+            end as "collation" from _base_query;"
+    `)
+
+    const queryResultWithFilter = await db.executeQuery(sqlWithFilter)
+    expect(queryResultWithFilter.length).toBe(1)
+    expect(queryResultWithFilter[0].collation).toBe('value2')
+  })
 })

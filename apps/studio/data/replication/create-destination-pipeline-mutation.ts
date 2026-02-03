@@ -6,6 +6,14 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
+export type DestinationConfig =
+  | {
+      bigQuery: BigQueryDestinationConfig
+    }
+  | {
+      iceberg: IcebergDestinationConfig
+    }
+
 export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
@@ -23,22 +31,20 @@ export type IcebergDestinationConfig = {
   s3Region: string
 }
 
+export type BatchConfig = {
+  maxFillMs?: number
+  maxSize?: number
+}
+
 export type CreateDestinationPipelineParams = {
   projectRef: string
   destinationName: string
-  destinationConfig:
-    | {
-        bigQuery: BigQueryDestinationConfig
-      }
-    | {
-        iceberg: IcebergDestinationConfig
-      }
+  destinationConfig: DestinationConfig
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch?: {
-      maxFillMs: number
-    }
+    batch?: BatchConfig
+    maxTableSyncWorkers?: number
   }
 }
 
@@ -47,7 +53,7 @@ async function createDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: { publicationName, batch },
+    pipelineConfig: { publicationName, batch, maxTableSyncWorkers },
     sourceId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
@@ -104,7 +110,17 @@ async function createDestinationPipeline(
       destination_config,
       pipeline_config: {
         publication_name: publicationName,
-        ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
+        ...(maxTableSyncWorkers !== undefined
+          ? { max_table_sync_workers: maxTableSyncWorkers }
+          : {}),
+        ...(batch
+          ? {
+              batch: {
+                ...(batch.maxFillMs !== undefined ? { max_fill_ms: batch.maxFillMs } : {}),
+                ...(batch.maxSize !== undefined ? { max_size: batch.maxSize } : {}),
+              },
+            }
+          : {}),
       },
     },
     signal,

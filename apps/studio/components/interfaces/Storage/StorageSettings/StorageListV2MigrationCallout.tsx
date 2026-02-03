@@ -32,39 +32,40 @@ export const StorageListV2MigrationCallout = () => {
 
   return (
     <Admonition
-      type={remainingMonths <= 1 ? 'warning' : 'note'}
+      type="note"
       title="A new version of Storage is available for your project"
-    >
-      <p className="!leading-normal prose max-w-full text-sm !mb-0">
-        Get access to the List-V2 endpoint for improved performance and the ability to enable
-        Analytics buckets to your storage system
-      </p>
-      {remainingMonths <= 1 && (
-        <p className="!leading-normal prose max-w-full text-sm">
-          Your project's Storage will be automatically upgraded by{' '}
-          <TimestampInfo
-            displayAs="utc"
-            utcTimestamp={MIGRATION_DEADLINE}
-            className="text-sm text-foreground"
-            labelFormat="DD MMM YYYY HH:mm (UTC)"
-          />{' '}
-          if the upgrade is not completed by then.
-        </p>
-      )}
-      <div className="flex items-center gap-x-2 mt-3">
-        <StorageListV2MigrationDialog />
-      </div>
-    </Admonition>
+      description={
+        <>
+          <p>
+            Get access to the List-V2 endpoint for improved performance and the ability to enable
+            Analytics buckets to your storage system.
+          </p>
+          {remainingMonths <= 1 && (
+            <p>
+              Your project's Storage will be automatically upgraded by{' '}
+              <TimestampInfo
+                displayAs="utc"
+                utcTimestamp={MIGRATION_DEADLINE}
+                className="text-sm text-inherit font-medium"
+                labelFormat="DD MMM YYYY HH:mm (UTC)"
+              />{' '}
+              if the upgrade is not completed by then.
+            </p>
+          )}
+        </>
+      }
+      actions={<StorageListV2MigrationDialog />}
+    />
   )
 }
 
 export const StorageListV2MigratingCallout = () => {
   return (
-    <Admonition type="note" title="Project's storage is currently upgrading">
-      <p className="!leading-normal prose max-w-full text-sm !mb-0">
-        This notice will be closed once the upgrade has been completed - hang tight!
-      </p>
-    </Admonition>
+    <Admonition
+      type="note"
+      title="Project storage is currently upgrading"
+      description="This notice will be closed once the upgrade has been completed. Hang tight!"
+    />
   )
 }
 

@@ -1,4 +1,12 @@
 import config from './config'
+import {
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_BASELINE_THROUGHPUT,
+  COMPUTE_DISK,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
+} from './compute-disk-limits'
 import extensions from './extensions.json'
 import logConstants from './logConstants'
 import { plans, PricingInformation } from './plans'
@@ -11,6 +19,12 @@ import tweets, { topTweets } from './tweets'
 
 export {
   AWS_REGIONS,
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_BASELINE_THROUGHPUT,
+  COMPUTE_DISK,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
   config,
   extensions,
   FLY_REGIONS,

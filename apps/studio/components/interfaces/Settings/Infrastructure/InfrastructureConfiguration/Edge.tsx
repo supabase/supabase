@@ -36,7 +36,7 @@ export const SmoothstepEdge = ({
 
   const {
     data: lagDuration,
-    isLoading,
+    isPending: isLoading,
     isError,
   } = useReplicationLagQuery(
     {

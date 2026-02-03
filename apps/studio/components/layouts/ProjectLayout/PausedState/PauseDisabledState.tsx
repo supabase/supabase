@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
@@ -121,10 +121,10 @@ export const PauseDisabledState = () => {
       <Admonition
         showIcon={false}
         type="warning"
-        className="rounded-none border-0 px-6"
+        className="rounded-none border-0 px-6 [&>div>div>div]:flex [&>div>div>div]:flex-col [&>div>div>div]:gap-y-3"
         title="Project can no longer be restored through the dashboard"
       >
-        <p className="!leading-normal !mb-3">
+        <p className="!leading-normal">
           This project has been paused for over{' '}
           <span className="text-foreground">
             {pauseStatus?.max_days_till_restore_disabled ?? 90} days
@@ -132,6 +132,17 @@ export const PauseDisabledState = () => {
           and cannot be restored through the dashboard. However, your data remains intact and can be
           downloaded as a backup.
         </p>
+
+        {!!pauseStatus?.last_paused_on && (
+          <p className="text-foreground-lighter text-sm">
+            Project last paused on{' '}
+            <TimestampInfo
+              className="text-sm"
+              labelFormat="DD MMM YYYY"
+              utcTimestamp={pauseStatus.last_paused_on}
+            />
+          </p>
+        )}
 
         <div>
           <p className="!leading-normal !mb-1">Recovery options:</p>

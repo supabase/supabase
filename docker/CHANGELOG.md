@@ -7,13 +7,126 @@ for complete image version history and rollback information.
 
 Check updates for each service to learn more.
 
-**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates. After updating `docker-compose.yml`, pull latest images and recreate containers - use `docker compose down && docker compose pull && docker compose up -d`.
+**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates. After updating `docker-compose.yml`, pull latest images and recreate containers - use `docker compose pull && docker compose down && docker compose up -d`.
 
 ---
 
 ## Unreleased
 
-[...]
+---
+
+## [2026-01-27]
+
+### Studio
+- Updated to `2026.01.27-sha-6aa59ff`
+- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557)
+- Fixed type generator - PR [#40481](https://github.com/supabase/supabase/pull/40481)
+- Fixed minor UI discrepancies - PR [#40579](https://github.com/supabase/supabase/pull/40579), PR [#41936](https://github.com/supabase/supabase/pull/41936), PR [#41970](https://github.com/supabase/supabase/pull/41970), PR [#41971](https://github.com/supabase/supabase/pull/41971), PR [#41972](https://github.com/supabase/supabase/pull/41972), PR [#42015](https://github.com/supabase/supabase/pull/42015)
+
+### Auth
+- Updated to `v2.185.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.185.0)
+- ⚠️ Fixed security related issues
+
+### PostgREST
+- Updated to `v14.3` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.3)
+
+### Realtime
+- Updated to `v2.72.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.72.0)
+- Changed healthchecks logging to off by default (requires `docker-compose.yml` update) - PR [realtime#1677](https://github.com/supabase/realtime/pull/1677), PR [#42156](https://github.com/supabase/supabase/pull/42156)
+- Changed logging configuration and healthcheck frequency to reduce log volume - PR [#42112](https://github.com/supabase/supabase/pull/42112)
+
+### Storage
+- Updated to `v1.33.5` - [Changelog](https://github.com/supabase/storage/releases/tag/v1.33.5)
+
+### imgproxy
+- Updated to `v3.30.1` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v3.30.1)
+
+### Postgres Meta
+- Updated to `v0.95.2` - [Changelog](https://github.com/supabase/postgres-meta/releases/tag/v0.95.2)
+
+### Edge Runtime
+- Updated to `v1.70.0` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.70.0)
+
+### Analytics (Logflare)
+- Updated to `v1.30.3` - [Changelog](https://github.com/Logflare/logflare/releases/tag/v1.30.3)
+
+### Postgres
+- No image update
+- Fixed Postgres logging configuration (requires `volumes/logs/vector.yml` update) - PR [#41800](https://github.com/supabase/supabase/pull/41800)
+
+---
+
+## [2025-12-18]
+
+### Documentation
+- Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901), PR [#41438](https://github.com/supabase/supabase/pull/41438)
+
+### Utils
+- Added `generate-keys.sh` - PR [#41363](https://github.com/supabase/supabase/pull/41363)
+- Added `db-passwd.sh` - PR [#41432](https://github.com/supabase/supabase/pull/41432)
+- Changed `reset.sh` to POSIX and added more checks - PR [#41361](https://github.com/supabase/supabase/pull/41361)
+
+### Studio
+- Updated to `2025.12.17-sha-43f4f7f`
+- ⚠️ Fixed additional issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- Fixed an issue with the Users page not being updated on changes - PR [#41254](https://github.com/supabase/supabase/pull/41254)
+
+### MCP Server
+- Updated to `v0.5.10` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.10)
+
+### Auth
+- Updated to `v2.184.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.184.0)
+
+### Postgres Meta
+- Updated to `v0.95.1` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.95.1)
+
+### Analytics (Logflare)
+- Updated to `v1.27.0` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.27.0)
+- Fixed multiple issues, including a race condition
+
+---
+
+## [2025-12-10]
+
+### Studio
+
+- Updated to `2025.12.09-sha-434634f`
+- ⚠️ Fixed security issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+
+### MCP Server
+
+- Updated to `v0.5.9` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.9)
+- ⚠️ Changed MCP tool `get_anon_key` to `get_publishable_keys`
+
+### PostgREST
+
+- Updated to `v14.1` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.1)
+- ⚠️ **Major upgrade from v13.x to v14.x** - please report any unexpected behavior
+
+### Realtime
+
+- Updated to `v2.68.0` - [Releases](https://github.com/supabase/realtime/releases/tag/v2.68.0)
+
+### Storage
+
+- Updated to `v1.33.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.33.0)
+
+### Edge Runtime
+
+- Updated to `v1.69.28` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.69.28)
+
+### Analytics (Logflare)
+
+- Updated to `v1.26.25` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.26.25)
+
+---
+
+## [2025-12-08]
+
+### Realtime
+- No image update
+- Changed boolean values to strings in Docker Compose for better compatibility with Podman - PR [#40994](https://github.com/supabase/supabase/pull/40994), also PR [realtime#1614](https://github.com/supabase/realtime/pull/1614)
+- Changed healthcheck in Docker Compose for better compatibility with Podman - PR [#41159](https://github.com/supabase/supabase/pull/41159)
 
 ---
 
@@ -40,7 +153,7 @@ Check updates for each service to learn more.
 - Updated to `2025.11.24-sha-d990ae8` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40734)
 - Fixed Queues configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - PR [#40078](https://github.com/supabase/supabase/pull/40078)
 - Fixed parameterized SQL queries in MCP tools - PR [#40499](https://github.com/supabase/supabase/pull/40499)
-- Fixed Studio showing paid options for log drains - [PR #40510](https://github.com/supabase/supabase/pull/40510)
+- Fixed Studio showing paid options for log drains - PR [#40510](https://github.com/supabase/supabase/pull/40510)
 - Fixed AI Assistant authentication - PR [#40654](https://github.com/supabase/supabase/pull/40654)
 
 ### Auth
@@ -48,6 +161,7 @@ Check updates for each service to learn more.
 
 ### Realtime
 - Updated to `v2.65.2` - [Release](https://github.com/supabase/realtime/releases/tag/v2.65.2)
+- Fixed handling of boolean configurations options - PR [realtime#1614](https://github.com/supabase/realtime/pull/1614)
 
 ### Storage
 - Updated to `v1.32.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.32.0)

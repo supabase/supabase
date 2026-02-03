@@ -1,17 +1,7 @@
 import { expect, Page } from '@playwright/test'
 import { waitForApiResponse } from './wait-for-response.js'
 import { toUrl } from './to-url.js'
-
-/**
- * Dismisses any visible toast notifications
- */
-export const dismissToastsIfAny = async (page: Page) => {
-  const closeButtons = page.getByRole('button', { name: 'Close toast' })
-  const count = await closeButtons.count()
-  for (let i = 0; i < count; i++) {
-    await closeButtons.nth(i).click()
-  }
-}
+import { dismissToastsIfAny } from './dismiss-toast.js'
 
 /**
  * Navigates to a the storage home view
@@ -69,7 +59,7 @@ export const createBucket = async (
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should be visible after creation`
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -147,7 +137,7 @@ export const navigateToBucket = async (page: Page, ref: string, bucketName: stri
   await expect(
     page.getByRole('button', { name: 'Edit bucket' }),
     `Should be in bucket ${bucketName}`
-  ).toBeVisible({ timeout: 10_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -171,7 +161,7 @@ export const createFolder = async (page: Page, folderName: string) => {
   await expect(
     page.getByTitle(folderName),
     `Folder ${folderName} should be visible after creation`
-  ).toBeVisible({ timeout: 10_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -217,7 +207,7 @@ export const deleteItem = async (page: Page, itemName: string) => {
   await expect(
     page.getByTitle(itemName),
     `Item ${itemName} should not be visible after deletion`
-  ).not.toBeVisible({ timeout: 10_000 })
+  ).not.toBeVisible()
 }
 
 /**

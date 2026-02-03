@@ -50,7 +50,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const {
     data = { exceptions: [] },
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useProjectLintRulesQuery({ projectRef })

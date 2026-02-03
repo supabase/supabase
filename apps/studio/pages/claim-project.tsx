@@ -6,7 +6,6 @@ import { ProjectClaimBenefits } from 'components/interfaces/Organization/Project
 import { ProjectClaimChooseOrg } from 'components/interfaces/Organization/ProjectClaim/choose-org'
 import { ProjectClaimConfirm } from 'components/interfaces/Organization/ProjectClaim/confirm'
 import { ProjectClaimLayout } from 'components/interfaces/Organization/ProjectClaim/layout'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimQuery } from 'data/organizations/organization-project-claim-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -14,6 +13,7 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {
   const { appTitle } = useCustomContent(['app:title'])
@@ -35,7 +35,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   const {
     data: requester,
-    isLoading: isLoadingRequester,
+    isPending: isLoadingRequester,
     isError: isErrorRequester,
     error: errorRequester,
   } = useApiAuthorizationQuery({ id: auth_id })
@@ -49,7 +49,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     data: projectClaim,
     error: errorProjectClaim,
     isError: isErrorProjectClaim,
-    isLoading: isLoadingProjectClaim,
+    isPending: isLoadingProjectClaim,
     isSuccess: isSuccessProjectClaim,
   } = useOrganizationProjectClaimQuery(
     {

@@ -34,7 +34,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
@@ -49,7 +49,7 @@ export const CronJobPage = () => {
 
   const jobId = Number(childId)
 
-  const { data: job, isLoading } = useCronJobQuery({
+  const { data: job, isPending: isLoading } = useCronJobQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: jobId,

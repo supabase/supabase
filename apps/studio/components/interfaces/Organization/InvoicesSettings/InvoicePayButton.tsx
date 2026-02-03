@@ -22,7 +22,7 @@ const InvoicePayButton = ({ slug, invoiceId }: InvoicePayButtonProps) => {
 
   return (
     <Button onClick={onPayNow} loading={isPending} disabled={isPending}>
-      Pay Now
+      Pay now
     </Button>
   )
 }
