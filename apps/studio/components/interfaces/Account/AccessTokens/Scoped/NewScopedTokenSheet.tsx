@@ -198,11 +198,6 @@ export const NewScopedTokenSheet = ({
       return
     }
 
-    console.log('=== SUBMITTING PAYLOAD ===')
-    console.log('Resource Access Mode:', values.resourceAccess)
-    console.log('Payload:', JSON.stringify(finalPayload, null, 2))
-    console.log('=== END PAYLOAD ===')
-
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
         toast.success('Access token created successfully')
@@ -210,12 +205,6 @@ export const NewScopedTokenSheet = ({
         handleClose()
       },
       onError: (error) => {
-        console.error('=== API ERROR ===')
-        console.error('Error details:', error)
-        console.error('Error message:', error.message)
-        console.error('Request payload:', finalPayload)
-        console.error('=== END API ERROR ===')
-
         if (error.message && error.message.includes("don't have access")) {
           toast.error(
             `Access Error: ${error.message}. Please verify you have access to the selected resources.`
@@ -262,8 +251,11 @@ export const NewScopedTokenSheet = ({
     <Sheet
       open={visible}
       onOpenChange={(open) => {
-        if (!open) handleClose()
-        onOpenChange(open)
+        if (!open) {
+          handleClose()
+        } else {
+          onOpenChange(open)
+        }
       }}
     >
       <SheetContent
