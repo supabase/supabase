@@ -44,6 +44,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
@@ -51,7 +52,7 @@ import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -93,7 +94,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
-  const hasTrackedRlsExposure = useRef(false)
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -390,18 +390,13 @@ const Wizard: NextPageWithLayout = () => {
   }, [instanceSize, watchedInstanceSize, form])
 
   // Track exposure to RLS option experiment (only when explicitly assigned to a variant)
-  useEffect(() => {
-    if (
-      !hasTrackedRlsExposure.current &&
-      currentOrg?.slug &&
-      (rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test')
-    ) {
-      hasTrackedRlsExposure.current = true
-      track('project_creation_rls_option_experiment_exposed', {
-        variant: rlsExperimentVariant,
-      })
-    }
-  }, [currentOrg?.slug, rlsExperimentVariant, track])
+  const shouldTrackRlsExposure =
+    !!currentOrg?.slug && (rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test')
+
+  useTrackExperimentExposure(
+    'project_creation_rls_option',
+    shouldTrackRlsExposure ? rlsExperimentVariant : undefined
+  )
 
   return (
     <Form_Shadcn_ {...form}>
