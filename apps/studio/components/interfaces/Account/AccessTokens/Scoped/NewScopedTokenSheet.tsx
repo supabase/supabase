@@ -32,7 +32,7 @@ import { Permissions } from './Form/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess'
 import {
   mapPermissionToFGA,
-  ExpiresAtOptions,
+  getExpiresAtOptions,
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
 
@@ -81,7 +81,7 @@ export const NewScopedTokenSheet = ({
     resolver: zodResolver(TokenSchema),
     defaultValues: {
       tokenName: '',
-      expiresAt: ExpiresAtOptions['month'].value,
+      expiresAt: getExpiresAtOptions()['month'].value,
       resourceAccess: 'all-orgs',
       selectedOrganizations: [],
       selectedProjects: [],
@@ -219,7 +219,7 @@ export const NewScopedTokenSheet = ({
   const handleClose = () => {
     form.reset({
       tokenName: '',
-      expiresAt: ExpiresAtOptions['month'].value,
+      expiresAt: getExpiresAtOptions()['month'].value,
       resourceAccess: 'all-orgs',
       selectedOrganizations: [],
       selectedProjects: [],

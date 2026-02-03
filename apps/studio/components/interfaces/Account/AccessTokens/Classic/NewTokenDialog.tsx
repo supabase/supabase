@@ -32,7 +32,7 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   CUSTOM_EXPIRY_VALUE,
-  ExpiresAtOptions,
+  getExpiresAtOptions,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../AccessToken.constants'
 
@@ -64,7 +64,7 @@ export const NewTokenDialog = ({
 
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
-    defaultValues: { tokenName: '', expiresAt: ExpiresAtOptions['month'].value },
+    defaultValues: { tokenName: '', expiresAt: getExpiresAtOptions()['month'].value },
     mode: 'onChange',
   })
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
@@ -199,11 +199,13 @@ export const NewTokenDialog = ({
                             <SelectValue_Shadcn_ placeholder="Expires at" />
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
-                            {Object.values(ExpiresAtOptions).map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem_Shadcn_>
-                            ))}
+                            {Object.values(getExpiresAtOptions()).map(
+                              (option: { value: string; label: string }) => (
+                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem_Shadcn_>
+                              )
+                            )}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
                       </FormControl_Shadcn_>

@@ -17,7 +17,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   CUSTOM_EXPIRY_VALUE,
-  ExpiresAtOptions,
+  getExpiresAtOptions,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
 
@@ -94,11 +94,13 @@ export const BasicInfo = ({
                     <SelectValue_Shadcn_ placeholder="Expires at" />
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
-                    {Object.values(ExpiresAtOptions).map((option) => (
-                      <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem_Shadcn_>
-                    ))}
+                    {Object.values(getExpiresAtOptions()).map(
+                      (option: { value: string; label: string }) => (
+                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem_Shadcn_>
+                      )
+                    )}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
               </FormControl_Shadcn_>

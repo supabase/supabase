@@ -1,4 +1,11 @@
-import { Control, UseFormSetValue, UseFormWatch, FieldValues, Path, PathValue } from 'react-hook-form'
+import {
+  Control,
+  UseFormSetValue,
+  UseFormWatch,
+  FieldValues,
+  Path,
+  PathValue,
+} from 'react-hook-form'
 import {
   Button,
   Popover_Shadcn_,
@@ -88,11 +95,12 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   const handleSelectAll = () => {
     const allPermissions: PermissionRow[] = allResources.map((resource) => ({
       resource: resource.resource,
-      action: resource.actions.includes('read-write')
-        ? 'read-write'
-        : resource.actions[0],
+      action: resource.actions.includes('read-write') ? 'read-write' : resource.actions[0],
     }))
-    setValue('permissionRows' as Path<TFormValues>, allPermissions as PathValue<TFormValues, Path<TFormValues>>)
+    setValue(
+      'permissionRows' as Path<TFormValues>,
+      allPermissions as PathValue<TFormValues, Path<TFormValues>>
+    )
     onOpenChange(false)
   }
 
@@ -101,11 +109,12 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
       .filter((resource) => resource.group === groupName)
       .map((resource) => ({
         resource: resource.resource,
-        action: resource.actions.includes('read-write')
-          ? 'read-write'
-          : resource.actions[0],
+        action: resource.actions.includes('read-write') ? 'read-write' : resource.actions[0],
       }))
-    setValue('permissionRows' as Path<TFormValues>, groupPermissions as PathValue<TFormValues, Path<TFormValues>>)
+    setValue(
+      'permissionRows' as Path<TFormValues>,
+      groupPermissions as PathValue<TFormValues, Path<TFormValues>>
+    )
     onOpenChange(false)
   }
 
@@ -117,18 +126,17 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
       ...permissionRows,
       { resource: resource.resource, action: defaultAction },
     ]
-    setValue('permissionRows' as Path<TFormValues>, newRows as PathValue<TFormValues, Path<TFormValues>>)
+    setValue(
+      'permissionRows' as Path<TFormValues>,
+      newRows as PathValue<TFormValues, Path<TFormValues>>
+    )
     onOpenChange(false)
   }
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="default"
-          size="tiny"
-          icon={<Plus className="h-4 w-4" />}
-        >
+        <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
           Add permission
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -209,9 +217,7 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
                     <div className="flex items-center gap-3">
                       <Key size={12} />
                       <div className="flex flex-col text-left">
-                        <span className="font-medium text-foreground">
-                          {resource.title}
-                        </span>
+                        <span className="font-medium text-foreground">{resource.title}</span>
                       </div>
                     </div>
                   </CommandItem_Shadcn_>
@@ -271,7 +277,10 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                 size="tiny"
                 className="p-1"
                 onClick={() => {
-                  setValue('permissionRows' as Path<TFormValues>, [] as PathValue<TFormValues, Path<TFormValues>>)
+                  setValue(
+                    'permissionRows' as Path<TFormValues>,
+                    [] as PathValue<TFormValues, Path<TFormValues>>
+                  )
                 }}
                 icon={<RotateCcw size={16} />}
                 tooltip={{
@@ -312,10 +321,14 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                             const newRows: PermissionRow[] = permissionRows.map((r, i) =>
                               i === index ? { resource: r.resource, action: value } : r
                             )
-                            setValue('permissionRows' as Path<TFormValues>, newRows as PathValue<TFormValues, Path<TFormValues>>, {
-                              shouldValidate: true,
-                              shouldDirty: true,
-                            })
+                            setValue(
+                              'permissionRows' as Path<TFormValues>,
+                              newRows as PathValue<TFormValues, Path<TFormValues>>,
+                              {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              }
+                            )
                           }}
                         >
                           <SelectTrigger_Shadcn_ className="w-[150px] h-7">
@@ -336,7 +349,10 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                         className="p-1"
                         onClick={() => {
                           const newRows = permissionRows.filter((_, i) => i !== index)
-                          setValue('permissionRows' as Path<TFormValues>, newRows as PathValue<TFormValues, Path<TFormValues>>)
+                          setValue(
+                            'permissionRows' as Path<TFormValues>,
+                            newRows as PathValue<TFormValues, Path<TFormValues>>
+                          )
                         }}
                         icon={<X size={16} />}
                       />
